@@ -52,6 +52,18 @@ jobs:
         with:
           python-version: '3.12'
           architecture: ${{ matrix.python_arch }}
+      - name: Install YASM's VC2010 runtime and pin the assembler binary
+        shell: pwsh
+        run: |
+          # URL/checksum from Microsoft's winget manifest for VCRedist.2010.x64.
+          $runtime = Join-Path $env:RUNNER_TEMP "vcredist-2010-x64.exe"
+          Invoke-WebRequest https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x64.exe -OutFile $runtime
+          if ((Get-FileHash $runtime).Hash -ne "F3B7A76D84D23F91957AA18456A14B4E90609E4CE8194C5653384ED38DADA6F3") { throw "Runtime checksum mismatch" }
+          $installation = Start-Process $runtime -ArgumentList '/quiet','/norestart' -Wait -PassThru
+          if ($installation.ExitCode -notin @(0, 3010, 1638)) { throw "VC2010 runtime installation failed: $($installation.ExitCode)" }
+          $assembler = "VSYASM\yasm_1.3.0_win64.exe"
+          Invoke-WebRequest https://www.tortall.net/projects/yasm/releases/yasm-1.3.0-win64.exe -OutFile $assembler
+          if ((Get-FileHash $assembler).Hash -ne "D160B1D97266F3F28A71B4420A0AD2CD088A7977C2DD3B25AF155652D8D8D91F") { throw "YASM checksum mismatch" }
       - name: Install original assembler integration
         shell: cmd
         run: call VSYASM\install_script.bat
