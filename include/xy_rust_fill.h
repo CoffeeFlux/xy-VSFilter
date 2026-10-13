@@ -7,6 +7,9 @@
 #define XY_FILL_CDECL
 #endif
 extern "C" {
+uint32_t XY_FILL_CDECL xy_vsfilter_add_pixel(uint32_t dst, uint8_t alpha, uint32_t color);
+void XY_FILL_CDECL xy_vsfilter_add_masked16(uint8_t*, uint64_t low, uint64_t high, uint32_t color);
+void XY_FILL_CDECL xy_vsfilter_plane_masked16(uint8_t*, uint64_t low, uint64_t high, uint8_t value);
 void XY_FILL_CDECL xy_vsfilter_fill_masked16(uint8_t*, uint64_t low, uint64_t high, uint32_t color);
 void XY_FILL_CDECL xy_vsfilter_fill_packed(uint8_t*, int32_t width, uint8_t alpha, uint32_t color);
 void XY_FILL_CDECL xy_vsfilter_fill_plane(uint8_t*, int32_t width, uint8_t alpha, uint8_t value);

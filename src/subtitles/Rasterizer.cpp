@@ -1523,6 +1523,12 @@ static __forceinline DWORD safe_subtract(DWORD a, DWORD b)
 
 static __forceinline void packed_pix_add_c(BYTE* dst, const BYTE* alpha, int w, DWORD color)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    DWORD* pixels = reinterpret_cast<DWORD*>(dst);
+    for (int pixel = 0; pixel < w; ++pixel) {
+        pixels[pixel] = xy_vsfilter_add_pixel(pixels[pixel], alpha[pixel], color);
+    }
+#else
     DWORD c_r = (color&0x00ff0000);
     DWORD c_g = (color&0x0000ff00);
     DWORD c_b = (color&0x000000ff);
@@ -1547,6 +1553,7 @@ static __forceinline void packed_pix_add_c(BYTE* dst, const BYTE* alpha, int w, 
 
         *dst_w = (d_a<<24) | d_r | d_g | d_b;
     }
+#endif
 }
 
 static __forceinline __m128i packed_pix_add_sse2(const __m128i& dst_argbargbargbargb, 
@@ -1569,6 +1576,20 @@ static __forceinline __m128i packed_pix_add_sse2(const __m128i& dst_argbargbargb
 
 static __forceinline void packed_pix_add_sse2(BYTE* dst, const BYTE* alpha, int w, DWORD color)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    const BYTE* alpha_end0 = alpha + (w & ~15);
+    const BYTE* alpha_end = alpha + w;
+    for (; alpha < alpha_end0; alpha += 16, dst += 64) {
+        uint64_t low, high;
+        memcpy(&low, alpha, 8);
+        memcpy(&high, alpha + 8, 8);
+        xy_vsfilter_add_masked16(dst, low, high, color);
+    }
+    DWORD* pixel = reinterpret_cast<DWORD*>(dst);
+    for (; alpha < alpha_end; ++alpha, ++pixel) {
+        *pixel = xy_vsfilter_add_pixel(*pixel, *alpha, color);
+    }
+#else
     DWORD _r_b =   (color & 0xFF00FF);
     DWORD _f_g = (((color & 0x00FF00)>>8)|0xFF0000);
 
@@ -1628,6 +1649,7 @@ static __forceinline void packed_pix_add_sse2(BYTE* dst, const BYTE* alpha, int 
         *dst_w = (r_b | a_g);
         *dst_w ^= 0xff000000;
     }
+#endif
 }
 
 
@@ -1642,6 +1664,13 @@ void AlphaBlt8bppC(byte* pY,
     const byte Y, 
     int h, int w, int src_stride, int dst_stride)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    for (; h > 0; --h, pAlphaMask += src_stride, pY += dst_stride) {
+        for (int x = 0; x < w; ++x) {
+            xy_vsfilter_fill_plane(pY + x, 1, pAlphaMask[x], Y);
+        }
+    }
+#else
     for( ; h>0; h--, pAlphaMask += src_stride, pY += dst_stride )
     {
         const BYTE* sa = pAlphaMask;
@@ -1653,6 +1682,7 @@ void AlphaBlt8bppC(byte* pY,
             *dy = (*dy * (256 - *sa)+ Y*(*sa+1))>>8;
         }
     }
+#endif
 }
 
 /***
@@ -1663,7 +1693,32 @@ void AlphaBlt8bppSse2(byte* pY,
     const byte* pAlphaMask, 
     const byte Y, 
     int h, int w, int src_stride, int dst_stride)
-{   
+{
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (w <= 16) {
+        AlphaBlt8bppC(pY, pAlphaMask, Y, h, w, src_stride, dst_stride);
+        return;
+    }
+    for (; h > 0; --h, pAlphaMask += src_stride, pY += dst_stride) {
+        const BYTE* sa = pAlphaMask;
+        BYTE* dy = pY;
+        const BYTE* first = reinterpret_cast<BYTE*>((reinterpret_cast<intptr_t>(pY) + 15) & ~15);
+        const BYTE* last = reinterpret_cast<BYTE*>(reinterpret_cast<intptr_t>(pY + w) & ~15);
+        const BYTE* end = pY + w;
+        for (; dy < first; ++sa, ++dy) {
+            xy_vsfilter_fill_plane(dy, 1, *sa, Y);
+        }
+        for (; dy < last; sa += 16, dy += 16) {
+            uint64_t low, high;
+            memcpy(&low, sa, 8);
+            memcpy(&high, sa + 8, 8);
+            xy_vsfilter_plane_masked16(dy, low, high, Y);
+        }
+        for (; dy < end; ++sa, ++dy) {
+            xy_vsfilter_fill_plane(dy, 1, *sa, Y);
+        }
+    }
+#else
     __m128i zero = _mm_setzero_si128();
     __m128i s = _mm_set1_epi16(Y);               //s = c  0  c  0  c  0  c  0  c  0  c  0  c  0  c  0    
 
@@ -1736,6 +1791,7 @@ void AlphaBlt8bppSse2(byte* pY,
     {
         AlphaBlt8bppC(pY, pAlphaMask, Y, h, w, src_stride, dst_stride);
     }
+#endif
 }
 
 typedef 

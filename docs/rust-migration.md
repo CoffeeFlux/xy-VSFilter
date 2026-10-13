@@ -20,6 +20,21 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust additive packed blending and variable-alpha planar blending are
+  prepared behind the existing opt-in switch. Additive colors saturate upward
+  while inverse alpha saturates downward. The bridge retains the SSE alpha
+  snapshots, planar alignment prefixes/tails and row order. New extracted
+  comparisons include all byte combinations, overlaps between masks and output,
+  overlapping rows, negative/zero source and destination pitch and controls
+  proving that grouped reads can differ from scalar reads.
+  Local x64 fatal ASan/UBSan comparisons passed **467,520 Release cases** and
+  **746,720 original-Debug-branch cases**, the latter including **279,200 masked
+  planar comparisons**. The pinned planar helper's Clang Release build differs
+  from its original Debug branch even on a zero-alpha fixture. The harness
+  therefore excludes that helper from Clang Release parity counts and records
+  the Debug build separately; Windows MSVC Release remains the production
+  reference. No failed comparison is counted as passing. Rust tests (36 core,
+  16 FFI) and strict Clippy pass. Windows validation is pending for this increment.
 * Safe Rust constant-alpha packed/planar row blending and variable-alpha packed
   blending, behind the existing opt-in switch in `Rasterizer.cpp`. This preserves
   the original alpha-plus-one weighting, truncation and inverse-alpha channel.

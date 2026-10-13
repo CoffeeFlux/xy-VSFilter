@@ -53,6 +53,43 @@ pub unsafe extern "C" fn xy_vsfilter_fill_masked16(dst: *mut u8, low: u64, high:
     );
 }
 
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_add_pixel(dst: u32, alpha: u8, color: u32) -> u32 {
+    xy_vsfilter_compat::fill::add_pixel(dst, alpha, color)
+}
+
+/// # Safety
+/// dst lends 64 initialized writable exclusive bytes for this call. Alpha was
+/// copied to scalars before the call, including when it overlaps destination.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_add_masked16(dst: *mut u8, low: u64, high: u64, color: u32) {
+    let mut alpha = [0; 16];
+    alpha[..8].copy_from_slice(&low.to_le_bytes());
+    alpha[8..].copy_from_slice(&high.to_le_bytes());
+    // SAFETY: the native group adapter lends exactly 16 initialized pixels.
+    xy_vsfilter_compat::fill::add_block(
+        unsafe { core::slice::from_raw_parts_mut(dst, 64) },
+        alpha,
+        color,
+    );
+}
+
+/// # Safety
+/// dst lends 16 initialized writable exclusive bytes for this call. No source
+/// pointer crosses the boundary; alpha snapshots may come from the destination.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_plane_masked16(dst: *mut u8, low: u64, high: u64, value: u8) {
+    let mut alpha = [0; 16];
+    alpha[..8].copy_from_slice(&low.to_le_bytes());
+    alpha[8..].copy_from_slice(&high.to_le_bytes());
+    // SAFETY: the native group adapter lends exactly 16 initialized bytes.
+    xy_vsfilter_compat::fill::masked_plane_block(
+        unsafe { core::slice::from_raw_parts_mut(dst, 16) },
+        alpha,
+        value,
+    );
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -73,6 +110,26 @@ mod tests {
 #[cfg(test)]
 mod masked_tests {
     use super::*;
+    #[test]
+    fn additive_and_plane_snapshots_end_before_overlapping_calls() {
+        let mut data = [255; 64];
+        let low = u64::from_le_bytes(data[..8].try_into().unwrap());
+        let high = u64::from_le_bytes(data[8..16].try_into().unwrap());
+        // SAFETY: snapshots precede each exclusive, bounded destination loan.
+        unsafe { xy_vsfilter_add_masked16(data.as_mut_ptr(), low, high, 0x12345678) };
+        for pixel in data.chunks_exact(4) {
+            assert_eq!(pixel, [255, 255, 255, 0]);
+        }
+        let low = u64::from_le_bytes(data[..8].try_into().unwrap());
+        let high = u64::from_le_bytes(data[8..16].try_into().unwrap());
+        // SAFETY: the previous borrow ended, and this call borrows only 16 bytes.
+        unsafe { xy_vsfilter_plane_masked16(data.as_mut_ptr().add(4), low, high, 17) };
+        for pixel in data[4..20].chunks_exact(4) {
+            assert_eq!(pixel, [17, 17, 17, 0]);
+        }
+        assert_eq!(data[..4], [255, 255, 255, 0]);
+        assert_eq!(data[20..24], [255, 255, 255, 0]);
+    }
     #[test]
     fn alpha_snapshot_can_come_from_the_destination() {
         let mut data = [255; 64];
