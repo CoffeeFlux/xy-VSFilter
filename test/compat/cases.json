@@ -2880,7 +2880,14 @@
         "2"
       ],
       "stride_padding": 16,
-      "fill_seed": 31
+      "fill_seed": 31,
+      "dialog_actions": [
+        {
+          "title": "Warning",
+          "text_prefix": "Unknown style found: \"\tDefault\", changed to \"Default\"!",
+          "button": "cancel"
+        }
+      ]
     },
     {
       "id": "field-tab-prefixes-memory",
@@ -2898,7 +2905,14 @@
         "2"
       ],
       "stride_padding": 16,
-      "fill_seed": 31
+      "fill_seed": 31,
+      "dialog_actions": [
+        {
+          "title": "Warning",
+          "text_prefix": "Unknown style found: \"\tDefault\", changed to \"Default\"!",
+          "button": "cancel"
+        }
+      ]
     },
     {
       "id": "field-final-field-reuse-file",
@@ -3096,7 +3110,14 @@
         "2"
       ],
       "stride_padding": 16,
-      "fill_seed": 31
+      "fill_seed": 31,
+      "dialog_actions": [
+        {
+          "title": "Warning",
+          "text_prefix": "Unknown style found: \"\u2003Default\", changed to \"Default\"!",
+          "button": "cancel"
+        }
+      ]
     },
     {
       "id": "field-unicode-style-space-memory",
@@ -3114,7 +3135,14 @@
         "2"
       ],
       "stride_padding": 16,
-      "fill_seed": 31
+      "fill_seed": 31,
+      "dialog_actions": [
+        {
+          "title": "Warning",
+          "text_prefix": "Unknown style found: \"\u2003Default\", changed to \"Default\"!",
+          "button": "cancel"
+        }
+      ]
     },
     {
       "id": "string-field-final-field-reuse-file",

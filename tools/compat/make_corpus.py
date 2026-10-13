@@ -195,6 +195,11 @@ def make_cases(files):
             cases.append({"id": path.stem + "-" + mode, "script": path.relative_to(ROOT).as_posix(),
                 "sha256": hashlib.sha256(data).hexdigest(), "open": mode, "width": 1280, "height": 720,
                 "times": timestamps(data), "stride_padding": 16, "fill_seed": 31})
+            warning_styles = {"field-tab-prefixes": "\tDefault", "field-unicode-style-space": "\u2003Default"}
+            if path.stem in warning_styles:
+                cases[-1]["dialog_actions"] = [{"title": "Warning",
+                    "text_prefix": 'Unknown style found: "' + warning_styles[path.stem] + '", changed to "Default"!',
+                    "button": "cancel"}]
     # Same source with additional geometry/stride/background configurations.
     path = DEST / "generated/plain.ass"
     for width, height, padding, bottom_up in ((641, 359, 12, False), (640, 360, 0, True)):

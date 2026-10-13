@@ -19,6 +19,7 @@ import subprocess
 import sys
 
 from pe_exports import exports as pe_exports
+from dialog_capture import DialogCapture, validate_actions
 
 ROOT = Path(__file__).resolve().parents[2]
 BGRX = 0x102
@@ -75,6 +76,7 @@ def load_library(path):
 
 def validate_case(case):
     # Validate harness configuration, NEVER the subtitle contents.
+    validate_actions(case.get("dialog_actions", []))
     if not isinstance(case.get("id"), str) or not case["id"]:
         raise ValueError("each case needs a nonempty id")
     for field in ("width", "height"):
@@ -202,7 +204,12 @@ def worker(dll, case_path, destination):
     destination = Path(destination)
     destination.mkdir(parents=True, exist_ok=True)
     try:
-        result = capture(dll, read_json(case_path), destination)
+        case = read_json(case_path)
+        with DialogCapture(case.get("dialog_actions", []), destination) as dialogs:
+            result = capture(dll, case, destination)
+        result["dialogs"] = dialogs.events
+        if dialogs.error:
+            result.update(status="harness_error", error=dialogs.error)
     except Exception as error:
         result = {"status": "harness_error", "error": f"{type(error).__name__}: {error}"}
     write_json(destination / "result.json", result)
@@ -233,6 +240,8 @@ def run_worker(dll, case_path, destination, timeout):
             result["last_progress"] = read_json(destination / "progress.json")
         except (OSError, ValueError) as error:
             result["progress_error"] = str(error)
+    if (destination / "dialogs.json").exists():
+        result["dialogs"] = read_json(destination / "dialogs.json")
     write_json(destination / "result.json", result)
     return result
 

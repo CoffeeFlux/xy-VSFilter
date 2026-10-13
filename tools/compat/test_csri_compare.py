@@ -16,14 +16,17 @@ class NativeHarnessTests(unittest.TestCase):
         cls.temporary = tempfile.TemporaryDirectory()
         cls.root = Path(cls.temporary.name)
         cls.libraries = {}
-        for variant in ("normal", "DIFFERENT", "CRASH", "HANG", "REJECT", "CORRUPT_GUARD", "INPUT_BYTE"):
+        variants = ["normal", "DIFFERENT", "CRASH", "HANG", "REJECT", "CORRUPT_GUARD", "INPUT_BYTE"]
+        if os.name == "nt":
+            variants += ["DIALOG", "DIALOG_DIFFERENT"]
+        for variant in variants:
             suffix = ".dll" if os.name == "nt" else ".dylib" if sys.platform == "darwin" else ".so"
             path = cls.root / (variant + suffix)
             source = harness.ROOT / "tools/compat/fake_csri.c"
             includes = harness.ROOT / "src/filters/transform/vsfilter"
             if os.name == "nt":
                 command = ["cl", "/nologo", "/LD", "/O2", "/MD", f"/I{includes}",
-                           f"/D{variant}", str(source), f"/Fe:{path}", f"/Fo:{cls.root / (variant + '.obj')}"]
+                           f"/D{variant}", str(source), f"/Fe:{path}", f"/Fo:{cls.root / (variant + '.obj')}", "/link", "user32.lib"]
             else:
                 command = ["cc", "-O2", "-dynamiclib" if sys.platform == "darwin" else "-shared",
                            "-fPIC", "-I", str(includes), f"-D{variant}", str(source), "-o", str(path)]
@@ -72,6 +75,29 @@ class NativeHarnessTests(unittest.TestCase):
     def test_timeout_is_unresolved(self):
         result, _ = self.run_variant("HANG", "hung", timeout=0.5)
         self.assertEqual(result["status"], "timeout")
+
+    @unittest.skipUnless(os.name == "nt", "native Windows modal dialogs")
+    def test_dialog_text_and_response_are_compared(self):
+        self.case["dialog_actions"] = [{"title": "Warning", "text_prefix": "Harness ", "button": "cancel"}]
+        harness.write_json(self.case_path, self.case)
+        left, ld = self.run_variant("DIALOG", "left")
+        right, rd = self.run_variant("DIALOG", "right")
+        self.assertEqual(left["status"], "ok", left)
+        self.assertEqual(left["dialogs"][0]["response"], "cancel")
+        self.assertEqual(harness.compare_captures(left,right,ld,rd), {"kind": "equal"})
+        other, od = self.run_variant("DIALOG_DIFFERENT", "other")
+        self.assertEqual(other["status"], "ok", other)
+        self.assertIn("dialogs", harness.compare_captures(left,other,ld,od)["changed_fields"])
+
+    @unittest.skipUnless(os.name == "nt", "native Windows modal dialogs")
+    def test_unscripted_dialog_times_out_and_missing_dialog_fails(self):
+        result, _ = self.run_variant("DIALOG", "unscripted", timeout=2)
+        self.assertEqual(result["status"], "timeout", result)
+        self.assertIsNone(result["dialogs"][0]["response"])
+        self.case["dialog_actions"] = [{"title": "Warning", "text_prefix": "Harness ", "button": "ok"}]
+        harness.write_json(self.case_path, self.case)
+        result, _ = self.run_variant("normal", "missing")
+        self.assertEqual(result["status"], "harness_error", result)
 
     def test_rejection_is_recorded_as_rejection(self):
         left, ld = self.run_variant("REJECT", "left")
