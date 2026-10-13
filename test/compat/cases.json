@@ -1,6 +1,16 @@
 {
   "schema": 1,
   "description": "Starter differential corpus; not exhaustive compatibility evidence.",
+  "expect_distinct_frames": [
+    [
+      "font-valid-attached-file",
+      "font-valid-control-file"
+    ],
+    [
+      "font-valid-attached-memory",
+      "font-valid-control-memory"
+    ]
+  ],
   "cases": [
     {
       "id": "1-file",
@@ -2792,6 +2802,94 @@
       "id": "utf8-truncated-no-bom-memory",
       "script": "test/compat/generated/utf8-truncated-no-bom.ass",
       "sha256": "5167c6e63f3a60d8040841ffe0a5721f93b64ba0f0b41a2d4cbb9a31662a4bbc",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "font-valid-control-file",
+      "script": "test/compat/generated/font-valid-control.ass",
+      "sha256": "c63eb5a045999e14445c4315f676a48748bd2998621f24167253b404cfc008b6",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "font-valid-control-memory",
+      "script": "test/compat/generated/font-valid-control.ass",
+      "sha256": "c63eb5a045999e14445c4315f676a48748bd2998621f24167253b404cfc008b6",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "font-valid-attached-file",
+      "script": "test/compat/generated/font-valid-attached.ass",
+      "sha256": "0b023318a23845c21eac5bc9318d1c9b776eb9d4b57898f072005bb4aa252409",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "font-valid-attached-memory",
+      "script": "test/compat/generated/font-valid-attached.ass",
+      "sha256": "0b023318a23845c21eac5bc9318d1c9b776eb9d4b57898f072005bb4aa252409",
       "open": "memory",
       "width": 1280,
       "height": 720,

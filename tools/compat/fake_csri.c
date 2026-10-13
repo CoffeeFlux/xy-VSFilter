@@ -10,7 +10,7 @@
 
 static int renderer;
 static struct csri_info info = {"fake", "1", "Harness test double", "test", "test"};
-struct instance { unsigned calls; };
+struct instance { unsigned calls; unsigned char input_byte; };
 
 csri_rend *csri_renderer_default(void) { return &renderer; }
 struct csri_info *csri_renderer_info(csri_rend *r) { (void)r; return &info; }
@@ -27,7 +27,11 @@ csri_inst *csri_open_file(csri_rend *r, const char *path, struct csri_openflag *
 #endif
 }
 csri_inst *csri_open_mem(csri_rend *r, const void *data, size_t size, struct csri_openflag *flags)
-{ (void)data; (void)size; return csri_open_file(r, "", flags); }
+{
+    struct instance *state = (struct instance *)csri_open_file(r, "", flags);
+    if (state && size) state->input_byte = ((const unsigned char *)data)[0];
+    return (csri_inst *)state;
+}
 void csri_close(csri_inst *i) { free(i); }
 int csri_request_fmt(csri_inst *i, const struct csri_fmt *fmt)
 { (void)i; return fmt->pixfmt == CSRI_F_BGR_ ? 0 : -1; }
@@ -41,6 +45,9 @@ void csri_render(csri_inst *i, struct csri_frame *frame, double time)
     for (;;) { }
 #endif
     frame->planes[0][0] = (unsigned char)(++state->calls + (int)(time * 10));
+#ifdef INPUT_BYTE
+    frame->planes[0][1] = state->input_byte;
+#endif
 #ifdef DIFFERENT
     frame->planes[0][1] ^= 1;
 #endif

@@ -58,12 +58,13 @@ unresolved reference outcomes requiring investigation, never matching results.
 * A separate Windows renderer workflow builds all three native DLLs
   from separate pinned-reference and candidate checkouts, compare exports, and
   run the real CSRI corpus. See Actions for the latest result; a build failure or
-  incomplete run is not compatibility evidence. The text-decoder candidate at
-  `8c8beed3` passed on **Windows x86 and x64**: all three DLL export tables match,
-  and each architecture passed 146 CSRI cases / 1,390 frames, including 860 frames
-  that changed destination pixels. [Build and evidence artifacts](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38355723780).
-  This result predates the font and ASS lexer components; those require their
-  own candidate build evidence.
+  incomplete run is not compatibility evidence. Candidate `008c7392`, containing
+  all three components and the CRT-only runtime, passed on **Windows x86 and
+  x64**: all three DLL export tables match and no normal/delay imports were added.
+  Each architecture passed 182 CSRI cases / 1,718 frames, plus 32 deterministic
+  mutation cases / 224 frames. [Build and evidence artifacts](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38360402331).
+  This result predates the valid-font control fixtures added afterward; consult
+  their later run before claiming coverage of successful attachment loading.
 
 The migration is an initial component and validation foundation, not a finished
 safe renderer. The rest of the native parsing, font handling, rendering,
@@ -230,13 +231,18 @@ artifacts, restore their `candidate/artifacts/native/...` tree under this checko
 
 ## CSRI corpus and evidence
 
-`test/compat/cases.json` initially contains 182 cases: both file and memory
-loading for 34 existing ASS samples and 56 generated samples, plus geometry and
+`test/compat/cases.json` initially contains 186 cases: both file and memory
+loading for 34 existing ASS samples and 58 generated samples, plus geometry and
 stride cases. Generated cases include malformed tags, duplicate tags, malformed
 UTF-8, unpaired UTF-16, embedded NUL, CR/LF differences, missing final newlines
 and the original 4096-byte refill boundary. `.gitattributes` prevents checkout
-from changing any test bytes. Font cases include invalid encoded lengths and raw
-UTF-16 units (their decoded bytes are deliberately not valid font binaries).
+from changing any test bytes. Font cases include invalid encoded lengths/raw
+UTF-16 units and a valid, pinned Abel font attachment. The unmodified font and
+its SIL Open Font License are in `test/compat/fonts`; `source.json` records its
+origin and hashes. Attached/attachment-free controls must produce different
+pixels in both builds, establishing that loading the font affects rendering.
+Run those controls on a machine without Abel already installed. A control failure
+is explicit and cannot pass merely because both renderers use the same fallback.
 Run `make_corpus.py` to regenerate, or `--check`
 to verify. Do not rewrite old fixtures to make a test pass.
 

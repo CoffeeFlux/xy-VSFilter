@@ -1,0 +1,11 @@
+{
+  "name": "Abel Regular",
+  "repository": "https://github.com/google/fonts",
+  "commit": "3b99d83d2625944fc0b8bd328d793fa819b92381",
+  "path": "ofl/abel/Abel-Regular.ttf",
+  "sha256": "8809dcad25318225052f88333e208c5aad4adcb7b2c934c135735ec19aa410b4",
+  "license": "OFL-1.1",
+  "license_file": "OFL.txt",
+  "license_sha256": "4f4bc3806a1e55789c6ef75ca5fc628297b05292f74966474dc0d40324abc609",
+  "purpose": "Unmodified font used to exercise successful ASS attachment decoding and GDI installation; not installed system-wide by the harness."
+}

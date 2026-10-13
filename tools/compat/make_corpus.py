@@ -60,6 +60,19 @@ def variants():
         else:
             yield name, data
     plain = SEED.replace(b"COMPAT_TEXT", b"Compatibility")
+    font = (DEST / "fonts/Abel-Regular.ttf").read_bytes()
+    if hashlib.sha256(font).hexdigest() != "8809dcad25318225052f88333e208c5aad4adcb7b2c934c135735ec19aa410b4":
+        raise ValueError("pinned test font has changed")
+    encoded = bytearray()
+    for start in range(0, len(font), 3):
+        block = font[start:start + 3]
+        bits = int.from_bytes(block.ljust(3, b"\0"), "big")
+        encoded.extend(((bits >> shift) & 63) + 33 for shift in (18, 12, 6, 0)[:len(block) + 1])
+    attachment = b"[Fonts]\r\nfontname:Abel-Regular.ttf\r\n" + b"\r\n".join(
+        encoded[start:start + 80] for start in range(0, len(encoded), 80)) + b"\r\n\r\n"
+    font_script = plain.replace(b",Arial,", b",Abel,")
+    yield "font-valid-control", font_script
+    yield "font-valid-attached", font_script.replace(b"[V4+ Styles]", attachment + b"[V4+ Styles]")
     yield "utf16-le", b"\xff\xfe" + plain.decode("ascii").encode("utf-16le")
     yield "utf16-be", b"\xfe\xff" + plain.decode("ascii").encode("utf-16be")
     yield "utf16-unpaired", b"\xff\xfe" + plain.decode("ascii").replace("Compatibility", "before\ud800after").encode("utf-16le", "surrogatepass")
@@ -114,7 +127,9 @@ def make_cases(files):
             "sha256": hashlib.sha256(dict(files)[path]).hexdigest(), "open": "memory",
             "width": width, "height": height, "stride_padding": padding, "bottom_up": bottom_up,
             "fill_seed": 173, "times": ["0", "1", "2", "4", "2"]})
-    return {"schema": 1, "description": "Starter differential corpus; not exhaustive compatibility evidence.", "cases": cases}
+    return {"schema": 1, "description": "Starter differential corpus; not exhaustive compatibility evidence.",
+            "expect_distinct_frames": [["font-valid-attached-" + mode, "font-valid-control-" + mode]
+                                       for mode in ("file", "memory")], "cases": cases}
 
 
 def main():
