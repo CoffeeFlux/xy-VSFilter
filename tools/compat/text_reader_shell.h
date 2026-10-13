@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <cstring>
 #include <vector>
+#include <stdexcept>
+#include "xy_rust_reader.h"
 
 using std::min;
 using std::max;
@@ -22,11 +24,24 @@ public:
     enum { begin, current, end, modeRead = 1, typeBinary = 2, shareDenyNone = 4 };
     std::vector<unsigned char> bytes;
     size_t offset;
-    explicit MemoryFile(const std::vector<unsigned char>& input) : bytes(input), offset(0) {}
+    size_t read_limit, fail_read, read_calls;
+    bool partial_failure;
+    std::vector<size_t> read_requests;
+    std::vector<int> diagnostics;
+    explicit MemoryFile(const std::vector<unsigned char>& input) : bytes(input), offset(0),
+        read_limit(4096), fail_read(0), read_calls(0), partial_failure(false) {}
     bool Open(LPCTSTR, int) { offset = 0; return true; }
     void Close() { offset = 0; }
     size_t Read(void* target, size_t count) {
-        count = min(count, bytes.size() - offset);
+        read_requests.push_back(count);
+        ++read_calls;
+        count = min(min(count, bytes.size() - offset), read_limit);
+        if (read_calls == fail_read) {
+            if (partial_failure && count) {
+                static_cast<unsigned char*>(target)[0] = bytes[offset++];
+            }
+            throw std::runtime_error("injected native read failure");
+        }
         if (count) memcpy(target, &bytes[offset], count);
         offset += count;
         return count;
@@ -40,21 +55,38 @@ public:
     }
 };
 
+struct OriginalTextState {
+    unsigned char m_readbuffer[4096];
+    size_t m_bufferPos, m_bufferCount;
+    std::vector<wchar_t> m_convertedBuffer;
+    OriginalTextState() : m_bufferPos(0), m_bufferCount(0) {}
+    size_t BufferPosition() const { return m_bufferPos; }
+    size_t BufferCount() const { return m_bufferCount; }
+    std::vector<wchar_t> Converted() const { return m_convertedBuffer; }
+};
+struct CandidateTextState {
+    XyRust::TextBuffer m_rustBuffer;
+    size_t BufferPosition() const { return m_rustBuffer.Position(); }
+    size_t BufferCount() const { return m_rustBuffer.Count(); }
+    std::vector<wchar_t> Converted() const {
+        std::vector<wchar_t> result;
+        m_rustBuffer.CopyLine(result);
+        return result;
+    }
+};
+
 // This shell is instantiated twice using a macro name. The original methods
 // use __super, which the generated test header maps to MemoryFile.
-#define TEXT_READER_SHELL(Name) \
-class Name : public MemoryFile { \
+#define TEXT_READER_SHELL(Name, State) \
+class Name : public MemoryFile, public State { \
 public: \
     enum enc { DEFAULT_ENCODING, UTF8, LE16, BE16 }; \
     enum charerror { CHARERR_NEED_MORE=-1, CHARERR_REOPEN=-2 }; \
     enc m_encoding, m_defaultencoding; \
     int m_offset; \
-    unsigned char m_readbuffer[4096]; \
-    size_t m_bufferPos, m_bufferCount; \
-    std::vector<wchar_t> m_convertedBuffer; \
     Name(const std::vector<unsigned char>& input, int encoding) : MemoryFile(input), \
         m_encoding(static_cast<enc>(encoding)), m_defaultencoding(m_encoding), \
-        m_offset(0), m_bufferPos(0), m_bufferCount(0) {} \
+        m_offset(0) {} \
     bool Open(LPCTSTR name); \
     ULONGLONG GetPosition() const; \
     ULONGLONG GetLength() const; \

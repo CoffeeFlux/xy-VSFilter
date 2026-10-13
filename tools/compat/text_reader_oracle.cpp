@@ -3,40 +3,70 @@
 #include <cstdlib>
 #include "original_text_reader.h"
 
-static uint64_t lines = 0, files = 0;
+static uint64_t lines = 0, files = 0, exceptions = 0;
 
-static void compare(const std::vector<unsigned char>& input, int encoding)
+static void check_state(const OriginalTextFile& original, const CandidateTextFile& candidate)
+{
+    if (original.Converted() != candidate.Converted() ||
+        original.GetPosition() != candidate.GetPosition() || original.GetLength() != candidate.GetLength() ||
+        static_cast<int>(original.m_encoding) != static_cast<int>(candidate.m_encoding) ||
+        original.BufferPosition() != candidate.BufferPosition() || original.BufferCount() != candidate.BufferCount() ||
+        original.read_requests != candidate.read_requests || original.diagnostics != candidate.diagnostics ||
+        original.offset != candidate.offset || original.m_offset != candidate.m_offset) {
+        fprintf(stderr, "State mismatch file=%llu comparison=%llu\n",
+            static_cast<unsigned long long>(files), static_cast<unsigned long long>(lines));
+        exit(1);
+    }
+}
+
+static bool read_pair(OriginalTextFile& original, CandidateTextFile& candidate)
+{
+    bool a = false, b = false, threw_a = false, threw_b = false;
+    try { a = original.ReadLine(); } catch (const std::runtime_error&) { threw_a = true; }
+    try { b = candidate.ReadLine(); } catch (const std::runtime_error&) { threw_b = true; }
+    ++lines;
+    if (a != b || threw_a != threw_b) abort();
+    if (threw_a) ++exceptions;
+    check_state(original, candidate);
+    return a;
+}
+
+static void compare(const std::vector<unsigned char>& input, int encoding,
+                    size_t limit = 4096, size_t failure = 0, bool partial = false)
 {
     OriginalTextFile original(input, encoding);
     CandidateTextFile candidate(input, encoding);
     if (original.Open("memory") != candidate.Open("memory")) abort();
     ++files;
+    original.read_limit = candidate.read_limit = limit;
+    original.fail_read = original.read_calls + failure;
+    candidate.fail_read = candidate.read_calls + failure;
+    original.partial_failure = candidate.partial_failure = partial;
     bool eof = false;
     size_t attempts = 0;
     while (!eof) {
         if (++attempts > input.size() + 2) abort();
-        eof = original.ReadLine();
-        const bool actual_eof = candidate.ReadLine();
-        ++lines;
-        if (actual_eof != eof || original.m_convertedBuffer != candidate.m_convertedBuffer ||
-            original.GetPosition() != candidate.GetPosition() || original.GetLength() != candidate.GetLength() ||
-            static_cast<int>(original.m_encoding) != static_cast<int>(candidate.m_encoding) ||
-            original.m_bufferPos != candidate.m_bufferPos || original.m_bufferCount != candidate.m_bufferCount) {
-            fprintf(stderr, "Line mismatch file=%llu line=%zu size=%zu encoding=%d\n",
-                    static_cast<unsigned long long>(files), attempts, input.size(), encoding);
-            exit(1);
-        }
+        eof = read_pair(original, candidate);
     }
+    // Incomplete tails can remain buffered at EOF. The next call must preserve
+    // the same state rather than silently discarding or replacing that tail.
+    for (int retry = 0; retry < 3; ++retry) read_pair(original, candidate);
     // Exercise the original logical seek calculation after decoding/fallback.
     for (int origin = 0; origin < 3; ++origin) {
         for (int offset = -2; offset < 8; ++offset) {
             if (original.Seek(offset, origin) != candidate.Seek(offset, origin)) abort();
-            const bool a = original.ReadLine(), b = candidate.ReadLine();
-            ++lines;
-            if (a != b || original.m_convertedBuffer != candidate.m_convertedBuffer ||
-                original.GetPosition() != candidate.GetPosition()) abort();
+            read_pair(original, candidate);
         }
     }
+    // Reopen on an existing reader leaves an old cursor behind; change encoding
+    // with unread buffered bytes as SetEncoding does, then resume decoding.
+    original.read_limit = candidate.read_limit = 4096;
+    if (original.Open("memory") != candidate.Open("memory")) abort();
+    check_state(original, candidate);
+    read_pair(original, candidate);
+    original.m_encoding = static_cast<OriginalTextFile::enc>((encoding + 1) % 4);
+    candidate.m_encoding = static_cast<CandidateTextFile::enc>((encoding + 1) % 4);
+    read_pair(original, candidate);
 }
 
 int main()
@@ -78,6 +108,23 @@ int main()
             }
         }
     }
-    printf("%llu text-file scenarios and %llu line/seek comparisons passed\n",
-        static_cast<unsigned long long>(files), static_cast<unsigned long long>(lines));
+    for (int encoding = 0; encoding < 4; ++encoding) {
+        for (size_t limit = 1; limit <= 7; ++limit) {
+            for (size_t failure = 0; failure <= 8; ++failure) {
+                for (int partial = 0; partial < 2; ++partial) {
+                    for (size_t probe = 0; probe < sizeof(probes) / sizeof(probes[0]); ++probe) {
+                        std::vector<unsigned char> bytes(9, 'a');
+                        bytes.insert(bytes.end(), probes[probe], probes[probe] + 4);
+                        bytes.push_back('\n'); bytes.push_back(0xf0); bytes.push_back(0x9f);
+                        compare(bytes, encoding, limit, failure, partial != 0);
+                        bytes.insert(bytes.begin(), {0xef, 0xbb, 0xbf});
+                        compare(bytes, encoding, limit, failure, partial != 0);
+                    }
+                }
+            }
+        }
+    }
+    printf("%llu text-file scenarios and %llu line/seek comparisons passed (%llu injected exceptions)\n",
+        static_cast<unsigned long long>(files), static_cast<unsigned long long>(lines),
+        static_cast<unsigned long long>(exceptions));
 }

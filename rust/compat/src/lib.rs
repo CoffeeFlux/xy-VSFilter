@@ -11,3 +11,4 @@ extern crate alloc;
 pub mod ass_tags;
 pub mod font;
 pub mod text;
+pub mod text_reader;

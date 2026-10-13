@@ -80,10 +80,11 @@ public:
 #include "Utf8.h"
 #include "xy_rust_text.h"
 #define __super MemoryFile
-#define XY_LOG_ERROR(message) ((void)0)
+#define XY_LOG_ERROR(message) (diagnostics.push_back(c))
 '''
     for name, content in (("OriginalTextFile", source), ("CandidateTextFile", candidate_source)):
-        reader += f"\nTEXT_READER_SHELL({name})\n#define CTextFile {name}\n"
+        state = "OriginalTextState" if name == "OriginalTextFile" else "CandidateTextState"
+        reader += f"\nTEXT_READER_SHELL({name}, {state})\n#define CTextFile {name}\n"
         if name == "CandidateTextFile":
             reader += "#define XY_VSFILTER_RUST_TEXT\n"
         reader += "\n".join(extract_method(content.decode("utf-8-sig"), signature) for signature in methods)
@@ -184,7 +185,12 @@ public:
     print(lexer_result.stderr, end="", file=sys.stderr)
     compiler = subprocess.run([args.cxx] if os.name == "nt" else [args.cxx, "--version"],
                               capture_output=True, text=True)
-    inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h", ROOT / "include/xy_rust_ass.h"]
+    inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
+              ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
+              ROOT / "src/subtitles/TextFile.h"]
+    inputs += sorted((ROOT / "tools/compat").glob("*oracle.cpp"))
+    inputs += sorted((ROOT / "tools/compat").glob("*shell.h"))
+    inputs += [ROOT / "tools/compat/check_decoder.py"]
     inputs += sorted((ROOT / "rust").rglob("*.rs")) + sorted((ROOT / "rust").rglob("Cargo.toml"))
     report = {"complete": True, "reference": reference, "source_sha256": hashlib.sha256(source).hexdigest(),
         "header_sha256": hashlib.sha256(header).hexdigest(), "target": args.target or "host",

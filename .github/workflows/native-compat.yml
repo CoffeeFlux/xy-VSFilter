@@ -18,6 +18,7 @@ on:
       - 'rust/**'
       - 'include/xy_rust_text.h'
       - 'include/xy_rust_ass.h'
+      - 'include/xy_rust_reader.h'
       - 'src/**'
       - 'tools/compat/**'
       - 'test/compat/**'
