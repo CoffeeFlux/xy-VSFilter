@@ -16,3 +16,4 @@ pub mod font;
 pub mod segments;
 pub mod text;
 pub mod text_reader;
+pub mod timeline_search;

@@ -25,6 +25,7 @@
 #include "xy_rust_text.h"
 #include "xy_rust_fields.h"
 #include "xy_rust_segments.h"
+#include "xy_rust_timeline_search.h"
 #endif
 #include "STS.h"
 #include <atlbase.h>
@@ -2694,6 +2695,20 @@ void CSimpleTextSubtitle::SetForceDefaultStyle( bool value )
 
 const STSSegment* CSimpleTextSubtitle::SearchSubs(REFERENCE_TIME t, double fps, /*[out]*/ int* iSegment, int* nSegments)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    const int count = static_cast<int>(m_segments.GetCount());
+    if (nSegments) *nSegments = count;
+    XyRust::TimelineSearch search(1, t, count);
+    while (search.Pending()) search.Supply(TranslateSegmentEnd(search.Index(), fps));
+    if (iSegment) *iSegment = search.Result();
+    if (search.Found()) return &m_segments[search.Result()];
+    if (count <= 0) {
+        TRACE_SUB("No subtitles at "<<XY_LOG_VAR_2_STR(t));
+    } else {
+        TRACE_SUB("No subtitles at "<<XY_LOG_VAR_2_STR(RT2MS(t)));
+    }
+    return NULL;
+#else
     int segmentsCount = m_segments.GetCount();
     int i = 0, j = segmentsCount - 1;
 
@@ -2736,10 +2751,25 @@ const STSSegment* CSimpleTextSubtitle::SearchSubs(REFERENCE_TIME t, double fps, 
     }
     TRACE_SUB("No subtitles at "<<XY_LOG_VAR_2_STR(RT2MS(t)));
     return(NULL);
+#endif
 }
 
 STSSegment* CSimpleTextSubtitle::SearchSubs2(REFERENCE_TIME t, double fps, /*[out]*/ int* iSegment, int* nSegments)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    const int count = static_cast<int>(m_segments.GetCount());
+    if (iSegment) *iSegment = -1;
+    if (nSegments) *nSegments = count;
+    XyRust::TimelineSearch search(2, t, count);
+    while (search.Pending()) {
+        const int index = search.Index();
+        search.Supply(search.Start() ? TranslateSegmentStart(index, fps) : TranslateSegmentEnd(index, fps));
+    }
+    if (count <= 0 || search.Found()) {
+        if (iSegment) *iSegment = search.Result();
+    }
+    return search.Found() ? &m_segments[search.Result()] : NULL;
+#else
     int segmentsCount = m_segments.GetCount();
     int i = 0, j = segmentsCount - 1;
 
@@ -2780,6 +2810,7 @@ STSSegment* CSimpleTextSubtitle::SearchSubs2(REFERENCE_TIME t, double fps, /*[ou
         return &m_segments[j];
     }
     return(NULL);
+#endif
 }
 
 REFERENCE_TIME CSimpleTextSubtitle::TranslateStart(int i, double fps)

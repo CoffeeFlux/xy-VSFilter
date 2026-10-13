@@ -13,6 +13,7 @@ mod fields;
 mod runtime;
 mod segments;
 mod text_reader;
+mod timeline_search;
 #[cfg(all(feature = "native-runtime", not(windows)))]
 compile_error!("native-runtime uses the Windows C runtime; omit it for portable tests");
 

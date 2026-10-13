@@ -128,6 +128,20 @@ public:
         segments += extract_method(content.decode("utf-8-sig"), "void CSimpleTextSubtitle::CreateSegments()")
         segments += "\n#undef CSimpleTextSubtitle\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_segments.h").write_text(segments, encoding="utf-8")
+    searches = '#include "original_segments.h"\n#include "timeline_search_shell.h"\n'
+    for name, content in (("OriginalTimelineSearch", font_source), ("CandidateTimelineSearch", candidate_font)):
+        searches += f"TIMELINE_SEARCH_SHELL({name})\n#define CSimpleTextSubtitle {name}\n"
+        if name == "CandidateTimelineSearch":
+            searches += "#define XY_VSFILTER_RUST_TEXT\n"
+        for signature in ("int CSimpleTextSubtitle::SearchSub(",
+                          "const STSSegment* CSimpleTextSubtitle::SearchSubs(",
+                          "STSSegment* CSimpleTextSubtitle::SearchSubs2("):
+            searches += extract_method(content.decode("utf-8-sig"), signature) + "\n"
+        for method in ("TranslateStart", "TranslateSegmentStart", "TranslateSegmentEnd"):
+            block = extract_method(content.decode("utf-8-sig"), "REFERENCE_TIME CSimpleTextSubtitle::" + method + "(")
+            searches += block.replace("::" + method + "(", "::" + method + "Impl(", 1) + "\n"
+        searches += "\n#undef CSimpleTextSubtitle\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_timeline_search.h").write_text(searches, encoding="utf-8")
     lexer_source = original("src/subtitles/RTS.cpp", reference["commit"])
     candidate_lexer = (ROOT / "src/subtitles/RTS.cpp").read_bytes()
     lexer = lexer_source.decode("utf-8-sig").split("#include", 1)[0]
@@ -273,6 +287,13 @@ public:
     segments_result = run([str(segments_executable)], capture_output=True, text=True)
     print(segments_result.stdout, end="")
     print(segments_result.stderr, end="", file=sys.stderr)
+    search_executable = destination / ("timeline-search-oracle.exe" if os.name == "nt" else "timeline-search-oracle")
+    search_compile = [arg.replace("decoder_oracle.cpp", "timeline_search_oracle.cpp")
+                      .replace("decoder-oracle", "timeline-search-oracle") for arg in compile_command]
+    run(search_compile)
+    search_result = run([str(search_executable)], capture_output=True, text=True)
+    print(search_result.stdout, end="")
+    print(search_result.stderr, end="", file=sys.stderr)
     compiler = subprocess.run([args.cxx] if os.name == "nt" else [args.cxx, "--version"],
                               capture_output=True, text=True)
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
@@ -281,6 +302,7 @@ public:
               ROOT / "include/xy_rust_drawing_tokens.h",
               ROOT / "include/xy_rust_fields.h",
               ROOT / "include/xy_rust_segments.h",
+              ROOT / "include/xy_rust_timeline_search.h",
               ROOT / "src/subtitles/TextFile.h"]
     inputs += sorted((ROOT / "tools/compat").glob("*oracle.cpp"))
     inputs += sorted((ROOT / "tools/compat").glob("*shell.h"))
@@ -313,7 +335,9 @@ public:
         "fields_result": fields_result.stdout, "fields_stderr": fields_result.stderr,
         "segments_header_sha256": hashlib.sha256(segment_header).hexdigest(),
         "segments_compile_command": segments_compile,
-        "segments_result": segments_result.stdout, "segments_stderr": segments_result.stderr}
+        "segments_result": segments_result.stdout, "segments_stderr": segments_result.stderr,
+        "timeline_search_compile_command": search_compile,
+        "timeline_search_result": search_result.stdout, "timeline_search_stderr": search_result.stderr}
     (destination / "report.json").write_text(json.dumps(report, indent=2) + "\n")
 
 
