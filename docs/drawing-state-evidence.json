@@ -1,0 +1,712 @@
+{
+  "schema": 1,
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "candidate_commit": "30ff444769be3303cd775d049d31ad8b60bc6a60",
+  "native_runs": [
+    {
+      "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38427593488",
+      "build": {
+        "msvc_tools_version": "14.44.35207",
+        "rustc": [
+          "rustc 1.85.0 (4d91de4e4 2025-02-17)",
+          "binary: rustc",
+          "commit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688",
+          "commit-date: 2025-02-17",
+          "host: x86_64-pc-windows-msvc",
+          "release: 1.85.0",
+          "LLVM version: 19.1.7"
+        ],
+        "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+        "mutation_count": 32,
+        "candidate_status": [],
+        "windows_sdk_version": "10.0.26100.0\\",
+        "platform": "Win32",
+        "configuration": "Release",
+        "cargo": [
+          "cargo 1.85.0 (d73d2caf9 2024-12-31)"
+        ],
+        "mutation_seed": 12345,
+        "candidate_commit": "30ff444769be3303cd775d049d31ad8b60bc6a60"
+      },
+      "checks": {
+        "smoke": {
+          "report_sha256": "ae2eb0eae073c5f8e36eca4e480ff5c6c624ba576920b9063584ecb8edca4675",
+          "case_count": 1,
+          "rendered_frames": 10,
+          "changed_frames": 6,
+          "case_verdicts": {
+            "equal": 1
+          },
+          "candidate_statuses": {
+            "ok": 1
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "aff943a1c633c5a1aca2d2f504b0b17c5a7f19b3d3bbffaa215d1889fff2da25"
+        },
+        "csri": {
+          "report_sha256": "784e0e4924588cc83f6f66f9aa20d76e27ac1c37b52aa3ee0b7b0a1b5ca9b37b",
+          "case_count": 240,
+          "rendered_frames": 2282,
+          "changed_frames": 1400,
+          "case_verdicts": {
+            "equal": 240
+          },
+          "candidate_statuses": {
+            "ok": 238,
+            "open_rejected": 2
+          },
+          "distinct_frame_controls": [
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-file",
+                "font-valid-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-memory",
+                "font-valid-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-file",
+                "drawing-state-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-memory",
+                "drawing-state-control-memory"
+              ],
+              "reference-0": true
+            }
+          ],
+          "manifest_sha256": "895a8725d7ff7bf1c480ce336073b508c9daa4a66e02dd807899dd695c1d9ed4"
+        },
+        "mutation-results": {
+          "report_sha256": "d13ced9f7dc29fb47b993e59c515804d0d64b80638b060f33e058517c2b3c925",
+          "case_count": 32,
+          "rendered_frames": 224,
+          "changed_frames": 160,
+          "case_verdicts": {
+            "equal": 32
+          },
+          "candidate_statuses": {
+            "ok": 32
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "692b4dcb930f2117e85805fead2e88d7a3e21f3894da6b3b27f6313f2afeef40"
+        }
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "f9aea567f2b60758f01cfa9886d72d31f80b1798fbd41f69efd00cc572f2681c",
+          "baseline_sha256": "0cbb0ef97b0b27f3dad21ae8f0ff88b1edbb014fa85a742e2b0e02844c38d141",
+          "candidate_sha256": "edcbe5e05aa94714942c74685d523d7c7a5e0ea1e874a1483ddeab3bb9f07cc7"
+        },
+        "XySubFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "d8cd7823d3b6d58469d5cdeb1e7f647d0aefb1c33c1d3d6c3064eb9dd72d5d5c",
+          "baseline_sha256": "0af0e0b03b62daeb140022344181003934251ea3c89f2a2720d6d0b8f49e4370",
+          "candidate_sha256": "d8a66c481119d498911705e89277652952a69e77371f379639ea20992497f2b1"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "e666b77b86ebf78670a821a32ef94257d7671059d660f18001c9641876d1625d",
+          "baseline_sha256": "08434b52388269a4dfa8b2c42f0d334aa6c0f6f82744bab30974d1a532dfaead",
+          "candidate_sha256": "d1f5d0a7afe21e3e4a726648ac62bfc6bb577f9019b56028a30187205717a494"
+        }
+      },
+      "candidate_log_sha256": "f73050fc2127dd1d2e3cc09ba38f1afec30c09dee2404ed69f34f63bc0bb8100"
+    },
+    {
+      "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38427593488",
+      "build": {
+        "mutation_count": 32,
+        "candidate_status": [],
+        "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+        "platform": "x64",
+        "msvc_tools_version": "14.44.35207",
+        "candidate_commit": "30ff444769be3303cd775d049d31ad8b60bc6a60",
+        "rustc": [
+          "rustc 1.85.0 (4d91de4e4 2025-02-17)",
+          "binary: rustc",
+          "commit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688",
+          "commit-date: 2025-02-17",
+          "host: x86_64-pc-windows-msvc",
+          "release: 1.85.0",
+          "LLVM version: 19.1.7"
+        ],
+        "windows_sdk_version": "10.0.26100.0\\",
+        "cargo": [
+          "cargo 1.85.0 (d73d2caf9 2024-12-31)"
+        ],
+        "mutation_seed": 12345,
+        "configuration": "Release"
+      },
+      "checks": {
+        "smoke": {
+          "report_sha256": "76398f8bd7874c72e1820bb04b3200c726c2ac361c5996cfa7e741848d52fbfc",
+          "case_count": 1,
+          "rendered_frames": 10,
+          "changed_frames": 6,
+          "case_verdicts": {
+            "equal": 1
+          },
+          "candidate_statuses": {
+            "ok": 1
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "b3091fe31459e8e5cbde58c9bac57749c0374ed063964c45f600d6693d62c9dd"
+        },
+        "csri": {
+          "report_sha256": "82395a01ad6b1be236ecb5d68c3a44379db16a2a469465eeca9986651d643340",
+          "case_count": 240,
+          "rendered_frames": 2282,
+          "changed_frames": 1400,
+          "case_verdicts": {
+            "equal": 240
+          },
+          "candidate_statuses": {
+            "ok": 238,
+            "open_rejected": 2
+          },
+          "distinct_frame_controls": [
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-file",
+                "font-valid-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-memory",
+                "font-valid-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-file",
+                "drawing-state-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-memory",
+                "drawing-state-control-memory"
+              ],
+              "reference-0": true
+            }
+          ],
+          "manifest_sha256": "895a8725d7ff7bf1c480ce336073b508c9daa4a66e02dd807899dd695c1d9ed4"
+        },
+        "mutation-results": {
+          "report_sha256": "41ffca8c5af5290ea16057221eaf8c7c9a186e9736da17a5e4b399ea20e0a620",
+          "case_count": 32,
+          "rendered_frames": 224,
+          "changed_frames": 160,
+          "case_verdicts": {
+            "equal": 32
+          },
+          "candidate_statuses": {
+            "ok": 32
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "90e89279db719c739c6a1363611c04225b3486f03fee6ad9ceaca20e084ce43c"
+        }
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "84a27c3f09cb0d719d9eda44878694f94595dada4c14ceb22a2e4e614f9ec4ff",
+          "baseline_sha256": "c05c49061436a517c49b0ba5b02df2f82f8e914ed73071fa3d7133bd93d55797",
+          "candidate_sha256": "60555dd28b8bbd45709bb4f5110d2e95053d72466941658473f9226be6b22cff"
+        },
+        "XySubFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "70a7daaf1cbd89db83662b6014439fe736474ef9fe6ad152a955d625901c74b2",
+          "baseline_sha256": "6c1a9eff22ad9c9f0f92aea2e61aea45d95f0593ffc09c8b2fa6839f84ebd341",
+          "candidate_sha256": "971468099c2eb80037c9b79bb6f4fe03e3674b7c97dbc90037b12b8d9158c052"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "d0b61ec5540588c5f5e14949472e20c26b17713b3700e75d9fc088d2bcc176b9",
+          "baseline_sha256": "cabe4d7ded7699d5090cbcca4b36d3af735c1ff6583c2f0be167208836d6c934",
+          "candidate_sha256": "fde8a80cbeec63e1657b518cc248ef4ea1cfc406498aabf5cec8303ce0773d08"
+        }
+      },
+      "candidate_log_sha256": "0e95d54fbccac26a4fb4a0887c6b66c772cef5ddc328dc2690df0acebf847ce5"
+    },
+    {
+      "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38427818278",
+      "build": {
+        "platform": "Win32",
+        "candidate_status": [],
+        "mutation_count": 256,
+        "rustc": [
+          "rustc 1.85.0 (4d91de4e4 2025-02-17)",
+          "binary: rustc",
+          "commit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688",
+          "commit-date: 2025-02-17",
+          "host: x86_64-pc-windows-msvc",
+          "release: 1.85.0",
+          "LLVM version: 19.1.7"
+        ],
+        "candidate_commit": "30ff444769be3303cd775d049d31ad8b60bc6a60",
+        "cargo": [
+          "cargo 1.85.0 (d73d2caf9 2024-12-31)"
+        ],
+        "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+        "msvc_tools_version": "14.44.35207",
+        "mutation_seed": 20261015,
+        "configuration": "Release",
+        "windows_sdk_version": "10.0.26100.0\\"
+      },
+      "checks": {
+        "smoke": {
+          "report_sha256": "32d788ff54a7ecc229611a34b04a36960a4994bfff43a2cf371c918f3ec463a9",
+          "case_count": 1,
+          "rendered_frames": 10,
+          "changed_frames": 6,
+          "case_verdicts": {
+            "equal": 1
+          },
+          "candidate_statuses": {
+            "ok": 1
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "aff943a1c633c5a1aca2d2f504b0b17c5a7f19b3d3bbffaa215d1889fff2da25"
+        },
+        "csri": {
+          "report_sha256": "8540348604dd87dd5ebf262e956081b267010ec61ca13d5742e6009e2c1927a6",
+          "case_count": 240,
+          "rendered_frames": 2282,
+          "changed_frames": 1400,
+          "case_verdicts": {
+            "equal": 240
+          },
+          "candidate_statuses": {
+            "ok": 238,
+            "open_rejected": 2
+          },
+          "distinct_frame_controls": [
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-file",
+                "font-valid-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-memory",
+                "font-valid-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-file",
+                "drawing-state-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-memory",
+                "drawing-state-control-memory"
+              ],
+              "reference-0": true
+            }
+          ],
+          "manifest_sha256": "895a8725d7ff7bf1c480ce336073b508c9daa4a66e02dd807899dd695c1d9ed4"
+        },
+        "mutation-results": {
+          "report_sha256": "8cec1937557d08ab1ffd958edbc5c9c180ae16e2aad7959f73eebfc61b1ca369",
+          "case_count": 256,
+          "rendered_frames": 1792,
+          "changed_frames": 1270,
+          "case_verdicts": {
+            "equal": 256
+          },
+          "candidate_statuses": {
+            "ok": 256
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "b721dd8056a254a9d01dfd0975199280c4f3397d6a6d43da2a8f4cf43c4b9ef1"
+        }
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "f9aea567f2b60758f01cfa9886d72d31f80b1798fbd41f69efd00cc572f2681c",
+          "baseline_sha256": "7ad5503b4fde63e09e47acf46cc8d60887f8ebbd1877305f358aa2dc348160f9",
+          "candidate_sha256": "63417b79d208dcaaed882292a0f079b8ab5ea04938a7d64b10f3be418afdadab"
+        },
+        "XySubFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "d8cd7823d3b6d58469d5cdeb1e7f647d0aefb1c33c1d3d6c3064eb9dd72d5d5c",
+          "baseline_sha256": "f676678f38097acf119b467a6e04919341beaa71db2c03babc5caeb6feb0189f",
+          "candidate_sha256": "bef271b9e088dee86126093ee896a8b4cfff33423f46da62b341c29baa129171"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "e666b77b86ebf78670a821a32ef94257d7671059d660f18001c9641876d1625d",
+          "baseline_sha256": "a1d09a1ef242c0821bb7e79b555618489541015196e9765a86785f642f96960e",
+          "candidate_sha256": "620cef7d332233cf6677f57d7bdf2eaaae0ebd36d12e73e502944a222df345e0"
+        }
+      },
+      "candidate_log_sha256": "f3c01f6caa0fe6c566d4b0fdbed2db886c5c4b2717af75bf69fed6e422aaabe6"
+    },
+    {
+      "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38427818278",
+      "build": {
+        "msvc_tools_version": "14.44.35207",
+        "cargo": [
+          "cargo 1.85.0 (d73d2caf9 2024-12-31)"
+        ],
+        "candidate_commit": "30ff444769be3303cd775d049d31ad8b60bc6a60",
+        "rustc": [
+          "rustc 1.85.0 (4d91de4e4 2025-02-17)",
+          "binary: rustc",
+          "commit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688",
+          "commit-date: 2025-02-17",
+          "host: x86_64-pc-windows-msvc",
+          "release: 1.85.0",
+          "LLVM version: 19.1.7"
+        ],
+        "platform": "x64",
+        "configuration": "Release",
+        "mutation_seed": 20261015,
+        "mutation_count": 256,
+        "windows_sdk_version": "10.0.26100.0\\",
+        "candidate_status": [],
+        "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62"
+      },
+      "checks": {
+        "smoke": {
+          "report_sha256": "9464a92b00da9aca810082b3b44873b6661f875c25cf1139679162de9b188328",
+          "case_count": 1,
+          "rendered_frames": 10,
+          "changed_frames": 6,
+          "case_verdicts": {
+            "equal": 1
+          },
+          "candidate_statuses": {
+            "ok": 1
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "b3091fe31459e8e5cbde58c9bac57749c0374ed063964c45f600d6693d62c9dd"
+        },
+        "csri": {
+          "report_sha256": "f24d0f48208c78479131f4ce05773be8d91d26f83624bb7d545d86bd9b83d7c5",
+          "case_count": 240,
+          "rendered_frames": 2282,
+          "changed_frames": 1400,
+          "case_verdicts": {
+            "equal": 240
+          },
+          "candidate_statuses": {
+            "ok": 238,
+            "open_rejected": 2
+          },
+          "distinct_frame_controls": [
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-file",
+                "font-valid-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-memory",
+                "font-valid-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-file",
+                "drawing-state-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-memory",
+                "drawing-state-control-memory"
+              ],
+              "reference-0": true
+            }
+          ],
+          "manifest_sha256": "895a8725d7ff7bf1c480ce336073b508c9daa4a66e02dd807899dd695c1d9ed4"
+        },
+        "mutation-results": {
+          "report_sha256": "e0d92d07733b7c97210a130ab03199587fbbdbb2b009594bf825229058070d7a",
+          "case_count": 256,
+          "rendered_frames": 1792,
+          "changed_frames": 1270,
+          "case_verdicts": {
+            "equal": 256
+          },
+          "candidate_statuses": {
+            "ok": 256
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "4826c566faf976eb5cbc58b89ef5e76bf65145b842a7b413e76b1c0190521a20"
+        }
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "84a27c3f09cb0d719d9eda44878694f94595dada4c14ceb22a2e4e614f9ec4ff",
+          "baseline_sha256": "9c4a17215e0e1c092249f12958f91f4e90db97817b01b70762960d4486443dcc",
+          "candidate_sha256": "fed8666d60168924a2d9fd577cc9ba0c57eb5b8718e94f5a078231d537815316"
+        },
+        "XySubFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "70a7daaf1cbd89db83662b6014439fe736474ef9fe6ad152a955d625901c74b2",
+          "baseline_sha256": "dab5594e6b186f2f4fa26e489b9c10575b5e69f55270187aa93a119fd1c41dff",
+          "candidate_sha256": "b95e463dcdcf18fda3eede73e8ca214cff66d68b9aa5dd33aa9b64186269d81a"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "d0b61ec5540588c5f5e14949472e20c26b17713b3700e75d9fc088d2bcc176b9",
+          "baseline_sha256": "8f54f2e2603d227c0d01652f10dd3df90029a6d0a0091dfa7a68890fccfc618c",
+          "candidate_sha256": "8e64105d307835652ea67a00828c3ed5c99d2435c1250c92fbc19ef3272c78d3"
+        }
+      },
+      "candidate_log_sha256": "abd5453d5bde29aa03a48be02e107dfd5f38d86771866c1de895d9673691a097"
+    }
+  ],
+  "portable_run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38427593494",
+  "portable": [
+    {
+      "target": "aarch64-apple-darwin",
+      "report_sha256": "34af8f472a3cf7cb80efab3db410a821ed608788ff3a2c52c26f88581d7d19ec",
+      "sanitizers": true,
+      "result": "85992064 exact decoder comparisons passed",
+      "text_reader_result": "37008 text-file scenarios and 1396467 line/seek comparisons passed (6096 injected exceptions)",
+      "font_result": "17371137 exact font-attachment comparisons passed",
+      "lexer_result": "2727819 exact ASS lexer comparisons passed (command, parameter units, order and empty tags).",
+      "drawing_result": "343183 exact drawing-state comparisons passed (types, points, validity, point requests and cache bypass)",
+      "candidate_inputs": {
+        "Cargo.toml": "34479687bc9fac5dcc025e7ad0d7c7392c9a8e6a95071ecfddae626de1713e05",
+        "Cargo.lock": "fd9331e0dc6b0183bf14e2e8c13939684182d7ec437ac1fac54abbaac8da7335",
+        "include/xy_rust_text.h": "4caa9df121c701b2008f1e41c1b476b98a1f9888fcb51a65de2dbc9bbd3e5c40",
+        "include/xy_rust_ass.h": "e25175962a04d23b8be31323e649bdf607814c6f11d201fd4bfb97c958b37bf8",
+        "include/xy_rust_reader.h": "fc98598650099534eeef499838e070b3affbacfd10e3a0f4f8bf1b3b8e40aeec",
+        "include/xy_rust_drawing.h": "0b1480d82c8d0c8ef221b395345593a8cbe5484e6e81b0862c88e1b3e3a5bd5c",
+        "src/subtitles/TextFile.h": "fe26e64597691da26aa13d3ba11c0027d23332dabf9c5f7bcd8ca3ec7d9a30fc",
+        "tools/compat/ass_lexer_oracle.cpp": "386c15ccbe78dcd816192de244c205dc1973bdf6075f71a10d69d99673442112",
+        "tools/compat/decoder_oracle.cpp": "2572d7ab48a8a0535308ff7bc7b8e1263b4d0c7ab96a961dd3baebc2cd45a923",
+        "tools/compat/drawing_oracle.cpp": "bae491f110922898af703fe1cc872cd5b15ef13811e0c337e90ddf4068f3297a",
+        "tools/compat/font_oracle.cpp": "66ae37e835f97bcd9ee645fa36f51a251b81eec525d51da099b804f08b36a63d",
+        "tools/compat/text_reader_oracle.cpp": "0f7491e79047e4547893f735617580ce08be4a23167e786f2035a531b755bcea",
+        "tools/compat/ass_lexer_shell.h": "285326c84f336cd68b1de88a7de2cfad6519f0e7ac8a0a609443d7da5c6eb6dd",
+        "tools/compat/drawing_shell.h": "312671e938ac4013a0b1ca969c8e612a9dd70e6c5e7d4ef32053c4e5f7121620",
+        "tools/compat/font_shell.h": "6d0acc73d6e5125fbac837a83310240c5371802fa4a40ddd93aec2a28bdd6818",
+        "tools/compat/text_reader_shell.h": "4031f09c42f76350b7611d21d1ffd26904fef8505ce718cddb9add791cbfb833",
+        "tools/compat/check_decoder.py": "00cdc351bac33372e5b069ed5a2808a9f81baa359ba3de4bfcf51e6c42c204f5",
+        "rust/compat/src/ass_tags.rs": "6792ac12ebbf50f9356d0aa7abad85b20d505e64f7ea539a66eb42990d05a637",
+        "rust/compat/src/drawing.rs": "505088c4b43cdc1049bdf5b2d71e3cc4d3aa5dfc533d5058e8f78cf32072b394",
+        "rust/compat/src/font.rs": "7fec61f79198f0dc07fbdbed25204b6422239580de5db434abad5c9bcedad1ac",
+        "rust/compat/src/lib.rs": "daaead5e905a818134310aed1a1152c12dfc89051734f146e7fab6d77232d383",
+        "rust/compat/src/text.rs": "b7265e27c081c94349505c5cd3db3af8c3f8a73f2a98074e1c8523a3b88f208f",
+        "rust/compat/src/text_reader.rs": "b78c3bc2eda230849d4b67f8547fbd3eb6303ba930f07c955b2a9b37b215b1da",
+        "rust/ffi/src/ass_tags.rs": "d1764911d033dd4995f1fe02669f11ece10757d4681db1f8d15f35c500382a07",
+        "rust/ffi/src/drawing.rs": "0903c53b826fbb717ff22fce12ad0878aa4b620f043b1f15c2b73002b2ef6bbb",
+        "rust/ffi/src/lib.rs": "d747cd868e5420237bc8ff4226f1fa648b67e221d848e83bb8a6e1702850391c",
+        "rust/ffi/src/runtime.rs": "6b974d023640354a5c65ea3d5d3feea35bd191192c8d859fb1f3be342f613f14",
+        "rust/ffi/src/text_reader.rs": "a4ab775620d77195187dff9279adbbf6432cd29bba437129f019c9b75fcc2091",
+        "rust/compat/Cargo.toml": "9f325d80554a26bfb2f50237382694f8e121072e2ce52a34cebf3fa118cce6d1",
+        "rust/ffi/Cargo.toml": "c557156364b3d955695f235a782d9a124d531cc2157bfea6ab209f33850edea7"
+      }
+    },
+    {
+      "target": "i686-pc-windows-msvc",
+      "report_sha256": "47eaa8aee77b7812ab6da5958bd028d0fa7118e7d04de2228ade0e39fd16758d",
+      "sanitizers": false,
+      "result": "85992064 exact decoder comparisons passed",
+      "text_reader_result": "37008 text-file scenarios and 1396467 line/seek comparisons passed (6096 injected exceptions)",
+      "font_result": "17371137 exact font-attachment comparisons passed",
+      "lexer_result": "2793355 exact ASS lexer comparisons passed (command, parameter units, order and empty tags).",
+      "drawing_result": "343183 exact drawing-state comparisons passed (types, points, validity, point requests and cache bypass)",
+      "candidate_inputs": {
+        "Cargo.toml": "e8ca379ac3641a00a701be9937cec15fb6a7cae4f746adc65de94eb7f63fb1b5",
+        "Cargo.lock": "84e7744a4412202b2ab9675d3464a48ff30b7342b4065a8105d8999e655cf640",
+        "include/xy_rust_text.h": "953a696e7534339a3fe57dbe688e24424c43f49a1f0c4de9e8173a5fc31a824a",
+        "include/xy_rust_ass.h": "9b29ae9492ed3ee0634d80178d4c049d7a2957a4104c375dd87cf5d66f2e7bd7",
+        "include/xy_rust_reader.h": "99a315beb43451f2dfd21fb5242b61a3507f1082dbddd5c87daa78bb6912a087",
+        "include/xy_rust_drawing.h": "0ed8f5a799ef5f96c6c1840e6cf9b3367d08f08b32e291677ec2dcc8b529224f",
+        "src/subtitles/TextFile.h": "fe26e64597691da26aa13d3ba11c0027d23332dabf9c5f7bcd8ca3ec7d9a30fc",
+        "tools/compat/ass_lexer_oracle.cpp": "81d81f6af5ed16957deb7f924d1ad3567282608911575a3b8d23222c5b41411e",
+        "tools/compat/decoder_oracle.cpp": "602b19b4316dfffd97ff52ab4cb1a187193e8ee17b54dcbc7ee5e30475397e31",
+        "tools/compat/drawing_oracle.cpp": "dd8a1552185f51255387085772ccdc593a1020d9a39c7dbc13bd4d6960b565ac",
+        "tools/compat/font_oracle.cpp": "5fe645bb340d242d6b2ff4e172cd0995f0c42847f1cbd5ae92d02fcc1ebb3d13",
+        "tools/compat/text_reader_oracle.cpp": "51511a81da0d1f596299ea82372f23137174e5ed5b34752770c1a2898717efd2",
+        "tools/compat/ass_lexer_shell.h": "f6d33cd6f15021ef235bfe04e0fedba5ad82042297c1fc2137984cc4a96b72cb",
+        "tools/compat/drawing_shell.h": "df7e957afd5abcff14616e86d96abaf832f1d3cc0be4128709ccef3dcbec8c06",
+        "tools/compat/font_shell.h": "8b39a6b88b75fc21a6f476b4286a5f79f1670a098844bc22aa942fe7fa2eed34",
+        "tools/compat/text_reader_shell.h": "0d07a19620575e4f61624aaf50ce7f1d6305bbe3bbabaeb295a1dfda15059f1b",
+        "tools/compat/check_decoder.py": "af3b5246c1d88aa6b2de188323f7b10cd90a90dfe0d9467362345a8aa10c24fd",
+        "rust/compat/src/ass_tags.rs": "e115beb8951b8432f94cb017b28aa00059b25de2ff954bb5cd041de5741001f8",
+        "rust/compat/src/drawing.rs": "23374d269fc8dd9803fbfa67414f65723a89e11fd717b896933ce9547955a5b2",
+        "rust/compat/src/font.rs": "c023cf9077f7776e58ca733bdf942e8d11b199e0ecdbc0b09d6ed6227e5f4de1",
+        "rust/compat/src/lib.rs": "6947935baf9b283300a88dc554d5f30e08ca74a79ba57c61568ce59ec8d4a7b6",
+        "rust/compat/src/text.rs": "3b0703918d4f71c112e53d52d2270b8aedfce9138ee1072b0145c8385590a45c",
+        "rust/compat/src/text_reader.rs": "21abafc3a781cf62ce008b71f92ac7096472b04b8b49f12a3b92854bafa3ed6f",
+        "rust/ffi/src/ass_tags.rs": "45e4a9d78406bd01c819e32d5e5211a30ae2a66d49d1bba28d6a33dc62c40978",
+        "rust/ffi/src/drawing.rs": "e4f23624c88c674bb82da0e543a38f2c783e14a87243e6df376c41875bf07851",
+        "rust/ffi/src/lib.rs": "d83114ee56f4df4de4214e6b0fae612c90681ac7c23ab99cac83e619425d8fdc",
+        "rust/ffi/src/runtime.rs": "a6987685d20b77364781149e4016375e1d1aa44762328796626a95d30661b686",
+        "rust/ffi/src/text_reader.rs": "e1613136127d0311747fa77b7a218cbc7b7844f217b770105ca9b7f4727953f8",
+        "rust/compat/Cargo.toml": "b066124a697288e311ef6225d5171c2f1d4a837199b47b12b70414dc7429a019",
+        "rust/ffi/Cargo.toml": "7a140438ea88afc518d4f6656efe4c2d961a8ad707dee6610f5a6f1a9d4cf81a"
+      }
+    },
+    {
+      "target": "x86_64-pc-windows-msvc",
+      "report_sha256": "45cba22450c7139122eb1661c6a78e61e7200493a2546e42e9464c04b9159bfc",
+      "sanitizers": false,
+      "result": "85992064 exact decoder comparisons passed",
+      "text_reader_result": "37008 text-file scenarios and 1396467 line/seek comparisons passed (6096 injected exceptions)",
+      "font_result": "17371137 exact font-attachment comparisons passed",
+      "lexer_result": "2793355 exact ASS lexer comparisons passed (command, parameter units, order and empty tags).",
+      "drawing_result": "343183 exact drawing-state comparisons passed (types, points, validity, point requests and cache bypass)",
+      "candidate_inputs": {
+        "Cargo.toml": "e8ca379ac3641a00a701be9937cec15fb6a7cae4f746adc65de94eb7f63fb1b5",
+        "Cargo.lock": "84e7744a4412202b2ab9675d3464a48ff30b7342b4065a8105d8999e655cf640",
+        "include/xy_rust_text.h": "953a696e7534339a3fe57dbe688e24424c43f49a1f0c4de9e8173a5fc31a824a",
+        "include/xy_rust_ass.h": "9b29ae9492ed3ee0634d80178d4c049d7a2957a4104c375dd87cf5d66f2e7bd7",
+        "include/xy_rust_reader.h": "99a315beb43451f2dfd21fb5242b61a3507f1082dbddd5c87daa78bb6912a087",
+        "include/xy_rust_drawing.h": "0ed8f5a799ef5f96c6c1840e6cf9b3367d08f08b32e291677ec2dcc8b529224f",
+        "src/subtitles/TextFile.h": "fe26e64597691da26aa13d3ba11c0027d23332dabf9c5f7bcd8ca3ec7d9a30fc",
+        "tools/compat/ass_lexer_oracle.cpp": "81d81f6af5ed16957deb7f924d1ad3567282608911575a3b8d23222c5b41411e",
+        "tools/compat/decoder_oracle.cpp": "602b19b4316dfffd97ff52ab4cb1a187193e8ee17b54dcbc7ee5e30475397e31",
+        "tools/compat/drawing_oracle.cpp": "dd8a1552185f51255387085772ccdc593a1020d9a39c7dbc13bd4d6960b565ac",
+        "tools/compat/font_oracle.cpp": "5fe645bb340d242d6b2ff4e172cd0995f0c42847f1cbd5ae92d02fcc1ebb3d13",
+        "tools/compat/text_reader_oracle.cpp": "51511a81da0d1f596299ea82372f23137174e5ed5b34752770c1a2898717efd2",
+        "tools/compat/ass_lexer_shell.h": "f6d33cd6f15021ef235bfe04e0fedba5ad82042297c1fc2137984cc4a96b72cb",
+        "tools/compat/drawing_shell.h": "df7e957afd5abcff14616e86d96abaf832f1d3cc0be4128709ccef3dcbec8c06",
+        "tools/compat/font_shell.h": "8b39a6b88b75fc21a6f476b4286a5f79f1670a098844bc22aa942fe7fa2eed34",
+        "tools/compat/text_reader_shell.h": "0d07a19620575e4f61624aaf50ce7f1d6305bbe3bbabaeb295a1dfda15059f1b",
+        "tools/compat/check_decoder.py": "af3b5246c1d88aa6b2de188323f7b10cd90a90dfe0d9467362345a8aa10c24fd",
+        "rust/compat/src/ass_tags.rs": "e115beb8951b8432f94cb017b28aa00059b25de2ff954bb5cd041de5741001f8",
+        "rust/compat/src/drawing.rs": "23374d269fc8dd9803fbfa67414f65723a89e11fd717b896933ce9547955a5b2",
+        "rust/compat/src/font.rs": "c023cf9077f7776e58ca733bdf942e8d11b199e0ecdbc0b09d6ed6227e5f4de1",
+        "rust/compat/src/lib.rs": "6947935baf9b283300a88dc554d5f30e08ca74a79ba57c61568ce59ec8d4a7b6",
+        "rust/compat/src/text.rs": "3b0703918d4f71c112e53d52d2270b8aedfce9138ee1072b0145c8385590a45c",
+        "rust/compat/src/text_reader.rs": "21abafc3a781cf62ce008b71f92ac7096472b04b8b49f12a3b92854bafa3ed6f",
+        "rust/ffi/src/ass_tags.rs": "45e4a9d78406bd01c819e32d5e5211a30ae2a66d49d1bba28d6a33dc62c40978",
+        "rust/ffi/src/drawing.rs": "e4f23624c88c674bb82da0e543a38f2c783e14a87243e6df376c41875bf07851",
+        "rust/ffi/src/lib.rs": "d83114ee56f4df4de4214e6b0fae612c90681ac7c23ab99cac83e619425d8fdc",
+        "rust/ffi/src/runtime.rs": "a6987685d20b77364781149e4016375e1d1aa44762328796626a95d30661b686",
+        "rust/ffi/src/text_reader.rs": "e1613136127d0311747fa77b7a218cbc7b7844f217b770105ca9b7f4727953f8",
+        "rust/compat/Cargo.toml": "b066124a697288e311ef6225d5171c2f1d4a837199b47b12b70414dc7429a019",
+        "rust/ffi/Cargo.toml": "7a140438ea88afc518d4f6656efe4c2d961a8ad707dee6610f5a6f1a9d4cf81a"
+      }
+    },
+    {
+      "target": "x86_64-unknown-linux-gnu",
+      "report_sha256": "a14e07735e9059f5861baa57c954aa1b05acbf27836274156829340007663a78",
+      "sanitizers": true,
+      "result": "85992064 exact decoder comparisons passed",
+      "text_reader_result": "37008 text-file scenarios and 1396467 line/seek comparisons passed (6096 injected exceptions)",
+      "font_result": "17371137 exact font-attachment comparisons passed",
+      "lexer_result": "2793355 exact ASS lexer comparisons passed (command, parameter units, order and empty tags).",
+      "drawing_result": "343183 exact drawing-state comparisons passed (types, points, validity, point requests and cache bypass)",
+      "candidate_inputs": {
+        "Cargo.toml": "34479687bc9fac5dcc025e7ad0d7c7392c9a8e6a95071ecfddae626de1713e05",
+        "Cargo.lock": "fd9331e0dc6b0183bf14e2e8c13939684182d7ec437ac1fac54abbaac8da7335",
+        "include/xy_rust_text.h": "4caa9df121c701b2008f1e41c1b476b98a1f9888fcb51a65de2dbc9bbd3e5c40",
+        "include/xy_rust_ass.h": "e25175962a04d23b8be31323e649bdf607814c6f11d201fd4bfb97c958b37bf8",
+        "include/xy_rust_reader.h": "fc98598650099534eeef499838e070b3affbacfd10e3a0f4f8bf1b3b8e40aeec",
+        "include/xy_rust_drawing.h": "0b1480d82c8d0c8ef221b395345593a8cbe5484e6e81b0862c88e1b3e3a5bd5c",
+        "src/subtitles/TextFile.h": "fe26e64597691da26aa13d3ba11c0027d23332dabf9c5f7bcd8ca3ec7d9a30fc",
+        "tools/compat/ass_lexer_oracle.cpp": "386c15ccbe78dcd816192de244c205dc1973bdf6075f71a10d69d99673442112",
+        "tools/compat/decoder_oracle.cpp": "2572d7ab48a8a0535308ff7bc7b8e1263b4d0c7ab96a961dd3baebc2cd45a923",
+        "tools/compat/drawing_oracle.cpp": "bae491f110922898af703fe1cc872cd5b15ef13811e0c337e90ddf4068f3297a",
+        "tools/compat/font_oracle.cpp": "66ae37e835f97bcd9ee645fa36f51a251b81eec525d51da099b804f08b36a63d",
+        "tools/compat/text_reader_oracle.cpp": "0f7491e79047e4547893f735617580ce08be4a23167e786f2035a531b755bcea",
+        "tools/compat/ass_lexer_shell.h": "285326c84f336cd68b1de88a7de2cfad6519f0e7ac8a0a609443d7da5c6eb6dd",
+        "tools/compat/drawing_shell.h": "312671e938ac4013a0b1ca969c8e612a9dd70e6c5e7d4ef32053c4e5f7121620",
+        "tools/compat/font_shell.h": "6d0acc73d6e5125fbac837a83310240c5371802fa4a40ddd93aec2a28bdd6818",
+        "tools/compat/text_reader_shell.h": "4031f09c42f76350b7611d21d1ffd26904fef8505ce718cddb9add791cbfb833",
+        "tools/compat/check_decoder.py": "00cdc351bac33372e5b069ed5a2808a9f81baa359ba3de4bfcf51e6c42c204f5",
+        "rust/compat/src/ass_tags.rs": "6792ac12ebbf50f9356d0aa7abad85b20d505e64f7ea539a66eb42990d05a637",
+        "rust/compat/src/drawing.rs": "505088c4b43cdc1049bdf5b2d71e3cc4d3aa5dfc533d5058e8f78cf32072b394",
+        "rust/compat/src/font.rs": "7fec61f79198f0dc07fbdbed25204b6422239580de5db434abad5c9bcedad1ac",
+        "rust/compat/src/lib.rs": "daaead5e905a818134310aed1a1152c12dfc89051734f146e7fab6d77232d383",
+        "rust/compat/src/text.rs": "b7265e27c081c94349505c5cd3db3af8c3f8a73f2a98074e1c8523a3b88f208f",
+        "rust/compat/src/text_reader.rs": "b78c3bc2eda230849d4b67f8547fbd3eb6303ba930f07c955b2a9b37b215b1da",
+        "rust/ffi/src/ass_tags.rs": "d1764911d033dd4995f1fe02669f11ece10757d4681db1f8d15f35c500382a07",
+        "rust/ffi/src/drawing.rs": "0903c53b826fbb717ff22fce12ad0878aa4b620f043b1f15c2b73002b2ef6bbb",
+        "rust/ffi/src/lib.rs": "d747cd868e5420237bc8ff4226f1fa648b67e221d848e83bb8a6e1702850391c",
+        "rust/ffi/src/runtime.rs": "6b974d023640354a5c65ea3d5d3feea35bd191192c8d859fb1f3be342f613f14",
+        "rust/ffi/src/text_reader.rs": "a4ab775620d77195187dff9279adbbf6432cd29bba437129f019c9b75fcc2091",
+        "rust/compat/Cargo.toml": "9f325d80554a26bfb2f50237382694f8e121072e2ce52a34cebf3fa118cce6d1",
+        "rust/ffi/Cargo.toml": "c557156364b3d955695f235a782d9a124d531cc2157bfea6ab209f33850edea7"
+      }
+    }
+  ],
+  "limits": [
+    "Finite fixtures and mutation campaigns do not establish universal compatibility or memory safety.",
+    "CSRI BGRX rendering and format queries; real Aegisub/player and other host integration remains outstanding.",
+    "Comparisons pair reference and candidate on the same architecture and environment, not across architectures.",
+    "Most native parsing, font handling, rasterization, compositing and third-party code remains C++.",
+    "Drawing numeric parsing, tokenization, scaling and final native path storage remain native.",
+    "Native sanitizers cover extracted C++ tests, not the full renderer or Rust static library.",
+    "Native out-of-memory recovery, Windows 7 and older CPUs remain unverified."
+  ],
+  "miri_job_passed": true
+}

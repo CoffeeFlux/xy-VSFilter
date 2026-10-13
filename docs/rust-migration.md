@@ -37,7 +37,11 @@ unresolved reference outcomes requiring investigation, never matching results.
   component passed local fatal ASan/UBSan, Miri and all four portable CI jobs.
   Candidate `022da3c4` also passed [Windows x86/x64 renderer validation](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38425799685)
   on the expanded 210-case corpus plus 32 mutations, with matching exports and
-  no added imports/changed platform headers for all three DLLs.
+  no added imports/changed platform headers for all three DLLs. A separate
+  [256-case mutation campaign](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38425941551)
+  also passed on both architectures. The corpus produced **1,982 frames** and
+  the larger mutation campaign **1,792 frames** per architecture.
+  [Reader-stage evidence](text-reader-evidence.json) records report and DLL hashes.
 * Safe Rust font-attachment decoding, preserving byte truncation of arbitrary
   UTF-16 units, invalid lengths and short tails. The same opt-in build property
   enables this component. GDI font installation remains native.
@@ -50,8 +54,18 @@ unresolved reference outcomes requiring investigation, never matching results.
   `wcstod`, numeric tracing, scaling and downstream rasterization remain intact.
   The extracted command-state oracle passed **343,183** comparisons of path
   types, coordinates, validity, cache bypass and point-request order, using
-  identical supplied token/point results. Local fatal ASan/UBSan passed; full
-  Windows validation of this new component is pending.
+  identical supplied token/point results. Fatal ASan/UBSan, all four portable
+  CI jobs and Miri passed. Candidate `30ff4447` passed the [Windows x86/x64
+  renderer comparison](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38427593488):
+  **240 cases / 2,282 frames** per architecture, plus 32 mutations / 224 frames.
+  Font and drawing controls passed; all three DLL export tables and declared
+  dependency requirements still match. A separate [256-case / 1,792-frame
+  mutation campaign](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38427818278)
+  also passed on both architectures with another seed.
+  [Combined-stage evidence](drawing-state-evidence.json) records the reports,
+  native build logs, source inputs and all DLL hashes.
+  [Portable tests and Miri](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38427593494)
+  passed for this same candidate.
 * Value-only internal C ABIs for the character and attachment decoders. The ASS lexer
   has a separate, documented ownership boundary: it borrows two bounded input
   arrays during scanning, retains only integer spans, and returns an opaque owner
@@ -59,6 +73,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   allocation is freed by C++, and query results contain only integers.
   The buffered reader has its own noncopyable owner and a documented, bounded
   mutable borrow for native file I/O; its line storage stays private to Rust.
+  The drawing owner accepts commands and coordinates by value and returns path
+  types/coordinates by value; no pointer to its vector escapes Rust.
 * An opt-in `RustTextDecoder=true` native build property. The original public DLL
   interfaces are retained. The default build still uses the original C++ code.
 * A differential test that extracts the exact original method and UTF-8 helper
@@ -77,9 +93,10 @@ unresolved reference outcomes requiring investigation, never matching results.
 * CI for macOS, Linux and Windows x86/x64 leaf/bridge tests. These jobs do not
   build or validate the complete legacy renderer.
 * A separate Windows renderer workflow builds all three native DLLs
-  from separate pinned-reference and candidate checkouts, compare exports, and
+  from separate pinned-reference and candidate checkouts, compares exports, and
   run the real CSRI corpus. See Actions for the latest result; a build failure or
-  incomplete run is not compatibility evidence. Candidate `7c45fc12`, containing
+  incomplete run is not compatibility evidence. The earlier foundation candidate
+  `7c45fc12`, containing
   all three components and the CRT-only runtime, passed on **Windows x86 and
   x64**: all three DLL export tables match and no normal/delay imports were added.
   Each architecture passed **186 CSRI cases / 1,758 frames**, including successful
@@ -296,7 +313,9 @@ and the original 4096-byte refill boundary. `.gitattributes` prevents checkout
 from changing any test bytes. Font cases include invalid encoded lengths/raw
 UTF-16 units and a valid, pinned Abel font attachment. The unmodified font and
 its SIL Open Font License are in `test/compat/fonts`; `source.json` records its
-origin and hashes. Attached/attachment-free controls must produce different
+origin and hashes. A separate drawing/control pair verifies that the valid
+spline fixture contributes visible output in both renderers. Attached/attachment-free
+font controls must produce different
 pixels in both builds, establishing that loading the font affects rendering.
 Run those controls on a machine without Abel already installed. A control failure
 is explicit and cannot pass merely because both renderers use the same fallback.
@@ -400,7 +419,7 @@ the native oracle where needed:
 | Next boundary | Portable work | Native behavior to retain and compare |
 | --- | --- | --- |
 | `STS.cpp` field splitting and numeric parsing | Raw UTF-16 fields, cursor/mutation state, error recovery | `GetStr` leaves the last undelimited field in the buffer; `TryNextStr` trims only ASCII space and mutates a separator to NUL. Keep CRT numeric conversion until overflow, locale, end-pointer and rounding results are captured. |
-| `RTS.cpp` `CPolygon::ParseStr` | Command recovery, path storage, spline state and closure | `SpanIncluding`'s return value is ignored; commands split inside arbitrary text; `s` falls through to `p`; the apparent Bezier truncation uses an incremented counter and must not be "fixed." Keep `wcstod` and float-to-LONG conversion at the native boundary initially. |
+| Remaining `RTS.cpp` drawing parsing | Raw-token preprocessing, numeric consumption and final native path storage; command state is now ported | `SpanIncluding`'s return value is ignored; commands split inside arbitrary text; `s` falls through to `p`; the apparent Bezier truncation uses an incremented counter and must not be "fixed." Keep `wcstod` and float-to-LONG conversion at the native boundary initially. |
 | `CompositionObject.cpp` bitmap run decoding | Bounded byte/bit readers, RLE state, emitted rectangles | Capture truncated-stream behavior, signed-short coordinate wrapping, palette state and transparent runs. Keep native palette conversion/compositing until those stages have separate exact-byte oracles. Uninitialized allocation tails are unresolved behavior, not a portable specification. |
 | `xy_filter.cpp` and raster/compositing kernels | Safe slice ownership and scalar arithmetic implementations | Capture each active SIMD path's operation order, padding, overlap and rounding. Scalar C++ output alone does not establish equality with the SIMD implementation used by a DLL. |
 
