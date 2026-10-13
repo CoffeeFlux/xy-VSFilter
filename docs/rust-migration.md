@@ -20,6 +20,23 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust DVB 2-, 4- and 8-bit pixel-code-string decoding. Rust requests the
+  original bit/byte reads and returns runs; native code retains coordinate
+  references, per-mode width checks, palette lookup, drawing, `UnionRect` and
+  final `BitByteAlign`. The 4-bit path keeps its disabled width check; the other
+  two still check even zero-count/quit runs. Explicit zero-length 8-bit runs
+  still consume their palette and continue. Native coordinate updates remain
+  after drawing and dirty-rectangle updates, including aliased x/y references.
+  The oracle extracts all three actual reference/candidate methods and uses
+  the pinned native bit reader. Windows uses the real `UnionRect`; other
+  platforms use a documented stand-in. It observes reader state, requests,
+  coordinates, dirty rectangles, palette changes and injected exceptions,
+  including reused readers with peeked or partially consumed bytes. As with
+  HDMV, packed and planar pixel cases use the original SSE fill methods on x86.
+  Local macOS arm64 validation passed **414,004 comparisons / 7,905,374
+  native observations**, including **152,467 injected boundary exceptions**,
+  under fatal ASan/UBSan. Windows and native pixel validation are pending.
+  The DVB field/packet parser and its buffer ownership remain native.
 * Safe Rust HDMV run-decoding state for `CompositionObject::RenderHdmv`.
   An opaque owner requests the original EOF/byte reads and rectangle draws in
   order. Transparent runs, implicit palette zero, zero-length line advances,
@@ -27,7 +44,7 @@ unresolved reference outcomes requiring investigation, never matching results.
   are retained. Palette lookup occurs at each native draw, without caching a
   copied palette. No native callback or exception unwinds through a Rust frame.
   RLE backing storage, `CGolombBuffer`, palette conversion, rasterization and
-  DVB decoding remain native. This is a decoder-state port, not a bitmap buffer
+  DVB field/packet parsing remain native; the pixel-code strings are covered above. This is a decoder-state port, not a bitmap buffer
   ownership or packet-parser port.
   The extracted original/candidate methods passed **483,497 comparisons /
   8,317,084 EOF/byte/draw observations** on macOS arm64 with fatal ASan/UBSan,
@@ -37,7 +54,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   exceptions, 16,100 exact pixel comparisons and 600 visibly drawing fixtures**.
   Extreme/malformed coordinate cases compare draw requests without calling the
   pixel fillers; pixel cases use bounded surfaces and compare padding/guards too.
-  Windows x86/x64, Miri and full DLL validation are pending. The existing CSRI
+  Candidate `4963c9d0` passed [all four CI platforms and Miri](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38470714683).
+  Full DLL validation of the combined bitmap increment is pending. The existing CSRI
   corpus remains a text-rendering regression check; it does not exercise HDMV
   stream parsing or host-driven bitmap playback. The new files retain the
   reference component's GPL-3.0-or-later terms; workspace package metadata now
@@ -599,7 +617,7 @@ python tools/compat/csri_compare.py --reference C:\baseline\VSFilter.dll --candi
 | VirtualDub | `plugins.cpp`, bundled SDK headers | Export calling conventions, filter negotiation, scripting, RGB orientation, lifecycle |
 | Text formats | `STS.cpp`, `TextFile.cpp`, `RealTextParser.cpp`, `USFSubtitles.cpp`, `libssf` | SSA/ASS, SubRip variants, SubViewer, MicroDVD, SAMI, WebVTT, VPlayer, XombieSub, USF, MPL2, RealText and SSF parsing/recovery |
 | Timeline and event ordering | `STS.cpp`, `STS.h` | Segment construction, incremental edits and lookup have differential tests; native entry preparation/storage/sorting, frame/time conversion and host-driven mutation/lifecycle sequences still need migration and broader integration coverage |
-| Bitmap subtitles | `VobSub*`, `HdmvSub*`, `DVBSub*`, `CompositionObject*`, `CCDecoder*` | HDMV run state has an extracted oracle; RLE buffer ownership, packet parsing, DVD/VobSub, PGS/SUP host playback, DVB, closed captions and external file behavior remain |
+| Bitmap subtitles | `VobSub*`, `HdmvSub*`, `DVBSub*`, `CompositionObject*`, `CCDecoder*` | HDMV and DVB run states have extracted oracles; RLE buffer ownership, field/packet parsing, DVD/VobSub, PGS/SUP and DVB host playback, closed captions and external file behavior remain |
 | Layout/rendering | `RTS.cpp`, `Rasterizer.cpp`, caches, overlay/clip code | Every tag's recovery and interaction, drawings, clipping, transforms, karaoke, blur/border/shadow, GDI/font metrics and fallback |
 | Compositing/color | `subpic`, SIMD/assembly, conversion tables | All RGB/YUV formats, high bit depths, interlace/subsampling, pitch/orientation, alpha and rounding |
 | Supporting behavior | `dsutil`, `decss`, vendored libraries, settings | Encodings, code pages, font attachments, file/network access, archive inputs, persistence and remaining unsafe dependencies |
