@@ -41,7 +41,9 @@ public:
         const size_t count=static_cast<size_t>(Field(0,6));
         for (size_t edit=0; edit<count; ++edit) {
             const size_t at=static_cast<size_t>(Field(edit,1));
-            switch (Field(edit,0)) {
+            const uint64_t kind=Field(edit,0);
+            if (kind == 2 ? at > segments.GetCount() : at >= segments.GetCount()) abort();
+            switch (kind) {
             case 0: {
                 const int64_t start=Signed(Field(edit,2));
                 NativeSegment segment(segments[at].start,start);
@@ -65,7 +67,12 @@ public:
                 break;
             }
             case 3: segments[at].subs.Add(Entry(Field(edit,2))); break;
-            case 4: segments[at].subs.InsertAt(static_cast<size_t>(Field(edit,3)),Entry(Field(edit,2))); break;
+            case 4: {
+                const size_t position=static_cast<size_t>(Field(edit,3));
+                if (position > segments[at].subs.GetCount()) abort();
+                segments[at].subs.InsertAt(position,Entry(Field(edit,2)));
+                break;
+            }
             default: abort();
             }
         }

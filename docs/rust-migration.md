@@ -34,8 +34,11 @@ unresolved reference outcomes requiring investigation, never matching results.
   frames alone, establishes intermediate insertion-state compatibility.
   The candidate explicitly handles WebVTT end-of-list insertion. This case is
   checked against candidate invariants and excluded from differential counts
-  because its reference outcome is unresolved. Windows x86/x64, four-platform
-  and Miri validation are pending.
+  because its reference outcome is unresolved. Candidate `e2e5560d` passed
+  [all four platforms and Miri](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38465704167)
+  with identical counts. The final adapter adds index checks before applying
+  native edits; local comparisons still pass. Final Windows DLL and portable
+  validation for that revision are pending.
 * Safe Rust `CSimpleTextSubtitle::CreateSegments`:
   breakpoint sorting, interval construction, temporary segment/entry storage,
   empty-range removal and original entry order. Even inactive zero-duration and
@@ -52,8 +55,9 @@ unresolved reference outcomes requiring investigation, never matching results.
   **306 cases / 3,274 frames** per architecture, plus 32 mutations / 224 frames.
   All three DLL export tables and declared dependency requirements match.
   [Segment-builder evidence](segment-builder-evidence.json) records the reports,
-  source inputs, DLL hashes and visible timeline-fixture output. Incremental
-  `Add`, sorting of native entries and time conversion remain native.
+  source inputs, DLL hashes and visible timeline-fixture output. The incremental
+  `Add` edit port is described above; sorting of native entries and time
+  conversion remain native.
 * The three timeline lookup algorithms (`SearchSub`, `SearchSubs`, `SearchSubs2`)
   now have safe Rust state machines. The native adapter performs each requested
   timestamp translation in the original order, so CRT/frame-rate rounding stays
@@ -409,13 +413,17 @@ artifacts, restore their `candidate/artifacts/native/...` tree under this checko
 
 ## CSRI corpus and evidence
 
-`test/compat/cases.json` contains 306 cases: both file and memory
-loading for 34 existing ASS samples and 118 generated samples, plus geometry and
+`test/compat/cases.json` contains 322 cases: both file and memory
+loading for 34 existing ASS samples and 126 generated samples, plus geometry and
 stride cases. Generated cases include malformed tags, duplicate tags, malformed
 UTF-8, unpaired UTF-16, embedded NUL, CR/LF differences, missing final newlines
 and the original 4096-byte refill boundary. Timeline fixtures cover overlapping,
 duplicate, zero-duration and reversed events, layer ordering, gaps, equal starts
 and ends, and repeated forward/backward seeks at one-tick boundaries.
+The eight SubRip fixtures exercise incremental insertion with overlaps,
+out-of-order cues, gap filling, nesting, touching intervals, duplicates, empty
+text and zero/reversed durations, including a UTF-16 input. The direct insertion
+oracle separately compares intermediate state before file opening rebuilds it.
 `.gitattributes` prevents checkout
 from changing any test bytes. Font cases include invalid encoded lengths/raw
 UTF-16 units and a valid, pinned Abel font attachment. The unmodified font and
@@ -544,7 +552,7 @@ python tools/compat/csri_compare.py --reference C:\baseline\VSFilter.dll --candi
 | AviSynth | `plugins.cpp`, `vfr.cpp` | Exact `VobSub`, `TextSub`, `TextSubSwapUV`, `MaskSub` signatures/defaults, frame properties, timing, pixel formats, MT behavior |
 | VirtualDub | `plugins.cpp`, bundled SDK headers | Export calling conventions, filter negotiation, scripting, RGB orientation, lifecycle |
 | Text formats | `STS.cpp`, `TextFile.cpp`, `RealTextParser.cpp`, `USFSubtitles.cpp`, `libssf` | SSA/ASS, SubRip variants, SubViewer, MicroDVD, SAMI, WebVTT, VPlayer, XombieSub, USF, MPL2, RealText and SSF parsing/recovery |
-| Timeline and event ordering | `STS.cpp`, `STS.h` | Segment construction and lookup have differential tests; incremental `Add`, native entry sorting, frame/time conversion and host-driven mutation/lifecycle sequences still need migration and broader integration coverage |
+| Timeline and event ordering | `STS.cpp`, `STS.h` | Segment construction, incremental edits and lookup have differential tests; native entry preparation/storage/sorting, frame/time conversion and host-driven mutation/lifecycle sequences still need migration and broader integration coverage |
 | Bitmap subtitles | `VobSub*`, `HdmvSub*`, `DVBSub*`, `CompositionObject*`, `CCDecoder*` | DVD/VobSub, PGS/SUP, DVB, closed captions, embedded stream and external file behavior |
 | Layout/rendering | `RTS.cpp`, `Rasterizer.cpp`, caches, overlay/clip code | Every tag's recovery and interaction, drawings, clipping, transforms, karaoke, blur/border/shadow, GDI/font metrics and fallback |
 | Compositing/color | `subpic`, SIMD/assembly, conversion tables | All RGB/YUV formats, high bit depths, interlace/subsampling, pitch/orientation, alpha and rounding |
