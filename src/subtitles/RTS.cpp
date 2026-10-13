@@ -23,6 +23,9 @@
 #include <math.h>
 #include <time.h>
 #include "RTS.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "xy_rust_ass.h"
+#endif
 #include "draw_item.h"
 #include "cache_manager.h"
 #include "subpixel_position_controler.h"
@@ -2048,12 +2051,27 @@ bool CRenderedTextSubtitle::ParseSSATag( AssTagList *assTags, const CStringW& st
 {
     if (!assTags) return(false);
     int nTags = 0, nUnrecognizedTags = 0;
+#ifdef XY_VSFILTER_RUST_TEXT
+    const XyRust::AssTokens tokens(str.GetString(), str.GetLength());
+    for (uint32_t tagIndex = 0; tagIndex < tokens.size(); ++tagIndex)
+#else
     for(int i = 0, j; (j = str.Find(L'\\', i)) >= 0; i = j)
+#endif
     {
         POSITION pos   = assTags->AddTail();
         AssTag& assTag = assTags->GetAt(pos);
         assTag.cmdType = CMD_COUNT;
 
+#ifdef XY_VSFILTER_RUST_TEXT
+        const XyRust::AssTokens::Span command = tokens.span(tagIndex, 1);
+        const CStringW cmd(str.GetString() + command.start, command.length);
+        if (cmd.IsEmpty()) continue;
+        CAtlArray<CStringW>& params = assTag.strParams;
+        for (uint32_t p = 0; p < tokens.parameters(tagIndex); ++p) {
+            const XyRust::AssTokens::Span parameter = tokens.span(tagIndex, 3, p);
+            params.Add(CStringW(str.GetString() + parameter.start, parameter.length));
+        }
+#else
         j++;
         CStringW::PCXSTR str_start = str.GetString() + j;
         CStringW::PCXSTR pc = str_start;
@@ -2128,6 +2146,7 @@ bool CRenderedTextSubtitle::ParseSSATag( AssTagList *assTags, const CStringW& st
             }
         }
 
+#endif
         AssCmdType cmd_type = CMD_COUNT;
         int cmd_length = min(MAX_CMD_LENGTH, cmd.GetLength());
         for( ;cmd_length>=MIN_CMD_LENGTH;cmd_length-- )

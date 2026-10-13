@@ -8,6 +8,7 @@ on:
       - '.github/workflows/native-compat.yml'
       - 'rust/**'
       - 'include/xy_rust_text.h'
+      - 'include/xy_rust_ass.h'
       - 'src/**'
       - 'tools/compat/**'
       - 'test/compat/**'

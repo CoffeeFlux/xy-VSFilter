@@ -1755,6 +1755,182 @@
       "fill_seed": 31
     },
     {
+      "id": "lexer-empty-commands-file",
+      "script": "test/compat/generated/lexer-empty-commands.ass",
+      "sha256": "b43b649547d4a960ab4d57bc564d913b3e3932d6dbfe2517c4d503b225f64605",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "lexer-empty-commands-memory",
+      "script": "test/compat/generated/lexer-empty-commands.ass",
+      "sha256": "b43b649547d4a960ab4d57bc564d913b3e3932d6dbfe2517c4d503b225f64605",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "lexer-nested-parentheses-file",
+      "script": "test/compat/generated/lexer-nested-parentheses.ass",
+      "sha256": "65157b56a7673ab6b926012ec66dbce01e2469eebbfac5bdabf9c03f74649ebb",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "lexer-nested-parentheses-memory",
+      "script": "test/compat/generated/lexer-nested-parentheses.ass",
+      "sha256": "65157b56a7673ab6b926012ec66dbce01e2469eebbfac5bdabf9c03f74649ebb",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "lexer-whitespace-parameters-file",
+      "script": "test/compat/generated/lexer-whitespace-parameters.ass",
+      "sha256": "61ec9a4fe9e10b590bc6a8973b9adc3ed3864b95f4d832ff9c8f5c83e2cf167d",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "lexer-whitespace-parameters-memory",
+      "script": "test/compat/generated/lexer-whitespace-parameters.ass",
+      "sha256": "61ec9a4fe9e10b590bc6a8973b9adc3ed3864b95f4d832ff9c8f5c83e2cf167d",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "lexer-command-prefixes-file",
+      "script": "test/compat/generated/lexer-command-prefixes.ass",
+      "sha256": "53d2c1ceba9f42008c6bd3d912f696c130ecba07a3558b726957abe6ab80d821",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "lexer-command-prefixes-memory",
+      "script": "test/compat/generated/lexer-command-prefixes.ass",
+      "sha256": "53d2c1ceba9f42008c6bd3d912f696c130ecba07a3558b726957abe6ab80d821",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
       "id": "numeric-junk-file",
       "script": "test/compat/generated/numeric-junk.ass",
       "sha256": "1bd734114c77a9e2ab4a62eccfbb126ddee4528422a4f85cc17a85df737d0d0d",
@@ -2728,6 +2904,114 @@
       "id": "utf16-unpaired-memory",
       "script": "test/compat/generated/utf16-unpaired.ass",
       "sha256": "5af9780569c74c145470934dba9b27f72f43225fc3789b4d11472e505905ee84",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "lexer-unicode-whitespace-file",
+      "script": "test/compat/generated/lexer-unicode-whitespace.ass",
+      "sha256": "4cd98dab0bfc1dfaf8bb8205bdd4b10cd7d3de3bf14a33521f70323ee89e0418",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "lexer-unicode-whitespace-memory",
+      "script": "test/compat/generated/lexer-unicode-whitespace.ass",
+      "sha256": "4cd98dab0bfc1dfaf8bb8205bdd4b10cd7d3de3bf14a33521f70323ee89e0418",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "lexer-raw-units-file",
+      "script": "test/compat/generated/lexer-raw-units.ass",
+      "sha256": "39a51de9002ac2cdc2ce3bfa6b846f9c07d476b3e1db25e978f880b1653c10fa",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "lexer-raw-units-memory",
+      "script": "test/compat/generated/lexer-raw-units.ass",
+      "sha256": "39a51de9002ac2cdc2ce3bfa6b846f9c07d476b3e1db25e978f880b1653c10fa",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "lexer-nul-command-file",
+      "script": "test/compat/generated/lexer-nul-command.ass",
+      "sha256": "f3ee29c5a8fa5819a9a9f32d13f94b1948730c33a4573af4aa588d9e77fb0272",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "lexer-nul-command-memory",
+      "script": "test/compat/generated/lexer-nul-command.ass",
+      "sha256": "f3ee29c5a8fa5819a9a9f32d13f94b1948730c33a4573af4aa588d9e77fb0272",
       "open": "memory",
       "width": 1280,
       "height": 720,

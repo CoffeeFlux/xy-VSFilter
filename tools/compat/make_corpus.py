@@ -34,6 +34,10 @@ def variants():
         "nested-tags": br"{\bord1{\bord8}\bord2}hello}",
         "unknown-tags": br"{\notatag123\bord2\an99}hello",
         "duplicate-tags": br"{\bord1\bord8\bord0\alpha&HFF&\alpha&H00&}hello",
+        "lexer-empty-commands": br"{\\\ (\b2)\pos(320,,180,)\bord(4)}hello",
+        "lexer-nested-parentheses": br"{\t(0,900,\t(100,300,\bord4)\shad2)\pos(320,(180))}hello",
+        "lexer-whitespace-parameters": b"{\\  bord 2 \t\\t( , 0 , 900 , \\blur3,4 )\\pos( 320 ,\t180 )}hello",
+        "lexer-command-prefixes": br"{\borders4\fscxy50\K20\kf10\alpha&&HH00&&\unknown(1,2)}hello",
         "numeric-junk": br"{\fs12junk\fscx+00100\bord-0\blur.5}hello",
         "color-junk": br"{\1c&H12zz&\alpha&H123456789&}hello",
         "reversed-transform": br"{\t(900,100,\frz90)\move(10,10,500,100,900,100)}hello",
@@ -59,6 +63,12 @@ def variants():
     yield "utf16-le", b"\xff\xfe" + plain.decode("ascii").encode("utf-16le")
     yield "utf16-be", b"\xfe\xff" + plain.decode("ascii").encode("utf-16be")
     yield "utf16-unpaired", b"\xff\xfe" + plain.decode("ascii").replace("Compatibility", "before\ud800after").encode("utf-16le", "surrogatepass")
+    for name, text in {
+        "lexer-unicode-whitespace": "{\\\u2003bord2\u2003\\pos(\u00a0320,\u3000180)}hello",
+        "lexer-raw-units": "{\\\ud800\udfff(1,2)\\bord\ud8002\\pos(320,180)}hello",
+        "lexer-nul-command": "{\\bord2\x00\\bord8}hello",
+    }.items():
+        yield name, b"\xff\xfe" + plain.decode("ascii").replace("Compatibility", text).encode("utf-16le", "surrogatepass")
     yield "no-final-newline", plain.rstrip(b"\r\n")
     yield "utf8-eof-partial", b"\xef\xbb\xbf" + plain.rstrip(b"\r\n") + b"\xf0\x80"
     yield "utf16-eof-partial", b"\xff\xfe" + plain.decode("ascii").encode("utf-16le") + b"x"

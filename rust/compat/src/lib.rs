@@ -5,5 +5,6 @@
 //! is the reference. These routines are not standards-conformance parsers.
 #![forbid(unsafe_code)]
 
+pub mod ass_tags;
 pub mod font;
 pub mod text;

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-//! Internal C ABI. No pointers, allocations, callbacks, or shared ownership.
+//! Internal C ABI. Scalar decoder calls and an isolated ASS lexer owner.
 #![deny(unsafe_op_in_unsafe_fn)]
+
+mod ass_tags;
 
 use xy_vsfilter_compat::text::{next_char, Decoded, Encoding, REOPEN};
 
