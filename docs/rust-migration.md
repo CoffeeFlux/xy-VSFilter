@@ -20,6 +20,20 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* The next increment ports `CSimpleTextSubtitle::CreateSegments` to safe Rust:
+  breakpoint sorting, interval construction, temporary segment/entry storage,
+  empty-range removal and original entry order. Even inactive zero-duration and
+  reversed entries retain their breakpoint effects; adjacent equivalent segments
+  are not merged. A scalar-only private owner returns the completed segments to
+  the existing native array, preserving `animated=false` and the native
+  `OnChanged`/logging calls. The extracted original and candidate methods passed
+  **205,982 exact segment comparisons** locally with fatal ASan/UBSan, including
+  callback snapshots, cached-state replacement and extreme signed timestamps.
+  Eight new ASS fixtures expand the DLL corpus to **306 cases**, sampling every
+  timeline boundary in both directions. Windows x86/x64 production validation
+  and four-platform/Miri validation for this increment are pending; prior
+  validated evidence below does not yet cover this change. Incremental `Add`,
+  sorting of native entries, timeline searches and time conversion remain native.
 * A dependency-free Cargo workspace. `rust/compat` forbids unsafe Rust and uses
   only `core`/`alloc`. The production Windows static library uses `native-runtime`
   to avoid pulling in Rust std's newer Windows dependencies. A small allocator

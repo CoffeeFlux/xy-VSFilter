@@ -11,6 +11,7 @@ mod drawing_tokens;
 mod fields;
 #[cfg(all(windows, any(feature = "native-runtime", test)))]
 mod runtime;
+mod segments;
 mod text_reader;
 #[cfg(all(feature = "native-runtime", not(windows)))]
 compile_error!("native-runtime uses the Windows C runtime; omit it for portable tests");

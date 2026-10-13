@@ -22,6 +22,7 @@ on:
       - 'include/xy_rust_drawing.h'
       - 'include/xy_rust_drawing_tokens.h'
       - 'include/xy_rust_fields.h'
+      - 'include/xy_rust_segments.h'
       - 'src/**'
       - 'tools/compat/**'
       - 'test/compat/**'

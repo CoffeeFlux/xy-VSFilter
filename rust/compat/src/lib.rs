@@ -13,5 +13,6 @@ pub mod drawing;
 pub mod drawing_tokens;
 pub mod fields;
 pub mod font;
+pub mod segments;
 pub mod text;
 pub mod text_reader;
