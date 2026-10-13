@@ -10,7 +10,24 @@ static void check(const std::wstring& input) {
     if (original!=candidate) {
         fprintf(stderr,"Drawing token mismatch at comparison %llu, units:",static_cast<unsigned long long>(comparisons));
         for (wchar_t c:input) fprintf(stderr," %04x",static_cast<unsigned>(c));
-        fprintf(stderr,"\nreference=%zu candidate=%zu\n",original.size(),candidate.size()); exit(1);
+        fprintf(stderr,"\nreference=%zu candidate=%zu\n",original.size(),candidate.size());
+        for (const auto* list : {&original, &candidate}) {
+            fprintf(stderr, "%s tokens:\n", list == &original ? "reference" : "candidate");
+            for (const auto& token : *list) {
+                fprintf(stderr, "  command=%04x parameters:", token.command);
+                for (uint16_t c : token.parameters) fprintf(stderr, " %04x", c);
+                fprintf(stderr, "\n");
+            }
+        }
+        DrawingString stages(input.data(), static_cast<int>(input.size()));
+        for (wchar_t command : std::wstring(L"mnlbspc")) {
+            const wchar_t from[] = {command, 0}, to[] = {L'*', command, 0};
+            stages.Replace(from, to);
+            fprintf(stderr, "after Replace %04x (length=%d):", static_cast<unsigned>(command), stages.GetLength());
+            for (int i=0; i<stages.GetLength(); ++i) fprintf(stderr, " %04x", static_cast<unsigned>(stages[i]));
+            fprintf(stderr, "\n");
+        }
+        exit(1);
     }
     ++comparisons;
 }
