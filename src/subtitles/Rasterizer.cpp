@@ -1710,6 +1710,8 @@ void FillAlphaMashBodyMasked_c   (BYTE* dst, const BYTE* src, int color_alpha, i
 void FillAlphaMashBorderMasked_c   (BYTE* dst, const BYTE* border, const BYTE* body, int color_alpha, int w, int h, int pitch,
     const BYTE* am, int am_pitch);
 
+
+
 void FillAlphaMashBody_c(BYTE* dst, const BYTE* src, int color_alpha, int w, int h, int pitch)
 {
     while(h--)
