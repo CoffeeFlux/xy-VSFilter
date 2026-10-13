@@ -67,13 +67,17 @@ unresolved reference outcomes requiring investigation, never matching results.
   native build logs, source inputs and all DLL hashes.
   [Portable tests and Miri](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38427593494)
   passed for this same candidate.
-* Safe Rust drawing token preprocessing and splitting, replacing the seven
-  native string replacements and `Tokenize`/`TrimLeft` loop. Raw UTF-16 units,
-  embedded NULs, literal `*` separators and command letters inside arbitrary
-  words are retained. The new extracted lexical oracle passed **1,342,183**
-  local comparisons with fatal ASan/UBSan. Windows tests use real ATL strings;
-  their validation and full DLL rendering checks are pending for this increment.
-  Numeric parsing remains in the original `GetPOINT`/Windows CRT boundary.
+* Safe Rust drawing token splitting and left trimming after the original seven
+  native replacements. Raw UTF-16 units, embedded NULs and literal `*` separators
+  are retained. The extracted oracle compares this boundary with real ATL on
+  Windows; validation of this revised boundary is pending.
+  **Preprocessing remains native:** an attempted replacement port exposed
+  allocation-dependent ATL results for `mmm\0mm`. Two evaluations in one process
+  produced different trailing command units. This is unresolved reference
+  behavior, not a passing comparison or a safe emulation target. See
+  [captured Windows evidence](drawing-replacement-unresolved.json). The prior
+  local replacement stand-in incorrectly assumed ordinary substring semantics;
+  it has been removed. Numeric parsing also remains native.
 * Value-only internal C ABIs for the character and attachment decoders. The ASS lexer
   has a separate, documented ownership boundary: it borrows two bounded input
   arrays during scanning, retains only integer spans, and returns an opaque owner
@@ -429,7 +433,7 @@ the native oracle where needed:
 | Next boundary | Portable work | Native behavior to retain and compare |
 | --- | --- | --- |
 | `STS.cpp` field splitting and numeric parsing | Raw UTF-16 fields, cursor/mutation state, error recovery | `GetStr` leaves the last undelimited field in the buffer; `TryNextStr` trims only ASCII space and mutates a separator to NUL. Keep CRT numeric conversion until overflow, locale, end-pointer and rounding results are captured. |
-| Remaining `RTS.cpp` drawing parsing | Raw-token preprocessing, numeric consumption and final native path storage; command state is now ported | `SpanIncluding`'s return value is ignored; commands split inside arbitrary text; `s` falls through to `p`; the apparent Bezier truncation uses an incremented counter and must not be "fixed." Keep `wcstod` and float-to-LONG conversion at the native boundary initially. |
+| Remaining `RTS.cpp` drawing parsing | Command replacement, numeric consumption and final native path storage; command state is now ported | `SpanIncluding`'s return value is ignored; commands split inside arbitrary text; `s` falls through to `p`; the apparent Bezier truncation uses an incremented counter and must not be "fixed." Keep `wcstod` and float-to-LONG conversion at the native boundary initially. |
 | `CompositionObject.cpp` bitmap run decoding | Bounded byte/bit readers, RLE state, emitted rectangles | Capture truncated-stream behavior, signed-short coordinate wrapping, palette state and transparent runs. Keep native palette conversion/compositing until those stages have separate exact-byte oracles. Uninitialized allocation tails are unresolved behavior, not a portable specification. |
 | `xy_filter.cpp` and raster/compositing kernels | Safe slice ownership and scalar arithmetic implementations | Capture each active SIMD path's operation order, padding, overlap and rounding. Scalar C++ output alone does not establish equality with the SIMD implementation used by a DLL. |
 

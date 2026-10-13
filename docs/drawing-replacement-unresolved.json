@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "status": "unresolved-reference-behavior",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "candidate_commit": "a339d6c311c51feb163348f54c2b76d8779b0cb0",
+  "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38439296380/job/115441371014",
+  "input_utf16": [
+    109,
+    109,
+    109,
+    0,
+    109,
+    109
+  ],
+  "observation": "Extracted original replacement/tokenization produced trailing command n. Repeating replacement stages on identical input in the same process exposed c instead. Neither is present in the input. The initial m replacement reports length 11 but leaves the final unit dependent on previous storage contents.",
+  "decision": "Keep original command replacements native. Validate only subsequent Tokenize/TrimLeft against initialized raw input arrays, including embedded NULs. Do not count these replacement outcomes as compatibility passes.",
+  "limits": [
+    "This is an extracted lexical reproducer, not proof of reachability through a particular public DLL input path.",
+    "Exact output for allocation-dependent reference behavior remains unresolved; no memory-corruption emulation is introduced."
+  ],
+  "diagnostic": [
+    "2026-10-13T17:32:23.7063753Z Drawing token mismatch at comparison 1005, units: 006d 006d 006d 0000 006d 006d",
+    "2026-10-13T17:32:23.7064248Z reference=5 candidate=5",
+    "2026-10-13T17:32:23.7064598Z reference tokens:",
+    "2026-10-13T17:32:23.7065311Z   command=006d parameters:",
+    "2026-10-13T17:32:23.7065802Z   command=006d parameters:",
+    "2026-10-13T17:32:23.7066179Z   command=006d parameters:",
+    "2026-10-13T17:32:23.7066520Z   command=006d parameters:",
+    "2026-10-13T17:32:23.7066921Z   command=006e parameters:",
+    "2026-10-13T17:32:23.7067288Z candidate tokens:",
+    "2026-10-13T17:32:23.7067620Z   command=006d parameters:",
+    "2026-10-13T17:32:23.7067993Z   command=006d parameters:",
+    "2026-10-13T17:32:23.7068383Z   command=006d parameters:",
+    "2026-10-13T17:32:23.7068745Z   command=006d parameters:",
+    "2026-10-13T17:32:23.7069086Z   command=006d parameters:",
+    "2026-10-13T17:32:23.7069536Z after Replace 006d (length=11): 002a 006d 002a 006d 002a 006d 0000 006d 006d 0000 0063",
+    "2026-10-13T17:32:23.7070048Z after Replace 006e (length=11): 002a 006d 002a 006d 002a 006d 0000 006d 006d 0000 0063",
+    "2026-10-13T17:32:23.7070526Z after Replace 006c (length=11): 002a 006d 002a 006d 002a 006d 0000 006d 006d 0000 0063",
+    "2026-10-13T17:32:23.7071018Z after Replace 0062 (length=11): 002a 006d 002a 006d 002a 006d 0000 006d 006d 0000 0063",
+    "2026-10-13T17:32:23.7071491Z after Replace 0073 (length=11): 002a 006d 002a 006d 002a 006d 0000 006d 006d 0000 0063",
+    "2026-10-13T17:32:23.7071968Z after Replace 0070 (length=11): 002a 006d 002a 006d 002a 006d 0000 006d 006d 0000 0063",
+    "2026-10-13T17:32:23.7072457Z after Replace 0063 (length=12): 002a 006d 002a 006d 002a 006d 0000 006d 006d 0000 002a 0063"
+  ]
+}

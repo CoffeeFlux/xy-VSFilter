@@ -19,14 +19,6 @@ static void check(const std::wstring& input) {
                 fprintf(stderr, "\n");
             }
         }
-        DrawingString stages(input.data(), static_cast<int>(input.size()));
-        for (wchar_t command : std::wstring(L"mnlbspc")) {
-            const wchar_t from[] = {command, 0}, to[] = {L'*', command, 0};
-            stages.Replace(from, to);
-            fprintf(stderr, "after Replace %04x (length=%d):", static_cast<unsigned>(command), stages.GetLength());
-            for (int i=0; i<stages.GetLength(); ++i) fprintf(stderr, " %04x", static_cast<unsigned>(stages[i]));
-            fprintf(stderr, "\n");
-        }
         exit(1);
     }
     ++comparisons;
@@ -38,6 +30,8 @@ static void enumerate(std::wstring& input,int remaining) {
     }
 }
 int main() {
+    // Raw post-replacement buffers: replacement itself remains native because
+    // embedded NULs can expose allocation-dependent contents (see evidence).
     std::wstring input; enumerate(input,6);
     for (uint32_t c=0;c<=0xffff;++c) {
         std::wstring unit(1,static_cast<wchar_t>(c));

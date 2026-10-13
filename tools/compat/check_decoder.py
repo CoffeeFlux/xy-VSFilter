@@ -148,7 +148,7 @@ public:
             # This oracle supplies synthetic GetPOINT outcomes to isolate path
             # state. The separate token oracle below tests the real new input
             # boundary against ATL. Substitute only that input-delivery region.
-            a = block.index("    // Drawing token input boundary.")
+            a = block.index("    CStringW str = m_str.Get();")
             b = block.index("        // Drawing command state.", a)
             block = block[:a] + original_token_input + block[b:]
         drawing += block + "return true;\n}\n#undef CPolygon\n#undef XY_VSFILTER_RUST_TEXT\n"
@@ -158,14 +158,14 @@ public:
     for name, content in (("OriginalDrawingTokens", lexer_source), ("CandidateDrawingTokens", candidate_lexer)):
         text = content.decode("utf-8-sig")
         if name == "OriginalDrawingTokens":
-            block = original_token_input
+            block = original_token_input[original_token_input.index("    int k = 0;"):]
         else:
             a = text.index("    // Drawing token input boundary.")
             b = text.index("        // Drawing command state.", a)
             block = text[a:b]
             token_code += "#define XY_VSFILTER_RUST_TEXT\n"
         token_code += f"namespace {name} {{\nDrawingTokenList Scan(const CStringW& input) {{\nDrawingTokenList result;\n"
-        token_code += block.replace("m_str.Get()", "input", 1)
+        token_code += "CStringW str = input;\n" + block
         token_code += "result.emplace_back(c, s);\n}\nreturn result;\n}\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_drawing_tokens.h").write_text(token_code, encoding="utf-8")
     cargo = ["cargo", "rustc", "--locked", "--offline", "--release", "-p", "xy-vsfilter-ffi"]
