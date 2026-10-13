@@ -1,0 +1,155 @@
+{
+  "schema": 1,
+  "status": "unresolved-timeouts-before-scripted-dialog-capture",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "candidate_commit": "ad5127e21d2676ff26fe367040e345f0f6ca167d",
+  "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38440503595/job/115445530726",
+  "report_sha256": "af0e92f97a3e2c5b98f8a4e817d626619655481fe9bd6e8f0f21b2743f24c006",
+  "cases": [
+    {
+      "candidate_status": "timeout",
+      "directory": "case-00130",
+      "id": "field-tab-prefixes-file",
+      "reference_status": "timeout",
+      "verdict": {
+        "kind": "unresolved_reference",
+        "repeat_results": [
+          {
+            "kind": "unresolved",
+            "left": "timeout",
+            "right": "timeout"
+          }
+        ]
+      },
+      "captures": {
+        "reference-0": {
+          "last_progress": {
+            "stage": "open_file"
+          },
+          "status": "timeout"
+        },
+        "reference-1": {
+          "last_progress": {
+            "stage": "open_file"
+          },
+          "status": "timeout"
+        },
+        "candidate": {
+          "last_progress": {
+            "stage": "open_file"
+          },
+          "status": "timeout"
+        }
+      }
+    },
+    {
+      "candidate_status": "timeout",
+      "directory": "case-00131",
+      "id": "field-tab-prefixes-memory",
+      "reference_status": "timeout",
+      "verdict": {
+        "kind": "unresolved_reference",
+        "repeat_results": [
+          {
+            "kind": "unresolved",
+            "left": "timeout",
+            "right": "timeout"
+          }
+        ]
+      },
+      "captures": {
+        "reference-0": {
+          "last_progress": {
+            "stage": "open_memory"
+          },
+          "status": "timeout"
+        },
+        "reference-1": {
+          "last_progress": {
+            "stage": "open_memory"
+          },
+          "status": "timeout"
+        },
+        "candidate": {
+          "last_progress": {
+            "stage": "open_memory"
+          },
+          "status": "timeout"
+        }
+      }
+    },
+    {
+      "candidate_status": "timeout",
+      "directory": "case-00142",
+      "id": "field-unicode-style-space-file",
+      "reference_status": "timeout",
+      "verdict": {
+        "kind": "unresolved_reference",
+        "repeat_results": [
+          {
+            "kind": "unresolved",
+            "left": "timeout",
+            "right": "timeout"
+          }
+        ]
+      },
+      "captures": {
+        "reference-0": {
+          "last_progress": {
+            "stage": "open_file"
+          },
+          "status": "timeout"
+        },
+        "reference-1": {
+          "last_progress": {
+            "stage": "open_file"
+          },
+          "status": "timeout"
+        },
+        "candidate": {
+          "last_progress": {
+            "stage": "open_file"
+          },
+          "status": "timeout"
+        }
+      }
+    },
+    {
+      "candidate_status": "timeout",
+      "directory": "case-00143",
+      "id": "field-unicode-style-space-memory",
+      "reference_status": "timeout",
+      "verdict": {
+        "kind": "unresolved_reference",
+        "repeat_results": [
+          {
+            "kind": "unresolved",
+            "left": "timeout",
+            "right": "timeout"
+          }
+        ]
+      },
+      "captures": {
+        "reference-0": {
+          "last_progress": {
+            "stage": "open_memory"
+          },
+          "status": "timeout"
+        },
+        "reference-1": {
+          "last_progress": {
+            "stage": "open_memory"
+          },
+          "status": "timeout"
+        },
+        "candidate": {
+          "last_progress": {
+            "stage": "open_memory"
+          },
+          "status": "timeout"
+        }
+      }
+    }
+  ],
+  "investigation": "The original ChangeUnknownStylesToDefault displays a modal warning for non-default unknown styles. The failing fixture style names retain a leading tab or U+2003. Subsequent runs explicitly capture these dialogs and script Cancel before comparing rendering; these earlier timeouts are not retroactively counted as equal."
+}

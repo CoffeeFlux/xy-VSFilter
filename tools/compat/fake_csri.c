@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #ifdef _WIN32
+#include <windows.h>
 #define CSRIAPI __declspec(dllexport)
 #endif
 #include "csri.h"
@@ -20,6 +21,12 @@ void *csri_query_ext(csri_rend *r, csri_ext_id name) { (void)r; (void)name; retu
 csri_inst *csri_open_file(csri_rend *r, const char *path, struct csri_openflag *flags)
 {
     (void)r; (void)path; (void)flags;
+#ifdef DIALOG
+    MessageBoxW(NULL, L"Harness warning", L"Warning", MB_OKCANCEL);
+#endif
+#ifdef DIALOG_DIFFERENT
+    MessageBoxW(NULL, L"Harness changed warning", L"Warning", MB_OKCANCEL);
+#endif
 #ifdef REJECT
     return NULL;
 #else

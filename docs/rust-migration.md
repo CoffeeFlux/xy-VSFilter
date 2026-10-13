@@ -361,6 +361,17 @@ Grow coverage using real scripts and minimized mismatch reproducers.
 
 Each case gets fresh reference processes (at least two) and a fresh candidate
 process, but retains one renderer instance for its entire timestamp sequence.
+Some malformed files invoke the original renderer's modal warning for an unknown
+style. Fixtures can declare `dialog_actions` containing an exact title, text
+prefix and `ok`/`cancel` response. A Windows observer is restricted to the worker's
+rendering thread, records dialog/control text, IDs, styles and the selected
+response, then clicks only a matching scripted button. The complete captured
+records are compared along with pixels. Unexpected dialogs still time out;
+missing planned dialogs fail the harness. Icon handles are never compared as
+text, and this does not validate dialog icon pixels or real host UI behavior.
+The original [four field-fixture timeouts](field-dialog-timeouts.json) are retained
+as unresolved evidence from before this interaction was scripted.
+
 The complete destination allocation, including row padding and the fourth byte,
 is initialized identically before each render and compared without tolerance.
 Frame output is compared byte-for-byte; canaries detect nearby writes outside
@@ -453,6 +464,16 @@ the native oracle where needed:
 | Remaining `RTS.cpp` drawing parsing | Command replacement, numeric consumption and final native path storage; command state is now ported | `SpanIncluding`'s return value is ignored; commands split inside arbitrary text; `s` falls through to `p`; the apparent Bezier truncation uses an incremented counter and must not be "fixed." Keep `wcstod` and float-to-LONG conversion at the native boundary initially. |
 | `CompositionObject.cpp` bitmap run decoding | Bounded byte/bit readers, RLE state, emitted rectangles | Capture truncated-stream behavior, signed-short coordinate wrapping, palette state and transparent runs. Keep native palette conversion/compositing until those stages have separate exact-byte oracles. Uninitialized allocation tails are unresolved behavior, not a portable specification. |
 | `xy_filter.cpp` and raster/compositing kernels | Safe slice ownership and scalar arithmetic implementations | Capture each active SIMD path's operation order, padding, overlap and rounding. Scalar C++ output alone does not establish equality with the SIMD implementation used by a DLL. |
+
+For bitmap decoding, start by extracting `CGolombBuffer` operation sequences
+before changing `CompositionObject`. Its failed `BitRead` shifts buffered state
+before returning zero, a peek can refill and advance the underlying byte cursor,
+and `BitByteAlign` changes the count without clearing the stored bits. The
+unsigned Exp-Golomb loop has no EOF exit for an all-zero/truncated prefix; isolate
+such probes in a worker with a timeout and record them as unresolved reference
+outcomes. `CompositionObject` also distinguishes allocated RLE length from the
+amount actually appended. These state details need captured comparisons before
+replacing pointer storage or assuming a conventional bit-reader API.
 
 These are code boundaries, not promises that a finite corpus covers every quirk.
 Each replacement needs the same sequence used for the buffered reader: extract
