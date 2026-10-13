@@ -124,6 +124,21 @@ int main()
             }
         }
     }
+    // Throw during compaction at the real buffer boundary, including a native
+    // read that wrote a byte before failing. Then retry on the same object.
+    for (int encoding = 0; encoding < 4; ++encoding) {
+        for (size_t probe = 0; probe < sizeof(probes) / sizeof(probes[0]); ++probe) {
+            for (size_t prefix = 4093; prefix <= 4097; ++prefix) {
+                for (size_t failure = 1; failure <= 3; ++failure) {
+                    for (int partial = 0; partial < 2; ++partial) {
+                        std::vector<unsigned char> bytes(prefix, 'a');
+                        bytes.insert(bytes.end(), probes[probe], probes[probe] + 4);
+                        compare(bytes, encoding, 4096, failure, partial != 0);
+                    }
+                }
+            }
+        }
+    }
     printf("%llu text-file scenarios and %llu line/seek comparisons passed (%llu injected exceptions)\n",
         static_cast<unsigned long long>(files), static_cast<unsigned long long>(lines),
         static_cast<unsigned long long>(exceptions));
