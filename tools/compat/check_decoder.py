@@ -90,6 +90,22 @@ public:
         reader += "\n#undef CTextFile\n#undef XY_VSFILTER_RUST_TEXT\n"
     reader += "#undef __super\n#undef XY_LOG_ERROR\n"
     (destination / "original_text_reader.h").write_text(reader, encoding="utf-8")
+    font_source = original("src/subtitles/STS.cpp", reference["commit"])
+    candidate_font = (ROOT / "src/subtitles/STS.cpp").read_bytes()
+    font = font_source.decode("utf-8-sig").split("#include", 1)[0]
+    font += '#include "font_shell.h"\n#include "xy_rust_text.h"\n'
+    for name, content in (("OriginalFont", font_source), ("CandidateFont", candidate_font)):
+        text = content.decode("utf-8-sig")
+        start = text.index("static bool LoadFont(CString& font)")
+        end = text.index("    HANDLE hFont = INVALID_HANDLE_VALUE;", start)
+        font += f"namespace {name} {{\nstd::vector<BYTE> decoded;\n"
+        if name == "CandidateFont":
+            font += "#define XY_VSFILTER_RUST_TEXT\n"
+        # Stop exactly where Windows font registration starts; retain the entire
+        # original decode/allocation/length-check block without rewriting it.
+        font += text[start:end] + '\n decoded.assign((BYTE*)pData, (BYTE*)pData + datalen);\n return true;\n}\n}\n'
+        font += "#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_font.h").write_text(font, encoding="utf-8")
     cargo = ["cargo", "rustc", "--locked", "--offline", "--release", "-p", "xy-vsfilter-ffi"]
     if args.target:
         cargo += ["--target", args.target]
@@ -130,6 +146,13 @@ public:
     reader_result = run([str(reader_executable)], capture_output=True, text=True)
     print(reader_result.stdout, end="")
     print(reader_result.stderr, end="", file=sys.stderr)
+    font_executable = destination / ("font-oracle.exe" if os.name == "nt" else "font-oracle")
+    font_compile = [arg.replace("decoder_oracle.cpp", "font_oracle.cpp")
+                    .replace("decoder-oracle", "font-oracle") for arg in compile_command]
+    run(font_compile)
+    font_result = run([str(font_executable)], capture_output=True, text=True)
+    print(font_result.stdout, end="")
+    print(font_result.stderr, end="", file=sys.stderr)
     compiler = subprocess.run([args.cxx] if os.name == "nt" else [args.cxx, "--version"],
                               capture_output=True, text=True)
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h"]
@@ -144,7 +167,11 @@ public:
         "result": result.stdout, "stderr": result.stderr,
         "candidate_source_sha256": hashlib.sha256(candidate_source).hexdigest(),
         "text_reader_compile_command": reader_compile,
-        "text_reader_result": reader_result.stdout, "text_reader_stderr": reader_result.stderr}
+        "text_reader_result": reader_result.stdout, "text_reader_stderr": reader_result.stderr,
+        "font_source_sha256": hashlib.sha256(font_source).hexdigest(),
+        "candidate_font_source_sha256": hashlib.sha256(candidate_font).hexdigest(),
+        "font_compile_command": font_compile,
+        "font_result": font_result.stdout, "font_stderr": font_result.stderr}
     (destination / "report.json").write_text(json.dumps(report, indent=2) + "\n")
 
 

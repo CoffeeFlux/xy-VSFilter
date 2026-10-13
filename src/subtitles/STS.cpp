@@ -21,6 +21,9 @@
  */
 
 #include "stdafx.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "xy_rust_text.h"
+#endif
 #include "STS.h"
 #include <atlbase.h>
 
@@ -1713,6 +1716,10 @@ static bool LoadFont(CString& font)
     if(len == 0 || (len&3) == 1 || !pData.Allocate(len))
         return(false);
 
+#ifdef XY_VSFILTER_RUST_TEXT
+    int datalen = XyRust::DecodeFont(static_cast<LPCTSTR>(font), len, static_cast<BYTE*>(pData));
+    if (datalen < 0) return false;
+#else
     const TCHAR* s = font;
     const TCHAR* e = s + len;
     for(BYTE* p = pData; s < e; s++, p++) *p = BYTE(*s - 33);
@@ -1735,6 +1742,8 @@ static bool LoadFont(CString& font)
         pData[datalen++] = ((pData[(len&~3)+0]&63)<<2)|((pData[(len&~3)+1]>>4)& 3);
         pData[datalen++] = ((pData[(len&~3)+1]&15)<<4)|((pData[(len&~3)+2]>>2)&15);
     }
+
+#endif
 
     // The font is private to this process and freed when it exits.
     DWORD cFonts;

@@ -111,7 +111,14 @@ def capture(dll, case, destination):
     if os.name == "nt":
         # Avoid OS crash dialogs; unsupported formats are queried, never rendered.
         C.windll.kernel32.SetErrorMode(0x0001 | 0x0002 | 0x8000)
+    def stage(name, **details):
+        # Survives a crash/timeout inside a native call. No worker output is
+        # interpreted as a completed result until close also returns.
+        write_json(destination / "progress.json", {"stage": name, **details})
+
+    stage("load_library")
     lib = load_library(dll)
+    stage("renderer_discovery")
     renderer = lib.csri_renderer_default()
     if not renderer:
         raise RuntimeError("no default renderer")
@@ -125,14 +132,17 @@ def capture(dll, case, destination):
               "unknown_name_returns_default": lib.csri_renderer_byname(b"xy_compat_nonexistent", None) == renderer,
               "unknown_extension_present": bool(lib.csri_query_ext(renderer, b"xy.compat.nonexistent"))}
     if case["open"] == "file":
+        stage("open_file")
         instance = lib.csri_open_file(renderer, str(script.resolve()).encode("utf-8"), None)
     else:
         buffer = C.create_string_buffer(data)
+        stage("open_memory")
         instance = lib.csri_open_mem(renderer, buffer, len(data), None)
     if not instance:
         result["status"] = "open_rejected"
         return result
     try:
+        stage("format_queries")
         # Capture the legacy advertised support separately from actual rendering.
         # These queries mutate the instance; set the final render format last.
         result["format_results"] = {}
@@ -163,7 +173,9 @@ def capture(dll, case, destination):
             frame.pixfmt = BGRX
             frame.planes[0] = C.cast(top, C.POINTER(C.c_ubyte))
             frame.strides[0] = stride
+            stage("render", frame=index, timestamp=str(timestamp))
             lib.csri_render(instance, C.byref(frame), float(timestamp))
+            stage("capture_frame", frame=index)
             before = C.string_at(address, GUARD)
             after = C.string_at(address + GUARD + size, GUARD)
             output = C.string_at(address + GUARD, size)
@@ -177,7 +189,9 @@ def capture(dll, case, destination):
                 result["status"] = "guard_corruption"
                 break
     finally:
+        stage("close")
         lib.csri_close(instance)
+    stage("complete")
     return result
 
 
@@ -209,6 +223,8 @@ def run_worker(dll, case_path, destination, timeout):
                 result = read_json(destination / "result.json")
             except (OSError, ValueError) as error:
                 result = {"status": "harness_error", "error": str(error)}
+    if result["status"] in {"timeout", "crash", "harness_error"} and (destination / "progress.json").exists():
+        result["last_progress"] = read_json(destination / "progress.json")
     write_json(destination / "result.json", result)
     return result
 
