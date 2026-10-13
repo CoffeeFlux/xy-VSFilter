@@ -42,6 +42,29 @@ def extract_method(source, signature):
     return source[start:end]
 
 
+def capture_inputs():
+    inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
+              ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
+              ROOT / "include/xy_rust_drawing.h",
+              ROOT / "include/xy_rust_drawing_tokens.h",
+              ROOT / "include/xy_rust_fields.h",
+              ROOT / "include/xy_rust_segments.h",
+              ROOT / "include/xy_rust_segment_insert.h",
+              ROOT / "include/xy_rust_hdmv.h",
+              ROOT / "include/xy_rust_dvb.h",
+              ROOT / "src/subtitles/CompositionObject.cpp",
+              ROOT / "include/xy_rust_timeline_search.h",
+              ROOT / "src/subtitles/TextFile.h",
+              ROOT / "src/subtitles/TextFile.cpp", ROOT / "src/subtitles/STS.cpp",
+              ROOT / "src/subtitles/RTS.cpp", ROOT / "tools/compat/reference.json"]
+    inputs += sorted((ROOT / "tools/compat").glob("*oracle.cpp"))
+    inputs += sorted((ROOT / "tools/compat").glob("*shell.h"))
+    inputs += [ROOT / "tools/compat/check_decoder.py"]
+    inputs += sorted((ROOT / "rust").rglob("*.rs")) + sorted((ROOT / "rust").rglob("Cargo.toml"))
+    return {path.relative_to(ROOT).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+            for path in inputs}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--target", help="Rust target; must match the C++ compiler")
@@ -53,6 +76,8 @@ def main():
     destination.mkdir(parents=True, exist_ok=True)
     # A failed rerun must never leave a previous run's successful report behind.
     (destination / "report.json").write_text(json.dumps({"complete": False, "reference": reference}) + "\n")
+    candidate_inputs = capture_inputs()
+    candidate_commit = run(["git", "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
     source = original("src/subtitles/TextFile.cpp", reference["commit"])
     header = original("include/Utf8.h", reference["commit"])
     (destination / "Utf8.h").write_bytes(header)
@@ -405,28 +430,17 @@ public:
     print(field_result.stderr, end="", file=sys.stderr)
     compiler = subprocess.run([args.cxx] if os.name == "nt" else [args.cxx, "--version"],
                               capture_output=True, text=True)
-    inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
-              ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
-              ROOT / "include/xy_rust_drawing.h",
-              ROOT / "include/xy_rust_drawing_tokens.h",
-              ROOT / "include/xy_rust_fields.h",
-              ROOT / "include/xy_rust_segments.h",
-              ROOT / "include/xy_rust_segment_insert.h",
-              ROOT / "include/xy_rust_hdmv.h",
-              ROOT / "include/xy_rust_dvb.h",
-              ROOT / "src/subtitles/CompositionObject.cpp",
-              ROOT / "include/xy_rust_timeline_search.h",
-              ROOT / "src/subtitles/TextFile.h"]
-    inputs += sorted((ROOT / "tools/compat").glob("*oracle.cpp"))
-    inputs += sorted((ROOT / "tools/compat").glob("*shell.h"))
-    inputs += [ROOT / "tools/compat/check_decoder.py"]
-    inputs += sorted((ROOT / "rust").rglob("*.rs")) + sorted((ROOT / "rust").rglob("Cargo.toml"))
+    if candidate_inputs != capture_inputs():
+        raise RuntimeError("Candidate inputs changed during validation; rerun from stable sources")
+    if candidate_commit != run(["git", "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip():
+        raise RuntimeError("Candidate commit changed during validation; rerun from a stable checkout")
     report = {"complete": True, "reference": reference, "source_sha256": hashlib.sha256(source).hexdigest(),
         "header_sha256": hashlib.sha256(header).hexdigest(), "target": args.target or "host",
         "sanitizers": args.sanitize, "compile_command": compile_command,
         "cpp_compiler": compiler.stdout + compiler.stderr,
-        "candidate_commit": run(["git", "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip(),
-        "candidate_inputs": {path.relative_to(ROOT).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest() for path in inputs},
+        "candidate_commit": candidate_commit,
+        "candidate_inputs": candidate_inputs,
+        "candidate_inputs_stable": True,
         "hdmv_source_sha256": hashlib.sha256(hdmv_source).hexdigest(),
         "hdmv_golomb_source_sha256": hashlib.sha256(golomb_source).hexdigest(),
         "hdmv_golomb_header_sha256": hashlib.sha256(golomb_header).hexdigest(),
