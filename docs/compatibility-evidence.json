@@ -1,0 +1,535 @@
+{
+  "schema": 1,
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "candidate_commit": "7c45fc126da9cbe88ae44b84fff24bd71b577c3b",
+  "native_runs": [
+    {
+      "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38362034452",
+      "build": {
+        "rustc": [
+          "rustc 1.85.0 (4d91de4e4 2025-02-17)",
+          "binary: rustc",
+          "commit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688",
+          "commit-date: 2025-02-17",
+          "host: x86_64-pc-windows-msvc",
+          "release: 1.85.0",
+          "LLVM version: 19.1.7"
+        ],
+        "msvc_tools_version": "14.44.35207",
+        "platform": "Win32",
+        "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+        "windows_sdk_version": "10.0.26100.0\\",
+        "candidate_commit": "7c45fc126da9cbe88ae44b84fff24bd71b577c3b",
+        "cargo": [
+          "cargo 1.85.0 (d73d2caf9 2024-12-31)"
+        ],
+        "configuration": "Release",
+        "candidate_status": [],
+        "mutation_count": 32,
+        "mutation_seed": 12345
+      },
+      "checks": {
+        "smoke": {
+          "report_sha256": "74e0f2af4f003653cf6c9165902da9306d23a5037f13f4f2c539a8d11c3f3888",
+          "case_count": 1,
+          "rendered_frames": 10,
+          "changed_frames": 6,
+          "case_verdicts": {
+            "equal": 1
+          },
+          "candidate_statuses": {
+            "ok": 1
+          },
+          "exports_equal": true,
+          "environment_unchanged": true,
+          "font_controls": [],
+          "manifest_sha256": "aff943a1c633c5a1aca2d2f504b0b17c5a7f19b3d3bbffaa215d1889fff2da25"
+        },
+        "csri": {
+          "report_sha256": "51301d7056e99045c3f24ccb2cd01730bddf65bff7ecf2a2e21f9e51bad60f9f",
+          "case_count": 186,
+          "rendered_frames": 1758,
+          "changed_frames": 1084,
+          "case_verdicts": {
+            "equal": 186
+          },
+          "candidate_statuses": {
+            "ok": 184,
+            "open_rejected": 2
+          },
+          "exports_equal": true,
+          "environment_unchanged": true,
+          "font_controls": [
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-file",
+                "font-valid-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-memory",
+                "font-valid-control-memory"
+              ],
+              "reference-0": true
+            }
+          ],
+          "manifest_sha256": "a324b2f5ed55a3728718af5e27a5d6cb548464dafa5924aa570fa3ab5dde94da"
+        },
+        "mutation-results": {
+          "report_sha256": "912edaebbdd9d4101dc7c05eb391a90f79889add68c79894123fa0f983ba2ffa",
+          "case_count": 32,
+          "rendered_frames": 224,
+          "changed_frames": 160,
+          "case_verdicts": {
+            "equal": 32
+          },
+          "candidate_statuses": {
+            "ok": 32
+          },
+          "exports_equal": true,
+          "environment_unchanged": true,
+          "font_controls": [],
+          "manifest_sha256": "692b4dcb930f2117e85805fead2e88d7a3e21f3894da6b3b27f6313f2afeef40"
+        }
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "f9aea567f2b60758f01cfa9886d72d31f80b1798fbd41f69efd00cc572f2681c",
+          "baseline_sha256": "2b2d70f3716bf41da8b7d0ac7bffed74023e9021ad0c5ba150df98e75937cc64",
+          "candidate_sha256": "558a788a2a5e8d92660d0957e84084d21c1034180abaae6142499519f5bf758a"
+        },
+        "XySubFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "d8cd7823d3b6d58469d5cdeb1e7f647d0aefb1c33c1d3d6c3064eb9dd72d5d5c",
+          "baseline_sha256": "adf2e0dc250b4d255ad0dd7506de504890ccfcc8bf15303408a383fde909cfc9",
+          "candidate_sha256": "ce5fbe97e54bbf57c068d0a46f054b84eab6ba0a84c41d76ed99c8dbb4991579"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "e666b77b86ebf78670a821a32ef94257d7671059d660f18001c9641876d1625d",
+          "baseline_sha256": "801819e01c78bc352179cf1efa055d6c7549c92abd9713921ce08f2e7c0cc627",
+          "candidate_sha256": "4efa8de68dcbaa9041661e679cb372f0bd2e0449537d61052ef4f54743e7d701"
+        }
+      }
+    },
+    {
+      "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38362034452",
+      "build": {
+        "mutation_seed": 12345,
+        "cargo": [
+          "cargo 1.85.0 (d73d2caf9 2024-12-31)"
+        ],
+        "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+        "msvc_tools_version": "14.44.35207",
+        "windows_sdk_version": "10.0.26100.0\\",
+        "candidate_commit": "7c45fc126da9cbe88ae44b84fff24bd71b577c3b",
+        "configuration": "Release",
+        "mutation_count": 32,
+        "candidate_status": [],
+        "rustc": [
+          "rustc 1.85.0 (4d91de4e4 2025-02-17)",
+          "binary: rustc",
+          "commit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688",
+          "commit-date: 2025-02-17",
+          "host: x86_64-pc-windows-msvc",
+          "release: 1.85.0",
+          "LLVM version: 19.1.7"
+        ],
+        "platform": "x64"
+      },
+      "checks": {
+        "smoke": {
+          "report_sha256": "9685910036b6b1d8a01f03b4e2aa44561a22a4c0f419ef02832a0278cad66bc9",
+          "case_count": 1,
+          "rendered_frames": 10,
+          "changed_frames": 6,
+          "case_verdicts": {
+            "equal": 1
+          },
+          "candidate_statuses": {
+            "ok": 1
+          },
+          "exports_equal": true,
+          "environment_unchanged": true,
+          "font_controls": [],
+          "manifest_sha256": "b3091fe31459e8e5cbde58c9bac57749c0374ed063964c45f600d6693d62c9dd"
+        },
+        "csri": {
+          "report_sha256": "9b74b54ac6016f5f07c2ef86dde522c0db8ce17897d7f7fa51c499478d8e1e0c",
+          "case_count": 186,
+          "rendered_frames": 1758,
+          "changed_frames": 1084,
+          "case_verdicts": {
+            "equal": 186
+          },
+          "candidate_statuses": {
+            "ok": 184,
+            "open_rejected": 2
+          },
+          "exports_equal": true,
+          "environment_unchanged": true,
+          "font_controls": [
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-file",
+                "font-valid-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-memory",
+                "font-valid-control-memory"
+              ],
+              "reference-0": true
+            }
+          ],
+          "manifest_sha256": "a324b2f5ed55a3728718af5e27a5d6cb548464dafa5924aa570fa3ab5dde94da"
+        },
+        "mutation-results": {
+          "report_sha256": "dd1d07f82469900507e38a6fc0e5f92376922ad41f0a4ebc60dc4a0be33576bf",
+          "case_count": 32,
+          "rendered_frames": 224,
+          "changed_frames": 160,
+          "case_verdicts": {
+            "equal": 32
+          },
+          "candidate_statuses": {
+            "ok": 32
+          },
+          "exports_equal": true,
+          "environment_unchanged": true,
+          "font_controls": [],
+          "manifest_sha256": "90e89279db719c739c6a1363611c04225b3486f03fee6ad9ceaca20e084ce43c"
+        }
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "84a27c3f09cb0d719d9eda44878694f94595dada4c14ceb22a2e4e614f9ec4ff",
+          "baseline_sha256": "19b36ba7683f23adefa8ad491bb462936f92142d5e586605dc7382beda6a51f3",
+          "candidate_sha256": "2fa8e6a6f2879ee8df0890dd572e918f046dd0145c0a995855efa50e64c5eaf0"
+        },
+        "XySubFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "70a7daaf1cbd89db83662b6014439fe736474ef9fe6ad152a955d625901c74b2",
+          "baseline_sha256": "717600f92ba116477e8794661c51f43d3d80f9d29231fc97c00e4b340a13250f",
+          "candidate_sha256": "d18cb42e5ca612e85c0604e87ddf3dfbeea6da0279f8842b076a345a52dbac5c"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "d0b61ec5540588c5f5e14949472e20c26b17713b3700e75d9fc088d2bcc176b9",
+          "baseline_sha256": "c751da629a6ce09841f13f9de522794cdd758bc188ec1822e9f5b3f447dd716d",
+          "candidate_sha256": "7f6f089f7e3e10febb165790bacd43f37b95152795670458f619e55d9845cf16"
+        }
+      }
+    },
+    {
+      "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38362090425",
+      "build": {
+        "mutation_seed": 20261013,
+        "msvc_tools_version": "14.44.35207",
+        "rustc": [
+          "rustc 1.85.0 (4d91de4e4 2025-02-17)",
+          "binary: rustc",
+          "commit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688",
+          "commit-date: 2025-02-17",
+          "host: x86_64-pc-windows-msvc",
+          "release: 1.85.0",
+          "LLVM version: 19.1.7"
+        ],
+        "mutation_count": 256,
+        "candidate_status": [],
+        "cargo": [
+          "cargo 1.85.0 (d73d2caf9 2024-12-31)"
+        ],
+        "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+        "windows_sdk_version": "10.0.26100.0\\",
+        "candidate_commit": "7c45fc126da9cbe88ae44b84fff24bd71b577c3b",
+        "platform": "Win32",
+        "configuration": "Release"
+      },
+      "checks": {
+        "smoke": {
+          "report_sha256": "212cd71736c9a479de1621cb756d5b62d55be6d83a8fc197d7b9236a204b5272",
+          "case_count": 1,
+          "rendered_frames": 10,
+          "changed_frames": 6,
+          "case_verdicts": {
+            "equal": 1
+          },
+          "candidate_statuses": {
+            "ok": 1
+          },
+          "exports_equal": true,
+          "environment_unchanged": true,
+          "font_controls": [],
+          "manifest_sha256": "aff943a1c633c5a1aca2d2f504b0b17c5a7f19b3d3bbffaa215d1889fff2da25"
+        },
+        "csri": {
+          "report_sha256": "7e351c94b469bfd833bd0e9cac062b8b79e9211d2688dc5a9dd2f9f6b0eb2be7",
+          "case_count": 186,
+          "rendered_frames": 1758,
+          "changed_frames": 1084,
+          "case_verdicts": {
+            "equal": 186
+          },
+          "candidate_statuses": {
+            "ok": 184,
+            "open_rejected": 2
+          },
+          "exports_equal": true,
+          "environment_unchanged": true,
+          "font_controls": [
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-file",
+                "font-valid-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-memory",
+                "font-valid-control-memory"
+              ],
+              "reference-0": true
+            }
+          ],
+          "manifest_sha256": "a324b2f5ed55a3728718af5e27a5d6cb548464dafa5924aa570fa3ab5dde94da"
+        },
+        "mutation-results": {
+          "report_sha256": "4f9639f35490242e0162460ce5854442fedf2e7d17ee870b720ccc57d2cfafbc",
+          "case_count": 256,
+          "rendered_frames": 1792,
+          "changed_frames": 1235,
+          "case_verdicts": {
+            "equal": 256
+          },
+          "candidate_statuses": {
+            "ok": 256
+          },
+          "exports_equal": true,
+          "environment_unchanged": true,
+          "font_controls": [],
+          "manifest_sha256": "d10ccf710f7eed44016c6cda10172cf1c9e23ec4f93eca6fb4124d04c7413b57"
+        }
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "f9aea567f2b60758f01cfa9886d72d31f80b1798fbd41f69efd00cc572f2681c",
+          "baseline_sha256": "a6bf479ee46932e61d31694ff30182568a33c199522aabf981964249c211f02e",
+          "candidate_sha256": "5f1a56fc6005e10d4939c77ee96b07272731842233456d28bbe60f4c64f4942a"
+        },
+        "XySubFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "d8cd7823d3b6d58469d5cdeb1e7f647d0aefb1c33c1d3d6c3064eb9dd72d5d5c",
+          "baseline_sha256": "b8dd606814f586cc2f0b6315fb5ff0472d91fc62b5a941c5c9bdf4a14b42fb01",
+          "candidate_sha256": "665eb4db7bba03182805529f1ab08936addaa99c7e2b33e24844907ae964d0b7"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "e666b77b86ebf78670a821a32ef94257d7671059d660f18001c9641876d1625d",
+          "baseline_sha256": "73e30f4f917e04ec897cdecfc6b48e2930087c4e88a53e464b4d6013dc331e0d",
+          "candidate_sha256": "75f51cb0bb89778faa5a381bc4f1231837a4feb66c47e74501f2b26ea034b194"
+        }
+      }
+    },
+    {
+      "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38362090425",
+      "build": {
+        "msvc_tools_version": "14.44.35207",
+        "platform": "x64",
+        "mutation_count": 256,
+        "candidate_status": [],
+        "rustc": [
+          "rustc 1.85.0 (4d91de4e4 2025-02-17)",
+          "binary: rustc",
+          "commit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688",
+          "commit-date: 2025-02-17",
+          "host: x86_64-pc-windows-msvc",
+          "release: 1.85.0",
+          "LLVM version: 19.1.7"
+        ],
+        "cargo": [
+          "cargo 1.85.0 (d73d2caf9 2024-12-31)"
+        ],
+        "mutation_seed": 20261013,
+        "windows_sdk_version": "10.0.26100.0\\",
+        "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+        "candidate_commit": "7c45fc126da9cbe88ae44b84fff24bd71b577c3b",
+        "configuration": "Release"
+      },
+      "checks": {
+        "smoke": {
+          "report_sha256": "ae5f8e20f63278a4eb25e4d66a07ecb695b974d81502f9cbb16db3af357b0551",
+          "case_count": 1,
+          "rendered_frames": 10,
+          "changed_frames": 6,
+          "case_verdicts": {
+            "equal": 1
+          },
+          "candidate_statuses": {
+            "ok": 1
+          },
+          "exports_equal": true,
+          "environment_unchanged": true,
+          "font_controls": [],
+          "manifest_sha256": "b3091fe31459e8e5cbde58c9bac57749c0374ed063964c45f600d6693d62c9dd"
+        },
+        "csri": {
+          "report_sha256": "fe914079e41610bdc05abf92c5e714d7c638451c6047e11753029151a1220077",
+          "case_count": 186,
+          "rendered_frames": 1758,
+          "changed_frames": 1084,
+          "case_verdicts": {
+            "equal": 186
+          },
+          "candidate_statuses": {
+            "ok": 184,
+            "open_rejected": 2
+          },
+          "exports_equal": true,
+          "environment_unchanged": true,
+          "font_controls": [
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-file",
+                "font-valid-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-memory",
+                "font-valid-control-memory"
+              ],
+              "reference-0": true
+            }
+          ],
+          "manifest_sha256": "a324b2f5ed55a3728718af5e27a5d6cb548464dafa5924aa570fa3ab5dde94da"
+        },
+        "mutation-results": {
+          "report_sha256": "bc8219309af75318406b99968a614fab9e793e991aba79bc30cf3f4522c9b7bb",
+          "case_count": 256,
+          "rendered_frames": 1792,
+          "changed_frames": 1235,
+          "case_verdicts": {
+            "equal": 256
+          },
+          "candidate_statuses": {
+            "ok": 256
+          },
+          "exports_equal": true,
+          "environment_unchanged": true,
+          "font_controls": [],
+          "manifest_sha256": "d2bd100e583b55b93d6a46951373528d3cecbf0b3d479df0c5e9e51729839cbc"
+        }
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "84a27c3f09cb0d719d9eda44878694f94595dada4c14ceb22a2e4e614f9ec4ff",
+          "baseline_sha256": "ffcb8961108d4fed3e4a08cc9c767f5d1c6efa2b5870357c2710cd3277deafb6",
+          "candidate_sha256": "0212c0046e58f2ce3bf895c4ee7cf29a0f591f1277aee04548967e1f142b39a0"
+        },
+        "XySubFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "70a7daaf1cbd89db83662b6014439fe736474ef9fe6ad152a955d625901c74b2",
+          "baseline_sha256": "fe825da8f8ecc6b596f4691fb7ce02bcbd17593f69d343b2bc87375c32511fac",
+          "candidate_sha256": "62c8ac631c0c3e8db4c544508b20d6f6fe78e4ebdb5722a79f38061791892816"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "d0b61ec5540588c5f5e14949472e20c26b17713b3700e75d9fc088d2bcc176b9",
+          "baseline_sha256": "d62917b49a064529ac69917dc6cd662102cb2587c5bda4eb4e0ced6c1cbab014",
+          "candidate_sha256": "7fd593c9581dbb406bfe18c7e58dcfeeca0373e889ed302cec03d32368552026"
+        }
+      }
+    }
+  ],
+  "portable_run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38362034486",
+  "miri_job_passed": true,
+  "portable": [
+    {
+      "target": "aarch64-apple-darwin",
+      "report_sha256": "af9b72f678269a2984842f3a4df0ff997c4267f6651b27202d6350cba811b900",
+      "sanitizers": true,
+      "decoder": "85992064 exact decoder comparisons passed",
+      "text_reader": "30240 text-file scenarios and 989282 line/seek comparisons passed",
+      "font": "17371137 exact font-attachment comparisons passed",
+      "ass_lexer": "2727819 exact ASS lexer comparisons passed (command, parameter units, order and empty tags)."
+    },
+    {
+      "target": "i686-pc-windows-msvc",
+      "report_sha256": "e607d3bd833cdf544c24701ac55df1fb869955a2a6107166371482a940dd78af",
+      "sanitizers": false,
+      "decoder": "85992064 exact decoder comparisons passed",
+      "text_reader": "30240 text-file scenarios and 989282 line/seek comparisons passed",
+      "font": "17371137 exact font-attachment comparisons passed",
+      "ass_lexer": "2793355 exact ASS lexer comparisons passed (command, parameter units, order and empty tags)."
+    },
+    {
+      "target": "x86_64-pc-windows-msvc",
+      "report_sha256": "10878fb66f09c07030de342e9a8165b408f7cf8d44043e89d2ea711925131c63",
+      "sanitizers": false,
+      "decoder": "85992064 exact decoder comparisons passed",
+      "text_reader": "30240 text-file scenarios and 989282 line/seek comparisons passed",
+      "font": "17371137 exact font-attachment comparisons passed",
+      "ass_lexer": "2793355 exact ASS lexer comparisons passed (command, parameter units, order and empty tags)."
+    },
+    {
+      "target": "x86_64-unknown-linux-gnu",
+      "report_sha256": "aab809ef1e70ec5ac484e7e2a2256b90f8e561047776ade52f68be280f63caff",
+      "sanitizers": true,
+      "decoder": "85992064 exact decoder comparisons passed",
+      "text_reader": "30240 text-file scenarios and 989282 line/seek comparisons passed",
+      "font": "17371137 exact font-attachment comparisons passed",
+      "ass_lexer": "2793355 exact ASS lexer comparisons passed (command, parameter units, order and empty tags)."
+    }
+  ],
+  "limits": [
+    "Comparisons pair original and candidate on the same architecture and environment; not cross-architecture equivalence.",
+    "CSRI BGRX rendering and advertised-format query coverage only; other host interfaces still need integration tests.",
+    "Stock Windows Server 2022 runners; Windows 7 and older CPU support unverified.",
+    "Native ASan/UBSan covers extracted C++ leaf tests on macOS/Linux, not the complete renderer or Rust static library.",
+    "Safe Rust core covers three components; most of the renderer and third-party code remains native.",
+    "Fixtures and finite mutation campaigns do not establish universal compatibility or memory safety."
+  ]
+}

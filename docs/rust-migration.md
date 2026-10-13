@@ -58,18 +58,51 @@ unresolved reference outcomes requiring investigation, never matching results.
 * A separate Windows renderer workflow builds all three native DLLs
   from separate pinned-reference and candidate checkouts, compare exports, and
   run the real CSRI corpus. See Actions for the latest result; a build failure or
-  incomplete run is not compatibility evidence. Candidate `008c7392`, containing
+  incomplete run is not compatibility evidence. Candidate `7c45fc12`, containing
   all three components and the CRT-only runtime, passed on **Windows x86 and
   x64**: all three DLL export tables match and no normal/delay imports were added.
-  Each architecture passed 182 CSRI cases / 1,718 frames, plus 32 deterministic
-  mutation cases / 224 frames. [Build and evidence artifacts](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38360402331).
-  This result predates the valid-font control fixtures added afterward; consult
-  their later run before claiming coverage of successful attachment loading.
+  Each architecture passed **186 CSRI cases / 1,758 frames**, including successful
+  embedded-font controls, plus two mutation campaigns: **32 cases / 224 frames**
+  and **256 cases / 1,792 frames** with different seeds. [Regular run](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38362034452),
+  [larger mutation run](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38362090425).
+  [Compatibility evidence](compatibility-evidence.json) preserves counts,
+  toolchains, report hashes and the six DLL hashes for each architecture/run.
+  All four portable jobs and Miri also [passed](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38362034486).
 
-The migration is an initial component and validation foundation, not a finished
+The migration is an initial set of components and validation tools, not a finished
 safe renderer. The rest of the native parsing, font handling, rendering,
 buffer management and host integration remains C++. There is no whole-renderer
 compatibility or memory-safety claim yet.
+
+## Migration shape
+
+Keep the existing native projects and host adapters while replacing internals
+behind a private C ABI. Consumers continue loading the same DLLs and public
+interfaces. Rust modules follow responsibilities (`text`, `font`, `ass_tags`);
+they do not need to reproduce every C++ class or directory. Retain a small
+reviewable native change per component and a pinned, independently built oracle.
+
+```mermaid
+flowchart LR
+    hosts[Players / Aegisub / AviSynth / VirtualDub] --> dll[Existing DLL interfaces]
+    dll --> native[Native host adapters and remaining renderer]
+    native --> abi[Private ownership and value ABI]
+    abi --> rust[Safe Rust core]
+    native --> windows[Windows / MFC / GDI]
+```
+
+Portable algorithms and their differential tests can be developed on macOS.
+Windows remains necessary for MFC, COM, GDI, DLL linking and actual host behavior;
+the new CI already handles paired builds and CSRI rendering remotely. The local
+Windows handoff is primarily for real application integration, debugger work,
+and environments such as Windows 7 or specific font/locale/CPU configurations.
+
+For each next component: isolate its real C++ code, capture its state and error
+semantics, port into bounded Rust storage, compare at the internal boundary,
+then compare complete DLL output. Move ownership of untrusted buffers into Rust
+as components grow. Tiny arithmetic ports alone do not remove native lifetime
+hazards. Keep production opt-in until wider host and malformed-input evidence
+supports changing the default.
 
 ## A concrete quirk already preserved
 
@@ -320,7 +353,7 @@ mismatch and verify reduction, while rejecting equal outputs and crashes.
 | --- | --- | --- |
 | DirectShow/COM, registration, property pages, autoload | `DirectVobSubFilterDll.cpp`, `DirectVobSub*.h`, `auto_load_helper.cpp` | CLSIDs/IIDs, vtables, HRESULTs, refcounts, graph negotiation, threading, registration/unload, player tests |
 | XySubFilter and consumer | `xy_sub_filter*.cpp`, `include/SubRenderIntf.h`, `XySubRenderIntf.h` | Provider/consumer negotiation, frame ownership, options and lifecycle |
-| Aegisub/CSRI | `csri.h`, `csriapi.cpp` | Broader DLL corpus, open flags/extensions, longer lifecycle sequences and real Aegisub integration; initial decoder corpus passes x86/x64 |
+| Aegisub/CSRI | `csri.h`, `csriapi.cpp` | Broader DLL corpus, open flags/extensions, longer lifecycle sequences and real Aegisub integration; the three-component corpus passes x86/x64 |
 | AviSynth | `plugins.cpp`, `vfr.cpp` | Exact `VobSub`, `TextSub`, `TextSubSwapUV`, `MaskSub` signatures/defaults, frame properties, timing, pixel formats, MT behavior |
 | VirtualDub | `plugins.cpp`, bundled SDK headers | Export calling conventions, filter negotiation, scripting, RGB orientation, lifecycle |
 | Text formats | `STS.cpp`, `TextFile.cpp`, `RealTextParser.cpp`, `USFSubtitles.cpp`, `libssf` | SSA/ASS, SubRip variants, SubViewer, MicroDVD, SAMI, WebVTT, VPlayer, XombieSub, USF, MPL2, RealText and SSF parsing/recovery |
@@ -329,10 +362,19 @@ mismatch and verify reduction, while rejecting equal outputs and crashes.
 | Compositing/color | `subpic`, SIMD/assembly, conversion tables | All RGB/YUV formats, high bit depths, interlace/subsampling, pitch/orientation, alpha and rounding |
 | Supporting behavior | `dsutil`, `decss`, vendored libraries, settings | Encodings, code pages, font attachments, file/network access, archive inputs, persistence and remaining unsafe dependencies |
 
-The next useful work is a Windows baseline + full DLL comparison for this decoder,
-then extracting the text reader/parser in bounded steps. Preserve bytes and UTF-16
-units until the original code itself converts them. Keep GDI font behavior while
-porting surrounding algorithms. Third-party native code also belongs in the
+Next, run actual Aegisub/player loading against the experimental DLLs and expand
+the host coverage above. The next useful port boundaries are the complete text
+reader/buffer state (the extracted oracle is already available), field/numeric
+parsing in `STS.cpp`, and drawing-path parsing in `CPolygon`. Numeric conversion
+must preserve the Windows CRT's overflow, locale, end-pointer and float-rounding
+behavior; substituting Rust's string parsers is not justified. The drawing code
+also has non-obvious recovery and truncation behavior to capture before porting.
+
+Preserve bytes and UTF-16 units until the original code itself converts them.
+Keep GDI font behavior while porting surrounding algorithms. Rasterization and
+compositing can start with scalar Rust implementations if their exact arithmetic
+matches the original SIMD/assembly. Third-party native code also belongs in the
 memory-safety inventory; converting first-party code alone does not establish a
-safe Aegisub dependency. Use fuzzing and minimized differential cases to discover
-the long tail, with a pinned reference and isolated workers for every experiment.
+safe Aegisub dependency. Use larger mutation campaigns, coverage-guided fuzzing
+and minimized differential cases to discover the long tail, with a pinned
+reference and isolated workers for every experiment.
