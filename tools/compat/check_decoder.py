@@ -317,6 +317,11 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
                           "static __forceinline void packed_pix_mix_sse2(BYTE* dst, const BYTE* alpha",
                           "static __forceinline void  packed_pix_mix_c              (BYTE* dst, BYTE alpha",
                           "static __forceinline void packed_pix_mix_sse2(BYTE* dst, BYTE alpha",
+                          "static __forceinline void packed_pix_add_c(BYTE*",
+                          "static __forceinline __m128i packed_pix_add_sse2(",
+                          "static __forceinline void packed_pix_add_sse2(BYTE*",
+                          "void AlphaBlt8bppC(byte*",
+                          "void AlphaBlt8bppSse2(byte*",
                           "void AlphaBlt8bppSingleAlphaC(byte*",
                           "void AlphaBlt8bppSingleAlphaSse2(byte*",
                           "void Rasterizer::FillSolidRect("):
@@ -474,6 +479,18 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     fill_result = run([str(fill_executable)], capture_output=True, text=True)
     print(fill_result.stdout, end="", flush=True)
     print(fill_result.stderr, end="", file=sys.stderr)
+    fill_debug_compile = []
+    fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
+    fill_debug_stderr = ""
+    if os.name != "nt":
+        # Keep the original _DEBUG branch explicit, separately from the Release
+        # oracle. Clang Release is not an admitted masked-planar reference.
+        fill_debug_compile = [arg.replace("fill-oracle", "fill-debug-oracle") for arg in fill_compile] + ["-D_DEBUG"]
+        run(fill_debug_compile)
+        fill_debug = run([str(destination / "fill-debug-oracle")], capture_output=True, text=True)
+        fill_debug_output, fill_debug_stderr = fill_debug.stdout, fill_debug.stderr
+        print(fill_debug_output, end="", flush=True)
+        print(fill_debug_stderr, end="", file=sys.stderr)
     compiler = subprocess.run([args.cxx] if os.name == "nt" else [args.cxx, "--version"],
                               capture_output=True, text=True)
     if candidate_inputs != capture_inputs():
@@ -491,6 +508,8 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "hdmv_golomb_source_sha256": hashlib.sha256(golomb_source).hexdigest(),
         "hdmv_golomb_header_sha256": hashlib.sha256(golomb_header).hexdigest(),
         "hdmv_raster_source_sha256": hashlib.sha256(raster_source).hexdigest(),
+        "fill_debug_compile_command": fill_debug_compile,
+        "fill_debug_result": fill_debug_output, "fill_debug_stderr": fill_debug_stderr,
         "fill_compile_command": fill_compile,
         "fill_result": fill_result.stdout, "fill_stderr": fill_result.stderr,
         "golomb_compile_command": golomb_compile,

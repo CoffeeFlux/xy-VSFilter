@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-//! Exact constant-alpha row blends used by the native solid-rectangle filler.
+//! Exact packed and planar pixel blends used by the native rasterizer.
 //! The legacy source weight is alpha + 1; destination weight is 256 - alpha.
 
 fn channel(dst: u8, source: u8, source_weight: u16, destination_weight: u16) -> u8 {
@@ -37,9 +37,39 @@ pub fn masked_block(dst: &mut [u8], alpha: [u8; 16], color: u32) {
     }
 }
 
+/// Additive packed blend: saturate color upward and inverse alpha downward.
+pub fn add_pixel(dst: u32, alpha: u8, color: u32) -> u32 {
+    let mut pixel = dst.to_le_bytes();
+    let source = color.to_le_bytes();
+    let weight = u16::from(alpha) + 1;
+    for i in 0..3 {
+        pixel[i] = pixel[i].saturating_add(((u16::from(source[i]) * weight) >> 8) as u8);
+    }
+    pixel[3] = pixel[3].saturating_sub(alpha);
+    u32::from_le_bytes(pixel)
+}
+
+pub fn add_block(dst: &mut [u8], alpha: [u8; 16], color: u32) {
+    for (pixel, alpha) in dst.chunks_exact_mut(4).zip(alpha) {
+        let original = u32::from_le_bytes([pixel[0], pixel[1], pixel[2], pixel[3]]);
+        pixel.copy_from_slice(&add_pixel(original, alpha, color).to_le_bytes());
+    }
+}
+
+pub fn masked_plane_block(dst: &mut [u8], alpha: [u8; 16], value: u8) {
+    for (byte, alpha) in dst.iter_mut().zip(alpha) {
+        *byte = channel(*byte, value, u16::from(alpha) + 1, 256 - u16::from(alpha));
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn additive_color_and_inverse_alpha_saturate_independently() {
+        assert_eq!(add_pixel(0x8010fe00, 128, 0x993020ff), 0x0028ff80);
+        assert_eq!(add_pixel(0xff123456, 0, 0xffffffff), 0xff123456);
+    }
     #[test]
     fn packed_color_ignores_its_own_alpha_and_preserves_partial_tail() {
         let mut row = [255, 128, 0, 255, 17];
