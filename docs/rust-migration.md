@@ -31,8 +31,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   and EOF cursor state. Native file reads, seeks, BOM detection and logging remain
   in a small adapter. The adapter borrows the fixed Rust buffer only during a
   native read; no Rust frame is active when an MFC exception can occur. The
-  extracted C++ oracle now checks **36,288 file scenarios / 1,369,597 line/seek
-  comparisons**, including **5,376 injected read exceptions**, short reads,
+  extracted C++ oracle now checks **37,008 file scenarios / 1,396,467 line/seek
+  comparisons**, including **6,096 injected read exceptions**, short reads,
   repeated EOF, reopening, encoding changes and diagnostic ordering. This new
   component passed local fatal ASan/UBSan; Windows renderer validation is pending.
 * Safe Rust font-attachment decoding, preserving byte truncation of arbitrary
@@ -150,9 +150,10 @@ the reference commit, source hashes, compiler and result. The native tests
 extract the original algorithm without modifying it; the only test stand-in is
 the class shell around that method. The ASan/UBSan run instruments the C++ side;
 it does not instrument the Rust static library. Safe Rust is enforced in the
-core by a compiler lint. The ASS lexer's FFI owner and the production CRT
+core by a compiler lint. The ASS lexer and text reader FFI owners and the production CRT
 allocator contain unsafe Rust, for constructing borrowed slices,
-querying/releasing the owned result, and allocating/deallocating aligned storage.
+querying/releasing owned results, lending the fixed read buffer to native I/O,
+and allocating/deallocating aligned storage.
 Every unsafe block states its caller contract. The native caller copies its
 inputs into typed vectors and bounds output spans by the original string length.
 Miri checks the Rust-side ownership lifecycle in a separate CI job. Windows unit
@@ -160,8 +161,10 @@ tests also check the CRT allocator's alignment, zeroing and reallocation. Native
 out-of-memory behavior and concurrent changes to the process locale have not
 been established as compatibility guarantees.
 
-The same command also compares the surrounding text-reader operations: **30,240
-file scenarios and 989,282 line/seek comparisons**. Original and candidate BOM
+The same command also compares the text-reader operations: **37,008
+file scenarios and 1,396,467 line/seek comparisons**, including **6,096 injected
+read exceptions**. It compares diagnostics, native read requests, cursor/count,
+encoding and output, including retries after a read writes a byte then throws. Original and candidate BOM
 detection, refill, line handling, logical positions and seeking are extracted
 from their actual source files; only MFC's underlying file reads/seeks are replaced
 by an in-memory test file. This exercises malformed sequences around 4096-byte
@@ -274,8 +277,8 @@ artifacts, restore their `candidate/artifacts/native/...` tree under this checko
 
 ## CSRI corpus and evidence
 
-`test/compat/cases.json` initially contains 186 cases: both file and memory
-loading for 34 existing ASS samples and 58 generated samples, plus geometry and
+`test/compat/cases.json` contains 210 cases: both file and memory
+loading for 34 existing ASS samples and 70 generated samples, plus geometry and
 stride cases. Generated cases include malformed tags, duplicate tags, malformed
 UTF-8, unpaired UTF-16, embedded NUL, CR/LF differences, missing final newlines
 and the original 4096-byte refill boundary. `.gitattributes` prevents checkout

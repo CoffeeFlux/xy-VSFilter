@@ -99,6 +99,24 @@ def variants():
     prefix, suffix = plain.split(b"Compatibility", 1)
     for offset in (4093, 4094, 4095, 4096):
         yield f"refill-{offset}", b"\xef\xbb\xbf" + prefix + b"x" * (offset - len(prefix) - 3) + b"\xf0\x9f\x98\x80" + suffix
+    # ReadLine now lives in Rust. Exercise error recovery and EOF on either
+    # side of its actual 4096-byte buffer (the BOM is read separately).
+    for bom in (b"", b"\xef\xbb\xbf"):
+        label = "bom" if bom else "no-bom"
+        for name, payload in {
+            "invalid-lead": b"\xc0\x80after",
+            "masked-tail": b"\xf0A\r\n",  # CR/LF are consumed as tail bytes
+            "out-of-range": b"\xf4\xbf\xbf\xbfafter",
+            "nul": b"\xe0\x80\x80after",
+        }.items():
+            yield f"reader-{label}-{name}", bom + prefix + b"x" * (4095 - len(prefix)) + payload + suffix
+        yield f"reader-{label}-incomplete-eof", bom + prefix + b"x" * (4095 - len(prefix)) + b"\xf0\x9f"
+    for codec, bom in (("utf-16le", b"\xff\xfe"), ("utf-16be", b"\xfe\xff")):
+        units = prefix.decode("ascii")
+        # Separate raw surrogate units across two native reads, then preserve
+        # an unpaired surrogate, embedded NUL and ordinary text after it.
+        text = units + "x" * (2047 - len(units)) + "\ud83d\ude00\ud800\0after" + suffix.decode("ascii")
+        yield f"reader-{codec}-surrogate-refill", bom + text.encode(codec, "surrogatepass")
 
 
 def timestamps(data):
