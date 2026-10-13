@@ -20,6 +20,20 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust scalar body/border alpha-mask arithmetic, with and without clip
+  masks, is prepared behind the same switch. Signed rounding and final byte
+  wrapping are preserved. Native code retains row traversal and buffer access;
+  the C ABI passes only scalar bytes/opacity and returns a byte, avoiding a Rust
+  borrow of output that may not yet have been initialized. Broader opacity
+  values outside the proven signed-intermediate range keep the native fallback.
+  This also reaches the 64-bit renderer through its existing scalar delegation;
+  32-bit MMX/SSE mask generation remains native at this stage.
+  The portable extracted oracle passed **268,496 exact comparisons /
+  1,099,759,616 bytes**, including **239,304 visibly changed cases**, with fatal
+  ASan/UBSan. It covers byte combinations, signed opacity, buffer/mask aliases,
+  strides and defined fallback cases. Rust tests (38 core, 16 FFI), strict
+  Clippy and default native branch syntax checks pass. Windows validation is
+  pending for this increment.
 * Safe Rust single-pixel scalar/SSE blending and scaled shape/clip-alpha
   arithmetic are prepared behind the same switch. SSE signed-word weights,
   bitwise weight construction, logical shifts and saturation remain distinct
@@ -60,8 +74,14 @@ unresolved reference outcomes requiring investigation, never matching results.
   emulation with fatal ASan/UBSan passed **303,688 exact comparisons /
   587,090,944 bytes**, including **10,560 rectangles** and **273,115 visibly
   changed cases**. arm64 reports this SSE-dependent component as unavailable.
-  Rust unit tests and strict Clippy pass. Windows validation is pending for this
-  increment. Native surfaces, broader compositing and allocation remain to port.
+  Candidate `15c45bed` passed all four CI platforms, Miri and both Windows DLL
+  jobs. Each x86 component run passed **303,688 exact comparisons**. Each DLL
+  job matched **322 corpus cases / 4,026 frames** and **32 mutations / 224
+  frames**, plus dialogs, visible controls, all export tables and dependencies.
+  Both build logs confirm Rust-enabled `Rasterizer.cpp` compilation.
+  [Pixel blend evidence](pixel-blend-evidence.json) records the verified source
+  and DLL hashes and exact scope. Native surfaces, broader compositing and
+  allocation remain to port.
 * Safe Rust scalar transitions for `CGolombBuffer::BitRead` requests from zero
   through 32 bits while the cached bit count is below 64. The bridge preserves
   the pre-EOF shift, peek refills, masking and residual-bit counts. Native code

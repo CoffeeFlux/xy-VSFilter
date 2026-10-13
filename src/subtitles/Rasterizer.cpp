@@ -28,6 +28,7 @@
 #include <math.h>
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_fill.h"
+#include "xy_rust_mask.h"
 #endif
 #include "xy_logger.h"
 #include "xy_bitmap.h"
@@ -1716,7 +1717,14 @@ void FillAlphaMashBody_c(BYTE* dst, const BYTE* src, int color_alpha, int w, int
         int j=0;
         for( ; j<w; j++ )
         {
-            dst[j] = ((src[j] * color_alpha)+32)>>6;
+            #ifdef XY_VSFILTER_RUST_TEXT
+            if (color_alpha >= -8421504 && color_alpha <= 8421504) {
+                dst[j] = xy_vsfilter_mask_scalar(src[j], 0, 0, color_alpha, 0);
+            } else
+#endif
+            {
+                dst[j] = ((src[j] * color_alpha)+32)>>6;
+            }
         }
         src += pitch;
         dst += pitch;
@@ -1732,7 +1740,14 @@ void FillAlphaMashBorder_c(BYTE* dst, const BYTE* border, const BYTE* body, int 
         {
             int temp = border[j]-body[j];
             temp = temp<0 ? 0 : temp;
-            dst[j] = ((temp * color_alpha)+32)>>6;
+            #ifdef XY_VSFILTER_RUST_TEXT
+            if (color_alpha >= -8421504 && color_alpha <= 8421504) {
+                dst[j] = xy_vsfilter_mask_scalar(border[j], body[j], 0, color_alpha, 1);
+            } else
+#endif
+            {
+                dst[j] = ((temp * color_alpha)+32)>>6;
+            }
         }
         body   += pitch;
         border += pitch;
@@ -1755,7 +1770,14 @@ void FillAlphaMashBodyMasked_c(       BYTE* dst        ,
         int j=0;
         for( ; j<w; j++ )
         {
-            dst[j] = ((src[j] * am[j] * color_alpha)+ROUND_ERR)>>12;
+            #ifdef XY_VSFILTER_RUST_TEXT
+            if (color_alpha >= -33025 && color_alpha <= 33025) {
+                dst[j] = xy_vsfilter_mask_scalar(src[j], 0, am[j], color_alpha, 2);
+            } else
+#endif
+            {
+                dst[j] = ((src[j] * am[j] * color_alpha)+ROUND_ERR)>>12;
+            }
         }
         src += pitch;
         am  += am_pitch;
@@ -1781,7 +1803,14 @@ void FillAlphaMashBorderMasked_c(       BYTE* dst        ,
         {
             int temp = border[j]-body[j];
             temp = temp<0 ? 0 : temp;
-            dst[j] = ((temp * am[j] * color_alpha)+ROUND_ERR)>>12;
+            #ifdef XY_VSFILTER_RUST_TEXT
+            if (color_alpha >= -33025 && color_alpha <= 33025) {
+                dst[j] = xy_vsfilter_mask_scalar(border[j], body[j], am[j], color_alpha, 3);
+            } else
+#endif
+            {
+                dst[j] = ((temp * am[j] * color_alpha)+ROUND_ERR)>>12;
+            }
         }
         body   += pitch;
         border += pitch;
