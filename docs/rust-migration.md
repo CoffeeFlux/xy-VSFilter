@@ -20,7 +20,7 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
-* The next increment ports `CSimpleTextSubtitle::CreateSegments` to safe Rust:
+* Safe Rust `CSimpleTextSubtitle::CreateSegments`:
   breakpoint sorting, interval construction, temporary segment/entry storage,
   empty-range removal and original entry order. Even inactive zero-duration and
   reversed entries retain their breakpoint effects; adjacent equivalent segments
@@ -32,9 +32,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   Eight new ASS fixtures expand the DLL corpus to **306 cases**, sampling every
   timeline boundary in both directions. Candidate `74439b37` passed all four
   platforms and Miri in [CI](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38450833335).
-  Windows x86/x64 production validation for this increment is pending; prior
-  validated evidence below does not yet cover this change. Incremental `Add`,
-  sorting of native entries and time conversion remain native.
+  It also passed [Windows x86/x64 DLL validation](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38450833303):
+  **306 cases / 3,274 frames** per architecture, plus 32 mutations / 224 frames.
+  All three DLL export tables and declared dependency requirements match.
+  [Segment-builder evidence](segment-builder-evidence.json) records the reports,
+  source inputs, DLL hashes and visible timeline-fixture output. Incremental
+  `Add`, sorting of native entries and time conversion remain native.
 * The three timeline lookup algorithms (`SearchSub`, `SearchSubs`, `SearchSubs2`)
   now have safe Rust state machines. The native adapter performs each requested
   timestamp translation in the original order, so CRT/frame-rate rounding stays
@@ -46,7 +49,19 @@ unresolved reference outcomes requiring investigation, never matching results.
   rates, negative frame rates, invalid mode values, unsorted/reversed timelines
   and extreme integer times are covered. Inputs large enough to overflow native
   signed array-index arithmetic and native OOM behavior remain unverified.
-  Combined Windows DLL, four-platform and Miri validation is pending.
+  Candidate `aa2e1997` passed [all four platforms and Miri](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38451614498)
+  with the same lookup/exception counts. The combined segment-builder/search
+  port passed [Windows x86/x64 DLL validation](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38451634396):
+  **306 cases / 3,274 frames** per architecture (294 successful opens and 12
+  matching open rejections), plus **256 mutations / 1,792 frames** using seed
+  `20261018`. Warning-dialog observations, font/drawing controls, all three DLL
+  export tables and declared dependency requirements match. Every new timeline
+  fixture produces visible output. The [regular 32-mutation campaign](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38451614349)
+  also passed on both architectures, including the same full corpus and another
+  224 mutation frames. [Combined timeline evidence](timeline-evidence.json)
+  records source inputs, reports, DLL hashes and fixture observations. These
+  passing cases do not resolve the older seed-20261017 native exception or the
+  allocation-dependent drawing replacement; both remain recorded below.
 * A dependency-free Cargo workspace. `rust/compat` forbids unsafe Rust and uses
   only `core`/`alloc`. The production Windows static library uses `native-runtime`
   to avoid pulling in Rust std's newer Windows dependencies. A small allocator
@@ -245,9 +260,13 @@ identical pre-tokenized inputs and point results; its separate lexical oracle
 tests `Tokenize`/`TrimLeft` against real ATL strings on Windows, starting with
 initialized post-replacement buffers. Native command replacement is outside that
 oracle because of the unresolved allocation-dependent behavior above. The field
-oracle compares six consecutive calls, mutated buffers and both pointer offsets. The ASan/UBSan run instruments the C++ side;
+oracle compares six consecutive calls, mutated buffers and both pointer offsets.
+The segment oracle checks the full native arrays and callback snapshots. Timeline
+search tests compare returned pointers, nullable/aliased output parameters,
+translation call traces and injected native exceptions. The ASan/UBSan run instruments the C++ side;
 it does not instrument the Rust static library. Safe Rust is enforced in the
-core by a compiler lint. The ASS lexer, text reader and drawing FFI owners and the production CRT
+core by a compiler lint. The ASS lexer, text reader, drawing, segment and timeline
+search FFI owners and the production CRT
 allocator contain unsafe Rust, for constructing borrowed slices,
 querying/releasing owned results, lending the fixed read buffer to native I/O,
 and allocating/deallocating aligned storage.
@@ -374,11 +393,14 @@ artifacts, restore their `candidate/artifacts/native/...` tree under this checko
 
 ## CSRI corpus and evidence
 
-`test/compat/cases.json` contains 290 cases: both file and memory
-loading for 34 existing ASS samples and 98 generated samples, plus geometry and
+`test/compat/cases.json` contains 306 cases: both file and memory
+loading for 34 existing ASS samples and 118 generated samples, plus geometry and
 stride cases. Generated cases include malformed tags, duplicate tags, malformed
 UTF-8, unpaired UTF-16, embedded NUL, CR/LF differences, missing final newlines
-and the original 4096-byte refill boundary. `.gitattributes` prevents checkout
+and the original 4096-byte refill boundary. Timeline fixtures cover overlapping,
+duplicate, zero-duration and reversed events, layer ordering, gaps, equal starts
+and ends, and repeated forward/backward seeks at one-tick boundaries.
+`.gitattributes` prevents checkout
 from changing any test bytes. Font cases include invalid encoded lengths/raw
 UTF-16 units and a valid, pinned Abel font attachment. The unmodified font and
 its SIL Open Font License are in `test/compat/fonts`; `source.json` records its
@@ -506,6 +528,7 @@ python tools/compat/csri_compare.py --reference C:\baseline\VSFilter.dll --candi
 | AviSynth | `plugins.cpp`, `vfr.cpp` | Exact `VobSub`, `TextSub`, `TextSubSwapUV`, `MaskSub` signatures/defaults, frame properties, timing, pixel formats, MT behavior |
 | VirtualDub | `plugins.cpp`, bundled SDK headers | Export calling conventions, filter negotiation, scripting, RGB orientation, lifecycle |
 | Text formats | `STS.cpp`, `TextFile.cpp`, `RealTextParser.cpp`, `USFSubtitles.cpp`, `libssf` | SSA/ASS, SubRip variants, SubViewer, MicroDVD, SAMI, WebVTT, VPlayer, XombieSub, USF, MPL2, RealText and SSF parsing/recovery |
+| Timeline and event ordering | `STS.cpp`, `STS.h` | Segment construction and lookup have differential tests; incremental `Add`, native entry sorting, frame/time conversion and host-driven mutation/lifecycle sequences still need migration and broader integration coverage |
 | Bitmap subtitles | `VobSub*`, `HdmvSub*`, `DVBSub*`, `CompositionObject*`, `CCDecoder*` | DVD/VobSub, PGS/SUP, DVB, closed captions, embedded stream and external file behavior |
 | Layout/rendering | `RTS.cpp`, `Rasterizer.cpp`, caches, overlay/clip code | Every tag's recovery and interaction, drawings, clipping, transforms, karaoke, blur/border/shadow, GDI/font metrics and fallback |
 | Compositing/color | `subpic`, SIMD/assembly, conversion tables | All RGB/YUV formats, high bit depths, interlace/subsampling, pitch/orientation, alpha and rounding |
