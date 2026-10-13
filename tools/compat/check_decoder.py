@@ -18,7 +18,13 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def run(command, **kwargs):
-    return subprocess.run(command, cwd=ROOT, check=True, **kwargs)
+    try:
+        return subprocess.run(command, cwd=ROOT, check=True, **kwargs)
+    except subprocess.CalledProcessError as error:
+        for output in (error.stdout, error.stderr):
+            if output:
+                print(output.decode(errors="replace") if isinstance(output, bytes) else output, file=sys.stderr)
+        raise
 
 
 def original(path, commit):
@@ -45,6 +51,8 @@ def main():
     reference = json.loads((ROOT / "tools/compat/reference.json").read_text())
     destination = ROOT / "artifacts/decoder" / (args.target or "host")
     destination.mkdir(parents=True, exist_ok=True)
+    # A failed rerun must never leave a previous run's successful report behind.
+    (destination / "report.json").write_text(json.dumps({"complete": False, "reference": reference}) + "\n")
     source = original("src/subtitles/TextFile.cpp", reference["commit"])
     header = original("include/Utf8.h", reference["commit"])
     (destination / "Utf8.h").write_bytes(header)
@@ -122,9 +130,16 @@ public:
     reader_result = run([str(reader_executable)], capture_output=True, text=True)
     print(reader_result.stdout, end="")
     print(reader_result.stderr, end="", file=sys.stderr)
-    report = {"reference": reference, "source_sha256": hashlib.sha256(source).hexdigest(),
+    compiler = subprocess.run([args.cxx] if os.name == "nt" else [args.cxx, "--version"],
+                              capture_output=True, text=True)
+    inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h"]
+    inputs += sorted((ROOT / "rust").rglob("*.rs")) + sorted((ROOT / "rust").rglob("Cargo.toml"))
+    report = {"complete": True, "reference": reference, "source_sha256": hashlib.sha256(source).hexdigest(),
         "header_sha256": hashlib.sha256(header).hexdigest(), "target": args.target or "host",
         "sanitizers": args.sanitize, "compile_command": compile_command,
+        "cpp_compiler": compiler.stdout + compiler.stderr,
+        "candidate_commit": run(["git", "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip(),
+        "candidate_inputs": {path.relative_to(ROOT).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest() for path in inputs},
         "rustc": run(["rustc", "-Vv"], capture_output=True, text=True).stdout,
         "result": result.stdout, "stderr": result.stderr,
         "candidate_source_sha256": hashlib.sha256(candidate_source).hexdigest(),
