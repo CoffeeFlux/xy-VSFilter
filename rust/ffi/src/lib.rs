@@ -11,6 +11,7 @@ mod drawing_tokens;
 mod fields;
 #[cfg(all(windows, any(feature = "native-runtime", test)))]
 mod runtime;
+mod segment_insert;
 mod segments;
 mod text_reader;
 mod timeline_search;
