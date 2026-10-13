@@ -4,7 +4,7 @@
 //! become active. Adjacent segments with identical entry lists stay separate.
 use alloc::vec::Vec;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Segment {
     pub start: i64,
     pub end: i64,

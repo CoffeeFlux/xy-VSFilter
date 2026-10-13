@@ -128,6 +128,23 @@ public:
         segments += extract_method(content.decode("utf-8-sig"), "void CSimpleTextSubtitle::CreateSegments()")
         segments += "\n#undef CSimpleTextSubtitle\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_segments.h").write_text(segments, encoding="utf-8")
+    insertion = '#include "original_segments.h"\n#include "segment_insert_shell.h"\n'
+    insertion += segment_class.replace("STSSegment", "InsertionSegment").replace("CAtlArray<int>", "ObservedArray<int>") + ";\n"
+    insertion += extract_method(font_source.decode("utf-8-sig"), "static bool SegmentCompStart(").replace("STSSegment", "InsertionSegment") + "\n"
+    for name, content in (("OriginalInsertion", font_source), ("CandidateInsertion", candidate_font)):
+        method = extract_method(content.decode("utf-8-sig"), "void CSimpleTextSubtitle::Add(")
+        insertion += f"INSERTION_SHELL({name})\n#define STSSegment InsertionSegment\n"
+        if name == "CandidateInsertion":
+            insertion += "#define XY_VSFILTER_RUST_TEXT\n"
+        # The unchanged string/style/WebVTT preprocessing remains native. Feed
+        # its prepared entry to the exact original/candidate timeline tail.
+        insertion += f"void {name}::AddPrepared(REFERENCE_TIME start, REFERENCE_TIME end, int readorder) {{\n"
+        insertion += "if (start > end) return;\nPreparedEntry sub = {start,end,0};\n"
+        a = method.index("    sub.readorder  =")
+        insertion += method[a:method.index(";", a)+1] + "\n"
+        insertion += method[method.index("    int n = (int)m_entries.GetCount();"):]
+        insertion += "\n#undef STSSegment\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_segment_insert.h").write_text(insertion, encoding="utf-8")
     searches = '#include "original_segments.h"\n#include "timeline_search_shell.h"\n'
     for name, content in (("OriginalTimelineSearch", font_source), ("CandidateTimelineSearch", candidate_font)):
         searches += f"TIMELINE_SEARCH_SHELL({name})\n#define CSimpleTextSubtitle {name}\n"
@@ -287,6 +304,13 @@ public:
     segments_result = run([str(segments_executable)], capture_output=True, text=True)
     print(segments_result.stdout, end="")
     print(segments_result.stderr, end="", file=sys.stderr)
+    insertion_executable = destination / ("segment-insert-oracle.exe" if os.name == "nt" else "segment-insert-oracle")
+    insertion_compile = [arg.replace("decoder_oracle.cpp", "segment_insert_oracle.cpp")
+                         .replace("decoder-oracle", "segment-insert-oracle") for arg in compile_command]
+    run(insertion_compile)
+    insertion_result = run([str(insertion_executable)], capture_output=True, text=True)
+    print(insertion_result.stdout, end="")
+    print(insertion_result.stderr, end="", file=sys.stderr)
     search_executable = destination / ("timeline-search-oracle.exe" if os.name == "nt" else "timeline-search-oracle")
     search_compile = [arg.replace("decoder_oracle.cpp", "timeline_search_oracle.cpp")
                       .replace("decoder-oracle", "timeline-search-oracle") for arg in compile_command]
@@ -302,6 +326,7 @@ public:
               ROOT / "include/xy_rust_drawing_tokens.h",
               ROOT / "include/xy_rust_fields.h",
               ROOT / "include/xy_rust_segments.h",
+              ROOT / "include/xy_rust_segment_insert.h",
               ROOT / "include/xy_rust_timeline_search.h",
               ROOT / "src/subtitles/TextFile.h"]
     inputs += sorted((ROOT / "tools/compat").glob("*oracle.cpp"))
@@ -336,6 +361,8 @@ public:
         "segments_header_sha256": hashlib.sha256(segment_header).hexdigest(),
         "segments_compile_command": segments_compile,
         "segments_result": segments_result.stdout, "segments_stderr": segments_result.stderr,
+        "segment_insert_compile_command": insertion_compile,
+        "segment_insert_result": insertion_result.stdout, "segment_insert_stderr": insertion_result.stderr,
         "timeline_search_compile_command": search_compile,
         "timeline_search_result": search_result.stdout, "timeline_search_stderr": search_result.stderr}
     (destination / "report.json").write_text(json.dumps(report, indent=2) + "\n")

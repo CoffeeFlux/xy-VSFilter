@@ -199,6 +199,30 @@ def variants():
         yield f"reader-{codec}-surrogate-refill", bom + text.encode(codec, "surrogatepass")
 
 
+def incremental_variants():
+    # ASS file loading uses AddSTSEntryOnly. SubRip exercises the incremental
+    # Add bridge during parsing (Open later rebuilds segments; the extracted
+    # insertion oracle is what verifies intermediate timeline state).
+    sequences = {
+        "overlap": [(1, 4), (2, 5), (3, 6)],
+        "out-of-order": [(4, 6), (0, 2), (1, 5), (2, 3)],
+        "gaps-bridged": [(0, 1), (3, 4), (5, 6), (0, 6)],
+        "nested": [(0, 6), (1, 5), (2, 4)],
+        "touching": [(0, 1), (1, 2), (2, 4)],
+        "zero-and-reversed": [(0, 6), (2, 2), (5, 1), (4, 5)],
+        "duplicates": [(1, 4), (1, 4), (1, 4)],
+        "empty-text": [(0, 6), (1, 4), (2, 5), (3, 6)],
+    }
+    for name, intervals in sequences.items():
+        text = ""
+        for index, (start, end) in enumerate(intervals):
+            payload = "" if name == "empty-text" and index % 2 else f"<i>cue {index}</i>\r\nsecond line"
+            text += (f"{index + 1}\r\n00:00:{start:02},000 --> 00:00:{end:02},000\r\n"
+                     f"{payload}\r\n\r\n")
+        data = b"\xff\xfe" + text.encode("utf-16le") if name == "out-of-order" else text.encode("ascii")
+        yield "incremental-" + name + ".srt", data
+
+
 def timestamps(data):
     matches = re.findall(rb"Dialogue:[^,]*,(\d+):(\d+):(\d+(?:\.\d+)?),(\d+):(\d+):(\d+(?:\.\d+)?)", data)
     if not matches:
@@ -218,7 +242,7 @@ def make_cases(files):
             cases.append({"id": path.stem + "-" + mode, "script": path.relative_to(ROOT).as_posix(),
                 "sha256": hashlib.sha256(data).hexdigest(), "open": mode, "width": 1280, "height": 720,
                 "times": timestamps(data), "stride_padding": 16, "fill_seed": 31})
-            if path.stem.startswith("timeline-"):
+            if path.stem.startswith(("timeline-", "incremental-")):
                 tick = Decimal("0.0000001")
                 times = [str(Decimal(t) + offset) for t in range(7) for offset in (-tick, Decimal(0), tick)]
                 cases[-1]["times"] = times + list(reversed(times)) + ["1", "3", "1", "5", "3"]
@@ -247,6 +271,7 @@ def main():
     args = parser.parse_args()
     files = [(path, path.read_bytes()) for path in sorted((ROOT / "test").glob("*.ass"))]
     generated = [(DEST / "generated" / (name + ".ass"), data) for name, data in variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in incremental_variants()]
     manifest = json.dumps(make_cases(files + generated), indent=2) + "\n"
     expected = generated + [(DEST / "cases.json", manifest.encode("utf-8"))]
     for path, data in expected:

@@ -20,6 +20,22 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* The next increment ports the incremental segment edits in
+  `CSimpleTextSubtitle::Add`. Rust owns a snapshot and computes ordered split,
+  gap-fill and entry-insertion operations. The native adapter applies these to
+  the existing arrays, preserving readorder shortcuts, animation flags, native
+  copy/insertion order and partial state at injected storage-call exceptions.
+  Entry preparation, first-entry insertion, string/style processing and native
+  array storage remain native. The extracted tail passed **59,215 comparisons /
+  1,453,819 mutation snapshots**, including **3,357 injected boundary exceptions**,
+  in the final local sanitizer run. Eight SubRip fixtures expand the corpus to
+  **322 cases** and exercise this bridge during native parsing. File opening
+  rebuilds segments afterward, so the extracted oracle, rather than final CSRI
+  frames alone, establishes intermediate insertion-state compatibility.
+  The candidate explicitly handles WebVTT end-of-list insertion. This case is
+  checked against candidate invariants and excluded from differential counts
+  because its reference outcome is unresolved. Windows x86/x64, four-platform
+  and Miri validation are pending.
 * Safe Rust `CSimpleTextSubtitle::CreateSegments`:
   breakpoint sorting, interval construction, temporary segment/entry storage,
   empty-range removal and original entry order. Even inactive zero-duration and

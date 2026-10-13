@@ -25,6 +25,7 @@
 #include "xy_rust_text.h"
 #include "xy_rust_fields.h"
 #include "xy_rust_segments.h"
+#include "xy_rust_segment_insert.h"
 #include "xy_rust_timeline_search.h"
 #endif
 #include "STS.h"
@@ -2480,7 +2481,11 @@ void CSimpleTextSubtitle::Add(CStringW str, bool fUnicode, REFERENCE_TIME start,
         STSSegment* segmentsEnd   = segmentsStart + segmentsCount;
         STSSegment* segment = std::lower_bound(segmentsStart, segmentsEnd, start, SegmentCompStart);
 
-        if (m_subtitleType == EXTVTT && start == segment->start && end == segment->end) {
+        if (m_subtitleType == EXTVTT
+#ifdef XY_VSFILTER_RUST_TEXT
+            && segment != segmentsEnd
+#endif
+            && start == segment->start && end == segment->end) {
             // ToDo: compare new sub with existing one to verify if it is really a duplicate
             //TRACE(_T("Dropping duplicate WebVTT sub (n=%d)\n"), n);
             return;
@@ -2489,6 +2494,17 @@ void CSimpleTextSubtitle::Add(CStringW str, bool fUnicode, REFERENCE_TIME start,
         n = (int)m_entries.Add(sub);
 
         size_t i = segment - segmentsStart;
+#ifdef XY_VSFILTER_RUST_TEXT
+        XyRust::SegmentInsertion insertion;
+        for (size_t j = 0; j < m_entries.GetCount(); ++j) insertion.Order(m_entries.GetAt(j).readorder);
+        for (size_t j = 0; j < m_segments.GetCount(); ++j) {
+            const STSSegment& existing = m_segments[j];
+            insertion.Segment(existing.start, existing.end);
+            for (size_t k = 0; k < existing.subs.GetCount(); ++k) insertion.Sub(existing.subs[k]);
+        }
+        insertion.Build(start, end, n, i);
+        insertion.Apply<STSSegment>(m_segments);
+#else
         if (i > 0 && m_segments[i - 1].end > start) {
             // The beginning of i-1th segment isn't modified
             // by the new entry so separate it in two segments
@@ -2554,6 +2570,7 @@ void CSimpleTextSubtitle::Add(CStringW str, bool fUnicode, REFERENCE_TIME start,
             stss.subs.Add(n);
             m_segments.InsertAt(i, stss);
         }
+#endif
     }
 }
 

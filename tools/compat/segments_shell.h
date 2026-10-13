@@ -15,7 +15,9 @@ template<typename T> class CAtlArray : public std::vector<T> {
 public:
     size_t GetCount() const { return this->size(); }
     void RemoveAll() { this->clear(); }
-    void Add(const T& item) { this->push_back(item); }
+    size_t Add(const T& item) { this->push_back(item); return this->size()-1; }
+    void InsertAt(size_t at, const T& item) { this->insert(this->begin()+at,item); }
+    T* GetData() { return this->data(); }
     T& GetAt(size_t index) { return this->at(index); }
     void Copy(const CAtlArray& other) { *this = other; }
 };
