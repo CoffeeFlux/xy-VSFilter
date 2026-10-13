@@ -252,6 +252,37 @@ enters invalid arithmetic. The harness records format-query results but only
 renders BGR32. This mismatch is recorded, not silently "corrected" or mistaken
 for implemented pixel-format coverage.
 
+## Mutation runs and mismatch reduction
+
+`mutate_corpus.py` adds deterministic byte edits to combinations of ASS tags,
+with UTF-8/BOM/raw UTF-16 variants. It records the seed, generator version,
+operations and hashes. This is a bounded mutation campaign, not coverage-guided
+fuzzing or exhaustive malformed-input coverage. Native CI adds 32 cases with
+seed 12345 after the checked-in corpus; manual workflow runs can select another
+seed and count. A reference crash remains a failure to investigate.
+
+```powershell
+python tools/compat/mutate_corpus.py --seed 12345 --count 64 --output artifacts\mutations
+python tools/compat/csri_compare.py --reference C:\baseline\VSFilter.dll --candidate C:\candidate\VSFilter.dll --cases artifacts\mutations\cases.json --output artifacts\mutation-results --timeout 10 --environment-label "local Windows mutation run"
+```
+
+For a mismatch whose reference runs agree, reduce the exact input bytes without
+rewriting the source fixture:
+
+```powershell
+python tools/compat/reduce_case.py --reference C:\baseline\VSFilter.dll --candidate C:\candidate\VSFilter.dll --case artifacts\mutation-results\case-00000\case.json --output artifacts\reduced --max-attempts 100
+```
+
+Every trial repeats the reference and checks the failure category. A crash,
+timeout, guard violation or unstable reference cannot replace a pixel mismatch.
+The reducer checkpoints the best input, case manifest, binary hashes and trial
+results, and retains initial/best frame evidence. Its report distinguishes
+finishing the reduction from exhausting the attempt budget. Re-run the final
+`cases.json`, inspect its raw bytes, then add it as a regression fixture. The
+reducer does not handle unresolved native crashes yet; keep those original inputs
+for a Windows debugger/sanitizer run. Native harness tests inject a real byte
+mismatch and verify reduction, while rejecting equal outputs and crashes.
+
 ## Coverage map and remaining migration
 
 | Surface/subsystem | Reference locations | Required evidence still missing |

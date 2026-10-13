@@ -183,7 +183,10 @@ def capture(dll, case, destination):
             (destination / filename).write_bytes(output)
             result["frames"].append({"file": filename, "time": str(timestamp),
                 "time_f64_hex": struct.pack("<d", float(timestamp)).hex(), "sha256": digest(output),
-                "bytes": size, "changed_bytes": sum(a != b for a, b in zip(initial, output)),
+                # Native byte comparison avoids billions of Python iterations
+                # during a corpus run. Actual reference/candidate bytes are
+                # still compared independently in compare_captures.
+                "bytes": size, "changed": output != initial,
                 "guards_intact": before == after == b"\xa5" * GUARD})
             if before != b"\xa5" * GUARD or after != b"\xa5" * GUARD:
                 result["status"] = "guard_corruption"
@@ -333,6 +336,8 @@ def compare(args):
         report["environment_after"] = after
     report["complete"] = True
     report["rendered_frames"] = sum(len(read_json(output / c["directory"] / "candidate/result.json").get("frames", [])) for c in report["cases"])
+    report["changed_frames"] = sum(sum(frame["changed"] for frame in
+        read_json(output / c["directory"] / "candidate/result.json").get("frames", [])) for c in report["cases"])
     report["passed"] = (report["environment_unchanged"] and report.get("exports_equal", True)
         and report["rendered_frames"] > 0 and all(c["verdict"]["kind"] == "equal" for c in report["cases"]))
     write_json(output / "report.json", report)

@@ -1,6 +1,8 @@
 param(
     [ValidateSet("Win32", "x64")][string]$Platform = "x64",
-    [Parameter(Mandatory=$true)][string]$Baseline
+    [Parameter(Mandatory=$true)][string]$Baseline,
+    [ValidateRange(0,256)][int]$MutationCount = 0,
+    [uint32]$MutationSeed = 12345
 )
 $ErrorActionPreference = "Stop"
 $candidateRoot = (Resolve-Path "$PSScriptRoot\..\..").Path
@@ -55,6 +57,14 @@ try {
         --output "$evidence\csri" --timeout 15 `
         --environment-label "GitHub windows-2022; VS2022 Release $Platform; stock runner fonts; pinned baseline"
     if ($LASTEXITCODE -ne 0) { throw "CSRI comparison failed; inspect artifacts/native/csri/report.json" }
+    if ($MutationCount -gt 0) {
+        & python "$PSScriptRoot\mutate_corpus.py" --seed $MutationSeed --count $MutationCount --output "$evidence\mutations"
+        if ($LASTEXITCODE -ne 0) { throw "Mutation generation failed" }
+        & python "$PSScriptRoot\csri_compare.py" --reference $original --candidate $candidate `
+            --cases "$evidence\mutations\cases.json" --output "$evidence\mutation-results" --timeout 10 `
+            --environment-label "GitHub windows-2022; VS2022 Release $Platform; mutation seed $MutationSeed"
+        if ($LASTEXITCODE -ne 0) { throw "Mutation comparison has failures; preserve and reduce its cases" }
+    }
 } finally {
     Pop-Location
 }

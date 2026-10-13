@@ -52,7 +52,7 @@ class NativeHarnessTests(unittest.TestCase):
         left, ld = self.run_variant("normal", "left")
         right, rd = self.run_variant("normal", "right")
         self.assertEqual(harness.compare_captures(left, right, ld, rd), {"kind": "equal"})
-        self.assertEqual([frame["changed_bytes"] for frame in left["frames"]], [1] * 4)
+        self.assertEqual([frame["changed"] for frame in left["frames"]], [True] * 4)
         self.assertEqual([(ld / frame["file"]).read_bytes()[0] for frame in left["frames"]], [11, 32, 13, 14])
         self.assertTrue(all(frame["guards_intact"] for frame in left["frames"]))
 
@@ -119,6 +119,26 @@ class NativeHarnessTests(unittest.TestCase):
                 self.assertEqual(list(output.glob("case-*/*/frame-*.bin")), [])
             else:
                 self.assertTrue(list(output.glob("case-*/*/frame-*.bin")))
+
+    def test_reducer_keeps_a_real_mismatch_and_preserves_the_original(self):
+        original = Path(self.case["script"]).read_bytes()
+        for variant, code in (("DIFFERENT", 0), ("normal", 2), ("CRASH", 2)):
+            output = self.case_dir / ("reduced-" + variant)
+            command = [sys.executable, str(harness.ROOT / "tools/compat/reduce_case.py"),
+                "--reference", str(self.libraries["normal"]), "--candidate", str(self.libraries[variant]),
+                "--case", str(self.case_path), "--output", str(output), "--max-attempts", "4"]
+            result = subprocess.run(command, capture_output=True, text=True)
+            self.assertEqual(result.returncode, code, result.stderr)
+            report = harness.read_json(output / "report.json")
+            self.assertEqual(Path(self.case["script"]).read_bytes(), original)
+            if variant == "DIFFERENT":
+                self.assertTrue(report["complete"])
+                self.assertLess(report["best_bytes"], len(original))
+                self.assertEqual(report["best_sha256"], harness.digest((output / "minimized.ass").read_bytes()))
+                self.assertTrue(report["environment_unchanged"])
+                self.assertTrue(list((output / report["best_trial"]).glob("*/frame-*.bin")))
+            else:
+                self.assertFalse(report["complete"])
 
 
 if __name__ == "__main__":
