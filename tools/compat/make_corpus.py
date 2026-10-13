@@ -64,6 +64,14 @@ def variants():
     yield "utf16-eof-partial", b"\xff\xfe" + plain.decode("ascii").encode("utf-16le") + b"x"
     yield "cr-only", plain.replace(b"\r\n", b"\r")
     yield "lf-only", plain.replace(b"\r\n", b"\n")
+    # Invalid font binaries still exercise the attachment decoder; the font
+    # registration result must match the original. These are not real fonts.
+    for length in range(10):
+        section = b"[Fonts]\r\nfontname:compat-invalid.ttf\r\n" + b"!" * length + b"\r\n\r\n"
+        yield f"font-length-{length}", plain.replace(b"[V4+ Styles]", section + b"[V4+ Styles]")
+    section = "[Fonts]\r\nfontname:compat-invalid.ttf\r\n\u00ff\ud800\uffff\x00!!\r\n\r\n"
+    raw_font = plain.decode("ascii").replace("[V4+ Styles]", section + "[V4+ Styles]")
+    yield "font-raw-units", b"\xff\xfe" + raw_font.encode("utf-16le", "surrogatepass")
     # Move a multibyte sequence across the original 4096-byte read boundary.
     prefix, suffix = plain.split(b"Compatibility", 1)
     for offset in (4093, 4094, 4095, 4096):

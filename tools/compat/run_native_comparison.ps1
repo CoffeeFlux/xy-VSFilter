@@ -42,6 +42,13 @@ try {
     }
     $original = Find-Dll $baselineRoot "VSFilter.dll"
     $candidate = Find-Dll $candidateRoot "VSFilter.dll"
+    $manifest = Get-Content "$candidateRoot\test\compat\cases.json" -Raw | ConvertFrom-Json
+    $smoke = @{schema=1; cases=@($manifest.cases | Where-Object { $_.id -eq "plain-memory" })}
+    $smoke | ConvertTo-Json -Depth 10 | Set-Content "$evidence\smoke-cases.json" -Encoding utf8
+    & python "$PSScriptRoot\csri_compare.py" --reference $original --candidate $candidate `
+        --cases "$evidence\smoke-cases.json" --output "$evidence\smoke" --timeout 30 `
+        --environment-label "GitHub windows-2022; VS2022 Release $Platform; initial DLL smoke check"
+    if ($LASTEXITCODE -ne 0) { throw "DLL smoke comparison failed; inspect artifacts/native/smoke/report.json" }
     & python "$PSScriptRoot\csri_compare.py" --reference $original --candidate $candidate `
         --output "$evidence\csri" --timeout 15 `
         --environment-label "GitHub windows-2022; VS2022 Release $Platform; stock runner fonts; pinned baseline"

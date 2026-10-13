@@ -23,6 +23,9 @@ unresolved reference outcomes requiring investigation, never matching results.
 * A dependency-free Cargo workspace. `rust/compat` forbids unsafe Rust.
 * A safe port of `CTextFile::NextChar`, including its nonstandard UTF-8 behavior,
   raw UTF-16 code units, error statuses and cursor movement.
+* Safe Rust font-attachment decoding, preserving byte truncation of arbitrary
+  UTF-16 units, invalid lengths and short tails. The same opt-in build property
+  enables this component. GDI font installation remains native.
 * A value-only internal C ABI: no foreign pointers, allocations or ownership
   enter Rust. A C++ adapter packs up to four bytes and updates the original cursor.
 * An opt-in `RustTextDecoder=true` native build property. The original public DLL
@@ -32,6 +35,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   header from the pinned Git commit, compiles them, and calls the real Rust ABI.
   It checks **85,992,064** cases: return values AND consumed bytes. This includes
   all 256 possibilities for each UTF-8 tail byte, not merely valid Unicode.
+  A second oracle extracts the original `LoadFont` decoding block and compares
+  **17,371,137** cases against the candidate block through its actual C ABI.
 * An isolated-process CSRI comparison harness, an exact-byte corpus generator,
   and a PE export/ordinal comparison tool.
 * CI for macOS, Linux and Windows x86/x64 leaf/bridge tests. These jobs do not
@@ -54,6 +59,13 @@ bytes. For example, `c2 41` produces `0x81`, `ed a0 80` produces the raw surroga
 `0xd800`, and `f4 bf bf bf` produces `0x13ffff`. The latter is handled later by
 `ReadLine`, not by this decoder. A rejected lead consumes one byte; an incomplete
 sequence consumes none. Rust strings or `char` would lose this behavior.
+
+The attachment decoder also accepts code units outside the usual encoded-font
+alphabet: it subtracts 33, truncates to a byte, and then masks bits. The port
+preserves that behavior. Its Rust bulk API validates the output slice before
+writing; the temporary C++ adapter retains allocation and packs four input units
+at a time into a value-only ABI. The native adapter's loop bounds still require
+review; no pointer is dereferenced inside Rust.
 
 ## Local validation
 
@@ -156,12 +168,14 @@ not VSFilter's output.
 
 ## CSRI corpus and evidence
 
-`test/compat/cases.json` initially contains 146 cases: both file and memory
-loading for 34 existing ASS samples and 38 generated samples, plus geometry and
+`test/compat/cases.json` initially contains 168 cases: both file and memory
+loading for 34 existing ASS samples and 49 generated samples, plus geometry and
 stride cases. Generated cases include malformed tags, duplicate tags, malformed
 UTF-8, unpaired UTF-16, embedded NUL, CR/LF differences, missing final newlines
 and the original 4096-byte refill boundary. `.gitattributes` prevents checkout
-from changing any test bytes. Run `make_corpus.py` to regenerate, or `--check`
+from changing any test bytes. Font cases include invalid encoded lengths and raw
+UTF-16 units (their decoded bytes are deliberately not valid font binaries).
+Run `make_corpus.py` to regenerate, or `--check`
 to verify. Do not rewrite old fixtures to make a test pass.
 
 Timestamps sample the first recognizable event's boundaries, midpoint and

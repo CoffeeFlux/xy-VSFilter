@@ -30,6 +30,21 @@ pub extern "C" fn xy_vsfilter_next_char(packed: u32, available: u32, encoding: u
     u64::from(result.value as u32) | (u64::from(result.consumed) << 32)
 }
 
+/// Four raw UTF-16 units, packed into successive 16-bit lanes. The result is
+/// three decoded bytes in the low 24 bits. The caller handles short final groups.
+/// SAFETY of the export: private, value-only C ABI declared in xy_rust_text.h.
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_decode_font_group(packed: u64) -> u32 {
+    let input = [
+        packed as u16,
+        (packed >> 16) as u16,
+        (packed >> 32) as u16,
+        (packed >> 48) as u16,
+    ];
+    let [a, b, c] = xy_vsfilter_compat::font::decode_group(input);
+    u32::from(a) | (u32::from(b) << 8) | (u32::from(c) << 16)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
