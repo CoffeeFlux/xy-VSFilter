@@ -25,44 +25,50 @@ static int ObservedUnionRect(RECT* dst,const RECT* a,const RECT* b) {
     hdmvObserve({{6,dst->left,dst->top,dst->right,dst->bottom,result,0}});
     return result;
 }
-class ObservedDvbBuffer : public ObservedGolomb {
+template<class Reader> class ObservedDvbBase : public ObservedGolombBase<Reader> {
 public:
-    ObservedDvbBuffer(BYTE* data,int size):ObservedGolomb(data,size){}
+    using Reader::m_nBitPos;
+    using Reader::m_bitlen;
+    using Reader::m_bitbuff;
+    ObservedDvbBase(BYTE* data,int size):ObservedGolombBase<Reader>(data,size){}
     short ReadShort() {
-        const short value=ReferenceGolomb::ReadShort();
+        const short value=Reader::ReadShort();
         hdmvObserve({{8,m_nBitPos,m_bitlen,m_bitbuff,value,0,0}});
         return value;
     }
     int GetPos() {
-        const int value=ReferenceGolomb::GetPos();
+        const int value=Reader::GetPos();
         hdmvObserve({{9,m_nBitPos,m_bitlen,m_bitbuff,value,0,0}});
         return value;
     }
     void SkipBytes(int count) {
-        ReferenceGolomb::SkipBytes(count);
+        Reader::SkipBytes(count);
         hdmvObserve({{10,count,m_nBitPos,m_bitlen,m_bitbuff,0,0}});
     }
     UINT64 BitRead(int bits,bool peek=false) {
-        const UINT64 value=ReferenceGolomb::BitRead(bits,peek);
+        const UINT64 value=Reader::BitRead(bits,peek);
         hdmvObserve({{4,bits,m_nBitPos,m_bitlen,m_bitbuff,static_cast<int64_t>(value),peek}});
         return value;
     }
     void BitByteAlign() {
         const int before=m_bitlen;
-        ReferenceGolomb::BitByteAlign();
+        Reader::BitByteAlign();
         hdmvObserve({{7,before,m_bitlen,m_bitbuff,m_nBitPos,0,0}});
     }
 };
-#define DVB_SHELL(Name) \
+typedef ObservedDvbBase<ReferenceGolomb> ObservedDvbBuffer;
+typedef ObservedDvbBase<CandidateGolomb> CandidateDvbBuffer;
+#define DVB_SHELL(Name,Buffer) \
 class Name : public HdmvObject { \
 public: \
+    typedef Buffer BufferType; \
     short m_width=0; \
     void RenderDvb(SubPicDesc&,short,short,RECT*); \
-    void DvbRenderField(SubPicDesc&,ObservedDvbBuffer&,short,short,short,RECT*); \
-    void Dvb2PixelsCodeString(SubPicDesc&,ObservedDvbBuffer&,short&,short&,RECT*); \
-    void Dvb4PixelsCodeString(SubPicDesc&,ObservedDvbBuffer&,short&,short&,RECT*); \
-    void Dvb8PixelsCodeString(SubPicDesc&,ObservedDvbBuffer&,short&,short&,RECT*); \
-    void Run(int mode,SubPicDesc& s,ObservedDvbBuffer& b,short& x,short& y,RECT* r) { \
+    void DvbRenderField(SubPicDesc&,Buffer&,short,short,short,RECT*); \
+    void Dvb2PixelsCodeString(SubPicDesc&,Buffer&,short&,short&,RECT*); \
+    void Dvb4PixelsCodeString(SubPicDesc&,Buffer&,short&,short&,RECT*); \
+    void Dvb8PixelsCodeString(SubPicDesc&,Buffer&,short&,short&,RECT*); \
+    void Run(int mode,SubPicDesc& s,Buffer& b,short& x,short& y,RECT* r) { \
         if(mode==2)Dvb2PixelsCodeString(s,b,x,y,r); \
         else if(mode==4)Dvb4PixelsCodeString(s,b,x,y,r); \
         else Dvb8PixelsCodeString(s,b,x,y,r); \

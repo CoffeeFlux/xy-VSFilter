@@ -16,9 +16,8 @@ struct FieldOutcome {
 template<class Owner> FieldOutcome run(const std::vector<BYTE>& input,short length,short x,short y,
     short width,int seed,int flags,int failure,int pixel_type) {
     std::vector<BYTE> data=input;const int size=static_cast<int>(data.size());data.push_back(0x5d);
-    ObservedDvbBuffer buffer(data.data(),size);
-    if(seed>0)buffer.ReferenceGolomb::BitRead(seed);
-    if(seed<0)buffer.ReferenceGolomb::BitRead(-seed,true);
+    typename Owner::BufferType buffer(data.data(),size);
+    buffer.Seed(seed);
     Owner owner;owner.m_width=width;
     owner.m_pRLEData=(flags&32) ? nullptr : data.data();owner.m_nRLEDataSize=size;
     for(unsigned i=0;i<256;++i)owner.m_Colors[i]=i*0x013b97e5u ^ 0x81050703u;

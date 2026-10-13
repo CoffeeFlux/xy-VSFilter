@@ -20,6 +20,9 @@
 
 #include "stdafx.h"
 #include "GolombBuffer.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "../../include/xy_rust_golomb.h"
+#endif
 
 CGolombBuffer::CGolombBuffer(BYTE* pBuffer, int nSize)
     : m_pBuffer(pBuffer)
@@ -34,6 +37,24 @@ CGolombBuffer::~CGolombBuffer()
 
 UINT64 CGolombBuffer::BitRead(int nBits, bool fPeek)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    for (;;) {
+        const XyGolombStep step = xy_vsfilter_golomb_step(
+            static_cast<UINT64>(m_bitbuff), m_bitlen, m_nBitPos, m_nSize, nBits, fPeek ? 1 : 0);
+        if (step.action == 2) {
+            break;
+        }
+        m_bitbuff = static_cast<INT64>(step.buffer);
+        m_bitlen = step.length;
+        if (step.action == 0) {
+            return step.value;
+        }
+        // Native storage access stays between Rust calls. Preserve the original
+        // refill order, including position advancement before the byte count.
+        *(BYTE*)&m_bitbuff = m_pBuffer[m_nBitPos++];
+        m_bitlen += 8;
+    }
+#endif
     //ASSERT(nBits >= 0 && nBits <= 64);
 
     while (m_bitlen < nBits) {

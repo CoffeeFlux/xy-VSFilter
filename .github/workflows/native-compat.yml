@@ -26,6 +26,7 @@ on:
       - 'include/xy_rust_segment_insert.h'
       - 'include/xy_rust_hdmv.h'
       - 'include/xy_rust_dvb.h'
+      - 'include/xy_rust_golomb.h'
       - 'include/xy_rust_timeline_search.h'
       - 'src/**'
       - 'tools/compat/**'
