@@ -74,6 +74,14 @@ def variants():
     }.items():
         text = SEED.decode("ascii").split("Dialogue:", 1)[0] + "Dialogue: " + fields + "\r\n"
         yield f"field-{name}", b"\xff\xfe" + text.encode("utf-16le", "surrogatepass")
+    for name, style in {
+        "final-field-reuse": "Style: Default,Arial,36",
+        "empty-numeric": "Style: Default,Arial,,&H00FFFFFF",
+        "unicode-prefixes": "Style: \u2003Default,\u00a0Arial,\t36,&H00FFFFFF",
+        "embedded-nul": "Style: Default,Arial\0tail,36,&H00FFFFFF",
+    }.items():
+        text = re.sub(r"Style: [^\r\n]*", lambda _: style, plain.decode("ascii"))
+        yield f"string-field-{name}", b"\xff\xfe" + text.encode("utf-16le", "surrogatepass")
     yield "drawing-state-control", SEED.replace(b"COMPAT_TEXT", b"after")
     for name, path in {
         "repeated-separators": "***m 0 0***l 60 0 60 60 0 60***",

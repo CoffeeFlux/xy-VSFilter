@@ -3117,6 +3117,150 @@
       "fill_seed": 31
     },
     {
+      "id": "string-field-final-field-reuse-file",
+      "script": "test/compat/generated/string-field-final-field-reuse.ass",
+      "sha256": "8e70feb27ae91e2fa534a19f5456639583b7ed08ae66d23e3b3fee308b46adc4",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "string-field-final-field-reuse-memory",
+      "script": "test/compat/generated/string-field-final-field-reuse.ass",
+      "sha256": "8e70feb27ae91e2fa534a19f5456639583b7ed08ae66d23e3b3fee308b46adc4",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "string-field-empty-numeric-file",
+      "script": "test/compat/generated/string-field-empty-numeric.ass",
+      "sha256": "4399faff4c7652964d1754b070af8607539624a97a8ce4316475491e18012468",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "string-field-empty-numeric-memory",
+      "script": "test/compat/generated/string-field-empty-numeric.ass",
+      "sha256": "4399faff4c7652964d1754b070af8607539624a97a8ce4316475491e18012468",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "string-field-unicode-prefixes-file",
+      "script": "test/compat/generated/string-field-unicode-prefixes.ass",
+      "sha256": "f11dbdddcd97276a756980ceb3f570e2d9134ded151774a444bac84202288e17",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "string-field-unicode-prefixes-memory",
+      "script": "test/compat/generated/string-field-unicode-prefixes.ass",
+      "sha256": "f11dbdddcd97276a756980ceb3f570e2d9134ded151774a444bac84202288e17",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "string-field-embedded-nul-file",
+      "script": "test/compat/generated/string-field-embedded-nul.ass",
+      "sha256": "5b1460a2462900611eaf5f63cdac7e3305bac422bb19eda80e59530b9eaa94ac",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "string-field-embedded-nul-memory",
+      "script": "test/compat/generated/string-field-embedded-nul.ass",
+      "sha256": "5b1460a2462900611eaf5f63cdac7e3305bac422bb19eda80e59530b9eaa94ac",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
       "id": "drawing-state-control-file",
       "script": "test/compat/generated/drawing-state-control.ass",
       "sha256": "1bd5e8f7c386e88b7786e9fe28953126221b0c4707f60cc11e94748008c571ae",

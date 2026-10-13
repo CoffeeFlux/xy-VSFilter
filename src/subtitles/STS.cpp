@@ -1625,6 +1625,9 @@ static bool OpenVPlayer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 
 static inline CStringW GetStr(CStringW& buff, WCHAR sep = L',') //throw(...)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    return XyRust::StringField(buff, sep);
+#else
     buff.TrimLeft();
 
     int pos = buff.Find(sep);
@@ -1638,6 +1641,7 @@ static inline CStringW GetStr(CStringW& buff, WCHAR sep = L',') //throw(...)
     if(pos < buff.GetLength()) buff.Delete(0, pos + 1);
 
     return(ret);
+#endif
 }
 
 static inline int GetInt(CStringW& buff, WCHAR sep = L',') //throw(...)

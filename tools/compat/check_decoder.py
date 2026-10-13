@@ -113,7 +113,8 @@ public:
         fields += f"namespace {name} {{\n"
         if name == "CandidateFields":
             fields += "#define XY_VSFILTER_RUST_TEXT\n"
-        fields += extract_method(content.decode("utf-8-sig"), "static inline CStringW::PCXSTR TryNextStr(")
+        for signature in ("static inline CStringW::PCXSTR TryNextStr(", "static inline CStringW GetStr("):
+            fields += extract_method(content.decode("utf-8-sig"), signature) + "\n"
         fields += "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_fields.h").write_text(fields, encoding="utf-8")
     lexer_source = original("src/subtitles/RTS.cpp", reference["commit"])
