@@ -20,6 +20,24 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust DVB field dispatch for `CompositionObject::DvbRenderField`, behind
+  the existing opt-in switch. The native reader still supplies logical positions
+  and bytes; Rust selects the pixel decoder, preserves signed field lengths,
+  requests mapping-table skips and tracks alternate-row coordinates. Mapping
+  skips and pixel strings are not clamped to the declared field end. Line markers
+  restore the starting X and narrow Y after adding two. Native pixel decoders
+  retain their coordinate references during drawing, and return updated values
+  before Rust resumes. Unknown type bytes keep the native assertion/release
+  behavior. No native callback runs inside a Rust frame.
+  A new extracted oracle covers actual `RenderDvb` and `DvbRenderField` bodies
+  together with the three pixel decoders, including shared top/bottom cursors,
+  negative lengths, prebuffered bits, skipped mappings, dirty rectangles, palette
+  changes and injected exceptions. x86 pixel cases use the original SSE fillers
+  for both packed and planar buffers, comparing all padding and guards.
+  Local and Windows validation for this increment is in progress; earlier
+  validated bitmap-run evidence below remains associated with its recorded SHA.
+  RLE ownership, bitmap packet parsing and host playback remain native/unverified
+  by this component oracle.
 * Safe Rust DVB 2-, 4- and 8-bit pixel-code-string decoding. Rust requests the
   original bit/byte reads and returns runs; native code retains coordinate
   references, per-mode width checks, palette lookup, drawing, `UnionRect` and
@@ -51,7 +69,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   compiled with the Rust adapter enabled. [Bitmap-run evidence](bitmap-run-evidence.json)
   records the exact source inputs, reference method hashes, reports, DLL hashes,
   successful job links and the separate component/CSRI validation scopes.
-  The DVB field/packet parser and its buffer ownership remain native.
+  The DVB packet parser and its buffer ownership remain native; the later
+  field-dispatch increment is described above.
 * Safe Rust HDMV run-decoding state for `CompositionObject::RenderHdmv`.
   An opaque owner requests the original EOF/byte reads and rectangle draws in
   order. Transparent runs, implicit palette zero, zero-length line advances,
@@ -59,7 +78,7 @@ unresolved reference outcomes requiring investigation, never matching results.
   are retained. Palette lookup occurs at each native draw, without caching a
   copied palette. No native callback or exception unwinds through a Rust frame.
   RLE backing storage, `CGolombBuffer`, palette conversion, rasterization and
-  DVB field/packet parsing remain native; the pixel-code strings are covered above. This is a decoder-state port, not a bitmap buffer
+  DVB packet parsing remain native; field dispatch and pixel-code strings are covered above. This is a decoder-state port, not a bitmap buffer
   ownership or packet-parser port.
   The extracted original/candidate methods passed **483,497 comparisons /
   8,317,084 EOF/byte/draw observations** on macOS arm64 with fatal ASan/UBSan,
@@ -657,7 +676,7 @@ and the validation scope for each increment.
 | VirtualDub | `plugins.cpp`, bundled SDK headers | Export calling conventions, filter negotiation, scripting, RGB orientation, lifecycle |
 | Text formats | `STS.cpp`, `TextFile.cpp`, `RealTextParser.cpp`, `USFSubtitles.cpp`, `libssf` | SSA/ASS, SubRip variants, SubViewer, MicroDVD, SAMI, WebVTT, VPlayer, XombieSub, USF, MPL2, RealText and SSF parsing/recovery |
 | Timeline and event ordering | `STS.cpp`, `STS.h` | Segment construction, incremental edits and lookup have differential tests; native entry preparation/storage/sorting, frame/time conversion and host-driven mutation/lifecycle sequences still need migration and broader integration coverage |
-| Bitmap subtitles | `VobSub*`, `HdmvSub*`, `DVBSub*`, `CompositionObject*`, `CCDecoder*` | HDMV and DVB run states have extracted oracles; RLE buffer ownership, field/packet parsing, DVD/VobSub, PGS/SUP and DVB host playback, closed captions and external file behavior remain |
+| Bitmap subtitles | `VobSub*`, `HdmvSub*`, `DVBSub*`, `CompositionObject*`, `CCDecoder*` | HDMV and DVB run states and DVB field assembly have extracted oracles; RLE buffer ownership, packet parsing, DVD/VobSub, PGS/SUP and DVB host playback, closed captions and external file behavior remain |
 | Layout/rendering | `RTS.cpp`, `Rasterizer.cpp`, caches, overlay/clip code | Every tag's recovery and interaction, drawings, clipping, transforms, karaoke, blur/border/shadow, GDI/font metrics and fallback |
 | Compositing/color | `subpic`, SIMD/assembly, conversion tables | All RGB/YUV formats, high bit depths, interlace/subsampling, pitch/orientation, alpha and rounding |
 | Supporting behavior | `dsutil`, `decss`, vendored libraries, settings | Encodings, code pages, font attachments, file/network access, archive inputs, persistence and remaining unsafe dependencies |
@@ -678,7 +697,7 @@ the native oracle where needed:
 | `STS.cpp` entry sorting and frame/time conversion | Own entry ordering and conversion state, with native callbacks initially | `Sort` uses CRT `qsort` with separate normal/readorder comparators; capture equal-key permutations and comparator results before choosing a Rust sorting algorithm. Preserve start-before-end conversion, `llround`, mode changes and the final `CreateSegments` call. |
 | `STS.cpp` field splitting and numeric parsing | Raw UTF-16 fields, cursor/mutation state, error recovery | Both field scanners are now ported, preserving final-field reuse, distinct whitespace rules and separator mutation. Keep CRT numeric conversion until overflow, locale, end-pointer and rounding results are captured. |
 | Remaining `RTS.cpp` drawing parsing | Command replacement, numeric consumption and final native path storage; command state is now ported | `SpanIncluding`'s return value is ignored; commands split inside arbitrary text; `s` falls through to `p`; the apparent Bezier truncation uses an incremented counter and must not be "fixed." Keep `wcstod` and float-to-LONG conversion at the native boundary initially. |
-| `CompositionObject.cpp` bitmap storage and field parsing | HDMV/DVB run state is ported; next capture `CGolombBuffer`, RLE storage and field/packet assembly | Preserve allocated versus appended lengths, reader offsets, palette state and transparent runs. Keep native palette conversion/compositing until those stages have separate exact-byte oracles. |
+| `CompositionObject.cpp` bitmap storage and field parsing | HDMV/DVB run state and DVB field dispatch are ported; next capture `CGolombBuffer`, RLE storage and packet assembly | Preserve allocated versus appended lengths, reader offsets, palette state and transparent runs. Keep native palette conversion/compositing until those stages have separate exact-byte oracles. |
 | `xy_filter.cpp` and raster/compositing kernels | Safe slice ownership and scalar arithmetic implementations | Capture each active SIMD path's operation order, padding, overlap and rounding. Scalar C++ output alone does not establish equality with the SIMD implementation used by a DLL. |
 
 Before migrating bitmap reader/storage ownership, extend the current extracted

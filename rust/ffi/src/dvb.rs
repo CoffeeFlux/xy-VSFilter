@@ -74,3 +74,87 @@ mod tests {
         }
     }
 }
+
+use xy_vsfilter_compat::dvb::{FieldDecoder, FieldRequest};
+
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_dvb_field_create(
+    position: i32,
+    length: i16,
+    x: i16,
+    y: i16,
+) -> *mut FieldDecoder {
+    Box::into_raw(Box::new(FieldDecoder::new(position, length, x, y)))
+}
+
+/// # Safety
+/// owner is the unique live field pointer, without concurrent access.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_dvb_field_supply(
+    owner: *mut FieldDecoder,
+    value: i32,
+    x: i16,
+    y: i16,
+) {
+    // SAFETY: the noncopyable native wrapper supplies exclusive access.
+    unsafe { &mut *owner }.supply(value, x, y);
+}
+
+/// Fields: 0=request (0=done, 1=position, 2=byte, 3=pixels, 4=skip,
+/// 5=unknown); 1=pixel mode or skip count; 2=x; 3=y.
+/// # Safety
+/// owner remains live and immutable for this call. No storage escapes Rust.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_dvb_field_query(
+    owner: *const FieldDecoder,
+    field: u32,
+) -> i32 {
+    // SAFETY: the native wrapper retains the live owner without mutation.
+    let decoder = unsafe { &*owner };
+    match (field, decoder.request()) {
+        (0, FieldRequest::Done) => 0,
+        (0, FieldRequest::Position) => 1,
+        (0, FieldRequest::Byte) => 2,
+        (0, FieldRequest::Pixels(_)) => 3,
+        (0, FieldRequest::Skip(_)) => 4,
+        (0, FieldRequest::Unknown) => 5,
+        (1, FieldRequest::Pixels(Mode::Two)) => 2,
+        (1, FieldRequest::Pixels(Mode::Four)) => 4,
+        (1, FieldRequest::Pixels(Mode::Eight)) => 8,
+        (1, FieldRequest::Skip(count)) => i32::from(count),
+        (2, _) => i32::from(decoder.coordinates().0),
+        (3, _) => i32::from(decoder.coordinates().1),
+        _ => 0,
+    }
+}
+
+/// # Safety
+/// Return the unique live field owner exactly once; null is allowed.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_dvb_field_release(owner: *mut FieldDecoder) {
+    if !owner.is_null() {
+        // SAFETY: ownership returns without outstanding borrows.
+        drop(unsafe { Box::from_raw(owner) });
+    }
+}
+
+#[cfg(test)]
+mod field_tests {
+    use super::*;
+    #[test]
+    fn field_owner_and_coordinate_protocol() {
+        let owner = xy_vsfilter_dvb_field_create(4, 12, -1, 32767);
+        // SAFETY: sequential calls to one live owner, released exactly once.
+        unsafe {
+            xy_vsfilter_dvb_field_supply(owner, 4, 0, 0);
+            xy_vsfilter_dvb_field_supply(owner, 0x10, 0, 0);
+            assert_eq!(xy_vsfilter_dvb_field_query(owner, 1), 2);
+            xy_vsfilter_dvb_field_supply(owner, 0, 20, 32767);
+            xy_vsfilter_dvb_field_supply(owner, 8, 0, 0);
+            xy_vsfilter_dvb_field_supply(owner, 0xf0, 0, 0);
+            assert_eq!(xy_vsfilter_dvb_field_query(owner, 2), -1);
+            assert_eq!(xy_vsfilter_dvb_field_query(owner, 3), -32767);
+            xy_vsfilter_dvb_field_release(owner);
+        }
+    }
+}
