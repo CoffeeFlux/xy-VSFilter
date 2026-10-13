@@ -1,0 +1,2047 @@
+{
+  "schema": 1,
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "candidate_commit": "320069fce8d03fdacdc06dd3dd5a3fbeb281ac0a",
+  "native_runs": [
+    {
+      "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38466508568",
+      "build": {
+        "configuration": "Release",
+        "mutation_count": 32,
+        "windows_sdk_version": "10.0.26100.0\\",
+        "msvc_tools_version": "14.44.35207",
+        "rustc": [
+          "rustc 1.85.0 (4d91de4e4 2025-02-17)",
+          "binary: rustc",
+          "commit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688",
+          "commit-date: 2025-02-17",
+          "host: x86_64-pc-windows-msvc",
+          "release: 1.85.0",
+          "LLVM version: 19.1.7"
+        ],
+        "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+        "cargo": [
+          "cargo 1.85.0 (d73d2caf9 2024-12-31)"
+        ],
+        "candidate_status": [],
+        "platform": "Win32",
+        "candidate_commit": "320069fce8d03fdacdc06dd3dd5a3fbeb281ac0a",
+        "mutation_seed": 12345
+      },
+      "checks": {
+        "smoke": {
+          "report_sha256": "9c37e2c536db46aeee8fa7e6cf9d3e16bdca6e1d89868d3424cfb4774fbe6069",
+          "case_count": 1,
+          "rendered_frames": 10,
+          "changed_frames": 6,
+          "case_verdicts": {
+            "equal": 1
+          },
+          "candidate_statuses": {
+            "ok": 1
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "aff943a1c633c5a1aca2d2f504b0b17c5a7f19b3d3bbffaa215d1889fff2da25",
+          "dialog_observations": {},
+          "timeline_observations": {}
+        },
+        "csri": {
+          "report_sha256": "a735639ffe6e41e1633bea3a57ccbe4de939073e5a139505fa2d6bc3c6b18519",
+          "case_count": 322,
+          "rendered_frames": 4026,
+          "changed_frames": 2702,
+          "case_verdicts": {
+            "equal": 322
+          },
+          "candidate_statuses": {
+            "ok": 310,
+            "open_rejected": 12
+          },
+          "distinct_frame_controls": [
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-file",
+                "font-valid-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-memory",
+                "font-valid-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-file",
+                "drawing-state-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-memory",
+                "drawing-state-control-memory"
+              ],
+              "reference-0": true
+            }
+          ],
+          "manifest_sha256": "1085589b52bb1de0ed549b316ef74e546e70e4901076db2d563811f8f8c38d4f",
+          "dialog_observations": {
+            "field-tab-prefixes-file": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\tDefault\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-tab-prefixes-memory": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\tDefault\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-unicode-style-space-file": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\u2003Default\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-unicode-style-space-memory": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\u2003Default\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ]
+          },
+          "timeline_observations": {
+            "timeline-overlap-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-order-reversed-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-order-reversed-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-duplicates-and-zero-file": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-duplicates-and-zero-memory": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-touching-and-gaps-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-touching-and-gaps-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-nested-layers-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "timeline-nested-layers-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "timeline-reversed-and-empty-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-reversed-and-empty-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-equal-starts-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-starts-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-ends-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-ends-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-overlap-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 11
+            },
+            "incremental-overlap-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 11
+            },
+            "incremental-out-of-order-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 8
+            },
+            "incremental-out-of-order-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 8
+            },
+            "incremental-gaps-bridged-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-gaps-bridged-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-nested-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-nested-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-touching-file": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-touching-memory": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-zero-and-reversed-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-zero-and-reversed-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-duplicates-file": {
+              "frame_count": 47,
+              "changed_frames": 22,
+              "distinct_frame_hashes": 2
+            },
+            "incremental-duplicates-memory": {
+              "frame_count": 47,
+              "changed_frames": 22,
+              "distinct_frame_hashes": 2
+            },
+            "incremental-empty-text-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-empty-text-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            }
+          }
+        },
+        "mutation-results": {
+          "report_sha256": "ec98c5ef771e7a0cb475300949cf07c24dcbf29e8b2ad3c488170b4ad0084b04",
+          "case_count": 32,
+          "rendered_frames": 224,
+          "changed_frames": 160,
+          "case_verdicts": {
+            "equal": 32
+          },
+          "candidate_statuses": {
+            "ok": 32
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "692b4dcb930f2117e85805fead2e88d7a3e21f3894da6b3b27f6313f2afeef40",
+          "dialog_observations": {},
+          "timeline_observations": {}
+        }
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "f9aea567f2b60758f01cfa9886d72d31f80b1798fbd41f69efd00cc572f2681c",
+          "baseline_sha256": "f50a84ece917cb931d3e4100b9f5f7982e65d0189865820cf4728f220e53f8a2",
+          "candidate_sha256": "80f391be1899de090132c169fa02d0907fae66f7536af791a58e3b50801e9c9b"
+        },
+        "XySubFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "d8cd7823d3b6d58469d5cdeb1e7f647d0aefb1c33c1d3d6c3064eb9dd72d5d5c",
+          "baseline_sha256": "b301d15a7d55761511f07ee9c396beb10c6519224d7f0ffa2b58ccd2950f4409",
+          "candidate_sha256": "927fea02b0b516d40d03a7a55f970f2188575ad8dafeda29896c455df6c12442"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "e666b77b86ebf78670a821a32ef94257d7671059d660f18001c9641876d1625d",
+          "baseline_sha256": "61bc055dd29b9a5725330d7c4a06e8221a171580bd901b66444272bc9f96b8f2",
+          "candidate_sha256": "7feba4e2bf31dc81b34888ef113513c7c740c4013415b1bdd561e80f294212e9"
+        }
+      },
+      "candidate_log_sha256": "4a9ae1882685f2e72c75a3f3f64cdfa61cf42b8ad33b514f8a8b77714dfc7c9e",
+      "job_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38466508568/job/115534575381",
+      "job_passed": true
+    },
+    {
+      "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38466508568",
+      "build": {
+        "mutation_count": 32,
+        "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+        "platform": "x64",
+        "configuration": "Release",
+        "rustc": [
+          "rustc 1.85.0 (4d91de4e4 2025-02-17)",
+          "binary: rustc",
+          "commit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688",
+          "commit-date: 2025-02-17",
+          "host: x86_64-pc-windows-msvc",
+          "release: 1.85.0",
+          "LLVM version: 19.1.7"
+        ],
+        "cargo": [
+          "cargo 1.85.0 (d73d2caf9 2024-12-31)"
+        ],
+        "msvc_tools_version": "14.44.35207",
+        "candidate_status": [],
+        "windows_sdk_version": "10.0.26100.0\\",
+        "mutation_seed": 12345,
+        "candidate_commit": "320069fce8d03fdacdc06dd3dd5a3fbeb281ac0a"
+      },
+      "checks": {
+        "smoke": {
+          "report_sha256": "223530d2f42813a28eb2f28c2dcc2f5be2fc825d6103f61ec28eaacdaa64644d",
+          "case_count": 1,
+          "rendered_frames": 10,
+          "changed_frames": 6,
+          "case_verdicts": {
+            "equal": 1
+          },
+          "candidate_statuses": {
+            "ok": 1
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "aff943a1c633c5a1aca2d2f504b0b17c5a7f19b3d3bbffaa215d1889fff2da25",
+          "dialog_observations": {},
+          "timeline_observations": {}
+        },
+        "csri": {
+          "report_sha256": "a976d62ed62ca2bc06f0e86397418cf3e5dcdb92775e55913cef968150e3f818",
+          "case_count": 322,
+          "rendered_frames": 4026,
+          "changed_frames": 2702,
+          "case_verdicts": {
+            "equal": 322
+          },
+          "candidate_statuses": {
+            "ok": 310,
+            "open_rejected": 12
+          },
+          "distinct_frame_controls": [
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-file",
+                "font-valid-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-memory",
+                "font-valid-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-file",
+                "drawing-state-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-memory",
+                "drawing-state-control-memory"
+              ],
+              "reference-0": true
+            }
+          ],
+          "manifest_sha256": "1085589b52bb1de0ed549b316ef74e546e70e4901076db2d563811f8f8c38d4f",
+          "dialog_observations": {
+            "field-tab-prefixes-file": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\tDefault\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-tab-prefixes-memory": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\tDefault\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-unicode-style-space-file": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\u2003Default\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-unicode-style-space-memory": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\u2003Default\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ]
+          },
+          "timeline_observations": {
+            "timeline-overlap-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-order-reversed-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-order-reversed-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-duplicates-and-zero-file": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-duplicates-and-zero-memory": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-touching-and-gaps-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-touching-and-gaps-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-nested-layers-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "timeline-nested-layers-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "timeline-reversed-and-empty-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-reversed-and-empty-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-equal-starts-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-starts-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-ends-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-ends-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-overlap-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 11
+            },
+            "incremental-overlap-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 11
+            },
+            "incremental-out-of-order-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 8
+            },
+            "incremental-out-of-order-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 8
+            },
+            "incremental-gaps-bridged-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-gaps-bridged-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-nested-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-nested-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-touching-file": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-touching-memory": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-zero-and-reversed-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-zero-and-reversed-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-duplicates-file": {
+              "frame_count": 47,
+              "changed_frames": 22,
+              "distinct_frame_hashes": 2
+            },
+            "incremental-duplicates-memory": {
+              "frame_count": 47,
+              "changed_frames": 22,
+              "distinct_frame_hashes": 2
+            },
+            "incremental-empty-text-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-empty-text-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            }
+          }
+        },
+        "mutation-results": {
+          "report_sha256": "0b0f098a74460a19aa6bb72031719e8b10ed7c615fc6c62e6a2678cbc706a9e2",
+          "case_count": 32,
+          "rendered_frames": 224,
+          "changed_frames": 160,
+          "case_verdicts": {
+            "equal": 32
+          },
+          "candidate_statuses": {
+            "ok": 32
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "90e89279db719c739c6a1363611c04225b3486f03fee6ad9ceaca20e084ce43c",
+          "dialog_observations": {},
+          "timeline_observations": {}
+        }
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "84a27c3f09cb0d719d9eda44878694f94595dada4c14ceb22a2e4e614f9ec4ff",
+          "baseline_sha256": "0cef89367127761fab895d93268bb30eabe061915ba9e0d155ff86874065ed9d",
+          "candidate_sha256": "a06b440c2d81a9e1a5f0471d4e552db88e4dcacda66764905ad7a55e062f3aff"
+        },
+        "XySubFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "70a7daaf1cbd89db83662b6014439fe736474ef9fe6ad152a955d625901c74b2",
+          "baseline_sha256": "c5941bbeed6d57ad9e66bbc2de631d153cdd6276da0ee100479e6ee3df872d50",
+          "candidate_sha256": "e9a4cdd1675145ab1e589eb4ef399020d3ba5847856deffd5c5d9e0d5c3b1f68"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "d0b61ec5540588c5f5e14949472e20c26b17713b3700e75d9fc088d2bcc176b9",
+          "baseline_sha256": "22f80956c4af19712777a647972d0328f501c2f8873aa837685bf9ebb1d03ff5",
+          "candidate_sha256": "13f51feabe735be32c5bfecd38f058114657a577ab651a52cc9ddec181044f71"
+        }
+      },
+      "candidate_log_sha256": "92623be4d37c0e403389278eec0161fb7e0b3fa3f2f2a4633dfaa31328f60266",
+      "job_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38466508568/job/115534574812",
+      "job_passed": true
+    },
+    {
+      "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38466766844",
+      "build": {
+        "candidate_status": [],
+        "configuration": "Release",
+        "candidate_commit": "320069fce8d03fdacdc06dd3dd5a3fbeb281ac0a",
+        "windows_sdk_version": "10.0.26100.0\\",
+        "mutation_count": 256,
+        "rustc": [
+          "rustc 1.85.0 (4d91de4e4 2025-02-17)",
+          "binary: rustc",
+          "commit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688",
+          "commit-date: 2025-02-17",
+          "host: x86_64-pc-windows-msvc",
+          "release: 1.85.0",
+          "LLVM version: 19.1.7"
+        ],
+        "msvc_tools_version": "14.44.35207",
+        "cargo": [
+          "cargo 1.85.0 (d73d2caf9 2024-12-31)"
+        ],
+        "platform": "Win32",
+        "mutation_seed": 20261019,
+        "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62"
+      },
+      "checks": {
+        "smoke": {
+          "report_sha256": "3bbd3fb2735bb9beba3a762fda2ba6cb1076bafc5082a124815539ba71f8e290",
+          "case_count": 1,
+          "rendered_frames": 10,
+          "changed_frames": 6,
+          "case_verdicts": {
+            "equal": 1
+          },
+          "candidate_statuses": {
+            "ok": 1
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "aff943a1c633c5a1aca2d2f504b0b17c5a7f19b3d3bbffaa215d1889fff2da25",
+          "dialog_observations": {},
+          "timeline_observations": {}
+        },
+        "csri": {
+          "report_sha256": "27f1e532220916bf96a9d98aa38224a2a3e42448e40efdaf7a7329d9c4177101",
+          "case_count": 322,
+          "rendered_frames": 4026,
+          "changed_frames": 2702,
+          "case_verdicts": {
+            "equal": 322
+          },
+          "candidate_statuses": {
+            "ok": 310,
+            "open_rejected": 12
+          },
+          "distinct_frame_controls": [
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-file",
+                "font-valid-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-memory",
+                "font-valid-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-file",
+                "drawing-state-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-memory",
+                "drawing-state-control-memory"
+              ],
+              "reference-0": true
+            }
+          ],
+          "manifest_sha256": "1085589b52bb1de0ed549b316ef74e546e70e4901076db2d563811f8f8c38d4f",
+          "dialog_observations": {
+            "field-tab-prefixes-file": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\tDefault\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-tab-prefixes-memory": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\tDefault\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-unicode-style-space-file": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\u2003Default\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-unicode-style-space-memory": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\u2003Default\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ]
+          },
+          "timeline_observations": {
+            "timeline-overlap-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-order-reversed-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-order-reversed-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-duplicates-and-zero-file": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-duplicates-and-zero-memory": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-touching-and-gaps-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-touching-and-gaps-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-nested-layers-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "timeline-nested-layers-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "timeline-reversed-and-empty-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-reversed-and-empty-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-equal-starts-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-starts-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-ends-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-ends-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-overlap-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 11
+            },
+            "incremental-overlap-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 11
+            },
+            "incremental-out-of-order-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 8
+            },
+            "incremental-out-of-order-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 8
+            },
+            "incremental-gaps-bridged-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-gaps-bridged-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-nested-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-nested-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-touching-file": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-touching-memory": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-zero-and-reversed-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-zero-and-reversed-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-duplicates-file": {
+              "frame_count": 47,
+              "changed_frames": 22,
+              "distinct_frame_hashes": 2
+            },
+            "incremental-duplicates-memory": {
+              "frame_count": 47,
+              "changed_frames": 22,
+              "distinct_frame_hashes": 2
+            },
+            "incremental-empty-text-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-empty-text-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            }
+          }
+        },
+        "mutation-results": {
+          "report_sha256": "ff325b34a1868d372dcccd38ed1d1febc3add8991e5d496451afafa1d7d45142",
+          "case_count": 256,
+          "rendered_frames": 1792,
+          "changed_frames": 1270,
+          "case_verdicts": {
+            "equal": 256
+          },
+          "candidate_statuses": {
+            "ok": 256
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "d5a7d337fd391272074251fd50a41c6e0c7975a43dc0361a72380aecb8e97334",
+          "dialog_observations": {},
+          "timeline_observations": {}
+        }
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "f9aea567f2b60758f01cfa9886d72d31f80b1798fbd41f69efd00cc572f2681c",
+          "baseline_sha256": "f744a932246036d06db06b04f8fedadb4234f17407a966d6046d24a194b65616",
+          "candidate_sha256": "ae33529ea9c594a9662d871a29d34244f7e7c6a45f36758933ce5deb0996b3ab"
+        },
+        "XySubFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "d8cd7823d3b6d58469d5cdeb1e7f647d0aefb1c33c1d3d6c3064eb9dd72d5d5c",
+          "baseline_sha256": "16d3e2218d4cf4c29291f66b624c05bc8c0c920706f0ec0b84fbd77c9f34b8f8",
+          "candidate_sha256": "3a5d16c43ba592631c5c4ddc174bd50b56b617c72fde2f95286d6e9dab0e7f89"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "e666b77b86ebf78670a821a32ef94257d7671059d660f18001c9641876d1625d",
+          "baseline_sha256": "c748371f3de382fbc8a387f67210c27fcd9429f0614fcfdfb42ff0b9d0b6a8e7",
+          "candidate_sha256": "96f2b2a0c92b52e86eacefaf5dbadaa7be5ae93a3767bdb1ce6ee70a452970ac"
+        }
+      },
+      "candidate_log_sha256": "6c7167ceb72890095eb54dfe51679657c5918af5a4a3f4b6b3c1c38ff0afb430",
+      "job_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38466766844/job/115535455468",
+      "job_passed": true
+    },
+    {
+      "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38467187846",
+      "build": {
+        "rustc": [
+          "rustc 1.85.0 (4d91de4e4 2025-02-17)",
+          "binary: rustc",
+          "commit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688",
+          "commit-date: 2025-02-17",
+          "host: x86_64-pc-windows-msvc",
+          "release: 1.85.0",
+          "LLVM version: 19.1.7"
+        ],
+        "candidate_commit": "320069fce8d03fdacdc06dd3dd5a3fbeb281ac0a",
+        "candidate_status": [],
+        "configuration": "Release",
+        "platform": "x64",
+        "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+        "cargo": [
+          "cargo 1.85.0 (d73d2caf9 2024-12-31)"
+        ],
+        "msvc_tools_version": "14.44.35207",
+        "windows_sdk_version": "10.0.26100.0\\",
+        "mutation_seed": 20261019,
+        "mutation_count": 256
+      },
+      "checks": {
+        "smoke": {
+          "report_sha256": "fd41a1cafa7aae1e5f99d82b96002e0cd6a7c04140150b97f2d43d240cf0d94c",
+          "case_count": 1,
+          "rendered_frames": 10,
+          "changed_frames": 6,
+          "case_verdicts": {
+            "equal": 1
+          },
+          "candidate_statuses": {
+            "ok": 1
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "b3091fe31459e8e5cbde58c9bac57749c0374ed063964c45f600d6693d62c9dd",
+          "dialog_observations": {},
+          "timeline_observations": {}
+        },
+        "csri": {
+          "report_sha256": "8ee3fd493174a144fb64ff79f86be9d9e12e268143a5d24f044222ff3b033cac",
+          "case_count": 322,
+          "rendered_frames": 4026,
+          "changed_frames": 2702,
+          "case_verdicts": {
+            "equal": 322
+          },
+          "candidate_statuses": {
+            "ok": 310,
+            "open_rejected": 12
+          },
+          "distinct_frame_controls": [
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-file",
+                "font-valid-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-memory",
+                "font-valid-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-file",
+                "drawing-state-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-memory",
+                "drawing-state-control-memory"
+              ],
+              "reference-0": true
+            }
+          ],
+          "manifest_sha256": "1085589b52bb1de0ed549b316ef74e546e70e4901076db2d563811f8f8c38d4f",
+          "dialog_observations": {
+            "field-tab-prefixes-file": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\tDefault\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-tab-prefixes-memory": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\tDefault\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-unicode-style-space-file": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\u2003Default\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-unicode-style-space-memory": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\u2003Default\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ]
+          },
+          "timeline_observations": {
+            "timeline-overlap-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-order-reversed-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-order-reversed-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-duplicates-and-zero-file": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-duplicates-and-zero-memory": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-touching-and-gaps-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-touching-and-gaps-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-nested-layers-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "timeline-nested-layers-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "timeline-reversed-and-empty-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-reversed-and-empty-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-equal-starts-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-starts-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-ends-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-ends-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-overlap-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 11
+            },
+            "incremental-overlap-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 11
+            },
+            "incremental-out-of-order-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 8
+            },
+            "incremental-out-of-order-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 8
+            },
+            "incremental-gaps-bridged-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-gaps-bridged-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-nested-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-nested-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-touching-file": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-touching-memory": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-zero-and-reversed-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-zero-and-reversed-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-duplicates-file": {
+              "frame_count": 47,
+              "changed_frames": 22,
+              "distinct_frame_hashes": 2
+            },
+            "incremental-duplicates-memory": {
+              "frame_count": 47,
+              "changed_frames": 22,
+              "distinct_frame_hashes": 2
+            },
+            "incremental-empty-text-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-empty-text-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            }
+          }
+        },
+        "mutation-results": {
+          "report_sha256": "61bc49d915ae3f050ec5387370bb48d3d36545588f00ff75168a45f774b48fce",
+          "case_count": 256,
+          "rendered_frames": 1792,
+          "changed_frames": 1270,
+          "case_verdicts": {
+            "equal": 256
+          },
+          "candidate_statuses": {
+            "ok": 256
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "cf26715fac2188db53dead225dd654f327164c3af3012fdbc128da59d45b65e2",
+          "dialog_observations": {},
+          "timeline_observations": {}
+        }
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "84a27c3f09cb0d719d9eda44878694f94595dada4c14ceb22a2e4e614f9ec4ff",
+          "baseline_sha256": "0d6999dfb3c6b36755b3c5a34a576a5f6a3a0a16d9d38ad5b2a39cf7e56a677a",
+          "candidate_sha256": "1ad41840d07c4b797e4317b9202470d78688e2a3308b80859014f2c4671752a3"
+        },
+        "XySubFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "70a7daaf1cbd89db83662b6014439fe736474ef9fe6ad152a955d625901c74b2",
+          "baseline_sha256": "22140117b58c1798319a6cf4daa070bf70eec74e94fea0fd1074ec5f186c5451",
+          "candidate_sha256": "ef60e76153736eaec2816621529ff387785a8cc168cc011bcd2e8e148ada272c"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "d0b61ec5540588c5f5e14949472e20c26b17713b3700e75d9fc088d2bcc176b9",
+          "baseline_sha256": "b5b76d230bad676be60d56a7bf3cec1eca1ffee0b0b3832ebf81840d5da69f5d",
+          "candidate_sha256": "52989015621fc38ad0568bbae8ddbceb96ecfe23898b9fe5d0afa30d0f03ba19"
+        }
+      },
+      "candidate_log_sha256": "cd1333968b6b816137bc117aa9bf1791f4ef982496a62b33d4286badd8d7a471",
+      "job_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38467187846/job/115536920655",
+      "job_passed": true
+    }
+  ],
+  "portable_run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38466508664",
+  "portable": [
+    {
+      "target": "aarch64-apple-darwin",
+      "report_sha256": "2425ab3cb409ad78b4980fd1408cbef0da89c873d834620f57816281c3fcc1a7",
+      "sanitizers": true,
+      "result": "85992064 exact decoder comparisons passed",
+      "text_reader_result": "37008 text-file scenarios and 1396467 line/seek comparisons passed (6096 injected exceptions)",
+      "font_result": "17371137 exact font-attachment comparisons passed",
+      "lexer_result": "2727819 exact ASS lexer comparisons passed (command, parameter units, order and empty tags).",
+      "drawing_result": "343183 exact drawing-state comparisons passed (types, points, validity, point requests and cache bypass)",
+      "drawing_tokens_result": "1342183 exact drawing-token comparisons passed (commands, raw parameter units, NUL handling and order)",
+      "fields_result": "4927032 exact field comparisons passed (buffer mutation, returned pointer, next cursor, repeated reads and raw units)\n4927032 exact CString field comparisons passed (trimmed buffer, returned raw units, exceptions, repeated reads and native locale whitespace)",
+      "segments_result": "205982 exact segment comparisons passed (boundaries, input entry order, inactive-entry splits, animated reset and callback snapshots)",
+      "timeline_search_result": "1051947 exact timeline lookup comparisons passed (14352 injected translation exceptions; returned pointer/index, aliased outputs and exact native translation call order)",
+      "segment_insert_result": "59215 exact incremental-segment comparisons passed (1453819 native mutation snapshots, 3357 injected boundary exceptions; entry order, animation flags and partial state)",
+      "candidate_inputs": {
+        "Cargo.toml": "34479687bc9fac5dcc025e7ad0d7c7392c9a8e6a95071ecfddae626de1713e05",
+        "Cargo.lock": "fd9331e0dc6b0183bf14e2e8c13939684182d7ec437ac1fac54abbaac8da7335",
+        "include/xy_rust_text.h": "4caa9df121c701b2008f1e41c1b476b98a1f9888fcb51a65de2dbc9bbd3e5c40",
+        "include/xy_rust_ass.h": "e25175962a04d23b8be31323e649bdf607814c6f11d201fd4bfb97c958b37bf8",
+        "include/xy_rust_reader.h": "fc98598650099534eeef499838e070b3affbacfd10e3a0f4f8bf1b3b8e40aeec",
+        "include/xy_rust_drawing.h": "0b1480d82c8d0c8ef221b395345593a8cbe5484e6e81b0862c88e1b3e3a5bd5c",
+        "include/xy_rust_drawing_tokens.h": "e45fceb1aabdb5ca172bc2f5356eb30c3dcd89cff88fa16b2d84e2551f8eebbb",
+        "include/xy_rust_fields.h": "07ef1a44d614fb35abd847f7ddee66558328264c34414c965d2058a557878642",
+        "include/xy_rust_segments.h": "de83a7723e20947cf21ebc963e94e02a7309251585b84d14b810cc3d764934d7",
+        "include/xy_rust_segment_insert.h": "4567c4d4ae5c719e9f557837bbd95a72f7130b217639b606f78c4110e7445dfc",
+        "include/xy_rust_timeline_search.h": "d0b86cc52ed2a08a3016b9f1f6f34949c55c252481df41cc428e753bb95a348e",
+        "src/subtitles/TextFile.h": "fe26e64597691da26aa13d3ba11c0027d23332dabf9c5f7bcd8ca3ec7d9a30fc",
+        "tools/compat/ass_lexer_oracle.cpp": "386c15ccbe78dcd816192de244c205dc1973bdf6075f71a10d69d99673442112",
+        "tools/compat/decoder_oracle.cpp": "2572d7ab48a8a0535308ff7bc7b8e1263b4d0c7ab96a961dd3baebc2cd45a923",
+        "tools/compat/drawing_oracle.cpp": "bae491f110922898af703fe1cc872cd5b15ef13811e0c337e90ddf4068f3297a",
+        "tools/compat/drawing_tokens_oracle.cpp": "b670388ec51ec421ffda51a874d0197aca21e31aabd9f3295d9c4ac1c980aa74",
+        "tools/compat/fields_oracle.cpp": "0048ac141b05e76cf0cf57a4444f7c8a526460117593c6d353bd7e66cfefcc79",
+        "tools/compat/font_oracle.cpp": "66ae37e835f97bcd9ee645fa36f51a251b81eec525d51da099b804f08b36a63d",
+        "tools/compat/segment_insert_oracle.cpp": "8693f1f8b89667126096368a9eb6a90d9e8b7fccfe404bd4e4db8d5d72fb2fb9",
+        "tools/compat/segments_oracle.cpp": "153ccb7adeaeaa82c7826826311304f979a19b5a07dc264136dee9660fff8bb1",
+        "tools/compat/text_reader_oracle.cpp": "0f7491e79047e4547893f735617580ce08be4a23167e786f2035a531b755bcea",
+        "tools/compat/timeline_search_oracle.cpp": "aa455fe0d315c286427f8d5e0c9355a628bc74ac65e623a3ae6efd180969aa9c",
+        "tools/compat/ass_lexer_shell.h": "285326c84f336cd68b1de88a7de2cfad6519f0e7ac8a0a609443d7da5c6eb6dd",
+        "tools/compat/drawing_shell.h": "312671e938ac4013a0b1ca969c8e612a9dd70e6c5e7d4ef32053c4e5f7121620",
+        "tools/compat/drawing_tokens_shell.h": "7e4f47650d18d0f9532498b5113884db2f3dfb46d20043812096e9d2723f806b",
+        "tools/compat/fields_shell.h": "bd9ce0dbdadada49d01da05f5d7c63878caa92c0fdfa9f2c7f4db7fa9e8fca3d",
+        "tools/compat/font_shell.h": "6d0acc73d6e5125fbac837a83310240c5371802fa4a40ddd93aec2a28bdd6818",
+        "tools/compat/segment_insert_shell.h": "0d307503dab1af8c72c03473e3d81e7620e8cf22da65f3c829d3f739f462807d",
+        "tools/compat/segments_shell.h": "adb773221c51f0ab26500e076b13ec420770765542f8fd73133da19c3f883fd1",
+        "tools/compat/text_reader_shell.h": "4031f09c42f76350b7611d21d1ffd26904fef8505ce718cddb9add791cbfb833",
+        "tools/compat/timeline_search_shell.h": "9714ed033c3a1c8bc054bccc0ac00722a6f233e29048da135874826cb0d218d5",
+        "tools/compat/check_decoder.py": "9675ad586b7c2b169d294b83692edb425b5a599917834362e443cb652990ed5d",
+        "rust/compat/src/ass_tags.rs": "6792ac12ebbf50f9356d0aa7abad85b20d505e64f7ea539a66eb42990d05a637",
+        "rust/compat/src/drawing.rs": "eca8f1053f8428d9b0c265752ab2f07687f83ae626db30ad2d27beb5ec0bcd67",
+        "rust/compat/src/drawing_tokens.rs": "c3db232dfdbec32354a3bc68fcb8c7a71f01e70e20c5832ca2021b8b559c245b",
+        "rust/compat/src/fields.rs": "398979232ca4b3e7f919daa23313c5e52ef681be15eeafdd0299ad2ef1b5c8a7",
+        "rust/compat/src/font.rs": "7fec61f79198f0dc07fbdbed25204b6422239580de5db434abad5c9bcedad1ac",
+        "rust/compat/src/lib.rs": "3806d43226661ea11e054516680717bee6469636edb30546d89204b517214a77",
+        "rust/compat/src/segment_insert.rs": "1176e67a65262686d2ee7a7bfd6a0b59b2340d945a639fad8f9cd72f6f0d6d89",
+        "rust/compat/src/segments.rs": "3cfdd0d0352e05770941ab630f111414b90d8b4baeb3841065cc8c5b046ca1ad",
+        "rust/compat/src/text.rs": "b7265e27c081c94349505c5cd3db3af8c3f8a73f2a98074e1c8523a3b88f208f",
+        "rust/compat/src/text_reader.rs": "b78c3bc2eda230849d4b67f8547fbd3eb6303ba930f07c955b2a9b37b215b1da",
+        "rust/compat/src/timeline_search.rs": "1b4d6b7a8eee6329b8cf4e564fa6e1aecbc866cfea26a59e9436590e0fe054a5",
+        "rust/ffi/src/ass_tags.rs": "d1764911d033dd4995f1fe02669f11ece10757d4681db1f8d15f35c500382a07",
+        "rust/ffi/src/drawing.rs": "0903c53b826fbb717ff22fce12ad0878aa4b620f043b1f15c2b73002b2ef6bbb",
+        "rust/ffi/src/drawing_tokens.rs": "7814644432e3a0e45a37a4701789698f4b529f1d962a8a64aa8b060cf10c23e2",
+        "rust/ffi/src/fields.rs": "eb6ed7a873a84defa4a2ebff5ea5d3241db58c546c56c0c3c4011bf3fdcfe395",
+        "rust/ffi/src/lib.rs": "4b1f92785e7197e5ef123b206bf6eb9dc3e610cbcb117ee2a4dab0f204a9ce7f",
+        "rust/ffi/src/runtime.rs": "6b974d023640354a5c65ea3d5d3feea35bd191192c8d859fb1f3be342f613f14",
+        "rust/ffi/src/segment_insert.rs": "6273ff03529551f00f0a4f7a95b442afecfa69c5119a640a325415d48206b235",
+        "rust/ffi/src/segments.rs": "f6391d7f5f27349c411339f709e9f102b5c12c51b4cb914f70485aeeef20749d",
+        "rust/ffi/src/text_reader.rs": "a4ab775620d77195187dff9279adbbf6432cd29bba437129f019c9b75fcc2091",
+        "rust/ffi/src/timeline_search.rs": "03308b3ffb052adeee9832fe91242c428e6244d8da0355987c0277c1aea52668",
+        "rust/compat/Cargo.toml": "9f325d80554a26bfb2f50237382694f8e121072e2ce52a34cebf3fa118cce6d1",
+        "rust/ffi/Cargo.toml": "c557156364b3d955695f235a782d9a124d531cc2157bfea6ab209f33850edea7"
+      }
+    },
+    {
+      "target": "i686-pc-windows-msvc",
+      "report_sha256": "a250325f1593da1e05d47769168498cd972e7ddeb91427b1c53621b7e905eae1",
+      "sanitizers": false,
+      "result": "85992064 exact decoder comparisons passed",
+      "text_reader_result": "37008 text-file scenarios and 1396467 line/seek comparisons passed (6096 injected exceptions)",
+      "font_result": "17371137 exact font-attachment comparisons passed",
+      "lexer_result": "2793355 exact ASS lexer comparisons passed (command, parameter units, order and empty tags).",
+      "drawing_result": "343183 exact drawing-state comparisons passed (types, points, validity, point requests and cache bypass)",
+      "drawing_tokens_result": "1342183 exact drawing-token comparisons passed (commands, raw parameter units, NUL handling and order)",
+      "fields_result": "5713464 exact field comparisons passed (buffer mutation, returned pointer, next cursor, repeated reads and raw units)\n5713464 exact CString field comparisons passed (trimmed buffer, returned raw units, exceptions, repeated reads and native locale whitespace)",
+      "segments_result": "205982 exact segment comparisons passed (boundaries, input entry order, inactive-entry splits, animated reset and callback snapshots)",
+      "timeline_search_result": "1051947 exact timeline lookup comparisons passed (14352 injected translation exceptions; returned pointer/index, aliased outputs and exact native translation call order)",
+      "segment_insert_result": "59215 exact incremental-segment comparisons passed (1453819 native mutation snapshots, 3357 injected boundary exceptions; entry order, animation flags and partial state)",
+      "candidate_inputs": {
+        "Cargo.toml": "e8ca379ac3641a00a701be9937cec15fb6a7cae4f746adc65de94eb7f63fb1b5",
+        "Cargo.lock": "84e7744a4412202b2ab9675d3464a48ff30b7342b4065a8105d8999e655cf640",
+        "include/xy_rust_text.h": "953a696e7534339a3fe57dbe688e24424c43f49a1f0c4de9e8173a5fc31a824a",
+        "include/xy_rust_ass.h": "9b29ae9492ed3ee0634d80178d4c049d7a2957a4104c375dd87cf5d66f2e7bd7",
+        "include/xy_rust_reader.h": "99a315beb43451f2dfd21fb5242b61a3507f1082dbddd5c87daa78bb6912a087",
+        "include/xy_rust_drawing.h": "0ed8f5a799ef5f96c6c1840e6cf9b3367d08f08b32e291677ec2dcc8b529224f",
+        "include/xy_rust_drawing_tokens.h": "1b13c031608d98aa46c28fadc3551ea32de20ad72c6cbf1ee5610c8372d315c8",
+        "include/xy_rust_fields.h": "24dc1d14d0767681c896e9d8875925a6a1757781e78616b244f85918bf835220",
+        "include/xy_rust_segments.h": "8332f335119038c4cc04a3f0efe0a701348ad0c8397ed9b44e0744e2a6ee1be2",
+        "include/xy_rust_segment_insert.h": "e4aafaf6bf8cd731fc60fbc109d5afc9c0a2c37874c90636abb04f01214eaeed",
+        "include/xy_rust_timeline_search.h": "c48ac952a67f419ad5cd9a2105c50c1fac394c943275b96a8bf12a40f5ca1aa7",
+        "src/subtitles/TextFile.h": "fe26e64597691da26aa13d3ba11c0027d23332dabf9c5f7bcd8ca3ec7d9a30fc",
+        "tools/compat/ass_lexer_oracle.cpp": "81d81f6af5ed16957deb7f924d1ad3567282608911575a3b8d23222c5b41411e",
+        "tools/compat/decoder_oracle.cpp": "602b19b4316dfffd97ff52ab4cb1a187193e8ee17b54dcbc7ee5e30475397e31",
+        "tools/compat/drawing_oracle.cpp": "dd8a1552185f51255387085772ccdc593a1020d9a39c7dbc13bd4d6960b565ac",
+        "tools/compat/drawing_tokens_oracle.cpp": "df26c6c95784030500151e4d9e8097379114aee764d9fb90c5ac9be59531f470",
+        "tools/compat/fields_oracle.cpp": "1d4bb0a71b2af5932f2e7272756d1c2188e31c58f6298988e2e132c424ad00eb",
+        "tools/compat/font_oracle.cpp": "5fe645bb340d242d6b2ff4e172cd0995f0c42847f1cbd5ae92d02fcc1ebb3d13",
+        "tools/compat/segment_insert_oracle.cpp": "f650fba088d2377a5ac9fa39bb483198d5d42ac80e22520148f5a123c095d819",
+        "tools/compat/segments_oracle.cpp": "93f4d5e00a332480aa15b62ab1f7af2bfbb01098037f68833f5316f1a66b621c",
+        "tools/compat/text_reader_oracle.cpp": "51511a81da0d1f596299ea82372f23137174e5ed5b34752770c1a2898717efd2",
+        "tools/compat/timeline_search_oracle.cpp": "13dc161f1baa422298f87a8791f731aeb43275b78fddd005ece16c4a0fef6ffc",
+        "tools/compat/ass_lexer_shell.h": "f6d33cd6f15021ef235bfe04e0fedba5ad82042297c1fc2137984cc4a96b72cb",
+        "tools/compat/drawing_shell.h": "df7e957afd5abcff14616e86d96abaf832f1d3cc0be4128709ccef3dcbec8c06",
+        "tools/compat/drawing_tokens_shell.h": "626fd244dee88dfbeed292e44c416e44e1765287f34a151397ffbba7fef6afa5",
+        "tools/compat/fields_shell.h": "8db4924635af5e46957dabde356120385e74bfcee3a3d87793418b9a471d6ae2",
+        "tools/compat/font_shell.h": "8b39a6b88b75fc21a6f476b4286a5f79f1670a098844bc22aa942fe7fa2eed34",
+        "tools/compat/segment_insert_shell.h": "d349eafadf2fe127f553d58c1d9592805fc2d5c5731b505cd5b3944e6ad95049",
+        "tools/compat/segments_shell.h": "7ae4e454e341fc161f35d80823c1c29d6e33aac14b59457756b9d2dbbf98fe92",
+        "tools/compat/text_reader_shell.h": "0d07a19620575e4f61624aaf50ce7f1d6305bbe3bbabaeb295a1dfda15059f1b",
+        "tools/compat/timeline_search_shell.h": "2b5788a4050342ab30f219e96d5fc1df81191d4a3bbcc77748e98f8cfdc3454f",
+        "tools/compat/check_decoder.py": "2e1003477146a81879d73eb92ff11082b6bdf8c095873b024a04cc3e6e7f3999",
+        "rust/compat/src/ass_tags.rs": "e115beb8951b8432f94cb017b28aa00059b25de2ff954bb5cd041de5741001f8",
+        "rust/compat/src/drawing.rs": "b2940c86ad7ed016aab4bef6aa3a60586a0a870a3f987201ad9ecfc3f38cf105",
+        "rust/compat/src/drawing_tokens.rs": "52e2ef140cc6915743d57381c8a1eb19ec24764f32da60736182194ceb806395",
+        "rust/compat/src/fields.rs": "232e2fcae2798886392faf8cdf92545c5cffe9841ad70c94e16380aa5f99e7e2",
+        "rust/compat/src/font.rs": "c023cf9077f7776e58ca733bdf942e8d11b199e0ecdbc0b09d6ed6227e5f4de1",
+        "rust/compat/src/lib.rs": "3969045b34adcec3dcff1a1a91509c22283205298bbd10b0519cfab0c92c5630",
+        "rust/compat/src/segment_insert.rs": "83a6ddb264f123f576daaf6c468f78b02244f842ec5de456132bd0b3c3b4507a",
+        "rust/compat/src/segments.rs": "020b2b5f37fca1cc58e7a391cbe05fa0a4a2e4ee193e39bfc5177ba852917b7c",
+        "rust/compat/src/text.rs": "3b0703918d4f71c112e53d52d2270b8aedfce9138ee1072b0145c8385590a45c",
+        "rust/compat/src/text_reader.rs": "21abafc3a781cf62ce008b71f92ac7096472b04b8b49f12a3b92854bafa3ed6f",
+        "rust/compat/src/timeline_search.rs": "da34a38e2720a1de77c4b178a0fe0274fa05f91e37e58f03bdb99d6b47a3cd02",
+        "rust/ffi/src/ass_tags.rs": "45e4a9d78406bd01c819e32d5e5211a30ae2a66d49d1bba28d6a33dc62c40978",
+        "rust/ffi/src/drawing.rs": "e4f23624c88c674bb82da0e543a38f2c783e14a87243e6df376c41875bf07851",
+        "rust/ffi/src/drawing_tokens.rs": "5e6b750f5cdf9de7a314656d42848c1e7df9300b06571227a3573783caf77f8a",
+        "rust/ffi/src/fields.rs": "6b821b5a80e40af40372912a545ac0bb2c9967a6e5a019cfe0a4d17fc65ea423",
+        "rust/ffi/src/lib.rs": "2078dd56b7cb4114528010836cd6fb9b19b4ed0d029188def1e4f20062531c70",
+        "rust/ffi/src/runtime.rs": "a6987685d20b77364781149e4016375e1d1aa44762328796626a95d30661b686",
+        "rust/ffi/src/segment_insert.rs": "20b9022439c9d32c5b4c879569be4a1cb1c7b5f0284547a212e8b99d0d5d0f42",
+        "rust/ffi/src/segments.rs": "437e10dae0a56434ee86feb1bf0a04c744a9b027a7363130be0d23dbe8cc5cf3",
+        "rust/ffi/src/text_reader.rs": "e1613136127d0311747fa77b7a218cbc7b7844f217b770105ca9b7f4727953f8",
+        "rust/ffi/src/timeline_search.rs": "dee5f75d6f92483d30e9e65990b86d1fdf4a87c8977b265f261833dd59e97a05",
+        "rust/compat/Cargo.toml": "b066124a697288e311ef6225d5171c2f1d4a837199b47b12b70414dc7429a019",
+        "rust/ffi/Cargo.toml": "7a140438ea88afc518d4f6656efe4c2d961a8ad707dee6610f5a6f1a9d4cf81a"
+      }
+    },
+    {
+      "target": "x86_64-pc-windows-msvc",
+      "report_sha256": "729dabb0d8087bb41d31da91fcc033d4d1607b0ddcde73814cb6a2a5448a7b61",
+      "sanitizers": false,
+      "result": "85992064 exact decoder comparisons passed",
+      "text_reader_result": "37008 text-file scenarios and 1396467 line/seek comparisons passed (6096 injected exceptions)",
+      "font_result": "17371137 exact font-attachment comparisons passed",
+      "lexer_result": "2793355 exact ASS lexer comparisons passed (command, parameter units, order and empty tags).",
+      "drawing_result": "343183 exact drawing-state comparisons passed (types, points, validity, point requests and cache bypass)",
+      "drawing_tokens_result": "1342183 exact drawing-token comparisons passed (commands, raw parameter units, NUL handling and order)",
+      "fields_result": "5713464 exact field comparisons passed (buffer mutation, returned pointer, next cursor, repeated reads and raw units)\n5713464 exact CString field comparisons passed (trimmed buffer, returned raw units, exceptions, repeated reads and native locale whitespace)",
+      "segments_result": "205982 exact segment comparisons passed (boundaries, input entry order, inactive-entry splits, animated reset and callback snapshots)",
+      "timeline_search_result": "1051947 exact timeline lookup comparisons passed (14352 injected translation exceptions; returned pointer/index, aliased outputs and exact native translation call order)",
+      "segment_insert_result": "59215 exact incremental-segment comparisons passed (1453819 native mutation snapshots, 3357 injected boundary exceptions; entry order, animation flags and partial state)",
+      "candidate_inputs": {
+        "Cargo.toml": "e8ca379ac3641a00a701be9937cec15fb6a7cae4f746adc65de94eb7f63fb1b5",
+        "Cargo.lock": "84e7744a4412202b2ab9675d3464a48ff30b7342b4065a8105d8999e655cf640",
+        "include/xy_rust_text.h": "953a696e7534339a3fe57dbe688e24424c43f49a1f0c4de9e8173a5fc31a824a",
+        "include/xy_rust_ass.h": "9b29ae9492ed3ee0634d80178d4c049d7a2957a4104c375dd87cf5d66f2e7bd7",
+        "include/xy_rust_reader.h": "99a315beb43451f2dfd21fb5242b61a3507f1082dbddd5c87daa78bb6912a087",
+        "include/xy_rust_drawing.h": "0ed8f5a799ef5f96c6c1840e6cf9b3367d08f08b32e291677ec2dcc8b529224f",
+        "include/xy_rust_drawing_tokens.h": "1b13c031608d98aa46c28fadc3551ea32de20ad72c6cbf1ee5610c8372d315c8",
+        "include/xy_rust_fields.h": "24dc1d14d0767681c896e9d8875925a6a1757781e78616b244f85918bf835220",
+        "include/xy_rust_segments.h": "8332f335119038c4cc04a3f0efe0a701348ad0c8397ed9b44e0744e2a6ee1be2",
+        "include/xy_rust_segment_insert.h": "e4aafaf6bf8cd731fc60fbc109d5afc9c0a2c37874c90636abb04f01214eaeed",
+        "include/xy_rust_timeline_search.h": "c48ac952a67f419ad5cd9a2105c50c1fac394c943275b96a8bf12a40f5ca1aa7",
+        "src/subtitles/TextFile.h": "fe26e64597691da26aa13d3ba11c0027d23332dabf9c5f7bcd8ca3ec7d9a30fc",
+        "tools/compat/ass_lexer_oracle.cpp": "81d81f6af5ed16957deb7f924d1ad3567282608911575a3b8d23222c5b41411e",
+        "tools/compat/decoder_oracle.cpp": "602b19b4316dfffd97ff52ab4cb1a187193e8ee17b54dcbc7ee5e30475397e31",
+        "tools/compat/drawing_oracle.cpp": "dd8a1552185f51255387085772ccdc593a1020d9a39c7dbc13bd4d6960b565ac",
+        "tools/compat/drawing_tokens_oracle.cpp": "df26c6c95784030500151e4d9e8097379114aee764d9fb90c5ac9be59531f470",
+        "tools/compat/fields_oracle.cpp": "1d4bb0a71b2af5932f2e7272756d1c2188e31c58f6298988e2e132c424ad00eb",
+        "tools/compat/font_oracle.cpp": "5fe645bb340d242d6b2ff4e172cd0995f0c42847f1cbd5ae92d02fcc1ebb3d13",
+        "tools/compat/segment_insert_oracle.cpp": "f650fba088d2377a5ac9fa39bb483198d5d42ac80e22520148f5a123c095d819",
+        "tools/compat/segments_oracle.cpp": "93f4d5e00a332480aa15b62ab1f7af2bfbb01098037f68833f5316f1a66b621c",
+        "tools/compat/text_reader_oracle.cpp": "51511a81da0d1f596299ea82372f23137174e5ed5b34752770c1a2898717efd2",
+        "tools/compat/timeline_search_oracle.cpp": "13dc161f1baa422298f87a8791f731aeb43275b78fddd005ece16c4a0fef6ffc",
+        "tools/compat/ass_lexer_shell.h": "f6d33cd6f15021ef235bfe04e0fedba5ad82042297c1fc2137984cc4a96b72cb",
+        "tools/compat/drawing_shell.h": "df7e957afd5abcff14616e86d96abaf832f1d3cc0be4128709ccef3dcbec8c06",
+        "tools/compat/drawing_tokens_shell.h": "626fd244dee88dfbeed292e44c416e44e1765287f34a151397ffbba7fef6afa5",
+        "tools/compat/fields_shell.h": "8db4924635af5e46957dabde356120385e74bfcee3a3d87793418b9a471d6ae2",
+        "tools/compat/font_shell.h": "8b39a6b88b75fc21a6f476b4286a5f79f1670a098844bc22aa942fe7fa2eed34",
+        "tools/compat/segment_insert_shell.h": "d349eafadf2fe127f553d58c1d9592805fc2d5c5731b505cd5b3944e6ad95049",
+        "tools/compat/segments_shell.h": "7ae4e454e341fc161f35d80823c1c29d6e33aac14b59457756b9d2dbbf98fe92",
+        "tools/compat/text_reader_shell.h": "0d07a19620575e4f61624aaf50ce7f1d6305bbe3bbabaeb295a1dfda15059f1b",
+        "tools/compat/timeline_search_shell.h": "2b5788a4050342ab30f219e96d5fc1df81191d4a3bbcc77748e98f8cfdc3454f",
+        "tools/compat/check_decoder.py": "2e1003477146a81879d73eb92ff11082b6bdf8c095873b024a04cc3e6e7f3999",
+        "rust/compat/src/ass_tags.rs": "e115beb8951b8432f94cb017b28aa00059b25de2ff954bb5cd041de5741001f8",
+        "rust/compat/src/drawing.rs": "b2940c86ad7ed016aab4bef6aa3a60586a0a870a3f987201ad9ecfc3f38cf105",
+        "rust/compat/src/drawing_tokens.rs": "52e2ef140cc6915743d57381c8a1eb19ec24764f32da60736182194ceb806395",
+        "rust/compat/src/fields.rs": "232e2fcae2798886392faf8cdf92545c5cffe9841ad70c94e16380aa5f99e7e2",
+        "rust/compat/src/font.rs": "c023cf9077f7776e58ca733bdf942e8d11b199e0ecdbc0b09d6ed6227e5f4de1",
+        "rust/compat/src/lib.rs": "3969045b34adcec3dcff1a1a91509c22283205298bbd10b0519cfab0c92c5630",
+        "rust/compat/src/segment_insert.rs": "83a6ddb264f123f576daaf6c468f78b02244f842ec5de456132bd0b3c3b4507a",
+        "rust/compat/src/segments.rs": "020b2b5f37fca1cc58e7a391cbe05fa0a4a2e4ee193e39bfc5177ba852917b7c",
+        "rust/compat/src/text.rs": "3b0703918d4f71c112e53d52d2270b8aedfce9138ee1072b0145c8385590a45c",
+        "rust/compat/src/text_reader.rs": "21abafc3a781cf62ce008b71f92ac7096472b04b8b49f12a3b92854bafa3ed6f",
+        "rust/compat/src/timeline_search.rs": "da34a38e2720a1de77c4b178a0fe0274fa05f91e37e58f03bdb99d6b47a3cd02",
+        "rust/ffi/src/ass_tags.rs": "45e4a9d78406bd01c819e32d5e5211a30ae2a66d49d1bba28d6a33dc62c40978",
+        "rust/ffi/src/drawing.rs": "e4f23624c88c674bb82da0e543a38f2c783e14a87243e6df376c41875bf07851",
+        "rust/ffi/src/drawing_tokens.rs": "5e6b750f5cdf9de7a314656d42848c1e7df9300b06571227a3573783caf77f8a",
+        "rust/ffi/src/fields.rs": "6b821b5a80e40af40372912a545ac0bb2c9967a6e5a019cfe0a4d17fc65ea423",
+        "rust/ffi/src/lib.rs": "2078dd56b7cb4114528010836cd6fb9b19b4ed0d029188def1e4f20062531c70",
+        "rust/ffi/src/runtime.rs": "a6987685d20b77364781149e4016375e1d1aa44762328796626a95d30661b686",
+        "rust/ffi/src/segment_insert.rs": "20b9022439c9d32c5b4c879569be4a1cb1c7b5f0284547a212e8b99d0d5d0f42",
+        "rust/ffi/src/segments.rs": "437e10dae0a56434ee86feb1bf0a04c744a9b027a7363130be0d23dbe8cc5cf3",
+        "rust/ffi/src/text_reader.rs": "e1613136127d0311747fa77b7a218cbc7b7844f217b770105ca9b7f4727953f8",
+        "rust/ffi/src/timeline_search.rs": "dee5f75d6f92483d30e9e65990b86d1fdf4a87c8977b265f261833dd59e97a05",
+        "rust/compat/Cargo.toml": "b066124a697288e311ef6225d5171c2f1d4a837199b47b12b70414dc7429a019",
+        "rust/ffi/Cargo.toml": "7a140438ea88afc518d4f6656efe4c2d961a8ad707dee6610f5a6f1a9d4cf81a"
+      }
+    },
+    {
+      "target": "x86_64-unknown-linux-gnu",
+      "report_sha256": "fe95adf699f29eec7c6da0990ef2378e3ff5dfb369e1abe047fecc7cfcd68567",
+      "sanitizers": true,
+      "result": "85992064 exact decoder comparisons passed",
+      "text_reader_result": "37008 text-file scenarios and 1396467 line/seek comparisons passed (6096 injected exceptions)",
+      "font_result": "17371137 exact font-attachment comparisons passed",
+      "lexer_result": "2793355 exact ASS lexer comparisons passed (command, parameter units, order and empty tags).",
+      "drawing_result": "343183 exact drawing-state comparisons passed (types, points, validity, point requests and cache bypass)",
+      "drawing_tokens_result": "1342183 exact drawing-token comparisons passed (commands, raw parameter units, NUL handling and order)",
+      "fields_result": "4927032 exact field comparisons passed (buffer mutation, returned pointer, next cursor, repeated reads and raw units)\n4927032 exact CString field comparisons passed (trimmed buffer, returned raw units, exceptions, repeated reads and native locale whitespace)",
+      "segments_result": "205982 exact segment comparisons passed (boundaries, input entry order, inactive-entry splits, animated reset and callback snapshots)",
+      "timeline_search_result": "1051947 exact timeline lookup comparisons passed (14352 injected translation exceptions; returned pointer/index, aliased outputs and exact native translation call order)",
+      "segment_insert_result": "59215 exact incremental-segment comparisons passed (1453819 native mutation snapshots, 3357 injected boundary exceptions; entry order, animation flags and partial state)",
+      "candidate_inputs": {
+        "Cargo.toml": "34479687bc9fac5dcc025e7ad0d7c7392c9a8e6a95071ecfddae626de1713e05",
+        "Cargo.lock": "fd9331e0dc6b0183bf14e2e8c13939684182d7ec437ac1fac54abbaac8da7335",
+        "include/xy_rust_text.h": "4caa9df121c701b2008f1e41c1b476b98a1f9888fcb51a65de2dbc9bbd3e5c40",
+        "include/xy_rust_ass.h": "e25175962a04d23b8be31323e649bdf607814c6f11d201fd4bfb97c958b37bf8",
+        "include/xy_rust_reader.h": "fc98598650099534eeef499838e070b3affbacfd10e3a0f4f8bf1b3b8e40aeec",
+        "include/xy_rust_drawing.h": "0b1480d82c8d0c8ef221b395345593a8cbe5484e6e81b0862c88e1b3e3a5bd5c",
+        "include/xy_rust_drawing_tokens.h": "e45fceb1aabdb5ca172bc2f5356eb30c3dcd89cff88fa16b2d84e2551f8eebbb",
+        "include/xy_rust_fields.h": "07ef1a44d614fb35abd847f7ddee66558328264c34414c965d2058a557878642",
+        "include/xy_rust_segments.h": "de83a7723e20947cf21ebc963e94e02a7309251585b84d14b810cc3d764934d7",
+        "include/xy_rust_segment_insert.h": "4567c4d4ae5c719e9f557837bbd95a72f7130b217639b606f78c4110e7445dfc",
+        "include/xy_rust_timeline_search.h": "d0b86cc52ed2a08a3016b9f1f6f34949c55c252481df41cc428e753bb95a348e",
+        "src/subtitles/TextFile.h": "fe26e64597691da26aa13d3ba11c0027d23332dabf9c5f7bcd8ca3ec7d9a30fc",
+        "tools/compat/ass_lexer_oracle.cpp": "386c15ccbe78dcd816192de244c205dc1973bdf6075f71a10d69d99673442112",
+        "tools/compat/decoder_oracle.cpp": "2572d7ab48a8a0535308ff7bc7b8e1263b4d0c7ab96a961dd3baebc2cd45a923",
+        "tools/compat/drawing_oracle.cpp": "bae491f110922898af703fe1cc872cd5b15ef13811e0c337e90ddf4068f3297a",
+        "tools/compat/drawing_tokens_oracle.cpp": "b670388ec51ec421ffda51a874d0197aca21e31aabd9f3295d9c4ac1c980aa74",
+        "tools/compat/fields_oracle.cpp": "0048ac141b05e76cf0cf57a4444f7c8a526460117593c6d353bd7e66cfefcc79",
+        "tools/compat/font_oracle.cpp": "66ae37e835f97bcd9ee645fa36f51a251b81eec525d51da099b804f08b36a63d",
+        "tools/compat/segment_insert_oracle.cpp": "8693f1f8b89667126096368a9eb6a90d9e8b7fccfe404bd4e4db8d5d72fb2fb9",
+        "tools/compat/segments_oracle.cpp": "153ccb7adeaeaa82c7826826311304f979a19b5a07dc264136dee9660fff8bb1",
+        "tools/compat/text_reader_oracle.cpp": "0f7491e79047e4547893f735617580ce08be4a23167e786f2035a531b755bcea",
+        "tools/compat/timeline_search_oracle.cpp": "aa455fe0d315c286427f8d5e0c9355a628bc74ac65e623a3ae6efd180969aa9c",
+        "tools/compat/ass_lexer_shell.h": "285326c84f336cd68b1de88a7de2cfad6519f0e7ac8a0a609443d7da5c6eb6dd",
+        "tools/compat/drawing_shell.h": "312671e938ac4013a0b1ca969c8e612a9dd70e6c5e7d4ef32053c4e5f7121620",
+        "tools/compat/drawing_tokens_shell.h": "7e4f47650d18d0f9532498b5113884db2f3dfb46d20043812096e9d2723f806b",
+        "tools/compat/fields_shell.h": "bd9ce0dbdadada49d01da05f5d7c63878caa92c0fdfa9f2c7f4db7fa9e8fca3d",
+        "tools/compat/font_shell.h": "6d0acc73d6e5125fbac837a83310240c5371802fa4a40ddd93aec2a28bdd6818",
+        "tools/compat/segment_insert_shell.h": "0d307503dab1af8c72c03473e3d81e7620e8cf22da65f3c829d3f739f462807d",
+        "tools/compat/segments_shell.h": "adb773221c51f0ab26500e076b13ec420770765542f8fd73133da19c3f883fd1",
+        "tools/compat/text_reader_shell.h": "4031f09c42f76350b7611d21d1ffd26904fef8505ce718cddb9add791cbfb833",
+        "tools/compat/timeline_search_shell.h": "9714ed033c3a1c8bc054bccc0ac00722a6f233e29048da135874826cb0d218d5",
+        "tools/compat/check_decoder.py": "9675ad586b7c2b169d294b83692edb425b5a599917834362e443cb652990ed5d",
+        "rust/compat/src/ass_tags.rs": "6792ac12ebbf50f9356d0aa7abad85b20d505e64f7ea539a66eb42990d05a637",
+        "rust/compat/src/drawing.rs": "eca8f1053f8428d9b0c265752ab2f07687f83ae626db30ad2d27beb5ec0bcd67",
+        "rust/compat/src/drawing_tokens.rs": "c3db232dfdbec32354a3bc68fcb8c7a71f01e70e20c5832ca2021b8b559c245b",
+        "rust/compat/src/fields.rs": "398979232ca4b3e7f919daa23313c5e52ef681be15eeafdd0299ad2ef1b5c8a7",
+        "rust/compat/src/font.rs": "7fec61f79198f0dc07fbdbed25204b6422239580de5db434abad5c9bcedad1ac",
+        "rust/compat/src/lib.rs": "3806d43226661ea11e054516680717bee6469636edb30546d89204b517214a77",
+        "rust/compat/src/segment_insert.rs": "1176e67a65262686d2ee7a7bfd6a0b59b2340d945a639fad8f9cd72f6f0d6d89",
+        "rust/compat/src/segments.rs": "3cfdd0d0352e05770941ab630f111414b90d8b4baeb3841065cc8c5b046ca1ad",
+        "rust/compat/src/text.rs": "b7265e27c081c94349505c5cd3db3af8c3f8a73f2a98074e1c8523a3b88f208f",
+        "rust/compat/src/text_reader.rs": "b78c3bc2eda230849d4b67f8547fbd3eb6303ba930f07c955b2a9b37b215b1da",
+        "rust/compat/src/timeline_search.rs": "1b4d6b7a8eee6329b8cf4e564fa6e1aecbc866cfea26a59e9436590e0fe054a5",
+        "rust/ffi/src/ass_tags.rs": "d1764911d033dd4995f1fe02669f11ece10757d4681db1f8d15f35c500382a07",
+        "rust/ffi/src/drawing.rs": "0903c53b826fbb717ff22fce12ad0878aa4b620f043b1f15c2b73002b2ef6bbb",
+        "rust/ffi/src/drawing_tokens.rs": "7814644432e3a0e45a37a4701789698f4b529f1d962a8a64aa8b060cf10c23e2",
+        "rust/ffi/src/fields.rs": "eb6ed7a873a84defa4a2ebff5ea5d3241db58c546c56c0c3c4011bf3fdcfe395",
+        "rust/ffi/src/lib.rs": "4b1f92785e7197e5ef123b206bf6eb9dc3e610cbcb117ee2a4dab0f204a9ce7f",
+        "rust/ffi/src/runtime.rs": "6b974d023640354a5c65ea3d5d3feea35bd191192c8d859fb1f3be342f613f14",
+        "rust/ffi/src/segment_insert.rs": "6273ff03529551f00f0a4f7a95b442afecfa69c5119a640a325415d48206b235",
+        "rust/ffi/src/segments.rs": "f6391d7f5f27349c411339f709e9f102b5c12c51b4cb914f70485aeeef20749d",
+        "rust/ffi/src/text_reader.rs": "a4ab775620d77195187dff9279adbbf6432cd29bba437129f019c9b75fcc2091",
+        "rust/ffi/src/timeline_search.rs": "03308b3ffb052adeee9832fe91242c428e6244d8da0355987c0277c1aea52668",
+        "rust/compat/Cargo.toml": "9f325d80554a26bfb2f50237382694f8e121072e2ce52a34cebf3fa118cce6d1",
+        "rust/ffi/Cargo.toml": "c557156364b3d955695f235a782d9a124d531cc2157bfea6ab209f33850edea7"
+      }
+    }
+  ],
+  "limits": [
+    "Finite fixtures and mutation campaigns do not establish universal compatibility or memory safety.",
+    "CSRI BGRX rendering and format queries; real Aegisub/player and other host integration remains outstanding.",
+    "Comparisons pair reference and candidate on the same architecture and environment, not across architectures.",
+    "Most native parsing, font handling, rasterization, compositing and third-party code remains C++.",
+    "Drawing preprocessing, numeric conversion, scaling and final path storage remain native.",
+    "Native sanitizers cover extracted C++ tests, not the full renderer or Rust static library.",
+    "Native out-of-memory recovery, Windows 7 and older CPUs remain unverified.",
+    "WebVTT end-of-list insertion has candidate-only validation and is excluded from reference-parity counts."
+  ],
+  "miri_job_passed": true,
+  "miri_job_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38466508664/job/115534575919",
+  "setup_retry": {
+    "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38466766844",
+    "failed_job": 115535455087,
+    "reason": "x64 assembler download connection timed out before any build or renderer comparison. The successful x64 retry is recorded separately; the original Win32 job passed."
+  }
+}

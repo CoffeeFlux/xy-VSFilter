@@ -20,7 +20,7 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
-* The next increment ports the incremental segment edits in
+* Safe Rust computes the incremental segment edits in
   `CSimpleTextSubtitle::Add`. Rust owns a snapshot and computes ordered split,
   gap-fill and entry-insertion operations. The native adapter applies these to
   the existing arrays, preserving readorder shortcuts, animation flags, native
@@ -34,11 +34,23 @@ unresolved reference outcomes requiring investigation, never matching results.
   frames alone, establishes intermediate insertion-state compatibility.
   The candidate explicitly handles WebVTT end-of-list insertion. This case is
   checked against candidate invariants and excluded from differential counts
-  because its reference outcome is unresolved. Candidate `e2e5560d` passed
-  [all four platforms and Miri](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38465704167)
-  with identical counts. The final adapter adds index checks before applying
-  native edits; local comparisons still pass. Final Windows DLL and portable
-  validation for that revision are pending.
+  because its reference outcome is unresolved. Candidate `320069fc` passed
+  [all four platforms and Miri](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38466508664)
+  with identical insertion counts, including the final native adapter index checks.
+  It also passed the [regular Windows x86/x64 DLL campaign](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38466508568):
+  **322 cases / 4,026 frames** per architecture (310 successful opens and 12
+  matching open rejections), plus **32 mutations / 224 frames**. Warning-dialog
+  observations, font/drawing controls, all three DLL export tables and declared
+  dependency requirements match. All eight new SubRip fixtures produce visible
+  output through both file and memory opening.
+  The larger seed-`20261019` campaign also matched **256 mutations / 1,792
+  frames** per architecture, plus the same full corpus, in the
+  [x86 job](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38466766844/job/115535455468)
+  and [x64 job](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38467187846/job/115536920655).
+  An assembler download timeout required retrying x64 setup; no renderer
+  comparison failed in that setup attempt. [Incremental timeline evidence](incremental-timeline-evidence.json)
+  records the exact successful jobs, source inputs, reports, DLL hashes and
+  visible fixture output. Entry sorting and frame/time conversion remain native.
 * Safe Rust `CSimpleTextSubtitle::CreateSegments`:
   breakpoint sorting, interval construction, temporary segment/entry storage,
   empty-range removal and original entry order. Even inactive zero-duration and
@@ -283,7 +295,14 @@ oracle because of the unresolved allocation-dependent behavior above. The field
 oracle compares six consecutive calls, mutated buffers and both pointer offsets.
 The segment oracle checks the full native arrays and callback snapshots. Timeline
 search tests compare returned pointers, nullable/aliased output parameters,
-translation call traces and injected native exceptions. The ASan/UBSan run instruments the C++ side;
+translation call traces and injected native exceptions. The incremental-insertion
+oracle extracts the prepared-entry timeline tail of `Add`, including its native
+readorder assignment. It compares entry metadata, segment endpoints and ordered
+entries, animation flags, each outer native `Copy`/`Add`/`InsertAt` call and state
+after injected call-boundary exceptions. Windows uses real ATL arrays; other
+platforms use the documented storage stand-in. It does not claim to reproduce
+allocation failure inside array relocation or to test entry text/style preparation.
+The ASan/UBSan run instruments the C++ side;
 it does not instrument the Rust static library. Safe Rust is enforced in the
 core by a compiler lint. The ASS lexer, text reader, drawing, segment and timeline
 search FFI owners and the production CRT
@@ -328,6 +347,11 @@ pwsh -File tools/compat/run_native_comparison.ps1 -Platform x64 -Baseline ..\xy-
 # Run from an x86 Native Tools prompt with x86 Python:
 pwsh -File tools/compat/run_native_comparison.ps1 -Platform Win32 -Baseline ..\xy-VSFilter-reference -MutationCount 32
 ```
+
+To repeat the larger incremental-timeline campaign, use
+`-MutationCount 256 -MutationSeed 20261019` on the same command and give each
+architecture a fresh `-Output` directory. This runs the full checked-in corpus
+before the generated mutation cases; it does not replace the extracted intermediate-state tests.
 
 Use PowerShell 7 (`pwsh`) for the combined runner. Evidence goes to
 `artifacts/native/x64` and `artifacts/native/Win32`; an existing destination is
@@ -571,6 +595,7 @@ the native oracle where needed:
 
 | Next boundary | Portable work | Native behavior to retain and compare |
 | --- | --- | --- |
+| `STS.cpp` entry sorting and frame/time conversion | Own entry ordering and conversion state, with native callbacks initially | `Sort` uses CRT `qsort` with separate normal/readorder comparators; capture equal-key permutations and comparator results before choosing a Rust sorting algorithm. Preserve start-before-end conversion, `llround`, mode changes and the final `CreateSegments` call. |
 | `STS.cpp` field splitting and numeric parsing | Raw UTF-16 fields, cursor/mutation state, error recovery | Both field scanners are now ported, preserving final-field reuse, distinct whitespace rules and separator mutation. Keep CRT numeric conversion until overflow, locale, end-pointer and rounding results are captured. |
 | Remaining `RTS.cpp` drawing parsing | Command replacement, numeric consumption and final native path storage; command state is now ported | `SpanIncluding`'s return value is ignored; commands split inside arbitrary text; `s` falls through to `p`; the apparent Bezier truncation uses an incremented counter and must not be "fixed." Keep `wcstod` and float-to-LONG conversion at the native boundary initially. |
 | `CompositionObject.cpp` bitmap run decoding | Bounded byte/bit readers, RLE state, emitted rectangles | Capture truncated-stream behavior, signed-short coordinate wrapping, palette state and transparent runs. Keep native palette conversion/compositing until those stages have separate exact-byte oracles. Uninitialized allocation tails are unresolved behavior, not a portable specification. |
