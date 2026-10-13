@@ -51,7 +51,8 @@ def capture_inputs():
               ROOT / "include/xy_rust_segments.h",
               ROOT / "include/xy_rust_segment_insert.h",
               ROOT / "include/xy_rust_hdmv.h",
-              ROOT / "include/xy_rust_dvb.h",
+              ROOT / "include/xy_rust_dvb.h", ROOT / "include/xy_rust_golomb.h",
+              ROOT / "src/dsutil/GolombBuffer.cpp", ROOT / "src/dsutil/GolombBuffer.h",
               ROOT / "src/subtitles/CompositionObject.cpp",
               ROOT / "include/xy_rust_timeline_search.h",
               ROOT / "src/subtitles/TextFile.h",
@@ -250,40 +251,58 @@ public:
     golomb_source = original("src/dsutil/GolombBuffer.cpp", reference["commit"])
     golomb_header = original("src/dsutil/GolombBuffer.h", reference["commit"])
     raster_source = original("src/subtitles/Rasterizer.cpp", reference["commit"])
+    golomb = '#pragma once\n#include "golomb_shell.h"\n'
+    candidate_golomb = (ROOT / "src/dsutil/GolombBuffer.cpp").read_bytes()
+    candidate_golomb_header = (ROOT / "src/dsutil/GolombBuffer.h").read_bytes()
+    for name, content, declaration in (("ReferenceGolomb", golomb_source, golomb_header),
+                                      ("CandidateGolomb", candidate_golomb, candidate_golomb_header)):
+        golomb += content.decode("utf-8-sig").split("#include", 1)[0]
+        # Fields are public only in the observation harness. Method bodies are
+        # extracted verbatim apart from the spelling of MSVC's 64-bit literal.
+        golomb += extract_method(declaration.decode("utf-8-sig"), "class CGolombBuffer").replace("private:", "public:").replace("CGolombBuffer", name) + ";\n"
+        if name == "CandidateGolomb":
+            golomb += "#define XY_VSFILTER_RUST_TEXT\n"
+        for signature in ("CGolombBuffer::CGolombBuffer(", "CGolombBuffer::~CGolombBuffer(",
+                          "UINT64 CGolombBuffer::BitRead(", "UINT64 CGolombBuffer::UExpGolombRead(",
+                          "INT64 CGolombBuffer::SExpGolombRead(", "void CGolombBuffer::Reset()",
+                          "void CGolombBuffer::Reset(BYTE*", "void CGolombBuffer::ReadBuffer(",
+                          "void CGolombBuffer::BitByteAlign()", "int CGolombBuffer::GetPos()",
+                          "void CGolombBuffer::SkipBytes("):
+            golomb += extract_method(content.decode("utf-8-sig"), signature).replace("CGolombBuffer", name).replace("1ui64", "UINT64_C(1)") + "\n"
+        golomb += "#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_golomb.h").write_text(golomb, encoding="utf-8")
     hdmv = hdmv_source.decode("utf-8-sig").split("#include", 1)[0]
-    hdmv += '#include "hdmv_shell.h"\n'
-    # Expose fields only for observation, without changing any reference body.
-    # Spell MSVC's 1ui64 literal with a portable standard macro.
-    hdmv += extract_method(golomb_header.decode("utf-8-sig"), "class CGolombBuffer").replace("private:", "public:").replace("CGolombBuffer", "ReferenceGolomb") + ";\n"
-    for signature in ("CGolombBuffer::CGolombBuffer(", "CGolombBuffer::~CGolombBuffer(",
-                      "UINT64 CGolombBuffer::BitRead(", "void CGolombBuffer::Reset()",
-                      "void CGolombBuffer::BitByteAlign()", "int CGolombBuffer::GetPos()",
-                      "void CGolombBuffer::SkipBytes("):
-        hdmv += extract_method(golomb_source.decode("utf-8-sig"), signature).replace("CGolombBuffer", "ReferenceGolomb").replace("1ui64", "UINT64_C(1)") + "\n"
+    hdmv += '#include "hdmv_shell.h"\n#include "original_golomb.h"\n'
     hdmv += """
-class ObservedGolomb : public ReferenceGolomb {
+template<class Reader> class ObservedGolombBase : public Reader {
 public:
-    ObservedGolomb(BYTE* data,int size):ReferenceGolomb(data,size){}
+    using Reader::m_nBitPos;
+    using Reader::m_bitlen;
+    using Reader::m_bitbuff;
+    ObservedGolombBase(BYTE* data,int size):Reader(data,size){}
+    void Seed(int bits) { if(bits)Reader::BitRead(bits>0 ? bits : -bits,bits<0); }
     bool IsEOF() const {
-        const bool value=ReferenceGolomb::IsEOF();
+        const bool value=Reader::IsEOF();
         hdmvObserve({{1,m_nBitPos,m_bitlen,m_bitbuff,value,0,0}});
         return value;
     }
     BYTE ReadByte() {
         const int before=m_nBitPos;
-        const BYTE value=ReferenceGolomb::ReadByte();
+        const BYTE value=Reader::ReadByte();
         hdmvObserve({{2,before,m_nBitPos,m_bitlen,m_bitbuff,value,0}});
         return value;
     }
 };
-#define CGolombBuffer ObservedGolomb
+typedef ObservedGolombBase<ReferenceGolomb> ObservedGolomb;
+typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
 """
     for name, content in (("OriginalHdmv", hdmv_source), ("CandidateHdmv", candidate_hdmv)):
-        hdmv += f"#define CompositionObject {name}\n"
+        reader = "ObservedGolomb" if name == "OriginalHdmv" else "CandidateObservedGolomb"
+        hdmv += f"#define CGolombBuffer {reader}\n#define CompositionObject {name}\n"
         if name == "CandidateHdmv":
             hdmv += "#define XY_VSFILTER_RUST_TEXT\n"
         hdmv += extract_method(content.decode("utf-8-sig"), "void CompositionObject::RenderHdmv(")
-        hdmv += "\n#undef CompositionObject\n#undef XY_VSFILTER_RUST_TEXT\n"
+        hdmv += "\n#undef CompositionObject\n#undef XY_VSFILTER_RUST_TEXT\n#undef CGolombBuffer\n"
     hdmv += "#undef CGolombBuffer\n#if HDMV_NATIVE_PIXELS\n"
     for signature in ("static __forceinline void pixmix_sse2(DWORD*",
                       "static __forceinline __m128i packed_pix_mix_sse2(",
@@ -295,16 +314,17 @@ public:
     hdmv += "#endif\n"
     (destination / "original_hdmv.h").write_text(hdmv, encoding="utf-8")
     dvb = '#include "original_hdmv.h"\n#include "dvb_shell.h"\n'
-    dvb += '#define CGolombBuffer ObservedDvbBuffer\n#define UnionRect ObservedUnionRect\n'
+    dvb += '#define UnionRect ObservedUnionRect\n'
     for name, content in (("OriginalDvb", hdmv_source), ("CandidateDvb", candidate_hdmv)):
-        dvb += f"DVB_SHELL({name})\n#define CompositionObject {name}\n"
+        reader = "ObservedDvbBuffer" if name == "OriginalDvb" else "CandidateDvbBuffer"
+        dvb += f"DVB_SHELL({name},{reader})\n#define CGolombBuffer {reader}\n#define CompositionObject {name}\n"
         if name == "CandidateDvb":
             dvb += "#define XY_VSFILTER_RUST_TEXT\n"
         for method in ("RenderDvb", "DvbRenderField"):
             dvb += extract_method(content.decode("utf-8-sig"), f"void CompositionObject::{method}(") + "\n"
         for bits in (2,4,8):
             dvb += extract_method(content.decode("utf-8-sig"), f"void CompositionObject::Dvb{bits}PixelsCodeString(") + "\n"
-        dvb += "#undef CompositionObject\n#undef XY_VSFILTER_RUST_TEXT\n"
+        dvb += "#undef CompositionObject\n#undef XY_VSFILTER_RUST_TEXT\n#undef CGolombBuffer\n"
     dvb += '#undef CGolombBuffer\n#undef UnionRect\n'
     (destination / "original_dvb.h").write_text(dvb, encoding="utf-8")
     cargo = ["cargo", "rustc", "--locked", "--offline", "--release", "-p", "xy-vsfilter-ffi"]
@@ -340,77 +360,84 @@ public:
             compile_command += ["-fsanitize=address,undefined", "-fno-sanitize-recover=all", "-fno-omit-frame-pointer"]
     run(compile_command)
     result = run([str(executable)], capture_output=True, text=True)
-    print(result.stdout, end="")
+    print(result.stdout, end="", flush=True)
     print(result.stderr, end="", file=sys.stderr)
+    golomb_executable = destination / ("golomb-oracle.exe" if os.name == "nt" else "golomb-oracle")
+    golomb_compile = [arg.replace("decoder_oracle.cpp", "golomb_oracle.cpp")
+                      .replace("decoder-oracle", "golomb-oracle") for arg in compile_command]
+    run(golomb_compile)
+    golomb_result = run([str(golomb_executable)], capture_output=True, text=True)
+    print(golomb_result.stdout, end="", flush=True)
+    print(golomb_result.stderr, end="", file=sys.stderr)
     reader_executable = destination / ("text-reader-oracle.exe" if os.name == "nt" else "text-reader-oracle")
     reader_compile = [arg.replace("decoder_oracle.cpp", "text_reader_oracle.cpp")
                       .replace("decoder-oracle", "text-reader-oracle") for arg in compile_command]
     run(reader_compile)
     reader_result = run([str(reader_executable)], capture_output=True, text=True)
-    print(reader_result.stdout, end="")
+    print(reader_result.stdout, end="", flush=True)
     print(reader_result.stderr, end="", file=sys.stderr)
     font_executable = destination / ("font-oracle.exe" if os.name == "nt" else "font-oracle")
     font_compile = [arg.replace("decoder_oracle.cpp", "font_oracle.cpp")
                     .replace("decoder-oracle", "font-oracle") for arg in compile_command]
     run(font_compile)
     font_result = run([str(font_executable)], capture_output=True, text=True)
-    print(font_result.stdout, end="")
+    print(font_result.stdout, end="", flush=True)
     print(font_result.stderr, end="", file=sys.stderr)
     lexer_executable = destination / ("ass-lexer-oracle.exe" if os.name == "nt" else "ass-lexer-oracle")
     lexer_compile = [arg.replace("decoder_oracle.cpp", "ass_lexer_oracle.cpp")
                     .replace("decoder-oracle", "ass-lexer-oracle") for arg in compile_command]
     run(lexer_compile)
     lexer_result = run([str(lexer_executable)], capture_output=True, text=True)
-    print(lexer_result.stdout, end="")
+    print(lexer_result.stdout, end="", flush=True)
     print(lexer_result.stderr, end="", file=sys.stderr)
     drawing_executable = destination / ("drawing-oracle.exe" if os.name == "nt" else "drawing-oracle")
     drawing_compile = [arg.replace("decoder_oracle.cpp", "drawing_oracle.cpp")
                        .replace("decoder-oracle", "drawing-oracle") for arg in compile_command]
     run(drawing_compile)
     drawing_result = run([str(drawing_executable)], capture_output=True, text=True)
-    print(drawing_result.stdout, end="")
+    print(drawing_result.stdout, end="", flush=True)
     print(drawing_result.stderr, end="", file=sys.stderr)
     token_executable = destination / ("drawing-tokens-oracle.exe" if os.name == "nt" else "drawing-tokens-oracle")
     token_compile = [arg.replace("decoder_oracle.cpp", "drawing_tokens_oracle.cpp")
                      .replace("decoder-oracle", "drawing-tokens-oracle") for arg in compile_command]
     run(token_compile)
     token_result = run([str(token_executable)], capture_output=True, text=True)
-    print(token_result.stdout, end="")
+    print(token_result.stdout, end="", flush=True)
     print(token_result.stderr, end="", file=sys.stderr)
     fields_executable = destination / ("fields-oracle.exe" if os.name == "nt" else "fields-oracle")
     fields_compile = [arg.replace("decoder_oracle.cpp", "fields_oracle.cpp")
                       .replace("decoder-oracle", "fields-oracle") for arg in compile_command]
     run(fields_compile)
     fields_result = run([str(fields_executable)], capture_output=True, text=True)
-    print(fields_result.stdout, end="")
+    print(fields_result.stdout, end="", flush=True)
     print(fields_result.stderr, end="", file=sys.stderr)
     segments_executable = destination / ("segments-oracle.exe" if os.name == "nt" else "segments-oracle")
     segments_compile = [arg.replace("decoder_oracle.cpp", "segments_oracle.cpp")
                         .replace("decoder-oracle", "segments-oracle") for arg in compile_command]
     run(segments_compile)
     segments_result = run([str(segments_executable)], capture_output=True, text=True)
-    print(segments_result.stdout, end="")
+    print(segments_result.stdout, end="", flush=True)
     print(segments_result.stderr, end="", file=sys.stderr)
     insertion_executable = destination / ("segment-insert-oracle.exe" if os.name == "nt" else "segment-insert-oracle")
     insertion_compile = [arg.replace("decoder_oracle.cpp", "segment_insert_oracle.cpp")
                          .replace("decoder-oracle", "segment-insert-oracle") for arg in compile_command]
     run(insertion_compile)
     insertion_result = run([str(insertion_executable)], capture_output=True, text=True)
-    print(insertion_result.stdout, end="")
+    print(insertion_result.stdout, end="", flush=True)
     print(insertion_result.stderr, end="", file=sys.stderr)
     search_executable = destination / ("timeline-search-oracle.exe" if os.name == "nt" else "timeline-search-oracle")
     search_compile = [arg.replace("decoder_oracle.cpp", "timeline_search_oracle.cpp")
                       .replace("decoder-oracle", "timeline-search-oracle") for arg in compile_command]
     run(search_compile)
     search_result = run([str(search_executable)], capture_output=True, text=True)
-    print(search_result.stdout, end="")
+    print(search_result.stdout, end="", flush=True)
     print(search_result.stderr, end="", file=sys.stderr)
     hdmv_executable = destination / ("hdmv-oracle.exe" if os.name == "nt" else "hdmv-oracle")
     hdmv_compile = [arg.replace("decoder_oracle.cpp", "hdmv_oracle.cpp")
                     .replace("decoder-oracle", "hdmv-oracle") for arg in compile_command]
     run(hdmv_compile)
     hdmv_result = run([str(hdmv_executable)], capture_output=True, text=True)
-    print(hdmv_result.stdout, end="")
+    print(hdmv_result.stdout, end="", flush=True)
     print(hdmv_result.stderr, end="", file=sys.stderr)
     dvb_executable = destination / ("dvb-oracle.exe" if os.name == "nt" else "dvb-oracle")
     dvb_compile = [arg.replace("decoder_oracle.cpp", "dvb_oracle.cpp")
@@ -419,14 +446,14 @@ public:
         dvb_compile += ["user32.lib"]  # Compare the actual Windows UnionRect API.
     run(dvb_compile)
     dvb_result = run([str(dvb_executable)], capture_output=True, text=True)
-    print(dvb_result.stdout, end="")
+    print(dvb_result.stdout, end="", flush=True)
     print(dvb_result.stderr, end="", file=sys.stderr)
     field_executable = destination / ("dvb-field-oracle.exe" if os.name == "nt" else "dvb-field-oracle")
     field_compile = [arg.replace("dvb_oracle.cpp", "dvb_field_oracle.cpp")
                      .replace("dvb-oracle", "dvb-field-oracle") for arg in dvb_compile]
     run(field_compile)
     field_result = run([str(field_executable)], capture_output=True, text=True)
-    print(field_result.stdout, end="")
+    print(field_result.stdout, end="", flush=True)
     print(field_result.stderr, end="", file=sys.stderr)
     compiler = subprocess.run([args.cxx] if os.name == "nt" else [args.cxx, "--version"],
                               capture_output=True, text=True)
@@ -445,6 +472,8 @@ public:
         "hdmv_golomb_source_sha256": hashlib.sha256(golomb_source).hexdigest(),
         "hdmv_golomb_header_sha256": hashlib.sha256(golomb_header).hexdigest(),
         "hdmv_raster_source_sha256": hashlib.sha256(raster_source).hexdigest(),
+        "golomb_compile_command": golomb_compile,
+        "golomb_result": golomb_result.stdout, "golomb_stderr": golomb_result.stderr,
         "dvb_field_compile_command": field_compile,
         "dvb_field_result": field_result.stdout, "dvb_field_stderr": field_result.stderr,
         "dvb_compile_command": dvb_compile,

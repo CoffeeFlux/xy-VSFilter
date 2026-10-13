@@ -20,6 +20,19 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust scalar transitions for `CGolombBuffer::BitRead` requests from zero
+  through 32 bits while the cached bit count is below 64. The bridge preserves
+  the pre-EOF shift, peek refills, masking and residual-bit counts. Native code
+  retains the byte storage, per-byte position/count updates and the wider or
+  unusual-state fallback. This adds no Rust owner or borrowed native slice;
+  the internal C ABI returns a struct of scalar values. The public reader class
+  and its layout are unchanged.
+  The harness now extracts separate reference and candidate reader classes and
+  runs candidate HDMV/DVB renders through the candidate reader. A standalone
+  operation oracle also compares peeks, resets, alignment, skips, size changes,
+  buffer copies, input mutations and complete signed/unsigned Exp-Golomb codes.
+  Validation for this increment is in progress. Buffer ownership and the
+  retained wider-read path still need migration and their own evidence.
 * Safe Rust DVB field dispatch for `CompositionObject::DvbRenderField`, behind
   the existing opt-in switch. The native reader still supplies logical positions
   and bytes; Rust selects the pixel decoder, preserves signed field lengths,

@@ -14,6 +14,7 @@ pub mod drawing_tokens;
 pub mod dvb;
 pub mod fields;
 pub mod font;
+pub mod golomb;
 pub mod hdmv;
 pub mod segment_insert;
 pub mod segments;

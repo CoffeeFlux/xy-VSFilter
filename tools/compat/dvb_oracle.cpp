@@ -14,10 +14,9 @@ struct Outcome {
 template<class Owner> Outcome run(int mode,std::vector<BYTE> data,short x,short y,short width,
     int seed,int failure,int flags,int pixel_type) {
     const int size=static_cast<int>(data.size());data.push_back(0x5d);
-    ObservedDvbBuffer buffer(data.data(),size);
+    typename Owner::BufferType buffer(data.data(),size);
     // Seed the exact native bit-buffer state, including peeked whole bytes.
-    if(seed>0)buffer.ReferenceGolomb::BitRead(seed);
-    if(seed<0)buffer.ReferenceGolomb::BitRead(-seed,true);
+    buffer.Seed(seed);
     Owner owner;owner.m_width=width;
     for(unsigned i=0;i<256;++i)owner.m_Colors[i]=i*0x013b97e5u ^ 0x81050703u;
     RECT dirty=(flags&8) ? RECT{9,10,-1,-2} : RECT{-1,1,2,3};
