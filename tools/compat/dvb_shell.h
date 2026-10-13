@@ -58,10 +58,11 @@ public:
 };
 typedef ObservedDvbBase<ReferenceGolomb> ObservedDvbBuffer;
 typedef ObservedDvbBase<CandidateGolomb> CandidateDvbBuffer;
-#define DVB_SHELL(Name,Buffer) \
+#define DVB_SHELL(Name,Buffer,RustPixels) \
 class Name : public HdmvObject { \
 public: \
     typedef Buffer BufferType; \
+    Name(){useRustPixels=RustPixels;} \
     short m_width=0; \
     void RenderDvb(SubPicDesc&,short,short,RECT*); \
     void DvbRenderField(SubPicDesc&,Buffer&,short,short,short,RECT*); \

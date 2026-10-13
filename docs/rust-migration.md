@@ -20,6 +20,21 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust constant-alpha packed/planar row blending and variable-alpha packed
+  blending, behind the existing opt-in switch in `Rasterizer.cpp`. This preserves
+  the original alpha-plus-one weighting, truncation and inverse-alpha channel.
+  Native adapters retain row/plane order and snapshot the SSE path's 16 alpha
+  bytes before borrowing its destination. Scalar calls preserve per-pixel read
+  timing, including when alpha overlaps the destination; the two paths can have
+  intentionally different results in those cases.
+  The extracted oracle compares both original paths against their own candidate,
+  including all channel/alpha byte combinations, SIMD boundaries, padding,
+  guards, strides, overlapping rows/planes and overlapping alpha. Local x64
+  emulation with fatal ASan/UBSan passed **303,688 exact comparisons /
+  587,090,944 bytes**, including **10,560 rectangles** and **273,115 visibly
+  changed cases**. arm64 reports this SSE-dependent component as unavailable.
+  Rust unit tests and strict Clippy pass. Windows validation is pending for this
+  increment. Native surfaces, broader compositing and allocation remain to port.
 * Safe Rust scalar transitions for `CGolombBuffer::BitRead` requests from zero
   through 32 bits while the cached bit count is below 64. The bridge preserves
   the pre-EOF shift, peek refills, masking and residual-bit counts. Native code
@@ -31,8 +46,13 @@ unresolved reference outcomes requiring investigation, never matching results.
   runs candidate HDMV/DVB renders through the candidate reader. A standalone
   operation oracle also compares peeks, resets, alignment, skips, size changes,
   buffer copies, input mutations and complete signed/unsigned Exp-Golomb codes.
-  Validation for this increment is in progress. Buffer ownership and the
-  retained wider-read path still need migration and their own evidence.
+  Candidate `221c8b24` passed **1,117,618 exact reader operations** locally
+  and on all four CI platforms, plus Miri and both Windows DLL jobs. The native
+  comparisons matched **322 corpus cases / 4,026 frames** and **32 mutations /
+  224 frames** on each architecture, including dialogs, exports and dependencies.
+  [Reader transition evidence](golomb-evidence.json) records the source and DLL
+  hashes and confirms Rust-enabled `GolombBuffer.cpp` compilation. Buffer
+  ownership and the retained wider-read path still need migration.
 * Safe Rust DVB field dispatch for `CompositionObject::DvbRenderField`, behind
   the existing opt-in switch. The native reader still supplies logical positions
   and bytes; Rust selects the pixel decoder, preserves signed field lengths,
@@ -729,23 +749,17 @@ the native oracle where needed:
 | `STS.cpp` entry sorting and frame/time conversion | Own entry ordering and conversion state, with native callbacks initially | `Sort` uses CRT `qsort` with separate normal/readorder comparators; capture equal-key permutations and comparator results before choosing a Rust sorting algorithm. Preserve start-before-end conversion, `llround`, mode changes and the final `CreateSegments` call. |
 | `STS.cpp` field splitting and numeric parsing | Raw UTF-16 fields, cursor/mutation state, error recovery | Both field scanners are now ported, preserving final-field reuse, distinct whitespace rules and separator mutation. Keep CRT numeric conversion until overflow, locale, end-pointer and rounding results are captured. |
 | Remaining `RTS.cpp` drawing parsing | Command replacement, numeric consumption and final native path storage; command state is now ported | `SpanIncluding`'s return value is ignored; commands split inside arbitrary text; `s` falls through to `p`; the apparent Bezier truncation uses an incremented counter and must not be "fixed." Keep `wcstod` and float-to-LONG conversion at the native boundary initially. |
-| `CompositionObject.cpp` bitmap storage and field parsing | HDMV/DVB run state and DVB field dispatch are ported; next capture `CGolombBuffer`, RLE storage and packet assembly | Preserve allocated versus appended lengths, reader offsets, palette state and transparent runs. Keep native palette conversion/compositing until those stages have separate exact-byte oracles. |
+| `CompositionObject.cpp` bitmap storage and field parsing | HDMV/DVB run state and DVB field dispatch are ported; common reader transitions are ported; next capture RLE storage and packet assembly | Preserve allocated versus appended lengths, reader offsets, palette state and transparent runs. Keep native palette conversion/compositing until those stages have separate exact-byte oracles. |
 | `xy_filter.cpp` and raster/compositing kernels | Safe slice ownership and scalar arithmetic implementations | Capture each active SIMD path's operation order, padding, overlap and rounding. Scalar C++ output alone does not establish equality with the SIMD implementation used by a DLL. |
 
-Before migrating bitmap reader/storage ownership, extend the current extracted
-`CGolombBuffer` coverage beyond the read/EOF/alignment/position/skip operations exercised by
-the run decoders. Its failed `BitRead` shifts buffered state
-before returning zero, a peek can refill and advance the underlying byte cursor,
-and `BitByteAlign` changes the count without clearing the stored bits. The
-unsigned Exp-Golomb loop has no EOF exit for an all-zero/truncated prefix; isolate
-such probes in a worker with a timeout and record them as unresolved reference
-outcomes. `CompositionObject` also distinguishes allocated RLE length from the
-amount actually appended. These state details need captured comparisons before
-replacing pointer storage or assuming a conventional bit-reader API.
-The packet parsers also use `GetBufferPos` to copy object data and `ReadBuffer`
-to assemble HDMV segments. `GetBufferPos` exposes the byte cursor; `GetPos`
-subtracts buffered whole bytes. Those offsets are distinct after a peek. Capture
-both before changing the backing buffer or replacing pointer returns with spans.
+The standalone `CGolombBuffer` oracle now covers reset, raw buffer copying,
+input changes, cursor/size changes, peek, alignment, skips and complete
+Exp-Golomb codes, alongside the renderer oracles. Failed reads shift cached state
+before returning zero; peeks can refill and move the byte cursor; alignment
+changes the count without clearing stored bits. `GetBufferPos` exposes the raw
+cursor whereas `GetPos` subtracts cached whole bytes. Wider reads and unusual
+cached states retain the native fallback. RLE ownership still needs a separate
+approach to preserve the distinction between allocated and appended lengths.
 
 These are code boundaries, not promises that a finite corpus covers every quirk.
 Each replacement needs the same sequence used for the buffered reader: extract
