@@ -11,6 +11,7 @@ extern crate alloc;
 pub mod ass_tags;
 pub mod drawing;
 pub mod drawing_tokens;
+pub mod dvb;
 pub mod fields;
 pub mod font;
 pub mod hdmv;

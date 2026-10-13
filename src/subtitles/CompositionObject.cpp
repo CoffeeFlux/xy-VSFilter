@@ -22,6 +22,7 @@
 #include "CompositionObject.h"
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_hdmv.h"
+#include "xy_rust_dvb.h"
 #endif
 #include "../DSUtil/GolombBuffer.h"
 #include "../subpic/color_conv_table.h"
@@ -298,12 +299,26 @@ void CompositionObject::DvbRenderField(SubPicDesc& spd, CGolombBuffer& gb, short
 
 void CompositionObject::Dvb2PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb, short& nX, short& nY, RECT *dirtyRect /*= NULL*/)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::DvbDecoder decoder(2);
+#else
     BYTE  bTemp;
     BYTE  nPaletteIndex = 0;
     short nCount;
     bool  bQuit = false;
 
-    while (!bQuit && !gb.IsEOF()) {
+#endif
+    while (
+#ifdef XY_VSFILTER_RUST_TEXT
+        decoder.Next(gb)
+#else
+        !bQuit && !gb.IsEOF()
+#endif
+    ) {
+#ifdef XY_VSFILTER_RUST_TEXT
+        short nCount = static_cast<short>(decoder.Field(2));
+        BYTE nPaletteIndex = static_cast<BYTE>(decoder.Field(3));
+#else
         nCount = 0;
         nPaletteIndex = 0;
         bTemp = (BYTE)gb.BitRead(2);
@@ -338,6 +353,7 @@ void CompositionObject::Dvb2PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb,
             }
         }
 
+#endif
         if (nX + nCount > m_width) {
             ASSERT(FALSE);
             break;
@@ -352,6 +368,9 @@ void CompositionObject::Dvb2PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb,
             }
             nX += nCount;
         }
+#ifdef XY_VSFILTER_RUST_TEXT
+        decoder.Supply(0);
+#endif
     }
 
     gb.BitByteAlign();
@@ -359,12 +378,26 @@ void CompositionObject::Dvb2PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb,
 
 void CompositionObject::Dvb4PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb, short& nX, short& nY, RECT *dirtyRect /*= NULL*/)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::DvbDecoder decoder(4);
+#else
     BYTE  bTemp;
     BYTE  nPaletteIndex = 0;
     short nCount;
     bool  bQuit = false;
 
-    while (!bQuit && !gb.IsEOF()) {
+#endif
+    while (
+#ifdef XY_VSFILTER_RUST_TEXT
+        decoder.Next(gb)
+#else
+        !bQuit && !gb.IsEOF()
+#endif
+    ) {
+#ifdef XY_VSFILTER_RUST_TEXT
+        short nCount = static_cast<short>(decoder.Field(2));
+        BYTE nPaletteIndex = static_cast<BYTE>(decoder.Field(3));
+#else
         nCount = 0;
         nPaletteIndex = 0;
         bTemp = (BYTE)gb.BitRead(4);
@@ -404,6 +437,7 @@ void CompositionObject::Dvb4PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb,
             }
         }
 
+#endif
 #if 0
         if (nX + nCount > m_width) {
             ASSERT(FALSE);
@@ -420,6 +454,9 @@ void CompositionObject::Dvb4PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb,
             }
             nX += nCount;
         }
+#ifdef XY_VSFILTER_RUST_TEXT
+        decoder.Supply(0);
+#endif
     }
 
     gb.BitByteAlign();
@@ -427,12 +464,26 @@ void CompositionObject::Dvb4PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb,
 
 void CompositionObject::Dvb8PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb, short& nX, short& nY, RECT *dirtyRect /*= NULL*/)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::DvbDecoder decoder(8);
+#else
     BYTE  bTemp;
     BYTE  nPaletteIndex = 0;
     short nCount;
     bool  bQuit = false;
 
-    while (!bQuit && !gb.IsEOF()) {
+#endif
+    while (
+#ifdef XY_VSFILTER_RUST_TEXT
+        decoder.Next(gb)
+#else
+        !bQuit && !gb.IsEOF()
+#endif
+    ) {
+#ifdef XY_VSFILTER_RUST_TEXT
+        short nCount = static_cast<short>(decoder.Field(2));
+        BYTE nPaletteIndex = static_cast<BYTE>(decoder.Field(3));
+#else
         nCount = 0;
         nPaletteIndex = 0;
         bTemp = gb.ReadByte();
@@ -451,6 +502,7 @@ void CompositionObject::Dvb8PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb,
             }
         }
 
+#endif
         if (nX + nCount > m_width) {
             ASSERT(FALSE);
             break;
@@ -465,6 +517,9 @@ void CompositionObject::Dvb8PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb,
             }
             nX += nCount;
         }
+#ifdef XY_VSFILTER_RUST_TEXT
+        decoder.Supply(0);
+#endif
     }
 
     gb.BitByteAlign();

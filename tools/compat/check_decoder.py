@@ -231,7 +231,8 @@ public:
     # Spell MSVC's 1ui64 literal with a portable standard macro.
     hdmv += extract_method(golomb_header.decode("utf-8-sig"), "class CGolombBuffer").replace("private:", "public:").replace("CGolombBuffer", "ReferenceGolomb") + ";\n"
     for signature in ("CGolombBuffer::CGolombBuffer(", "CGolombBuffer::~CGolombBuffer(",
-                      "UINT64 CGolombBuffer::BitRead(", "void CGolombBuffer::Reset()"):
+                      "UINT64 CGolombBuffer::BitRead(", "void CGolombBuffer::Reset()",
+                      "void CGolombBuffer::BitByteAlign()"):
         hdmv += extract_method(golomb_source.decode("utf-8-sig"), signature).replace("CGolombBuffer", "ReferenceGolomb").replace("1ui64", "UINT64_C(1)") + "\n"
     hdmv += """
 class ObservedGolomb : public ReferenceGolomb {
@@ -267,6 +268,17 @@ public:
         hdmv += extract_method(raster_source.decode("utf-8-sig"), signature) + "\n"
     hdmv += "#endif\n"
     (destination / "original_hdmv.h").write_text(hdmv, encoding="utf-8")
+    dvb = '#include "original_hdmv.h"\n#include "dvb_shell.h"\n'
+    dvb += '#define CGolombBuffer ObservedDvbBuffer\n#define UnionRect ObservedUnionRect\n'
+    for name, content in (("OriginalDvb", hdmv_source), ("CandidateDvb", candidate_hdmv)):
+        dvb += f"DVB_SHELL({name})\n#define CompositionObject {name}\n"
+        if name == "CandidateDvb":
+            dvb += "#define XY_VSFILTER_RUST_TEXT\n"
+        for bits in (2,4,8):
+            dvb += extract_method(content.decode("utf-8-sig"), f"void CompositionObject::Dvb{bits}PixelsCodeString(") + "\n"
+        dvb += "#undef CompositionObject\n#undef XY_VSFILTER_RUST_TEXT\n"
+    dvb += '#undef CGolombBuffer\n#undef UnionRect\n'
+    (destination / "original_dvb.h").write_text(dvb, encoding="utf-8")
     cargo = ["cargo", "rustc", "--locked", "--offline", "--release", "-p", "xy-vsfilter-ffi"]
     if os.name == "nt":
         cargo += ["--features", "native-runtime"]
@@ -372,6 +384,15 @@ public:
     hdmv_result = run([str(hdmv_executable)], capture_output=True, text=True)
     print(hdmv_result.stdout, end="")
     print(hdmv_result.stderr, end="", file=sys.stderr)
+    dvb_executable = destination / ("dvb-oracle.exe" if os.name == "nt" else "dvb-oracle")
+    dvb_compile = [arg.replace("decoder_oracle.cpp", "dvb_oracle.cpp")
+                   .replace("decoder-oracle", "dvb-oracle") for arg in compile_command]
+    if os.name == "nt":
+        dvb_compile += ["user32.lib"]  # Compare the actual Windows UnionRect API.
+    run(dvb_compile)
+    dvb_result = run([str(dvb_executable)], capture_output=True, text=True)
+    print(dvb_result.stdout, end="")
+    print(dvb_result.stderr, end="", file=sys.stderr)
     compiler = subprocess.run([args.cxx] if os.name == "nt" else [args.cxx, "--version"],
                               capture_output=True, text=True)
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
@@ -382,6 +403,7 @@ public:
               ROOT / "include/xy_rust_segments.h",
               ROOT / "include/xy_rust_segment_insert.h",
               ROOT / "include/xy_rust_hdmv.h",
+              ROOT / "include/xy_rust_dvb.h",
               ROOT / "src/subtitles/CompositionObject.cpp",
               ROOT / "include/xy_rust_timeline_search.h",
               ROOT / "src/subtitles/TextFile.h"]
@@ -399,6 +421,8 @@ public:
         "hdmv_golomb_source_sha256": hashlib.sha256(golomb_source).hexdigest(),
         "hdmv_golomb_header_sha256": hashlib.sha256(golomb_header).hexdigest(),
         "hdmv_raster_source_sha256": hashlib.sha256(raster_source).hexdigest(),
+        "dvb_compile_command": dvb_compile,
+        "dvb_result": dvb_result.stdout, "dvb_stderr": dvb_result.stderr,
         "hdmv_compile_command": hdmv_compile,
         "hdmv_result": hdmv_result.stdout, "hdmv_stderr": hdmv_result.stderr,
         "rustc": run(["rustc", "-Vv"], capture_output=True, text=True).stdout,
