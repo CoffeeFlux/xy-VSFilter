@@ -64,6 +64,24 @@ public:
 '''
     license_header = source.decode("utf-8-sig").split("#include", 1)[0]
     (destination / "original_next_char.h").write_text(license_header + shell + method, encoding="utf-8")
+    candidate_source = (ROOT / "src/subtitles/TextFile.cpp").read_bytes()
+    methods = ["bool CTextFile::Open(", "ULONGLONG CTextFile::GetPosition(",
+               "ULONGLONG CTextFile::GetLength(", "ULONGLONG CTextFile::Seek(",
+               "bool CTextFile::ReadLine(", "int CTextFile::NextChar("]
+    reader = license_header + '''#include "text_reader_shell.h"
+#include "Utf8.h"
+#include "xy_rust_text.h"
+#define __super MemoryFile
+#define XY_LOG_ERROR(message) ((void)0)
+'''
+    for name, content in (("OriginalTextFile", source), ("CandidateTextFile", candidate_source)):
+        reader += f"\nTEXT_READER_SHELL({name})\n#define CTextFile {name}\n"
+        if name == "CandidateTextFile":
+            reader += "#define XY_VSFILTER_RUST_TEXT\n"
+        reader += "\n".join(extract_method(content.decode("utf-8-sig"), signature) for signature in methods)
+        reader += "\n#undef CTextFile\n#undef XY_VSFILTER_RUST_TEXT\n"
+    reader += "#undef __super\n#undef XY_LOG_ERROR\n"
+    (destination / "original_text_reader.h").write_text(reader, encoding="utf-8")
     cargo = ["cargo", "rustc", "--locked", "--offline", "--release", "-p", "xy-vsfilter-ffi"]
     if args.target:
         cargo += ["--target", args.target]
@@ -83,12 +101,12 @@ public:
         if args.sanitize:
             parser.error("--sanitize is currently supported with Clang/GCC only")
         compile_command = [args.cxx, "/nologo", "/O2", "/EHsc", "/std:c++14", "/MD",
-            f"/I{destination}", f"/I{ROOT / 'include'}",
+            f"/I{destination}", f"/I{ROOT / 'include'}", f"/I{ROOT / 'tools/compat'}",
             str(ROOT / "tools/compat/decoder_oracle.cpp"), str(library_dir / "xy_vsfilter_ffi.lib"),
             *libraries, f"/Fe:{executable}", f"/Fo:{destination / 'decoder-oracle.obj'}"]
     else:
         compile_command = [args.cxx, "-std=c++11", "-O2", "-Wall", "-Wextra",
-            "-I", str(destination), "-I", str(ROOT / "include"),
+            "-I", str(destination), "-I", str(ROOT / "include"), "-I", str(ROOT / "tools/compat"),
             str(ROOT / "tools/compat/decoder_oracle.cpp"), str(library_dir / "libxy_vsfilter_ffi.a"),
             *libraries, "-o", str(executable)]
         if args.sanitize:
@@ -97,11 +115,21 @@ public:
     result = run([str(executable)], capture_output=True, text=True)
     print(result.stdout, end="")
     print(result.stderr, end="", file=sys.stderr)
+    reader_executable = destination / ("text-reader-oracle.exe" if os.name == "nt" else "text-reader-oracle")
+    reader_compile = [arg.replace("decoder_oracle.cpp", "text_reader_oracle.cpp")
+                      .replace("decoder-oracle", "text-reader-oracle") for arg in compile_command]
+    run(reader_compile)
+    reader_result = run([str(reader_executable)], capture_output=True, text=True)
+    print(reader_result.stdout, end="")
+    print(reader_result.stderr, end="", file=sys.stderr)
     report = {"reference": reference, "source_sha256": hashlib.sha256(source).hexdigest(),
         "header_sha256": hashlib.sha256(header).hexdigest(), "target": args.target or "host",
         "sanitizers": args.sanitize, "compile_command": compile_command,
         "rustc": run(["rustc", "-Vv"], capture_output=True, text=True).stdout,
-        "result": result.stdout, "stderr": result.stderr}
+        "result": result.stdout, "stderr": result.stderr,
+        "candidate_source_sha256": hashlib.sha256(candidate_source).hexdigest(),
+        "text_reader_compile_command": reader_compile,
+        "text_reader_result": reader_result.stdout, "text_reader_stderr": reader_result.stderr}
     (destination / "report.json").write_text(json.dumps(report, indent=2) + "\n")
 
 

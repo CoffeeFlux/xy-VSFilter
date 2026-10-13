@@ -1,0 +1,73 @@
+name: Windows renderer differential
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['rust/**']
+    paths:
+      - '.github/workflows/native-compat.yml'
+      - 'rust/**'
+      - 'include/xy_rust_text.h'
+      - 'src/**'
+      - 'tools/compat/**'
+      - 'test/compat/**'
+
+permissions:
+  contents: read
+
+jobs:
+  renderer:
+    runs-on: windows-2022
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: x64
+            arch: x64
+            target: x86_64-pc-windows-msvc
+            python_arch: x64
+          - platform: Win32
+            arch: amd64_x86
+            target: i686-pc-windows-msvc
+            python_arch: x86
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: candidate
+          fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          path: baseline
+          ref: 4911cacb102bc0cbd41449793e54473265b04e62
+      - uses: actions/checkout@v4
+        with:
+          repository: ShiftMediaProject/VSYASM
+          ref: 0b3840076a6cbb1574e031a3a2688554cb09d82a
+          path: VSYASM
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          architecture: ${{ matrix.python_arch }}
+      - name: Install original assembler integration
+        shell: cmd
+        run: call VSYASM\install_script.bat
+      - name: Install Rust
+        run: |
+          rustup toolchain install 1.85.0 --profile minimal --target ${{ matrix.target }}
+          rustup default 1.85.0
+      - name: Build the reference and candidate and compare actual DLLs
+        shell: pwsh
+        run: |
+          & candidate\tools\compat\run_native_comparison.ps1 -Platform ${{ matrix.platform }} -Baseline "$pwd\baseline"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: renderer-evidence-${{ matrix.platform }}
+          path: |
+            candidate/artifacts/native/
+            candidate/bin/lib*/**/Release/*.dll
+            baseline/bin/lib*/**/Release/*.dll
