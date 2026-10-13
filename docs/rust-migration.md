@@ -20,6 +20,18 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust single-pixel scalar/SSE blending and scaled shape/clip-alpha
+  arithmetic are prepared behind the same switch. SSE signed-word weights,
+  bitwise weight construction, logical shifts and saturation remain distinct
+  from the scalar packed arithmetic for wider alpha values. Native pixel loads
+  and stores remain at the boundary; the new C ABI takes and returns scalars.
+  The scalar adapter retains its original body for the small signed-setup
+  overflow range, which is excluded from parity counts. The extracted x64
+  oracle passed **71,764,938 exact comparisons** with fatal ASan/UBSan: all byte
+  channel/alpha combinations, wide-alpha boundaries and deterministic full-width
+  values, plus byte and wider shape/clip products. Existing row/rectangle tests
+  also pass with these helpers enabled. Rust tests (37 core, 16 FFI), strict
+  Clippy and default C++ branch syntax checks pass. Windows validation is pending.
 * Safe Rust additive packed blending and variable-alpha planar blending are
   prepared behind the existing opt-in switch. Additive colors saturate upward
   while inverse alpha saturates downward. The bridge retains the SSE alpha

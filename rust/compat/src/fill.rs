@@ -62,9 +62,54 @@ pub fn masked_plane_block(dst: &mut [u8], alpha: [u8; 16], value: u8) {
     }
 }
 
+/// Scalar packed arithmetic, including cross-lane carry for wider alpha values.
+/// The native adapter retains its original path where signed setup overflows.
+pub fn mix_pixel_scalar(dst: u32, color: u32, alpha: u32) -> u32 {
+    let inverse = 256u32.wrapping_sub(alpha);
+    let weight = alpha.wrapping_add(1);
+    let rb = (dst & 0x00ff00ff)
+        .wrapping_mul(inverse)
+        .wrapping_add((color & 0x00ff00ff).wrapping_mul(weight));
+    let g = (dst & 0x0000ff00)
+        .wrapping_mul(inverse)
+        .wrapping_add((color & 0x0000ff00).wrapping_mul(weight));
+    let a = ((dst >> 8) & 0x00ff0000).wrapping_mul(inverse);
+    ((rb & 0xff00ff00) >> 8) | ((g & 0x00ff0000) >> 8) | (a & 0xff000000)
+}
+
+/// The SSE helper constructs its two signed 16-bit weights with a bitwise OR,
+/// then logically shifts and saturates the products. Wider alpha values must
+/// retain this sequence rather than being narrowed to a byte.
+pub fn mix_pixel_sse(dst: u32, color: u32, alpha: u32) -> u32 {
+    let weights = (alpha.wrapping_add(1) << 16) | 256u32.wrapping_sub(alpha);
+    let inverse = i32::from(weights as i16);
+    let weight = i32::from((weights >> 16) as i16);
+    let mut output = dst.to_le_bytes();
+    let source = (color & 0x00ffffff).to_le_bytes();
+    for i in 0..4 {
+        // Byte * signed word products and their sum fit in i32.
+        let product = i32::from(output[i]) * inverse + i32::from(source[i]) * weight;
+        // Logical shift makes even negative products positive. The two native
+        // packing operations then saturate the result to the byte range.
+        output[i] = ((product as u32) >> 8).min(255) as u8;
+    }
+    u32::from_le_bytes(output)
+}
+
+pub fn mix_pixel_scaled(dst: u32, color: u32, shape: u32, clip: u32) -> u32 {
+    let alpha = (shape.wrapping_mul(clip).wrapping_mul(color >> 24) >> 12) & 255;
+    mix_pixel_sse(dst, color, alpha)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn wider_alpha_keeps_the_original_sse_weight_construction() {
+        assert_eq!(mix_pixel_sse(0, 0xffffff, 257), 0x00ffffff);
+        assert_eq!(mix_pixel_scalar(0, 0xffffff, 257), 0x00000000);
+        assert_eq!(mix_pixel_sse(0xffffffff, 0, 0xffffffff), 0xffffffff);
+    }
     #[test]
     fn additive_color_and_inverse_alpha_saturate_independently() {
         assert_eq!(add_pixel(0x8010fe00, 128, 0x993020ff), 0x0028ff80);

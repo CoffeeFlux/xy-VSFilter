@@ -312,6 +312,8 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
             hdmv += "#define XY_VSFILTER_RUST_TEXT\n"
         for signature in ("static __forceinline void pixmix_c(DWORD *",
                           "static __forceinline void pixmix_sse2(DWORD*",
+                          "static __forceinline void pixmix2(DWORD *",
+                          "static __forceinline void pixmix2_sse2(DWORD*",
                           "static __forceinline __m128i packed_pix_mix_sse2(",
                           "static __forceinline void packed_pix_mix_c(BYTE* dst, const BYTE* alpha",
                           "static __forceinline void packed_pix_mix_sse2(BYTE* dst, const BYTE* alpha",
@@ -479,6 +481,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     fill_result = run([str(fill_executable)], capture_output=True, text=True)
     print(fill_result.stdout, end="", flush=True)
     print(fill_result.stderr, end="", file=sys.stderr)
+    pixel_executable = destination / ("pixel-oracle.exe" if os.name == "nt" else "pixel-oracle")
+    pixel_compile = [arg.replace("fill_oracle.cpp", "pixel_oracle.cpp").replace("fill-oracle", "pixel-oracle") for arg in fill_compile]
+    run(pixel_compile)
+    pixel_result = run([str(pixel_executable)], capture_output=True, text=True)
+    print(pixel_result.stdout, end="", flush=True)
+    print(pixel_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -508,6 +516,8 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "hdmv_golomb_source_sha256": hashlib.sha256(golomb_source).hexdigest(),
         "hdmv_golomb_header_sha256": hashlib.sha256(golomb_header).hexdigest(),
         "hdmv_raster_source_sha256": hashlib.sha256(raster_source).hexdigest(),
+        "pixel_compile_command": pixel_compile,
+        "pixel_result": pixel_result.stdout, "pixel_stderr": pixel_result.stderr,
         "fill_debug_compile_command": fill_debug_compile,
         "fill_debug_result": fill_debug_output, "fill_debug_stderr": fill_debug_stderr,
         "fill_compile_command": fill_compile,

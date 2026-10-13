@@ -621,6 +621,13 @@ static __forceinline void   pixmix_sse2(DWORD *dst, DWORD color, DWORD alpha);
 
 static __forceinline void pixmix_c(DWORD *dst, DWORD color, DWORD alpha)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (alpha < 0x7fffffffU || alpha > 0x80000100U) {
+        *dst = xy_vsfilter_mix_pixel_scalar(*dst, color, alpha);
+        return;
+    }
+#endif
+
     int a = alpha;
     // Make sure both a and ia are in range 1..256 for the >>8 operations below to be correct
     int ia = 256-a;
@@ -632,6 +639,9 @@ static __forceinline void pixmix_c(DWORD *dst, DWORD color, DWORD alpha)
 
 static __forceinline void pixmix_sse2(DWORD* dst, DWORD color, DWORD alpha)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    *dst = xy_vsfilter_mix_pixel_sse(*dst, color, alpha);
+#else
     //    alpha = (((alpha) * (color>>24)) >> 6) & 0xff;
     color &= 0xffffff;
     __m128i zero = _mm_setzero_si128();
@@ -644,6 +654,7 @@ static __forceinline void pixmix_sse2(DWORD* dst, DWORD color, DWORD alpha)
     r = _mm_packs_epi32(r, r);
     r = _mm_packus_epi16(r, r);
     *dst = (DWORD)_mm_cvtsi128_si32(r);
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////
