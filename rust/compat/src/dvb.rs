@@ -199,3 +199,104 @@ mod tests {
         assert_eq!(d.request(), Request::Done);
     }
 }
+
+/// Field dispatch deliberately uses the declared signed length, without an EOF
+/// clamp. Mapping tables are skipped, and each line marker advances two rows.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum FieldRequest {
+    Done,
+    Position,
+    Byte,
+    Pixels(Mode),
+    Skip(u8),
+    Unknown,
+}
+
+pub struct FieldDecoder {
+    end: i32,
+    start_x: i16,
+    x: i16,
+    y: i16,
+    request: FieldRequest,
+}
+
+impl FieldDecoder {
+    pub fn new(position: i32, length: i16, x: i16, y: i16) -> Self {
+        Self {
+            end: position.wrapping_add(i32::from(length)),
+            start_x: x,
+            x,
+            y,
+            request: FieldRequest::Position,
+        }
+    }
+
+    pub fn request(&self) -> FieldRequest {
+        self.request
+    }
+
+    pub fn coordinates(&self) -> (i16, i16) {
+        (self.x, self.y)
+    }
+
+    /// Supplies a position, byte, or completed native action. Coordinates are
+    /// copied back only after a pixel decoder returns; native callbacks never
+    /// execute while this state is borrowed.
+    pub fn supply(&mut self, value: i32, x: i16, y: i16) {
+        self.request = match self.request {
+            FieldRequest::Done => FieldRequest::Done,
+            FieldRequest::Position if value < self.end => FieldRequest::Byte,
+            FieldRequest::Position => FieldRequest::Done,
+            FieldRequest::Byte => match value {
+                0x10 => FieldRequest::Pixels(Mode::Two),
+                0x11 => FieldRequest::Pixels(Mode::Four),
+                0x12 => FieldRequest::Pixels(Mode::Eight),
+                0x20 => FieldRequest::Skip(2),
+                0x21 => FieldRequest::Skip(4),
+                0x22 => FieldRequest::Skip(16),
+                0xf0 => {
+                    self.x = self.start_x;
+                    self.y = self.y.wrapping_add(2);
+                    FieldRequest::Position
+                }
+                _ => FieldRequest::Unknown,
+            },
+            FieldRequest::Pixels(_) => {
+                self.x = x;
+                self.y = y;
+                FieldRequest::Position
+            }
+            FieldRequest::Skip(_) | FieldRequest::Unknown => FieldRequest::Position,
+        };
+    }
+}
+
+#[cfg(test)]
+mod field_tests {
+    use super::*;
+
+    #[test]
+    fn marker_resets_x_and_wraps_alternate_row() {
+        let mut d = FieldDecoder::new(4, 8, -2, i16::MAX);
+        d.supply(4, 0, 0);
+        d.supply(0x12, 0, 0);
+        assert_eq!(d.request(), FieldRequest::Pixels(Mode::Eight));
+        d.supply(0, 123, i16::MAX);
+        d.supply(7, 0, 0);
+        d.supply(0xf0, 0, 0);
+        assert_eq!(d.coordinates(), (-2, i16::MIN + 1));
+        d.supply(12, 0, 0);
+        assert_eq!(d.request(), FieldRequest::Done);
+    }
+
+    #[test]
+    fn mapping_skip_is_not_clamped_to_remaining_field() {
+        let mut d = FieldDecoder::new(4, 1, 0, 0);
+        d.supply(4, 0, 0);
+        d.supply(0x22, 0, 0);
+        assert_eq!(d.request(), FieldRequest::Skip(16));
+        d.supply(0, 0, 0);
+        d.supply(21, 0, 0);
+        assert_eq!(d.request(), FieldRequest::Done);
+    }
+}

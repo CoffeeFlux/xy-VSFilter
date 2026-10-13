@@ -257,6 +257,22 @@ void CompositionObject::RenderDvb(SubPicDesc& spd, short nX, short nY, RECT *dir
 
 void CompositionObject::DvbRenderField(SubPicDesc& spd, CGolombBuffer& gb, short nXStart, short nYStart, short nLength, RECT *dirtyRect /*= NULL*/)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::DvbFieldDecoder decoder(gb.GetPos(), nLength, nXStart, nYStart);
+    short nX = nXStart;
+    short nY = nYStart;
+    for (int mode; (mode = decoder.Next(gb)) != 0;) {
+        nX = static_cast<short>(decoder.Field(2));
+        nY = static_cast<short>(decoder.Field(3));
+        switch (mode) {
+            case 2: Dvb2PixelsCodeString(spd, gb, nX, nY, dirtyRect); break;
+            case 4: Dvb4PixelsCodeString(spd, gb, nX, nY, dirtyRect); break;
+            case 8: Dvb8PixelsCodeString(spd, gb, nX, nY, dirtyRect); break;
+            default: ASSERT(FALSE); break;
+        }
+        decoder.Supply(0, nX, nY);
+    }
+#else
     //FillSolidRect(spd, nXStart, nYStart, m_width, m_height, 0xFFFF0000);  // Red opaque
     //FillSolidRect(spd, nXStart, nYStart, m_width, m_height, 0xCC00FF00);  // Green 80%
     //FillSolidRect(spd, nXStart, nYStart, m_width, m_height, 0x100000FF);  // Blue 60%
@@ -294,6 +310,7 @@ void CompositionObject::DvbRenderField(SubPicDesc& spd, CGolombBuffer& gb, short
                 break;
         }
     }
+#endif
 }
 
 

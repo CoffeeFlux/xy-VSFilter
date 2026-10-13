@@ -232,7 +232,8 @@ public:
     hdmv += extract_method(golomb_header.decode("utf-8-sig"), "class CGolombBuffer").replace("private:", "public:").replace("CGolombBuffer", "ReferenceGolomb") + ";\n"
     for signature in ("CGolombBuffer::CGolombBuffer(", "CGolombBuffer::~CGolombBuffer(",
                       "UINT64 CGolombBuffer::BitRead(", "void CGolombBuffer::Reset()",
-                      "void CGolombBuffer::BitByteAlign()"):
+                      "void CGolombBuffer::BitByteAlign()", "int CGolombBuffer::GetPos()",
+                      "void CGolombBuffer::SkipBytes("):
         hdmv += extract_method(golomb_source.decode("utf-8-sig"), signature).replace("CGolombBuffer", "ReferenceGolomb").replace("1ui64", "UINT64_C(1)") + "\n"
     hdmv += """
 class ObservedGolomb : public ReferenceGolomb {
@@ -274,6 +275,8 @@ public:
         dvb += f"DVB_SHELL({name})\n#define CompositionObject {name}\n"
         if name == "CandidateDvb":
             dvb += "#define XY_VSFILTER_RUST_TEXT\n"
+        for method in ("RenderDvb", "DvbRenderField"):
+            dvb += extract_method(content.decode("utf-8-sig"), f"void CompositionObject::{method}(") + "\n"
         for bits in (2,4,8):
             dvb += extract_method(content.decode("utf-8-sig"), f"void CompositionObject::Dvb{bits}PixelsCodeString(") + "\n"
         dvb += "#undef CompositionObject\n#undef XY_VSFILTER_RUST_TEXT\n"
@@ -393,6 +396,13 @@ public:
     dvb_result = run([str(dvb_executable)], capture_output=True, text=True)
     print(dvb_result.stdout, end="")
     print(dvb_result.stderr, end="", file=sys.stderr)
+    field_executable = destination / ("dvb-field-oracle.exe" if os.name == "nt" else "dvb-field-oracle")
+    field_compile = [arg.replace("dvb_oracle.cpp", "dvb_field_oracle.cpp")
+                     .replace("dvb-oracle", "dvb-field-oracle") for arg in dvb_compile]
+    run(field_compile)
+    field_result = run([str(field_executable)], capture_output=True, text=True)
+    print(field_result.stdout, end="")
+    print(field_result.stderr, end="", file=sys.stderr)
     compiler = subprocess.run([args.cxx] if os.name == "nt" else [args.cxx, "--version"],
                               capture_output=True, text=True)
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
@@ -421,6 +431,8 @@ public:
         "hdmv_golomb_source_sha256": hashlib.sha256(golomb_source).hexdigest(),
         "hdmv_golomb_header_sha256": hashlib.sha256(golomb_header).hexdigest(),
         "hdmv_raster_source_sha256": hashlib.sha256(raster_source).hexdigest(),
+        "dvb_field_compile_command": field_compile,
+        "dvb_field_result": field_result.stdout, "dvb_field_stderr": field_result.stderr,
         "dvb_compile_command": dvb_compile,
         "dvb_result": dvb_result.stdout, "dvb_stderr": dvb_result.stderr,
         "hdmv_compile_command": hdmv_compile,

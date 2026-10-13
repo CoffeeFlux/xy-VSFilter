@@ -28,6 +28,20 @@ static int ObservedUnionRect(RECT* dst,const RECT* a,const RECT* b) {
 class ObservedDvbBuffer : public ObservedGolomb {
 public:
     ObservedDvbBuffer(BYTE* data,int size):ObservedGolomb(data,size){}
+    short ReadShort() {
+        const short value=ReferenceGolomb::ReadShort();
+        hdmvObserve({{8,m_nBitPos,m_bitlen,m_bitbuff,value,0,0}});
+        return value;
+    }
+    int GetPos() {
+        const int value=ReferenceGolomb::GetPos();
+        hdmvObserve({{9,m_nBitPos,m_bitlen,m_bitbuff,value,0,0}});
+        return value;
+    }
+    void SkipBytes(int count) {
+        ReferenceGolomb::SkipBytes(count);
+        hdmvObserve({{10,count,m_nBitPos,m_bitlen,m_bitbuff,0,0}});
+    }
     UINT64 BitRead(int bits,bool peek=false) {
         const UINT64 value=ReferenceGolomb::BitRead(bits,peek);
         hdmvObserve({{4,bits,m_nBitPos,m_bitlen,m_bitbuff,static_cast<int64_t>(value),peek}});
@@ -43,6 +57,8 @@ public:
 class Name : public HdmvObject { \
 public: \
     short m_width=0; \
+    void RenderDvb(SubPicDesc&,short,short,RECT*); \
+    void DvbRenderField(SubPicDesc&,ObservedDvbBuffer&,short,short,short,RECT*); \
     void Dvb2PixelsCodeString(SubPicDesc&,ObservedDvbBuffer&,short&,short&,RECT*); \
     void Dvb4PixelsCodeString(SubPicDesc&,ObservedDvbBuffer&,short&,short&,RECT*); \
     void Dvb8PixelsCodeString(SubPicDesc&,ObservedDvbBuffer&,short&,short&,RECT*); \
