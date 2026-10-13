@@ -1,0 +1,12 @@
+[workspace]
+members = ["rust/compat", "rust/ffi"]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+license = "GPL-2.0-or-later"
+publish = false
+
+[profile.release]
+panic = "abort"
+
