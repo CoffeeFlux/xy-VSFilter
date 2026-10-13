@@ -35,7 +35,22 @@ unresolved reference outcomes requiring investigation, never matching results.
   HDMV, packed and planar pixel cases use the original SSE fill methods on x86.
   Local macOS arm64 validation passed **414,004 comparisons / 7,905,374
   native observations**, including **152,467 injected boundary exceptions**,
-  under fatal ASan/UBSan. Windows and native pixel validation are pending.
+  under fatal ASan/UBSan. The local x64-emulated run also passed **440,180
+  comparisons / 8,123,934 observations**, including **176,979 injected
+  exceptions, 26,176 exact native pixel comparisons and 1,664 visibly drawing
+  fixtures**. Combined candidate `a0d3ab3f` passed
+  [all four CI platforms and Miri](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38471876844).
+  Both Windows architectures and Linux produced the same HDMV/DVB observation,
+  exception and pixel-comparison counts as the local x64 run. The arm64 runner
+  compares state/requests; it does not substitute a scalar pixel filler for SSE.
+  The combined candidate also passed [Windows x86/x64 DLL validation](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38471876823):
+  **322 cases / 4,026 frames** per architecture (310 successful opens and 12
+  matching open rejections), plus **32 mutations / 224 frames**. Warning-dialog
+  observations, font/drawing controls, all three DLL export tables and declared
+  dependency requirements match. Both build logs show `CompositionObject.cpp`
+  compiled with the Rust adapter enabled. [Bitmap-run evidence](bitmap-run-evidence.json)
+  records the exact source inputs, reference method hashes, reports, DLL hashes,
+  successful job links and the separate component/CSRI validation scopes.
   The DVB field/packet parser and its buffer ownership remain native.
 * Safe Rust HDMV run-decoding state for `CompositionObject::RenderHdmv`.
   An opaque owner requests the original EOF/byte reads and rectangle draws in
@@ -55,7 +70,7 @@ unresolved reference outcomes requiring investigation, never matching results.
   Extreme/malformed coordinate cases compare draw requests without calling the
   pixel fillers; pixel cases use bounded surfaces and compare padding/guards too.
   Candidate `4963c9d0` passed [all four CI platforms and Miri](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38470714683).
-  Full DLL validation of the combined bitmap increment is pending. The existing CSRI
+  Combined-candidate DLL validation is recorded above. The existing CSRI
   corpus remains a text-rendering regression check; it does not exercise HDMV
   stream parsing or host-driven bitmap playback. The new files retain the
   reference component's GPL-3.0-or-later terms; workspace package metadata now
@@ -344,8 +359,8 @@ platforms use the documented storage stand-in. It does not claim to reproduce
 allocation failure inside array relocation or to test entry text/style preparation.
 The ASan/UBSan run instruments the C++ side;
 it does not instrument the Rust static library. Safe Rust is enforced in the
-core by a compiler lint. The ASS lexer, text reader, drawing, segment and timeline
-search FFI owners and the production CRT
+core by a compiler lint. The ASS lexer, text reader, drawing, segment, timeline
+search and bitmap decoder FFI owners and the production CRT
 allocator contain unsafe Rust, for constructing borrowed slices,
 querying/releasing owned results, lending the fixed read buffer to native I/O,
 and allocating/deallocating aligned storage.
@@ -606,6 +621,31 @@ failed rather than being relabeled as a success:
 python tools/compat/csri_compare.py --reference C:\baseline\VSFilter.dll --candidate C:\candidate\VSFilter.dll --cases test/compat/unresolved/cases.json --output artifacts\unresolved-native-exception --timeout 10
 ```
 
+## Verifying downloaded evidence
+
+`tools/compat/summarize_evidence.py` verifies downloaded artifact reports, paired
+DLL hashes, export/dependency checks, dialogs and visible timeline controls.
+It checks all four portable platforms against the same candidate/reference,
+and compares recorded source-input hashes with that Git commit, allowing only
+checkout line-ending conversion. It refuses to overwrite existing evidence or
+run with Python assertions disabled. Incomplete or failed reports cannot produce
+a summary. Miri and workflow job status must also be checked in GitHub; the
+artifact verifier does not query GitHub itself.
+
+Download artifacts under `artifacts/ci-RUN` using the artifact names as
+subdirectories. For example, after both workflows finish:
+
+```sh
+gh run download 38471876844 --dir artifacts/ci-38471876844
+gh run download 38471876823 --dir artifacts/ci-38471876823
+python tools/compat/summarize_evidence.py a0d3ab3fec7dafbc2dc300721c82f2066827f29d 38471876844 artifacts/verified-bitmap-evidence.json 38471876823
+```
+
+Use `RUN/Win32` or `RUN/x64` when selecting a successful architecture job from
+a workflow whose other job did not complete. This never relabels that workflow
+as successful. The checked-in summaries additionally record reviewed job links
+and the validation scope for each increment.
+
 ## Coverage map and remaining migration
 
 | Surface/subsystem | Reference locations | Required evidence still missing |
@@ -638,11 +678,12 @@ the native oracle where needed:
 | `STS.cpp` entry sorting and frame/time conversion | Own entry ordering and conversion state, with native callbacks initially | `Sort` uses CRT `qsort` with separate normal/readorder comparators; capture equal-key permutations and comparator results before choosing a Rust sorting algorithm. Preserve start-before-end conversion, `llround`, mode changes and the final `CreateSegments` call. |
 | `STS.cpp` field splitting and numeric parsing | Raw UTF-16 fields, cursor/mutation state, error recovery | Both field scanners are now ported, preserving final-field reuse, distinct whitespace rules and separator mutation. Keep CRT numeric conversion until overflow, locale, end-pointer and rounding results are captured. |
 | Remaining `RTS.cpp` drawing parsing | Command replacement, numeric consumption and final native path storage; command state is now ported | `SpanIncluding`'s return value is ignored; commands split inside arbitrary text; `s` falls through to `p`; the apparent Bezier truncation uses an incremented counter and must not be "fixed." Keep `wcstod` and float-to-LONG conversion at the native boundary initially. |
-| `CompositionObject.cpp` bitmap run decoding | Bounded byte/bit readers, RLE state, emitted rectangles | Capture truncated-stream behavior, signed-short coordinate wrapping, palette state and transparent runs. Keep native palette conversion/compositing until those stages have separate exact-byte oracles. Uninitialized allocation tails are unresolved behavior, not a portable specification. |
+| `CompositionObject.cpp` bitmap storage and field parsing | HDMV/DVB run state is ported; next capture `CGolombBuffer`, RLE storage and field/packet assembly | Preserve allocated versus appended lengths, reader offsets, palette state and transparent runs. Keep native palette conversion/compositing until those stages have separate exact-byte oracles. |
 | `xy_filter.cpp` and raster/compositing kernels | Safe slice ownership and scalar arithmetic implementations | Capture each active SIMD path's operation order, padding, overlap and rounding. Scalar C++ output alone does not establish equality with the SIMD implementation used by a DLL. |
 
-For bitmap decoding, start by extracting `CGolombBuffer` operation sequences
-before changing `CompositionObject`. Its failed `BitRead` shifts buffered state
+Before migrating bitmap reader/storage ownership, extend the current extracted
+`CGolombBuffer` coverage beyond the read/EOF/alignment operations exercised by
+the run decoders. Its failed `BitRead` shifts buffered state
 before returning zero, a peek can refill and advance the underlying byte cursor,
 and `BitByteAlign` changes the count without clearing the stored bits. The
 unsigned Exp-Golomb loop has no EOF exit for an all-zero/truncated prefix; isolate
@@ -650,6 +691,10 @@ such probes in a worker with a timeout and record them as unresolved reference
 outcomes. `CompositionObject` also distinguishes allocated RLE length from the
 amount actually appended. These state details need captured comparisons before
 replacing pointer storage or assuming a conventional bit-reader API.
+The packet parsers also use `GetBufferPos` to copy object data and `ReadBuffer`
+to assemble HDMV segments. `GetBufferPos` exposes the byte cursor; `GetPos`
+subtracts buffered whole bytes. Those offsets are distinct after a peek. Capture
+both before changing the backing buffer or replacing pointer returns with spans.
 
 These are code boundaries, not promises that a finite corpus covers every quirk.
 Each replacement needs the same sequence used for the buffered reader: extract
