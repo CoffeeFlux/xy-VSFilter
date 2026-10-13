@@ -9,6 +9,7 @@ mod ass_tags;
 mod drawing;
 mod drawing_tokens;
 mod fields;
+mod hdmv;
 #[cfg(all(windows, any(feature = "native-runtime", test)))]
 mod runtime;
 mod segment_insert;

@@ -13,6 +13,7 @@ pub mod drawing;
 pub mod drawing_tokens;
 pub mod fields;
 pub mod font;
+pub mod hdmv;
 pub mod segment_insert;
 pub mod segments;
 pub mod text;
