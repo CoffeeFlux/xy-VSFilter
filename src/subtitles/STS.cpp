@@ -23,6 +23,7 @@
 #include "stdafx.h"
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_text.h"
+#include "xy_rust_fields.h"
 #endif
 #include "STS.h"
 #include <atlbase.h>
@@ -1745,6 +1746,9 @@ static inline double GetFloat(CStringW& buff, WCHAR sep = L',') //throw(...)
 
 static inline CStringW::PCXSTR TryNextStr(CStringW::PXSTR * buff, WCHAR sep = L',')
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    return XyRust::NextField(buff, sep);
+#else
     CStringW::PXSTR start = NULL;
     CStringW::PXSTR ret = NULL;
     for(start=*buff; *start!=0 && *start==WCHAR(' '); start++) ;
@@ -1760,6 +1764,7 @@ static inline CStringW::PCXSTR TryNextStr(CStringW::PXSTR * buff, WCHAR sep = L'
     *start = 0;
 
     return(ret);
+#endif
 }
 
 static inline int NextInt(CStringW::PXSTR * buff, WCHAR sep = L',') //throw(...)
