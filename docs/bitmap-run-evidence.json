@@ -1,0 +1,1266 @@
+{
+  "schema": 1,
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "candidate_commit": "a0d3ab3fec7dafbc2dc300721c82f2066827f29d",
+  "native_runs": [
+    {
+      "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38471876823",
+      "build": {
+        "candidate_commit": "a0d3ab3fec7dafbc2dc300721c82f2066827f29d",
+        "rustc": [
+          "rustc 1.85.0 (4d91de4e4 2025-02-17)",
+          "binary: rustc",
+          "commit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688",
+          "commit-date: 2025-02-17",
+          "host: x86_64-pc-windows-msvc",
+          "release: 1.85.0",
+          "LLVM version: 19.1.7"
+        ],
+        "mutation_count": 32,
+        "windows_sdk_version": "10.0.26100.0\\",
+        "platform": "Win32",
+        "mutation_seed": 12345,
+        "cargo": [
+          "cargo 1.85.0 (d73d2caf9 2024-12-31)"
+        ],
+        "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+        "configuration": "Release",
+        "msvc_tools_version": "14.44.35207",
+        "candidate_status": []
+      },
+      "checks": {
+        "smoke": {
+          "report_sha256": "1432be22a865da63a77695835cd9ff0b07ef82e9a64df4d68caed488a217d5f6",
+          "case_count": 1,
+          "rendered_frames": 10,
+          "changed_frames": 6,
+          "case_verdicts": {
+            "equal": 1
+          },
+          "candidate_statuses": {
+            "ok": 1
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "aff943a1c633c5a1aca2d2f504b0b17c5a7f19b3d3bbffaa215d1889fff2da25",
+          "dialog_observations": {},
+          "timeline_observations": {}
+        },
+        "csri": {
+          "report_sha256": "c5bba7d64ba56249f3974c3b0d8da8b093c2ab8f5217ba9a2120b4d9d817eaa3",
+          "case_count": 322,
+          "rendered_frames": 4026,
+          "changed_frames": 2702,
+          "case_verdicts": {
+            "equal": 322
+          },
+          "candidate_statuses": {
+            "ok": 310,
+            "open_rejected": 12
+          },
+          "distinct_frame_controls": [
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-file",
+                "font-valid-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-memory",
+                "font-valid-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-file",
+                "drawing-state-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-memory",
+                "drawing-state-control-memory"
+              ],
+              "reference-0": true
+            }
+          ],
+          "manifest_sha256": "1085589b52bb1de0ed549b316ef74e546e70e4901076db2d563811f8f8c38d4f",
+          "dialog_observations": {
+            "field-tab-prefixes-file": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\tDefault\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-tab-prefixes-memory": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\tDefault\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-unicode-style-space-file": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\u2003Default\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-unicode-style-space-memory": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\u2003Default\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ]
+          },
+          "timeline_observations": {
+            "timeline-overlap-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-order-reversed-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-order-reversed-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-duplicates-and-zero-file": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-duplicates-and-zero-memory": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-touching-and-gaps-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-touching-and-gaps-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-nested-layers-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "timeline-nested-layers-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "timeline-reversed-and-empty-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-reversed-and-empty-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-equal-starts-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-starts-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-ends-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-ends-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-overlap-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 11
+            },
+            "incremental-overlap-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 11
+            },
+            "incremental-out-of-order-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 8
+            },
+            "incremental-out-of-order-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 8
+            },
+            "incremental-gaps-bridged-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-gaps-bridged-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-nested-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-nested-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-touching-file": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-touching-memory": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-zero-and-reversed-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-zero-and-reversed-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-duplicates-file": {
+              "frame_count": 47,
+              "changed_frames": 22,
+              "distinct_frame_hashes": 2
+            },
+            "incremental-duplicates-memory": {
+              "frame_count": 47,
+              "changed_frames": 22,
+              "distinct_frame_hashes": 2
+            },
+            "incremental-empty-text-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-empty-text-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            }
+          }
+        },
+        "mutation-results": {
+          "report_sha256": "c3eda317dfdf402dafeadbbe19c7bcc3b2c09b39d58e0dd45d1cf1dcbb43fbc2",
+          "case_count": 32,
+          "rendered_frames": 224,
+          "changed_frames": 160,
+          "case_verdicts": {
+            "equal": 32
+          },
+          "candidate_statuses": {
+            "ok": 32
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "692b4dcb930f2117e85805fead2e88d7a3e21f3894da6b3b27f6313f2afeef40",
+          "dialog_observations": {},
+          "timeline_observations": {}
+        }
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "f9aea567f2b60758f01cfa9886d72d31f80b1798fbd41f69efd00cc572f2681c",
+          "baseline_sha256": "c3b097f82215b4c9d4413b31c0259b5b467862e15047b9c080be7d78f7b98d3e",
+          "candidate_sha256": "4799216920f1d707e1cf5239c944232848978bbfb3d64e4611375180657aa6f9"
+        },
+        "XySubFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "d8cd7823d3b6d58469d5cdeb1e7f647d0aefb1c33c1d3d6c3064eb9dd72d5d5c",
+          "baseline_sha256": "a31104b357abd3afbc725f40e1bd8e79e3292d25e4ee5cff819cc0a57ac73e45",
+          "candidate_sha256": "9c8e89b4c02a91ae16cd926ae9bf64aec84b824a178f689b64703dc38b2344fe"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "e666b77b86ebf78670a821a32ef94257d7671059d660f18001c9641876d1625d",
+          "baseline_sha256": "59b741d9a22dcb18089a9758c9c5d458ebfcd6acac62c18763992f121b22f3df",
+          "candidate_sha256": "57cbf3177f5397bfe79e68e4340852317ba4de687e4629a504d7078e483ae5a5"
+        }
+      },
+      "candidate_log_sha256": "7568ac18e9114f30d6ff3fe57e0ccd261820b0c7f02992901779c8a701b6d4d6",
+      "job_passed": true,
+      "job_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38471876823/job/115552738362",
+      "bitmap_native_bridge_compile_observed": true
+    },
+    {
+      "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38471876823",
+      "build": {
+        "mutation_count": 32,
+        "cargo": [
+          "cargo 1.85.0 (d73d2caf9 2024-12-31)"
+        ],
+        "rustc": [
+          "rustc 1.85.0 (4d91de4e4 2025-02-17)",
+          "binary: rustc",
+          "commit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688",
+          "commit-date: 2025-02-17",
+          "host: x86_64-pc-windows-msvc",
+          "release: 1.85.0",
+          "LLVM version: 19.1.7"
+        ],
+        "windows_sdk_version": "10.0.26100.0\\",
+        "mutation_seed": 12345,
+        "candidate_commit": "a0d3ab3fec7dafbc2dc300721c82f2066827f29d",
+        "configuration": "Release",
+        "platform": "x64",
+        "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+        "msvc_tools_version": "14.44.35207",
+        "candidate_status": []
+      },
+      "checks": {
+        "smoke": {
+          "report_sha256": "8ff2d9c88742c54d38e0bbea8fe4bf946c62b441f23ba748bf2f2994fa30b75d",
+          "case_count": 1,
+          "rendered_frames": 10,
+          "changed_frames": 6,
+          "case_verdicts": {
+            "equal": 1
+          },
+          "candidate_statuses": {
+            "ok": 1
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "aff943a1c633c5a1aca2d2f504b0b17c5a7f19b3d3bbffaa215d1889fff2da25",
+          "dialog_observations": {},
+          "timeline_observations": {}
+        },
+        "csri": {
+          "report_sha256": "3d87f029f584dc766f08b483db79c87062656f022f4562279e9a33e3c2606e31",
+          "case_count": 322,
+          "rendered_frames": 4026,
+          "changed_frames": 2702,
+          "case_verdicts": {
+            "equal": 322
+          },
+          "candidate_statuses": {
+            "ok": 310,
+            "open_rejected": 12
+          },
+          "distinct_frame_controls": [
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-file",
+                "font-valid-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-memory",
+                "font-valid-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-file",
+                "drawing-state-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-memory",
+                "drawing-state-control-memory"
+              ],
+              "reference-0": true
+            }
+          ],
+          "manifest_sha256": "1085589b52bb1de0ed549b316ef74e546e70e4901076db2d563811f8f8c38d4f",
+          "dialog_observations": {
+            "field-tab-prefixes-file": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\tDefault\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-tab-prefixes-memory": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\tDefault\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-unicode-style-space-file": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\u2003Default\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-unicode-style-space-memory": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\u2003Default\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ]
+          },
+          "timeline_observations": {
+            "timeline-overlap-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-order-reversed-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-order-reversed-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-duplicates-and-zero-file": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-duplicates-and-zero-memory": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-touching-and-gaps-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-touching-and-gaps-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-nested-layers-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "timeline-nested-layers-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "timeline-reversed-and-empty-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-reversed-and-empty-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-equal-starts-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-starts-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-ends-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-ends-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-overlap-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 11
+            },
+            "incremental-overlap-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 11
+            },
+            "incremental-out-of-order-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 8
+            },
+            "incremental-out-of-order-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 8
+            },
+            "incremental-gaps-bridged-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-gaps-bridged-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-nested-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-nested-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-touching-file": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-touching-memory": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-zero-and-reversed-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-zero-and-reversed-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-duplicates-file": {
+              "frame_count": 47,
+              "changed_frames": 22,
+              "distinct_frame_hashes": 2
+            },
+            "incremental-duplicates-memory": {
+              "frame_count": 47,
+              "changed_frames": 22,
+              "distinct_frame_hashes": 2
+            },
+            "incremental-empty-text-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-empty-text-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            }
+          }
+        },
+        "mutation-results": {
+          "report_sha256": "5b4ace67887399b3fcf60c72d51c0ebf59d71eb342f1353cd67e49bdd33a10c5",
+          "case_count": 32,
+          "rendered_frames": 224,
+          "changed_frames": 160,
+          "case_verdicts": {
+            "equal": 32
+          },
+          "candidate_statuses": {
+            "ok": 32
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "90e89279db719c739c6a1363611c04225b3486f03fee6ad9ceaca20e084ce43c",
+          "dialog_observations": {},
+          "timeline_observations": {}
+        }
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "84a27c3f09cb0d719d9eda44878694f94595dada4c14ceb22a2e4e614f9ec4ff",
+          "baseline_sha256": "4b8ef8c1dd346cfbd934cee6dc9640a3f841ef27444aeee2deef95325d13c63c",
+          "candidate_sha256": "38521cdf88a0f88432c09269f7e57adb62d49a5a38a7b7d061c5f339b79f545b"
+        },
+        "XySubFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "70a7daaf1cbd89db83662b6014439fe736474ef9fe6ad152a955d625901c74b2",
+          "baseline_sha256": "6e07e19258ee7e66120f7f38f2454a6af15dc8ebdb3d902acbb05027d760729e",
+          "candidate_sha256": "1070d4257f8d09a290e1cf3ed73b61bbab72d54e646d7ec423df3361e0ff7c1d"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "d0b61ec5540588c5f5e14949472e20c26b17713b3700e75d9fc088d2bcc176b9",
+          "baseline_sha256": "8a671ec5ad6c04d3e226cfc691d1c8b61a902a91e5073b27aff8ac309bb0495f",
+          "candidate_sha256": "74f610114ce03f8334e0663d45e94180ea98a6a5b612e5ea9968c3d19da792cc"
+        }
+      },
+      "candidate_log_sha256": "fd944ac63c6f80578561e1edd96f449b9aeeb0ae0518bb1f9f4642e809fb4b6f",
+      "job_passed": true,
+      "job_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38471876823/job/115552738882",
+      "bitmap_native_bridge_compile_observed": true
+    }
+  ],
+  "portable_run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38471876844",
+  "portable": [
+    {
+      "target": "aarch64-apple-darwin",
+      "report_sha256": "e7606a0bde56f4b6987c3f0c5a4003c6702753bd9e7da0c6c605d302ca22da82",
+      "sanitizers": true,
+      "result": "85992064 exact decoder comparisons passed",
+      "text_reader_result": "37008 text-file scenarios and 1396467 line/seek comparisons passed (6096 injected exceptions)",
+      "font_result": "17371137 exact font-attachment comparisons passed",
+      "lexer_result": "2727819 exact ASS lexer comparisons passed (command, parameter units, order and empty tags).",
+      "drawing_result": "343183 exact drawing-state comparisons passed (types, points, validity, point requests and cache bypass)",
+      "drawing_tokens_result": "1342183 exact drawing-token comparisons passed (commands, raw parameter units, NUL handling and order)",
+      "fields_result": "4927032 exact field comparisons passed (buffer mutation, returned pointer, next cursor, repeated reads and raw units)\n4927032 exact CString field comparisons passed (trimmed buffer, returned raw units, exceptions, repeated reads and native locale whitespace)",
+      "segments_result": "205982 exact segment comparisons passed (boundaries, input entry order, inactive-entry splits, animated reset and callback snapshots)",
+      "timeline_search_result": "1051947 exact timeline lookup comparisons passed (14352 injected translation exceptions; returned pointer/index, aliased outputs and exact native translation call order)",
+      "segment_insert_result": "59215 exact incremental-segment comparisons passed (1453819 native mutation snapshots, 3357 injected boundary exceptions; entry order, animation flags and partial state)",
+      "hdmv_result": "483497 exact HDMV comparisons passed (8317084 EOF/byte/draw observations, 3798 injected boundary exceptions, 0 native pixel comparisons, 0 visible pixel cases)",
+      "dvb_result": "414004 exact DVB comparisons passed (7905374 native observations, 152467 injected boundary exceptions, 0 native pixel comparisons, 0 visible pixel cases)",
+      "candidate_inputs": {
+        "Cargo.toml": "37d81b9748493b9bb9eb818d6e1dcf5991a7626b0981b0e3ac7f45d2e2ab6097",
+        "Cargo.lock": "fd9331e0dc6b0183bf14e2e8c13939684182d7ec437ac1fac54abbaac8da7335",
+        "include/xy_rust_text.h": "4caa9df121c701b2008f1e41c1b476b98a1f9888fcb51a65de2dbc9bbd3e5c40",
+        "include/xy_rust_ass.h": "e25175962a04d23b8be31323e649bdf607814c6f11d201fd4bfb97c958b37bf8",
+        "include/xy_rust_reader.h": "fc98598650099534eeef499838e070b3affbacfd10e3a0f4f8bf1b3b8e40aeec",
+        "include/xy_rust_drawing.h": "0b1480d82c8d0c8ef221b395345593a8cbe5484e6e81b0862c88e1b3e3a5bd5c",
+        "include/xy_rust_drawing_tokens.h": "e45fceb1aabdb5ca172bc2f5356eb30c3dcd89cff88fa16b2d84e2551f8eebbb",
+        "include/xy_rust_fields.h": "07ef1a44d614fb35abd847f7ddee66558328264c34414c965d2058a557878642",
+        "include/xy_rust_segments.h": "de83a7723e20947cf21ebc963e94e02a7309251585b84d14b810cc3d764934d7",
+        "include/xy_rust_segment_insert.h": "4567c4d4ae5c719e9f557837bbd95a72f7130b217639b606f78c4110e7445dfc",
+        "include/xy_rust_hdmv.h": "80fb7c8e0d895aba245d8e8f47686b354cc48f7e301e7920fac7d6e7ee08551e",
+        "include/xy_rust_dvb.h": "8e93171a2543d4348d18945114183d826d55c51fe091dcef1d47e996b59a20cf",
+        "src/subtitles/CompositionObject.cpp": "f3f3e824996b29563f9673a063cb41decb2720077fcc9db76f47d147d7b6cb7c",
+        "include/xy_rust_timeline_search.h": "d0b86cc52ed2a08a3016b9f1f6f34949c55c252481df41cc428e753bb95a348e",
+        "src/subtitles/TextFile.h": "fe26e64597691da26aa13d3ba11c0027d23332dabf9c5f7bcd8ca3ec7d9a30fc",
+        "tools/compat/ass_lexer_oracle.cpp": "386c15ccbe78dcd816192de244c205dc1973bdf6075f71a10d69d99673442112",
+        "tools/compat/decoder_oracle.cpp": "2572d7ab48a8a0535308ff7bc7b8e1263b4d0c7ab96a961dd3baebc2cd45a923",
+        "tools/compat/drawing_oracle.cpp": "bae491f110922898af703fe1cc872cd5b15ef13811e0c337e90ddf4068f3297a",
+        "tools/compat/drawing_tokens_oracle.cpp": "b670388ec51ec421ffda51a874d0197aca21e31aabd9f3295d9c4ac1c980aa74",
+        "tools/compat/dvb_oracle.cpp": "060a7d55436953d7df4db3e131aa87289075607946e6be7e9ec3d07d34f5f31b",
+        "tools/compat/fields_oracle.cpp": "0048ac141b05e76cf0cf57a4444f7c8a526460117593c6d353bd7e66cfefcc79",
+        "tools/compat/font_oracle.cpp": "66ae37e835f97bcd9ee645fa36f51a251b81eec525d51da099b804f08b36a63d",
+        "tools/compat/hdmv_oracle.cpp": "0e4e3635079cc27d877d599c176590fd05a581fea11af43c6da1c1a7dff6ff06",
+        "tools/compat/segment_insert_oracle.cpp": "8693f1f8b89667126096368a9eb6a90d9e8b7fccfe404bd4e4db8d5d72fb2fb9",
+        "tools/compat/segments_oracle.cpp": "153ccb7adeaeaa82c7826826311304f979a19b5a07dc264136dee9660fff8bb1",
+        "tools/compat/text_reader_oracle.cpp": "0f7491e79047e4547893f735617580ce08be4a23167e786f2035a531b755bcea",
+        "tools/compat/timeline_search_oracle.cpp": "aa455fe0d315c286427f8d5e0c9355a628bc74ac65e623a3ae6efd180969aa9c",
+        "tools/compat/ass_lexer_shell.h": "285326c84f336cd68b1de88a7de2cfad6519f0e7ac8a0a609443d7da5c6eb6dd",
+        "tools/compat/drawing_shell.h": "312671e938ac4013a0b1ca969c8e612a9dd70e6c5e7d4ef32053c4e5f7121620",
+        "tools/compat/drawing_tokens_shell.h": "7e4f47650d18d0f9532498b5113884db2f3dfb46d20043812096e9d2723f806b",
+        "tools/compat/dvb_shell.h": "49a54b545d7f2b82182c7477b3b969605f08ce036e194bfb79148388f867ee2a",
+        "tools/compat/fields_shell.h": "bd9ce0dbdadada49d01da05f5d7c63878caa92c0fdfa9f2c7f4db7fa9e8fca3d",
+        "tools/compat/font_shell.h": "6d0acc73d6e5125fbac837a83310240c5371802fa4a40ddd93aec2a28bdd6818",
+        "tools/compat/hdmv_shell.h": "da95584e11c179c9742adccf837e81d724718a2f0ae437d7f4d6e8c7174e4f89",
+        "tools/compat/segment_insert_shell.h": "0d307503dab1af8c72c03473e3d81e7620e8cf22da65f3c829d3f739f462807d",
+        "tools/compat/segments_shell.h": "adb773221c51f0ab26500e076b13ec420770765542f8fd73133da19c3f883fd1",
+        "tools/compat/text_reader_shell.h": "4031f09c42f76350b7611d21d1ffd26904fef8505ce718cddb9add791cbfb833",
+        "tools/compat/timeline_search_shell.h": "9714ed033c3a1c8bc054bccc0ac00722a6f233e29048da135874826cb0d218d5",
+        "tools/compat/check_decoder.py": "1a6431d33dfd40eaaad3439127d701c2e25c3185a3f635d0ec01e3a783562c26",
+        "rust/compat/src/ass_tags.rs": "6792ac12ebbf50f9356d0aa7abad85b20d505e64f7ea539a66eb42990d05a637",
+        "rust/compat/src/drawing.rs": "eca8f1053f8428d9b0c265752ab2f07687f83ae626db30ad2d27beb5ec0bcd67",
+        "rust/compat/src/drawing_tokens.rs": "c3db232dfdbec32354a3bc68fcb8c7a71f01e70e20c5832ca2021b8b559c245b",
+        "rust/compat/src/dvb.rs": "1a61efdf07bf065fbe2272798433e373e5cab6977658532de8a554aaf29abb30",
+        "rust/compat/src/fields.rs": "398979232ca4b3e7f919daa23313c5e52ef681be15eeafdd0299ad2ef1b5c8a7",
+        "rust/compat/src/font.rs": "7fec61f79198f0dc07fbdbed25204b6422239580de5db434abad5c9bcedad1ac",
+        "rust/compat/src/hdmv.rs": "c2f712577c50703d05ad3b3aedae9d8ed941ef760c2f3a447f96b007b465e74d",
+        "rust/compat/src/lib.rs": "8f1cfd9f4cc9dc127b719492d922a62aa59f8cc0321bafad3acdcade8241b1fa",
+        "rust/compat/src/segment_insert.rs": "1176e67a65262686d2ee7a7bfd6a0b59b2340d945a639fad8f9cd72f6f0d6d89",
+        "rust/compat/src/segments.rs": "3cfdd0d0352e05770941ab630f111414b90d8b4baeb3841065cc8c5b046ca1ad",
+        "rust/compat/src/text.rs": "b7265e27c081c94349505c5cd3db3af8c3f8a73f2a98074e1c8523a3b88f208f",
+        "rust/compat/src/text_reader.rs": "b78c3bc2eda230849d4b67f8547fbd3eb6303ba930f07c955b2a9b37b215b1da",
+        "rust/compat/src/timeline_search.rs": "1b4d6b7a8eee6329b8cf4e564fa6e1aecbc866cfea26a59e9436590e0fe054a5",
+        "rust/ffi/src/ass_tags.rs": "d1764911d033dd4995f1fe02669f11ece10757d4681db1f8d15f35c500382a07",
+        "rust/ffi/src/drawing.rs": "0903c53b826fbb717ff22fce12ad0878aa4b620f043b1f15c2b73002b2ef6bbb",
+        "rust/ffi/src/drawing_tokens.rs": "7814644432e3a0e45a37a4701789698f4b529f1d962a8a64aa8b060cf10c23e2",
+        "rust/ffi/src/dvb.rs": "88d820e7b0db278a9e3328423e497565be733b1ebd224ac8a13358f74203470c",
+        "rust/ffi/src/fields.rs": "eb6ed7a873a84defa4a2ebff5ea5d3241db58c546c56c0c3c4011bf3fdcfe395",
+        "rust/ffi/src/hdmv.rs": "b96823ac5487ef90815aeaa44f392dd07ae1a539cb98baa88c4141ded6d943c7",
+        "rust/ffi/src/lib.rs": "e92c31fed2fab9c0ef72e3720653ddb34b3838aa0e76acb90f12c0488fb62525",
+        "rust/ffi/src/runtime.rs": "6b974d023640354a5c65ea3d5d3feea35bd191192c8d859fb1f3be342f613f14",
+        "rust/ffi/src/segment_insert.rs": "6273ff03529551f00f0a4f7a95b442afecfa69c5119a640a325415d48206b235",
+        "rust/ffi/src/segments.rs": "f6391d7f5f27349c411339f709e9f102b5c12c51b4cb914f70485aeeef20749d",
+        "rust/ffi/src/text_reader.rs": "a4ab775620d77195187dff9279adbbf6432cd29bba437129f019c9b75fcc2091",
+        "rust/ffi/src/timeline_search.rs": "03308b3ffb052adeee9832fe91242c428e6244d8da0355987c0277c1aea52668",
+        "rust/compat/Cargo.toml": "9f325d80554a26bfb2f50237382694f8e121072e2ce52a34cebf3fa118cce6d1",
+        "rust/ffi/Cargo.toml": "c557156364b3d955695f235a782d9a124d531cc2157bfea6ab209f33850edea7"
+      },
+      "hdmv_source_sha256": "8c25ed49d9789c3a535a200c6518e54dd330cb859c64d14dbdfc8b22bb3feeb5",
+      "hdmv_golomb_source_sha256": "ca9728f60515f6df05c305d52f550a7dba16687b97c74dd11ac668a5b88dca36",
+      "hdmv_golomb_header_sha256": "16d5dcc8f7edd876ec67ecb720e1d66b8c8b9fdd86ddb50e95262bc8fe6d47a9",
+      "hdmv_raster_source_sha256": "29b113f2c927793005afd25d8d0c861a430b55462f6e8e057e1bbaceccf08334"
+    },
+    {
+      "target": "i686-pc-windows-msvc",
+      "report_sha256": "e2704c58a0367d6dd5acd17ce5511d3417cfec468eb1d30792f8c3f95e8814e5",
+      "sanitizers": false,
+      "result": "85992064 exact decoder comparisons passed",
+      "text_reader_result": "37008 text-file scenarios and 1396467 line/seek comparisons passed (6096 injected exceptions)",
+      "font_result": "17371137 exact font-attachment comparisons passed",
+      "lexer_result": "2793355 exact ASS lexer comparisons passed (command, parameter units, order and empty tags).",
+      "drawing_result": "343183 exact drawing-state comparisons passed (types, points, validity, point requests and cache bypass)",
+      "drawing_tokens_result": "1342183 exact drawing-token comparisons passed (commands, raw parameter units, NUL handling and order)",
+      "fields_result": "5713464 exact field comparisons passed (buffer mutation, returned pointer, next cursor, repeated reads and raw units)\n5713464 exact CString field comparisons passed (trimmed buffer, returned raw units, exceptions, repeated reads and native locale whitespace)",
+      "segments_result": "205982 exact segment comparisons passed (boundaries, input entry order, inactive-entry splits, animated reset and callback snapshots)",
+      "timeline_search_result": "1051947 exact timeline lookup comparisons passed (14352 injected translation exceptions; returned pointer/index, aliased outputs and exact native translation call order)",
+      "segment_insert_result": "59215 exact incremental-segment comparisons passed (1453819 native mutation snapshots, 3357 injected boundary exceptions; entry order, animation flags and partial state)",
+      "hdmv_result": "499597 exact HDMV comparisons passed (8540584 EOF/byte/draw observations, 19298 injected boundary exceptions, 16100 native pixel comparisons, 600 visible pixel cases)",
+      "dvb_result": "440180 exact DVB comparisons passed (8123934 native observations, 176979 injected boundary exceptions, 26176 native pixel comparisons, 1664 visible pixel cases)",
+      "candidate_inputs": {
+        "Cargo.toml": "a8ee041aa60d77588e332b3aaffea1177b7da4e6b121545572c9f3ddb1f92185",
+        "Cargo.lock": "84e7744a4412202b2ab9675d3464a48ff30b7342b4065a8105d8999e655cf640",
+        "include/xy_rust_text.h": "953a696e7534339a3fe57dbe688e24424c43f49a1f0c4de9e8173a5fc31a824a",
+        "include/xy_rust_ass.h": "9b29ae9492ed3ee0634d80178d4c049d7a2957a4104c375dd87cf5d66f2e7bd7",
+        "include/xy_rust_reader.h": "99a315beb43451f2dfd21fb5242b61a3507f1082dbddd5c87daa78bb6912a087",
+        "include/xy_rust_drawing.h": "0ed8f5a799ef5f96c6c1840e6cf9b3367d08f08b32e291677ec2dcc8b529224f",
+        "include/xy_rust_drawing_tokens.h": "1b13c031608d98aa46c28fadc3551ea32de20ad72c6cbf1ee5610c8372d315c8",
+        "include/xy_rust_fields.h": "24dc1d14d0767681c896e9d8875925a6a1757781e78616b244f85918bf835220",
+        "include/xy_rust_segments.h": "8332f335119038c4cc04a3f0efe0a701348ad0c8397ed9b44e0744e2a6ee1be2",
+        "include/xy_rust_segment_insert.h": "e4aafaf6bf8cd731fc60fbc109d5afc9c0a2c37874c90636abb04f01214eaeed",
+        "include/xy_rust_hdmv.h": "06e4736c8f8dab4282f46b6fd3e4b4acf2c732bf6b6d8b45e24244ac80c86cde",
+        "include/xy_rust_dvb.h": "b51015eb31a610e42160f6c983b5b6a457f880eacea156788c0552ed7fff000c",
+        "src/subtitles/CompositionObject.cpp": "f3f3e824996b29563f9673a063cb41decb2720077fcc9db76f47d147d7b6cb7c",
+        "include/xy_rust_timeline_search.h": "c48ac952a67f419ad5cd9a2105c50c1fac394c943275b96a8bf12a40f5ca1aa7",
+        "src/subtitles/TextFile.h": "fe26e64597691da26aa13d3ba11c0027d23332dabf9c5f7bcd8ca3ec7d9a30fc",
+        "tools/compat/ass_lexer_oracle.cpp": "81d81f6af5ed16957deb7f924d1ad3567282608911575a3b8d23222c5b41411e",
+        "tools/compat/decoder_oracle.cpp": "602b19b4316dfffd97ff52ab4cb1a187193e8ee17b54dcbc7ee5e30475397e31",
+        "tools/compat/drawing_oracle.cpp": "dd8a1552185f51255387085772ccdc593a1020d9a39c7dbc13bd4d6960b565ac",
+        "tools/compat/drawing_tokens_oracle.cpp": "df26c6c95784030500151e4d9e8097379114aee764d9fb90c5ac9be59531f470",
+        "tools/compat/dvb_oracle.cpp": "4cfcb29f1675fe84004d5eb9d7014caa3da836585342e2aac781941fb726dce2",
+        "tools/compat/fields_oracle.cpp": "1d4bb0a71b2af5932f2e7272756d1c2188e31c58f6298988e2e132c424ad00eb",
+        "tools/compat/font_oracle.cpp": "5fe645bb340d242d6b2ff4e172cd0995f0c42847f1cbd5ae92d02fcc1ebb3d13",
+        "tools/compat/hdmv_oracle.cpp": "251af8e7b4625d09b4002420f71f69ae5fadcbb223dbd11098752c8029e084fa",
+        "tools/compat/segment_insert_oracle.cpp": "f650fba088d2377a5ac9fa39bb483198d5d42ac80e22520148f5a123c095d819",
+        "tools/compat/segments_oracle.cpp": "93f4d5e00a332480aa15b62ab1f7af2bfbb01098037f68833f5316f1a66b621c",
+        "tools/compat/text_reader_oracle.cpp": "51511a81da0d1f596299ea82372f23137174e5ed5b34752770c1a2898717efd2",
+        "tools/compat/timeline_search_oracle.cpp": "13dc161f1baa422298f87a8791f731aeb43275b78fddd005ece16c4a0fef6ffc",
+        "tools/compat/ass_lexer_shell.h": "f6d33cd6f15021ef235bfe04e0fedba5ad82042297c1fc2137984cc4a96b72cb",
+        "tools/compat/drawing_shell.h": "df7e957afd5abcff14616e86d96abaf832f1d3cc0be4128709ccef3dcbec8c06",
+        "tools/compat/drawing_tokens_shell.h": "626fd244dee88dfbeed292e44c416e44e1765287f34a151397ffbba7fef6afa5",
+        "tools/compat/dvb_shell.h": "3eef92c4b1d364cc3f9a274de08a562367dfbc698f4f0d077ca830f7c51e9d87",
+        "tools/compat/fields_shell.h": "8db4924635af5e46957dabde356120385e74bfcee3a3d87793418b9a471d6ae2",
+        "tools/compat/font_shell.h": "8b39a6b88b75fc21a6f476b4286a5f79f1670a098844bc22aa942fe7fa2eed34",
+        "tools/compat/hdmv_shell.h": "ca68dbffdfb6f5d9cbdafcfdf35fb9d850f7e7eff950d338fa349715d720dc88",
+        "tools/compat/segment_insert_shell.h": "d349eafadf2fe127f553d58c1d9592805fc2d5c5731b505cd5b3944e6ad95049",
+        "tools/compat/segments_shell.h": "7ae4e454e341fc161f35d80823c1c29d6e33aac14b59457756b9d2dbbf98fe92",
+        "tools/compat/text_reader_shell.h": "0d07a19620575e4f61624aaf50ce7f1d6305bbe3bbabaeb295a1dfda15059f1b",
+        "tools/compat/timeline_search_shell.h": "2b5788a4050342ab30f219e96d5fc1df81191d4a3bbcc77748e98f8cfdc3454f",
+        "tools/compat/check_decoder.py": "316543cb8ba317cd9d865e2aa30fe8def59a4ec6c9c667ee8a3895ef2edba352",
+        "rust/compat/src/ass_tags.rs": "e115beb8951b8432f94cb017b28aa00059b25de2ff954bb5cd041de5741001f8",
+        "rust/compat/src/drawing.rs": "b2940c86ad7ed016aab4bef6aa3a60586a0a870a3f987201ad9ecfc3f38cf105",
+        "rust/compat/src/drawing_tokens.rs": "52e2ef140cc6915743d57381c8a1eb19ec24764f32da60736182194ceb806395",
+        "rust/compat/src/dvb.rs": "5633726516dd18e510fd504888f400a5c3311570d37c3bae79b38b5d7e2c9b08",
+        "rust/compat/src/fields.rs": "232e2fcae2798886392faf8cdf92545c5cffe9841ad70c94e16380aa5f99e7e2",
+        "rust/compat/src/font.rs": "c023cf9077f7776e58ca733bdf942e8d11b199e0ecdbc0b09d6ed6227e5f4de1",
+        "rust/compat/src/hdmv.rs": "d7d0bb002dd17bc267ed09c954cd63f24ecebe8ccea429b7d93cafab3954a1c0",
+        "rust/compat/src/lib.rs": "77b6540ddc03cb981440fdcdc3676ff7acba410cb04df784481ee75d1dcba6b0",
+        "rust/compat/src/segment_insert.rs": "83a6ddb264f123f576daaf6c468f78b02244f842ec5de456132bd0b3c3b4507a",
+        "rust/compat/src/segments.rs": "020b2b5f37fca1cc58e7a391cbe05fa0a4a2e4ee193e39bfc5177ba852917b7c",
+        "rust/compat/src/text.rs": "3b0703918d4f71c112e53d52d2270b8aedfce9138ee1072b0145c8385590a45c",
+        "rust/compat/src/text_reader.rs": "21abafc3a781cf62ce008b71f92ac7096472b04b8b49f12a3b92854bafa3ed6f",
+        "rust/compat/src/timeline_search.rs": "da34a38e2720a1de77c4b178a0fe0274fa05f91e37e58f03bdb99d6b47a3cd02",
+        "rust/ffi/src/ass_tags.rs": "45e4a9d78406bd01c819e32d5e5211a30ae2a66d49d1bba28d6a33dc62c40978",
+        "rust/ffi/src/drawing.rs": "e4f23624c88c674bb82da0e543a38f2c783e14a87243e6df376c41875bf07851",
+        "rust/ffi/src/drawing_tokens.rs": "5e6b750f5cdf9de7a314656d42848c1e7df9300b06571227a3573783caf77f8a",
+        "rust/ffi/src/dvb.rs": "a6ed224db32fd0896517d106c7783f3b301daf809a2e5bd7cbe0a279a3920cff",
+        "rust/ffi/src/fields.rs": "6b821b5a80e40af40372912a545ac0bb2c9967a6e5a019cfe0a4d17fc65ea423",
+        "rust/ffi/src/hdmv.rs": "316fbeeedca0a552a5d8b6895862fa6cc36b29a6feb760425b7a1a14e8923b21",
+        "rust/ffi/src/lib.rs": "c88339473551b1f9b37c379862d00e0895492441c4f76612b5eaa98d6969e095",
+        "rust/ffi/src/runtime.rs": "a6987685d20b77364781149e4016375e1d1aa44762328796626a95d30661b686",
+        "rust/ffi/src/segment_insert.rs": "20b9022439c9d32c5b4c879569be4a1cb1c7b5f0284547a212e8b99d0d5d0f42",
+        "rust/ffi/src/segments.rs": "437e10dae0a56434ee86feb1bf0a04c744a9b027a7363130be0d23dbe8cc5cf3",
+        "rust/ffi/src/text_reader.rs": "e1613136127d0311747fa77b7a218cbc7b7844f217b770105ca9b7f4727953f8",
+        "rust/ffi/src/timeline_search.rs": "dee5f75d6f92483d30e9e65990b86d1fdf4a87c8977b265f261833dd59e97a05",
+        "rust/compat/Cargo.toml": "b066124a697288e311ef6225d5171c2f1d4a837199b47b12b70414dc7429a019",
+        "rust/ffi/Cargo.toml": "7a140438ea88afc518d4f6656efe4c2d961a8ad707dee6610f5a6f1a9d4cf81a"
+      },
+      "hdmv_source_sha256": "8c25ed49d9789c3a535a200c6518e54dd330cb859c64d14dbdfc8b22bb3feeb5",
+      "hdmv_golomb_source_sha256": "ca9728f60515f6df05c305d52f550a7dba16687b97c74dd11ac668a5b88dca36",
+      "hdmv_golomb_header_sha256": "16d5dcc8f7edd876ec67ecb720e1d66b8c8b9fdd86ddb50e95262bc8fe6d47a9",
+      "hdmv_raster_source_sha256": "29b113f2c927793005afd25d8d0c861a430b55462f6e8e057e1bbaceccf08334"
+    },
+    {
+      "target": "x86_64-pc-windows-msvc",
+      "report_sha256": "f6b4fd2468cdd1e5a93c0667dae0046c49f2d991b0622678eedeee09be99b053",
+      "sanitizers": false,
+      "result": "85992064 exact decoder comparisons passed",
+      "text_reader_result": "37008 text-file scenarios and 1396467 line/seek comparisons passed (6096 injected exceptions)",
+      "font_result": "17371137 exact font-attachment comparisons passed",
+      "lexer_result": "2793355 exact ASS lexer comparisons passed (command, parameter units, order and empty tags).",
+      "drawing_result": "343183 exact drawing-state comparisons passed (types, points, validity, point requests and cache bypass)",
+      "drawing_tokens_result": "1342183 exact drawing-token comparisons passed (commands, raw parameter units, NUL handling and order)",
+      "fields_result": "5713464 exact field comparisons passed (buffer mutation, returned pointer, next cursor, repeated reads and raw units)\n5713464 exact CString field comparisons passed (trimmed buffer, returned raw units, exceptions, repeated reads and native locale whitespace)",
+      "segments_result": "205982 exact segment comparisons passed (boundaries, input entry order, inactive-entry splits, animated reset and callback snapshots)",
+      "timeline_search_result": "1051947 exact timeline lookup comparisons passed (14352 injected translation exceptions; returned pointer/index, aliased outputs and exact native translation call order)",
+      "segment_insert_result": "59215 exact incremental-segment comparisons passed (1453819 native mutation snapshots, 3357 injected boundary exceptions; entry order, animation flags and partial state)",
+      "hdmv_result": "499597 exact HDMV comparisons passed (8540584 EOF/byte/draw observations, 19298 injected boundary exceptions, 16100 native pixel comparisons, 600 visible pixel cases)",
+      "dvb_result": "440180 exact DVB comparisons passed (8123934 native observations, 176979 injected boundary exceptions, 26176 native pixel comparisons, 1664 visible pixel cases)",
+      "candidate_inputs": {
+        "Cargo.toml": "a8ee041aa60d77588e332b3aaffea1177b7da4e6b121545572c9f3ddb1f92185",
+        "Cargo.lock": "84e7744a4412202b2ab9675d3464a48ff30b7342b4065a8105d8999e655cf640",
+        "include/xy_rust_text.h": "953a696e7534339a3fe57dbe688e24424c43f49a1f0c4de9e8173a5fc31a824a",
+        "include/xy_rust_ass.h": "9b29ae9492ed3ee0634d80178d4c049d7a2957a4104c375dd87cf5d66f2e7bd7",
+        "include/xy_rust_reader.h": "99a315beb43451f2dfd21fb5242b61a3507f1082dbddd5c87daa78bb6912a087",
+        "include/xy_rust_drawing.h": "0ed8f5a799ef5f96c6c1840e6cf9b3367d08f08b32e291677ec2dcc8b529224f",
+        "include/xy_rust_drawing_tokens.h": "1b13c031608d98aa46c28fadc3551ea32de20ad72c6cbf1ee5610c8372d315c8",
+        "include/xy_rust_fields.h": "24dc1d14d0767681c896e9d8875925a6a1757781e78616b244f85918bf835220",
+        "include/xy_rust_segments.h": "8332f335119038c4cc04a3f0efe0a701348ad0c8397ed9b44e0744e2a6ee1be2",
+        "include/xy_rust_segment_insert.h": "e4aafaf6bf8cd731fc60fbc109d5afc9c0a2c37874c90636abb04f01214eaeed",
+        "include/xy_rust_hdmv.h": "06e4736c8f8dab4282f46b6fd3e4b4acf2c732bf6b6d8b45e24244ac80c86cde",
+        "include/xy_rust_dvb.h": "b51015eb31a610e42160f6c983b5b6a457f880eacea156788c0552ed7fff000c",
+        "src/subtitles/CompositionObject.cpp": "f3f3e824996b29563f9673a063cb41decb2720077fcc9db76f47d147d7b6cb7c",
+        "include/xy_rust_timeline_search.h": "c48ac952a67f419ad5cd9a2105c50c1fac394c943275b96a8bf12a40f5ca1aa7",
+        "src/subtitles/TextFile.h": "fe26e64597691da26aa13d3ba11c0027d23332dabf9c5f7bcd8ca3ec7d9a30fc",
+        "tools/compat/ass_lexer_oracle.cpp": "81d81f6af5ed16957deb7f924d1ad3567282608911575a3b8d23222c5b41411e",
+        "tools/compat/decoder_oracle.cpp": "602b19b4316dfffd97ff52ab4cb1a187193e8ee17b54dcbc7ee5e30475397e31",
+        "tools/compat/drawing_oracle.cpp": "dd8a1552185f51255387085772ccdc593a1020d9a39c7dbc13bd4d6960b565ac",
+        "tools/compat/drawing_tokens_oracle.cpp": "df26c6c95784030500151e4d9e8097379114aee764d9fb90c5ac9be59531f470",
+        "tools/compat/dvb_oracle.cpp": "4cfcb29f1675fe84004d5eb9d7014caa3da836585342e2aac781941fb726dce2",
+        "tools/compat/fields_oracle.cpp": "1d4bb0a71b2af5932f2e7272756d1c2188e31c58f6298988e2e132c424ad00eb",
+        "tools/compat/font_oracle.cpp": "5fe645bb340d242d6b2ff4e172cd0995f0c42847f1cbd5ae92d02fcc1ebb3d13",
+        "tools/compat/hdmv_oracle.cpp": "251af8e7b4625d09b4002420f71f69ae5fadcbb223dbd11098752c8029e084fa",
+        "tools/compat/segment_insert_oracle.cpp": "f650fba088d2377a5ac9fa39bb483198d5d42ac80e22520148f5a123c095d819",
+        "tools/compat/segments_oracle.cpp": "93f4d5e00a332480aa15b62ab1f7af2bfbb01098037f68833f5316f1a66b621c",
+        "tools/compat/text_reader_oracle.cpp": "51511a81da0d1f596299ea82372f23137174e5ed5b34752770c1a2898717efd2",
+        "tools/compat/timeline_search_oracle.cpp": "13dc161f1baa422298f87a8791f731aeb43275b78fddd005ece16c4a0fef6ffc",
+        "tools/compat/ass_lexer_shell.h": "f6d33cd6f15021ef235bfe04e0fedba5ad82042297c1fc2137984cc4a96b72cb",
+        "tools/compat/drawing_shell.h": "df7e957afd5abcff14616e86d96abaf832f1d3cc0be4128709ccef3dcbec8c06",
+        "tools/compat/drawing_tokens_shell.h": "626fd244dee88dfbeed292e44c416e44e1765287f34a151397ffbba7fef6afa5",
+        "tools/compat/dvb_shell.h": "3eef92c4b1d364cc3f9a274de08a562367dfbc698f4f0d077ca830f7c51e9d87",
+        "tools/compat/fields_shell.h": "8db4924635af5e46957dabde356120385e74bfcee3a3d87793418b9a471d6ae2",
+        "tools/compat/font_shell.h": "8b39a6b88b75fc21a6f476b4286a5f79f1670a098844bc22aa942fe7fa2eed34",
+        "tools/compat/hdmv_shell.h": "ca68dbffdfb6f5d9cbdafcfdf35fb9d850f7e7eff950d338fa349715d720dc88",
+        "tools/compat/segment_insert_shell.h": "d349eafadf2fe127f553d58c1d9592805fc2d5c5731b505cd5b3944e6ad95049",
+        "tools/compat/segments_shell.h": "7ae4e454e341fc161f35d80823c1c29d6e33aac14b59457756b9d2dbbf98fe92",
+        "tools/compat/text_reader_shell.h": "0d07a19620575e4f61624aaf50ce7f1d6305bbe3bbabaeb295a1dfda15059f1b",
+        "tools/compat/timeline_search_shell.h": "2b5788a4050342ab30f219e96d5fc1df81191d4a3bbcc77748e98f8cfdc3454f",
+        "tools/compat/check_decoder.py": "316543cb8ba317cd9d865e2aa30fe8def59a4ec6c9c667ee8a3895ef2edba352",
+        "rust/compat/src/ass_tags.rs": "e115beb8951b8432f94cb017b28aa00059b25de2ff954bb5cd041de5741001f8",
+        "rust/compat/src/drawing.rs": "b2940c86ad7ed016aab4bef6aa3a60586a0a870a3f987201ad9ecfc3f38cf105",
+        "rust/compat/src/drawing_tokens.rs": "52e2ef140cc6915743d57381c8a1eb19ec24764f32da60736182194ceb806395",
+        "rust/compat/src/dvb.rs": "5633726516dd18e510fd504888f400a5c3311570d37c3bae79b38b5d7e2c9b08",
+        "rust/compat/src/fields.rs": "232e2fcae2798886392faf8cdf92545c5cffe9841ad70c94e16380aa5f99e7e2",
+        "rust/compat/src/font.rs": "c023cf9077f7776e58ca733bdf942e8d11b199e0ecdbc0b09d6ed6227e5f4de1",
+        "rust/compat/src/hdmv.rs": "d7d0bb002dd17bc267ed09c954cd63f24ecebe8ccea429b7d93cafab3954a1c0",
+        "rust/compat/src/lib.rs": "77b6540ddc03cb981440fdcdc3676ff7acba410cb04df784481ee75d1dcba6b0",
+        "rust/compat/src/segment_insert.rs": "83a6ddb264f123f576daaf6c468f78b02244f842ec5de456132bd0b3c3b4507a",
+        "rust/compat/src/segments.rs": "020b2b5f37fca1cc58e7a391cbe05fa0a4a2e4ee193e39bfc5177ba852917b7c",
+        "rust/compat/src/text.rs": "3b0703918d4f71c112e53d52d2270b8aedfce9138ee1072b0145c8385590a45c",
+        "rust/compat/src/text_reader.rs": "21abafc3a781cf62ce008b71f92ac7096472b04b8b49f12a3b92854bafa3ed6f",
+        "rust/compat/src/timeline_search.rs": "da34a38e2720a1de77c4b178a0fe0274fa05f91e37e58f03bdb99d6b47a3cd02",
+        "rust/ffi/src/ass_tags.rs": "45e4a9d78406bd01c819e32d5e5211a30ae2a66d49d1bba28d6a33dc62c40978",
+        "rust/ffi/src/drawing.rs": "e4f23624c88c674bb82da0e543a38f2c783e14a87243e6df376c41875bf07851",
+        "rust/ffi/src/drawing_tokens.rs": "5e6b750f5cdf9de7a314656d42848c1e7df9300b06571227a3573783caf77f8a",
+        "rust/ffi/src/dvb.rs": "a6ed224db32fd0896517d106c7783f3b301daf809a2e5bd7cbe0a279a3920cff",
+        "rust/ffi/src/fields.rs": "6b821b5a80e40af40372912a545ac0bb2c9967a6e5a019cfe0a4d17fc65ea423",
+        "rust/ffi/src/hdmv.rs": "316fbeeedca0a552a5d8b6895862fa6cc36b29a6feb760425b7a1a14e8923b21",
+        "rust/ffi/src/lib.rs": "c88339473551b1f9b37c379862d00e0895492441c4f76612b5eaa98d6969e095",
+        "rust/ffi/src/runtime.rs": "a6987685d20b77364781149e4016375e1d1aa44762328796626a95d30661b686",
+        "rust/ffi/src/segment_insert.rs": "20b9022439c9d32c5b4c879569be4a1cb1c7b5f0284547a212e8b99d0d5d0f42",
+        "rust/ffi/src/segments.rs": "437e10dae0a56434ee86feb1bf0a04c744a9b027a7363130be0d23dbe8cc5cf3",
+        "rust/ffi/src/text_reader.rs": "e1613136127d0311747fa77b7a218cbc7b7844f217b770105ca9b7f4727953f8",
+        "rust/ffi/src/timeline_search.rs": "dee5f75d6f92483d30e9e65990b86d1fdf4a87c8977b265f261833dd59e97a05",
+        "rust/compat/Cargo.toml": "b066124a697288e311ef6225d5171c2f1d4a837199b47b12b70414dc7429a019",
+        "rust/ffi/Cargo.toml": "7a140438ea88afc518d4f6656efe4c2d961a8ad707dee6610f5a6f1a9d4cf81a"
+      },
+      "hdmv_source_sha256": "8c25ed49d9789c3a535a200c6518e54dd330cb859c64d14dbdfc8b22bb3feeb5",
+      "hdmv_golomb_source_sha256": "ca9728f60515f6df05c305d52f550a7dba16687b97c74dd11ac668a5b88dca36",
+      "hdmv_golomb_header_sha256": "16d5dcc8f7edd876ec67ecb720e1d66b8c8b9fdd86ddb50e95262bc8fe6d47a9",
+      "hdmv_raster_source_sha256": "29b113f2c927793005afd25d8d0c861a430b55462f6e8e057e1bbaceccf08334"
+    },
+    {
+      "target": "x86_64-unknown-linux-gnu",
+      "report_sha256": "d8221c53f7c725e15a29d077049ea049c5db5bf81bca7e3eefc9320c9d276096",
+      "sanitizers": true,
+      "result": "85992064 exact decoder comparisons passed",
+      "text_reader_result": "37008 text-file scenarios and 1396467 line/seek comparisons passed (6096 injected exceptions)",
+      "font_result": "17371137 exact font-attachment comparisons passed",
+      "lexer_result": "2793355 exact ASS lexer comparisons passed (command, parameter units, order and empty tags).",
+      "drawing_result": "343183 exact drawing-state comparisons passed (types, points, validity, point requests and cache bypass)",
+      "drawing_tokens_result": "1342183 exact drawing-token comparisons passed (commands, raw parameter units, NUL handling and order)",
+      "fields_result": "4927032 exact field comparisons passed (buffer mutation, returned pointer, next cursor, repeated reads and raw units)\n4927032 exact CString field comparisons passed (trimmed buffer, returned raw units, exceptions, repeated reads and native locale whitespace)",
+      "segments_result": "205982 exact segment comparisons passed (boundaries, input entry order, inactive-entry splits, animated reset and callback snapshots)",
+      "timeline_search_result": "1051947 exact timeline lookup comparisons passed (14352 injected translation exceptions; returned pointer/index, aliased outputs and exact native translation call order)",
+      "segment_insert_result": "59215 exact incremental-segment comparisons passed (1453819 native mutation snapshots, 3357 injected boundary exceptions; entry order, animation flags and partial state)",
+      "hdmv_result": "499597 exact HDMV comparisons passed (8540584 EOF/byte/draw observations, 19298 injected boundary exceptions, 16100 native pixel comparisons, 600 visible pixel cases)",
+      "dvb_result": "440180 exact DVB comparisons passed (8123934 native observations, 176979 injected boundary exceptions, 26176 native pixel comparisons, 1664 visible pixel cases)",
+      "candidate_inputs": {
+        "Cargo.toml": "37d81b9748493b9bb9eb818d6e1dcf5991a7626b0981b0e3ac7f45d2e2ab6097",
+        "Cargo.lock": "fd9331e0dc6b0183bf14e2e8c13939684182d7ec437ac1fac54abbaac8da7335",
+        "include/xy_rust_text.h": "4caa9df121c701b2008f1e41c1b476b98a1f9888fcb51a65de2dbc9bbd3e5c40",
+        "include/xy_rust_ass.h": "e25175962a04d23b8be31323e649bdf607814c6f11d201fd4bfb97c958b37bf8",
+        "include/xy_rust_reader.h": "fc98598650099534eeef499838e070b3affbacfd10e3a0f4f8bf1b3b8e40aeec",
+        "include/xy_rust_drawing.h": "0b1480d82c8d0c8ef221b395345593a8cbe5484e6e81b0862c88e1b3e3a5bd5c",
+        "include/xy_rust_drawing_tokens.h": "e45fceb1aabdb5ca172bc2f5356eb30c3dcd89cff88fa16b2d84e2551f8eebbb",
+        "include/xy_rust_fields.h": "07ef1a44d614fb35abd847f7ddee66558328264c34414c965d2058a557878642",
+        "include/xy_rust_segments.h": "de83a7723e20947cf21ebc963e94e02a7309251585b84d14b810cc3d764934d7",
+        "include/xy_rust_segment_insert.h": "4567c4d4ae5c719e9f557837bbd95a72f7130b217639b606f78c4110e7445dfc",
+        "include/xy_rust_hdmv.h": "80fb7c8e0d895aba245d8e8f47686b354cc48f7e301e7920fac7d6e7ee08551e",
+        "include/xy_rust_dvb.h": "8e93171a2543d4348d18945114183d826d55c51fe091dcef1d47e996b59a20cf",
+        "src/subtitles/CompositionObject.cpp": "f3f3e824996b29563f9673a063cb41decb2720077fcc9db76f47d147d7b6cb7c",
+        "include/xy_rust_timeline_search.h": "d0b86cc52ed2a08a3016b9f1f6f34949c55c252481df41cc428e753bb95a348e",
+        "src/subtitles/TextFile.h": "fe26e64597691da26aa13d3ba11c0027d23332dabf9c5f7bcd8ca3ec7d9a30fc",
+        "tools/compat/ass_lexer_oracle.cpp": "386c15ccbe78dcd816192de244c205dc1973bdf6075f71a10d69d99673442112",
+        "tools/compat/decoder_oracle.cpp": "2572d7ab48a8a0535308ff7bc7b8e1263b4d0c7ab96a961dd3baebc2cd45a923",
+        "tools/compat/drawing_oracle.cpp": "bae491f110922898af703fe1cc872cd5b15ef13811e0c337e90ddf4068f3297a",
+        "tools/compat/drawing_tokens_oracle.cpp": "b670388ec51ec421ffda51a874d0197aca21e31aabd9f3295d9c4ac1c980aa74",
+        "tools/compat/dvb_oracle.cpp": "060a7d55436953d7df4db3e131aa87289075607946e6be7e9ec3d07d34f5f31b",
+        "tools/compat/fields_oracle.cpp": "0048ac141b05e76cf0cf57a4444f7c8a526460117593c6d353bd7e66cfefcc79",
+        "tools/compat/font_oracle.cpp": "66ae37e835f97bcd9ee645fa36f51a251b81eec525d51da099b804f08b36a63d",
+        "tools/compat/hdmv_oracle.cpp": "0e4e3635079cc27d877d599c176590fd05a581fea11af43c6da1c1a7dff6ff06",
+        "tools/compat/segment_insert_oracle.cpp": "8693f1f8b89667126096368a9eb6a90d9e8b7fccfe404bd4e4db8d5d72fb2fb9",
+        "tools/compat/segments_oracle.cpp": "153ccb7adeaeaa82c7826826311304f979a19b5a07dc264136dee9660fff8bb1",
+        "tools/compat/text_reader_oracle.cpp": "0f7491e79047e4547893f735617580ce08be4a23167e786f2035a531b755bcea",
+        "tools/compat/timeline_search_oracle.cpp": "aa455fe0d315c286427f8d5e0c9355a628bc74ac65e623a3ae6efd180969aa9c",
+        "tools/compat/ass_lexer_shell.h": "285326c84f336cd68b1de88a7de2cfad6519f0e7ac8a0a609443d7da5c6eb6dd",
+        "tools/compat/drawing_shell.h": "312671e938ac4013a0b1ca969c8e612a9dd70e6c5e7d4ef32053c4e5f7121620",
+        "tools/compat/drawing_tokens_shell.h": "7e4f47650d18d0f9532498b5113884db2f3dfb46d20043812096e9d2723f806b",
+        "tools/compat/dvb_shell.h": "49a54b545d7f2b82182c7477b3b969605f08ce036e194bfb79148388f867ee2a",
+        "tools/compat/fields_shell.h": "bd9ce0dbdadada49d01da05f5d7c63878caa92c0fdfa9f2c7f4db7fa9e8fca3d",
+        "tools/compat/font_shell.h": "6d0acc73d6e5125fbac837a83310240c5371802fa4a40ddd93aec2a28bdd6818",
+        "tools/compat/hdmv_shell.h": "da95584e11c179c9742adccf837e81d724718a2f0ae437d7f4d6e8c7174e4f89",
+        "tools/compat/segment_insert_shell.h": "0d307503dab1af8c72c03473e3d81e7620e8cf22da65f3c829d3f739f462807d",
+        "tools/compat/segments_shell.h": "adb773221c51f0ab26500e076b13ec420770765542f8fd73133da19c3f883fd1",
+        "tools/compat/text_reader_shell.h": "4031f09c42f76350b7611d21d1ffd26904fef8505ce718cddb9add791cbfb833",
+        "tools/compat/timeline_search_shell.h": "9714ed033c3a1c8bc054bccc0ac00722a6f233e29048da135874826cb0d218d5",
+        "tools/compat/check_decoder.py": "1a6431d33dfd40eaaad3439127d701c2e25c3185a3f635d0ec01e3a783562c26",
+        "rust/compat/src/ass_tags.rs": "6792ac12ebbf50f9356d0aa7abad85b20d505e64f7ea539a66eb42990d05a637",
+        "rust/compat/src/drawing.rs": "eca8f1053f8428d9b0c265752ab2f07687f83ae626db30ad2d27beb5ec0bcd67",
+        "rust/compat/src/drawing_tokens.rs": "c3db232dfdbec32354a3bc68fcb8c7a71f01e70e20c5832ca2021b8b559c245b",
+        "rust/compat/src/dvb.rs": "1a61efdf07bf065fbe2272798433e373e5cab6977658532de8a554aaf29abb30",
+        "rust/compat/src/fields.rs": "398979232ca4b3e7f919daa23313c5e52ef681be15eeafdd0299ad2ef1b5c8a7",
+        "rust/compat/src/font.rs": "7fec61f79198f0dc07fbdbed25204b6422239580de5db434abad5c9bcedad1ac",
+        "rust/compat/src/hdmv.rs": "c2f712577c50703d05ad3b3aedae9d8ed941ef760c2f3a447f96b007b465e74d",
+        "rust/compat/src/lib.rs": "8f1cfd9f4cc9dc127b719492d922a62aa59f8cc0321bafad3acdcade8241b1fa",
+        "rust/compat/src/segment_insert.rs": "1176e67a65262686d2ee7a7bfd6a0b59b2340d945a639fad8f9cd72f6f0d6d89",
+        "rust/compat/src/segments.rs": "3cfdd0d0352e05770941ab630f111414b90d8b4baeb3841065cc8c5b046ca1ad",
+        "rust/compat/src/text.rs": "b7265e27c081c94349505c5cd3db3af8c3f8a73f2a98074e1c8523a3b88f208f",
+        "rust/compat/src/text_reader.rs": "b78c3bc2eda230849d4b67f8547fbd3eb6303ba930f07c955b2a9b37b215b1da",
+        "rust/compat/src/timeline_search.rs": "1b4d6b7a8eee6329b8cf4e564fa6e1aecbc866cfea26a59e9436590e0fe054a5",
+        "rust/ffi/src/ass_tags.rs": "d1764911d033dd4995f1fe02669f11ece10757d4681db1f8d15f35c500382a07",
+        "rust/ffi/src/drawing.rs": "0903c53b826fbb717ff22fce12ad0878aa4b620f043b1f15c2b73002b2ef6bbb",
+        "rust/ffi/src/drawing_tokens.rs": "7814644432e3a0e45a37a4701789698f4b529f1d962a8a64aa8b060cf10c23e2",
+        "rust/ffi/src/dvb.rs": "88d820e7b0db278a9e3328423e497565be733b1ebd224ac8a13358f74203470c",
+        "rust/ffi/src/fields.rs": "eb6ed7a873a84defa4a2ebff5ea5d3241db58c546c56c0c3c4011bf3fdcfe395",
+        "rust/ffi/src/hdmv.rs": "b96823ac5487ef90815aeaa44f392dd07ae1a539cb98baa88c4141ded6d943c7",
+        "rust/ffi/src/lib.rs": "e92c31fed2fab9c0ef72e3720653ddb34b3838aa0e76acb90f12c0488fb62525",
+        "rust/ffi/src/runtime.rs": "6b974d023640354a5c65ea3d5d3feea35bd191192c8d859fb1f3be342f613f14",
+        "rust/ffi/src/segment_insert.rs": "6273ff03529551f00f0a4f7a95b442afecfa69c5119a640a325415d48206b235",
+        "rust/ffi/src/segments.rs": "f6391d7f5f27349c411339f709e9f102b5c12c51b4cb914f70485aeeef20749d",
+        "rust/ffi/src/text_reader.rs": "a4ab775620d77195187dff9279adbbf6432cd29bba437129f019c9b75fcc2091",
+        "rust/ffi/src/timeline_search.rs": "03308b3ffb052adeee9832fe91242c428e6244d8da0355987c0277c1aea52668",
+        "rust/compat/Cargo.toml": "9f325d80554a26bfb2f50237382694f8e121072e2ce52a34cebf3fa118cce6d1",
+        "rust/ffi/Cargo.toml": "c557156364b3d955695f235a782d9a124d531cc2157bfea6ab209f33850edea7"
+      },
+      "hdmv_source_sha256": "8c25ed49d9789c3a535a200c6518e54dd330cb859c64d14dbdfc8b22bb3feeb5",
+      "hdmv_golomb_source_sha256": "ca9728f60515f6df05c305d52f550a7dba16687b97c74dd11ac668a5b88dca36",
+      "hdmv_golomb_header_sha256": "16d5dcc8f7edd876ec67ecb720e1d66b8c8b9fdd86ddb50e95262bc8fe6d47a9",
+      "hdmv_raster_source_sha256": "29b113f2c927793005afd25d8d0c861a430b55462f6e8e057e1bbaceccf08334"
+    }
+  ],
+  "limits": [
+    "Finite fixtures and mutation campaigns do not establish universal compatibility or memory safety.",
+    "CSRI BGRX rendering and format queries; real Aegisub/player and other host integration remains outstanding.",
+    "Comparisons pair reference and candidate on the same architecture and environment, not across architectures.",
+    "Most native parsing, font handling, rasterization, compositing and third-party code remains C++.",
+    "Drawing preprocessing, numeric conversion, scaling and final path storage remain native.",
+    "Native sanitizers cover extracted C++ tests, not the full renderer or Rust static library.",
+    "Native out-of-memory recovery, Windows 7 and older CPUs remain unverified.",
+    "WebVTT end-of-list insertion has candidate-only validation and is excluded from reference-parity counts."
+  ],
+  "miri_job_passed": true,
+  "miri_job_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38471876844/job/115552736367",
+  "artifact_verifier_source_sha256": "3d36f2d87b053d49dfe0af483708a81d711da58c83dad154e730e0d180415581",
+  "bitmap_scope": {
+    "ported_methods": [
+      "CompositionObject::RenderHdmv",
+      "CompositionObject::Dvb2PixelsCodeString",
+      "CompositionObject::Dvb4PixelsCodeString",
+      "CompositionObject::Dvb8PixelsCodeString"
+    ],
+    "boundary": "Rust owns run-decoding state. Native code performs each requested bit/byte/EOF operation, palette lookup, rectangle draw, coordinate/dirty-rectangle update and DVB byte alignment.",
+    "windows_rectangle_api": "Real User32 UnionRect on both Windows architectures; portable stand-in on other hosts.",
+    "native_pixels": "Pinned original packed and planar SSE pixel-fill methods on x86/x64. Pixel comparisons include injected partial operations, padding and guards. Separate non-injected fixtures must visibly draw.",
+    "trace_only_inputs": "Extreme and malformed coordinate cases compare requested operations and state without passing out-of-surface rectangles to the native pixel fillers.",
+    "retained_native_scope": [
+      "CGolombBuffer and RLE backing storage",
+      "palette conversion and rasterization",
+      "DVB field parsing",
+      "HDMV/DVB packet parsing and host playback"
+    ],
+    "csri_scope": "The full DLL corpus verifies text-renderer regressions; it does not establish HDMV/DVB packet or host integration."
+  }
+}
