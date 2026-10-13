@@ -20,6 +20,9 @@
 
 #include "stdafx.h"
 #include "CompositionObject.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "xy_rust_hdmv.h"
+#endif
 #include "../DSUtil/GolombBuffer.h"
 #include "../subpic/color_conv_table.h"
 
@@ -166,6 +169,24 @@ void CompositionObject::RenderHdmv(SubPicDesc& spd)
     }
 
     CGolombBuffer GBuffer(m_pRLEData, m_nRLEDataSize);
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::HdmvDecoder decoder(m_horizontal_position, m_vertical_position, m_height);
+    for (;;) {
+        switch (decoder.Field(0)) {
+        case 0: return;
+        case 1: decoder.Supply(GBuffer.IsEOF() ? 1 : 0); break;
+        case 2: decoder.Supply(GBuffer.ReadByte()); break;
+        case 3: {
+            const int palette = decoder.Field(4);
+            if (palette < 0 || palette >= 256) abort();
+            FillSolidRect(spd, decoder.Field(1), decoder.Field(2), decoder.Field(3), 1, m_Colors[palette]);
+            decoder.Supply(0);
+            break;
+        }
+        default: abort();
+        }
+    }
+#else
     BYTE  bTemp;
     BYTE  bSwitch;
     BYTE  nPaletteIndex = 0;
@@ -211,6 +232,7 @@ void CompositionObject::RenderHdmv(SubPicDesc& spd)
             nX = m_horizontal_position;
         }
     }
+#endif
 }
 
 

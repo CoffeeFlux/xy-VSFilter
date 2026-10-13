@@ -220,6 +220,53 @@ public:
         token_code += "CStringW str = input;\n" + block
         token_code += "result.emplace_back(c, s);\n}\nreturn result;\n}\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_drawing_tokens.h").write_text(token_code, encoding="utf-8")
+    hdmv_source = original("src/subtitles/CompositionObject.cpp", reference["commit"])
+    candidate_hdmv = (ROOT / "src/subtitles/CompositionObject.cpp").read_bytes()
+    golomb_source = original("src/dsutil/GolombBuffer.cpp", reference["commit"])
+    golomb_header = original("src/dsutil/GolombBuffer.h", reference["commit"])
+    raster_source = original("src/subtitles/Rasterizer.cpp", reference["commit"])
+    hdmv = hdmv_source.decode("utf-8-sig").split("#include", 1)[0]
+    hdmv += '#include "hdmv_shell.h"\n'
+    # Expose fields only for observation, without changing any reference body.
+    # Spell MSVC's 1ui64 literal with a portable standard macro.
+    hdmv += extract_method(golomb_header.decode("utf-8-sig"), "class CGolombBuffer").replace("private:", "public:").replace("CGolombBuffer", "ReferenceGolomb") + ";\n"
+    for signature in ("CGolombBuffer::CGolombBuffer(", "CGolombBuffer::~CGolombBuffer(",
+                      "UINT64 CGolombBuffer::BitRead(", "void CGolombBuffer::Reset()"):
+        hdmv += extract_method(golomb_source.decode("utf-8-sig"), signature).replace("CGolombBuffer", "ReferenceGolomb").replace("1ui64", "UINT64_C(1)") + "\n"
+    hdmv += """
+class ObservedGolomb : public ReferenceGolomb {
+public:
+    ObservedGolomb(BYTE* data,int size):ReferenceGolomb(data,size){}
+    bool IsEOF() const {
+        const bool value=ReferenceGolomb::IsEOF();
+        hdmvObserve({{1,m_nBitPos,m_bitlen,m_bitbuff,value,0,0}});
+        return value;
+    }
+    BYTE ReadByte() {
+        const int before=m_nBitPos;
+        const BYTE value=ReferenceGolomb::ReadByte();
+        hdmvObserve({{2,before,m_nBitPos,m_bitlen,m_bitbuff,value,0}});
+        return value;
+    }
+};
+#define CGolombBuffer ObservedGolomb
+"""
+    for name, content in (("OriginalHdmv", hdmv_source), ("CandidateHdmv", candidate_hdmv)):
+        hdmv += f"#define CompositionObject {name}\n"
+        if name == "CandidateHdmv":
+            hdmv += "#define XY_VSFILTER_RUST_TEXT\n"
+        hdmv += extract_method(content.decode("utf-8-sig"), "void CompositionObject::RenderHdmv(")
+        hdmv += "\n#undef CompositionObject\n#undef XY_VSFILTER_RUST_TEXT\n"
+    hdmv += "#undef CGolombBuffer\n#if HDMV_NATIVE_PIXELS\n"
+    for signature in ("static __forceinline void pixmix_sse2(DWORD*",
+                      "static __forceinline __m128i packed_pix_mix_sse2(",
+                      "static __forceinline void packed_pix_mix_sse2(BYTE* dst, BYTE alpha",
+                      "void AlphaBlt8bppSingleAlphaC(byte*",
+                      "void AlphaBlt8bppSingleAlphaSse2(byte*",
+                      "void Rasterizer::FillSolidRect("):
+        hdmv += extract_method(raster_source.decode("utf-8-sig"), signature) + "\n"
+    hdmv += "#endif\n"
+    (destination / "original_hdmv.h").write_text(hdmv, encoding="utf-8")
     cargo = ["cargo", "rustc", "--locked", "--offline", "--release", "-p", "xy-vsfilter-ffi"]
     if os.name == "nt":
         cargo += ["--features", "native-runtime"]
@@ -318,6 +365,13 @@ public:
     search_result = run([str(search_executable)], capture_output=True, text=True)
     print(search_result.stdout, end="")
     print(search_result.stderr, end="", file=sys.stderr)
+    hdmv_executable = destination / ("hdmv-oracle.exe" if os.name == "nt" else "hdmv-oracle")
+    hdmv_compile = [arg.replace("decoder_oracle.cpp", "hdmv_oracle.cpp")
+                    .replace("decoder-oracle", "hdmv-oracle") for arg in compile_command]
+    run(hdmv_compile)
+    hdmv_result = run([str(hdmv_executable)], capture_output=True, text=True)
+    print(hdmv_result.stdout, end="")
+    print(hdmv_result.stderr, end="", file=sys.stderr)
     compiler = subprocess.run([args.cxx] if os.name == "nt" else [args.cxx, "--version"],
                               capture_output=True, text=True)
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
@@ -327,6 +381,8 @@ public:
               ROOT / "include/xy_rust_fields.h",
               ROOT / "include/xy_rust_segments.h",
               ROOT / "include/xy_rust_segment_insert.h",
+              ROOT / "include/xy_rust_hdmv.h",
+              ROOT / "src/subtitles/CompositionObject.cpp",
               ROOT / "include/xy_rust_timeline_search.h",
               ROOT / "src/subtitles/TextFile.h"]
     inputs += sorted((ROOT / "tools/compat").glob("*oracle.cpp"))
@@ -339,6 +395,12 @@ public:
         "cpp_compiler": compiler.stdout + compiler.stderr,
         "candidate_commit": run(["git", "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip(),
         "candidate_inputs": {path.relative_to(ROOT).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest() for path in inputs},
+        "hdmv_source_sha256": hashlib.sha256(hdmv_source).hexdigest(),
+        "hdmv_golomb_source_sha256": hashlib.sha256(golomb_source).hexdigest(),
+        "hdmv_golomb_header_sha256": hashlib.sha256(golomb_header).hexdigest(),
+        "hdmv_raster_source_sha256": hashlib.sha256(raster_source).hexdigest(),
+        "hdmv_compile_command": hdmv_compile,
+        "hdmv_result": hdmv_result.stdout, "hdmv_stderr": hdmv_result.stderr,
         "rustc": run(["rustc", "-Vv"], capture_output=True, text=True).stdout,
         "result": result.stdout, "stderr": result.stderr,
         "candidate_source_sha256": hashlib.sha256(candidate_source).hexdigest(),
