@@ -72,7 +72,7 @@ unresolved reference outcomes requiring investigation, never matching results.
   are retained. The extracted oracle compares this boundary with real ATL on
   Windows. The revised boundary passed **1,342,183** comparisons on all four
   platforms, including Windows x86/x64, plus Miri and local fatal ASan/UBSan.
-  Full DLL rendering validation of the combined increment is pending.
+  Full DLL validation of the combined drawing/field increment is recorded below.
   **Preprocessing remains native:** an attempted replacement port exposed
   allocation-dependent ATL results for `mmm\0mm`. Two evaluations in one process
   produced different trailing command units. This is unresolved reference
@@ -87,11 +87,22 @@ unresolved reference outcomes requiring investigation, never matching results.
   preserves buffer mutation before throwing on an empty trimmed field. Native
   adapters keep the original string storage; Rust borrows bounded code-unit
   copies and returns offsets. Numeric conversion remains in the Windows CRT.
-  Both functions passed the [four-platform CI and Miri run](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38442860012):
+  Both functions passed the [four-platform CI and Miri run](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38445306389):
   **5,713,464 comparisons per function** on Windows x86/x64, and **4,927,032 per
   function** on macOS/Linux with fatal ASan/UBSan. The oracle compares raw units,
-  mutated buffers, returned pointer/field, next cursor and exceptions. Full DLL
-  validation with scripted native warnings is pending.
+  mutated buffers, returned pointer/field, next cursor and exceptions.
+  Candidate `130cfea7` passed the [Windows x86/x64 DLL comparison](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38445306418):
+  **290 cases / 2,522 frames** per architecture, with 278 successful opens,
+  12 matching open rejections, four matching warning-dialog interactions, and
+  passing font/drawing controls. The 32-case / 224-frame mutation run passed;
+  all three DLL export tables and declared dependency requirements match.
+  [Combined evidence](drawing-and-fields-evidence.json) records source inputs,
+  reports, DLL hashes and exact warning/control text with scripted responses.
+  A separate [256-case campaign](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38445381552)
+  matched **255 cases / 1,785 frames** per architecture; one case raises a Windows
+  exception in both baseline repeats and the candidate. That campaign remains
+  **failed**, with its [unresolved evidence](native-exception-20261017.json) and
+  exact reproducer preserved. No original exception is counted as compatibility.
 * Value-only internal C ABIs for the character and attachment decoders. The ASS lexer
   has a separate, documented ownership boundary: it borrows two bounded input
   arrays during scanning, retains only integer spans, and returns an opaque owner
@@ -444,7 +455,11 @@ investigate, not an established cause. The initial report's last stage was
 `close`, but cleanup could have overwritten an earlier failure. The harness now
 records `failure-before-close.json` and Python tracebacks before cleanup; Windows
 tests inject a native exception during rendering to verify that this context
-survives. Exceptions remain unresolved even if both implementations raise them.
+survives. The [diagnostic replay](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38445381552)
+locates the first exception in `csri_render` at timestamp `1` (frame index 1),
+before cleanup, on Windows x86 and x64 in both reference repeats and the candidate. It does not
+identify the internal native throwing function. Exceptions remain unresolved even
+if both implementations raise them.
 
 Replay this case separately with the real Windows DLLs; it is deliberately not
 included among the passing fixtures, and the original 256-case campaign remains

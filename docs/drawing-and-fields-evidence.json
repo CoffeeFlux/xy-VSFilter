@@ -1,0 +1,772 @@
+{
+  "schema": 1,
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "candidate_commit": "130cfea7f1645c34752469014f77b4f9281ae926",
+  "native_runs": [
+    {
+      "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38445306418",
+      "build": {
+        "rustc": [
+          "rustc 1.85.0 (4d91de4e4 2025-02-17)",
+          "binary: rustc",
+          "commit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688",
+          "commit-date: 2025-02-17",
+          "host: x86_64-pc-windows-msvc",
+          "release: 1.85.0",
+          "LLVM version: 19.1.7"
+        ],
+        "platform": "Win32",
+        "windows_sdk_version": "10.0.26100.0\\",
+        "configuration": "Release",
+        "candidate_status": [],
+        "mutation_count": 32,
+        "candidate_commit": "130cfea7f1645c34752469014f77b4f9281ae926",
+        "msvc_tools_version": "14.44.35207",
+        "mutation_seed": 12345,
+        "cargo": [
+          "cargo 1.85.0 (d73d2caf9 2024-12-31)"
+        ],
+        "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62"
+      },
+      "checks": {
+        "smoke": {
+          "report_sha256": "b98f5676d2348a8c67c271c2aa2ae7dc1226f118cfc2634b55b1f6dc4da2b579",
+          "case_count": 1,
+          "rendered_frames": 10,
+          "changed_frames": 6,
+          "case_verdicts": {
+            "equal": 1
+          },
+          "candidate_statuses": {
+            "ok": 1
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "b3091fe31459e8e5cbde58c9bac57749c0374ed063964c45f600d6693d62c9dd",
+          "dialog_observations": {}
+        },
+        "csri": {
+          "report_sha256": "c368b5f946e38f7997c4d309a613ee8b200caf912cdd0b499723dbaddbf89432",
+          "case_count": 290,
+          "rendered_frames": 2522,
+          "changed_frames": 1552,
+          "case_verdicts": {
+            "equal": 290
+          },
+          "candidate_statuses": {
+            "ok": 278,
+            "open_rejected": 12
+          },
+          "distinct_frame_controls": [
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-file",
+                "font-valid-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-memory",
+                "font-valid-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-file",
+                "drawing-state-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-memory",
+                "drawing-state-control-memory"
+              ],
+              "reference-0": true
+            }
+          ],
+          "manifest_sha256": "de9e54b61960123334a0f57115eaa8a236ba3a1855def13eef9231154f5330e1",
+          "dialog_observations": {
+            "field-tab-prefixes-file": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\tDefault\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-tab-prefixes-memory": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\tDefault\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-unicode-style-space-file": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\u2003Default\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-unicode-style-space-memory": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\u2003Default\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ]
+          }
+        },
+        "mutation-results": {
+          "report_sha256": "5864d8fbcb6e923dcf6c8f599833b71f16e2d5d80df6423197d181f2cfc5b09e",
+          "case_count": 32,
+          "rendered_frames": 224,
+          "changed_frames": 160,
+          "case_verdicts": {
+            "equal": 32
+          },
+          "candidate_statuses": {
+            "ok": 32
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "692b4dcb930f2117e85805fead2e88d7a3e21f3894da6b3b27f6313f2afeef40",
+          "dialog_observations": {}
+        }
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "f9aea567f2b60758f01cfa9886d72d31f80b1798fbd41f69efd00cc572f2681c",
+          "baseline_sha256": "b4ad6b34636b8b40e759041578476ebd5b8b59ba5cbb2287353efcae4b9ae0a7",
+          "candidate_sha256": "617b62ec40668331d79547242b8157f04a3a40b7359bf945b4964e028787ac81"
+        },
+        "XySubFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "d8cd7823d3b6d58469d5cdeb1e7f647d0aefb1c33c1d3d6c3064eb9dd72d5d5c",
+          "baseline_sha256": "5790a0b73089e4643fc2f95987880b0bd9c8343141a063c1e07f92e570b0fe11",
+          "candidate_sha256": "b9cfcf0704e480620f28e6b7fd9b0c7dab4897b8c50b565f1eea82b9395b5502"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "e666b77b86ebf78670a821a32ef94257d7671059d660f18001c9641876d1625d",
+          "baseline_sha256": "3b26068a613c654bb8db7b2472f30b6c7a4079cb29c39cb932078bee7e6d94d0",
+          "candidate_sha256": "6eee66c087688275353e6bd883d32b24ad6d6cff004709a307e697f55f38c927"
+        }
+      },
+      "candidate_log_sha256": "153542c1309f559ddaa544167264c2c8a8df56b14cb71a0f6bfb139cb6e349a7"
+    },
+    {
+      "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38445306418",
+      "build": {
+        "configuration": "Release",
+        "candidate_commit": "130cfea7f1645c34752469014f77b4f9281ae926",
+        "msvc_tools_version": "14.44.35207",
+        "windows_sdk_version": "10.0.26100.0\\",
+        "cargo": [
+          "cargo 1.85.0 (d73d2caf9 2024-12-31)"
+        ],
+        "mutation_seed": 12345,
+        "mutation_count": 32,
+        "candidate_status": [],
+        "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+        "rustc": [
+          "rustc 1.85.0 (4d91de4e4 2025-02-17)",
+          "binary: rustc",
+          "commit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688",
+          "commit-date: 2025-02-17",
+          "host: x86_64-pc-windows-msvc",
+          "release: 1.85.0",
+          "LLVM version: 19.1.7"
+        ],
+        "platform": "x64"
+      },
+      "checks": {
+        "smoke": {
+          "report_sha256": "b674979577874b6cb90a8d15b7a130ff7e7ca777c79b3025e2e72156e7ded870",
+          "case_count": 1,
+          "rendered_frames": 10,
+          "changed_frames": 6,
+          "case_verdicts": {
+            "equal": 1
+          },
+          "candidate_statuses": {
+            "ok": 1
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "aff943a1c633c5a1aca2d2f504b0b17c5a7f19b3d3bbffaa215d1889fff2da25",
+          "dialog_observations": {}
+        },
+        "csri": {
+          "report_sha256": "401f1fdba9a59e26e2b2ae5006a7982b7adc5282a4e26c65aeb3a7fa51f9d573",
+          "case_count": 290,
+          "rendered_frames": 2522,
+          "changed_frames": 1552,
+          "case_verdicts": {
+            "equal": 290
+          },
+          "candidate_statuses": {
+            "ok": 278,
+            "open_rejected": 12
+          },
+          "distinct_frame_controls": [
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-file",
+                "font-valid-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-memory",
+                "font-valid-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-file",
+                "drawing-state-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-memory",
+                "drawing-state-control-memory"
+              ],
+              "reference-0": true
+            }
+          ],
+          "manifest_sha256": "de9e54b61960123334a0f57115eaa8a236ba3a1855def13eef9231154f5330e1",
+          "dialog_observations": {
+            "field-tab-prefixes-file": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\tDefault\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-tab-prefixes-memory": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\tDefault\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-unicode-style-space-file": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\u2003Default\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-unicode-style-space-memory": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\u2003Default\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ]
+          }
+        },
+        "mutation-results": {
+          "report_sha256": "648430749ffc7b3a877283bbb9ab2050ebd1b1e56ec6743bdece6245fe9a453a",
+          "case_count": 32,
+          "rendered_frames": 224,
+          "changed_frames": 160,
+          "case_verdicts": {
+            "equal": 32
+          },
+          "candidate_statuses": {
+            "ok": 32
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "90e89279db719c739c6a1363611c04225b3486f03fee6ad9ceaca20e084ce43c",
+          "dialog_observations": {}
+        }
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "84a27c3f09cb0d719d9eda44878694f94595dada4c14ceb22a2e4e614f9ec4ff",
+          "baseline_sha256": "eab9330f2409d902bffe4a50ec4cc5e72c3529ede99e46145232810d217134b5",
+          "candidate_sha256": "d14b1e88e55c69767d2f6968b2753854a243048e50c7f4f3a84e4245d8ed295a"
+        },
+        "XySubFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "70a7daaf1cbd89db83662b6014439fe736474ef9fe6ad152a955d625901c74b2",
+          "baseline_sha256": "3bf46c51373aea099ee4bac910c9573a70daa90a65ba6f945ebf7d79c3a49db9",
+          "candidate_sha256": "24f1472512da8b7c12ff53c27f4e9bd22e6fcd672e43117dfd5019f8a45c98be"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "d0b61ec5540588c5f5e14949472e20c26b17713b3700e75d9fc088d2bcc176b9",
+          "baseline_sha256": "5e8f3cd7961efa013a57b1254bea836b1582797eeae28687aef3d746639904e2",
+          "candidate_sha256": "80e3578dc66cbb87ec61d1e76e586cb7f05aa69f1479c15d421a2cd6e12d51d6"
+        }
+      },
+      "candidate_log_sha256": "5bbe76013ff9230ce965f48d0cef503992dd8b0d7f92da2bf482a2d1d1413072"
+    }
+  ],
+  "portable_run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38445306389",
+  "portable": [
+    {
+      "target": "aarch64-apple-darwin",
+      "report_sha256": "104bf34b395c946e33db72e954c040cb2df24ddf8ca5b3c53acff96e70948675",
+      "sanitizers": true,
+      "result": "85992064 exact decoder comparisons passed",
+      "text_reader_result": "37008 text-file scenarios and 1396467 line/seek comparisons passed (6096 injected exceptions)",
+      "font_result": "17371137 exact font-attachment comparisons passed",
+      "lexer_result": "2727819 exact ASS lexer comparisons passed (command, parameter units, order and empty tags).",
+      "drawing_result": "343183 exact drawing-state comparisons passed (types, points, validity, point requests and cache bypass)",
+      "drawing_tokens_result": "1342183 exact drawing-token comparisons passed (commands, raw parameter units, NUL handling and order)",
+      "fields_result": "4927032 exact field comparisons passed (buffer mutation, returned pointer, next cursor, repeated reads and raw units)\n4927032 exact CString field comparisons passed (trimmed buffer, returned raw units, exceptions, repeated reads and native locale whitespace)",
+      "candidate_inputs": {
+        "Cargo.toml": "34479687bc9fac5dcc025e7ad0d7c7392c9a8e6a95071ecfddae626de1713e05",
+        "Cargo.lock": "fd9331e0dc6b0183bf14e2e8c13939684182d7ec437ac1fac54abbaac8da7335",
+        "include/xy_rust_text.h": "4caa9df121c701b2008f1e41c1b476b98a1f9888fcb51a65de2dbc9bbd3e5c40",
+        "include/xy_rust_ass.h": "e25175962a04d23b8be31323e649bdf607814c6f11d201fd4bfb97c958b37bf8",
+        "include/xy_rust_reader.h": "fc98598650099534eeef499838e070b3affbacfd10e3a0f4f8bf1b3b8e40aeec",
+        "include/xy_rust_drawing.h": "0b1480d82c8d0c8ef221b395345593a8cbe5484e6e81b0862c88e1b3e3a5bd5c",
+        "include/xy_rust_drawing_tokens.h": "e45fceb1aabdb5ca172bc2f5356eb30c3dcd89cff88fa16b2d84e2551f8eebbb",
+        "include/xy_rust_fields.h": "07ef1a44d614fb35abd847f7ddee66558328264c34414c965d2058a557878642",
+        "src/subtitles/TextFile.h": "fe26e64597691da26aa13d3ba11c0027d23332dabf9c5f7bcd8ca3ec7d9a30fc",
+        "tools/compat/ass_lexer_oracle.cpp": "386c15ccbe78dcd816192de244c205dc1973bdf6075f71a10d69d99673442112",
+        "tools/compat/decoder_oracle.cpp": "2572d7ab48a8a0535308ff7bc7b8e1263b4d0c7ab96a961dd3baebc2cd45a923",
+        "tools/compat/drawing_oracle.cpp": "bae491f110922898af703fe1cc872cd5b15ef13811e0c337e90ddf4068f3297a",
+        "tools/compat/drawing_tokens_oracle.cpp": "b670388ec51ec421ffda51a874d0197aca21e31aabd9f3295d9c4ac1c980aa74",
+        "tools/compat/fields_oracle.cpp": "0048ac141b05e76cf0cf57a4444f7c8a526460117593c6d353bd7e66cfefcc79",
+        "tools/compat/font_oracle.cpp": "66ae37e835f97bcd9ee645fa36f51a251b81eec525d51da099b804f08b36a63d",
+        "tools/compat/text_reader_oracle.cpp": "0f7491e79047e4547893f735617580ce08be4a23167e786f2035a531b755bcea",
+        "tools/compat/ass_lexer_shell.h": "285326c84f336cd68b1de88a7de2cfad6519f0e7ac8a0a609443d7da5c6eb6dd",
+        "tools/compat/drawing_shell.h": "312671e938ac4013a0b1ca969c8e612a9dd70e6c5e7d4ef32053c4e5f7121620",
+        "tools/compat/drawing_tokens_shell.h": "7e4f47650d18d0f9532498b5113884db2f3dfb46d20043812096e9d2723f806b",
+        "tools/compat/fields_shell.h": "bd9ce0dbdadada49d01da05f5d7c63878caa92c0fdfa9f2c7f4db7fa9e8fca3d",
+        "tools/compat/font_shell.h": "6d0acc73d6e5125fbac837a83310240c5371802fa4a40ddd93aec2a28bdd6818",
+        "tools/compat/text_reader_shell.h": "4031f09c42f76350b7611d21d1ffd26904fef8505ce718cddb9add791cbfb833",
+        "tools/compat/check_decoder.py": "663123bf3efd55b2d6a8e425d8bc4ce28fe8ebdb4d7137e2120822119f9ef31b",
+        "rust/compat/src/ass_tags.rs": "6792ac12ebbf50f9356d0aa7abad85b20d505e64f7ea539a66eb42990d05a637",
+        "rust/compat/src/drawing.rs": "eca8f1053f8428d9b0c265752ab2f07687f83ae626db30ad2d27beb5ec0bcd67",
+        "rust/compat/src/drawing_tokens.rs": "c3db232dfdbec32354a3bc68fcb8c7a71f01e70e20c5832ca2021b8b559c245b",
+        "rust/compat/src/fields.rs": "398979232ca4b3e7f919daa23313c5e52ef681be15eeafdd0299ad2ef1b5c8a7",
+        "rust/compat/src/font.rs": "7fec61f79198f0dc07fbdbed25204b6422239580de5db434abad5c9bcedad1ac",
+        "rust/compat/src/lib.rs": "6df255e08ff5564a87113ade2c50e1778da06cf497e6e1c42516f81c005c4535",
+        "rust/compat/src/text.rs": "b7265e27c081c94349505c5cd3db3af8c3f8a73f2a98074e1c8523a3b88f208f",
+        "rust/compat/src/text_reader.rs": "b78c3bc2eda230849d4b67f8547fbd3eb6303ba930f07c955b2a9b37b215b1da",
+        "rust/ffi/src/ass_tags.rs": "d1764911d033dd4995f1fe02669f11ece10757d4681db1f8d15f35c500382a07",
+        "rust/ffi/src/drawing.rs": "0903c53b826fbb717ff22fce12ad0878aa4b620f043b1f15c2b73002b2ef6bbb",
+        "rust/ffi/src/drawing_tokens.rs": "7814644432e3a0e45a37a4701789698f4b529f1d962a8a64aa8b060cf10c23e2",
+        "rust/ffi/src/fields.rs": "eb6ed7a873a84defa4a2ebff5ea5d3241db58c546c56c0c3c4011bf3fdcfe395",
+        "rust/ffi/src/lib.rs": "fe341ed5b8fbeca38daa498b06c9bb2b47c85d8f0e7c4db805d974230245de4b",
+        "rust/ffi/src/runtime.rs": "6b974d023640354a5c65ea3d5d3feea35bd191192c8d859fb1f3be342f613f14",
+        "rust/ffi/src/text_reader.rs": "a4ab775620d77195187dff9279adbbf6432cd29bba437129f019c9b75fcc2091",
+        "rust/compat/Cargo.toml": "9f325d80554a26bfb2f50237382694f8e121072e2ce52a34cebf3fa118cce6d1",
+        "rust/ffi/Cargo.toml": "c557156364b3d955695f235a782d9a124d531cc2157bfea6ab209f33850edea7"
+      }
+    },
+    {
+      "target": "i686-pc-windows-msvc",
+      "report_sha256": "df28dc853811034f1c8e40eb60b0bca448649dcacef09133435d177fc10679c1",
+      "sanitizers": false,
+      "result": "85992064 exact decoder comparisons passed",
+      "text_reader_result": "37008 text-file scenarios and 1396467 line/seek comparisons passed (6096 injected exceptions)",
+      "font_result": "17371137 exact font-attachment comparisons passed",
+      "lexer_result": "2793355 exact ASS lexer comparisons passed (command, parameter units, order and empty tags).",
+      "drawing_result": "343183 exact drawing-state comparisons passed (types, points, validity, point requests and cache bypass)",
+      "drawing_tokens_result": "1342183 exact drawing-token comparisons passed (commands, raw parameter units, NUL handling and order)",
+      "fields_result": "5713464 exact field comparisons passed (buffer mutation, returned pointer, next cursor, repeated reads and raw units)\n5713464 exact CString field comparisons passed (trimmed buffer, returned raw units, exceptions, repeated reads and native locale whitespace)",
+      "candidate_inputs": {
+        "Cargo.toml": "e8ca379ac3641a00a701be9937cec15fb6a7cae4f746adc65de94eb7f63fb1b5",
+        "Cargo.lock": "84e7744a4412202b2ab9675d3464a48ff30b7342b4065a8105d8999e655cf640",
+        "include/xy_rust_text.h": "953a696e7534339a3fe57dbe688e24424c43f49a1f0c4de9e8173a5fc31a824a",
+        "include/xy_rust_ass.h": "9b29ae9492ed3ee0634d80178d4c049d7a2957a4104c375dd87cf5d66f2e7bd7",
+        "include/xy_rust_reader.h": "99a315beb43451f2dfd21fb5242b61a3507f1082dbddd5c87daa78bb6912a087",
+        "include/xy_rust_drawing.h": "0ed8f5a799ef5f96c6c1840e6cf9b3367d08f08b32e291677ec2dcc8b529224f",
+        "include/xy_rust_drawing_tokens.h": "1b13c031608d98aa46c28fadc3551ea32de20ad72c6cbf1ee5610c8372d315c8",
+        "include/xy_rust_fields.h": "24dc1d14d0767681c896e9d8875925a6a1757781e78616b244f85918bf835220",
+        "src/subtitles/TextFile.h": "fe26e64597691da26aa13d3ba11c0027d23332dabf9c5f7bcd8ca3ec7d9a30fc",
+        "tools/compat/ass_lexer_oracle.cpp": "81d81f6af5ed16957deb7f924d1ad3567282608911575a3b8d23222c5b41411e",
+        "tools/compat/decoder_oracle.cpp": "602b19b4316dfffd97ff52ab4cb1a187193e8ee17b54dcbc7ee5e30475397e31",
+        "tools/compat/drawing_oracle.cpp": "dd8a1552185f51255387085772ccdc593a1020d9a39c7dbc13bd4d6960b565ac",
+        "tools/compat/drawing_tokens_oracle.cpp": "df26c6c95784030500151e4d9e8097379114aee764d9fb90c5ac9be59531f470",
+        "tools/compat/fields_oracle.cpp": "1d4bb0a71b2af5932f2e7272756d1c2188e31c58f6298988e2e132c424ad00eb",
+        "tools/compat/font_oracle.cpp": "5fe645bb340d242d6b2ff4e172cd0995f0c42847f1cbd5ae92d02fcc1ebb3d13",
+        "tools/compat/text_reader_oracle.cpp": "51511a81da0d1f596299ea82372f23137174e5ed5b34752770c1a2898717efd2",
+        "tools/compat/ass_lexer_shell.h": "f6d33cd6f15021ef235bfe04e0fedba5ad82042297c1fc2137984cc4a96b72cb",
+        "tools/compat/drawing_shell.h": "df7e957afd5abcff14616e86d96abaf832f1d3cc0be4128709ccef3dcbec8c06",
+        "tools/compat/drawing_tokens_shell.h": "626fd244dee88dfbeed292e44c416e44e1765287f34a151397ffbba7fef6afa5",
+        "tools/compat/fields_shell.h": "8db4924635af5e46957dabde356120385e74bfcee3a3d87793418b9a471d6ae2",
+        "tools/compat/font_shell.h": "8b39a6b88b75fc21a6f476b4286a5f79f1670a098844bc22aa942fe7fa2eed34",
+        "tools/compat/text_reader_shell.h": "0d07a19620575e4f61624aaf50ce7f1d6305bbe3bbabaeb295a1dfda15059f1b",
+        "tools/compat/check_decoder.py": "4514de2ae13b14925375fc28e9330879e5c093302e0aa32b7737bec73d2ac997",
+        "rust/compat/src/ass_tags.rs": "e115beb8951b8432f94cb017b28aa00059b25de2ff954bb5cd041de5741001f8",
+        "rust/compat/src/drawing.rs": "b2940c86ad7ed016aab4bef6aa3a60586a0a870a3f987201ad9ecfc3f38cf105",
+        "rust/compat/src/drawing_tokens.rs": "52e2ef140cc6915743d57381c8a1eb19ec24764f32da60736182194ceb806395",
+        "rust/compat/src/fields.rs": "232e2fcae2798886392faf8cdf92545c5cffe9841ad70c94e16380aa5f99e7e2",
+        "rust/compat/src/font.rs": "c023cf9077f7776e58ca733bdf942e8d11b199e0ecdbc0b09d6ed6227e5f4de1",
+        "rust/compat/src/lib.rs": "97e64778b733bf32a84bc12e62e9f1f76d0939ab788a758628fcf0c98107c22d",
+        "rust/compat/src/text.rs": "3b0703918d4f71c112e53d52d2270b8aedfce9138ee1072b0145c8385590a45c",
+        "rust/compat/src/text_reader.rs": "21abafc3a781cf62ce008b71f92ac7096472b04b8b49f12a3b92854bafa3ed6f",
+        "rust/ffi/src/ass_tags.rs": "45e4a9d78406bd01c819e32d5e5211a30ae2a66d49d1bba28d6a33dc62c40978",
+        "rust/ffi/src/drawing.rs": "e4f23624c88c674bb82da0e543a38f2c783e14a87243e6df376c41875bf07851",
+        "rust/ffi/src/drawing_tokens.rs": "5e6b750f5cdf9de7a314656d42848c1e7df9300b06571227a3573783caf77f8a",
+        "rust/ffi/src/fields.rs": "6b821b5a80e40af40372912a545ac0bb2c9967a6e5a019cfe0a4d17fc65ea423",
+        "rust/ffi/src/lib.rs": "5b5e976f09fbe2a7ce8b8f8e9302b21788036224b7da63ce38eb070579a3349a",
+        "rust/ffi/src/runtime.rs": "a6987685d20b77364781149e4016375e1d1aa44762328796626a95d30661b686",
+        "rust/ffi/src/text_reader.rs": "e1613136127d0311747fa77b7a218cbc7b7844f217b770105ca9b7f4727953f8",
+        "rust/compat/Cargo.toml": "b066124a697288e311ef6225d5171c2f1d4a837199b47b12b70414dc7429a019",
+        "rust/ffi/Cargo.toml": "7a140438ea88afc518d4f6656efe4c2d961a8ad707dee6610f5a6f1a9d4cf81a"
+      }
+    },
+    {
+      "target": "x86_64-pc-windows-msvc",
+      "report_sha256": "06d682f78beba9f4dcd96f69c7377b10536be49f4e6317a870cc671a58785bfa",
+      "sanitizers": false,
+      "result": "85992064 exact decoder comparisons passed",
+      "text_reader_result": "37008 text-file scenarios and 1396467 line/seek comparisons passed (6096 injected exceptions)",
+      "font_result": "17371137 exact font-attachment comparisons passed",
+      "lexer_result": "2793355 exact ASS lexer comparisons passed (command, parameter units, order and empty tags).",
+      "drawing_result": "343183 exact drawing-state comparisons passed (types, points, validity, point requests and cache bypass)",
+      "drawing_tokens_result": "1342183 exact drawing-token comparisons passed (commands, raw parameter units, NUL handling and order)",
+      "fields_result": "5713464 exact field comparisons passed (buffer mutation, returned pointer, next cursor, repeated reads and raw units)\n5713464 exact CString field comparisons passed (trimmed buffer, returned raw units, exceptions, repeated reads and native locale whitespace)",
+      "candidate_inputs": {
+        "Cargo.toml": "e8ca379ac3641a00a701be9937cec15fb6a7cae4f746adc65de94eb7f63fb1b5",
+        "Cargo.lock": "84e7744a4412202b2ab9675d3464a48ff30b7342b4065a8105d8999e655cf640",
+        "include/xy_rust_text.h": "953a696e7534339a3fe57dbe688e24424c43f49a1f0c4de9e8173a5fc31a824a",
+        "include/xy_rust_ass.h": "9b29ae9492ed3ee0634d80178d4c049d7a2957a4104c375dd87cf5d66f2e7bd7",
+        "include/xy_rust_reader.h": "99a315beb43451f2dfd21fb5242b61a3507f1082dbddd5c87daa78bb6912a087",
+        "include/xy_rust_drawing.h": "0ed8f5a799ef5f96c6c1840e6cf9b3367d08f08b32e291677ec2dcc8b529224f",
+        "include/xy_rust_drawing_tokens.h": "1b13c031608d98aa46c28fadc3551ea32de20ad72c6cbf1ee5610c8372d315c8",
+        "include/xy_rust_fields.h": "24dc1d14d0767681c896e9d8875925a6a1757781e78616b244f85918bf835220",
+        "src/subtitles/TextFile.h": "fe26e64597691da26aa13d3ba11c0027d23332dabf9c5f7bcd8ca3ec7d9a30fc",
+        "tools/compat/ass_lexer_oracle.cpp": "81d81f6af5ed16957deb7f924d1ad3567282608911575a3b8d23222c5b41411e",
+        "tools/compat/decoder_oracle.cpp": "602b19b4316dfffd97ff52ab4cb1a187193e8ee17b54dcbc7ee5e30475397e31",
+        "tools/compat/drawing_oracle.cpp": "dd8a1552185f51255387085772ccdc593a1020d9a39c7dbc13bd4d6960b565ac",
+        "tools/compat/drawing_tokens_oracle.cpp": "df26c6c95784030500151e4d9e8097379114aee764d9fb90c5ac9be59531f470",
+        "tools/compat/fields_oracle.cpp": "1d4bb0a71b2af5932f2e7272756d1c2188e31c58f6298988e2e132c424ad00eb",
+        "tools/compat/font_oracle.cpp": "5fe645bb340d242d6b2ff4e172cd0995f0c42847f1cbd5ae92d02fcc1ebb3d13",
+        "tools/compat/text_reader_oracle.cpp": "51511a81da0d1f596299ea82372f23137174e5ed5b34752770c1a2898717efd2",
+        "tools/compat/ass_lexer_shell.h": "f6d33cd6f15021ef235bfe04e0fedba5ad82042297c1fc2137984cc4a96b72cb",
+        "tools/compat/drawing_shell.h": "df7e957afd5abcff14616e86d96abaf832f1d3cc0be4128709ccef3dcbec8c06",
+        "tools/compat/drawing_tokens_shell.h": "626fd244dee88dfbeed292e44c416e44e1765287f34a151397ffbba7fef6afa5",
+        "tools/compat/fields_shell.h": "8db4924635af5e46957dabde356120385e74bfcee3a3d87793418b9a471d6ae2",
+        "tools/compat/font_shell.h": "8b39a6b88b75fc21a6f476b4286a5f79f1670a098844bc22aa942fe7fa2eed34",
+        "tools/compat/text_reader_shell.h": "0d07a19620575e4f61624aaf50ce7f1d6305bbe3bbabaeb295a1dfda15059f1b",
+        "tools/compat/check_decoder.py": "4514de2ae13b14925375fc28e9330879e5c093302e0aa32b7737bec73d2ac997",
+        "rust/compat/src/ass_tags.rs": "e115beb8951b8432f94cb017b28aa00059b25de2ff954bb5cd041de5741001f8",
+        "rust/compat/src/drawing.rs": "b2940c86ad7ed016aab4bef6aa3a60586a0a870a3f987201ad9ecfc3f38cf105",
+        "rust/compat/src/drawing_tokens.rs": "52e2ef140cc6915743d57381c8a1eb19ec24764f32da60736182194ceb806395",
+        "rust/compat/src/fields.rs": "232e2fcae2798886392faf8cdf92545c5cffe9841ad70c94e16380aa5f99e7e2",
+        "rust/compat/src/font.rs": "c023cf9077f7776e58ca733bdf942e8d11b199e0ecdbc0b09d6ed6227e5f4de1",
+        "rust/compat/src/lib.rs": "97e64778b733bf32a84bc12e62e9f1f76d0939ab788a758628fcf0c98107c22d",
+        "rust/compat/src/text.rs": "3b0703918d4f71c112e53d52d2270b8aedfce9138ee1072b0145c8385590a45c",
+        "rust/compat/src/text_reader.rs": "21abafc3a781cf62ce008b71f92ac7096472b04b8b49f12a3b92854bafa3ed6f",
+        "rust/ffi/src/ass_tags.rs": "45e4a9d78406bd01c819e32d5e5211a30ae2a66d49d1bba28d6a33dc62c40978",
+        "rust/ffi/src/drawing.rs": "e4f23624c88c674bb82da0e543a38f2c783e14a87243e6df376c41875bf07851",
+        "rust/ffi/src/drawing_tokens.rs": "5e6b750f5cdf9de7a314656d42848c1e7df9300b06571227a3573783caf77f8a",
+        "rust/ffi/src/fields.rs": "6b821b5a80e40af40372912a545ac0bb2c9967a6e5a019cfe0a4d17fc65ea423",
+        "rust/ffi/src/lib.rs": "5b5e976f09fbe2a7ce8b8f8e9302b21788036224b7da63ce38eb070579a3349a",
+        "rust/ffi/src/runtime.rs": "a6987685d20b77364781149e4016375e1d1aa44762328796626a95d30661b686",
+        "rust/ffi/src/text_reader.rs": "e1613136127d0311747fa77b7a218cbc7b7844f217b770105ca9b7f4727953f8",
+        "rust/compat/Cargo.toml": "b066124a697288e311ef6225d5171c2f1d4a837199b47b12b70414dc7429a019",
+        "rust/ffi/Cargo.toml": "7a140438ea88afc518d4f6656efe4c2d961a8ad707dee6610f5a6f1a9d4cf81a"
+      }
+    },
+    {
+      "target": "x86_64-unknown-linux-gnu",
+      "report_sha256": "cdc252f77a11c1bf7e112060b2cc72d9562044e9e1f887cfe559705efb0e91f0",
+      "sanitizers": true,
+      "result": "85992064 exact decoder comparisons passed",
+      "text_reader_result": "37008 text-file scenarios and 1396467 line/seek comparisons passed (6096 injected exceptions)",
+      "font_result": "17371137 exact font-attachment comparisons passed",
+      "lexer_result": "2793355 exact ASS lexer comparisons passed (command, parameter units, order and empty tags).",
+      "drawing_result": "343183 exact drawing-state comparisons passed (types, points, validity, point requests and cache bypass)",
+      "drawing_tokens_result": "1342183 exact drawing-token comparisons passed (commands, raw parameter units, NUL handling and order)",
+      "fields_result": "4927032 exact field comparisons passed (buffer mutation, returned pointer, next cursor, repeated reads and raw units)\n4927032 exact CString field comparisons passed (trimmed buffer, returned raw units, exceptions, repeated reads and native locale whitespace)",
+      "candidate_inputs": {
+        "Cargo.toml": "34479687bc9fac5dcc025e7ad0d7c7392c9a8e6a95071ecfddae626de1713e05",
+        "Cargo.lock": "fd9331e0dc6b0183bf14e2e8c13939684182d7ec437ac1fac54abbaac8da7335",
+        "include/xy_rust_text.h": "4caa9df121c701b2008f1e41c1b476b98a1f9888fcb51a65de2dbc9bbd3e5c40",
+        "include/xy_rust_ass.h": "e25175962a04d23b8be31323e649bdf607814c6f11d201fd4bfb97c958b37bf8",
+        "include/xy_rust_reader.h": "fc98598650099534eeef499838e070b3affbacfd10e3a0f4f8bf1b3b8e40aeec",
+        "include/xy_rust_drawing.h": "0b1480d82c8d0c8ef221b395345593a8cbe5484e6e81b0862c88e1b3e3a5bd5c",
+        "include/xy_rust_drawing_tokens.h": "e45fceb1aabdb5ca172bc2f5356eb30c3dcd89cff88fa16b2d84e2551f8eebbb",
+        "include/xy_rust_fields.h": "07ef1a44d614fb35abd847f7ddee66558328264c34414c965d2058a557878642",
+        "src/subtitles/TextFile.h": "fe26e64597691da26aa13d3ba11c0027d23332dabf9c5f7bcd8ca3ec7d9a30fc",
+        "tools/compat/ass_lexer_oracle.cpp": "386c15ccbe78dcd816192de244c205dc1973bdf6075f71a10d69d99673442112",
+        "tools/compat/decoder_oracle.cpp": "2572d7ab48a8a0535308ff7bc7b8e1263b4d0c7ab96a961dd3baebc2cd45a923",
+        "tools/compat/drawing_oracle.cpp": "bae491f110922898af703fe1cc872cd5b15ef13811e0c337e90ddf4068f3297a",
+        "tools/compat/drawing_tokens_oracle.cpp": "b670388ec51ec421ffda51a874d0197aca21e31aabd9f3295d9c4ac1c980aa74",
+        "tools/compat/fields_oracle.cpp": "0048ac141b05e76cf0cf57a4444f7c8a526460117593c6d353bd7e66cfefcc79",
+        "tools/compat/font_oracle.cpp": "66ae37e835f97bcd9ee645fa36f51a251b81eec525d51da099b804f08b36a63d",
+        "tools/compat/text_reader_oracle.cpp": "0f7491e79047e4547893f735617580ce08be4a23167e786f2035a531b755bcea",
+        "tools/compat/ass_lexer_shell.h": "285326c84f336cd68b1de88a7de2cfad6519f0e7ac8a0a609443d7da5c6eb6dd",
+        "tools/compat/drawing_shell.h": "312671e938ac4013a0b1ca969c8e612a9dd70e6c5e7d4ef32053c4e5f7121620",
+        "tools/compat/drawing_tokens_shell.h": "7e4f47650d18d0f9532498b5113884db2f3dfb46d20043812096e9d2723f806b",
+        "tools/compat/fields_shell.h": "bd9ce0dbdadada49d01da05f5d7c63878caa92c0fdfa9f2c7f4db7fa9e8fca3d",
+        "tools/compat/font_shell.h": "6d0acc73d6e5125fbac837a83310240c5371802fa4a40ddd93aec2a28bdd6818",
+        "tools/compat/text_reader_shell.h": "4031f09c42f76350b7611d21d1ffd26904fef8505ce718cddb9add791cbfb833",
+        "tools/compat/check_decoder.py": "663123bf3efd55b2d6a8e425d8bc4ce28fe8ebdb4d7137e2120822119f9ef31b",
+        "rust/compat/src/ass_tags.rs": "6792ac12ebbf50f9356d0aa7abad85b20d505e64f7ea539a66eb42990d05a637",
+        "rust/compat/src/drawing.rs": "eca8f1053f8428d9b0c265752ab2f07687f83ae626db30ad2d27beb5ec0bcd67",
+        "rust/compat/src/drawing_tokens.rs": "c3db232dfdbec32354a3bc68fcb8c7a71f01e70e20c5832ca2021b8b559c245b",
+        "rust/compat/src/fields.rs": "398979232ca4b3e7f919daa23313c5e52ef681be15eeafdd0299ad2ef1b5c8a7",
+        "rust/compat/src/font.rs": "7fec61f79198f0dc07fbdbed25204b6422239580de5db434abad5c9bcedad1ac",
+        "rust/compat/src/lib.rs": "6df255e08ff5564a87113ade2c50e1778da06cf497e6e1c42516f81c005c4535",
+        "rust/compat/src/text.rs": "b7265e27c081c94349505c5cd3db3af8c3f8a73f2a98074e1c8523a3b88f208f",
+        "rust/compat/src/text_reader.rs": "b78c3bc2eda230849d4b67f8547fbd3eb6303ba930f07c955b2a9b37b215b1da",
+        "rust/ffi/src/ass_tags.rs": "d1764911d033dd4995f1fe02669f11ece10757d4681db1f8d15f35c500382a07",
+        "rust/ffi/src/drawing.rs": "0903c53b826fbb717ff22fce12ad0878aa4b620f043b1f15c2b73002b2ef6bbb",
+        "rust/ffi/src/drawing_tokens.rs": "7814644432e3a0e45a37a4701789698f4b529f1d962a8a64aa8b060cf10c23e2",
+        "rust/ffi/src/fields.rs": "eb6ed7a873a84defa4a2ebff5ea5d3241db58c546c56c0c3c4011bf3fdcfe395",
+        "rust/ffi/src/lib.rs": "fe341ed5b8fbeca38daa498b06c9bb2b47c85d8f0e7c4db805d974230245de4b",
+        "rust/ffi/src/runtime.rs": "6b974d023640354a5c65ea3d5d3feea35bd191192c8d859fb1f3be342f613f14",
+        "rust/ffi/src/text_reader.rs": "a4ab775620d77195187dff9279adbbf6432cd29bba437129f019c9b75fcc2091",
+        "rust/compat/Cargo.toml": "9f325d80554a26bfb2f50237382694f8e121072e2ce52a34cebf3fa118cce6d1",
+        "rust/ffi/Cargo.toml": "c557156364b3d955695f235a782d9a124d531cc2157bfea6ab209f33850edea7"
+      }
+    }
+  ],
+  "limits": [
+    "Finite fixtures and mutation campaigns do not establish universal compatibility or memory safety.",
+    "CSRI BGRX rendering and format queries; real Aegisub/player and other host integration remains outstanding.",
+    "Comparisons pair reference and candidate on the same architecture and environment, not across architectures.",
+    "Most native parsing, font handling, rasterization, compositing and third-party code remains C++.",
+    "Drawing command replacement, numeric parsing, scaling and final native path storage remain native; allocation-dependent replacement results are unresolved (docs/drawing-replacement-unresolved.json).",
+    "Native sanitizers cover extracted C++ tests, not the full renderer or Rust static library.",
+    "Native out-of-memory recovery, Windows 7 and older CPUs remain unverified.",
+    "Native dialogs compare text, control IDs/styles and scripted responses, not icon pixels or real host UI behavior."
+  ],
+  "miri_job_passed": true,
+  "native_dialog_and_exception_harness_tests_passed_on_windows_x86_x64": true
+}

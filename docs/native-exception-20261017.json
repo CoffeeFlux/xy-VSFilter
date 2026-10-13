@@ -82,5 +82,269 @@
     "The last recorded stage is close, but finally cleanup overwrote any preceding render failure. This old report cannot localize the first exception.",
     "255 cases matched; this 256th case is an unresolved result, never a passing exception comparison.",
     "The fixture is preserved byte-for-byte with its mutation operations; it has not been minimized."
-  ]
+  ],
+  "campaign_architectures": [
+    {
+      "platform": "Win32",
+      "complete": true,
+      "passed": false,
+      "counts": {
+        "equal": 255,
+        "unresolved_reference": 1
+      },
+      "rendered_frames": 1785,
+      "report_sha256": "d8399490c773d2ec4158c4ec3a8ea325e70df93e0b1fea642c0e963792922d9b",
+      "reference_dll": {
+        "path": "D:\\a\\xy-VSFilter\\xy-VSFilter\\baseline\\bin\\lib_17.0\\Win32\\Release\\VSFilter.dll",
+        "sha256": "0160d061423b08216358a7def2d20de4f1e7a3d84a1c3ff834587c4672cba456"
+      },
+      "candidate_dll": {
+        "path": "D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\bin\\lib_17.0\\Win32\\Release\\VSFilter.dll",
+        "sha256": "008d666df2b577a68cd6315e74c8b08d0b2791635fc296a3742f2fcc51a1b48e"
+      },
+      "case": {
+        "candidate_status": "harness_error",
+        "directory": "case-00172",
+        "id": "mutation-01352899-00172",
+        "reference_status": "harness_error",
+        "verdict": {
+          "kind": "unresolved_reference",
+          "repeat_results": [
+            {
+              "kind": "unresolved",
+              "left": "harness_error",
+              "right": "harness_error"
+            }
+          ]
+        }
+      },
+      "captures": {
+        "reference-0": {
+          "error": "OSError: [WinError -529697949] Windows Error 0xe06d7363",
+          "last_progress": {
+            "stage": "close"
+          },
+          "status": "harness_error"
+        },
+        "reference-1": {
+          "error": "OSError: [WinError -529697949] Windows Error 0xe06d7363",
+          "last_progress": {
+            "stage": "close"
+          },
+          "status": "harness_error"
+        },
+        "candidate": {
+          "error": "OSError: [WinError -529697949] Windows Error 0xe06d7363",
+          "last_progress": {
+            "stage": "close"
+          },
+          "status": "harness_error"
+        }
+      }
+    },
+    {
+      "platform": "x64",
+      "complete": true,
+      "passed": false,
+      "counts": {
+        "equal": 255,
+        "unresolved_reference": 1
+      },
+      "rendered_frames": 1785,
+      "report_sha256": "76f4c9028adcd19fc90edc4f0a5df54128465f44136f05915644905e4b6c8650",
+      "reference_dll": {
+        "path": "D:\\a\\xy-VSFilter\\xy-VSFilter\\baseline\\bin\\lib_17.0\\x64\\Release\\VSFilter.dll",
+        "sha256": "4c16c79ab0a0d24f869aaf009217ed7a75ac6ed3aed37911bc81dc28d6879c27"
+      },
+      "candidate_dll": {
+        "path": "D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\bin\\lib_17.0\\x64\\Release\\VSFilter.dll",
+        "sha256": "a061548c7b1f5c4209caff65c5fea44c2f6081f928b81c309877815762986ef0"
+      },
+      "case": {
+        "candidate_status": "harness_error",
+        "directory": "case-00172",
+        "id": "mutation-01352899-00172",
+        "reference_status": "harness_error",
+        "verdict": {
+          "kind": "unresolved_reference",
+          "repeat_results": [
+            {
+              "kind": "unresolved",
+              "left": "harness_error",
+              "right": "harness_error"
+            }
+          ]
+        }
+      },
+      "captures": {
+        "reference-0": {
+          "error": "OSError: [WinError -529697949] Windows Error 0xe06d7363",
+          "last_progress": {
+            "stage": "close"
+          },
+          "status": "harness_error"
+        },
+        "reference-1": {
+          "error": "OSError: [WinError -529697949] Windows Error 0xe06d7363",
+          "last_progress": {
+            "stage": "close"
+          },
+          "status": "harness_error"
+        },
+        "candidate": {
+          "error": "OSError: [WinError -529697949] Windows Error 0xe06d7363",
+          "last_progress": {
+            "stage": "close"
+          },
+          "status": "harness_error"
+        }
+      }
+    }
+  ],
+  "diagnostic_replay": {
+    "candidate_commit": "130cfea7f1645c34752469014f77b4f9281ae926",
+    "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38445381552",
+    "architectures": [
+      {
+        "platform": "Win32",
+        "complete": true,
+        "passed": false,
+        "case_count": 256,
+        "matched_cases": 255,
+        "rendered_frames": 1785,
+        "report_sha256": "f508b93a2f2d6ba33060677e4845784e202836ace652baae3ff92fb85974e119",
+        "reference_dll": {
+          "path": "D:\\a\\xy-VSFilter\\xy-VSFilter\\baseline\\bin\\lib_17.0\\Win32\\Release\\VSFilter.dll",
+          "sha256": "3fc4d9e1de1b38672d0839a5e54e15f97bfc9ac5886717599d2b7eac1da6a187"
+        },
+        "candidate_dll": {
+          "path": "D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\bin\\lib_17.0\\Win32\\Release\\VSFilter.dll",
+          "sha256": "572444fc8f3ee1d864b63ed57aff9ee2d6595f945d3046ea14bf402b7db16461"
+        },
+        "captures": {
+          "reference-0": {
+            "error": "OSError: [WinError -529697949] Windows Error 0xe06d7363",
+            "failure_before_close": {
+              "error": "OSError: [WinError -529697949] Windows Error 0xe06d7363",
+              "progress": {
+                "frame": 1,
+                "stage": "render",
+                "timestamp": "1"
+              },
+              "traceback": "Traceback (most recent call last):\n  File \"D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\tools\\compat\\csri_compare.py\", line 180, in capture\n    lib.csri_render(instance, C.byref(frame), float(timestamp))\nOSError: [WinError -529697949] Windows Error 0xe06d7363\n"
+            },
+            "last_progress": {
+              "stage": "close"
+            },
+            "status": "harness_error",
+            "traceback": "Traceback (most recent call last):\n  File \"D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\tools\\compat\\csri_compare.py\", line 217, in worker\n    result = capture(dll, case, destination)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\tools\\compat\\csri_compare.py\", line 180, in capture\n    lib.csri_render(instance, C.byref(frame), float(timestamp))\nOSError: [WinError -529697949] Windows Error 0xe06d7363\n"
+          },
+          "reference-1": {
+            "error": "OSError: [WinError -529697949] Windows Error 0xe06d7363",
+            "failure_before_close": {
+              "error": "OSError: [WinError -529697949] Windows Error 0xe06d7363",
+              "progress": {
+                "frame": 1,
+                "stage": "render",
+                "timestamp": "1"
+              },
+              "traceback": "Traceback (most recent call last):\n  File \"D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\tools\\compat\\csri_compare.py\", line 180, in capture\n    lib.csri_render(instance, C.byref(frame), float(timestamp))\nOSError: [WinError -529697949] Windows Error 0xe06d7363\n"
+            },
+            "last_progress": {
+              "stage": "close"
+            },
+            "status": "harness_error",
+            "traceback": "Traceback (most recent call last):\n  File \"D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\tools\\compat\\csri_compare.py\", line 217, in worker\n    result = capture(dll, case, destination)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\tools\\compat\\csri_compare.py\", line 180, in capture\n    lib.csri_render(instance, C.byref(frame), float(timestamp))\nOSError: [WinError -529697949] Windows Error 0xe06d7363\n"
+          },
+          "candidate": {
+            "error": "OSError: [WinError -529697949] Windows Error 0xe06d7363",
+            "failure_before_close": {
+              "error": "OSError: [WinError -529697949] Windows Error 0xe06d7363",
+              "progress": {
+                "frame": 1,
+                "stage": "render",
+                "timestamp": "1"
+              },
+              "traceback": "Traceback (most recent call last):\n  File \"D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\tools\\compat\\csri_compare.py\", line 180, in capture\n    lib.csri_render(instance, C.byref(frame), float(timestamp))\nOSError: [WinError -529697949] Windows Error 0xe06d7363\n"
+            },
+            "last_progress": {
+              "stage": "close"
+            },
+            "status": "harness_error",
+            "traceback": "Traceback (most recent call last):\n  File \"D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\tools\\compat\\csri_compare.py\", line 217, in worker\n    result = capture(dll, case, destination)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\tools\\compat\\csri_compare.py\", line 180, in capture\n    lib.csri_render(instance, C.byref(frame), float(timestamp))\nOSError: [WinError -529697949] Windows Error 0xe06d7363\n"
+          }
+        }
+      },
+      {
+        "platform": "x64",
+        "complete": true,
+        "passed": false,
+        "case_count": 256,
+        "matched_cases": 255,
+        "rendered_frames": 1785,
+        "report_sha256": "8bc14ad40cc7d992e70ca4867bf278d47adfaf5d5c97adecf5de460291550135",
+        "reference_dll": {
+          "path": "D:\\a\\xy-VSFilter\\xy-VSFilter\\baseline\\bin\\lib_17.0\\x64\\Release\\VSFilter.dll",
+          "sha256": "a77eee75b6b3cfac526d283f8aa0b18bf11048ff92c4a33b4e83f2d83cfbd517"
+        },
+        "candidate_dll": {
+          "path": "D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\bin\\lib_17.0\\x64\\Release\\VSFilter.dll",
+          "sha256": "7d496d6db7349c60234c388ae07abab24b5b0bbe666ea693cabe811abafc0d32"
+        },
+        "captures": {
+          "reference-0": {
+            "error": "OSError: [WinError -529697949] Windows Error 0xe06d7363",
+            "failure_before_close": {
+              "error": "OSError: [WinError -529697949] Windows Error 0xe06d7363",
+              "progress": {
+                "frame": 1,
+                "stage": "render",
+                "timestamp": "1"
+              },
+              "traceback": "Traceback (most recent call last):\n  File \"D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\tools\\compat\\csri_compare.py\", line 180, in capture\n    lib.csri_render(instance, C.byref(frame), float(timestamp))\nOSError: [WinError -529697949] Windows Error 0xe06d7363\n"
+            },
+            "last_progress": {
+              "stage": "close"
+            },
+            "status": "harness_error",
+            "traceback": "Traceback (most recent call last):\n  File \"D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\tools\\compat\\csri_compare.py\", line 217, in worker\n    result = capture(dll, case, destination)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\tools\\compat\\csri_compare.py\", line 180, in capture\n    lib.csri_render(instance, C.byref(frame), float(timestamp))\nOSError: [WinError -529697949] Windows Error 0xe06d7363\n"
+          },
+          "reference-1": {
+            "error": "OSError: [WinError -529697949] Windows Error 0xe06d7363",
+            "failure_before_close": {
+              "error": "OSError: [WinError -529697949] Windows Error 0xe06d7363",
+              "progress": {
+                "frame": 1,
+                "stage": "render",
+                "timestamp": "1"
+              },
+              "traceback": "Traceback (most recent call last):\n  File \"D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\tools\\compat\\csri_compare.py\", line 180, in capture\n    lib.csri_render(instance, C.byref(frame), float(timestamp))\nOSError: [WinError -529697949] Windows Error 0xe06d7363\n"
+            },
+            "last_progress": {
+              "stage": "close"
+            },
+            "status": "harness_error",
+            "traceback": "Traceback (most recent call last):\n  File \"D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\tools\\compat\\csri_compare.py\", line 217, in worker\n    result = capture(dll, case, destination)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\tools\\compat\\csri_compare.py\", line 180, in capture\n    lib.csri_render(instance, C.byref(frame), float(timestamp))\nOSError: [WinError -529697949] Windows Error 0xe06d7363\n"
+          },
+          "candidate": {
+            "error": "OSError: [WinError -529697949] Windows Error 0xe06d7363",
+            "failure_before_close": {
+              "error": "OSError: [WinError -529697949] Windows Error 0xe06d7363",
+              "progress": {
+                "frame": 1,
+                "stage": "render",
+                "timestamp": "1"
+              },
+              "traceback": "Traceback (most recent call last):\n  File \"D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\tools\\compat\\csri_compare.py\", line 180, in capture\n    lib.csri_render(instance, C.byref(frame), float(timestamp))\nOSError: [WinError -529697949] Windows Error 0xe06d7363\n"
+            },
+            "last_progress": {
+              "stage": "close"
+            },
+            "status": "harness_error",
+            "traceback": "Traceback (most recent call last):\n  File \"D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\tools\\compat\\csri_compare.py\", line 217, in worker\n    result = capture(dll, case, destination)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\tools\\compat\\csri_compare.py\", line 180, in capture\n    lib.csri_render(instance, C.byref(frame), float(timestamp))\nOSError: [WinError -529697949] Windows Error 0xe06d7363\n"
+          }
+        }
+      }
+    ]
+  }
 }
