@@ -34,13 +34,24 @@ unresolved reference outcomes requiring investigation, never matching results.
   extracted C++ oracle now checks **37,008 file scenarios / 1,396,467 line/seek
   comparisons**, including **6,096 injected read exceptions**, short reads,
   repeated EOF, reopening, encoding changes and diagnostic ordering. This new
-  component passed local fatal ASan/UBSan; Windows renderer validation is pending.
+  component passed local fatal ASan/UBSan, Miri and all four portable CI jobs.
+  Candidate `022da3c4` also passed [Windows x86/x64 renderer validation](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38425799685)
+  on the expanded 210-case corpus plus 32 mutations, with matching exports and
+  no added imports/changed platform headers for all three DLLs.
 * Safe Rust font-attachment decoding, preserving byte truncation of arbitrary
   UTF-16 units, invalid lengths and short tails. The same opt-in build property
   enables this component. GDI font installation remains native.
 * Safe Rust ASS command/parameter tokenization. Empty tags, non-nesting
   parentheses, comma/backslash recovery and raw code units are retained. Native
   `iswspace` supplies classifications to preserve CRT/locale behavior.
+* Safe Rust drawing command state and temporary path storage. Empty moves,
+  incomplete Bezier groups, spline rollback/fallthrough, closure and validity
+  checks follow `CPolygon::ParseStr`. Native CString tokenization, `GetPOINT`/
+  `wcstod`, numeric tracing, scaling and downstream rasterization remain intact.
+  The extracted command-state oracle passed **343,183** comparisons of path
+  types, coordinates, validity, cache bypass and point-request order, using
+  identical supplied token/point results. Local fatal ASan/UBSan passed; full
+  Windows validation of this new component is pending.
 * Value-only internal C ABIs for the character and attachment decoders. The ASS lexer
   has a separate, documented ownership boundary: it borrows two bounded input
   arrays during scanning, retains only integer spans, and returns an opaque owner
@@ -150,7 +161,7 @@ the reference commit, source hashes, compiler and result. The native tests
 extract the original algorithm without modifying it; the only test stand-in is
 the class shell around that method. The ASan/UBSan run instruments the C++ side;
 it does not instrument the Rust static library. Safe Rust is enforced in the
-core by a compiler lint. The ASS lexer and text reader FFI owners and the production CRT
+core by a compiler lint. The ASS lexer, text reader and drawing FFI owners and the production CRT
 allocator contain unsafe Rust, for constructing borrowed slices,
 querying/releasing owned results, lending the fixed read buffer to native I/O,
 and allocating/deallocating aligned storage.
@@ -277,8 +288,8 @@ artifacts, restore their `candidate/artifacts/native/...` tree under this checko
 
 ## CSRI corpus and evidence
 
-`test/compat/cases.json` contains 210 cases: both file and memory
-loading for 34 existing ASS samples and 70 generated samples, plus geometry and
+`test/compat/cases.json` contains 240 cases: both file and memory
+loading for 34 existing ASS samples and 85 generated samples, plus geometry and
 stride cases. Generated cases include malformed tags, duplicate tags, malformed
 UTF-8, unpaired UTF-16, embedded NUL, CR/LF differences, missing final newlines
 and the original 4096-byte refill boundary. `.gitattributes` prevents checkout
@@ -382,6 +393,21 @@ and drawing-path parsing in `CPolygon`. Numeric conversion
 must preserve the Windows CRT's overflow, locale, end-pointer and float-rounding
 behavior; substituting Rust's string parsers is not justified. The drawing code
 also has non-obvious recovery and truncation behavior to capture before porting.
+
+Concrete boundaries that can be developed on macOS, with Windows CI supplying
+the native oracle where needed:
+
+| Next boundary | Portable work | Native behavior to retain and compare |
+| --- | --- | --- |
+| `STS.cpp` field splitting and numeric parsing | Raw UTF-16 fields, cursor/mutation state, error recovery | `GetStr` leaves the last undelimited field in the buffer; `TryNextStr` trims only ASCII space and mutates a separator to NUL. Keep CRT numeric conversion until overflow, locale, end-pointer and rounding results are captured. |
+| `RTS.cpp` `CPolygon::ParseStr` | Command recovery, path storage, spline state and closure | `SpanIncluding`'s return value is ignored; commands split inside arbitrary text; `s` falls through to `p`; the apparent Bezier truncation uses an incremented counter and must not be "fixed." Keep `wcstod` and float-to-LONG conversion at the native boundary initially. |
+| `CompositionObject.cpp` bitmap run decoding | Bounded byte/bit readers, RLE state, emitted rectangles | Capture truncated-stream behavior, signed-short coordinate wrapping, palette state and transparent runs. Keep native palette conversion/compositing until those stages have separate exact-byte oracles. Uninitialized allocation tails are unresolved behavior, not a portable specification. |
+| `xy_filter.cpp` and raster/compositing kernels | Safe slice ownership and scalar arithmetic implementations | Capture each active SIMD path's operation order, padding, overlap and rounding. Scalar C++ output alone does not establish equality with the SIMD implementation used by a DLL. |
+
+These are code boundaries, not promises that a finite corpus covers every quirk.
+Each replacement needs the same sequence used for the buffered reader: extract
+the reference code, compare state and errors locally, then build both Windows
+architectures and compare actual output before expanding its use.
 
 Preserve bytes and UTF-16 units until the original code itself converts them.
 Keep GDI font behavior while porting surrounding algorithms. Rasterization and

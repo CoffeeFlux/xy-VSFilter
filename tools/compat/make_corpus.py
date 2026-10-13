@@ -60,6 +60,24 @@ def variants():
         else:
             yield name, data
     plain = SEED.replace(b"COMPAT_TEXT", b"Compatibility")
+    yield "drawing-state-control", SEED.replace(b"COMPAT_TEXT", b"after")
+    for name, path in {
+        "empty-move": b"m",
+        "missing-move": b"n 0 0 l 60 0 60 60 0 60",
+        "late-move": b"n 0 0 m 10 10 l 60 10 60 60",
+        "empty-move-then-n": b"m n 0 0 l 60 0 60 60 0 60",
+        "bezier-one": b"m 0 0 b 60 60 l 0 60",
+        "bezier-two": b"m 0 0 b 60 0 60 60 l 0 60",
+        "bezier-four": b"m 0 0 b 20 60 40 60 60 0 80 20 l 0 60",
+        "spline-short": b"m 0 0 s 60 0 60 60 c l 0 60",
+        "spline-rollback-patch": b"m 0 0 60 0 60 60 s 30 30 junk p 0 60 c",
+        "spline-close-twice": b"m 0 0 s 60 0 60 60 0 60 p 0 30 c c",
+        "spline-close-after-move": b"m 0 0 s 60 0 60 60 0 60 m 80 80 c",
+        "exponent": b"m 0 0 l 6e1 0 6e1 6e1 0 6e1",
+        "fractional": b"m -.5 -.5 l 60.125 .5 60.75 60.25 .25 60.5",
+        "command-splitting": b"junk*M 0 0*m 0 0 l 60 0*60 60 l 0 60",
+    }.items():
+        yield f"drawing-state-{name}", SEED.replace(b"COMPAT_TEXT", br"{\p1}" + path + br"{\p0}after")
     font = (DEST / "fonts/Abel-Regular.ttf").read_bytes()
     if hashlib.sha256(font).hexdigest() != "8809dcad25318225052f88333e208c5aad4adcb7b2c934c135735ec19aa410b4":
         raise ValueError("pinned test font has changed")
@@ -146,7 +164,9 @@ def make_cases(files):
             "width": width, "height": height, "stride_padding": padding, "bottom_up": bottom_up,
             "fill_seed": 173, "times": ["0", "1", "2", "4", "2"]})
     return {"schema": 1, "description": "Starter differential corpus; not exhaustive compatibility evidence.",
-            "expect_distinct_frames": [["font-valid-attached-" + mode, "font-valid-control-" + mode]
+            "expect_distinct_frames": [[a + "-" + mode, b + "-" + mode]
+                                       for a, b in (("font-valid-attached", "font-valid-control"),
+                                                    ("drawing-state-spline-close-twice", "drawing-state-control"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
