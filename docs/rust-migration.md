@@ -26,8 +26,14 @@ unresolved reference outcomes requiring investigation, never matching results.
 * Safe Rust font-attachment decoding, preserving byte truncation of arbitrary
   UTF-16 units, invalid lengths and short tails. The same opt-in build property
   enables this component. GDI font installation remains native.
-* A value-only internal C ABI: no foreign pointers, allocations or ownership
-  enter Rust. A C++ adapter packs up to four bytes and updates the original cursor.
+* Safe Rust ASS command/parameter tokenization. Empty tags, non-nesting
+  parentheses, comma/backslash recovery and raw code units are retained. Native
+  `iswspace` supplies classifications to preserve CRT/locale behavior.
+* Value-only internal C ABIs for the text and attachment decoders. The ASS lexer
+  has a separate, documented ownership boundary: it borrows two bounded input
+  arrays during scanning, retains only integer spans, and returns an opaque owner
+  whose destructor runs in Rust. A noncopyable C++ RAII wrapper owns it. No Rust
+  allocation is freed by C++, and query results contain only integers.
 * An opt-in `RustTextDecoder=true` native build property. The original public DLL
   interfaces and the surrounding line reader are retained during this step.
   The default build still uses the original decoder, pending Windows validation.
@@ -37,14 +43,23 @@ unresolved reference outcomes requiring investigation, never matching results.
   all 256 possibilities for each UTF-8 tail byte, not merely valid Unicode.
   A second oracle extracts the original `LoadFont` decoding block and compares
   **17,371,137** cases against the candidate block through its actual C ABI.
+  The ASS lexer oracle extracts its original scanning block unchanged and
+  compares commands, parameters, ordering and empty tags; it uses real ATL
+  strings on Windows and storage stand-ins elsewhere. The local macOS run checks
+  **2,793,355** cases with fatal ASan/UBSan; counts vary with available CRT locales.
 * An isolated-process CSRI comparison harness, an exact-byte corpus generator,
   and a PE export/ordinal comparison tool.
 * CI for macOS, Linux and Windows x86/x64 leaf/bridge tests. These jobs do not
   build or validate the complete legacy renderer.
-* A separate Windows renderer workflow attempts to build all three native DLLs
+* A separate Windows renderer workflow builds all three native DLLs
   from separate pinned-reference and candidate checkouts, compare exports, and
   run the real CSRI corpus. See Actions for the latest result; a build failure or
-  incomplete run is not compatibility evidence.
+  incomplete run is not compatibility evidence. The text-decoder candidate at
+  `8c8beed3` passed on **Windows x86 and x64**: all three DLL export tables match,
+  and each architecture passed 146 CSRI cases / 1,390 frames, including 860 frames
+  that changed destination pixels. [Build and evidence artifacts](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38355723780).
+  This result predates the font and ASS lexer components; those require their
+  own candidate build evidence.
 
 The migration is an initial component and validation foundation, not a finished
 safe renderer. The rest of the native parsing, font handling, rendering,
@@ -87,7 +102,13 @@ the reference commit, source hashes, compiler and result. The native tests
 extract the original algorithm without modifying it; the only test stand-in is
 the class shell around that method. The ASan/UBSan run instruments the C++ side;
 it does not instrument the Rust static library. Safe Rust is enforced in the
-core by a compiler lint. The FFI export has no unsafe blocks.
+core by a compiler lint. Only the ASS lexer's FFI owner module contains unsafe
+Rust, for constructing borrowed slices and querying/releasing the owned result.
+Every unsafe block states its caller contract. The native caller copies its
+inputs into typed vectors and bounds output spans by the original string length.
+Miri checks the Rust-side ownership lifecycle in a separate CI job. Native
+out-of-memory behavior and concurrent changes to the process locale have not
+been established as compatibility guarantees.
 
 The same command also compares the surrounding text-reader operations: **30,240
 file scenarios and 989,282 line/seek comparisons**. Original and candidate BOM
@@ -168,8 +189,8 @@ not VSFilter's output.
 
 ## CSRI corpus and evidence
 
-`test/compat/cases.json` initially contains 168 cases: both file and memory
-loading for 34 existing ASS samples and 49 generated samples, plus geometry and
+`test/compat/cases.json` initially contains 182 cases: both file and memory
+loading for 34 existing ASS samples and 56 generated samples, plus geometry and
 stride cases. Generated cases include malformed tags, duplicate tags, malformed
 UTF-8, unpaired UTF-16, embedded NUL, CR/LF differences, missing final newlines
 and the original 4096-byte refill boundary. `.gitattributes` prevents checkout
@@ -221,7 +242,7 @@ for implemented pixel-format coverage.
 | --- | --- | --- |
 | DirectShow/COM, registration, property pages, autoload | `DirectVobSubFilterDll.cpp`, `DirectVobSub*.h`, `auto_load_helper.cpp` | CLSIDs/IIDs, vtables, HRESULTs, refcounts, graph negotiation, threading, registration/unload, player tests |
 | XySubFilter and consumer | `xy_sub_filter*.cpp`, `include/SubRenderIntf.h`, `XySubRenderIntf.h` | Provider/consumer negotiation, frame ownership, options and lifecycle |
-| Aegisub/CSRI | `csri.h`, `csriapi.cpp` | Real DLL corpus runs, discovery/metadata/flags, format queries, lifecycle and real Aegisub integration |
+| Aegisub/CSRI | `csri.h`, `csriapi.cpp` | Broader DLL corpus, open flags/extensions, longer lifecycle sequences and real Aegisub integration; initial decoder corpus passes x86/x64 |
 | AviSynth | `plugins.cpp`, `vfr.cpp` | Exact `VobSub`, `TextSub`, `TextSubSwapUV`, `MaskSub` signatures/defaults, frame properties, timing, pixel formats, MT behavior |
 | VirtualDub | `plugins.cpp`, bundled SDK headers | Export calling conventions, filter negotiation, scripting, RGB orientation, lifecycle |
 | Text formats | `STS.cpp`, `TextFile.cpp`, `RealTextParser.cpp`, `USFSubtitles.cpp`, `libssf` | SSA/ASS, SubRip variants, SubViewer, MicroDVD, SAMI, WebVTT, VPlayer, XombieSub, USF, MPL2, RealText and SSF parsing/recovery |

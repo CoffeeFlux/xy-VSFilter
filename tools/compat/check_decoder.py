@@ -106,6 +106,26 @@ public:
         font += text[start:end] + '\n decoded.assign((BYTE*)pData, (BYTE*)pData + datalen);\n return true;\n}\n}\n'
         font += "#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_font.h").write_text(font, encoding="utf-8")
+    lexer_source = original("src/subtitles/RTS.cpp", reference["commit"])
+    candidate_lexer = (ROOT / "src/subtitles/RTS.cpp").read_bytes()
+    lexer = lexer_source.decode("utf-8-sig").split("#include", 1)[0]
+    lexer += '#include "ass_lexer_shell.h"\n#include "xy_rust_ass.h"\n'
+    for name, content in (("OriginalLexer", lexer_source), ("CandidateLexer", candidate_lexer)):
+        text = content.decode("utf-8-sig")
+        lexer += f"namespace {name} {{\n"
+        for signature in ("inline CStringW::PCXSTR SkipWhiteSpaceLeft(CStringW::PCXSTR start",
+                          "inline CStringW::PCXSTR FastSkipWhiteSpaceRight(",
+                          "inline CStringW::PCXSTR FindChar("):
+            lexer += extract_method(text, signature) + "\n"
+        start = text.index("bool CRenderedTextSubtitle::ParseSSATag( AssTagList *assTags, const CStringW& str )")
+        end = text.index("        AssCmdType cmd_type = CMD_COUNT;", start)
+        if name == "CandidateLexer":
+            lexer += "#define XY_VSFILTER_RUST_TEXT\n"
+        # Capture the exact lexical block; command dispatch/style application
+        # are unchanged and are exercised by the complete Windows DLL corpus.
+        lexer += text[start:end].replace("CRenderedTextSubtitle::", "", 1)
+        lexer += "\n assTag.command = cmd;\n }\n return true;\n}\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_ass_lexer.h").write_text(lexer, encoding="utf-8")
     cargo = ["cargo", "rustc", "--locked", "--offline", "--release", "-p", "xy-vsfilter-ffi"]
     if args.target:
         cargo += ["--target", args.target]
@@ -153,9 +173,16 @@ public:
     font_result = run([str(font_executable)], capture_output=True, text=True)
     print(font_result.stdout, end="")
     print(font_result.stderr, end="", file=sys.stderr)
+    lexer_executable = destination / ("ass-lexer-oracle.exe" if os.name == "nt" else "ass-lexer-oracle")
+    lexer_compile = [arg.replace("decoder_oracle.cpp", "ass_lexer_oracle.cpp")
+                    .replace("decoder-oracle", "ass-lexer-oracle") for arg in compile_command]
+    run(lexer_compile)
+    lexer_result = run([str(lexer_executable)], capture_output=True, text=True)
+    print(lexer_result.stdout, end="")
+    print(lexer_result.stderr, end="", file=sys.stderr)
     compiler = subprocess.run([args.cxx] if os.name == "nt" else [args.cxx, "--version"],
                               capture_output=True, text=True)
-    inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h"]
+    inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h", ROOT / "include/xy_rust_ass.h"]
     inputs += sorted((ROOT / "rust").rglob("*.rs")) + sorted((ROOT / "rust").rglob("Cargo.toml"))
     report = {"complete": True, "reference": reference, "source_sha256": hashlib.sha256(source).hexdigest(),
         "header_sha256": hashlib.sha256(header).hexdigest(), "target": args.target or "host",
@@ -171,7 +198,11 @@ public:
         "font_source_sha256": hashlib.sha256(font_source).hexdigest(),
         "candidate_font_source_sha256": hashlib.sha256(candidate_font).hexdigest(),
         "font_compile_command": font_compile,
-        "font_result": font_result.stdout, "font_stderr": font_result.stderr}
+        "font_result": font_result.stdout, "font_stderr": font_result.stderr,
+        "lexer_source_sha256": hashlib.sha256(lexer_source).hexdigest(),
+        "candidate_lexer_source_sha256": hashlib.sha256(candidate_lexer).hexdigest(),
+        "lexer_compile_command": lexer_compile,
+        "lexer_result": lexer_result.stdout, "lexer_stderr": lexer_result.stderr}
     (destination / "report.json").write_text(json.dumps(report, indent=2) + "\n")
 
 
