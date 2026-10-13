@@ -30,10 +30,23 @@ unresolved reference outcomes requiring investigation, never matching results.
   **205,982 exact segment comparisons** locally with fatal ASan/UBSan, including
   callback snapshots, cached-state replacement and extreme signed timestamps.
   Eight new ASS fixtures expand the DLL corpus to **306 cases**, sampling every
-  timeline boundary in both directions. Windows x86/x64 production validation
-  and four-platform/Miri validation for this increment are pending; prior
+  timeline boundary in both directions. Candidate `74439b37` passed all four
+  platforms and Miri in [CI](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38450833335).
+  Windows x86/x64 production validation for this increment is pending; prior
   validated evidence below does not yet cover this change. Incremental `Add`,
-  sorting of native entries, timeline searches and time conversion remain native.
+  sorting of native entries and time conversion remain native.
+* The three timeline lookup algorithms (`SearchSub`, `SearchSubs`, `SearchSubs2`)
+  now have safe Rust state machines. The native adapter performs each requested
+  timestamp translation in the original order, so CRT/frame-rate rounding stays
+  native and exceptions cannot unwind through a Rust frame. Gap behavior,
+  equality shortcuts, empty-list output indices and aliased output pointers are
+  retained. The extracted methods passed **1,051,947 exact local comparisons**
+  under fatal ASan/UBSan, including **14,352 injected translation exceptions**.
+  Actual native translation bodies are retained in the oracle; finite frame
+  rates, negative frame rates, invalid mode values, unsorted/reversed timelines
+  and extreme integer times are covered. Inputs large enough to overflow native
+  signed array-index arithmetic and native OOM behavior remain unverified.
+  Combined Windows DLL, four-platform and Miri validation is pending.
 * A dependency-free Cargo workspace. `rust/compat` forbids unsafe Rust and uses
   only `core`/`alloc`. The production Windows static library uses `native-runtime`
   to avoid pulling in Rust std's newer Windows dependencies. A small allocator
