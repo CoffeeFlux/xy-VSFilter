@@ -16,7 +16,7 @@ class NativeHarnessTests(unittest.TestCase):
         cls.temporary = tempfile.TemporaryDirectory()
         cls.root = Path(cls.temporary.name)
         cls.libraries = {}
-        for variant in ("normal", "DIFFERENT", "CRASH", "HANG", "REJECT", "CORRUPT_GUARD"):
+        for variant in ("normal", "DIFFERENT", "CRASH", "HANG", "REJECT", "CORRUPT_GUARD", "INPUT_BYTE"):
             suffix = ".dll" if os.name == "nt" else ".dylib" if sys.platform == "darwin" else ".so"
             path = cls.root / (variant + suffix)
             source = harness.ROOT / "tools/compat/fake_csri.c"
@@ -139,6 +139,23 @@ class NativeHarnessTests(unittest.TestCase):
                 self.assertTrue(list((output / report["best_trial"]).glob("*/frame-*.bin")))
             else:
                 self.assertFalse(report["complete"])
+
+    def test_control_requires_the_fixture_to_affect_rendered_pixels(self):
+        second = self.case_dir / "second.ass"
+        second.write_bytes(b"other raw input")
+        case = dict(self.case, id="control", script=str(second), sha256=harness.digest(second.read_bytes()))
+        manifest = self.case_dir / "control-cases.json"
+        harness.write_json(manifest, {"schema": 1, "cases": [self.case, case],
+                                     "expect_distinct_frames": [[self.case["id"], case["id"]]]})
+        for variant, code in (("normal", 1), ("INPUT_BYTE", 0)):
+            output = self.case_dir / ("control-" + variant)
+            command = [sys.executable, str(harness.ROOT / "tools/compat/csri_compare.py"),
+                "--reference", str(self.libraries[variant]), "--candidate", str(self.libraries[variant]),
+                "--cases", str(manifest), "--output", str(output), "--environment-label", "FAKE CONTROL TEST"]
+            result = subprocess.run(command, capture_output=True, text=True)
+            self.assertEqual(result.returncode, code, result.stderr)
+            report = harness.read_json(output / "report.json")
+            self.assertEqual(report["controls_passed"], code == 0)
 
 
 if __name__ == "__main__":

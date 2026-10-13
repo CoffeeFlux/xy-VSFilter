@@ -90,8 +90,8 @@ jobs:
       - name: Build the reference and candidate and compare actual DLLs
         shell: pwsh
         env:
-          XY_MUTATION_COUNT: ${{ github.event_name == 'workflow_dispatch' && toJSON(inputs.mutation_count) || '32' }}
-          XY_MUTATION_SEED: ${{ github.event_name == 'workflow_dispatch' && toJSON(inputs.mutation_seed) || '12345' }}
+          XY_MUTATION_COUNT: ${{ github.event_name == 'workflow_dispatch' && format('{0}', inputs.mutation_count) || '32' }}
+          XY_MUTATION_SEED: ${{ github.event_name == 'workflow_dispatch' && format('{0}', inputs.mutation_seed) || '12345' }}
         run: |
           & candidate\tools\compat\run_native_comparison.ps1 -Platform ${{ matrix.platform }} -Baseline "$pwd\baseline" -MutationCount ([int]$env:XY_MUTATION_COUNT) -MutationSeed ([uint32]$env:XY_MUTATION_SEED)
       - uses: actions/upload-artifact@v4

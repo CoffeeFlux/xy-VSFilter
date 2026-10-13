@@ -297,6 +297,15 @@ def compare(args):
         ids.add(case["id"])
         if digest((ROOT / case["script"]).read_bytes()) != case["sha256"]:
             raise ValueError(f"fixture hash mismatch: {case['script']}")
+    by_id = {case["id"]: case for case in manifest["cases"]}
+    controls = manifest.get("expect_distinct_frames", [])
+    for pair in controls:
+        if not isinstance(pair, list) or len(pair) != 2 or any(name not in ids for name in pair):
+            raise ValueError("invalid distinct-frame control")
+        left, right = (by_id[name] for name in pair)
+        for field in ("width", "height", "times", "open", "stride_padding", "bottom_up", "fill_seed"):
+            if left.get(field) != right.get(field):
+                raise ValueError("distinct-frame controls must use the same rendering configuration")
     reference, candidate = Path(args.reference).resolve(), Path(args.candidate).resolve()
     output = Path(args.output).resolve()
     output.mkdir(parents=True, exist_ok=False)  # never mix runs or overwrite evidence
@@ -343,8 +352,20 @@ def compare(args):
     report["rendered_frames"] = sum(len(read_json(output / c["directory"] / "candidate/result.json").get("frames", [])) for c in report["cases"])
     report["changed_frames"] = sum(sum(frame["changed"] for frame in
         read_json(output / c["directory"] / "candidate/result.json").get("frames", [])) for c in report["cases"])
+    directories = {case["id"]: output / case["directory"] for case in report["cases"]}
+    report["distinct_frame_controls"] = []
+    for pair in controls:
+        control = {"cases": pair}
+        for side in ("reference-0", "candidate"):
+            a, b = (read_json(directories[name] / side / "result.json") for name in pair)
+            control[side] = (a["status"] == b["status"] == "ok" and
+                len(a["frames"]) == len(b["frames"]) and any(x["sha256"] != y["sha256"]
+                    for x, y in zip(a["frames"], b["frames"])))
+        report["distinct_frame_controls"].append(control)
+    report["controls_passed"] = all(c["reference-0"] and c["candidate"] for c in report["distinct_frame_controls"])
     report["passed"] = (report["environment_unchanged"] and report.get("exports_equal", True)
-        and report["rendered_frames"] > 0 and all(c["verdict"]["kind"] == "equal" for c in report["cases"]))
+        and report["controls_passed"] and report["rendered_frames"] > 0
+        and all(c["verdict"]["kind"] == "equal" for c in report["cases"]))
     write_json(output / "report.json", report)
     print(f"Report: {output / 'report.json'}")
     return 0 if report["passed"] else 1
