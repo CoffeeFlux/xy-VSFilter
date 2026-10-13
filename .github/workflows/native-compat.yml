@@ -55,6 +55,12 @@ jobs:
       - name: Install original assembler integration
         shell: cmd
         run: call VSYASM\install_script.bat
+      - name: Select the installed YASM executable
+        shell: pwsh
+        run: |
+          "$env:VCINSTALLDIR" | Out-File -FilePath $env:GITHUB_PATH -Append
+          & "$env:VCINSTALLDIR\yasm.exe" --version
+          if ($LASTEXITCODE -ne 0) { throw "Installed YASM cannot run" }
       - name: Install Rust
         run: |
           rustup toolchain install 1.85.0 --profile minimal --target ${{ matrix.target }}

@@ -8,8 +8,10 @@
 
 using std::min;
 using std::max;
-typedef uint64_t ULONGLONG;
-typedef int64_t LONGLONG;
+// Windows uses long long here even on platforms where int64_t aliases long.
+typedef unsigned long long ULONGLONG;
+typedef long long LONGLONG;
+static_assert(sizeof(LONGLONG) == 8, "Windows LONGLONG width");
 typedef uint16_t WORD;
 typedef unsigned char BYTE;
 typedef unsigned int UINT;
