@@ -25,6 +25,9 @@
 #include <vector>
 
 #include "StdioFile64.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "xy_rust_reader.h"
+#endif
 
 class CTextFile : protected CStdioFile64
 {
@@ -40,10 +43,14 @@ private:
 	enc m_encoding, m_defaultencoding;
 	int m_offset;
 
+#ifdef XY_VSFILTER_RUST_TEXT
+	XyRust::TextBuffer m_rustBuffer;
+#else
 	unsigned char m_readbuffer[4096];
 	size_t m_bufferPos;
 	size_t m_bufferCount;
 	std::vector<wchar_t> m_convertedBuffer;
+#endif
 
 	enum charerror {CHARERR_NEED_MORE=-1, CHARERR_REOPEN=-2};
 

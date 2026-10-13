@@ -34,8 +34,10 @@ CTextFile::CTextFile(enc e)
 : m_encoding(e)
 , m_defaultencoding(e)
 , m_offset(0)
+#ifndef XY_VSFILTER_RUST_TEXT
 , m_bufferPos(0)
 , m_bufferCount(0)
+#endif
 {
 }
 
@@ -47,7 +49,11 @@ bool CTextFile::Open(LPCTSTR lpszFileName)
 
 	m_encoding = m_defaultencoding;
 	m_offset = 0;
+#ifdef XY_VSFILTER_RUST_TEXT
+	m_rustBuffer.Invalidate();
+#else
 	m_bufferCount = false;
+#endif
 
 	if(__super::GetLength() >= 2)
 	{
@@ -139,7 +145,11 @@ CString CTextFile::GetFilePath() const
 
 ULONGLONG CTextFile::GetPosition() const
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+	return __super::GetPosition() - m_offset - m_rustBuffer.Unread();
+#else
 	return (__super::GetPosition() - m_offset - (m_bufferCount ? m_bufferCount - m_bufferPos : 0));
+#endif
 }
 
 ULONGLONG CTextFile::GetLength() const
@@ -163,7 +173,11 @@ ULONGLONG CTextFile::Seek(LONGLONG lOff, UINT nFrom)
 	lOff = max((LONGLONG)min((ULONGLONG)lOff, len), 0ll) + m_offset;
 
 	pos = __super::Seek(lOff, begin) - m_offset;
+#ifdef XY_VSFILTER_RUST_TEXT
+	m_rustBuffer.Invalidate();
+#else
 	m_bufferCount = 0;
+#endif
 
 	return pos;
 }
@@ -198,6 +212,37 @@ void CTextFile::WriteString(LPCWSTR lpsz/*CStringW str*/)
 }
 
 bool CTextFile::ReadLine() {
+#ifdef XY_VSFILTER_RUST_TEXT
+	m_rustBuffer.ClearLine();
+	const ULONGLONG startPos = GetPosition();
+	while (true) {
+		const uint64_t result = m_rustBuffer.Advance(m_encoding, m_offset != 0);
+		switch (static_cast<uint32_t>(result)) {
+		case XyRust::TextBuffer::Read: {
+			const UINT capacity = m_rustBuffer.ReadCapacity();
+			// Rust has returned before native I/O. An MFC exception cannot
+			// unwind through Rust; the buffer borrow ends on return or throw.
+			const UINT count = Read(m_rustBuffer.ReadDestination(), capacity);
+			m_rustBuffer.FinishRead(count);
+			if (!count) return true;
+			break;
+		}
+		case XyRust::TextBuffer::Line: return false;
+		case XyRust::TextBuffer::Reopen:
+			m_encoding = DEFAULT_ENCODING;
+			m_rustBuffer.ClearLine();
+			Seek(startPos, begin);
+			break;
+		case XyRust::TextBuffer::Log: {
+			const int c = static_cast<int>(result >> 32);
+			XY_LOG_ERROR("This character code '" << c << "'is out of UTF-16 accessible range");
+			m_rustBuffer.AppendReplacement();
+			break;
+		}
+		default: abort(); // Broken private ABI, never an input recovery rule.
+		}
+	}
+#else
 	m_convertedBuffer.clear();
 	ULONGLONG startPos = GetPosition();
 
@@ -248,13 +293,14 @@ bool CTextFile::ReadLine() {
 		XY_LOG_ERROR("This character code '" << c << "'is out of UTF-16 accessible range");
 		m_convertedBuffer.push_back(L'?');
 	}
+#endif
 }
 
 int CTextFile::NextChar() {
 #ifdef XY_VSFILTER_RUST_TEXT
 	static_assert(DEFAULT_ENCODING == 0 && UTF8 == 1 && LE16 == 2 && BE16 == 3, "Rust encoding ABI");
 	static_assert(CHARERR_NEED_MORE == -1 && CHARERR_REOPEN == -2, "Rust status ABI");
-	return XyRust::NextChar(m_readbuffer, m_bufferCount, m_bufferPos, m_encoding);
+	return m_rustBuffer.NextChar(m_encoding);
 #else
 	if (m_encoding == UTF8) {
 		unsigned char c = m_readbuffer[m_bufferPos++];
@@ -306,6 +352,10 @@ BOOL CTextFile::ReadString(CStringW& str) {
 	bool fEOF = ReadLine();
 
 	str.Empty();
+#ifdef XY_VSFILTER_RUST_TEXT
+	std::vector<wchar_t> m_convertedBuffer;
+	m_rustBuffer.CopyLine(m_convertedBuffer);
+#endif
 	if (!m_convertedBuffer.empty()) {
 		str.Append(&m_convertedBuffer[0], m_convertedBuffer.size());
 	}

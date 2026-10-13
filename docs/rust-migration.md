@@ -26,20 +26,30 @@ unresolved reference outcomes requiring investigation, never matching results.
   adapter uses the DLL's existing CRT `_aligned_malloc`/`_aligned_free` pair.
 * A safe port of `CTextFile::NextChar`, including its nonstandard UTF-8 behavior,
   raw UTF-16 code units, error statuses and cursor movement.
+* Safe Rust ownership of the text reader's 4 KB buffer and decoded line, including
+  refill/compaction, CR/LF handling, surrogate output, malformed-input fallback
+  and EOF cursor state. Native file reads, seeks, BOM detection and logging remain
+  in a small adapter. The adapter borrows the fixed Rust buffer only during a
+  native read; no Rust frame is active when an MFC exception can occur. The
+  extracted C++ oracle now checks **36,288 file scenarios / 1,369,597 line/seek
+  comparisons**, including **5,376 injected read exceptions**, short reads,
+  repeated EOF, reopening, encoding changes and diagnostic ordering. This new
+  component passed local fatal ASan/UBSan; Windows renderer validation is pending.
 * Safe Rust font-attachment decoding, preserving byte truncation of arbitrary
   UTF-16 units, invalid lengths and short tails. The same opt-in build property
   enables this component. GDI font installation remains native.
 * Safe Rust ASS command/parameter tokenization. Empty tags, non-nesting
   parentheses, comma/backslash recovery and raw code units are retained. Native
   `iswspace` supplies classifications to preserve CRT/locale behavior.
-* Value-only internal C ABIs for the text and attachment decoders. The ASS lexer
+* Value-only internal C ABIs for the character and attachment decoders. The ASS lexer
   has a separate, documented ownership boundary: it borrows two bounded input
   arrays during scanning, retains only integer spans, and returns an opaque owner
   whose destructor runs in Rust. A noncopyable C++ RAII wrapper owns it. No Rust
   allocation is freed by C++, and query results contain only integers.
+  The buffered reader has its own noncopyable owner and a documented, bounded
+  mutable borrow for native file I/O; its line storage stays private to Rust.
 * An opt-in `RustTextDecoder=true` native build property. The original public DLL
-  interfaces and the surrounding line reader are retained during this step.
-  The default build still uses the original decoder, pending Windows validation.
+  interfaces are retained. The default build still uses the original C++ code.
 * A differential test that extracts the exact original method and UTF-8 helper
   header from the pinned Git commit, compiles them, and calls the real Rust ABI.
   It checks **85,992,064** cases: return values AND consumed bytes. This includes
@@ -71,7 +81,7 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 The migration is an initial set of components and validation tools, not a finished
 safe renderer. The rest of the native parsing, font handling, rendering,
-buffer management and host integration remains C++. There is no whole-renderer
+other buffer management and host integration remains C++. There is no whole-renderer
 compatibility or memory-safety claim yet.
 
 ## Migration shape
@@ -362,10 +372,10 @@ mismatch and verify reduction, while rejecting equal outputs and crashes.
 | Compositing/color | `subpic`, SIMD/assembly, conversion tables | All RGB/YUV formats, high bit depths, interlace/subsampling, pitch/orientation, alpha and rounding |
 | Supporting behavior | `dsutil`, `decss`, vendored libraries, settings | Encodings, code pages, font attachments, file/network access, archive inputs, persistence and remaining unsafe dependencies |
 
-Next, run actual Aegisub/player loading against the experimental DLLs and expand
-the host coverage above. The next useful port boundaries are the complete text
-reader/buffer state (the extracted oracle is already available), field/numeric
-parsing in `STS.cpp`, and drawing-path parsing in `CPolygon`. Numeric conversion
+Continue portable migration here while Windows CI checks each native bridge.
+Local Windows work includes actual Aegisub/player loading and the host coverage
+above. Useful next port boundaries include field/numeric parsing in `STS.cpp`
+and drawing-path parsing in `CPolygon`. Numeric conversion
 must preserve the Windows CRT's overflow, locale, end-pointer and float-rounding
 behavior; substituting Rust's string parsers is not justified. The drawing code
 also has non-obvious recovery and truncation behavior to capture before porting.
