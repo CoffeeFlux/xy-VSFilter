@@ -20,6 +20,21 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust 32-bit MMX/SSE body/border mask arithmetic is prepared behind the
+  same switch. Four-byte signed high-word mask products and sixteen-byte
+  unsigned products remain distinct. Native adapters preserve the original
+  first-row alignment thresholds across all rows, byte/four-byte/sixteen-byte
+  input snapshots and final MMX-state cleanup. All inputs and results cross the
+  C ABI by value; Rust does not borrow native input or output storage. Broader
+  opacity states retain the native fallback.
+  Portable scalar/Win64-delegation tests passed **533,992 comparisons** with
+  fatal ASan/UBSan. A supplementary x64 execution of the Win32 source branch
+  passed **34,088,424 comparisons**, including **33,554,432 explicit group-size
+  byte-triple comparisons**. That supplementary run uses Clang MS extensions
+  for the original pointer narrowing and disables alignment instrumentation for
+  x86 unaligned loads; it is not a Win32 ABI result. Actual Windows x86
+  component and DLL validation is still pending. Rust tests (39 core, 17 FFI)
+  and strict Clippy pass.
 * Safe Rust scalar body/border alpha-mask arithmetic, with and without clip
   masks, is prepared behind the same switch. Signed rounding and final byte
   wrapping are preserved. Native code retains row traversal and buffer access;
@@ -60,7 +75,14 @@ unresolved reference outcomes requiring investigation, never matching results.
   therefore excludes that helper from Clang Release parity counts and records
   the Debug build separately; Windows MSVC Release remains the production
   reference. No failed comparison is counted as passing. Rust tests (36 core,
-  16 FFI) and strict Clippy pass. Windows validation is pending for this increment.
+  16 FFI) and strict Clippy pass. Candidate `0f149c4c` passed all four CI
+  platforms, Miri and both Windows DLL jobs. Each Windows component job passed
+  **746,720 fill comparisons**, including **279,200 masked planar comparisons**
+  against the original MSVC Release branch. Each DLL job matched **322 corpus
+  cases / 4,026 frames** and **32 mutations / 224 frames**, plus dialogs,
+  visible controls, exports and dependencies. Both logs confirm Rust-enabled
+  `Rasterizer.cpp` compilation. [Additive/planar evidence](additive-planar-evidence.json)
+  records the source/DLL hashes and the distinct reference build scopes.
 * Safe Rust constant-alpha packed/planar row blending and variable-alpha packed
   blending, behind the existing opt-in switch in `Rasterizer.cpp`. This preserves
   the original alpha-plus-one weighting, truncation and inverse-alpha channel.

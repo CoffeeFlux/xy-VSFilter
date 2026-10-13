@@ -2443,6 +2443,58 @@ void FillAlphaMashBorderMasked_c   (BYTE* dst, const BYTE* border, const BYTE* b
 void FillAlphaMashBorderMasked_sse2(BYTE* dst, const BYTE* border, const BYTE* body, int color_alpha, int w, int h, int pitch,
     const BYTE* am, int am_pitch);
 
+#if defined(XY_VSFILTER_RUST_TEXT) && !defined(_WIN64)
+static XYRustMaskBytes xyRustMaskSnapshot(const BYTE* source, int count)
+{
+    XYRustMaskBytes result = {0, 0};
+    memcpy(&result, source, count);
+    return result;
+}
+
+static void xyRustMaskRows(BYTE* dst, const BYTE* source, const BYTE* body,
+    const BYTE* mask, int color_alpha, int w, int h, int pitch, int mask_pitch, unsigned flags)
+{
+    // Compute the original x86 thresholds once, even for overlapping rows or
+    // pitches which change alignment. Each group snapshots all inputs first.
+    const int x0 = ((reinterpret_cast<int>(dst)+3)&~3) - reinterpret_cast<int>(dst) < w ?
+        ((reinterpret_cast<int>(dst)+3)&~3) - reinterpret_cast<int>(dst) : w;
+    const int x00 = ((reinterpret_cast<int>(dst)+15)&~15) - reinterpret_cast<int>(dst) < w ?
+        ((reinterpret_cast<int>(dst)+15)&~15) - reinterpret_cast<int>(dst) : w;
+    const int x_end00 = ((reinterpret_cast<int>(dst)+w)&~15) - reinterpret_cast<int>(dst);
+    const int x_end0 = ((reinterpret_cast<int>(dst)+w)&~3) - reinterpret_cast<int>(dst);
+    while (h--) {
+        int j = 0;
+        for (; j < x0; ++j) {
+            dst[j] = xy_vsfilter_mask_scalar(source[j], flags & 1 ? body[j] : 0,
+                flags & 2 ? mask[j] : 0, color_alpha, flags);
+        }
+        const int ends[] = {x00, x_end00, x_end0};
+        const int sizes[] = {4, 16, 4};
+        for (int stage = 0; stage < 3; ++stage) {
+            const int size = sizes[stage];
+            for (; j < ends[stage]; j += size) {
+                const XYRustMaskBytes source_bytes = xyRustMaskSnapshot(source + j, size);
+                const XYRustMaskBytes zero = {0, 0};
+                const XYRustMaskBytes body_bytes = flags & 1 ? xyRustMaskSnapshot(body + j, size) : zero;
+                const XYRustMaskBytes mask_bytes = flags & 2 ? xyRustMaskSnapshot(mask + j, size) : zero;
+                const XYRustMaskBytes result = xy_vsfilter_mask_block(source_bytes, body_bytes,
+                    mask_bytes, color_alpha, flags, size == 4);
+                memcpy(dst + j, &result, size);
+            }
+        }
+        for (; j < w; ++j) {
+            dst[j] = xy_vsfilter_mask_scalar(source[j], flags & 1 ? body[j] : 0,
+                flags & 2 ? mask[j] : 0, color_alpha, flags);
+        }
+        source += pitch;
+        if (flags & 1) body += pitch;
+        if (flags & 2) mask += mask_pitch;
+        dst += pitch;
+    }
+    _mm_empty();
+}
+#endif
+
 void FillAlphaMashBody_c(BYTE* dst, const BYTE* src, int color_alpha, int w, int h, int pitch)
 {
     while(h--)
@@ -2467,6 +2519,12 @@ void FillAlphaMashBody_c(BYTE* dst, const BYTE* src, int color_alpha, int w, int
 void FillAlphaMashBody_sse2(BYTE* dst, const BYTE* src, int color_alpha, int w, int h, int pitch)
 {
 #ifndef _WIN64
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (color_alpha >= -8421504 && color_alpha <= 8421504) {
+        xyRustMaskRows(dst, src, NULL, NULL, color_alpha, w, h, pitch, 0, 0);
+        return;
+    }
+#endif
     const int ROUDN_ERR = 1<<(6-1);
 
     const int x0 = ((reinterpret_cast<int>(dst)+3)&~3) - reinterpret_cast<int>(dst) < w ?
@@ -2565,6 +2623,12 @@ void FillAlphaMashBorder_c(BYTE* dst, const BYTE* border, const BYTE* body, int 
 void FillAlphaMashBorder_sse2( BYTE* dst, const BYTE* border, const BYTE* body, int color_alpha, int w, int h, int pitch )
 {
 #ifndef _WIN64
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (color_alpha >= -8421504 && color_alpha <= 8421504) {
+        xyRustMaskRows(dst, border, body, NULL, color_alpha, w, h, pitch, 0, 1);
+        return;
+    }
+#endif
     const int ROUDN_ERR = 1<<(6-1);
 
     const int x0 = ((reinterpret_cast<int>(dst)+3)&~3) - reinterpret_cast<int>(dst) < w ?
@@ -2687,6 +2751,12 @@ void FillAlphaMashBodyMasked_sse2(       BYTE* dst        ,
                                    int         am_pitch)
 {
 #ifndef _WIN64
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (color_alpha >= -33025 && color_alpha <= 33025) {
+        xyRustMaskRows(dst, src, NULL, am, color_alpha, w, h, pitch, am_pitch, 2);
+        return;
+    }
+#endif
     const int ROUND_ERR = 1<<(12-1);
 
     const int x0 = ((reinterpret_cast<int>(dst)+3)&~3) - reinterpret_cast<int>(dst) < w ?
@@ -2818,6 +2888,12 @@ void FillAlphaMashBorderMasked_sse2(       BYTE* dst        ,
                                      int         am_pitch)
 {
 #ifndef _WIN64
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (color_alpha >= -33025 && color_alpha <= 33025) {
+        xyRustMaskRows(dst, border, body, am, color_alpha, w, h, pitch, am_pitch, 3);
+        return;
+    }
+#endif
     const int ROUND_ERR = 1<<(12-1);
 
     const int x0 = ((reinterpret_cast<int>(dst)+3)&~3) - reinterpret_cast<int>(dst) < w ?

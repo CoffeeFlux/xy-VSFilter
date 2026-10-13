@@ -42,6 +42,14 @@ def extract_method(source, signature):
     return source[start:end]
 
 
+def extract_definition(source, signature):
+    """Skip forward declarations when a signature also appears before a body."""
+    start = source.index(signature)
+    while ";" in source[start:source.index("{", start)]:
+        start = source.index(signature, start + len(signature))
+    return extract_method(source[start:], signature)
+
+
 def capture_inputs():
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
@@ -335,10 +343,15 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     for name, content in (("ReferenceMask", raster_source), ("CandidateMask", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         masks += f"namespace {name} {{\n"
         if name == "CandidateMask":
-            masks += "#define XY_VSFILTER_RUST_TEXT\n"
+            masks += "#define XY_VSFILTER_RUST_TEXT\n#ifndef _WIN64\n"
+            for signature in ("static XYRustMaskBytes xyRustMaskSnapshot(", "static void xyRustMaskRows("):
+                masks += extract_definition(content.decode("utf-8-sig"), signature) + "\n"
+            masks += "#endif\n"
         for signature in ("void FillAlphaMashBody_c(BYTE*", "void FillAlphaMashBorder_c(BYTE*",
-                          "void FillAlphaMashBodyMasked_c(       BYTE*", "void FillAlphaMashBorderMasked_c(       BYTE*"):
-            masks += extract_method(content.decode("utf-8-sig"), signature) + "\n"
+                          "void FillAlphaMashBodyMasked_c(       BYTE*", "void FillAlphaMashBorderMasked_c(       BYTE*",
+                          "void FillAlphaMashBody_sse2(BYTE*", "void FillAlphaMashBorder_sse2( BYTE*",
+                          "void FillAlphaMashBodyMasked_sse2(       BYTE*", "void FillAlphaMashBorderMasked_sse2(       BYTE*"):
+            masks += extract_definition(content.decode("utf-8-sig"), signature) + "\n"
         masks += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_mask.h").write_text(masks, encoding="utf-8")
     dvb = '#include "original_hdmv.h"\n#include "dvb_shell.h"\n'

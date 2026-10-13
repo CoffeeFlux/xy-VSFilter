@@ -6,6 +6,21 @@
 #include <climits>
 static uint64_t comparisons=0,bytes_compared=0,changed=0;
 static void apply(bool candidate,int mode,BYTE* dst,const BYTE* src,const BYTE* body,const BYTE* mask,int alpha,int w,int h,int pitch,int mpitch) {
+    if(mode>=4) {
+        mode-=4;
+        if(candidate) {
+            if(mode==0)CandidateMask::FillAlphaMashBody_sse2(dst,src,alpha,w,h,pitch);
+            if(mode==1)CandidateMask::FillAlphaMashBorder_sse2(dst,src,body,alpha,w,h,pitch);
+            if(mode==2)CandidateMask::FillAlphaMashBodyMasked_sse2(dst,src,alpha,w,h,pitch,mask,mpitch);
+            if(mode==3)CandidateMask::FillAlphaMashBorderMasked_sse2(dst,src,body,alpha,w,h,pitch,mask,mpitch);
+        }else {
+            if(mode==0)ReferenceMask::FillAlphaMashBody_sse2(dst,src,alpha,w,h,pitch);
+            if(mode==1)ReferenceMask::FillAlphaMashBorder_sse2(dst,src,body,alpha,w,h,pitch);
+            if(mode==2)ReferenceMask::FillAlphaMashBodyMasked_sse2(dst,src,alpha,w,h,pitch,mask,mpitch);
+            if(mode==3)ReferenceMask::FillAlphaMashBorderMasked_sse2(dst,src,body,alpha,w,h,pitch,mask,mpitch);
+        }
+        return;
+    }
     if(candidate) {
         if(mode==0)CandidateMask::FillAlphaMashBody_c(dst,src,alpha,w,h,pitch);
         if(mode==1)CandidateMask::FillAlphaMashBorder_c(dst,src,body,alpha,w,h,pitch);
@@ -19,7 +34,7 @@ static void apply(bool candidate,int mode,BYTE* dst,const BYTE* src,const BYTE* 
     }
 }
 static void fixture(int mode,int alpha,int width,int height,int pitch,int mpitch,int offset,int source_delta,int body_delta,int mask_delta,int body_value=-1,int mask_value=-1,bool zero=false) {
-    std::array<BYTE,4096> initial,source,body,mask,a,b;
+    alignas(16) std::array<BYTE,4096> initial,source,body,mask,a,b;
     for(size_t i=0;i<initial.size();++i) {
         initial[i]=static_cast<BYTE>(i*37+(i>>8));
         source[i]=zero ? 0 : static_cast<BYTE>(i);
@@ -45,35 +60,65 @@ static void fixture(int mode,int alpha,int width,int height,int pitch,int mpitch
     ++comparisons;bytes_compared+=a.size();if(a!=initial)++changed;
 }
 int main() {
-    for(int alpha=0;alpha<256;++alpha) {
-        fixture(0,alpha,256,1,0,0,0,INT_MAX,INT_MAX,INT_MAX);
+    for(int path:{0,4})for(int alpha=0;alpha<256;++alpha) {
+        fixture(path+0,alpha,256,1,0,0,0,INT_MAX,INT_MAX,INT_MAX);
         for(int value=0;value<256;++value) {
-            fixture(1,alpha,256,1,0,0,0,INT_MAX,INT_MAX,INT_MAX,value);
-            fixture(2,alpha,256,1,0,0,0,INT_MAX,INT_MAX,INT_MAX,0,value);
-            fixture(3,alpha,256,1,0,0,0,INT_MAX,INT_MAX,INT_MAX,value,alpha^value);
+            fixture(path+1,alpha,256,1,0,0,0,INT_MAX,INT_MAX,INT_MAX,value);
+            fixture(path+2,alpha,256,1,0,0,0,INT_MAX,INT_MAX,INT_MAX,0,value);
+            fixture(path+3,alpha,256,1,0,0,0,INT_MAX,INT_MAX,INT_MAX,value,alpha^value);
         }
     }
-    for(int mode:{0,1,2,3})for(int width:{-1,0,1,3,4,15,16,17,31,32,33,255,256,257})for(int height:{0,1,3})
+    for(int mode:{0,1,2,3,4,5,6,7})for(int width:{-1,0,1,3,4,15,16,17,31,32,33,255,256,257})for(int height:{0,1,3})
         for(int pitch:{-320,-8,0,8,320})for(int mpitch:{-320,0,320})
             for(int delta:{INT_MAX,-33,-16,-1,0,1,7,16,255}) {
                 fixture(mode,173,width,height,pitch,mpitch,7,delta,delta,delta);
                 fixture(mode,-173,width,height,pitch,mpitch,3,INT_MAX,delta,INT_MAX);
                 fixture(mode,257,width,height,pitch,mpitch,0,delta,INT_MAX,-1);
             }
-    for(int mode:{0,1,2,3})for(int alpha:{-33025,-32768,-257,-1,0,1,63,64,65,127,128,255,256,257,32767,33025})
+    for(int mode:{0,1,2,3,4,5,6,7})for(int alpha:{-33025,-32768,-257,-1,0,1,63,64,65,127,128,255,256,257,32767,33025})
         for(int value:{0,1,63,64,65,127,128,254,255})
             fixture(mode,alpha,256,3,-320,320,15,INT_MAX,INT_MAX,INT_MAX,value,255-value);
-    for(int mode:{0,1})for(int alpha:{-8421504,-8421503,8421503,8421504})
+    for(int mode:{0,1,4,5})for(int alpha:{-8421504,-8421503,8421503,8421504})
         fixture(mode,alpha,256,1,0,0,0,INT_MAX,INT_MAX,INT_MAX,0,255);
-    for(int mode:{0,1,2,3})for(int alpha:{INT_MIN,INT_MAX})
+    for(int mode:{0,1,2,3,4,5,6,7})for(int alpha:{INT_MIN,INT_MAX})
         fixture(mode,alpha,256,3,320,-320,0,INT_MAX,INT_MAX,INT_MAX,255,255,true);
     uint32_t random=0x371957efU;
     const auto next=[&]() -> uint32_t {random^=random<<13;random^=random>>17;random^=random<<5;return random;};
     for(unsigned i=0;i<3000;++i) {
-        const int mode=next()%4,alpha=static_cast<int>(next()%66051)-33025,width=next()%258;
+        const int mode=next()%8,alpha=static_cast<int>(next()%66051)-33025,width=next()%258;
         const int body=next()%256,mask=next()%256,offset=next()%16;
         fixture(mode,alpha,width,3,320,-320,offset,INT_MAX,INT_MAX,INT_MAX,body,mask);
     }
-    printf("%llu exact scalar mask comparisons passed (%llu bytes including padding/guards, %llu visibly changed cases; body/border, masked/unmasked, signed opacity, wrapping byte output, source/destination/mask overlap, negative/zero pitches)\n",
+#ifndef _WIN64
+    // Real Win32 MMX and SSE bodies: every source/mask/opacity byte triple,
+    // explicitly exercising four-byte and sixteen-byte groups separately.
+    alignas(16) std::array<BYTE,16> source,mask,a,b;
+    for(unsigned src=0;src<256;++src)for(unsigned alpha=0;alpha<256;++alpha)for(unsigned clip=0;clip<256;++clip) {
+        source.fill(static_cast<BYTE>(src));mask.fill(static_cast<BYTE>(clip));
+        for(int width:{4,16}) {
+            a.fill(0xa5);b=a;
+            ReferenceMask::FillAlphaMashBodyMasked_sse2(a.data(),source.data(),alpha,width,1,0,mask.data(),0);
+            CandidateMask::FillAlphaMashBodyMasked_sse2(b.data(),source.data(),alpha,width,1,0,mask.data(),0);
+            if(a!=b){fprintf(stderr,"Mask group mismatch src=%u alpha=%u mask=%u width=%d\n",src,alpha,clip,width);return 1;}
+            ++comparisons;bytes_compared+=a.size();if(a[0]!=0xa5)++changed;
+        }
+    }
+    source.fill(16);mask.fill(255);a.fill(0);b.fill(0);
+    ReferenceMask::FillAlphaMashBodyMasked_sse2(a.data(),source.data(),64,4,1,0,mask.data(),0);
+    ReferenceMask::FillAlphaMashBodyMasked_sse2(b.data(),source.data(),64,16,1,0,mask.data(),0);
+    if(a[0]==b[0]){fprintf(stderr,"Signed/unsigned mask group control failed\n");return 1;}
+    source.fill(255);
+    ReferenceMask::FillAlphaMashBody_c(a.data(),source.data(),255,16,1,0);
+    ReferenceMask::FillAlphaMashBody_sse2(b.data(),source.data(),255,16,1,0);
+    if(a==b){fprintf(stderr,"Scalar wrap/SIMD saturation control failed\n");return 1;}
+#endif
+    printf("%llu exact mask comparisons passed (%llu bytes including padding/guards, %llu visibly changed cases; body/border, masked/unmasked, signed opacity, wrapping byte output, source/destination/mask overlap, negative/zero pitches)\n",
         static_cast<unsigned long long>(comparisons),static_cast<unsigned long long>(bytes_compared),static_cast<unsigned long long>(changed));
+#ifndef _WIN64
+    printf("Mask reference: original Win32 MMX/SSE and scalar paths; 33554432 explicit SIMD byte-triple comparisons\n");
+#elif defined(XY_MASK_PORTABLE_WIN64)
+    printf("Mask reference: portable scalar extraction plus original Win64 scalar delegation; Win32 SIMD not exercised\n");
+#else
+    printf("Mask reference: original Win64 scalar delegation and scalar paths; Win32 SIMD not exercised\n");
+#endif
 }
