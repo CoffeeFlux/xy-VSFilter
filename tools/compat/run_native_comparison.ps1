@@ -2,17 +2,35 @@ param(
     [ValidateSet("Win32", "x64")][string]$Platform = "x64",
     [Parameter(Mandatory=$true)][string]$Baseline,
     [ValidateRange(0,256)][int]$MutationCount = 0,
-    [uint32]$MutationSeed = 12345
+    [uint32]$MutationSeed = 12345,
+    [string]$Output = ""
 )
 $ErrorActionPreference = "Stop"
 $candidateRoot = (Resolve-Path "$PSScriptRoot\..\..").Path
 $baselineRoot = (Resolve-Path $Baseline).Path
-$evidence = Join-Path $candidateRoot "artifacts\native"
+$evidence = if ($Output) { [System.IO.Path]::GetFullPath($Output) } else { Join-Path $candidateRoot "artifacts\native\$Platform" }
+if (Test-Path $evidence) { throw "Evidence directory already exists: $evidence. Choose a new -Output; preserve previous evidence." }
 New-Item -ItemType Directory -Force -Path $evidence | Out-Null
 $reference = Get-Content "$PSScriptRoot\reference.json" | ConvertFrom-Json
 $baselineCommit = (& git -C $baselineRoot rev-parse HEAD).Trim()
 if ($baselineCommit -ne $reference.commit) { throw "Baseline is not the pinned reference commit" }
 if (& git -C $baselineRoot status --porcelain) { throw "Baseline has local changes" }
+$candidateCommit = (& git -C $candidateRoot rev-parse HEAD).Trim()
+$candidateStatus = @(& git -C $candidateRoot status --porcelain)
+@{
+    reference_commit = $baselineCommit
+    candidate_commit = $candidateCommit
+    candidate_status = $candidateStatus
+    platform = $Platform
+    configuration = "Release"
+    rustc = @(& rustc -Vv)
+    cargo = @(& cargo -V)
+    msvc_tools_version = $env:VCToolsVersion
+    windows_sdk_version = $env:WindowsSDKVersion
+    mutation_count = $MutationCount
+    mutation_seed = $MutationSeed
+} | ConvertTo-Json -Depth 10 | Set-Content "$evidence\build-info.json" -Encoding utf8
+& git -C $candidateRoot diff --binary "--output=$evidence\candidate-working-tree.patch" HEAD
 
 function Build-Native([string]$Root, [string]$Label, [bool]$Rust) {
     $arguments = @("$Root\VSFilter.sln", "/m", "/t:vsfilter;xy_sub_filter;xy_sub_filter_consumer",
@@ -52,11 +70,11 @@ try {
     & python "$PSScriptRoot\csri_compare.py" --reference $original --candidate $candidate `
         --cases "$evidence\smoke-cases.json" --output "$evidence\smoke" --timeout 30 `
         --environment-label "GitHub windows-2022; VS2022 Release $Platform; initial DLL smoke check"
-    if ($LASTEXITCODE -ne 0) { throw "DLL smoke comparison failed; inspect artifacts/native/smoke/report.json" }
+    if ($LASTEXITCODE -ne 0) { throw "DLL smoke comparison failed; inspect $evidence\smoke\report.json" }
     & python "$PSScriptRoot\csri_compare.py" --reference $original --candidate $candidate `
         --output "$evidence\csri" --timeout 15 `
         --environment-label "GitHub windows-2022; VS2022 Release $Platform; stock runner fonts; pinned baseline"
-    if ($LASTEXITCODE -ne 0) { throw "CSRI comparison failed; inspect artifacts/native/csri/report.json" }
+    if ($LASTEXITCODE -ne 0) { throw "CSRI comparison failed; inspect $evidence\csri\report.json" }
     if ($MutationCount -gt 0) {
         & python "$PSScriptRoot\mutate_corpus.py" --seed $MutationSeed --count $MutationCount --output "$evidence\mutations"
         if ($LASTEXITCODE -ne 0) { throw "Mutation generation failed" }

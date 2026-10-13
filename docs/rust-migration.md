@@ -131,6 +131,31 @@ not VSFilter's output.
 
 ## Windows handoff
 
+The workflow `.github/workflows/native-compat.yml` is the executable build recipe
+already used on Windows runners. It pins YASM and its required VC2010 runtime
+with checksums. Use it when reproducing the setup locally; installing a newer
+Visual C++ runtime alone does not provide `MSVCR100.dll` for that assembler.
+
+Once the prerequisites below are installed, the combined runner builds both
+trees, checks exports/imports, and runs the smoke, corpus and mutation comparisons:
+
+```powershell
+git worktree add --detach ..\xy-VSFilter-reference 4911cacb102bc0cbd41449793e54473265b04e62
+pwsh -File tools/compat/run_native_comparison.ps1 -Platform x64 -Baseline ..\xy-VSFilter-reference -MutationCount 32
+# Run from an x86 Native Tools prompt with x86 Python:
+pwsh -File tools/compat/run_native_comparison.ps1 -Platform Win32 -Baseline ..\xy-VSFilter-reference -MutationCount 32
+```
+
+Use PowerShell 7 (`pwsh`) for the combined runner. Evidence goes to
+`artifacts/native/x64` and `artifacts/native/Win32`; an existing destination is
+rejected. For subsequent runs supply a new `-Output` directory. Build reports
+record both commits, toolchain versions, dirty-tree status and the tracked-source
+patch. A dirty/untracked working tree is not established by the commit ID alone;
+commit source changes before producing release evidence. CI uploads reports,
+build logs and all three reference/candidate DLLs. To replay downloaded mutation
+artifacts, restore their `candidate/artifacts/native/...` tree under this checkout's
+`artifacts/native/...`, preserving the manifest's relative fixture paths.
+
 1. Clone `https://github.com/CoffeeFlux/xy-VSFilter.git`, fetch all history, and
    check out `rust/compatibility-foundation`.
 2. Use separate baseline and candidate worktrees/build directories. The baseline

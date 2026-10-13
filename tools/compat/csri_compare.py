@@ -214,8 +214,10 @@ def run_worker(dll, case_path, destination, timeout):
                str(dll), str(case_path), str(destination)]
     try:
         process = subprocess.run(command, capture_output=True, timeout=timeout)
-    except subprocess.TimeoutExpired:
+    except subprocess.TimeoutExpired as error:
         result = {"status": "timeout"}
+        (destination / "stdout.txt").write_bytes(error.stdout or b"")
+        (destination / "stderr.txt").write_bytes(error.stderr or b"")
     else:
         (destination / "stdout.txt").write_bytes(process.stdout)
         (destination / "stderr.txt").write_bytes(process.stderr)
@@ -227,7 +229,10 @@ def run_worker(dll, case_path, destination, timeout):
             except (OSError, ValueError) as error:
                 result = {"status": "harness_error", "error": str(error)}
     if result["status"] in {"timeout", "crash", "harness_error"} and (destination / "progress.json").exists():
-        result["last_progress"] = read_json(destination / "progress.json")
+        try:
+            result["last_progress"] = read_json(destination / "progress.json")
+        except (OSError, ValueError) as error:
+            result["progress_error"] = str(error)
     write_json(destination / "result.json", result)
     return result
 
