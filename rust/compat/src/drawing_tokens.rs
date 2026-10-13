@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Derived from CPolygon::ParseStr, Copyright (C) 2003-2006 Gabest.
-//! Raw UTF-16 drawing tokens. This models the original Replace/Tokenize/TrimLeft
-//! sequence, including embedded NULs; it is not a drawing grammar validator.
+//! Raw UTF-16 drawing tokens after native command replacement. Models the
+//! original Tokenize/TrimLeft sequence, including embedded NULs. The preceding
+//! CString replacements remain native: their NUL behavior can expose stale
+//! allocation contents and has no stable safe-Rust specification yet.
 use alloc::vec::Vec;
 use core::ops::Range;
 
@@ -21,15 +23,7 @@ pub struct Tokens {
 
 impl Tokens {
     pub fn scan(input: &[u16]) -> Self {
-        let mut units = Vec::new();
-        // The ignored SpanIncluding return does not filter the input. Each of
-        // the seven replacements inserts '*' before its command everywhere.
-        for &unit in input {
-            if command(unit) {
-                units.push(u16::from(b'*'));
-            }
-            units.push(unit);
-        }
+        let units = input.to_vec();
         let mut tokens = Vec::new();
         let mut cursor = 0;
         while cursor < units.len() {
@@ -76,8 +70,8 @@ mod tests {
     use alloc::vec;
 
     #[test]
-    fn commands_split_inside_words_and_trimming_is_not_unicode_whitespace() {
-        let tokens = Tokens::scan(&"junk*m\t1 2 n 3 4".encode_utf16().collect::<Vec<_>>());
+    fn separators_and_trimming_are_not_unicode_whitespace() {
+        let tokens = Tokens::scan(&"ju*nk**m\t1 2 *n 3 4".encode_utf16().collect::<Vec<_>>());
         let commands: Vec<_> = tokens.tokens().iter().map(|t| t.command).collect();
         assert_eq!(commands, vec![106, 110, 109, 110]);
         assert_eq!(tokens.parameters(2).unwrap(), &[9, 49, 32, 50, 32]);

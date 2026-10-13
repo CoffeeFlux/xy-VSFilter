@@ -792,15 +792,6 @@ bool CPolygon::ParseStr()
 #else
     int j, lastsplinestart = -1, firstmoveto = -1, lastmoveto = -1;
 #endif
-    // Drawing token input boundary.
-#ifdef XY_VSFILTER_RUST_TEXT
-    XyRust::DrawingTokens tokens(m_str.Get());
-    CStringW s;
-    uint16_t command;
-    while (tokens.Next(s, command))
-    {
-        WCHAR c = static_cast<WCHAR>(command);
-#else
     CStringW str = m_str.Get();
     str.SpanIncluding(L"mnlbspc 0123456789");
     str.Replace(L"m", L"*m");
@@ -810,6 +801,14 @@ bool CPolygon::ParseStr()
     str.Replace(L"s", L"*s");
     str.Replace(L"p", L"*p");
     str.Replace(L"c", L"*c");
+    // Drawing token input boundary.
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::DrawingTokens tokens(str);
+    CStringW s;
+    uint16_t command;
+    while (tokens.Next(s, command)) {
+        WCHAR c = static_cast<WCHAR>(command);
+#else
     int k = 0;
     for(CStringW s = str.Tokenize(L"*", k); !s.IsEmpty(); s = str.Tokenize(L"*", k))
     {

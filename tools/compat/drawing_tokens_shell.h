@@ -19,13 +19,6 @@ public:
     int GetLength() const { return static_cast<int>(value.size()); }
     wchar_t operator[](size_t index) const { return value.at(index); }
     bool IsEmpty() const { return value.empty(); }
-    void SpanIncluding(const wchar_t*) const {} // return value ignored by source
-    void Replace(const wchar_t* from, const wchar_t* to) {
-        size_t cursor=0, a=std::wcslen(from), b=std::wcslen(to);
-        while ((cursor=value.find(from,cursor)) != std::wstring::npos) {
-            value.replace(cursor,a,to); cursor+=b;
-        }
-    }
     DrawingString Tokenize(const wchar_t* separators, int& cursor) const {
         if (cursor >= 0 && static_cast<size_t>(cursor) < value.size()) {
             size_t start=static_cast<size_t>(cursor);
