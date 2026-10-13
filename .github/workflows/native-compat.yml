@@ -2,6 +2,15 @@ name: Windows renderer differential
 
 on:
   workflow_dispatch:
+    inputs:
+      mutation_count:
+        description: Additional reproducible malformed-input cases (0 to 256)
+        type: number
+        default: 32
+      mutation_seed:
+        description: Reproducible u32 seed
+        type: number
+        default: 12345
   push:
     branches: ['rust/**']
     paths:
@@ -19,7 +28,7 @@ permissions:
 jobs:
   renderer:
     runs-on: windows-2022
-    timeout-minutes: 45
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -80,8 +89,11 @@ jobs:
           rustup default 1.85.0
       - name: Build the reference and candidate and compare actual DLLs
         shell: pwsh
+        env:
+          XY_MUTATION_COUNT: ${{ github.event_name == 'workflow_dispatch' && toJSON(inputs.mutation_count) || '32' }}
+          XY_MUTATION_SEED: ${{ github.event_name == 'workflow_dispatch' && toJSON(inputs.mutation_seed) || '12345' }}
         run: |
-          & candidate\tools\compat\run_native_comparison.ps1 -Platform ${{ matrix.platform }} -Baseline "$pwd\baseline"
+          & candidate\tools\compat\run_native_comparison.ps1 -Platform ${{ matrix.platform }} -Baseline "$pwd\baseline" -MutationCount ([int]$env:XY_MUTATION_COUNT) -MutationSeed ([uint32]$env:XY_MUTATION_SEED)
       - uses: actions/upload-artifact@v4
         if: always()
         with:
