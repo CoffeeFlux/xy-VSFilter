@@ -117,7 +117,10 @@ def reduce(args):
     report["complete"] = True
     report["budget_exhausted"] = exhausted
     report["best_trial"] = best_trial.name
-    report["environment_unchanged"] = environment_manifest() == environment
+    after = environment_manifest()
+    report["environment_unchanged"] = after == environment
+    if after != environment:
+        report["environment_after"] = after
     save_best(best)
     return 0 if report["environment_unchanged"] else 1
 
