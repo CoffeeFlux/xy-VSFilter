@@ -2873,6 +2873,474 @@
       "fill_seed": 31
     },
     {
+      "id": "drawing-lex-repeated-separators-file",
+      "script": "test/compat/generated/drawing-lex-repeated-separators.ass",
+      "sha256": "9bd36db34235b8483ac598afb459af0722b753795ce614d2d7a5328dc3e18465",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-repeated-separators-memory",
+      "script": "test/compat/generated/drawing-lex-repeated-separators.ass",
+      "sha256": "9bd36db34235b8483ac598afb459af0722b753795ce614d2d7a5328dc3e18465",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-leading-space-file",
+      "script": "test/compat/generated/drawing-lex-leading-space.ass",
+      "sha256": "d2e7af39867c8fa0dd45fbae785098555b09c225b87cb816edd16e73bcf9b2ef",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-leading-space-memory",
+      "script": "test/compat/generated/drawing-lex-leading-space.ass",
+      "sha256": "d2e7af39867c8fa0dd45fbae785098555b09c225b87cb816edd16e73bcf9b2ef",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-uppercase-commands-file",
+      "script": "test/compat/generated/drawing-lex-uppercase-commands.ass",
+      "sha256": "13ea94b8a85a9cf518a049a0ae1a3eb9f70feb01b2173ba9a45b9555f4483fa8",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-uppercase-commands-memory",
+      "script": "test/compat/generated/drawing-lex-uppercase-commands.ass",
+      "sha256": "13ea94b8a85a9cf518a049a0ae1a3eb9f70feb01b2173ba9a45b9555f4483fa8",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-hex-exponent-split-file",
+      "script": "test/compat/generated/drawing-lex-hex-exponent-split.ass",
+      "sha256": "212ade152284c5af8265fcc557536f7f58dd995a16af2f9c75d25cbf6998810d",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-hex-exponent-split-memory",
+      "script": "test/compat/generated/drawing-lex-hex-exponent-split.ass",
+      "sha256": "212ade152284c5af8265fcc557536f7f58dd995a16af2f9c75d25cbf6998810d",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-tab-after-command-file",
+      "script": "test/compat/generated/drawing-lex-tab-after-command.ass",
+      "sha256": "6f99a222df0723ef026c0a34d19fa06c96725a0e49c4d9598b99d8b4fbd2849f",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-tab-after-command-memory",
+      "script": "test/compat/generated/drawing-lex-tab-after-command.ass",
+      "sha256": "6f99a222df0723ef026c0a34d19fa06c96725a0e49c4d9598b99d8b4fbd2849f",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-nul-at-start-file",
+      "script": "test/compat/generated/drawing-lex-nul-at-start.ass",
+      "sha256": "e533d2ec323e1305cb38894bdcab79a38e8af9a33c83887660531f863ff5e1da",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-nul-at-start-memory",
+      "script": "test/compat/generated/drawing-lex-nul-at-start.ass",
+      "sha256": "e533d2ec323e1305cb38894bdcab79a38e8af9a33c83887660531f863ff5e1da",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-nul-after-token-file",
+      "script": "test/compat/generated/drawing-lex-nul-after-token.ass",
+      "sha256": "b27eca84e494ed5feda0a46adfe0430973ba52dd7dead1faeda64c7134a3a107",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-nul-after-token-memory",
+      "script": "test/compat/generated/drawing-lex-nul-after-token.ass",
+      "sha256": "b27eca84e494ed5feda0a46adfe0430973ba52dd7dead1faeda64c7134a3a107",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-two-nuls-file",
+      "script": "test/compat/generated/drawing-lex-two-nuls.ass",
+      "sha256": "6e9e4cd88d1918a50ed30bd5cd73c96a33b113f08250e2f07e7525de11847054",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-two-nuls-memory",
+      "script": "test/compat/generated/drawing-lex-two-nuls.ass",
+      "sha256": "6e9e4cd88d1918a50ed30bd5cd73c96a33b113f08250e2f07e7525de11847054",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-nul-after-separator-file",
+      "script": "test/compat/generated/drawing-lex-nul-after-separator.ass",
+      "sha256": "4da91920b3eff6214b9ee20dc0657a9308d0893b2042a69b399028b642e409ca",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-nul-after-separator-memory",
+      "script": "test/compat/generated/drawing-lex-nul-after-separator.ass",
+      "sha256": "4da91920b3eff6214b9ee20dc0657a9308d0893b2042a69b399028b642e409ca",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-nul-before-separator-file",
+      "script": "test/compat/generated/drawing-lex-nul-before-separator.ass",
+      "sha256": "1304614eba9bde22cd4f3d0c4053793bf3bcc4f8991948d4e38aeb8e10f0289f",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-nul-before-separator-memory",
+      "script": "test/compat/generated/drawing-lex-nul-before-separator.ass",
+      "sha256": "1304614eba9bde22cd4f3d0c4053793bf3bcc4f8991948d4e38aeb8e10f0289f",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-unicode-space-file",
+      "script": "test/compat/generated/drawing-lex-unicode-space.ass",
+      "sha256": "4b003870868471a68408118b5790682cd34994187cffb592be31141daa947a84",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-unicode-space-memory",
+      "script": "test/compat/generated/drawing-lex-unicode-space.ass",
+      "sha256": "4b003870868471a68408118b5790682cd34994187cffb592be31141daa947a84",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-surrogate-file",
+      "script": "test/compat/generated/drawing-lex-surrogate.ass",
+      "sha256": "b0d8ab42f8688770e2422fedcc434da2ee3de6a931f4e3fa1ef4eb91d5d4dacc",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-surrogate-memory",
+      "script": "test/compat/generated/drawing-lex-surrogate.ass",
+      "sha256": "b0d8ab42f8688770e2422fedcc434da2ee3de6a931f4e3fa1ef4eb91d5d4dacc",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-noncharacter-file",
+      "script": "test/compat/generated/drawing-lex-noncharacter.ass",
+      "sha256": "d7c9395e2e1cd5ad1a426a06b149fea545ebdacf9974001df911e95bbfdbb5dd",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-lex-noncharacter-memory",
+      "script": "test/compat/generated/drawing-lex-noncharacter.ass",
+      "sha256": "d7c9395e2e1cd5ad1a426a06b149fea545ebdacf9974001df911e95bbfdbb5dd",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
       "id": "drawing-state-empty-move-file",
       "script": "test/compat/generated/drawing-state-empty-move.ass",
       "sha256": "114dafba65cf076be6a99da5187df583e26920067664038884d0fa9a76b28931",
