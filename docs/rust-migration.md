@@ -36,6 +36,10 @@ unresolved reference outcomes requiring investigation, never matching results.
   and a PE export/ordinal comparison tool.
 * CI for macOS, Linux and Windows x86/x64 leaf/bridge tests. These jobs do not
   build or validate the complete legacy renderer.
+* A separate Windows renderer workflow attempts to build all three native DLLs
+  from separate pinned-reference and candidate checkouts, compare exports, and
+  run the real CSRI corpus. See Actions for the latest result; a build failure or
+  incomplete run is not compatibility evidence.
 
 The migration is an initial component and validation foundation, not a finished
 safe renderer. The rest of the native parsing, font handling, rendering,
@@ -72,6 +76,14 @@ extract the original algorithm without modifying it; the only test stand-in is
 the class shell around that method. The ASan/UBSan run instruments the C++ side;
 it does not instrument the Rust static library. Safe Rust is enforced in the
 core by a compiler lint. The FFI export has no unsafe blocks.
+
+The same command also compares the surrounding text-reader operations: **30,240
+file scenarios and 989,282 line/seek comparisons**. Original and candidate BOM
+detection, refill, line handling, logical positions and seeking are extracted
+from their actual source files; only MFC's underlying file reads/seeks are replaced
+by an in-memory test file. This exercises malformed sequences around 4096-byte
+boundaries and encoding fallback. The complete MFC/Windows file path still needs
+native integration coverage.
 
 Harness tests compile a deliberately fake native CSRI library, exercise the real
 ctypes ABI and subprocess machinery, and inject byte changes, crashes, hangs,
