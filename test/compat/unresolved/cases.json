@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "description": "Unresolved reference outcomes, deliberately outside the passing rendering corpus. These cases must not count as equal on exceptions, crashes or timeouts.",
+  "cases": [
+    {
+      "fill_seed": 31,
+      "height": 360,
+      "id": "mutation-01352899-00172",
+      "mutation": {
+        "encoding_variant": 3,
+        "index": 172,
+        "operations": [
+          [
+            "delete",
+            137,
+            15
+          ],
+          [
+            "replace",
+            122,
+            98
+          ],
+          [
+            "insert",
+            95,
+            "5c6b3130"
+          ],
+          [
+            "replace",
+            44,
+            177
+          ],
+          [
+            "insert",
+            52,
+            "5c626f726432"
+          ]
+        ]
+      },
+      "open": "file",
+      "script": "test/compat/unresolved/native-exception-20261017-00172.ass",
+      "sha256": "640758c00c1ee84f370a4a7532fb86495b684ea7a25438efa724ff754871a2a7",
+      "stride_padding": 16,
+      "times": [
+        "0",
+        "1",
+        "1.0000001",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "width": 640
+    }
+  ]
+}

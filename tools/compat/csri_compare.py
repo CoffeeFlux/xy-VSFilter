@@ -17,6 +17,7 @@ import platform
 import struct
 import subprocess
 import sys
+import traceback
 
 from pe_exports import exports as pe_exports
 from dialog_capture import DialogCapture, validate_actions
@@ -193,6 +194,13 @@ def capture(dll, case, destination):
             if before != b"\xa5" * GUARD or after != b"\xa5" * GUARD:
                 result["status"] = "guard_corruption"
                 break
+    except Exception as error:
+        # Cleanup can overwrite progress (or itself throw). Preserve the exact
+        # operation that failed before close runs; neither outcome is a pass.
+        write_json(destination / "failure-before-close.json", {
+            "progress": read_json(destination / "progress.json"),
+            "error": f"{type(error).__name__}: {error}", "traceback": traceback.format_exc()})
+        raise
     finally:
         stage("close")
         lib.csri_close(instance)
@@ -211,7 +219,8 @@ def worker(dll, case_path, destination):
         if dialogs.error:
             result.update(status="harness_error", error=dialogs.error)
     except Exception as error:
-        result = {"status": "harness_error", "error": f"{type(error).__name__}: {error}"}
+        result = {"status": "harness_error", "error": f"{type(error).__name__}: {error}",
+                  "traceback": traceback.format_exc()}
     write_json(destination / "result.json", result)
 
 
@@ -241,7 +250,12 @@ def run_worker(dll, case_path, destination, timeout):
         except (OSError, ValueError) as error:
             result["progress_error"] = str(error)
     if (destination / "dialogs.json").exists():
-        result["dialogs"] = read_json(destination / "dialogs.json")
+        try:
+            result["dialogs"] = read_json(destination / "dialogs.json")
+        except (OSError, ValueError) as error:
+            result.update(status="harness_error", dialog_capture_error=str(error))
+    if (destination / "failure-before-close.json").exists():
+        result["failure_before_close"] = read_json(destination / "failure-before-close.json")
     write_json(destination / "result.json", result)
     return result
 

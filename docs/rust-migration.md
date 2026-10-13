@@ -87,11 +87,11 @@ unresolved reference outcomes requiring investigation, never matching results.
   preserves buffer mutation before throwing on an empty trimmed field. Native
   adapters keep the original string storage; Rust borrows bounded code-unit
   copies and returns offsets. Numeric conversion remains in the Windows CRT.
-  The `TryNextStr` increment passed all four platforms and Miri. The combined
-  extracted oracle passed **4,927,032 comparisons per function** locally with
-  fatal ASan/UBSan, covering raw units, mutated buffers, returned pointer/field,
-  next cursor and exceptions. Windows and full DLL validation of the combined
-  increment is pending.
+  Both functions passed the [four-platform CI and Miri run](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38442860012):
+  **5,713,464 comparisons per function** on Windows x86/x64, and **4,927,032 per
+  function** on macOS/Linux with fatal ASan/UBSan. The oracle compares raw units,
+  mutated buffers, returned pointer/field, next cursor and exceptions. Full DLL
+  validation with scripted native warnings is pending.
 * Value-only internal C ABIs for the character and attachment decoders. The ASS lexer
   has a separate, documented ownership boundary: it borrows two bounded input
   arrays during scanning, retains only integer spans, and returns an opaque owner
@@ -120,7 +120,7 @@ unresolved reference outcomes requiring investigation, never matching results.
   build or validate the complete legacy renderer.
 * A separate Windows renderer workflow builds all three native DLLs
   from separate pinned-reference and candidate checkouts, compares exports, and
-  run the real CSRI corpus. See Actions for the latest result; a build failure or
+  runs the real CSRI corpus. See Actions for the latest result; a build failure or
   incomplete run is not compatibility evidence. The earlier foundation candidate
   `7c45fc12`, containing
   all three components and the CRT-only runtime, passed on **Windows x86 and
@@ -367,7 +367,8 @@ prefix and `ok`/`cancel` response. A Windows observer is restricted to the worke
 rendering thread, records dialog/control text, IDs, styles and the selected
 response, then clicks only a matching scripted button. The complete captured
 records are compared along with pixels. Unexpected dialogs still time out;
-missing planned dialogs fail the harness. Icon handles are never compared as
+missing planned dialogs fail the harness. Dedicated Windows x86/x64 tests verify
+these failures, successful scripted responses and warning-text mismatches. Icon handles are never compared as
 text, and this does not validate dialog icon pixels or real host UI behavior.
 The original [four field-fixture timeouts](field-dialog-timeouts.json) are retained
 as unresolved evidence from before this interaction was scripted.
@@ -432,13 +433,34 @@ reducer does not handle unresolved native crashes yet; keep those original input
 for a Windows debugger/sanitizer run. Native harness tests inject a real byte
 mismatch and verify reduction, while rejecting equal outputs and crashes.
 
+### Preserved native exception from mutation seed 20261017
+
+The 256-case campaign found one unresolved Windows exception in both reference
+runs and the candidate: `mutation-01352899-00172`. The other 255 cases matched.
+The [exact fixture and one-case manifest](../test/compat/unresolved/cases.json)
+and [original exception evidence](native-exception-20261017.json) are retained.
+It contains `\bord23456`; excessive border allocation is a hypothesis to
+investigate, not an established cause. The initial report's last stage was
+`close`, but cleanup could have overwritten an earlier failure. The harness now
+records `failure-before-close.json` and Python tracebacks before cleanup; Windows
+tests inject a native exception during rendering to verify that this context
+survives. Exceptions remain unresolved even if both implementations raise them.
+
+Replay this case separately with the real Windows DLLs; it is deliberately not
+included among the passing fixtures, and the original 256-case campaign remains
+failed rather than being relabeled as a success:
+
+```powershell
+python tools/compat/csri_compare.py --reference C:\baseline\VSFilter.dll --candidate C:\candidate\VSFilter.dll --cases test/compat/unresolved/cases.json --output artifacts\unresolved-native-exception --timeout 10
+```
+
 ## Coverage map and remaining migration
 
 | Surface/subsystem | Reference locations | Required evidence still missing |
 | --- | --- | --- |
 | DirectShow/COM, registration, property pages, autoload | `DirectVobSubFilterDll.cpp`, `DirectVobSub*.h`, `auto_load_helper.cpp` | CLSIDs/IIDs, vtables, HRESULTs, refcounts, graph negotiation, threading, registration/unload, player tests |
 | XySubFilter and consumer | `xy_sub_filter*.cpp`, `include/SubRenderIntf.h`, `XySubRenderIntf.h` | Provider/consumer negotiation, frame ownership, options and lifecycle |
-| Aegisub/CSRI | `csri.h`, `csriapi.cpp` | Broader DLL corpus, open flags/extensions, longer lifecycle sequences and real Aegisub integration; the three-component corpus passes x86/x64 |
+| Aegisub/CSRI | `csri.h`, `csriapi.cpp` | Broader DLL corpus, open flags/extensions, longer lifecycle sequences and real Aegisub integration; see the recorded component-stage corpus results above |
 | AviSynth | `plugins.cpp`, `vfr.cpp` | Exact `VobSub`, `TextSub`, `TextSubSwapUV`, `MaskSub` signatures/defaults, frame properties, timing, pixel formats, MT behavior |
 | VirtualDub | `plugins.cpp`, bundled SDK headers | Export calling conventions, filter negotiation, scripting, RGB orientation, lifecycle |
 | Text formats | `STS.cpp`, `TextFile.cpp`, `RealTextParser.cpp`, `USFSubtitles.cpp`, `libssf` | SSA/ASS, SubRip variants, SubViewer, MicroDVD, SAMI, WebVTT, VPlayer, XombieSub, USF, MPL2, RealText and SSF parsing/recovery |
@@ -449,8 +471,8 @@ mismatch and verify reduction, while rejecting equal outputs and crashes.
 
 Continue portable migration here while Windows CI checks each native bridge.
 Local Windows work includes actual Aegisub/player loading and the host coverage
-above. Useful next port boundaries include field/numeric parsing in `STS.cpp`
-and drawing-path parsing in `CPolygon`. Numeric conversion
+above. Useful next port boundaries include numeric parsing in `STS.cpp`
+and the remaining command replacement/numeric parsing in `CPolygon`. Numeric conversion
 must preserve the Windows CRT's overflow, locale, end-pointer and float-rounding
 behavior; substituting Rust's string parsers is not justified. The drawing code
 also has non-obvious recovery and truncation behavior to capture before porting.

@@ -51,6 +51,9 @@ void csri_render(csri_inst *i, struct csri_frame *frame, double time)
 #ifdef HANG
     for (;;) { }
 #endif
+#ifdef NATIVE_EXCEPTION
+    RaiseException(0xe06d7363, 0, 0, NULL);
+#endif
     frame->planes[0][0] = (unsigned char)(++state->calls + (int)(time * 10));
 #ifdef INPUT_BYTE
     frame->planes[0][1] = state->input_byte;
