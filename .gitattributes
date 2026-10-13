@@ -1,0 +1,2 @@
+# Corpus hashes describe exact bytes, including malformed encodings and CR/LF.
+/test/** -text

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- Experimental migration path. Baseline builds do not require Rust. -->
+  <PropertyGroup Condition="'$(RustTextDecoder)'=='true'">
+    <XyRustTarget Condition="'$(Platform)'=='Win32'">i686-pc-windows-msvc</XyRustTarget>
+    <XyRustTarget Condition="'$(Platform)'=='x64'">x86_64-pc-windows-msvc</XyRustTarget>
+    <XyRustLibrary>$(SolutionDir)target\$(XyRustTarget)\release\xy_vsfilter_ffi.lib</XyRustLibrary>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(RustTextDecoder)'=='true'">
+    <ClCompile>
+      <PreprocessorDefinitions>XY_VSFILTER_RUST_TEXT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <Target Name="ValidateRustTextDecoder" BeforeTargets="PrepareForBuild" Condition="'$(RustTextDecoder)'=='true'">
+    <Error Condition="'$(Configuration)'!='Release' And '$(Configuration)'!='Release Unicode'" Text="RustTextDecoder currently supports Release (/MT) only. Build the reference with the same configuration." />
+    <Error Condition="'$(XyRustTarget)'==''" Text="RustTextDecoder supports Win32 and x64 only." />
+    <Error Condition="!Exists('$(XyRustLibrary)')" Text="Build the Rust library first with tools\compat\build_rust_windows.ps1 for $(Platform)." />
+  </Target>
+</Project>

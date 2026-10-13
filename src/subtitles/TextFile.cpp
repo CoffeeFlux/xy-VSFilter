@@ -26,6 +26,9 @@
 
 #include "TextFile.h"
 #include "Utf8.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "xy_rust_text.h"
+#endif
 
 CTextFile::CTextFile(enc e)
 : m_encoding(e)
@@ -316,6 +319,11 @@ bool CTextFile::ReadLine() {
 }
 
 int CTextFile::NextChar() {
+#ifdef XY_VSFILTER_RUST_TEXT
+	static_assert(DEFAULT_ENCODING == 0 && UTF8 == 1 && LE16 == 2 && BE16 == 3, "Rust encoding ABI");
+	static_assert(CHARERR_NEED_MORE == -1 && CHARERR_REOPEN == -2, "Rust status ABI");
+	return XyRust::NextChar(m_readbuffer, m_bufferCount, m_bufferPos, m_encoding);
+#else
 	if (m_encoding == UTF8) {
 		unsigned char c = m_readbuffer[m_bufferPos++];
 		if (Utf8::isSingleByte(c)) return c;
@@ -359,6 +367,7 @@ int CTextFile::NextChar() {
 	}
 
 	return CHARERR_REOPEN;
+#endif
 }
 
 BOOL CTextFile::ReadString(CStringW& str) {

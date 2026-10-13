@@ -12,3 +12,6 @@ ipch
 /src/filters/BaseClasses/*.asm
 /src/filters/transform/VSFilter/*.asm
 /.vs
+/target/
+/artifacts/
+__pycache__/

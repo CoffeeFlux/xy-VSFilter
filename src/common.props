@@ -86,4 +86,5 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
+  <Import Project="$(MSBuildThisFileDirectory)rust-text.props" />
 </Project>
