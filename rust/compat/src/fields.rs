@@ -26,6 +26,24 @@ pub fn next_field(input: &[u16], separator: u16) -> Field {
     Field { start, end }
 }
 
+/// CString-based GetStr uses CRT whitespace, preserves explicit lengths after
+/// an embedded NUL, and throws on an empty trimmed buffer. A missing separator
+/// returns the entire remaining string without consuming it.
+pub fn string_field(input: &[u16], whitespace: &[u8], separator: u16) -> Field {
+    let mut start = 0;
+    while start < input.len() && input[start] != 0 && whitespace.get(start) == Some(&1) {
+        start += 1;
+    }
+    let mut end = start;
+    while end < input.len() && input[end] != separator && input[end] != 0 {
+        end += 1;
+    }
+    if end < input.len() && input[end] != separator {
+        end = input.len();
+    }
+    Field { start, end }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -50,5 +68,22 @@ mod tests {
             Field { start: 1, end: 2 }
         );
         assert_eq!(next_field(&[44, 50], 44), Field { start: 0, end: 0 });
+    }
+
+    #[test]
+    fn cstring_search_stops_at_nul_but_missing_separator_keeps_explicit_tail() {
+        let input = [32, 0xd800, 0, 44, 50];
+        assert_eq!(
+            string_field(&input, &[1, 0, 0, 0, 0], 44),
+            Field { start: 1, end: 5 }
+        );
+        assert_eq!(
+            string_field(&input, &[1, 0, 0, 0, 0], 0),
+            Field { start: 1, end: 2 }
+        );
+        assert_eq!(
+            string_field(&[9, 32], &[1, 1], 44),
+            Field { start: 2, end: 2 }
+        );
     }
 }

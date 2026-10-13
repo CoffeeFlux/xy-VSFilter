@@ -80,14 +80,18 @@ unresolved reference outcomes requiring investigation, never matching results.
   [captured Windows evidence](drawing-replacement-unresolved.json). The prior
   local replacement stand-in incorrectly assumed ordinary substring semantics;
   it has been removed. Numeric parsing also remains native.
-* Safe Rust `TryNextStr` field scanning. Only ASCII spaces are trimmed; empty
-  fields, embedded NUL termination, delimiter mutation and repeated reads of an
-  undelimited final field retain their original behavior. The native bridge
-  keeps the original string allocation and returns pointers into it; Rust sees
-  a bounded code-unit copy and returns only offsets. Windows CRT numeric parsing
-  and `GetStr` remain native. The extracted original/candidate functions passed
-  **4,140,600** local comparisons of every buffer unit, returned pointer and next
-  cursor, with fatal ASan/UBSan. Windows and full-renderer validation is pending.
+* Safe Rust `TryNextStr` and `GetStr` field scanning. `TryNextStr` trims only
+  ASCII spaces; `GetStr` consumes classifications from the native CRT to retain
+  locale behavior. Both preserve empty fields, embedded NUL handling, delimiter
+  mutation and repeated reads of an undelimited final field. `GetStr` also
+  preserves buffer mutation before throwing on an empty trimmed field. Native
+  adapters keep the original string storage; Rust borrows bounded code-unit
+  copies and returns offsets. Numeric conversion remains in the Windows CRT.
+  The `TryNextStr` increment passed all four platforms and Miri. The combined
+  extracted oracle passed **4,927,032 comparisons per function** locally with
+  fatal ASan/UBSan, covering raw units, mutated buffers, returned pointer/field,
+  next cursor and exceptions. Windows and full DLL validation of the combined
+  increment is pending.
 * Value-only internal C ABIs for the character and attachment decoders. The ASS lexer
   has a separate, documented ownership boundary: it borrows two bounded input
   arrays during scanning, retains only integer spans, and returns an opaque owner
@@ -332,7 +336,7 @@ artifacts, restore their `candidate/artifacts/native/...` tree under this checko
 
 ## CSRI corpus and evidence
 
-`test/compat/cases.json` contains 282 cases: both file and memory
+`test/compat/cases.json` contains 290 cases: both file and memory
 loading for 34 existing ASS samples and 98 generated samples, plus geometry and
 stride cases. Generated cases include malformed tags, duplicate tags, malformed
 UTF-8, unpaired UTF-16, embedded NUL, CR/LF differences, missing final newlines
@@ -445,7 +449,7 @@ the native oracle where needed:
 
 | Next boundary | Portable work | Native behavior to retain and compare |
 | --- | --- | --- |
-| `STS.cpp` field splitting and numeric parsing | Raw UTF-16 fields, cursor/mutation state, error recovery | `GetStr` leaves the last undelimited field in the buffer; `TryNextStr` scanning is now ported, retaining ASCII-space trimming and separator-to-NUL mutation. Keep CRT numeric conversion until overflow, locale, end-pointer and rounding results are captured. |
+| `STS.cpp` field splitting and numeric parsing | Raw UTF-16 fields, cursor/mutation state, error recovery | Both field scanners are now ported, preserving final-field reuse, distinct whitespace rules and separator mutation. Keep CRT numeric conversion until overflow, locale, end-pointer and rounding results are captured. |
 | Remaining `RTS.cpp` drawing parsing | Command replacement, numeric consumption and final native path storage; command state is now ported | `SpanIncluding`'s return value is ignored; commands split inside arbitrary text; `s` falls through to `p`; the apparent Bezier truncation uses an incremented counter and must not be "fixed." Keep `wcstod` and float-to-LONG conversion at the native boundary initially. |
 | `CompositionObject.cpp` bitmap run decoding | Bounded byte/bit readers, RLE state, emitted rectangles | Capture truncated-stream behavior, signed-short coordinate wrapping, palette state and transparent runs. Keep native palette conversion/compositing until those stages have separate exact-byte oracles. Uninitialized allocation tails are unresolved behavior, not a portable specification. |
 | `xy_filter.cpp` and raster/compositing kernels | Safe slice ownership and scalar arithmetic implementations | Capture each active SIMD path's operation order, padding, overlap and rounding. Scalar C++ output alone does not establish equality with the SIMD implementation used by a DLL. |
