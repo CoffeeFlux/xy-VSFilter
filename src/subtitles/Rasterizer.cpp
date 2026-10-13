@@ -28,6 +28,7 @@
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_fill.h"
 #include "xy_rust_mask.h"
+#include "xy_rust_bilinear.h"
 #endif
 #include "SeparableFilter.h"
 #include "xy_logger.h"
@@ -762,6 +763,15 @@ static void Bilinear(unsigned char *buf, int w, int h, int stride, int x_factor,
         return;
     }
     memset(col_pix_buf_base, 0, w*sizeof(WORD));
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (w > 0 && w <= INT32_MAX / 2 && x_factor >= 0 && x_factor <= 8 && y_factor >= 0 && y_factor <= 8) {
+        for (int y = 0; y < h; ++y) {
+            xy_vsfilter_bilinear_row(buf + y * stride, col_pix_buf_base, w, x_factor, y_factor);
+        }
+        xy_free(col_pix_buf_base);
+        return;
+    }
+#endif
 
     for (int y = 0; y < h; y++){
         unsigned char *src=buf+y*stride;

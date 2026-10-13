@@ -20,7 +20,7 @@ TARGETS = {"aarch64-apple-darwin", "x86_64-unknown-linux-gnu",
 COMPONENTS = ["result", "text_reader_result", "font_result", "lexer_result",
               "drawing_result", "drawing_tokens_result", "fields_result",
               "segments_result", "timeline_search_result", "segment_insert_result",
-              "hdmv_result", "dvb_result", "dvb_field_result", "golomb_result", "fill_result", "fill_debug_result", "pixel_result", "mask_result"]
+              "hdmv_result", "dvb_result", "dvb_field_result", "golomb_result", "fill_result", "fill_debug_result", "pixel_result", "mask_result", "bilinear_result"]
 BITMAP_SOURCES = ["hdmv_source_sha256", "hdmv_golomb_source_sha256",
                   "hdmv_golomb_header_sha256", "hdmv_raster_source_sha256"]
 

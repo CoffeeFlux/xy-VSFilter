@@ -29,6 +29,7 @@ on:
       - 'include/xy_rust_golomb.h'
       - 'include/xy_rust_fill.h'
       - 'include/xy_rust_mask.h'
+      - 'include/xy_rust_bilinear.h'
       - 'include/xy_rust_timeline_search.h'
       - 'src/**'
       - 'tools/compat/**'
