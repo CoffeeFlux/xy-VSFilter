@@ -18,7 +18,7 @@ class NativeHarnessTests(unittest.TestCase):
         cls.libraries = {}
         variants = ["normal", "DIFFERENT", "CRASH", "HANG", "REJECT", "CORRUPT_GUARD", "INPUT_BYTE"]
         if os.name == "nt":
-            variants += ["DIALOG", "DIALOG_DIFFERENT"]
+            variants += ["DIALOG", "DIALOG_DIFFERENT", "NATIVE_EXCEPTION"]
         for variant in variants:
             suffix = ".dll" if os.name == "nt" else ".dylib" if sys.platform == "darwin" else ".so"
             path = cls.root / (variant + suffix)
@@ -98,6 +98,15 @@ class NativeHarnessTests(unittest.TestCase):
         harness.write_json(self.case_path, self.case)
         result, _ = self.run_variant("normal", "missing")
         self.assertEqual(result["status"], "harness_error", result)
+
+    @unittest.skipUnless(os.name == "nt", "Windows structured exception capture")
+    def test_native_failure_keeps_its_stage_before_close(self):
+        result, directory = self.run_variant("NATIVE_EXCEPTION", "native-exception")
+        self.assertEqual(result["status"], "harness_error", result)
+        self.assertEqual(result["last_progress"], {"stage": "close"})
+        self.assertEqual(result["failure_before_close"]["progress"], {"stage": "render", "frame": 0, "timestamp": "1"})
+        self.assertIn("csri_render", result["failure_before_close"]["traceback"])
+        self.assertEqual(harness.compare_captures(result,result,directory,directory)["kind"], "unresolved")
 
     def test_rejection_is_recorded_as_rejection(self):
         left, ld = self.run_variant("REJECT", "left")
