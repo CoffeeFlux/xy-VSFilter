@@ -14,6 +14,9 @@
 extern "C" void* XY_ASS_CDECL xy_vsfilter_ass_scan(const uint16_t*, const uint8_t*, uint32_t);
 extern "C" uint64_t XY_ASS_CDECL xy_vsfilter_ass_field(const void*, uint32_t, uint32_t, uint32_t);
 extern "C" void XY_ASS_CDECL xy_vsfilter_ass_release(void*);
+#ifdef _WIN32
+extern "C" void XY_ASS_CDECL xy_vsfilter_native_runtime_v1();
+#endif
 #undef XY_ASS_CDECL
 
 namespace XyRust {
@@ -27,6 +30,9 @@ public:
     // Copying avoids wchar_t representation/aliasing assumptions. Whitespace
     // classification stays with the same native CRT and locale as the original.
     template<typename Unit> AssTokens(const Unit* input, int length) : owner(nullptr) {
+#ifdef _WIN32
+        xy_vsfilter_native_runtime_v1(); // Fail linking if built with Rust std.
+#endif
         if (length < 0 || (!input && length)) throw std::bad_alloc();
         std::vector<uint16_t> units(length);
         std::vector<uint8_t> whitespace(length);

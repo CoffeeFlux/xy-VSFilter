@@ -8,6 +8,9 @@ publish.workspace = true
 [lib]
 crate-type = ["staticlib", "rlib"]
 
+[features]
+native-runtime = []
+
 [dependencies]
 xy-vsfilter-compat = { path = "../compat" }
 

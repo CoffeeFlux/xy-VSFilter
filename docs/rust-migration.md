@@ -20,7 +20,10 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
-* A dependency-free Cargo workspace. `rust/compat` forbids unsafe Rust.
+* A dependency-free Cargo workspace. `rust/compat` forbids unsafe Rust and uses
+  only `core`/`alloc`. The production Windows static library uses `native-runtime`
+  to avoid pulling in Rust std's newer Windows dependencies. A small allocator
+  adapter uses the DLL's existing CRT `_aligned_malloc`/`_aligned_free` pair.
 * A safe port of `CTextFile::NextChar`, including its nonstandard UTF-8 behavior,
   raw UTF-16 code units, error statuses and cursor movement.
 * Safe Rust font-attachment decoding, preserving byte truncation of arbitrary
@@ -48,7 +51,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   strings on Windows and storage stand-ins elsewhere. The local macOS run checks
   **2,793,355** cases with fatal ASan/UBSan; counts vary with available CRT locales.
 * An isolated-process CSRI comparison harness, an exact-byte corpus generator,
-  and a PE export/ordinal comparison tool.
+  PE export/ordinal comparison, and a gate against added normal/delay imports or
+  changed declared OS/subsystem requirements.
 * CI for macOS, Linux and Windows x86/x64 leaf/bridge tests. These jobs do not
   build or validate the complete legacy renderer.
 * A separate Windows renderer workflow builds all three native DLLs
@@ -102,11 +106,13 @@ the reference commit, source hashes, compiler and result. The native tests
 extract the original algorithm without modifying it; the only test stand-in is
 the class shell around that method. The ASan/UBSan run instruments the C++ side;
 it does not instrument the Rust static library. Safe Rust is enforced in the
-core by a compiler lint. Only the ASS lexer's FFI owner module contains unsafe
-Rust, for constructing borrowed slices and querying/releasing the owned result.
+core by a compiler lint. The ASS lexer's FFI owner and the production CRT
+allocator contain unsafe Rust, for constructing borrowed slices,
+querying/releasing the owned result, and allocating/deallocating aligned storage.
 Every unsafe block states its caller contract. The native caller copies its
 inputs into typed vectors and bounds output spans by the original string length.
-Miri checks the Rust-side ownership lifecycle in a separate CI job. Native
+Miri checks the Rust-side ownership lifecycle in a separate CI job. Windows unit
+tests also check the CRT allocator's alignment, zeroing and reallocation. Native
 out-of-memory behavior and concurrent changes to the process locale have not
 been established as compatibility guarantees.
 
@@ -166,6 +172,16 @@ not VSFilter's output.
    link configuration when changing Rust versions. Rebuild all dependent native
    libraries after changing the property; existing objects are not trustworthy
    when switching implementations.
+
+   `src/common.props` targets Windows 7 (`WINVER=0x0601`). Modern Rust's regular
+   Windows std targets require Windows 10, so production uses `core`/`alloc` and
+   the existing native CRT instead. The C++ bridge requires a link marker from
+   this configuration, rejecting an accidentally linked std build. The native
+   workflow rejects added imports and changed PE OS/subsystem fields. These
+   checks do **not** establish Windows 7 or older-CPU support: run the binaries
+   on those environments before release, checking code generation and dynamic
+   API loading too. [Rust's Windows baseline change](https://blog.rust-lang.org/2024/02/26/Windows-7/),
+   [MSVC aligned-allocation contract](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/aligned-malloc).
 
 7. Compare exports for every shipped DLL, including the consumer when built:
 

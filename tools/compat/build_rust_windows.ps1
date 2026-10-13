@@ -9,7 +9,7 @@ Push-Location $repoRoot
 try {
     # The original Release projects use /MT. Match it; never share allocations.
     $env:RUSTFLAGS = "-C target-feature=+crt-static"
-    & cargo rustc --locked --offline --release -p xy-vsfilter-ffi --target $rustTarget -- --print native-static-libs
+    & cargo rustc --locked --offline --release -p xy-vsfilter-ffi --features native-runtime --target $rustTarget -- --print native-static-libs
     if ($LASTEXITCODE -ne 0) { throw "Rust build failed ($LASTEXITCODE)" }
     Write-Host "Built target\$rustTarget\release\xy_vsfilter_ffi.lib"
     Write-Host "Rebuild ALL native projects with /p:RustTextDecoder=true; do not reuse baseline objects."

@@ -5,7 +5,8 @@
 //! Whitespace is supplied by the native CRT, not Rust's Unicode tables. Spans
 //! refer to raw UTF-16 units. Command lookup and style application remain native.
 
-use std::ops::Range;
+use alloc::vec::Vec;
+use core::ops::Range;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Tag {
@@ -85,6 +86,7 @@ pub fn tokenize(input: &[u16], whitespace: &[u8]) -> Vec<Tag> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::string::String;
 
     #[test]
     fn keeps_empty_tags_and_non_nested_parameter_recovery() {

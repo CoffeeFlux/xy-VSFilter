@@ -1,8 +1,15 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 //! Internal C ABI. Scalar decoder calls and an isolated ASS lexer owner.
 #![deny(unsafe_op_in_unsafe_fn)]
+#![cfg_attr(all(feature = "native-runtime", not(test)), no_std)]
+
+extern crate alloc;
 
 mod ass_tags;
+#[cfg(all(windows, any(feature = "native-runtime", test)))]
+mod runtime;
+#[cfg(all(feature = "native-runtime", not(windows)))]
+compile_error!("native-runtime uses the Windows C runtime; omit it for portable tests");
 
 use xy_vsfilter_compat::text::{next_char, Decoded, Encoding, REOPEN};
 

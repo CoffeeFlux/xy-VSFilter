@@ -4,6 +4,9 @@
 //! The pinned C++ implementation, including its malformed-input behavior,
 //! is the reference. These routines are not standards-conformance parsers.
 #![forbid(unsafe_code)]
+#![no_std]
+
+extern crate alloc;
 
 pub mod ass_tags;
 pub mod font;
