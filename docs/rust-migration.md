@@ -20,6 +20,19 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust bilinear subpixel rows for horizontal/vertical factors zero through
+  eight, behind the existing switch. The bridge lends one initialized byte row
+  and its disjoint WORD column history at a time. Row borrows end before later
+  overlapping rows; the Rust loop retains left-edge reset, column updates,
+  rounding and byte narrowing. Native column allocation/zeroing/free and uncommon
+  factors remain in place, including allocation failure and empty-row behavior.
+  The extracted oracle passed **97,897 exact comparisons / 801,972,224 bytes**
+  with fatal ASan/UBSan, including **53,046 visibly changed cases** and **256
+  injected allocation failures**. It compares pixels, padding, guards, allocation
+  events and final column history across all factor pairs, repeated shifts,
+  negative/zero pitch and overlapping rows. Rust tests (41 core, 18 FFI), strict
+  Clippy and default native branch syntax checks pass. Windows validation is
+  pending for this increment.
 * Safe Rust 32-bit MMX/SSE body/border mask arithmetic is prepared behind the
   same switch. Four-byte signed high-word mask products and sixteen-byte
   unsigned products remain distinct. Native adapters preserve the original
@@ -60,7 +73,13 @@ unresolved reference outcomes requiring investigation, never matching results.
   channel/alpha combinations, wide-alpha boundaries and deterministic full-width
   values, plus byte and wider shape/clip products. Existing row/rectangle tests
   also pass with these helpers enabled. Rust tests (37 core, 16 FFI), strict
-  Clippy and default C++ branch syntax checks pass. Windows validation is pending.
+  Clippy and default C++ branch syntax checks pass. Candidate `76fa23c8`
+  passed all four CI platforms, Miri and both Windows DLL jobs. Each Windows
+  component job passed **71,764,938 single-pixel comparisons**. Each DLL job
+  matched **322 corpus cases / 4,026 frames** and **32 mutations / 224 frames**,
+  plus dialogs, visible controls, exports and dependencies. Both logs confirm
+  Rust-enabled `Rasterizer.cpp` compilation. [Single-pixel evidence](single-pixel-evidence.json)
+  records verified source/DLL hashes and the retained fallback scope.
 * Safe Rust additive packed blending and variable-alpha planar blending are
   prepared behind the existing opt-in switch. Additive colors saturate upward
   while inverse alpha saturates downward. The bridge retains the SSE alpha

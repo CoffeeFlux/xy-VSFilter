@@ -60,7 +60,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_segment_insert.h",
               ROOT / "include/xy_rust_hdmv.h",
               ROOT / "include/xy_rust_dvb.h", ROOT / "include/xy_rust_golomb.h", ROOT / "include/xy_rust_fill.h",
-              ROOT / "src/subtitles/Rasterizer.cpp", ROOT / "include/xy_rust_mask.h",
+              ROOT / "src/subtitles/Rasterizer.cpp", ROOT / "include/xy_rust_mask.h", ROOT / "include/xy_rust_bilinear.h",
               ROOT / "src/dsutil/GolombBuffer.cpp", ROOT / "src/dsutil/GolombBuffer.h",
               ROOT / "src/subtitles/CompositionObject.cpp",
               ROOT / "include/xy_rust_timeline_search.h",
@@ -339,6 +339,14 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         hdmv += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     hdmv += "#endif\n"
     (destination / "original_hdmv.h").write_text(hdmv, encoding="utf-8")
+    bilinear = '#include "bilinear_shell.h"\n'
+    for name, content in (("ReferenceBilinear", raster_source), ("CandidateBilinear", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+        bilinear += f"namespace {name} {{\n"
+        if name == "CandidateBilinear":
+            bilinear += "#define XY_VSFILTER_RUST_TEXT\n"
+        bilinear += extract_definition(content.decode("utf-8-sig"), "static void Bilinear(")
+        bilinear += "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_bilinear.h").write_text(bilinear, encoding="utf-8")
     masks = '#include "mask_shell.h"\n'
     for name, content in (("ReferenceMask", raster_source), ("CandidateMask", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         masks += f"namespace {name} {{\n"
@@ -516,6 +524,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     mask_result = run([str(mask_executable)], capture_output=True, text=True)
     print(mask_result.stdout, end="", flush=True)
     print(mask_result.stderr, end="", file=sys.stderr)
+    bilinear_executable = destination / ("bilinear-oracle.exe" if os.name == "nt" else "bilinear-oracle")
+    bilinear_compile = [arg.replace("fill_oracle.cpp", "bilinear_oracle.cpp").replace("fill-oracle", "bilinear-oracle") for arg in fill_compile]
+    run(bilinear_compile)
+    bilinear_result = run([str(bilinear_executable)], capture_output=True, text=True)
+    print(bilinear_result.stdout, end="", flush=True)
+    print(bilinear_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -545,6 +559,8 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "hdmv_golomb_source_sha256": hashlib.sha256(golomb_source).hexdigest(),
         "hdmv_golomb_header_sha256": hashlib.sha256(golomb_header).hexdigest(),
         "hdmv_raster_source_sha256": hashlib.sha256(raster_source).hexdigest(),
+        "bilinear_compile_command": bilinear_compile,
+        "bilinear_result": bilinear_result.stdout, "bilinear_stderr": bilinear_result.stderr,
         "mask_compile_command": mask_compile,
         "mask_result": mask_result.stdout, "mask_stderr": mask_result.stderr,
         "pixel_compile_command": pixel_compile,
