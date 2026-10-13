@@ -60,6 +60,29 @@ def variants():
         else:
             yield name, data
     plain = SEED.replace(b"COMPAT_TEXT", b"Compatibility")
+    # Exercise CreateSegments through the actual DLL, with overlapping glyphs
+    # so entry order changes affect pixels. Sample every boundary below, then
+    # seek backwards. Zero-duration entries can split otherwise active ranges.
+    timelines = {
+        "overlap": [(1, 4, 0), (2, 5, 0), (3, 6, 0)],
+        "overlap-order-reversed": [(3, 6, 0), (2, 5, 0), (1, 4, 0)],
+        "duplicates-and-zero": [(1, 5, 0), (1, 5, 0), (2, 2, 0), (4, 4, 0)],
+        "touching-and-gaps": [(0, 1, 0), (1, 2, 0), (3, 4, 0), (4, 6, 0)],
+        "nested-layers": [(0, 6, 2), (1, 5, -1), (2, 4, 0), (3, 3, 0)],
+        "reversed-and-empty": [(5, 1, 0), (1, 6, 0), (2, 2, 0), (4, 3, 0)],
+        "equal-starts": [(1, 6, 0), (1, 2, 0), (1, 5, 0), (1, 4, 0)],
+        "equal-ends": [(4, 6, 0), (0, 6, 0), (3, 6, 0), (1, 6, 0)],
+    }
+    for name, entries in timelines.items():
+        script = SEED.split(b"Dialogue:", 1)[0]
+        for index, (start, end, layer) in enumerate(entries):
+            color = ("0000FF", "00FF00", "FF0000", "00FFFF")[index % 4]
+            # Same opaque glyph at the same location exposes ordering without
+            # relying on collision-placement differences.
+            text = r"{\pos(320,180)\an5\bord0\shad0\1c&H" + color + r"&}MMMM"
+            script += (f"Dialogue: {layer},0:00:{start:05.2f},0:00:{end:05.2f},"
+                       f"Default,,0,0,0,,{text}\r\n").encode("ascii")
+        yield "timeline-" + name, script
     # TryNextStr mutates delimiters and leaves an undelimited final field in
     # place. Keep raw code units and odd whitespace at the numeric/field boundary.
     for name, fields in {
@@ -195,6 +218,10 @@ def make_cases(files):
             cases.append({"id": path.stem + "-" + mode, "script": path.relative_to(ROOT).as_posix(),
                 "sha256": hashlib.sha256(data).hexdigest(), "open": mode, "width": 1280, "height": 720,
                 "times": timestamps(data), "stride_padding": 16, "fill_seed": 31})
+            if path.stem.startswith("timeline-"):
+                tick = Decimal("0.0000001")
+                times = [str(Decimal(t) + offset) for t in range(7) for offset in (-tick, Decimal(0), tick)]
+                cases[-1]["times"] = times + list(reversed(times)) + ["1", "3", "1", "5", "3"]
             warning_styles = {"field-tab-prefixes": "\tDefault", "field-unicode-style-space": "\u2003Default"}
             if path.stem in warning_styles:
                 cases[-1]["dialog_actions"] = [{"title": "Warning",

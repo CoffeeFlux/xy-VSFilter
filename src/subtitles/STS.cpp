@@ -24,6 +24,7 @@
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_text.h"
 #include "xy_rust_fields.h"
+#include "xy_rust_segments.h"
 #endif
 #include "STS.h"
 #include <atlbase.h>
@@ -3176,6 +3177,22 @@ void CSimpleTextSubtitle::CreateSegments()
 {
     m_segments.RemoveAll();
 
+#ifdef XY_VSFILTER_RUST_TEXT
+    {
+        XyRust::Segments segments;
+        for (size_t i = 0; i < m_entries.GetCount(); ++i) {
+            const STSEntry& entry = m_entries.GetAt(i);
+            segments.Add(entry.start, entry.end);
+        }
+        const size_t count = segments.Build();
+        for (size_t i = 0; i < count; ++i) {
+            STSSegment segment(segments.Start(i), segments.End(i));
+            const size_t entries = segments.Count(i);
+            for (size_t j = 0; j < entries; ++j) segment.subs.Add(segments.Entry(i, j));
+            m_segments.Add(segment);
+        }
+    }
+#else
     if(m_entries.GetCount()>0)
     {
         size_t start, mid, end;
@@ -3228,6 +3245,7 @@ void CSimpleTextSubtitle::CreateSegments()
             if(tempSegments[i].subs.GetCount()>0)
                 m_segments.Add(tempSegments[i]);
     }
+#endif
     OnChanged();
     LogSegments(m_segments);
 }

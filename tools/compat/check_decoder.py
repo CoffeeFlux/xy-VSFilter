@@ -117,6 +117,17 @@ public:
             fields += extract_method(content.decode("utf-8-sig"), signature) + "\n"
         fields += "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_fields.h").write_text(fields, encoding="utf-8")
+    segment_header = original("src/subtitles/STS.h", reference["commit"])
+    segment_class = extract_method(segment_header.decode("utf-8-sig"), "class STSSegment")
+    segments = font_source.decode("utf-8-sig").split("#include", 1)[0]
+    segments += '#include "segments_shell.h"\n' + segment_class + ";\n"
+    for name, content in (("OriginalSegments", font_source), ("CandidateSegments", candidate_font)):
+        segments += f"SEGMENTS_SHELL({name})\n#define CSimpleTextSubtitle {name}\n"
+        if name == "CandidateSegments":
+            segments += "#define XY_VSFILTER_RUST_TEXT\n"
+        segments += extract_method(content.decode("utf-8-sig"), "void CSimpleTextSubtitle::CreateSegments()")
+        segments += "\n#undef CSimpleTextSubtitle\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_segments.h").write_text(segments, encoding="utf-8")
     lexer_source = original("src/subtitles/RTS.cpp", reference["commit"])
     candidate_lexer = (ROOT / "src/subtitles/RTS.cpp").read_bytes()
     lexer = lexer_source.decode("utf-8-sig").split("#include", 1)[0]
@@ -255,6 +266,13 @@ public:
     fields_result = run([str(fields_executable)], capture_output=True, text=True)
     print(fields_result.stdout, end="")
     print(fields_result.stderr, end="", file=sys.stderr)
+    segments_executable = destination / ("segments-oracle.exe" if os.name == "nt" else "segments-oracle")
+    segments_compile = [arg.replace("decoder_oracle.cpp", "segments_oracle.cpp")
+                        .replace("decoder-oracle", "segments-oracle") for arg in compile_command]
+    run(segments_compile)
+    segments_result = run([str(segments_executable)], capture_output=True, text=True)
+    print(segments_result.stdout, end="")
+    print(segments_result.stderr, end="", file=sys.stderr)
     compiler = subprocess.run([args.cxx] if os.name == "nt" else [args.cxx, "--version"],
                               capture_output=True, text=True)
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
@@ -262,6 +280,7 @@ public:
               ROOT / "include/xy_rust_drawing.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
               ROOT / "include/xy_rust_fields.h",
+              ROOT / "include/xy_rust_segments.h",
               ROOT / "src/subtitles/TextFile.h"]
     inputs += sorted((ROOT / "tools/compat").glob("*oracle.cpp"))
     inputs += sorted((ROOT / "tools/compat").glob("*shell.h"))
@@ -291,7 +310,10 @@ public:
         "drawing_tokens_compile_command": token_compile,
         "drawing_tokens_result": token_result.stdout, "drawing_tokens_stderr": token_result.stderr,
         "fields_compile_command": fields_compile,
-        "fields_result": fields_result.stdout, "fields_stderr": fields_result.stderr}
+        "fields_result": fields_result.stdout, "fields_stderr": fields_result.stderr,
+        "segments_header_sha256": hashlib.sha256(segment_header).hexdigest(),
+        "segments_compile_command": segments_compile,
+        "segments_result": segments_result.stdout, "segments_stderr": segments_result.stderr}
     (destination / "report.json").write_text(json.dumps(report, indent=2) + "\n")
 
 
