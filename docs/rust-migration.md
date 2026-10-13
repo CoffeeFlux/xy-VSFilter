@@ -34,8 +34,20 @@ unresolved reference outcomes requiring investigation, never matching results.
   negative lengths, prebuffered bits, skipped mappings, dirty rectangles, palette
   changes and injected exceptions. x86 pixel cases use the original SSE fillers
   for both packed and planar buffers, comparing all padding and guards.
-  Local and Windows validation for this increment is in progress; earlier
-  validated bitmap-run evidence below remains associated with its recorded SHA.
+  The full local suite passed with fatal ASan/UBSan: **253,887 field
+  comparisons / 9,545,490 native observations**, including **164,958 injected
+  boundary exceptions**. Rust tests (30 core and 12 FFI) and strict Clippy pass.
+  The default C++ path was also syntax-checked for arm64 and x64. Windows x86/x64
+  component runs passed **284,607 field comparisons / 12,116,250 observations**,
+  including **195,438 injected exceptions, 30,720 exact native pixel comparisons
+  and 240 visibly drawing fixtures** per architecture. Candidate `9dff4fc6`
+  passed [all four CI platforms and Miri](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38476034205)
+  and [both Windows DLL jobs](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38476034214).
+  Each DLL job matched **322 corpus cases / 4,026 frames**, plus **32 mutations /
+  224 frames**, warning dialogs, visible controls, all three export tables and
+  declared dependency requirements. Both logs confirm the Rust-enabled
+  `CompositionObject.cpp` compilation. [DVB field evidence](dvb-field-evidence.json)
+  records source inputs, paired DLL hashes, successful jobs and exact scope.
   RLE ownership, bitmap packet parsing and host playback remain native/unverified
   by this component oracle.
 * Safe Rust DVB 2-, 4- and 8-bit pixel-code-string decoding. Rust requests the
@@ -651,6 +663,13 @@ run with Python assertions disabled. Incomplete or failed reports cannot produce
 a summary. Miri and workflow job status must also be checked in GitHub; the
 artifact verifier does not query GitHub itself.
 
+The portable runner snapshots candidate inputs and the commit before extraction
+and compilation, then checks both again before marking a report complete. It
+rejects changed files, newly added harness/Rust inputs, or a changed HEAD. Keep
+the checkout stable throughout validation; commit source changes first. Local
+runs with edits still have content hashes, but the evidence summary only accepts
+hashes matching the recorded commit.
+
 Download artifacts under `artifacts/ci-RUN` using the artifact names as
 subdirectories. For example, after both workflows finish:
 
@@ -701,7 +720,7 @@ the native oracle where needed:
 | `xy_filter.cpp` and raster/compositing kernels | Safe slice ownership and scalar arithmetic implementations | Capture each active SIMD path's operation order, padding, overlap and rounding. Scalar C++ output alone does not establish equality with the SIMD implementation used by a DLL. |
 
 Before migrating bitmap reader/storage ownership, extend the current extracted
-`CGolombBuffer` coverage beyond the read/EOF/alignment operations exercised by
+`CGolombBuffer` coverage beyond the read/EOF/alignment/position/skip operations exercised by
 the run decoders. Its failed `BitRead` shifts buffered state
 before returning zero, a peek can refill and advance the underlying byte cursor,
 and `BitByteAlign` changes the count without clearing the stored bits. The
