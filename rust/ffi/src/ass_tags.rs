@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 //! Private ownership boundary for the ASS lexer. See include/xy_rust_ass.h.
+use alloc::{boxed::Box, vec::Vec};
 use xy_vsfilter_compat::ass_tags::{tokenize, Tag};
 
 pub struct Tags(Vec<Tag>);
@@ -19,11 +20,11 @@ pub unsafe extern "C" fn xy_vsfilter_ass_scan(
         return Box::into_raw(Box::new(Tags(Vec::new())));
     }
     if units.is_null() || whitespace.is_null() || length as u64 > isize::MAX as u64 / 2 {
-        return std::ptr::null_mut();
+        return core::ptr::null_mut();
     }
     // SAFETY: the caller provides the live immutable arrays described above.
-    let units = unsafe { std::slice::from_raw_parts(units, length as usize) };
-    let whitespace = unsafe { std::slice::from_raw_parts(whitespace, length as usize) };
+    let units = unsafe { core::slice::from_raw_parts(units, length as usize) };
+    let whitespace = unsafe { core::slice::from_raw_parts(whitespace, length as usize) };
     Box::into_raw(Box::new(Tags(tokenize(units, whitespace))))
 }
 

@@ -59,6 +59,9 @@ jobs:
       - run: cargo fmt --all --check
       - run: cargo test --workspace --locked --offline --target ${{ matrix.target }}
       - run: cargo clippy --workspace --all-targets --locked --offline --target ${{ matrix.target }} -- -D warnings
+      - name: Check production runtime
+        if: runner.os == 'Windows'
+        run: cargo clippy -p xy-vsfilter-ffi --lib --release --features native-runtime --locked --offline --target ${{ matrix.target }} -- -D warnings
       - run: python tools/compat/make_corpus.py --check
       - run: python -m unittest discover -s tools/compat -p "test_*.py" -v
       - name: Compare original C++ with Rust through the C ABI

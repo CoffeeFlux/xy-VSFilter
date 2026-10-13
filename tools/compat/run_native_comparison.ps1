@@ -39,6 +39,8 @@ try {
         $candidate = Find-Dll $candidateRoot $name
         & python "$PSScriptRoot\pe_exports.py" $original $candidate > "$evidence\$name.exports.json"
         if ($LASTEXITCODE -ne 0) { throw "Export mismatch: $name" }
+        & python "$PSScriptRoot\pe_dependencies.py" $original $candidate > "$evidence\$name.dependencies.json"
+        if ($LASTEXITCODE -ne 0) { throw "Added imports or changed platform requirements: $name" }
     }
     $original = Find-Dll $baselineRoot "VSFilter.dll"
     $candidate = Find-Dll $candidateRoot "VSFilter.dll"

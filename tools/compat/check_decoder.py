@@ -127,6 +127,8 @@ public:
         lexer += "\n assTag.command = cmd;\n }\n return true;\n}\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_ass_lexer.h").write_text(lexer, encoding="utf-8")
     cargo = ["cargo", "rustc", "--locked", "--offline", "--release", "-p", "xy-vsfilter-ffi"]
+    if os.name == "nt":
+        cargo += ["--features", "native-runtime"]
     if args.target:
         cargo += ["--target", args.target]
     cargo += ["--", "--print", "native-static-libs"]
