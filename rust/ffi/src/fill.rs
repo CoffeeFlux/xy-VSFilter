@@ -90,6 +90,21 @@ pub unsafe extern "C" fn xy_vsfilter_plane_masked16(dst: *mut u8, low: u64, high
     );
 }
 
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_mix_pixel_scalar(dst: u32, color: u32, alpha: u32) -> u32 {
+    xy_vsfilter_compat::fill::mix_pixel_scalar(dst, color, alpha)
+}
+
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_mix_pixel_sse(dst: u32, color: u32, alpha: u32) -> u32 {
+    xy_vsfilter_compat::fill::mix_pixel_sse(dst, color, alpha)
+}
+
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_mix_pixel_scaled(dst: u32, color: u32, shape: u32, clip: u32) -> u32 {
+    xy_vsfilter_compat::fill::mix_pixel_scaled(dst, color, shape, clip)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

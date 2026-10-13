@@ -7,6 +7,9 @@
 #define XY_FILL_CDECL
 #endif
 extern "C" {
+uint32_t XY_FILL_CDECL xy_vsfilter_mix_pixel_scalar(uint32_t dst, uint32_t color, uint32_t alpha);
+uint32_t XY_FILL_CDECL xy_vsfilter_mix_pixel_sse(uint32_t dst, uint32_t color, uint32_t alpha);
+uint32_t XY_FILL_CDECL xy_vsfilter_mix_pixel_scaled(uint32_t dst, uint32_t color, uint32_t shape, uint32_t clip);
 uint32_t XY_FILL_CDECL xy_vsfilter_add_pixel(uint32_t dst, uint8_t alpha, uint32_t color);
 void XY_FILL_CDECL xy_vsfilter_add_masked16(uint8_t*, uint64_t low, uint64_t high, uint32_t color);
 void XY_FILL_CDECL xy_vsfilter_plane_masked16(uint8_t*, uint64_t low, uint64_t high, uint8_t value);
