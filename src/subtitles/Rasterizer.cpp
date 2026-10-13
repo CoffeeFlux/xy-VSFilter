@@ -25,6 +25,9 @@
 #include <vector>
 #include <algorithm>
 #include "Rasterizer.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "xy_rust_fill.h"
+#endif
 #include "SeparableFilter.h"
 #include "xy_logger.h"
 #include <boost/flyweight/key_value.hpp>
@@ -1317,9 +1320,16 @@ static __forceinline void  packed_pix_mix_sse2(BYTE* dst, const BYTE* alpha, int
 
 static __forceinline void packed_pix_mix_c(BYTE* dst, const BYTE* alpha, int w, DWORD color)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    for (int pixel = 0; pixel < w; ++pixel) {
+        xy_vsfilter_fill_packed(dst + 4 * pixel, 1, alpha[pixel], color);
+    }
+#else
+
     DWORD * dst_w = (DWORD *)dst;
     for(int wt=0; wt<w; ++wt)
         pixmix_c(&dst_w[wt], color, alpha[wt]);
+#endif
 }
 
 static __forceinline __m128i packed_pix_mix_sse2(const __m128i& dst, 
@@ -1364,6 +1374,20 @@ static __forceinline __m128i packed_pix_mix_sse2(const __m128i& dst,
 
 static __forceinline void packed_pix_mix_sse2(BYTE* dst, const BYTE* alpha, int w, DWORD color)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    const BYTE* alpha_end0 = alpha + (w & ~15);
+    const BYTE* alpha_end = alpha + w;
+    for (; alpha < alpha_end0; alpha += 16, dst += 64) {
+        uint64_t low, high;
+        memcpy(&low, alpha, 8);
+        memcpy(&high, alpha + 8, 8);
+        xy_vsfilter_fill_masked16(dst, low, high, color);
+    }
+    for (; alpha < alpha_end; ++alpha, dst += 4) {
+        xy_vsfilter_fill_packed(dst, 1, *alpha, color);
+    }
+#else
+
     __m128i c_r = _mm_set1_epi32( (color & 0xFF0000) );
     __m128i c_g = _mm_set1_epi32( (color & 0xFF00)<<8 );
     __m128i c_b = _mm_set1_epi32( (color & 0xFF)<<16 );
@@ -1415,6 +1439,7 @@ static __forceinline void packed_pix_mix_sse2(BYTE* dst, const BYTE* alpha, int 
     {
         pixmix_sse2(dst_w, color, *alpha);
     }
+#endif
 }
 
 static __forceinline void  packed_pix_mix_c              (BYTE* dst, BYTE alpha, int w, DWORD color);
@@ -1422,15 +1447,24 @@ static __forceinline void  packed_pix_mix_sse2           (BYTE* dst, BYTE alpha,
 
 static __forceinline void  packed_pix_mix_c              (BYTE* dst, BYTE alpha, int w, DWORD color)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    xy_vsfilter_fill_packed(dst, w, alpha, color);
+#else
+
     const BYTE *dst_end = dst + 4*w;
     for ( ; dst<dst_end; dst+=4 )
     {
         pixmix_c(reinterpret_cast<DWORD*>(dst), color, alpha);
     }
+#endif
 }
 
 static __forceinline void packed_pix_mix_sse2(BYTE* dst, BYTE alpha, int w, DWORD color)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    xy_vsfilter_fill_packed(dst, w, alpha, color);
+#else
+
     __m128i c_r = _mm_set1_epi32( (color & 0xFF0000) );
     __m128i c_g = _mm_set1_epi32( (color & 0xFF00)<<8 );
     __m128i c_b = _mm_set1_epi32( (color & 0xFF)<<16 );
@@ -1463,6 +1497,7 @@ static __forceinline void packed_pix_mix_sse2(BYTE* dst, BYTE alpha, int w, DWOR
     {
         pixmix_sse2(reinterpret_cast<DWORD*>(dst), color, alpha);
     }
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1712,7 +1747,12 @@ void AlphaBlt8bppSingleAlphaC(byte* pY,
     const byte alpha, 
     const byte Y, 
     int h, int w, int dst_stride)
-{   
+{
+#ifdef XY_VSFILTER_RUST_TEXT
+    for (; h > 0; --h, pY += dst_stride) {
+        xy_vsfilter_fill_plane(pY, w, alpha, Y);
+    }
+#else
     int yPremul = Y*(alpha+1);
     int dstAlpha = 0x100 - alpha;
 
@@ -1726,6 +1766,7 @@ void AlphaBlt8bppSingleAlphaC(byte* pY,
             *dy = (*dy * dstAlpha + yPremul)>>8;
         }
     }
+#endif
 }
 
 /***
@@ -1736,7 +1777,10 @@ void AlphaBlt8bppSingleAlphaSse2(byte* pY,
     const byte alpha, 
     const byte Y, 
     int h, int w, int dst_stride)
-{   
+{
+#ifdef XY_VSFILTER_RUST_TEXT
+    AlphaBlt8bppSingleAlphaC(pY, alpha, Y, h, w, dst_stride);
+#else
     int yPremul = Y*(alpha+1);
     int dstAlpha = 0x100 - alpha;
     if( w>32 )//IMPORTANT! The result of the following code is undefined with w<15.
@@ -1784,6 +1828,7 @@ void AlphaBlt8bppSingleAlphaSse2(byte* pY,
     {
         AlphaBlt8bppSingleAlphaC(pY, alpha, Y, h, w, dst_stride);
     }
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////

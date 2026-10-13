@@ -51,7 +51,8 @@ def capture_inputs():
               ROOT / "include/xy_rust_segments.h",
               ROOT / "include/xy_rust_segment_insert.h",
               ROOT / "include/xy_rust_hdmv.h",
-              ROOT / "include/xy_rust_dvb.h", ROOT / "include/xy_rust_golomb.h",
+              ROOT / "include/xy_rust_dvb.h", ROOT / "include/xy_rust_golomb.h", ROOT / "include/xy_rust_fill.h",
+              ROOT / "src/subtitles/Rasterizer.cpp",
               ROOT / "src/dsutil/GolombBuffer.cpp", ROOT / "src/dsutil/GolombBuffer.h",
               ROOT / "src/subtitles/CompositionObject.cpp",
               ROOT / "include/xy_rust_timeline_search.h",
@@ -304,20 +305,31 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         hdmv += extract_method(content.decode("utf-8-sig"), "void CompositionObject::RenderHdmv(")
         hdmv += "\n#undef CompositionObject\n#undef XY_VSFILTER_RUST_TEXT\n#undef CGolombBuffer\n"
     hdmv += "#undef CGolombBuffer\n#if HDMV_NATIVE_PIXELS\n"
-    for signature in ("static __forceinline void pixmix_sse2(DWORD*",
-                      "static __forceinline __m128i packed_pix_mix_sse2(",
-                      "static __forceinline void packed_pix_mix_sse2(BYTE* dst, BYTE alpha",
-                      "void AlphaBlt8bppSingleAlphaC(byte*",
-                      "void AlphaBlt8bppSingleAlphaSse2(byte*",
-                      "void Rasterizer::FillSolidRect("):
-        hdmv += extract_method(raster_source.decode("utf-8-sig"), signature) + "\n"
+    for name, content in (("ReferencePixels", raster_source),
+                          ("CandidatePixels", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+        hdmv += f"namespace {name} {{\n"
+        if name == "CandidatePixels":
+            hdmv += "#define XY_VSFILTER_RUST_TEXT\n"
+        for signature in ("static __forceinline void pixmix_c(DWORD *",
+                          "static __forceinline void pixmix_sse2(DWORD*",
+                          "static __forceinline __m128i packed_pix_mix_sse2(",
+                          "static __forceinline void packed_pix_mix_c(BYTE* dst, const BYTE* alpha",
+                          "static __forceinline void packed_pix_mix_sse2(BYTE* dst, const BYTE* alpha",
+                          "static __forceinline void  packed_pix_mix_c              (BYTE* dst, BYTE alpha",
+                          "static __forceinline void packed_pix_mix_sse2(BYTE* dst, BYTE alpha",
+                          "void AlphaBlt8bppSingleAlphaC(byte*",
+                          "void AlphaBlt8bppSingleAlphaSse2(byte*",
+                          "void Rasterizer::FillSolidRect("):
+            hdmv += extract_method(content.decode("utf-8-sig"), signature) + "\n"
+        hdmv += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     hdmv += "#endif\n"
     (destination / "original_hdmv.h").write_text(hdmv, encoding="utf-8")
     dvb = '#include "original_hdmv.h"\n#include "dvb_shell.h"\n'
     dvb += '#define UnionRect ObservedUnionRect\n'
     for name, content in (("OriginalDvb", hdmv_source), ("CandidateDvb", candidate_hdmv)):
         reader = "ObservedDvbBuffer" if name == "OriginalDvb" else "CandidateDvbBuffer"
-        dvb += f"DVB_SHELL({name},{reader})\n#define CGolombBuffer {reader}\n#define CompositionObject {name}\n"
+        pixels = "false" if name == "OriginalDvb" else "true"
+        dvb += f"DVB_SHELL({name},{reader},{pixels})\n#define CGolombBuffer {reader}\n#define CompositionObject {name}\n"
         if name == "CandidateDvb":
             dvb += "#define XY_VSFILTER_RUST_TEXT\n"
         for method in ("RenderDvb", "DvbRenderField"):
@@ -455,6 +467,13 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     field_result = run([str(field_executable)], capture_output=True, text=True)
     print(field_result.stdout, end="", flush=True)
     print(field_result.stderr, end="", file=sys.stderr)
+    fill_executable = destination / ("fill-oracle.exe" if os.name == "nt" else "fill-oracle")
+    fill_compile = [arg.replace("hdmv_oracle.cpp", "fill_oracle.cpp")
+                    .replace("hdmv-oracle", "fill-oracle") for arg in hdmv_compile]
+    run(fill_compile)
+    fill_result = run([str(fill_executable)], capture_output=True, text=True)
+    print(fill_result.stdout, end="", flush=True)
+    print(fill_result.stderr, end="", file=sys.stderr)
     compiler = subprocess.run([args.cxx] if os.name == "nt" else [args.cxx, "--version"],
                               capture_output=True, text=True)
     if candidate_inputs != capture_inputs():
@@ -472,6 +491,8 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "hdmv_golomb_source_sha256": hashlib.sha256(golomb_source).hexdigest(),
         "hdmv_golomb_header_sha256": hashlib.sha256(golomb_header).hexdigest(),
         "hdmv_raster_source_sha256": hashlib.sha256(raster_source).hexdigest(),
+        "fill_compile_command": fill_compile,
+        "fill_result": fill_result.stdout, "fill_stderr": fill_result.stderr,
         "golomb_compile_command": golomb_compile,
         "golomb_result": golomb_result.stdout, "golomb_stderr": golomb_result.stderr,
         "dvb_field_compile_command": field_compile,

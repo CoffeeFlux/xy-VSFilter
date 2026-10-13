@@ -10,6 +10,7 @@ mod drawing;
 mod drawing_tokens;
 mod dvb;
 mod fields;
+mod fill;
 mod golomb;
 mod hdmv;
 #[cfg(all(windows, any(feature = "native-runtime", test)))]
