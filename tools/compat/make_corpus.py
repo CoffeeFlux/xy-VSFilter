@@ -60,6 +60,20 @@ def variants():
         else:
             yield name, data
     plain = SEED.replace(b"COMPAT_TEXT", b"Compatibility")
+    # TryNextStr mutates delimiters and leaves an undelimited final field in
+    # place. Keep raw code units and odd whitespace at the numeric/field boundary.
+    for name, fields in {
+        "space-prefixes": " 0, 0: 00: 01. 00, 0: 00: 04. 00, Default, actor, 0, 0, 0, ,visible",
+        "tab-prefixes": "\t0,\t0:\t00:\t01.\t00,0:00:04.00,\tDefault,\tactor,\t0,0,0,,visible",
+        "final-field-reuse": "0,0:00:01.00,0:00:04.00,Default,,0,0,0,visible",
+        "numeric-final-reuse": "0,0:00:01.00,0:00:04.00,Default,,0",
+        "empty-numeric": "0,0:00:01.00,0:00:04.00,Default,,,0,0,,visible",
+        "nul-in-actor": "0,0:00:01.00,0:00:04.00,Default,actor\0tail,0,0,0,,visible",
+        "raw-actor-units": "0,0:00:01.00,0:00:04.00,Default,\ud800\uffff,0,0,0,,visible",
+        "unicode-style-space": "0,0:00:01.00,0:00:04.00,\u2003Default,\u00a0actor,0,0,0,,visible",
+    }.items():
+        text = SEED.decode("ascii").split("Dialogue:", 1)[0] + "Dialogue: " + fields + "\r\n"
+        yield f"field-{name}", b"\xff\xfe" + text.encode("utf-16le", "surrogatepass")
     yield "drawing-state-control", SEED.replace(b"COMPAT_TEXT", b"after")
     for name, path in {
         "repeated-separators": "***m 0 0***l 60 0 60 60 0 60***",

@@ -2829,6 +2829,294 @@
       "fill_seed": 31
     },
     {
+      "id": "field-space-prefixes-file",
+      "script": "test/compat/generated/field-space-prefixes.ass",
+      "sha256": "8e49544890393c5594d6c2842e56c44822c9535fdf6b60a981632846bb708723",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "field-space-prefixes-memory",
+      "script": "test/compat/generated/field-space-prefixes.ass",
+      "sha256": "8e49544890393c5594d6c2842e56c44822c9535fdf6b60a981632846bb708723",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "field-tab-prefixes-file",
+      "script": "test/compat/generated/field-tab-prefixes.ass",
+      "sha256": "50212289bd20766aaa51ff639b01adc2fb2e932328da65d7cf30602d11f38391",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "field-tab-prefixes-memory",
+      "script": "test/compat/generated/field-tab-prefixes.ass",
+      "sha256": "50212289bd20766aaa51ff639b01adc2fb2e932328da65d7cf30602d11f38391",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "field-final-field-reuse-file",
+      "script": "test/compat/generated/field-final-field-reuse.ass",
+      "sha256": "7d42c37f261a223fdbc5cf71e1ed0c70067b81416d097ea1daba018eaa48624e",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "field-final-field-reuse-memory",
+      "script": "test/compat/generated/field-final-field-reuse.ass",
+      "sha256": "7d42c37f261a223fdbc5cf71e1ed0c70067b81416d097ea1daba018eaa48624e",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "field-numeric-final-reuse-file",
+      "script": "test/compat/generated/field-numeric-final-reuse.ass",
+      "sha256": "61d29a1936f333e493e5615348d05fc8ae4a0b29e5b8889844f9b3173c312332",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "field-numeric-final-reuse-memory",
+      "script": "test/compat/generated/field-numeric-final-reuse.ass",
+      "sha256": "61d29a1936f333e493e5615348d05fc8ae4a0b29e5b8889844f9b3173c312332",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "field-empty-numeric-file",
+      "script": "test/compat/generated/field-empty-numeric.ass",
+      "sha256": "e3a499e92fd66c50faf62b56c3c091af053d26cd163c6628b3135ec6efd18408",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "field-empty-numeric-memory",
+      "script": "test/compat/generated/field-empty-numeric.ass",
+      "sha256": "e3a499e92fd66c50faf62b56c3c091af053d26cd163c6628b3135ec6efd18408",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "field-nul-in-actor-file",
+      "script": "test/compat/generated/field-nul-in-actor.ass",
+      "sha256": "e43d9228c60140d95fe1acbd106ae086cd1baa449cf42c5c3199a67bef4d0337",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "field-nul-in-actor-memory",
+      "script": "test/compat/generated/field-nul-in-actor.ass",
+      "sha256": "e43d9228c60140d95fe1acbd106ae086cd1baa449cf42c5c3199a67bef4d0337",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "field-raw-actor-units-file",
+      "script": "test/compat/generated/field-raw-actor-units.ass",
+      "sha256": "fd120aeadf3fc279cccda07700b37f6915319012b59391acadff39c8c309d6ff",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "field-raw-actor-units-memory",
+      "script": "test/compat/generated/field-raw-actor-units.ass",
+      "sha256": "fd120aeadf3fc279cccda07700b37f6915319012b59391acadff39c8c309d6ff",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "field-unicode-style-space-file",
+      "script": "test/compat/generated/field-unicode-style-space.ass",
+      "sha256": "30e37d4109a5124022b5ebc0cb9c981d73646d400380cb3d319b549208484830",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "field-unicode-style-space-memory",
+      "script": "test/compat/generated/field-unicode-style-space.ass",
+      "sha256": "30e37d4109a5124022b5ebc0cb9c981d73646d400380cb3d319b549208484830",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
       "id": "drawing-state-control-file",
       "script": "test/compat/generated/drawing-state-control.ass",
       "sha256": "1bd5e8f7c386e88b7786e9fe28953126221b0c4707f60cc11e94748008c571ae",

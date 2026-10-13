@@ -107,6 +107,15 @@ public:
         font += text[start:end] + '\n decoded.assign((BYTE*)pData, (BYTE*)pData + datalen);\n return true;\n}\n}\n'
         font += "#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_font.h").write_text(font, encoding="utf-8")
+    fields = font_source.decode("utf-8-sig").split("#include", 1)[0]
+    fields += '#include "fields_shell.h"\n'
+    for name, content in (("OriginalFields", font_source), ("CandidateFields", candidate_font)):
+        fields += f"namespace {name} {{\n"
+        if name == "CandidateFields":
+            fields += "#define XY_VSFILTER_RUST_TEXT\n"
+        fields += extract_method(content.decode("utf-8-sig"), "static inline CStringW::PCXSTR TryNextStr(")
+        fields += "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_fields.h").write_text(fields, encoding="utf-8")
     lexer_source = original("src/subtitles/RTS.cpp", reference["commit"])
     candidate_lexer = (ROOT / "src/subtitles/RTS.cpp").read_bytes()
     lexer = lexer_source.decode("utf-8-sig").split("#include", 1)[0]
@@ -238,12 +247,20 @@ public:
     token_result = run([str(token_executable)], capture_output=True, text=True)
     print(token_result.stdout, end="")
     print(token_result.stderr, end="", file=sys.stderr)
+    fields_executable = destination / ("fields-oracle.exe" if os.name == "nt" else "fields-oracle")
+    fields_compile = [arg.replace("decoder_oracle.cpp", "fields_oracle.cpp")
+                      .replace("decoder-oracle", "fields-oracle") for arg in compile_command]
+    run(fields_compile)
+    fields_result = run([str(fields_executable)], capture_output=True, text=True)
+    print(fields_result.stdout, end="")
+    print(fields_result.stderr, end="", file=sys.stderr)
     compiler = subprocess.run([args.cxx] if os.name == "nt" else [args.cxx, "--version"],
                               capture_output=True, text=True)
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
               ROOT / "include/xy_rust_drawing.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
+              ROOT / "include/xy_rust_fields.h",
               ROOT / "src/subtitles/TextFile.h"]
     inputs += sorted((ROOT / "tools/compat").glob("*oracle.cpp"))
     inputs += sorted((ROOT / "tools/compat").glob("*shell.h"))
@@ -271,7 +288,9 @@ public:
         "drawing_compile_command": drawing_compile,
         "drawing_result": drawing_result.stdout, "drawing_stderr": drawing_result.stderr,
         "drawing_tokens_compile_command": token_compile,
-        "drawing_tokens_result": token_result.stdout, "drawing_tokens_stderr": token_result.stderr}
+        "drawing_tokens_result": token_result.stdout, "drawing_tokens_stderr": token_result.stderr,
+        "fields_compile_command": fields_compile,
+        "fields_result": fields_result.stdout, "fields_stderr": fields_result.stderr}
     (destination / "report.json").write_text(json.dumps(report, indent=2) + "\n")
 
 

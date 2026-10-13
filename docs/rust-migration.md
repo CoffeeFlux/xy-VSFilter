@@ -70,7 +70,9 @@ unresolved reference outcomes requiring investigation, never matching results.
 * Safe Rust drawing token splitting and left trimming after the original seven
   native replacements. Raw UTF-16 units, embedded NULs and literal `*` separators
   are retained. The extracted oracle compares this boundary with real ATL on
-  Windows; validation of this revised boundary is pending.
+  Windows. The revised boundary passed **1,342,183** comparisons on all four
+  platforms, including Windows x86/x64, plus Miri and local fatal ASan/UBSan.
+  Full DLL rendering validation of the combined increment is pending.
   **Preprocessing remains native:** an attempted replacement port exposed
   allocation-dependent ATL results for `mmm\0mm`. Two evaluations in one process
   produced different trailing command units. This is unresolved reference
@@ -78,6 +80,14 @@ unresolved reference outcomes requiring investigation, never matching results.
   [captured Windows evidence](drawing-replacement-unresolved.json). The prior
   local replacement stand-in incorrectly assumed ordinary substring semantics;
   it has been removed. Numeric parsing also remains native.
+* Safe Rust `TryNextStr` field scanning. Only ASCII spaces are trimmed; empty
+  fields, embedded NUL termination, delimiter mutation and repeated reads of an
+  undelimited final field retain their original behavior. The native bridge
+  keeps the original string allocation and returns pointers into it; Rust sees
+  a bounded code-unit copy and returns only offsets. Windows CRT numeric parsing
+  and `GetStr` remain native. The extracted original/candidate functions passed
+  **4,140,600** local comparisons of every buffer unit, returned pointer and next
+  cursor, with fatal ASan/UBSan. Windows and full-renderer validation is pending.
 * Value-only internal C ABIs for the character and attachment decoders. The ASS lexer
   has a separate, documented ownership boundary: it borrows two bounded input
   arrays during scanning, retains only integer spans, and returns an opaque owner
@@ -190,7 +200,10 @@ the reference commit, source hashes, compiler and result. The native tests
 extract original algorithm blocks without modifying their logic. Storage and
 file-I/O stand-ins surround those blocks. The drawing-state oracle supplies
 identical pre-tokenized inputs and point results; its separate lexical oracle
-tests token delivery against real ATL strings on Windows. The ASan/UBSan run instruments the C++ side;
+tests `Tokenize`/`TrimLeft` against real ATL strings on Windows, starting with
+initialized post-replacement buffers. Native command replacement is outside that
+oracle because of the unresolved allocation-dependent behavior above. The field
+oracle compares six consecutive calls, mutated buffers and both pointer offsets. The ASan/UBSan run instruments the C++ side;
 it does not instrument the Rust static library. Safe Rust is enforced in the
 core by a compiler lint. The ASS lexer, text reader and drawing FFI owners and the production CRT
 allocator contain unsafe Rust, for constructing borrowed slices,
@@ -319,7 +332,7 @@ artifacts, restore their `candidate/artifacts/native/...` tree under this checko
 
 ## CSRI corpus and evidence
 
-`test/compat/cases.json` contains 266 cases: both file and memory
+`test/compat/cases.json` contains 282 cases: both file and memory
 loading for 34 existing ASS samples and 98 generated samples, plus geometry and
 stride cases. Generated cases include malformed tags, duplicate tags, malformed
 UTF-8, unpaired UTF-16, embedded NUL, CR/LF differences, missing final newlines
@@ -432,7 +445,7 @@ the native oracle where needed:
 
 | Next boundary | Portable work | Native behavior to retain and compare |
 | --- | --- | --- |
-| `STS.cpp` field splitting and numeric parsing | Raw UTF-16 fields, cursor/mutation state, error recovery | `GetStr` leaves the last undelimited field in the buffer; `TryNextStr` trims only ASCII space and mutates a separator to NUL. Keep CRT numeric conversion until overflow, locale, end-pointer and rounding results are captured. |
+| `STS.cpp` field splitting and numeric parsing | Raw UTF-16 fields, cursor/mutation state, error recovery | `GetStr` leaves the last undelimited field in the buffer; `TryNextStr` scanning is now ported, retaining ASCII-space trimming and separator-to-NUL mutation. Keep CRT numeric conversion until overflow, locale, end-pointer and rounding results are captured. |
 | Remaining `RTS.cpp` drawing parsing | Command replacement, numeric consumption and final native path storage; command state is now ported | `SpanIncluding`'s return value is ignored; commands split inside arbitrary text; `s` falls through to `p`; the apparent Bezier truncation uses an incremented counter and must not be "fixed." Keep `wcstod` and float-to-LONG conversion at the native boundary initially. |
 | `CompositionObject.cpp` bitmap run decoding | Bounded byte/bit readers, RLE state, emitted rectangles | Capture truncated-stream behavior, signed-short coordinate wrapping, palette state and transparent runs. Keep native palette conversion/compositing until those stages have separate exact-byte oracles. Uninitialized allocation tails are unresolved behavior, not a portable specification. |
 | `xy_filter.cpp` and raster/compositing kernels | Safe slice ownership and scalar arithmetic implementations | Capture each active SIMD path's operation order, padding, overlap and rounding. Scalar C++ output alone does not establish equality with the SIMD implementation used by a DLL. |
