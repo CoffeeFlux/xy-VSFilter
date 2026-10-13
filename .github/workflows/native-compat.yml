@@ -19,6 +19,7 @@ on:
       - 'include/xy_rust_text.h'
       - 'include/xy_rust_ass.h'
       - 'include/xy_rust_reader.h'
+      - 'include/xy_rust_drawing.h'
       - 'src/**'
       - 'tools/compat/**'
       - 'test/compat/**'

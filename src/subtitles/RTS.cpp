@@ -25,6 +25,7 @@
 #include "RTS.h"
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_ass.h"
+#include "xy_rust_drawing.h"
 #endif
 #include "draw_item.h"
 #include "cache_manager.h"
@@ -783,7 +784,13 @@ bool CPolygon::ParseStr()
 {
     if(m_pathTypesOrg.GetCount() > 0) return(true);
     CPoint p;
+#ifdef XY_VSFILTER_RUST_TEXT
+    static_assert(PT_MOVETO == 6 && PT_MOVETONC == 0xfe && PT_LINETO == 2 &&
+        PT_BEZIERTO == 4 && PT_BSPLINETO == 0xfc && PT_BSPLINEPATCHTO == 0xfa, "Rust path type ABI");
+    XyRust::DrawingPath path;
+#else
     int j, lastsplinestart = -1, firstmoveto = -1, lastmoveto = -1;
+#endif
     CStringW str = m_str.Get();
     str.SpanIncluding(L"mnlbspc 0123456789");
     str.Replace(L"m", L"*m");
@@ -798,6 +805,14 @@ bool CPolygon::ParseStr()
     {
         WCHAR c = s[0];
         s.TrimLeft(L"mnlbspc ");
+#ifdef XY_VSFILTER_RUST_TEXT
+        bool needPoint = path.Command(static_cast<uint16_t>(c));
+        while (needPoint) {
+            // Keep CRT parsing, point consumption and TRACE_PARSER native.
+            // No callback or native exception crosses a Rust stack frame.
+            needPoint = GetPOINT(s, p) ? path.Point(p.x, p.y) : path.NoPoint();
+        }
+#else
         switch(c)
         {
         case 'm':
@@ -884,13 +899,26 @@ bool CPolygon::ParseStr()
         default:
             break;
         }
+#endif
     }
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (!path.Finish()) {
+        m_pathTypesOrg.RemoveAll();
+        m_pathPointsOrg.RemoveAll();
+        return false;
+    }
+    for (size_t i = 0; i < path.Count(); ++i) {
+        m_pathTypesOrg.Add(path.Type(i));
+        m_pathPointsOrg.Add(path.GetPoint<CPoint>(i));
+    }
+#else
     if(lastmoveto == -1 || firstmoveto > 0)
     {
         m_pathTypesOrg.RemoveAll();
         m_pathPointsOrg.RemoveAll();
         return(false);
     }
+#endif
     int minx = INT_MAX, miny = INT_MAX, maxx = -INT_MAX, maxy = -INT_MAX;
     for(size_t i = 0; i < m_pathTypesOrg.GetCount(); i++)
     {

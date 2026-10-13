@@ -127,6 +127,20 @@ public:
         lexer += text[start:end].replace("CRenderedTextSubtitle::", "", 1)
         lexer += "\n assTag.command = cmd;\n }\n return true;\n}\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_ass_lexer.h").write_text(lexer, encoding="utf-8")
+    drawing = lexer_source.decode("utf-8-sig").split("#include", 1)[0]
+    drawing += '#include "drawing_shell.h"\n'
+    for name, content in (("OriginalDrawing", lexer_source), ("CandidateDrawing", candidate_lexer)):
+        text = content.decode("utf-8-sig")
+        start = text.index("bool CPolygon::ParseStr()")
+        end = text.index("    int minx =", start)
+        drawing += f"DRAWING_SHELL({name})\n#define CPolygon {name}\n"
+        if name == "CandidateDrawing":
+            drawing += "#define XY_VSFILTER_RUST_TEXT\n"
+        # Keep the complete command-state block unchanged. CString tokenization
+        # and GetPOINT are supplied identical results; native DLL tests cover
+        # their real CRT behavior plus the unchanged scaling/rasterization tail.
+        drawing += text[start:end] + "return true;\n}\n#undef CPolygon\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_drawing.h").write_text(drawing, encoding="utf-8")
     cargo = ["cargo", "rustc", "--locked", "--offline", "--release", "-p", "xy-vsfilter-ffi"]
     if os.name == "nt":
         cargo += ["--features", "native-runtime"]
@@ -183,10 +197,18 @@ public:
     lexer_result = run([str(lexer_executable)], capture_output=True, text=True)
     print(lexer_result.stdout, end="")
     print(lexer_result.stderr, end="", file=sys.stderr)
+    drawing_executable = destination / ("drawing-oracle.exe" if os.name == "nt" else "drawing-oracle")
+    drawing_compile = [arg.replace("decoder_oracle.cpp", "drawing_oracle.cpp")
+                       .replace("decoder-oracle", "drawing-oracle") for arg in compile_command]
+    run(drawing_compile)
+    drawing_result = run([str(drawing_executable)], capture_output=True, text=True)
+    print(drawing_result.stdout, end="")
+    print(drawing_result.stderr, end="", file=sys.stderr)
     compiler = subprocess.run([args.cxx] if os.name == "nt" else [args.cxx, "--version"],
                               capture_output=True, text=True)
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
+              ROOT / "include/xy_rust_drawing.h",
               ROOT / "src/subtitles/TextFile.h"]
     inputs += sorted((ROOT / "tools/compat").glob("*oracle.cpp"))
     inputs += sorted((ROOT / "tools/compat").glob("*shell.h"))
@@ -210,7 +232,9 @@ public:
         "lexer_source_sha256": hashlib.sha256(lexer_source).hexdigest(),
         "candidate_lexer_source_sha256": hashlib.sha256(candidate_lexer).hexdigest(),
         "lexer_compile_command": lexer_compile,
-        "lexer_result": lexer_result.stdout, "lexer_stderr": lexer_result.stderr}
+        "lexer_result": lexer_result.stdout, "lexer_stderr": lexer_result.stderr,
+        "drawing_compile_command": drawing_compile,
+        "drawing_result": drawing_result.stdout, "drawing_stderr": drawing_result.stderr}
     (destination / "report.json").write_text(json.dumps(report, indent=2) + "\n")
 
 

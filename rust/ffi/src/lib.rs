@@ -6,6 +6,7 @@
 extern crate alloc;
 
 mod ass_tags;
+mod drawing;
 #[cfg(all(windows, any(feature = "native-runtime", test)))]
 mod runtime;
 mod text_reader;
