@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Derived from CPolygon::ParseStr, Copyright (C) 2003-2006 Gabest.
-//! Drawing command recovery and path storage. Tokenization and numeric parsing
-//! stay native; each requested point must be parsed with the original GetPOINT.
+//! Drawing command recovery and path storage. Tokenization is a separate stage;
+//! each requested point is still parsed with the original native GetPOINT.
 use alloc::vec::Vec;
 
 pub const MOVE: u8 = 6;

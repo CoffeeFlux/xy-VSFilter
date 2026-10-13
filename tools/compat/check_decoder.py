@@ -129,6 +129,10 @@ public:
     (destination / "original_ass_lexer.h").write_text(lexer, encoding="utf-8")
     drawing = lexer_source.decode("utf-8-sig").split("#include", 1)[0]
     drawing += '#include "drawing_shell.h"\n'
+    original_drawing_text = lexer_source.decode("utf-8-sig")
+    token_start = original_drawing_text.index("    CStringW str = m_str.Get();", original_drawing_text.index("bool CPolygon::ParseStr()"))
+    token_end = original_drawing_text.index("        switch(c)", token_start)
+    original_token_input = original_drawing_text[token_start:token_end]
     for name, content in (("OriginalDrawing", lexer_source), ("CandidateDrawing", candidate_lexer)):
         text = content.decode("utf-8-sig")
         start = text.index("bool CPolygon::ParseStr()")
@@ -139,8 +143,31 @@ public:
         # Keep the complete command-state block unchanged. CString tokenization
         # and GetPOINT are supplied identical results; native DLL tests cover
         # their real CRT behavior plus the unchanged scaling/rasterization tail.
-        drawing += text[start:end] + "return true;\n}\n#undef CPolygon\n#undef XY_VSFILTER_RUST_TEXT\n"
+        block = text[start:end]
+        if name == "CandidateDrawing":
+            # This oracle supplies synthetic GetPOINT outcomes to isolate path
+            # state. The separate token oracle below tests the real new input
+            # boundary against ATL. Substitute only that input-delivery region.
+            a = block.index("    // Drawing token input boundary.")
+            b = block.index("        // Drawing command state.", a)
+            block = block[:a] + original_token_input + block[b:]
+        drawing += block + "return true;\n}\n#undef CPolygon\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_drawing.h").write_text(drawing, encoding="utf-8")
+    token_code = lexer_source.decode("utf-8-sig").split("#include", 1)[0]
+    token_code += '#include "drawing_tokens_shell.h"\n'
+    for name, content in (("OriginalDrawingTokens", lexer_source), ("CandidateDrawingTokens", candidate_lexer)):
+        text = content.decode("utf-8-sig")
+        if name == "OriginalDrawingTokens":
+            block = original_token_input
+        else:
+            a = text.index("    // Drawing token input boundary.")
+            b = text.index("        // Drawing command state.", a)
+            block = text[a:b]
+            token_code += "#define XY_VSFILTER_RUST_TEXT\n"
+        token_code += f"namespace {name} {{\nDrawingTokenList Scan(const CStringW& input) {{\nDrawingTokenList result;\n"
+        token_code += block.replace("m_str.Get()", "input", 1)
+        token_code += "result.emplace_back(c, s);\n}\nreturn result;\n}\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_drawing_tokens.h").write_text(token_code, encoding="utf-8")
     cargo = ["cargo", "rustc", "--locked", "--offline", "--release", "-p", "xy-vsfilter-ffi"]
     if os.name == "nt":
         cargo += ["--features", "native-runtime"]
@@ -204,11 +231,19 @@ public:
     drawing_result = run([str(drawing_executable)], capture_output=True, text=True)
     print(drawing_result.stdout, end="")
     print(drawing_result.stderr, end="", file=sys.stderr)
+    token_executable = destination / ("drawing-tokens-oracle.exe" if os.name == "nt" else "drawing-tokens-oracle")
+    token_compile = [arg.replace("decoder_oracle.cpp", "drawing_tokens_oracle.cpp")
+                     .replace("decoder-oracle", "drawing-tokens-oracle") for arg in compile_command]
+    run(token_compile)
+    token_result = run([str(token_executable)], capture_output=True, text=True)
+    print(token_result.stdout, end="")
+    print(token_result.stderr, end="", file=sys.stderr)
     compiler = subprocess.run([args.cxx] if os.name == "nt" else [args.cxx, "--version"],
                               capture_output=True, text=True)
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
               ROOT / "include/xy_rust_drawing.h",
+              ROOT / "include/xy_rust_drawing_tokens.h",
               ROOT / "src/subtitles/TextFile.h"]
     inputs += sorted((ROOT / "tools/compat").glob("*oracle.cpp"))
     inputs += sorted((ROOT / "tools/compat").glob("*shell.h"))
@@ -234,7 +269,9 @@ public:
         "lexer_compile_command": lexer_compile,
         "lexer_result": lexer_result.stdout, "lexer_stderr": lexer_result.stderr,
         "drawing_compile_command": drawing_compile,
-        "drawing_result": drawing_result.stdout, "drawing_stderr": drawing_result.stderr}
+        "drawing_result": drawing_result.stdout, "drawing_stderr": drawing_result.stderr,
+        "drawing_tokens_compile_command": token_compile,
+        "drawing_tokens_result": token_result.stdout, "drawing_tokens_stderr": token_result.stderr}
     (destination / "report.json").write_text(json.dumps(report, indent=2) + "\n")
 
 

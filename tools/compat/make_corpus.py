@@ -62,6 +62,23 @@ def variants():
     plain = SEED.replace(b"COMPAT_TEXT", b"Compatibility")
     yield "drawing-state-control", SEED.replace(b"COMPAT_TEXT", b"after")
     for name, path in {
+        "repeated-separators": "***m 0 0***l 60 0 60 60 0 60***",
+        "leading-space": " \t m 0 0 l 60 0 60 60 0 60",
+        "uppercase-commands": "M 0 0 L 60 0 m 0 0 l 60 0 60 60 0 60",
+        "hex-exponent-split": "m 0 0 l 0x1p+4 0 60 60 0 60",
+        "tab-after-command": "m\t0\t0 l\t60\t0\t60\t60\t0\t60",
+        "nul-at-start": "\0m 0 0 l 60 0 60 60 0 60",
+        "nul-after-token": "m 0 0\0l 60 0 60 60 0 60",
+        "two-nuls": "m 0 0\0\0l 60 0 60 60 0 60",
+        "nul-after-separator": "m 0 0*\0l 60 0 60 60 0 60",
+        "nul-before-separator": "m 0 0\0*l 60 0 60 60 0 60",
+        "unicode-space": "\u2003m\u00a00 0 l 60 0 60 60 0 60",
+        "surrogate": "m 0 0 l 60 0\ud800 60 60 0 60",
+        "noncharacter": "m 0 0 l 60 0\uffff 60 60 0 60",
+    }.items():
+        text = SEED.decode("ascii").replace("COMPAT_TEXT", "{\\p1}" + path + "{\\p0}after")
+        yield f"drawing-lex-{name}", b"\xff\xfe" + text.encode("utf-16le", "surrogatepass")
+    for name, path in {
         "empty-move": b"m",
         "missing-move": b"n 0 0 l 60 0 60 60 0 60",
         "late-move": b"n 0 0 m 10 10 l 60 10 60 60",

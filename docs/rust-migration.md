@@ -50,8 +50,9 @@ unresolved reference outcomes requiring investigation, never matching results.
   `iswspace` supplies classifications to preserve CRT/locale behavior.
 * Safe Rust drawing command state and temporary path storage. Empty moves,
   incomplete Bezier groups, spline rollback/fallthrough, closure and validity
-  checks follow `CPolygon::ParseStr`. Native CString tokenization, `GetPOINT`/
-  `wcstod`, numeric tracing, scaling and downstream rasterization remain intact.
+  checks follow `CPolygon::ParseStr`. Native `GetPOINT`/`wcstod`, numeric
+  tracing, scaling and downstream rasterization remain intact. Tokenization is
+  covered by the next increment below.
   The extracted command-state oracle passed **343,183** comparisons of path
   types, coordinates, validity, cache bypass and point-request order, using
   identical supplied token/point results. Fatal ASan/UBSan, all four portable
@@ -66,6 +67,13 @@ unresolved reference outcomes requiring investigation, never matching results.
   native build logs, source inputs and all DLL hashes.
   [Portable tests and Miri](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38427593494)
   passed for this same candidate.
+* Safe Rust drawing token preprocessing and splitting, replacing the seven
+  native string replacements and `Tokenize`/`TrimLeft` loop. Raw UTF-16 units,
+  embedded NULs, literal `*` separators and command letters inside arbitrary
+  words are retained. The new extracted lexical oracle passed **1,342,183**
+  local comparisons with fatal ASan/UBSan. Windows tests use real ATL strings;
+  their validation and full DLL rendering checks are pending for this increment.
+  Numeric parsing remains in the original `GetPOINT`/Windows CRT boundary.
 * Value-only internal C ABIs for the character and attachment decoders. The ASS lexer
   has a separate, documented ownership boundary: it borrows two bounded input
   arrays during scanning, retains only integer spans, and returns an opaque owner
@@ -175,8 +183,10 @@ python3 tools/compat/make_corpus.py --check
 
 The decoder report goes to `artifacts/decoder/<target>/report.json` and records
 the reference commit, source hashes, compiler and result. The native tests
-extract the original algorithm without modifying it; the only test stand-in is
-the class shell around that method. The ASan/UBSan run instruments the C++ side;
+extract original algorithm blocks without modifying their logic. Storage and
+file-I/O stand-ins surround those blocks. The drawing-state oracle supplies
+identical pre-tokenized inputs and point results; its separate lexical oracle
+tests token delivery against real ATL strings on Windows. The ASan/UBSan run instruments the C++ side;
 it does not instrument the Rust static library. Safe Rust is enforced in the
 core by a compiler lint. The ASS lexer, text reader and drawing FFI owners and the production CRT
 allocator contain unsafe Rust, for constructing borrowed slices,
@@ -305,8 +315,8 @@ artifacts, restore their `candidate/artifacts/native/...` tree under this checko
 
 ## CSRI corpus and evidence
 
-`test/compat/cases.json` contains 240 cases: both file and memory
-loading for 34 existing ASS samples and 85 generated samples, plus geometry and
+`test/compat/cases.json` contains 266 cases: both file and memory
+loading for 34 existing ASS samples and 98 generated samples, plus geometry and
 stride cases. Generated cases include malformed tags, duplicate tags, malformed
 UTF-8, unpaired UTF-16, embedded NUL, CR/LF differences, missing final newlines
 and the original 4096-byte refill boundary. `.gitattributes` prevents checkout

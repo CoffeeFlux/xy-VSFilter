@@ -26,6 +26,7 @@
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_ass.h"
 #include "xy_rust_drawing.h"
+#include "xy_rust_drawing_tokens.h"
 #endif
 #include "draw_item.h"
 #include "cache_manager.h"
@@ -791,6 +792,15 @@ bool CPolygon::ParseStr()
 #else
     int j, lastsplinestart = -1, firstmoveto = -1, lastmoveto = -1;
 #endif
+    // Drawing token input boundary.
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::DrawingTokens tokens(m_str.Get());
+    CStringW s;
+    uint16_t command;
+    while (tokens.Next(s, command))
+    {
+        WCHAR c = static_cast<WCHAR>(command);
+#else
     CStringW str = m_str.Get();
     str.SpanIncluding(L"mnlbspc 0123456789");
     str.Replace(L"m", L"*m");
@@ -805,6 +815,8 @@ bool CPolygon::ParseStr()
     {
         WCHAR c = s[0];
         s.TrimLeft(L"mnlbspc ");
+#endif
+        // Drawing command state.
 #ifdef XY_VSFILTER_RUST_TEXT
         bool needPoint = path.Command(static_cast<uint16_t>(c));
         while (needPoint) {

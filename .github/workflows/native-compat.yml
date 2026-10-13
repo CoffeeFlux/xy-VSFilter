@@ -20,6 +20,7 @@ on:
       - 'include/xy_rust_ass.h'
       - 'include/xy_rust_reader.h'
       - 'include/xy_rust_drawing.h'
+      - 'include/xy_rust_drawing_tokens.h'
       - 'src/**'
       - 'tools/compat/**'
       - 'test/compat/**'
