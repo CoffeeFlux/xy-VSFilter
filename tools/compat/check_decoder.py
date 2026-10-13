@@ -52,7 +52,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_segment_insert.h",
               ROOT / "include/xy_rust_hdmv.h",
               ROOT / "include/xy_rust_dvb.h", ROOT / "include/xy_rust_golomb.h", ROOT / "include/xy_rust_fill.h",
-              ROOT / "src/subtitles/Rasterizer.cpp",
+              ROOT / "src/subtitles/Rasterizer.cpp", ROOT / "include/xy_rust_mask.h",
               ROOT / "src/dsutil/GolombBuffer.cpp", ROOT / "src/dsutil/GolombBuffer.h",
               ROOT / "src/subtitles/CompositionObject.cpp",
               ROOT / "include/xy_rust_timeline_search.h",
@@ -331,6 +331,16 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         hdmv += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     hdmv += "#endif\n"
     (destination / "original_hdmv.h").write_text(hdmv, encoding="utf-8")
+    masks = '#include "mask_shell.h"\n'
+    for name, content in (("ReferenceMask", raster_source), ("CandidateMask", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+        masks += f"namespace {name} {{\n"
+        if name == "CandidateMask":
+            masks += "#define XY_VSFILTER_RUST_TEXT\n"
+        for signature in ("void FillAlphaMashBody_c(BYTE*", "void FillAlphaMashBorder_c(BYTE*",
+                          "void FillAlphaMashBodyMasked_c(       BYTE*", "void FillAlphaMashBorderMasked_c(       BYTE*"):
+            masks += extract_method(content.decode("utf-8-sig"), signature) + "\n"
+        masks += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_mask.h").write_text(masks, encoding="utf-8")
     dvb = '#include "original_hdmv.h"\n#include "dvb_shell.h"\n'
     dvb += '#define UnionRect ObservedUnionRect\n'
     for name, content in (("OriginalDvb", hdmv_source), ("CandidateDvb", candidate_hdmv)):
@@ -487,6 +497,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     pixel_result = run([str(pixel_executable)], capture_output=True, text=True)
     print(pixel_result.stdout, end="", flush=True)
     print(pixel_result.stderr, end="", file=sys.stderr)
+    mask_executable = destination / ("mask-oracle.exe" if os.name == "nt" else "mask-oracle")
+    mask_compile = [arg.replace("fill_oracle.cpp", "mask_oracle.cpp").replace("fill-oracle", "mask-oracle") for arg in fill_compile]
+    run(mask_compile)
+    mask_result = run([str(mask_executable)], capture_output=True, text=True)
+    print(mask_result.stdout, end="", flush=True)
+    print(mask_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -516,6 +532,8 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "hdmv_golomb_source_sha256": hashlib.sha256(golomb_source).hexdigest(),
         "hdmv_golomb_header_sha256": hashlib.sha256(golomb_header).hexdigest(),
         "hdmv_raster_source_sha256": hashlib.sha256(raster_source).hexdigest(),
+        "mask_compile_command": mask_compile,
+        "mask_result": mask_result.stdout, "mask_stderr": mask_result.stderr,
         "pixel_compile_command": pixel_compile,
         "pixel_result": pixel_result.stdout, "pixel_stderr": pixel_result.stderr,
         "fill_debug_compile_command": fill_debug_compile,
