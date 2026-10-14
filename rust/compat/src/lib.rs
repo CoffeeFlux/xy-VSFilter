@@ -94,3 +94,5 @@ pub mod text_runs;
 pub mod wrap_width;
 
 pub mod line_layout;
+
+pub mod text_seek;

@@ -147,3 +147,5 @@ mod text_runs;
 mod wrap_width;
 
 mod line_layout;
+
+mod text_seek;

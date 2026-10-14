@@ -7,6 +7,7 @@
 #include <vector>
 #include <stdexcept>
 #include "xy_rust_reader.h"
+#include "xy_rust_seek.h"
 
 using std::min;
 using std::max;

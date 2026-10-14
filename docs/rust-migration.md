@@ -20,6 +20,28 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust computes `CTextFile::Seek` targets while native position/length/seek
+  calls and successful-seek buffer invalidation retain their order. Unsigned
+  wrapping, reinterpretation before the zero clamp, unknown origins, BOM offsets,
+  negative-offset end clamping and subtractive end-relative offsets are preserved.
+  Fatal ASan/UBSan comparisons passed **112,459 complete calls** on arm64 and
+  under x64 execution: **2,629,896 callback observations / 8,640 interruptions /
+  15,120 live state mutations**, **106,699 Rust targets / zero fallbacks**.
+  The **8,421 arithmetic-domain exclusions** are not passing comparisons; separate
+  Rust/FFI checks confirm unchanged output when physical signed addition declines.
+  The full reader also passes **37,008 scenarios / 1,396,467 line/seek comparisons /
+  6,096 injected exceptions** on both local architectures with the actual Rust
+  buffer. Native OS file operations are modeled in these extracted tests.
+  Rust 1.85 tests (120 core, 77 FFI), strict Clippy, default syntax and Python
+  checks pass. The renderer corpus remains **626 cases**; Windows/Miri and native
+  renderer checks for this increment are pending. Actual-host file I/O and
+  filesystem error integration remain separate work.
+* Block-layout helper run
+  [38542340983](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38542340983)
+  failed compilation on both Windows architectures because the test shell omitted
+  `atlcoll.h`, which declares `POSITION`. The missing include is corrected; those
+  failed jobs are not compatibility evidence. Production block-layout code is
+  unchanged by this harness fix, and corrected Windows checks are pending.
 * Safe Rust grows subtitle block dimensions and computes final alignment in
   `CSubtitle::MakeLines`. Native line creation/insertion, top-border capture,
   bottom-border rereading and partial results retain their exact order, including
