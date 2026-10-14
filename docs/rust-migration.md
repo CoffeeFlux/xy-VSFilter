@@ -700,6 +700,35 @@ remain pending. This is no claim about graph integration, callback counts,
 allocation failure or complete style ownership.
 
 
+### D2b supplied style values
+
+`document_style.rs` defines the complete safe owned value representation and a
+bounded 192-byte-header LE codec. The representation preserves all fifteen
+double fields by their stored bits, all signed scalars/margins, colors, alpha,
+flags and full raw UTF-16 font names. Equality is a separate operation following
+the native field-comparison order and first-NUL CString rule; it treats signed
+zeros as equal and NaNs as unequal. Floating status/traps are outside this
+comparison contract. No native object layout, flyweight handle or CString pointer
+crosses the value boundary. Native defaults are supplied rather than duplicated
+as unvalidated Rust constants. No style owner is retired by this foundation.
+
+Six core tests cover every truncated wire prefix, invalid counts/reserved/Boolean
+fields, pointer-width bounds, per-field inequality, and bit-preserving exceptional
+float/raw-name roundtrips. Signaling-NaN patterns are only copied in safe Rust
+bit-roundtrip tests, without native equality or rendering. All 173 core and 117
+FFI tests pass locally on Rust 1.85, as do formatting and Clippy. The new code
+adds no unsafe Rust.
+
+`document_style_value_check.py` builds an actual pinned-library STSStyle probe
+and the Rust codec example on each Windows architecture. The fixed initialized
+corpus has 209 values and 43,681 native equality observations, including each
+field independently, full names after NUL, signed zero, quiet NaNs, infinities
+and subnormals. It compares both full wire bytes and the equality matrix, with
+two executions per side, checked source provenance and retained inputs/binaries.
+The probe never receives arbitrary native input; all native objects stay in its
+own module. Windows results are pending. Default-style ownership and the named
+map's ordering/rename/copy semantics remain the next integration work.
+
 ## Independent audit and unsafe boundary
 
 The user-requested independent audit is recorded in

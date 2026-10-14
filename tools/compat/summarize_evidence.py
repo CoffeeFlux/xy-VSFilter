@@ -231,6 +231,12 @@ def summarize_native(run, platform, candidate, reference, document_storage="nati
     if has_style_probe and document_storage == "rust-experimental":
         entry["checks"]["document-style-api"] = summarize_style_api(
             base / "document-style-api", candidate, reference, platform, entry["dlls"])
+    has_style_value_probe = subprocess.run(
+        ["git", "cat-file", "-e", f"{candidate}:tools/compat/document_style_value_check.py"],
+        cwd=ROOT, capture_output=True).returncode == 0
+    if has_style_value_probe and document_storage == "rust-experimental":
+        entry["checks"]["document-style-value"] = summarize_style_value(
+            base / "document-style-value", candidate, reference, platform)
     log = (base / "candidate.log").read_text(errors="replace")
     assert "XY_VSFILTER_RUST_TEXT" in log and "xy_vsfilter_ffi.lib" in log
     if document_storage == "rust-experimental":
@@ -292,6 +298,47 @@ def summarize_style_api(directory, candidate, reference, platform, production_dl
     assert all(len(traces) == 4 and all(t == traces[0] for t in traces) for traces in groups.values())
     return {"report_sha256": sha(path), "equal": True, "class_mode_pairs": 4, "executions": 16,
             "scope": "Test-instrumented copies of actual DLLs; native style values remain in-module; production DLL hashes unchanged. Build-library hashes are runner-reported. No graph/real-host/callback-count coverage."}
+
+
+def summarize_style_value(directory, candidate, reference, platform):
+    from document_style_value_check import compare_traces
+    path = directory / "report.json"
+    report = load(path)
+    assert report["schema"] == "document-style-value-v1" and report["status"] == "complete"
+    assert all(report[key] is True for key in ("complete", "equal", "repeat_equal", "stderr_empty", "inputs_unchanged"))
+    assert report["candidate_commit"] == candidate and report["reference_commit"] == reference
+    assert report["platform"] == platform
+    checked = set()
+    for source, digest in report["artifacts"].items():
+        parts = PureWindowsPath(source).parts
+        if "document-style-value" in parts:
+            relative = parts[parts.index("document-style-value") + 1:]
+            assert sha(directory.joinpath(*relative)) == digest
+        elif "candidate" in parts or "baseline" in parts:
+            side = "candidate" if "candidate" in parts else "baseline"
+            name = "/".join(parts[parts.index(side) + 1:])
+            raw = windows_source_bytes(candidate if side == "candidate" else reference, name)
+            lf = raw.replace(b"\r\n", b"\n")
+            assert digest in {hashlib.sha256(v).hexdigest() for v in (raw, lf, lf.replace(b"\n", b"\r\n"))}
+            checked.add((side, normalize_windows_source(name)))
+    for name in ("rust/compat/src/document_style.rs", "rust/compat/examples/document_style_codec.rs",
+                 "tools/compat/document_style_value_probe.cpp", "tools/compat/document_style_value_check.py"):
+        assert ("candidate", name) in checked
+    assert ("baseline", "src/subtitles/sts.h") in checked
+    expected = {"native-0", "native-1", "rust-0", "rust-1"}
+    executions = [item for item in report["executions"] if item["name"] in expected]
+    assert len(executions) == 4 and {item["name"] for item in executions} == expected
+    for item in executions:
+        assert item["status"] == "complete" and item["returncode"] == 0
+        assert not (directory / (item["name"] + ".stderr")).read_bytes()
+        for suffix in ("stdout", "stderr"):
+            assert item[suffix + "_sha256"] == sha(directory / (item["name"] + "." + suffix))
+    native = [(directory / f"native-{i}.stdout").read_bytes() for i in range(2)]
+    rust = [(directory / f"rust-{i}.stdout").read_bytes() for i in range(2)]
+    count = compare_traces(native, rust, 32 if platform == "Win32" else 64)
+    assert count == report["value_count"] and count * count == report["equality_cells"]
+    return {"report_sha256": sha(path), "equal": True, "values": count, "equality_cells": count * count,
+            "scope": report["scope"], "provenance_scope": "Retained sources, headers, executables, input and traces rehashed; external toolchain and native library hashes runner-reported."}
 
 
 def summarize_portable(run, candidate, reference):
