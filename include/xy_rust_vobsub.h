@@ -24,4 +24,8 @@ extern "C" uint64_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_code_step(uint32_t code, 
 extern "C" uint32_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_bounds(const uint8_t* source, int32_t width, int32_t height, int32_t* output);
 extern "C" uint32_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_crop(const uint8_t* source, int32_t pitch, int32_t width, int32_t height, uint8_t* destination, const uint8_t* protected_object, size_t protected_length);
 extern "C" uint32_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_scale(const uint32_t* source, uint32_t* destination, int32_t width, int32_t height);
+struct XyVobSubOutlineStep { int32_t x,y,direction,point_x,point_y; };
+extern "C" uint32_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_outline_mask(const uint8_t* source, uint8_t* output, size_t count);
+extern "C" uint32_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_outline_find(const uint8_t* grid, int32_t width, int32_t height, int32_t* point);
+extern "C" uint32_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_outline_walk(uint8_t* grid, int32_t width, int32_t height, int32_t x, int32_t y, int32_t direction, XyVobSubOutlineStep* output);
 #undef XY_VOBSUB_CDECL

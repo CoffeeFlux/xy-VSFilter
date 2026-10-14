@@ -496,8 +496,13 @@ CAutoPtrList<COutline>* CVobSubImage::GetOutlineList(CPoint& topleft)
     BYTE* cp = p;
     RGBQUAD* rgbp = (RGBQUAD*)lpPixels;
 
-    for (int i = 0; i < len; i++, cp++, rgbp++) {
-        *cp = !!rgbp->rgbReserved;
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (!xy_vsfilter_vobsub_outline_mask(reinterpret_cast<const uint8_t*>(rgbp), cp, static_cast<size_t>(len)))
+#endif
+    {
+        for (int i = 0; i < len; i++, cp++, rgbp++) {
+            *cp = !!rgbp->rgbReserved;
+        }
     }
 
     enum { UP, RIGHT, DOWN, LEFT };
@@ -510,18 +515,27 @@ CAutoPtrList<COutline>* CVobSubImage::GetOutlineList(CPoint& topleft)
         int x = 0;
         int y = 0;
 
-        for (y = 0; y < h; y++) {
-            for (x = 0; x < w - 1; x++, cp++) {
-                if (cp[0] == 0 && cp[1] == 1) {
+#ifdef XY_VSFILTER_RUST_TEXT
+        int32_t position[2];
+        if (xy_vsfilter_vobsub_outline_find(p, w, h, position)) {
+            x = position[0];
+            y = position[1];
+        } else
+#endif
+        {
+            for (y = 0; y < h; y++) {
+                for (x = 0; x < w - 1; x++, cp++) {
+                    if (cp[0] == 0 && cp[1] == 1) {
+                        break;
+                    }
+                }
+
+                if (x < w - 1) {
                     break;
                 }
-            }
 
-            if (x < w - 1) {
-                break;
+                cp++;
             }
-
-            cp++;
         }
 
         if (y == h) {
@@ -549,90 +563,101 @@ CAutoPtrList<COutline>* CVobSubImage::GetOutlineList(CPoint& topleft)
 
             int prevdir = dir;
 
-            switch (prevdir) {
-                case UP:
-                    pp = CPoint(x + 1, y);
-                    fl = GP(x, y - 1);
-                    fr = GP(x + 1, y - 1);
-                    br = GP(x + 1, y);
-                    break;
-                case RIGHT:
-                    pp = CPoint(x + 1, y + 1);
-                    fl = GP(x + 1, y);
-                    fr = GP(x + 1, y + 1);
-                    br = GP(x, y + 1);
-                    break;
-                case DOWN:
-                    pp = CPoint(x, y + 1);
-                    fl = GP(x, y + 1);
-                    fr = GP(x - 1, y + 1);
-                    br = GP(x - 1, y);
-                    break;
-                case LEFT:
-                    pp = CPoint(x, y);
-                    fl = GP(x - 1, y);
-                    fr = GP(x - 1, y - 1);
-                    br = GP(x, y - 1);
-                    break;
-            }
+#ifdef XY_VSFILTER_RUST_TEXT
+            XyVobSubOutlineStep step;
+            if (xy_vsfilter_vobsub_outline_walk(p, w, h, x, y, dir, &step)) {
+                x = step.x;
+                y = step.y;
+                dir = step.direction;
+                pp = CPoint(step.point_x, step.point_y);
+            } else
+#endif
+            {
+                switch (prevdir) {
+                    case UP:
+                        pp = CPoint(x + 1, y);
+                        fl = GP(x, y - 1);
+                        fr = GP(x + 1, y - 1);
+                        br = GP(x + 1, y);
+                        break;
+                    case RIGHT:
+                        pp = CPoint(x + 1, y + 1);
+                        fl = GP(x + 1, y);
+                        fr = GP(x + 1, y + 1);
+                        br = GP(x, y + 1);
+                        break;
+                    case DOWN:
+                        pp = CPoint(x, y + 1);
+                        fl = GP(x, y + 1);
+                        fr = GP(x - 1, y + 1);
+                        br = GP(x - 1, y);
+                        break;
+                    case LEFT:
+                        pp = CPoint(x, y);
+                        fl = GP(x - 1, y);
+                        fr = GP(x - 1, y - 1);
+                        br = GP(x, y - 1);
+                        break;
+                }
 
-            // turning left if:
-            // o . | o .
-            // ^ o | < o
-            // turning right if:
-            // x x | x >
-            // ^ o | x o
-            //
-            // o set, x empty, . can be anything
+                // turning left if:
+                // o . | o .
+                // ^ o | < o
+                // turning right if:
+                // x x | x >
+                // ^ o | x o
+                //
+                // o set, x empty, . can be anything
 
-            if (fl == 1) {
-                dir = (dir - 1 + 4) & 3;
-            } else if (fl != 1 && fr != 1 && br == 1) {
-                dir = (dir + 1) & 3;
-            } else if (p[y * w + x] & 16) {
-                ASSERT(0);    // we are going around in one place (this must not happen if the starting conditions were correct)
-                break;
-            }
+                if (fl == 1) {
+                    dir = (dir - 1 + 4) & 3;
+                } else if (fl != 1 && fr != 1 && br == 1) {
+                    dir = (dir + 1) & 3;
+                } else if (p[y * w + x] & 16) {
+                    ASSERT(0);    // we are going around in one place (this must not happen if the starting conditions were correct)
+                    break;
+                }
 
-            p[y * w + x] = (p[y * w + x] << 1) | 2; // increase turn count (== log2(highordbit(*p)))
+                p[y * w + x] = (p[y * w + x] << 1) | 2; // increase turn count (== log2(highordbit(*p)))
 
-            switch (dir) {
-                case UP:
-                    if (prevdir == LEFT) {
-                        x--;
-                        y--;
-                    }
-                    if (prevdir == UP) {
-                        y--;
-                    }
-                    break;
-                case RIGHT:
-                    if (prevdir == UP) {
-                        x++;
-                        y--;
-                    }
-                    if (prevdir == RIGHT) {
-                        x++;
-                    }
-                    break;
-                case DOWN:
-                    if (prevdir == RIGHT) {
-                        x++;
-                        y++;
-                    }
-                    if (prevdir == DOWN) {
-                        y++;
-                    }
-                    break;
-                case LEFT:
-                    if (prevdir == DOWN) {
-                        x--;
-                        y++;
-                    }
-                    if (prevdir == LEFT) {
-                        x--;
-                    }
-                    break;
+                switch (dir) {
+                    case UP:
+                        if (prevdir == LEFT) {
+                            x--;
+                            y--;
+                        }
+                        if (prevdir == UP) {
+                            y--;
+                        }
+                        break;
+                    case RIGHT:
+                        if (prevdir == UP) {
+                            x++;
+                            y--;
+                        }
+                        if (prevdir == RIGHT) {
+                            x++;
+                        }
+                        break;
+                    case DOWN:
+                        if (prevdir == RIGHT) {
+                            x++;
+                            y++;
+                        }
+                        if (prevdir == DOWN) {
+                            y++;
+                        }
+                        break;
+                    case LEFT:
+                        if (prevdir == DOWN) {
+                            x--;
+                            y++;
+                        }
+                        if (prevdir == LEFT) {
+                            x--;
+                        }
+                        break;
+                }
             }
 
             int d = dir - prevdir;

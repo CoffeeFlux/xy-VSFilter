@@ -386,6 +386,20 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         vobsub_scale += extract_definition(content.decode("utf-8-sig"), "void CVobSubImage::Scale2x(") + "\n"
         vobsub_scale += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_vobsub_scale.h").write_text(vobsub_scale, encoding="utf-8")
+    vobsub_outline = '#include "vobsub_outline_shell.h"\n'
+    for name, content in (("ReferenceVobOutline", vobsub_source), ("CandidateVobOutline", (ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
+        vobsub_outline += f"VOBSUB_OUTLINE_SHELL({name})\n#define CVobSubImage {name}\n"
+        if name == "CandidateVobOutline":
+            vobsub_outline += "#define XY_VSFILTER_RUST_TEXT\n"
+        outline_method = extract_definition(content.decode("utf-8-sig"), "CAutoPtrList<COutline>* CVobSubImage::GetOutlineList(")
+        vobsub_outline += outline_method + "\n"
+        walk_start = outline_method.index("            CPoint pp;")
+        walk_end = outline_method.index("            int d = dir - prevdir;", walk_start)
+        walk_body = outline_method[walk_start:walk_end].replace("CPoint pp;", "", 1)
+        vobsub_outline += f"static std::vector<int32_t> {name}Walk(std::vector<BYTE>& grid,int w,int h,int x,int y,int dir) {{\nBYTE* p=grid.data();CPoint pp;enum {{ UP, RIGHT, DOWN, LEFT }};bool completed=false;do {{\n"
+        vobsub_outline += walk_body + "\ncompleted=true;\n}while(false);return {x,y,dir,pp.x,pp.y,completed ? 1 : 0};\n}\n"
+        vobsub_outline += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_vobsub_outline.h").write_text(vobsub_outline, encoding="utf-8")
     byte_float = '#include "byte_float_shell.h"\n'
     for name, content in (("ReferenceByteFloat", filter_source), ("CandidateByteFloat", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
         byte_float += f"namespace {name} {{\n"
@@ -721,6 +735,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     vobsub_scale_result = run([str(vobsub_scale_executable)], capture_output=True, text=True)
     print(vobsub_scale_result.stdout, end="", flush=True)
     print(vobsub_scale_result.stderr, end="", file=sys.stderr)
+    vobsub_outline_executable = destination / ("vobsub-outline-oracle.exe" if os.name == "nt" else "vobsub-outline-oracle")
+    vobsub_outline_compile = [arg.replace("fill_oracle.cpp", "vobsub_outline_oracle.cpp").replace("fill-oracle", "vobsub-outline-oracle") for arg in fill_compile]
+    run(vobsub_outline_compile)
+    vobsub_outline_result = run([str(vobsub_outline_executable)], capture_output=True, text=True)
+    print(vobsub_outline_result.stdout, end="", flush=True)
+    print(vobsub_outline_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -762,6 +782,8 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "vobsub_trim_result": vobsub_trim_result.stdout, "vobsub_trim_stderr": vobsub_trim_result.stderr,
         "vobsub_scale_compile_command": vobsub_scale_compile,
         "vobsub_scale_result": vobsub_scale_result.stdout, "vobsub_scale_stderr": vobsub_scale_result.stderr,
+        "vobsub_outline_compile_command": vobsub_outline_compile,
+        "vobsub_outline_result": vobsub_outline_result.stdout, "vobsub_outline_stderr": vobsub_outline_result.stderr,
         "weighted_filter_compile_command": weighted_compile,
         "weighted_filter_result": weighted_result.stdout, "weighted_filter_stderr": weighted_result.stderr,
         "gauss_integer_compile_command": integer_gauss_compile,
