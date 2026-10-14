@@ -1,0 +1,59 @@
+{
+  "candidate_commit": "355ef9c996aadd03e7685c5ac521adfefd7767a4",
+  "run_id": 38612513345,
+  "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38612513345",
+  "scope": "Prepared-record document lifecycle and TIME queries through portable storage shells on Windows; no ATL, callback, rendering or production ownership claim.",
+  "full_matrix_pass": false,
+  "platforms": [
+    {
+      "target": "i686-pc-windows-msvc",
+      "job_id": 116019197921,
+      "job_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38612513345/job/116019197921",
+      "job_conclusion": "failure",
+      "document_step_conclusion": "success",
+      "operations": 89131,
+      "queries": 87312,
+      "sequences": 133,
+      "trace_sha256": "9fd1bcd754a07691bebb942e2d9cf18de5b333781cee8d3a3fc8d1dbb506301a",
+      "report_sha256": "852adc607c7ada76eddf1413fe1aa4f68664621818a86d292fa3c90f73f58386",
+      "operations_sha256": "80c769649b23389df1dc18036e5bce835f7f38626042d46a726e70a3ca7aee84",
+      "extracted_header_sha256": "7ccbe89cce6ea18ca94419090713c0a8ea1141e4a6336205991c8270b436f039",
+      "native_binary_sha256": "9b4912cac594d94cd4dc78ab10c73b6349c6fcc37642c77075e9a023d883e0e0",
+      "candidate_binary_sha256": "42f492bf6b86df7756d2f1d5ef4ac8f4f1b0b0cb43a0d899d67c61acca862f84",
+      "candidate_source_hashes_verified_against_commit_with_checkout_line_endings": true,
+      "reference_hashes_verified": true,
+      "negative_controls": {
+        "content": true,
+        "length": true
+      },
+      "native_sanitizers": [],
+      "callback_scope": "native callback observations only, no callback parity",
+      "other_failure": "Separate ATL/CRT primitive probe failed CRect using-declaration; not a full job pass."
+    },
+    {
+      "target": "x86_64-pc-windows-msvc",
+      "job_id": 116019198012,
+      "job_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38612513345/job/116019198012",
+      "job_conclusion": "failure",
+      "document_step_conclusion": "success",
+      "operations": 89131,
+      "queries": 87312,
+      "sequences": 133,
+      "trace_sha256": "9fd1bcd754a07691bebb942e2d9cf18de5b333781cee8d3a3fc8d1dbb506301a",
+      "report_sha256": "9d633a924b689455e8c0abce6af3af0f6e8c041e4c85978cb2fb5a38e517e188",
+      "operations_sha256": "80c769649b23389df1dc18036e5bce835f7f38626042d46a726e70a3ca7aee84",
+      "extracted_header_sha256": "7ccbe89cce6ea18ca94419090713c0a8ea1141e4a6336205991c8270b436f039",
+      "native_binary_sha256": "3c368557403b59757be129abc8257249b30d4a390a3a0feacd55a2aba007ef8c",
+      "candidate_binary_sha256": "e9d57641011c58bbd487a7bf58e8fc326e675e8612f0674a83ddd0601c80b6bc",
+      "candidate_source_hashes_verified_against_commit_with_checkout_line_endings": true,
+      "reference_hashes_verified": true,
+      "negative_controls": {
+        "content": true,
+        "length": true
+      },
+      "native_sanitizers": [],
+      "callback_scope": "native callback observations only, no callback parity",
+      "other_failure": "Separate ATL/CRT primitive probe failed CRect using-declaration; not a full job pass."
+    }
+  ]
+}

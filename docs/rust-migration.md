@@ -345,6 +345,37 @@ from this failed probe. Its build log and successful lifecycle artifacts are
 retained locally under `artifacts/ci-38612513345`. The follow-up also normalizes
 extracted line endings before writing generated includes on Windows.
 
+The same `355ef9c9` run also passes the prepared-owner comparison on Windows
+x86. [Verified Windows evidence](rust-document-windows-evidence.json) checks
+both architectures' source hashes against that commit (allowing checkout line
+endings), pinned reference hashes, generated headers, input traces and all
+89,131 state snapshots. The Windows traces have the same digest as local arm64.
+Both Windows jobs nevertheless fail the separate probe compilation, so the
+artifact explicitly records a focused-step pass and no full-matrix pass.
+
+At `faffdad2`, run `38612951161` passes Miri and the corrected primitive probe
+on Windows x64. Windows x86 stops earlier in the existing controlled-dialog
+unit test: a queued BM_CLICK was recorded but the worker timed out. Activation
+state was not captured, so the precise original cause is unproven. The follow-up
+harness validates the scripted button's parent, ID, class and readiness, then
+queues one WM_COMMAND/BN_CLICKED notification to the matched dialog. It retains
+unexpected-dialog and timeout failures; it does not retry commands or extend
+deadlines. Fake-DLL checks now verify the native MessageBox return value for both
+OK and Cancel, alongside portable readiness/failed-delivery controls. Windows
+validation of this correction is pending.
+The notification choice follows Microsoft's
+[BM_CLICK](https://learn.microsoft.com/en-us/windows/win32/controls/bm-click)
+and [BN_CLICKED](https://learn.microsoft.com/en-us/windows/win32/controls/bn-clicked)
+contracts; documentation of an inactive-dialog limitation does not establish
+the activation state of the failed run.
+
+CI now runs and uploads the independent document comparison/probe artifacts
+before the generic Python suite and long decoder campaign. All suites remain
+required; this ordering makes focused evidence available promptly even when a
+later unrelated check fails. Superseded documentation-only runs `38608195241`
+and `38610117782` were cancelled after confirming their code matched the
+already-passing `19032c76` baseline; cancellations are not validation passes.
+
 The prior RLE fixture failure remains an integration gate pending CI. A focused
 correction makes owner snapshots use exact allocation-base identity, and avoids
 inventing offset observations for zero-byte copies at adjacent-region boundaries.
