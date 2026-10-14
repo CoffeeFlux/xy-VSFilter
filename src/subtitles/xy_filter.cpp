@@ -3,6 +3,7 @@
 #include "xy_rust_be_filter.h"
 #include "xy_rust_transpose.h"
 #include "xy_rust_byte_float.h"
+#include "xy_rust_plane.h"
 #endif
 #include "../dsutil/vd.h"
 
@@ -926,7 +927,12 @@ void xy_gaussian_blur(PUINT8 dst, int dst_stride,
     int fheight = (height+3)&~3;
     int fstride_ver = (fheight+ex_mask_width_y)*sizeof(float);
 
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::PlaneAllocation rust_scratch(height*fstride + (fwidth + ex_mask_width_x)*fstride_ver);
+    PUINT8 buff_base = rust_scratch.Ready() ? rust_scratch.Data() : reinterpret_cast<PUINT8>(xy_malloc(height*fstride + (fwidth + ex_mask_width_x)*fstride_ver));
+#else
     PUINT8 buff_base = reinterpret_cast<PUINT8>(xy_malloc(height*fstride + (fwidth + ex_mask_width_x)*fstride_ver));
+#endif
     
     float *hor_buff_base = reinterpret_cast<float*>(buff_base);
     float *hor_buff = hor_buff_base + ex_mask_width_x;    
@@ -953,6 +959,10 @@ void xy_gaussian_blur(PUINT8 dst, int dst_stride,
     int true_height = height + 2*r_y;
     xy_float_2_byte_transpose_sse(dst, true_width, dst_stride, ver_buff-r_y*2, true_height, true_width, fstride_ver);
     
+#ifdef XY_VSFILTER_RUST_TEXT
+    if(rust_scratch.Ready()) rust_scratch.Reset();
+    else
+#endif
     xy_free(buff_base);
 #ifndef _WIN64
     // TODOX64 : fixme!

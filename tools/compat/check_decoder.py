@@ -856,6 +856,14 @@ public:
         legacy_blur_code += extract_definition(text, "bool Rasterizer::OldFixedPointBlur(").replace("memcpy(", "checkedLegacyCopy(") + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_legacy_blur.h").write_text(legacy_blur_code, encoding="utf-8")
     filter_source = original("src/subtitles/xy_filter.cpp", reference["commit"])
+    gauss_storage_code = '#include "gauss_storage_shell.h"\n'
+    for name, content in (("ReferenceGaussStorage", filter_source), ("CandidateGaussStorage", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
+        text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        gauss_storage_code += f"namespace {name} {{\n"
+        if name == "CandidateGaussStorage":
+            gauss_storage_code += "#define XY_VSFILTER_RUST_TEXT\n"
+        gauss_storage_code += extract_definition(text, "void xy_gaussian_blur(") + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_gauss_storage.h").write_text(gauss_storage_code, encoding="utf-8")
     vobsub_source = original("src/subtitles/VobSubImage.cpp", reference["commit"])
     golomb = '#pragma once\n#include "golomb_shell.h"\n'
     candidate_golomb = (ROOT / "src/dsutil/GolombBuffer.cpp").read_bytes()
@@ -1392,6 +1400,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     legacy_blur_result = run([str(legacy_blur_executable)], capture_output=True, text=True)
     print(legacy_blur_result.stdout, end="", flush=True)
     print(legacy_blur_result.stderr, end="", file=sys.stderr)
+    gauss_storage_executable = destination / ("gauss-storage-oracle.exe" if os.name == "nt" else "gauss-storage-oracle")
+    gauss_storage_compile = [arg.replace("find_char_oracle.cpp", "gauss_storage_oracle.cpp").replace("find-char-oracle", "gauss-storage-oracle") for arg in find_char_compile]
+    run(gauss_storage_compile)
+    gauss_storage_result = run([str(gauss_storage_executable)], capture_output=True, text=True)
+    print(gauss_storage_result.stdout, end="", flush=True)
+    print(gauss_storage_result.stderr, end="", file=sys.stderr)
     pipe_line_executable = destination / ("pipe-line-oracle.exe" if os.name == "nt" else "pipe-line-oracle")
     pipe_line_compile = [arg.replace("find_char_oracle.cpp", "pipe_line_oracle.cpp").replace("find-char-oracle", "pipe-line-oracle") for arg in find_char_compile]
     run(pipe_line_compile)
@@ -1781,6 +1795,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "path_align_compile_command": path_align_compile,
         "path_align_result": path_align_result.stdout, "path_align_stderr": path_align_result.stderr,
         "path_align_scope": "Complete pinned PathData::AlignLeftTop over initialized point/type buffers; actual Windows POINT/ATL geometry; exact guarded buffers, origin/size, errno/FP/Windows error state; native cleanup modeled, outputs disjoint and representable arithmetic only",
+        "gauss_storage_compile_command": gauss_storage_compile,
+        "gauss_storage_result": gauss_storage_result.stdout, "gauss_storage_stderr": gauss_storage_result.stderr,
+        "gauss_storage_scope": "Complete pinned xy_gaussian_blur with controlled byte/float, filter and transpose callbacks; exact region offsets, callback arguments, initialized scratch handoff, output/padding bytes, logical cache accounting and successful native fallback after modeled Rust decline. Unwritten scratch bytes are never read or compared. Invalid kernel/dimension domains and actual allocation failure are excluded; underlying filter arithmetic has separate leaf comparisons.",
         "legacy_blur_compile_command": legacy_blur_compile,
         "legacy_blur_result": legacy_blur_result.stdout, "legacy_blur_stderr": legacy_blur_result.stderr,
         "legacy_blur_scope": "Complete pinned OldFixedPointBlur and blur predicate, native floating geometry/pass control and full-pitch source copies including padding. Preflight excludes layouts whose copy or final row cursor leaves the logical backing; an independent checked-copy interceptor rejects before memory access. These exclusions are not parity passes; production selects native fallback on decline. Coefficient factories and filter kernels are controlled callbacks. Both input planes present; object aliasing, invalid geometry, actual OOM and native scratch allocation failure excluded. Checks include source-plane aliases, retained shared references, logical cache accounting and modeled output-plane allocation failure. Production renderer entry into this legacy method is not asserted.",

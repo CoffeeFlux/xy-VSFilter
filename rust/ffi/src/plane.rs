@@ -47,6 +47,36 @@ pub unsafe extern "C" fn xy_vsfilter_plane_release(owner: *mut Plane) {
 mod tests {
     use super::*;
     #[test]
+    fn disjoint_float_regions_share_an_owner_without_reading_unwritten_padding() {
+        let owner = xy_vsfilter_plane_create(64);
+        assert!(!owner.is_null());
+        // SAFETY: one live allocation with two disjoint 32-byte regions; only
+        // active source words are initialized and read. Padding stays untouched.
+        unsafe {
+            let base = xy_vsfilter_plane_loan(owner);
+            let source = base.cast::<u32>();
+            let destination = base.add(32).cast::<u32>();
+            for (index, value) in [
+                (0, 0x8000_0000),
+                (1, 0x3f80_0000),
+                (4, 0x4000_0000),
+                (5, 0x4040_0000),
+            ] {
+                source.add(index).write(value);
+            }
+            assert_eq!(
+                crate::transpose::xy_vsfilter_word_transpose(destination, 2, 16, source, 2, 2, 16),
+                1
+            );
+            assert_eq!(destination.read(), 0x8000_0000);
+            assert_eq!(destination.add(1).read(), 0x4000_0000);
+            assert_eq!(destination.add(4).read(), 0x3f80_0000);
+            assert_eq!(destination.add(5).read(), 0x4040_0000);
+            assert_eq!(source.add(1).read(), 0x3f80_0000);
+            xy_vsfilter_plane_release(owner);
+        }
+    }
+    #[test]
     fn two_word_history_loans_survive_fixed_blur_phases_and_reverse_release() {
         let pixels = xy_vsfilter_plane_create(16);
         let sums = xy_vsfilter_plane_create(16);

@@ -20,6 +20,27 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Rust owns Gaussian filtering's combined horizontal/vertical scratch buffer.
+  Native region layout, alignment, pointer offsets, stage order and release
+  before MMX-state reset remain unchanged; scalar accounting preserves logical
+  cache bytes. Fatal ASan/UBSan comparisons pass on arm64 and under x64 execution:
+  **19,760 full xy_gaussian_blur calls / 9,614,592 output bytes and guards /
+  61,080,832 initialized scratch index-byte fields / 770,640 allocation/stage
+  observations / 19,712 Rust owners, loans and releases**. **48 modeled Rust
+  declines** take the successful native allocation path. All modeled stage reads
+  require initialized bytes, and every read/write checks its backing extent;
+  unwritten scratch is never read or compared. Filter/conversion kernels are
+  controlled here and have separate leaf comparisons. A real FFI transpose test
+  uses two disjoint regions of one Rust owner with uninitialized padding.
+  Rust 1.85 tests (143 core, 95 FFI), strict Clippy, default syntax and Python
+  checks pass. The corpus remains **762 cases**; Windows/Miri and DLL checks
+  are pending. Invalid kernel/dimension domains and actual allocation failure
+  remain outside this scope.
+* Span coverage has completed all four portable CI targets, Miri and both Windows
+  renderer architectures. The **746-case / 7,810-frame** corpus and **32 mutations /
+  224 frames** match on each architecture, alongside exports and declared platform
+  requirements. [Archived evidence](span-coverage-evidence.json) distinguishes the
+  controlled allocation boundary from actual renderer comparisons.
 * Scanline sorting/winding has completed all four portable CI targets, Miri and
   both Windows renderer architectures. The **730-case / 7,650-frame** corpus and
   **32 mutations / 224 frames** match on each architecture, with matching exports
