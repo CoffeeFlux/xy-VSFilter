@@ -53,7 +53,7 @@ def extract_definition(source, signature):
 def capture_inputs():
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h", ROOT / "include/xy_rust_writer.h",
-              ROOT / "include/xy_rust_drawing.h", ROOT / "include/xy_rust_layout.h", ROOT / "src/subtitles/RTS.h",
+              ROOT / "include/xy_rust_drawing.h", ROOT / "include/xy_rust_layout.h", ROOT / "include/xy_rust_text_runs.h", ROOT / "src/subtitles/RTS.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
               ROOT / "include/xy_rust_pipe_line.h", ROOT / "include/xy_rust_subrip_cue.h", ROOT / "include/xy_rust_sami_file.h", ROOT / "include/xy_rust_microdvd_style.h", ROOT / "include/xy_rust_font_records.h", ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
@@ -197,6 +197,18 @@ public:
             layout += definition + "\n"
         layout += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_layout_rects.h").write_text(layout, encoding="utf-8")
+    text_runs = '#include "text_runs_shell.h"\n'
+    for name, content in (("ReferenceTextRuns", layout_source), ("CandidateTextRuns", (ROOT / "src/subtitles/RTS.cpp").read_bytes())):
+        text_runs += f"namespace {name} {{\n"
+        text_runs += "class CRenderedTextSubtitle : public RenderState { public: void ParseString(CSubtitle*, CStringW, const FwSTSStyle&); };\n"
+        if name == "CandidateTextRuns":
+            text_runs += "#define XY_VSFILTER_RUST_TEXT\n"
+        definition = extract_definition(content.decode("utf-8-sig"), "void CRenderedTextSubtitle::ParseString(")
+        if name == "CandidateTextRuns":
+            assert definition.count("XyRust::TextRuns runs") == 1
+            definition = definition.replace("XyRust::TextRuns runs", "XyRust::ObservedTextRuns runs")
+        text_runs += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_text_runs.h").write_text(text_runs, encoding="utf-8")
     realtext_source = original("src/subtitles/RealTextParser.cpp", reference["commit"])
     realtext_header = original("src/subtitles/RealTextParser.h", reference["commit"])
     realtext_class = extract_method(realtext_header.decode("utf-8-sig"), "class CRealTextParser")
@@ -1015,6 +1027,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     find_char_result = run([str(find_char_executable)], capture_output=True, text=True)
     print(find_char_result.stdout, end="", flush=True)
     print(find_char_result.stderr, end="", file=sys.stderr)
+    text_runs_executable = destination / ("text-runs-oracle.exe" if os.name == "nt" else "text-runs-oracle")
+    text_runs_compile = [arg.replace("find_char_oracle.cpp", "text_runs_oracle.cpp").replace("find-char-oracle", "text-runs-oracle") for arg in find_char_compile]
+    run(text_runs_compile)
+    text_runs_result = run([str(text_runs_executable)], capture_output=True, text=True)
+    print(text_runs_result.stdout, end="", flush=True)
+    print(text_runs_result.stderr, end="", file=sys.stderr)
     layout_executable = destination / ("layout-rects-oracle.exe" if os.name == "nt" else "layout-rects-oracle")
     layout_compile = [arg.replace("find_char_oracle.cpp", "layout_rects_oracle.cpp").replace("find-char-oracle", "layout-rects-oracle") for arg in find_char_compile]
     if os.name == "nt":
@@ -1400,6 +1418,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "webvtt_compile_command": webvtt_compile,
         "webvtt_result": webvtt_result.stdout, "webvtt_stderr": webvtt_result.stderr,
         "webvtt_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring model with host iswspace; Windows comparison required",
+        "text_runs_compile_command": text_runs_compile,
+        "text_runs_result": text_runs_result.stdout, "text_runs_stderr": text_runs_result.stderr,
+        "text_runs_scope": "Complete pinned CRenderedTextSubtitle::ParseString; actual ATL strings on Windows, portable strings elsewhere; native escape replacements retained; modeled CText constructor and word-list boundaries, exact word arguments/float bits, live karaoke/scaling state, callback mutations/interruption and partial output; replacement-bearing NUL fixtures, native font metrics and allocation failures excluded",
         "layout_rects_compile_command": layout_compile,
         "layout_rects_result": layout_result.stdout, "layout_rects_stderr": layout_result.stderr,
         "layout_rects_scope": "Complete pinned CScreenLayoutAllocator methods and class record layout; actual ATL CRect/list/array on Windows, controlled models on portable hosts; exact returned rectangles and full ordered retained records after each operation; Rust collision passes and segment retention, native border geometry; errno/Windows LastError; representable arithmetic, finite collision sequences and successful allocation only",

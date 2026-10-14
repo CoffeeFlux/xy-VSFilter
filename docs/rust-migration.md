@@ -20,6 +20,31 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns rendered-text run storage and traversal after native escape
+  replacement. Only ASCII space, LF and NUL split words: NUL is skipped while its
+  counted tail is still scanned; tabs and NBSP remain inside words. Repeated
+  spaces/newlines create separate native word objects. Native CText construction,
+  list insertion, live scaling/karaoke arguments and karaoke-start updates retain
+  their ordering, including partial output when a callback throws.
+  Fatal ASan/UBSan comparisons passed **161,266 complete ParseString calls** on
+  arm64 and under x64 execution: **732,205 retained words**, **15,452,828 callback
+  observation values**, **560 interruptions**, **4,080 live renderer-state
+  mutations**, and **161,259 Rust owners / 893,464 token steps**. Tests cover every
+  UTF-16 value, NUL tails, all wrap-style branches, repeated delimiters, null
+  subtitle pointers and exact word arguments/scale bits. Word construction and
+  list insertion are modeled boundaries; replacement-bearing NUL fixtures and
+  allocation failures are excluded.
+  Eight whitespace/karaoke scripts and a soft-break visible control expand
+  renderer validation to **586 cases**. Rust 1.85 tests (111 core, 73 FFI), strict
+  Clippy, default syntax and Python harness checks pass. Windows/Miri and full
+  renderer checks are pending; escape replacement, font metrics, word objects
+  and full host integration remain native/separate work.
+* Corrected SAMI, SubRip and legacy SubRip/VPlayer Windows x86/x64 renderer checks
+  passed **554 cases / 5,730 frames** per architecture, plus **32 mutation cases /
+  224 frames**, with matching dialogs, visible controls, exports and declared
+  dependencies. All four platform reports and Miri passed; isolated local
+  ASan/UBSan evidence is complete. The two earlier harness compile failures are
+  explicitly recorded in [verified legacy-file evidence](legacy-files-evidence.json).
 * Safe Rust now also performs screen-layout collision placement and adjacent-
   segment retention. Collision scans preserve list order and repeat until clear;
   duplicate active entries, reverse playback and layer selection retain their
@@ -91,8 +116,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   and numeric fixtures use representable arithmetic.
   Eight legacy-format scripts and two pipe-layout visible controls expand renderer
   validation to **554 cases**. Rust 1.85 tests (105 core, 69 FFI), strict Clippy,
-  default syntax and Python harness checks pass. Windows/Miri and full renderer
-  validation are pending; native numeric/file/sink and host behavior remain.
+  default syntax and Python harness checks pass. Corrected Windows/Miri and
+  renderer evidence is linked above; native numeric/file/sink and host work remain.
 * SubRip cue helper run
   [38535443165](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38535443165)
   passed on Windows x64 but failed compilation on Win32: the test string wrapper
@@ -121,8 +146,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   Overflowing numeric scans and replacement-bearing NUL fixtures are excluded.
   Eight cue-level scripts and a numeric-caption visible control expand renderer
   validation to **538 cases**. Rust 1.85 tests (103 core, 68 FFI), strict Clippy,
-  default syntax and Python harness checks pass. Windows/Miri and full renderer
-  validation are pending; native file decoding and final subtitle storage remain.
+  default syntax and Python harness checks pass. Corrected Windows/Miri and
+  renderer evidence is linked above; native file decoding and final storage remain.
 * The first SAMI file Windows helper run
   [38534766416](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38534766416)
   failed to compile because the Windows `max` macro expanded the test shell's
@@ -145,8 +170,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   timestamps use representable arithmetic and NUL fixtures avoid replacements.
   Eight file-level SAMI scripts and a visible title-suppression control expand
   renderer validation to **522 cases**. Rust 1.85 tests (102 core, 67 FFI), strict
-  Clippy, default syntax and Python harness checks pass. Windows/Miri and full
-  renderer validation are pending. Native file decoding, final subtitle storage
+  Clippy, default syntax and Python harness checks pass. Corrected Windows/Miri
+  and renderer evidence is linked above. Native file decoding, final subtitle storage
   and real-host integration remain separate work.
 * Safe Rust owns `GetMicroDVDStyle` source and tag traversal. Searches stop at
   NUL, the first closing brace wins, an unclosed tag retains its counted tail,
