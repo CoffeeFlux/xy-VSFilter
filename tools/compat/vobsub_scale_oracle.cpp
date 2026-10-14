@@ -3,24 +3,38 @@
 #include <array>
 #include <cstdio>
 typedef std::array<DWORD,256> Storage;
+static void seedEffects(){errno=EDOM;std::feclearexcept(FE_ALL_EXCEPT);std::feraiseexcept(FE_DIVBYZERO);
+#ifdef _WIN32
+SetLastError(0x12345678);
+#endif
+}
+struct Effects {int error,flags;unsigned long last;Effects():error(errno),flags(std::fetestexcept(FE_ALL_EXCEPT)),last(0){
+#ifdef _WIN32
+last=GetLastError();
+#endif
+}bool operator==(const Effects& o)const{return error==o.error&&flags==o.flags&&last==o.last;}};
 struct Outcome {
-    Storage first,second;std::vector<size_t> allocations;bool interrupted;CRect rect;ptrdiff_t pixels;
-    bool operator==(const Outcome& other)const{return first==other.first && second==other.second && allocations==other.allocations && interrupted==other.interrupted && rect.left==other.rect.left && rect.top==other.rect.top && rect.right==other.rect.right && rect.bottom==other.rect.bottom && pixels==other.pixels;}
+    Effects firstEffects,secondEffects;Storage first,second;std::vector<size_t> allocations;std::vector<int64_t> events;bool interrupted;CRect rect;ptrdiff_t pixels;
+    bool operator==(const Outcome& other)const{return firstEffects==other.firstEffects && secondEffects==other.secondEffects && first==other.first && second==other.second && allocations==other.allocations && events==other.events && interrupted==other.interrupted && rect.left==other.rect.left && rect.top==other.rect.top && rect.right==other.rect.right && rect.bottom==other.rect.bottom && pixels==other.pixels;}
 };
 static uint64_t comparisons=0,changed=0,interruptions=0,allocations=0;
 template<class Image> static Outcome execute(Storage storage,int width,int height,int failure) {
     Image image;image.rect=CRect(-7,13,width-7,height+13);image.lpPixels=storage.data()+16;
-    scaleAllocations.clear();scaleFailure=failure;Outcome result;result.interrupted=false;
-    try{image.Scale2x();}catch(const ScaleInterrupted&){result.interrupted=true;}
-    result.first=storage;
-    if(!result.interrupted){try{image.Scale2x();}catch(const ScaleInterrupted&){result.interrupted=true;}}
-    result.second=storage;result.allocations=scaleAllocations;result.rect=image.rect;result.pixels=image.lpPixels-storage.data();return result;
+    scaleRequire(scaleRegions.empty());scaleAllocations.clear();scaleEvents.clear();scaleFailure=failure;Outcome result;result.interrupted=false;
+    seedEffects();try{image.Scale2x();}catch(const ScaleInterrupted&){result.interrupted=true;}
+    result.firstEffects=Effects();result.first=storage;
+    seedEffects();if(!result.interrupted){try{image.Scale2x();}catch(const ScaleInterrupted&){result.interrupted=true;}}
+    result.secondEffects=Effects();
+    scaleRequire(scaleRegions.empty());result.second=storage;result.allocations=scaleAllocations;result.events=scaleEvents;result.rect=image.rect;result.pixels=image.lpPixels-storage.data();return result;
 }
 static void compare(const Storage& storage,int width,int height,int failure=-1) {
-    const auto a=execute<ReferenceVobScale>(storage,width,height,failure);
-    const auto b=execute<CandidateVobScale>(storage,width,height,failure);
-    if(!(a==b)){fprintf(stderr,"VobSub Scale2x mismatch width=%d height=%d failure=%d\n",width,height,failure);std::abort();}
-    ++comparisons;changed+=a.first!=storage;interruptions+=a.interrupted;allocations+=a.allocations.size();
+    for(bool decline:{false,true}){
+        scaleDecline=decline;
+        const auto a=execute<ReferenceVobScale>(storage,width,height,failure);
+        const auto b=execute<CandidateVobScale>(storage,width,height,failure);
+        if(!(a==b)){fprintf(stderr,"VobSub Scale2x mismatch width=%d height=%d failure=%d decline=%d\n",width,height,failure,decline);std::abort();}
+        ++comparisons;changed+=a.first!=storage;interruptions+=a.interrupted;allocations+=a.allocations.size();
+    }
 }
 static uint32_t rng=0x10293847;
 static uint32_t nextRandom(){rng^=rng<<13;rng^=rng>>17;rng^=rng<<5;return rng;}
@@ -46,13 +60,17 @@ int main() {
     for(int width:{1,3,11})for(int height:{1,3,9})for(int failure:{0,1})compare(initial(),width,height,failure);
     auto control=initial();control[17]=control[19]=control[20]=0;control[21]=control[23]=0xffffffffU;
     const auto native=execute<ReferenceVobScale>(control,3,3,-1);
-    if(native.first[20]!=0x3f3f4040U || !changed || !scaleHandled || interruptions!=18){fprintf(stderr,"VobSub Scale2x rounding/route controls failed\n");return 1;}
+    if(native.first[20]!=0x3f3f4040U || !changed || !scaleHandled || interruptions!=36){fprintf(stderr,"VobSub Scale2x rounding/route controls failed\n");return 1;}
+    Storage loanControl={};loanControl[16+5]=loanControl[16+7]=0xffffffffU;
+    const auto loanNative=execute<ReferenceVobScale>(loanControl,3,3,-1);
+    scaleRequire(loanNative.first[20]==0x3f3f4040U && loanNative.second[20]==0x5f5f6060U);
     // Allocation exceptions occur before any pixel access.
     ReferenceVobScale ref;CandidateVobScale candidate;
     ref.rect=candidate.rect=CRect(0,0,1,1);ref.lpPixels=candidate.lpPixels=nullptr;
     bool a=false,b=false;scaleAllocations.clear();scaleFailure=0;try{ref.Scale2x();}catch(const ScaleInterrupted&){a=true;}
     scaleAllocations.clear();scaleFailure=0;try{candidate.Scale2x();}catch(const ScaleInterrupted&){b=true;}
-    if(!a || !b){fprintf(stderr,"VobSub Scale2x allocation-order control failed\n");return 1;}
-    printf("%llu exact VobSub Scale2x comparisons passed (%llu bytes across two full image/guard checkpoints, %llu visibly changed cases, %llu observed allocations, %llu injected allocation interruptions, %llu Rust-filled images, %llu native fallback images; all five-neighbor equality assignments, channel pairs, edge substitution and unchanged image dimensions)\n",
+    if(!a || !b || !scaleRegions.empty() || !scaleOwners || scaleOwners!=scaleLoans || scaleLoans!=scaleReleases || !scaleDeclines){fprintf(stderr,"VobSub Scale2x allocation-order control failed\n");return 1;}
+    printf("%llu exact VobSub Scale2x comparisons passed (%llu bytes across two full image/guard checkpoints, %llu visibly changed cases, %llu observed allocations, %llu injected allocation interruptions, %llu Rust-filled images, %llu native arithmetic fallback images; all five-neighbor equality assignments, channel pairs, edge substitution, unchanged image dimensions and exact allocation/release order; scratch ownership, Rust-declined native allocation fallback and modeled allocation interruptions; actual OOM and overflowing dimensions excluded)\n",
         static_cast<unsigned long long>(comparisons),static_cast<unsigned long long>(comparisons*2*sizeof(Storage)),static_cast<unsigned long long>(changed),static_cast<unsigned long long>(allocations),static_cast<unsigned long long>(interruptions),static_cast<unsigned long long>(scaleHandled),static_cast<unsigned long long>(scaleFallback));
+    printf("%llu Rust scratch owners, loans and releases / %llu modeled Rust allocation declines\n",(unsigned long long)scaleOwners,(unsigned long long)scaleDeclines);
 }

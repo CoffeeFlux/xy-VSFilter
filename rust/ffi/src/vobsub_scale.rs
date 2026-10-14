@@ -48,6 +48,32 @@ pub unsafe extern "C" fn xy_vsfilter_vobsub_scale(
 mod tests {
     use super::*;
     #[test]
+    fn scratch_loan_is_initialized_then_copied_back_before_release() {
+        use crate::plane::{
+            xy_vsfilter_plane_create, xy_vsfilter_plane_loan, xy_vsfilter_plane_release,
+        };
+        let owner = xy_vsfilter_plane_create(9 * 4);
+        assert!(!owner.is_null());
+        let mut pixels = [0u32; 9];
+        pixels[5] = u32::MAX;
+        pixels[7] = u32::MAX;
+        let original = pixels;
+        // SAFETY: one aligned scratch loan, disjoint from the initialized image.
+        // The filter initializes every output word before copy-back reads it.
+        // No access to the owner occurs until all scratch views have ended.
+        unsafe {
+            let scratch = xy_vsfilter_plane_loan(owner).cast::<u32>();
+            assert_eq!(xy_vsfilter_vobsub_scale(pixels.as_ptr(), scratch, 3, 3), 1);
+            assert_eq!(pixels, original);
+            core::ptr::copy_nonoverlapping(scratch, pixels.as_mut_ptr(), pixels.len());
+            assert_eq!(pixels[4], 0x3f3f4040);
+            assert_eq!(xy_vsfilter_vobsub_scale(pixels.as_ptr(), scratch, 3, 3), 1);
+            core::ptr::copy_nonoverlapping(scratch, pixels.as_mut_ptr(), pixels.len());
+            xy_vsfilter_plane_release(owner);
+        }
+        assert_eq!(pixels[4], 0x5f5f6060);
+    }
+    #[test]
     fn fresh_native_output_is_written_without_reading_it() {
         let input = [0x12345678u32];
         let mut output = MaybeUninit::<u32>::uninit();
