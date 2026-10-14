@@ -34,7 +34,7 @@ def wrapper_xml(project, helper, root, out, intermediate, library_dir):
 </Project>'''
 
 
-def validate_trace(data, stderr, returncode, mode, bits):
+def validate_trace(data, stderr, returncode, mode, bits, video_setup=False):
     if returncode or stderr:
         raise ValueError('nonzero exit or nonempty stderr: unresolved execution')
     lines = data.decode('utf-8', errors='strict').splitlines()
@@ -42,7 +42,10 @@ def validate_trace(data, stderr, returncode, mode, bits):
         raise ValueError('missing provenance/completion')
     if lines.count('document-style-api-v1 complete') != 1:
         raise ValueError('duplicate completion')
-    required = ['factory hr=0', 'create hr=0', 'load hr=0', 'count hr=0']
+    required = ['factory hr=0', 'create hr=0']
+    if video_setup:
+        required += ['setup.video_check hr=0', 'setup.video hr=0']
+    required += ['load hr=0', 'count hr=0']
     required += (['baseline hr=0', 'getter.wrong_count hr=80070057', 'setter.wrong_count hr=80070057',
                   'after.wrong_count hr=0', 'getter.alias hr=0', 'getter.null_style hr=0', 'setter.missing_late hr=80004005',
                   'after.missing_late hr=0', 'setter.duplicate hr=0', 'after.duplicate hr=0', 'setter.all_null hr=0', 'after.all_null hr=0']
@@ -180,7 +183,8 @@ def main():
                             env = dict(os.environ, XY_DOCUMENT_STYLE_REGISTRY_KEY=key)
                             try:
                                 result = run([str(host), str(built), record['clsid'], str(ass), mode], label, env)
-                                validate_trace(result.stdout, result.stderr, result.returncode, mode, 32 if args.platform == 'Win32' else 64)
+                                validate_trace(result.stdout, result.stderr, result.returncode, mode, 32 if args.platform == 'Win32' else 64,
+                                               video_setup=record['class'] == 'CDirectVobSubFilter')
                                 report['runs'].append({'side': side, 'class': record['class'], 'mode': mode, 'repeat': repeat, 'trace': label + '.stdout', 'stdout_sha256': protect(out / (label + '.stdout')), 'stderr_sha256': protect(out / (label + '.stderr')), 'returncode': result.returncode})
                             finally:
                                 import winreg
