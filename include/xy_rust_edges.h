@@ -15,9 +15,23 @@ uint32_t XY_EDGES_CDECL xy_vsfilter_edges_insert(void*,uint32_t,int32_t,int32_t)
 uint32_t XY_EDGES_CDECL xy_vsfilter_edges_resize(void*,uint32_t);
 int64_t XY_EDGES_CDECL xy_vsfilter_edges_query(const void*,uint32_t,size_t);
 void XY_EDGES_CDECL xy_vsfilter_edges_release(void*);
+void* XY_EDGES_CDECL xy_vsfilter_edges_spans(const void*,int32_t);
+uint64_t XY_EDGES_CDECL xy_vsfilter_row_field(const void*,uint32_t,size_t);
+void XY_EDGES_CDECL xy_vsfilter_row_release(void*);
 }
 #undef XY_EDGES_CDECL
 namespace XyRust {
+class ScanRow {
+    void* owner;
+    ScanRow(const ScanRow&);ScanRow& operator=(const ScanRow&);
+public:
+    ScanRow(const void* edges,int row):owner(xy_vsfilter_edges_spans(edges,row)){}
+    ~ScanRow(){xy_vsfilter_row_release(owner);}
+    bool Ready()const{return owner!=NULL;}
+    size_t Count()const{return static_cast<size_t>(xy_vsfilter_row_field(owner,0,0));}
+    uint64_t Start(size_t i)const{return xy_vsfilter_row_field(owner,1,i);}
+    uint64_t End(size_t i)const{return xy_vsfilter_row_field(owner,2,i);}
+};
 class EdgeStorage {
     void* owner;
     EdgeStorage(const EdgeStorage&);EdgeStorage& operator=(const EdgeStorage&);
@@ -35,5 +49,14 @@ public:
     unsigned Head(size_t row)const{return static_cast<unsigned>(Get(0,row));}
     unsigned Next(unsigned index)const{return static_cast<unsigned>(Get(1,index));}
     int Position(unsigned index)const{return static_cast<int>(Get(2,index));}
+    template<class Spans> bool AppendRow(int row,Spans& destination)const{
+        ScanRow result(owner,row);
+        if(!result.Ready())return false;
+        for(size_t i=0,n=result.Count();i<n;++i){
+            const uint64_t start=result.Start(i),end=result.End(i);
+            destination.push_back(typename Spans::value_type(start,end));
+        }
+        return true;
+    }
 };
 }

@@ -20,6 +20,28 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Rust now sorts scanline edges and calculates nonzero winding spans, including
+  signed positions, closing-before-opening ties, either winding direction and
+  discarded unfinished contours. Packed coordinates and winding updates use
+  checked native-width arithmetic before publishing a row; decline retains the
+  native path. Native outline reserve/push order and capacity remain unchanged.
+  Fatal ASan/UBSan comparisons pass on arm64 and under x64 execution: **22,116
+  histories / 66,348 calls / 77,595 emitted spans / 188,398 Rust rows / zero row
+  fallbacks**, alongside **3,042,814 initialized edge-and-row fields**. The full
+  pinned ScanConvert comparison now includes every sequence through five edges
+  from seven signed/touching/duplicate values, signed endpoints, large unfinished
+  windings, every path-type byte at bounded indices, and reuse/empty calls.
+  Line/curve emission remains controlled; native geometry and allocation failures
+  are outside this focused scope. The FFI lifetime check releases the edge owner
+  before reading the independently owned row. Rust 1.85 tests (139 core, 90 FFI),
+  strict Clippy, default syntax and Python checks pass. Six drawing scripts cover
+  same/opposite contours, holes, touching boundaries and crossings, expanding the
+  corpus to **730 cases**. Windows/Miri and actual DLL checks are pending.
+* Ellipse-matrix ownership has completed all four portable CI targets, Miri and
+  both Windows renderer architectures. The **706-case / 7,410-frame** corpus and
+  **32 mutations / 224 frames** match on each architecture, with matching exports
+  and declared platform requirements. [Archived evidence](ellipse-matrix-evidence.json)
+  retains the separate ordinary optimized FP-flag limitation.
 * Persistent ellipse-arc storage has completed all four portable CI targets,
   Miri, and both Windows renderer architectures. The **706-case / 7,410-frame**
   corpus and **32 mutations / 224 frames** match exactly on each architecture;
