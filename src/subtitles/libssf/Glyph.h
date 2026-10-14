@@ -58,6 +58,5 @@ namespace ssf
 
 		float GetBackgroundSize() const;
 		float GetShadowDepth() const;
-		CRect GetClipRect() const;
 	};
 }

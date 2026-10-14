@@ -60,12 +60,6 @@ namespace ssf
 		}
 	}
 
-	int Split::GetAtInt(size_t i)
-	{
-		if(i >= GetCount()) throw Exception(_T("Index out of bounds"));
-		return _wtoi(GetAt(i));
-	}
-
 	float Split::GetAtFloat(size_t i)
 	{
 		if(i >= GetCount()) throw Exception(_T("Index out of bounds"));

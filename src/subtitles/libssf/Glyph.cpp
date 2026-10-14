@@ -45,24 +45,6 @@ namespace ssf
 		return style.shadow.depth * (scale.cx + scale.cy) / 2;
 	}
 
-	CRect Glyph::GetClipRect() const
-	{
-		CRect r = bbox + tl;
-
-		int size = (int)(GetBackgroundSize() + 0.5);
-		int depth = (int)(GetShadowDepth() + 0.5);
-
-		r.InflateRect(size, size);
-		r.InflateRect(depth, depth);
-
-		r.left >>= 6;
-		r.top >>= 6;
-		r.right = (r.right + 32) >> 6;
-		r.bottom = (r.bottom + 32) >> 6;
-
-		return r;
-	}
-
 	void Glyph::CreateBkg()
 	{
 		path_bkg.RemoveAll();

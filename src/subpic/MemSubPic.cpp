@@ -2000,60 +2000,6 @@ HRESULT CMemSubPic::AlphaBltAnv12_P210(const BYTE* src_a, const BYTE* src_y, con
     return S_OK;
 }
 
-HRESULT CMemSubPic::AlphaBltAnv12_P010_C( const BYTE* src_a, const BYTE* src_y, const BYTE* src_uv, int src_pitch, BYTE* dst_y, BYTE* dst_uv, int dst_pitch, int w, int h )
-{
-    const BYTE* sa = src_a;
-    for(int i=0; i<h; i++, sa += src_pitch, src_y += src_pitch, dst_y += dst_pitch)
-    {
-        const BYTE* sa2 = sa;
-        const BYTE* s2 = src_y;
-        const BYTE* s2end = s2 + w;
-        WORD* d2 = reinterpret_cast<WORD*>(dst_y);
-        for(; s2 < s2end; s2+=1, sa2+=1, d2+=1)
-        {
-            if(sa2[0] < 0xff)
-            {                            
-                d2[0] = ((d2[0]*sa2[0])>>8) + (s2[0]<<8);
-            }
-        }
-    }
-    //UV
-    int h2 = h/2;
-    BYTE* d = dst_uv;
-    for(int j = 0; j < h2; j++, src_uv += src_pitch, src_a += src_pitch*2, d += dst_pitch)
-    {
-        hleft_vmid_mix_uv_p010_c(d, w, src_uv, src_a, src_pitch);
-    }
-    return S_OK;
-}
-
-HRESULT CMemSubPic::AlphaBltAnv12_P210_C(const BYTE* src_a, const BYTE* src_y, const BYTE* src_uv, int src_pitch, BYTE* dst_y, BYTE* dst_uv, int dst_pitch, int w, int h)
-{
-    const BYTE* sa = src_a;
-    for (int i = 0; i < h; i++, sa += src_pitch, src_y += src_pitch, dst_y += dst_pitch)
-    {
-        const BYTE* sa2 = sa;
-        const BYTE* s2 = src_y;
-        const BYTE* s2end = s2 + w;
-        WORD* d2 = reinterpret_cast<WORD*>(dst_y);
-        for (; s2 < s2end; s2 += 1, sa2 += 1, d2 += 1)
-        {
-            if (sa2[0] < 0xff)
-            {
-                d2[0] = ((d2[0] * sa2[0]) >> 8) + (s2[0] << 8);
-            }
-        }
-    }
-    //UV
-    int h2 = h; // 4:2:2: no vertical subsampling
-    BYTE* d = dst_uv;
-    for (int j = 0; j < h2; j++, src_uv += src_pitch, src_a += src_pitch, d += dst_pitch)
-    {
-        mix_uv_p210_c(d, w, src_uv, src_a, src_pitch);
-    }
-    return S_OK;
-}
-
 HRESULT CMemSubPic::AlphaBltAnv12_Nv12( const BYTE* src_a, const BYTE* src_y, const BYTE* src_uv, int src_pitch, 
     BYTE* dst_y, BYTE* dst_uv, int dst_pitch, int w, int h )
 {
@@ -2088,18 +2034,6 @@ HRESULT CMemSubPic::AlphaBltAnv12_Nv12( const BYTE* src_a, const BYTE* src_y, co
         {
             hleft_vmid_mix_uv_nv12_c(d, w, src_uv, src_a, src_pitch);
         }
-    }
-    return S_OK;
-}
-
-HRESULT CMemSubPic::AlphaBltAnv12_Nv12_C( const BYTE* src_a, const BYTE* src_y, const BYTE* src_uv, int src_pitch, BYTE* dst_y, BYTE* dst_uv, int dst_pitch, int w, int h )
-{
-    AlphaBltYv12LumaC( dst_y, dst_pitch, w, h, src_y, src_a, src_pitch );
-    int h2 = h/2;
-    BYTE* d = dst_uv;
-    for(int j = 0; j < h2; j++, src_uv += src_pitch, src_a += src_pitch*2, d += dst_pitch)
-    {
-        hleft_vmid_mix_uv_nv12_c(d, w, src_uv, src_a, src_pitch);
     }
     return S_OK;
 }
@@ -2171,68 +2105,4 @@ HRESULT CMemSubPic::FlipAlphaValue( const CRect& dirtyRect )
     BYTE* top = (BYTE*)m_spd.bits + m_spd.pitch*(cRect.top) + cRect.left*4;
     XyBitmap::FlipAlphaValue(top, w, h, m_spd.pitch);
     return S_OK;
-}
-
-//
-// CMemSubPicAllocator
-//
-
-CMemSubPicAllocator::CMemSubPicAllocator(int alpha_blt_dst_type, SIZE maxsize, int type/*=-1*/)
-    : CSubPicExAllocatorImpl(maxsize, false, false)
-    , m_alpha_blt_dst_type(alpha_blt_dst_type)
-    , m_maxsize(maxsize)
-    , m_type(type)
-{
-    if(m_type==-1)
-    {
-        switch(alpha_blt_dst_type)
-        {
-        case MSP_YUY2:
-            m_type = MSP_XY_AUYV;
-            break;
-        case MSP_AYUV:
-            m_type = MSP_AYUV;
-            break;
-        case MSP_IYUV:
-        case MSP_YV12:
-        case MSP_YV16:
-        case MSP_YV24:
-        case MSP_P010:
-        case MSP_P016:
-        case MSP_P210:
-        case MSP_P216:
-        case MSP_NV12:
-        case MSP_NV21:
-            m_type = MSP_AYUV_PLANAR;
-            break;
-        default:
-            m_type = MSP_RGBA;
-            break;
-        }
-    }
-}
-
-// ISubPicAllocatorImpl
-
-bool CMemSubPicAllocator::AllocEx(bool fStatic, ISubPicEx** ppSubPic)
-{
-    if(!ppSubPic) {
-        return false;
-    }
-    SubPicDesc spd;
-    spd.w = m_maxsize.cx;
-    spd.h = m_maxsize.cy;
-    spd.bpp = 32;
-    spd.pitch = (spd.w*spd.bpp)>>3;
-    spd.type = m_type;
-    spd.bits = DEBUG_NEW BYTE[spd.pitch*spd.h];
-    if(!spd.bits) {
-        return false;
-    }    
-    *ppSubPic = DEBUG_NEW CMemSubPic(spd, m_alpha_blt_dst_type);
-    if(!(*ppSubPic)) {
-        return false;
-    }
-    (*ppSubPic)->AddRef();
-    return true;
 }

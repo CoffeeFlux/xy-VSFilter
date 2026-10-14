@@ -32,22 +32,8 @@ struct ColorConvTable
     static YuvRangeType GetDefaultRangeType();
 
     static DWORD Argb2Ayuv(DWORD argb);
-    static DWORD Argb2Ayuv_TV_BT601(DWORD argb);
     static DWORD Argb2Auyv(DWORD argb);
-    static DWORD Ayuv2Auyv(DWORD ayuv);
-    static DWORD Rgb2Y(int r8, int g8, int b8);
     static DWORD PreMulArgb2Ayuv( int a8, int r8, int g8, int b8 );
-
-    static DWORD Ayuv2Argb(DWORD ayuv);
-    static DWORD Ayuv2Argb_TV_BT601(DWORD ayuv);
-    static DWORD A8Y8U8V8_To_ARGB_TV_BT601( int a8, int y8, int u8, int v8 );
-    static DWORD A8Y8U8V8_To_ARGB_PC_BT601( int a8, int y8, int u8, int v8 );
-    static DWORD Ayuv2Argb_TV_BT709(DWORD ayuv);
-    static DWORD A8Y8U8V8_To_ARGB_TV_BT709( int a8, int y8, int u8, int v8 );
-    static DWORD A8Y8U8V8_To_ARGB_PC_BT709( int a8, int y8, int u8, int v8 );
-    static DWORD Ayuv2Argb_TV_BT2020(DWORD ayuv);
-    static DWORD A8Y8U8V8_To_ARGB_TV_BT2020( int a8, int y8, int u8, int v8 );
-    static DWORD A8Y8U8V8_To_ARGB_PC_BT2020( int a8, int y8, int u8, int v8 );
 
     static DWORD A8Y8U8V8_PC_To_TV( int a8, int y8, int u8, int v8 );
     static DWORD A8Y8U8V8_TV_To_PC( int a8, int y8, int u8, int v8 );

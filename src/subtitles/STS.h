@@ -222,14 +222,12 @@ public:
 
     bool IsEmpty();
 
-    void Sort(bool fRestoreReadorder = false);
     void RemoveAllEntries();
     void CreateSegments();
 
     bool Open(CString    fn           , int CharSet, CString name = _T(""));
     bool Open(CTextFile* f            , int CharSet, CString name);
     bool Open(BYTE     * data, int len, int CharSet, CString name);
-    bool SaveAs(CString fn, exttype et, double fps = -1, CTextFile::enc = CTextFile::DEFAULT_ENCODING);
 
     void Add(CStringW str, bool fUnicode, REFERENCE_TIME start, REFERENCE_TIME end, CString style = CString(_T("Default")),
         const CString& actor  = CString(_T("")), 
@@ -243,21 +241,15 @@ public:
     //remember to call sort when all STSEntrys are ready
     void AddSTSEntryOnly(CStringW str, bool fUnicode, REFERENCE_TIME start, REFERENCE_TIME end, CString style = _T("Default"), const CString& actor = _T(""), const CString& effect = _T(""), const CRect& marginRect = CRect(0,0,0,0), int layer = 0, int readorder = -1);
 
-    STSStyle* CreateDefaultStyle(int CharSet);
     void ChangeUnknownStylesToDefault();
     void AddStyle(CString name, STSStyle* style); // style will be stored and freed in Empty() later
 
     bool SetDefaultStyle(STSStyle& s);
-    bool GetDefaultStyle(STSStyle& s);
 
     void SetForceDefaultStyle(bool value);
 
-    void ConvertToTimeBased (double fps);
-    void ConvertToFrameBased(double fps);
-
     REFERENCE_TIME TranslateStart(int i, double fps);
     REFERENCE_TIME TranslateEnd  (int i, double fps);
-    int SearchSub     (REFERENCE_TIME t, double fps);
 
     REFERENCE_TIME TranslateSegmentStart   (int i, double fps);
     REFERENCE_TIME TranslateSegmentEnd     (int i, double fps);
@@ -280,15 +272,10 @@ public:
     STSStyle* GetStyle(int i);
     bool      GetStyle(int i, STSStyle* const stss);
     int       GetCharSet(int i);
-    bool      IsEntryUnicode(int i);
-    void      ConvertUnicode(int i, bool fUnicode);
 
     CStringW GetStrW (int i, bool fSSA = false);
-    CStringW GetStrWA(int i, bool fSSA = false);
 
 #  define GetStr GetStrW
-
-    void SetStr(int i, CStringW str, bool fUnicode);
 
     friend bool OpenMicroDVD(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet);
 private:

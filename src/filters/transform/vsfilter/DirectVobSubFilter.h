@@ -174,7 +174,6 @@ protected:
 	// the text input pin is using these
 	void AddSubStream(ISubStream* pSubStream);
 	void RemoveSubStream(ISubStream* pSubStream);
-	void Post_EC_OLE_EVENT(CString str, DWORD_PTR nSubtitleId = -1);
 
 private:
 	class CFileReloaderData

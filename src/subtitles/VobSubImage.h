@@ -23,19 +23,6 @@
 
 #include <atlcoll.h>
 
-struct COutline {
-    CAtlArray<CPoint> pa;
-    CAtlArray<int> da;
-    void RemoveAll() {
-        pa.RemoveAll();
-        da.RemoveAll();
-    }
-    void Add(CPoint p, int d) {
-        pa.Add(p);
-        da.Add(d);
-    }
-};
-
 class CVobSubImage
 {
     friend class CVobSubFile;
@@ -81,16 +68,4 @@ public:
                 int tridx,
                 RGBQUAD* orgpal /*[16]*/, RGBQUAD* cuspal /*[4]*/,
                 bool fTrim);
-
-private:
-    CAutoPtrList<COutline>* GetOutlineList(CPoint& topleft);
-    int  GrabSegment(int start, const COutline& o, COutline& ret);
-    void SplitOutline(const COutline& o, COutline& o1, COutline& o2);
-    void AddSegment(COutline& o, CAtlArray<BYTE>& pathTypes, CAtlArray<CPoint>& pathPoints);
-
-public:
-    bool Polygonize(CAtlArray<BYTE>& pathTypes, CAtlArray<CPoint>& pathPoints, bool fSmooth, int scale);
-    bool Polygonize(CStringW& assstr, bool fSmooth = true, int scale = 3);
-
-    void Scale2x();
 };

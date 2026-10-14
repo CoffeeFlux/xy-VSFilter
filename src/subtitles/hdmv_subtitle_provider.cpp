@@ -407,14 +407,6 @@ static UINT64 ReadByte(CFile* mfile, size_t count = 1)
     return ret;
 }
 
-static CString StripPath(CString path)
-{
-    CString p = path;
-    p.Replace('\\', '/');
-    p = p.Mid(p.ReverseFind('/')+1);
-    return (p.IsEmpty() ? path : p);
-}
-
 bool SupFileSubtitleProvider::Open(CString fn, CString subName /*= _T("")*/)
 {
     if (!m_fname.IsEmpty())

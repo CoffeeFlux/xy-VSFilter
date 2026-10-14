@@ -29,20 +29,11 @@
 
 #define VOBSUBIDXVER 7
 
-#define ReadBEb(var)              \
-    f.Read(&((BYTE*)&var)[0], 1);
-
-#define ReadBEw(var)              \
-    f.Read(&((BYTE*)&var)[1], 1); \
-    f.Read(&((BYTE*)&var)[0], 1);
-
 #define ReadBEdw(var)             \
     f.Read(&((BYTE*)&var)[3], 1); \
     f.Read(&((BYTE*)&var)[2], 1); \
     f.Read(&((BYTE*)&var)[1], 1); \
     f.Read(&((BYTE*)&var)[0], 1);
-
-extern CString FindLangFromId(WORD id);
 
 class CVobSubSettings
 {
@@ -70,7 +61,6 @@ public:
     CVobSubSettings() { InitSettings(); }
     void InitSettings();
 
-    bool GetCustomPal(RGBQUAD* cuspal, int& tridx);
     void SetCustomPal(const RGBQUAD* cuspal, int tridx);
 
     void GetDestrect(CRect& r); // destrect of m_img, considering the current alignment mode
@@ -106,20 +96,13 @@ protected:
 
     void TrimExtension(CString& fn);
     bool ReadIdx(CString fn, int& ver), ReadSub(CString fn), ReadRar(CString fn), ReadIfo(CString fn);
-    bool WriteIdx(CString fn, int delay), WriteSub(CString fn);
 
     CMemFile m_sub;
 
     BYTE* GetPacket(size_t idx, size_t& packetSize, size_t& dataSize, size_t nLang = -1);
     const SubPos* GetFrameInfo(size_t idx, size_t nLang = -1) const;
     bool GetFrame(size_t idx, size_t nLang = -1, REFERENCE_TIME rt = -1);
-    bool GetFrameByTimeStamp(__int64 time);
     size_t GetFrameIdxByTimeStamp(__int64 time);
-
-    bool SaveVobSub(CString fn, int delay);
-    bool SaveWinSubMux(CString fn, int delay);
-    bool SaveScenarist(CString fn, int delay);
-    bool SaveMaestro(CString fn, int delay);
 
 public:
     size_t m_iLang;
@@ -128,21 +111,8 @@ public:
     CVobSubFile(CCritSec* pLock);
     virtual ~CVobSubFile();
 
-    bool Copy(CVobSubFile& vsf);
-
-    enum SubFormat {
-        None,
-        VobSub,
-        WinSubMux,
-        Scenarist,
-        Maestro
-    };
-
     bool Open(CString fn);
-    bool Save(CString fn, int delay = 0, SubFormat sf = VobSub);
     void Close();
-
-    CString GetTitle() { return m_title; }
 
     DECLARE_IUNKNOWN
     STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);

@@ -113,9 +113,6 @@
     <ClInclude Include="RTS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SeparableFilter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SSF.h">
       <Filter>Header Files</Filter>
     </ClInclude>

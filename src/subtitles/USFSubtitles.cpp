@@ -116,13 +116,6 @@ static int TimeToInt(CStringW str)
 	return(time);
 }
 
-static DWORD StringToDWORD(CStringW str)
-{
-	if(str.IsEmpty()) return(0);
-	if(str[0] == '#') return((DWORD)wcstol(str, NULL, 16));
-	else return((DWORD)wcstol(str, NULL, 10));	
-}
-
 static DWORD ColorToDWORD(CStringW str)
 {
 	if(str.IsEmpty()) return(0);
@@ -788,7 +781,3 @@ void CUSFSubtitles::ParseText(CComPtr<IXMLDOMNode> pNode, CStringW& str)
 	str = prefix + str + postfix;
 }
 
-void CUSFSubtitles::ParseShape(CComPtr<IXMLDOMNode> pNode)
-{
-	// no specs on this yet
-}

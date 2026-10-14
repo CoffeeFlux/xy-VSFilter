@@ -109,7 +109,6 @@ public:
     virtual ~ScanLineData();
 
     bool ScanConvert(const PathData& path_data, const CSize& size);
-    void DeleteOutlines();
 
     friend class Rasterizer;
     friend class ScanLineData2;
@@ -127,11 +126,6 @@ public:
         ,mPathOffsetX(left_top.x)
         ,mPathOffsetY(left_top.y)
     {
-    }
-    void SetOffset(const CPoint& offset)
-    {
-        mPathOffsetX = offset.x;
-        mPathOffsetY = offset.y;
     }
     bool CreateWidenedRegion(int borderX, int borderY);
 private:
@@ -224,8 +218,6 @@ public:
     static bool Rasterize(const ScanLineData2& scan_line_data2, int xsub, int ysub, SharedPtrOverlay overlay);
 
     static bool IsItReallyBlur(float be_strength, double gaussian_blur_strength);
-    static bool OldFixedPointBlur(const Overlay& input_overlay, float be_strength, double gaussian_blur_strength, 
-        double target_scale_x, double target_scale_y, SharedPtrOverlay output_overlay);
 
     static bool Blur(const Overlay& input_overlay, float be_strength, double gaussian_blur_strength, 
         double target_scale_x, double target_scale_y, SharedPtrOverlay output_overlay);

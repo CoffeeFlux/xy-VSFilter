@@ -104,7 +104,6 @@
     <ClInclude Include="RealTextParser.h" />
     <ClInclude Include="RenderedHdmvSubtitle.h" />
     <ClInclude Include="RTS.h" />
-    <ClInclude Include="SeparableFilter.h" />
     <ClInclude Include="SSF.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="StdioFile64.h" />

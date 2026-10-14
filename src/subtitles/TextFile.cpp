@@ -143,11 +143,6 @@ bool CTextFile::Save(LPCTSTR lpszFileName, enc e)
 	return true;
 }
 
-void CTextFile::SetEncoding(enc e)
-{
-	m_encoding = e;
-}
-
 CTextFile::enc CTextFile::GetEncoding()
 {
 	return m_encoding;

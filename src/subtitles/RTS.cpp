@@ -1152,14 +1152,6 @@ void CClipper::SetEffect( const Effect& effect, int effectType )
     m_effect     = effect;
 }
 
-SharedPtrGrayImage2 CClipper::GetAlphaMask( const SharedPtrCClipper& clipper )
-{
-    SharedPtrGrayImage2 result;
-    CClipperPaintMachine paint_machine(clipper);
-    paint_machine.Paint(&result);
-    return result;
-}
-
 // CLine
 
 CLine::~CLine()
@@ -1396,14 +1388,6 @@ void CSubtitle::Empty()
 //    while(pos) delete m_words.GetNext(pos);
     for(int i = 0; i < EF_NUMBEROFEFFECTS; i++) {if(m_effects[i]) delete m_effects[i];}
     memset(m_effects, 0, sizeof(Effect*)*EF_NUMBEROFEFFECTS);
-}
-
-int CSubtitle::GetFullWidth()
-{
-    int width = 0;
-    POSITION pos = m_words.GetHeadPosition();
-    while(pos) width += m_words.GetNext(pos)->m_width;
-    return(width);
 }
 
 int CSubtitle::GetFullLineWidth(POSITION pos)

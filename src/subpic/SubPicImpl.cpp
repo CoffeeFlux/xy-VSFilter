@@ -23,7 +23,6 @@
 
 #include "stdafx.h"
 #include "SubPicImpl.h"
-#include "CRect2.h"
 #include "../DSUtil/DSUtil.h"
 #include "../DSUtil/xy_utils.h"
 

@@ -74,7 +74,6 @@ public:
 	// Returns the buffer passed to OpenMemory(), or NULL when reading a file.
 	const BYTE* GetMemoryData(size_t& len) const;
 
-	void SetEncoding(enc e);
 	enc GetEncoding();
 	bool IsUnicode();
 

@@ -26,14 +26,6 @@ static inline void FlipAlphaValueSSE(BYTE *data, int w)
         *(data_w+i) = *(data_w+i) ^ 0xFF000000;
     }
 }
-static inline void FlipAlphaValueC(BYTE *data, int w)
-{
-    DWORD *data_w = reinterpret_cast<DWORD*>(data);
-    for (int i=0;i<w;i++)
-    {
-        *(data_w+i) = *(data_w+i) ^ 0xFF000000;
-    }
-}
 
 XyBitmap::~XyBitmap()
 {

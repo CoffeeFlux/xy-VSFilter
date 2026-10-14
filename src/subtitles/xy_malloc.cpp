@@ -47,22 +47,4 @@ void xy_free( void *p )
     }
 }
 
-/****************************************************************************
- * xy_realloc:
- ****************************************************************************/
-void *xy_realloc( void *p, std::size_t i_size, int align_shift )
-{
-    std::size_t i_old_size = 0;
-    uint8_t    *p_new = NULL;
-    p_new = (uint8_t*)xy_malloc( i_size, align_shift );
-    if (p_new && p)
-    {
-        i_old_size = *( (std::size_t*) ( (uint8_t*) p - sizeof( void ** ) -
-            sizeof( i_size ) ) );
-        memcpy( p_new, p, ( i_old_size < i_size ) ? i_old_size : i_size );
-        xy_free(p);
-    }
-    return p_new;
-}
-
 

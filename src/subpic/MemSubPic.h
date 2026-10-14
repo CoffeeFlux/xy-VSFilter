@@ -45,19 +45,10 @@ public:
     static HRESULT AlphaBltAnv12_P010(const BYTE* src_a, const BYTE* src_y, const BYTE* src_uv, int src_pitch,
         BYTE* dst_y, BYTE* dst_uv, int dst_pitch,
         int w, int h);
-    static HRESULT AlphaBltAnv12_P010_C(const BYTE* src_a, const BYTE* src_y, const BYTE* src_uv, int src_pitch,
-        BYTE* dst_y, BYTE* dst_uv, int dst_pitch,
-        int w, int h);
     static HRESULT AlphaBltAnv12_P210(const BYTE* src_a, const BYTE* src_y, const BYTE* src_uv, int src_pitch,
         BYTE* dst_y, BYTE* dst_uv, int dst_pitch,
         int w, int h);
-    static HRESULT AlphaBltAnv12_P210_C(const BYTE* src_a, const BYTE* src_y, const BYTE* src_uv, int src_pitch,
-        BYTE* dst_y, BYTE* dst_uv, int dst_pitch,
-        int w, int h);
     static HRESULT AlphaBltAnv12_Nv12(const BYTE* src_a, const BYTE* src_y, const BYTE* src_uv, int src_pitch,
-        BYTE* dst_y, BYTE* dst_uv, int dst_pitch,
-        int w, int h);
-    static HRESULT AlphaBltAnv12_Nv12_C(const BYTE* src_a, const BYTE* src_y, const BYTE* src_uv, int src_pitch,
         BYTE* dst_y, BYTE* dst_uv, int dst_pitch,
         int w, int h);
 
@@ -112,20 +103,6 @@ protected:
     void SubsampleAndInterlace_422(const CRect& cRect, bool u_first);
 
     friend class XySubRenderFrameWrapper;
-};
-
-// CMemSubPicAllocator
-
-class CMemSubPicAllocator : public CSubPicExAllocatorImpl
-{
-	int m_type;
-    int m_alpha_blt_dst_type;
-	CSize m_maxsize;
-
-	bool AllocEx(bool fStatic, ISubPicEx** ppSubPic);
-
-public:
-	CMemSubPicAllocator(int alpha_blt_dst_type, SIZE maxsize, int type=-1);
 };
 
 

@@ -74,10 +74,8 @@ public:
     void  AppendRLEData(const BYTE* pBuffer, int nSize);
     const BYTE* GetRLEData() { return m_pRLEData; };
     int   GetRLEDataSize() { return m_nRLEDataSize; };
-    bool  IsRLEComplete() { return m_nRLEPos >= m_nRLEDataSize; };
     void  RenderHdmv(SubPicDesc& spd);
     void  RenderDvb(SubPicDesc& spd, short nX, short nY, RECT *dirtyRect = NULL /* in-out */);
-    void  WriteSeg(SubPicDesc& spd, short nX, short nY, short nCount, short nPaletteIndex);
     void  InitColor(const SubPicDesc& spd);
     void  SetPalette(int nNbEntry, HDMV_PALETTE* pPalette, ColorType color_type, YuvRangeType yuv_range);
     void  SetPalette(int nNbEntry, DWORD* dwColors);

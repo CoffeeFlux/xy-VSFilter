@@ -425,40 +425,6 @@ int CRealTextParser::GetTimecode(const std::wstring& p_crszTimecode)
     return iTimecode;
 }
 
-std::wstring CRealTextParser::FormatTimecode(int iTimecode,
-                                             int iMillisecondPrecision/* = 3*/,
-                                             bool p_bPadZeroes/* = true*/,
-                                             const std::wstring& p_crszSeparator/* = ":"*/,
-                                             const std::wstring& p_crszMillisecondSeparator/* = "."*/)
-{
-    std::wostringstream ossTimecode;
-
-    int iHours = iTimecode / 1000 / 60 / 60;
-
-    ossTimecode << iHours;
-
-    int iMinutes = (iTimecode / 1000 / 60) % 60;
-
-    ossTimecode << p_crszSeparator;
-    ossTimecode << iMinutes;
-
-    int iSeconds = (iTimecode / 1000) % 60;
-
-    ossTimecode << p_crszSeparator;
-    ossTimecode << iSeconds;
-
-    int iMilliSeconds = iTimecode % 1000;
-
-    if (iMillisecondPrecision < 3) {
-        iMilliSeconds /= 10 * (3 - iMillisecondPrecision);
-    }
-
-    ossTimecode << p_crszMillisecondSeparator;
-    ossTimecode << iMilliSeconds;
-
-    return ossTimecode.str();
-}
-
 std::wstring CRealTextParser::StringToLower(const std::wstring& p_crszString)
 {
     std::wstring szLowercaseString;
@@ -552,26 +518,6 @@ std::wstring CRealTextParser::RenderTags(const std::list<Tag>& p_crlTags)
     } else {
         return szString;
     }
-}
-
-bool CRealTextParser::OutputSRT(std::wostream& p_rOutput)
-{
-    int iCounter = 1;
-    for (auto i = m_RealText.m_mapLines.cbegin(); i != m_RealText.m_mapLines.cend(); ++i) {
-        p_rOutput << iCounter++;
-        p_rOutput << std::endl;
-
-        p_rOutput << FormatTimecode(i->first.first);
-        p_rOutput << L" --> ";
-        p_rOutput << FormatTimecode(i->first.second);
-        p_rOutput << std::endl;
-
-        p_rOutput << i->second;
-        p_rOutput << std::endl;
-        p_rOutput << std::endl;
-    }
-
-    return true;
 }
 
 void CRealTextParser::PopTag(std::list<Tag>& p_rlistTags, const std::wstring& p_crszTagName)

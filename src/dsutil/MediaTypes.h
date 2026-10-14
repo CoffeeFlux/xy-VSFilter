@@ -43,5 +43,5 @@ extern VIH2 vih2s[];
 
 extern int VIHSIZE;
 
-extern CString VIH2String(int i), Subtype2String(const GUID& subtype);
+extern CString Subtype2String(const GUID& subtype);
 extern void CorrectMediaType(AM_MEDIA_TYPE* pmt);

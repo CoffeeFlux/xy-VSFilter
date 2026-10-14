@@ -50,7 +50,6 @@ class CUSFSubtitles
 	  void ParseKeyframe(CComPtr<IXMLDOMNode> pNode, keyframe_t* k);
 	 void ParseSubtitle(CComPtr<IXMLDOMNode> pNode, int start, int stop);
 	  void ParseText(CComPtr<IXMLDOMNode> pNode, CStringW& assstr);
-	  void ParseShape(CComPtr<IXMLDOMNode> pNode);
 
 public:
 	CUSFSubtitles();

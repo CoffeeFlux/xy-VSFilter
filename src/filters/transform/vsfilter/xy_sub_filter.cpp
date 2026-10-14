@@ -2337,24 +2337,6 @@ bool XySubFilter::LoadExternalSubtitle(IFilterGraph* pGraph)
     return fRet;
 }
 
-HRESULT IsPinConnected(IPin *pPin, bool *pResult)
-{
-    CComPtr<IPin> pTmp = NULL;
-    HRESULT hr = pPin->ConnectedTo(&pTmp);
-    if (SUCCEEDED(hr))
-    {
-        *pResult = true;
-    }
-    else if (hr == VFW_E_NOT_CONNECTED)
-    {
-        // The pin is not connected. This is not an error for our purposes.
-        *pResult = false;
-        hr = S_OK;
-    }
-
-    return hr;
-}
-
 HRESULT XySubFilter::GetRidOfVSFilter()
 {
     XY_LOG_INFO("Remove VSFilter from the graph.");

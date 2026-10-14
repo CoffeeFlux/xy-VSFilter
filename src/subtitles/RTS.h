@@ -225,7 +225,6 @@ public:
     void SetEffect(const Effect& effect, int effectType);
     virtual ~CClipper();
 
-    static SharedPtrGrayImage2 GetAlphaMask(const SharedPtrCClipper& clipper);
 
     friend class ClipperTraits;
     friend class ClipperAlphaMaskCacheKey;
@@ -253,7 +252,6 @@ public:
 
 class CSubtitle: private CAtlList<CLine*>
 {
-    int GetFullWidth();
     int GetFullLineWidth(POSITION pos);
     int GetWrapWidth(POSITION pos, int maxwidth);
     CLine* GetNextLine(POSITION& pos, int maxwidth);

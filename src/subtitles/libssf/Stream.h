@@ -100,44 +100,4 @@ namespace ssf
 	public:
 		WCharInputStream(CStringW str);
 	};
-
-	class OutputStream : public Stream
-	{
-		bool m_bof;
-
-	protected:
-		virtual void NextByte(int b) = 0;
-
-	public:
-		OutputStream(encoding_t e);
-		virtual ~OutputStream();
-
-		void PutChar(WCHAR c);
-		void PutString(LPCWSTR fmt, ...);
-	};
-
-	class WCharOutputStream : public OutputStream
-	{
-		CStringW m_str;
-
-	protected:
-		void NextByte(int b);
-
-	public:
-		WCharOutputStream();
-
-		const CStringW& GetString() {return m_str;}
-	};
-
-	class DebugOutputStream : public OutputStream
-	{
-		CStringW m_str;
-
-	protected:
-		void NextByte(int b);
-
-	public:
-		DebugOutputStream();
-		~DebugOutputStream();
-	};
 }

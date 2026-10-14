@@ -56,14 +56,9 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="DSMPropertyBag.cpp" />
     <ClCompile Include="DSUtil.cpp" />
     <ClCompile Include="GolombBuffer.cpp" />
-    <ClCompile Include="H264Nalu.cpp" />
-    <ClCompile Include="HdmvClipInfo.cpp" />
-    <ClCompile Include="MediaTypeEx.cpp" />
     <ClCompile Include="MediaTypes.cpp" />
-    <ClCompile Include="NullRenderers.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -72,15 +67,9 @@
     <ClCompile Include="xy_utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DSMPropertyBag.h" />
     <ClInclude Include="DSUtil.h" />
     <ClInclude Include="GolombBuffer.h" />
-    <ClInclude Include="H264Nalu.h" />
-    <ClInclude Include="HdmvClipInfo.h" />
-    <ClInclude Include="MediaTypeEx.h" />
     <ClInclude Include="MediaTypes.h" />
-    <ClInclude Include="Mpeg2Def.h" />
-    <ClInclude Include="NullRenderers.h" />
     <ClInclude Include="SharedInclude.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="text.h" />

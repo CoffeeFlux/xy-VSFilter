@@ -127,29 +127,6 @@ namespace ssf
 		}
 	}
 
-	void Reference::Dump(OutputStream& s, int level, bool fLast)
-	{
-		if(m_predefined) return;
-
-		CStringW tabs(' ', level*4);
-
-		// s.PutString(tabs + '\n' + tabs + L" {\n");
-		s.PutString(L" {\n");
-
-		POSITION pos = m_nodes.GetHeadPosition();
-		while(pos)
-		{
-			Node* pNode = m_nodes.GetNext(pos);
-
-			if(Definition* pDef = dynamic_cast<Definition*>(pNode))
-			{
-				pDef->Dump(s, level + 1, pos == NULL);
-			}
-		}
-
-		s.PutString(tabs + '}');
-	}
-
 	// Definition
 
 	Definition::Definition(NodeFactory* pnf, CStringW name)
@@ -486,66 +463,4 @@ namespace ssf
 		return pDef;
 	}
 
-	void Definition::Dump(OutputStream& s, int level, bool fLast)
-	{
-		if(m_predefined) return;
-
-		CStringW tabs(' ', level*4);
-
-		CStringW str = tabs;
-		if(m_predefined) str += '?';
-		if(m_priority == PLow) str += '*';
-		else if(m_priority == PHigh) str += '!';
-		if(!IsTypeUnknown() && !m_autotype) str += m_type;
-		if(!IsNameUnknown()) str += '#' + m_name;
-		str += ':';
-		s.PutString(L"%s", str);
-
-		if(!m_nodes.IsEmpty())
-		{
-			POSITION pos = m_nodes.GetHeadPosition();
-			while(pos)
-			{
-				Node* pNode = m_nodes.GetNext(pos);
-
-				if(Reference* pRef = dynamic_cast<Reference*>(pNode))
-				{
-					pRef->Dump(s, level, fLast);
-				}
-				else 
-				{
-					ASSERT(!pNode->IsNameUnknown());
-					s.PutString(L" %s", pNode->m_name);
-				}
-			}
-
-			s.PutString(L";\n");
-
-			if(!fLast && (!m_nodes.IsEmpty() || level == 0)) s.PutString(L"\n");
-		}
-		else if(m_status == string)
-		{
-			CStringW str = m_value;
-			str.Replace(L"\"", L"\\\"");
-			s.PutString(L" \"%s\";\n", str);
-		}
-		else if(m_status == number)
-		{
-			CStringW str = m_value;
-			if(!m_unit.IsEmpty()) str += m_unit;
-			s.PutString(L" %s;\n", str);
-		}
-		else if(m_status == boolean)
-		{
-			s.PutString(L" %s;\n", m_value);
-		}
-		else if(m_status == block)
-		{
-			s.PutString(L" {%s};\n", m_value);
-		}
-		else
-		{
-			s.PutString(L" null;\n");
-		}
-	}
 }

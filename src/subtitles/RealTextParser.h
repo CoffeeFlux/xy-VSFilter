@@ -62,7 +62,6 @@ public:
 
     const Subtitles& GetParsedSubtitles();
 
-    bool OutputSRT(std::wostream& p_rOutput);
 
 private:
     bool ExtractTag(std::wstring& p_rszLine, Tag& p_rTag);
@@ -73,11 +72,6 @@ private:
     bool GetAttributes(std::wstring& p_rszLine, unsigned int& p_riPos, std::map<std::wstring, std::wstring>& p_rmapAttributes);
 
     int GetTimecode(const std::wstring& p_crszTimecode);
-    std::wstring FormatTimecode(int iTimecode,
-                                int iMillisecondPrecision = 3,
-                                bool p_bPadZeroes = true,
-                                const std::wstring& p_crszSeparator = L":",
-                                const std::wstring& p_crszMillisecondSeparator = L".");
 
     std::wstring StringToLower(const std::wstring& p_crszString);
 

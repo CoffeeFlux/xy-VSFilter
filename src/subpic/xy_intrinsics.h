@@ -234,44 +234,6 @@ static __forceinline void pix_alpha_blend_yv12_luma_sse2(byte* dst, const byte* 
     _mm_store_si128( reinterpret_cast<__m128i*>(dst), dst_lo128 );
 }
 
-/***
- * output not exactly identical to pix_alpha_blend_yv12_chroma
- */
-static __forceinline void pix_alpha_blend_yv12_chroma_sse2(byte* dst, const byte* src, const byte* alpha, int src_pitch)
-{
-    __m128i zero = _mm_setzero_si128();
-    __m128i alpha128_1 = _mm_load_si128( reinterpret_cast<const __m128i*>(alpha) );
-    __m128i alpha128_2 = _mm_load_si128( reinterpret_cast<const __m128i*>(alpha+src_pitch) );
-    __m128i dst128 = _mm_loadl_epi64( reinterpret_cast<const __m128i*>(dst) );
-
-    __m128i sub128_1 = _mm_load_si128( reinterpret_cast<const __m128i*>(src) );
-    __m128i sub128_2 = _mm_load_si128( reinterpret_cast<const __m128i*>(src+src_pitch) );
-
-    AVERAGE_4_PIX_INTRINSICS(alpha128_1, alpha128_2);
-
-    __m128i ones;
-#ifdef _DEBUG
-    ones = _mm_setzero_si128();//disable warning C4700
-#endif
-    ones = _mm_cmpeq_epi32(ones,ones);
-    ones = _mm_cmpeq_epi8(ones, alpha128_1);
-    
-    dst128 = _mm_unpacklo_epi8(dst128, zero);
-    __m128i dst128_2 = _mm_and_si128(dst128, ones);
-    
-    dst128 = _mm_mullo_epi16(dst128, alpha128_1);
-    dst128 = _mm_adds_epu16(dst128, dst128_2);
-    
-    dst128 = _mm_srli_epi16(dst128, 8);
-        
-    AVERAGE_4_PIX_INTRINSICS(sub128_1, sub128_2);
-
-    dst128 = _mm_adds_epi16(dst128, sub128_1);    
-    dst128 = _mm_packus_epi16(dst128, dst128);
-    
-    _mm_storel_epi64( reinterpret_cast<__m128i*>(dst), dst128 );
-}
-
 static __forceinline void mix_16_y_p010_P210_sse2(BYTE* dst, const BYTE* src, const BYTE* src_alpha)
 {
     //important!
@@ -344,16 +306,6 @@ static void mix_16_y_p010_c(BYTE* dst, const BYTE* src, const BYTE* src_alpha)
     }
 }
 
-static __forceinline void pix_alpha_blend_yv12_chroma(byte* dst, const byte* src, const byte* alpha, int src_pitch)
-{
-    unsigned int ia = (alpha[0]+alpha[1]+
-        alpha[0+src_pitch]+alpha[1+src_pitch])>>2;
-    if(ia!=0xff)
-    {
-        *dst= (((*dst)*ia)>>8) + ((src[0]        +src[1]+
-            src[src_pitch]+src[1+src_pitch] )>>2);
-    }    
-}
 static __forceinline void mix_16_uv_p010_sse2(BYTE* dst, const BYTE* src, const BYTE* src_alpha, int pitch)
 {
     //important!
@@ -416,70 +368,6 @@ static __forceinline void mix_16_uv_p010_sse2(BYTE* dst, const BYTE* src, const 
     _mm_store_si128( reinterpret_cast<__m128i*>(dst), dst_y );
 }
 
-static __forceinline void mix_16_uv_p210_sse2(BYTE* dst, const BYTE* src, const BYTE* src_alpha, int pitch)
-{
-    // 4:2:2 only horizontal subsampling
-
-    //important!
-    __m128i alpha = _mm_load_si128(reinterpret_cast<const __m128i*>(src_alpha));
-
-    __m128i src_y = _mm_load_si128(reinterpret_cast<const __m128i*>(src));
-    __m128i dst_y = _mm_load_si128(reinterpret_cast<const __m128i*>(dst));
-
-    __m128i tmp;
-    AVERAGE_4_PIX_INTRINSICS_0(alpha, tmp); // average two horizontally
-
-    __m128i alpha_ff;
-#ifdef _DEBUG
-    alpha_ff = _mm_setzero_si128();//disable warning C4700
-#endif
-    alpha_ff = _mm_cmpeq_epi32(alpha_ff, alpha_ff);
-
-    alpha_ff = _mm_cmpeq_epi8(alpha_ff, alpha);
-
-    __m128i lo = _mm_unpacklo_epi8(alpha_ff, alpha);//(alpha<<8)+0x100 will overflow
-    //so we do it another way
-    //first, (alpha<<8)+0xff
-    __m128i ones = _mm_setzero_si128();
-    ones = _mm_cmpeq_epi16(dst_y, ones);
-
-    __m128i ones2;
-#ifdef _DEBUG
-    ones2 = _mm_setzero_si128();//disable warning C4700
-#endif
-    ones2 = _mm_cmpeq_epi32(ones2, ones2);
-    ones = _mm_xor_si128(ones, ones2);
-    ones = _mm_srli_epi16(ones, 15);
-    ones = _mm_and_si128(ones, lo);
-
-    dst_y = _mm_mulhi_epu16(dst_y, lo);
-    dst_y = _mm_adds_epu16(dst_y, ones);//then add one if necessary
-
-    lo = _mm_setzero_si128();
-    lo = _mm_unpacklo_epi8(lo, src_y);
-    dst_y = _mm_adds_epu16(dst_y, lo);
-    _mm_store_si128(reinterpret_cast<__m128i*>(dst), dst_y);
-
-    dst += 16;
-    dst_y = _mm_load_si128(reinterpret_cast<const __m128i*>(dst));
-
-    lo = _mm_unpackhi_epi8(alpha_ff, alpha);
-
-    ones = _mm_setzero_si128();
-    ones = _mm_cmpeq_epi16(dst_y, ones);
-    ones = _mm_xor_si128(ones, ones2);
-    ones = _mm_srli_epi16(ones, 15);
-    ones = _mm_and_si128(ones, lo);
-
-    dst_y = _mm_mulhi_epu16(dst_y, lo);
-    dst_y = _mm_adds_epu16(dst_y, ones);
-
-    lo = _mm_setzero_si128();
-    lo = _mm_unpackhi_epi8(lo, src_y);
-    dst_y = _mm_adds_epu16(dst_y, lo);
-    _mm_store_si128(reinterpret_cast<__m128i*>(dst), dst_y);
-}
-
 static void mix_16_uv_p010_c(BYTE* dst, const BYTE* src, const BYTE* src_alpha, int pitch)
 {
     WORD* dst_word = reinterpret_cast<WORD*>(dst);
@@ -495,25 +383,6 @@ static void mix_16_uv_p010_c(BYTE* dst, const BYTE* src, const BYTE* src_alpha, 
             dst_word[0] = tmp;
             tmp = (((dst_word[1])*ia)>>8) + (src[1]<<8);
             if(tmp>0xffff) tmp = 0xffff;
-            dst_word[1] = tmp;
-        }
-    }
-}
-
-static void mix_16_uv_p210_c(BYTE* dst, const BYTE* src, const BYTE* src_alpha, int pitch)
-{
-    WORD* dst_word = reinterpret_cast<WORD*>(dst);
-    for (int i = 0; i < 8; i++, src_alpha += 2, src += 2, dst_word += 2)
-    {
-        // only horizontal subsampling
-        unsigned int ia = (src_alpha[0] + src_alpha[1] + 1) / 2;
-        if (ia != 0xFF)
-        {
-            int tmp = (((dst_word[0]) * ia) >> 8) + (src[0] << 8);
-            if (tmp > 0xffff) tmp = 0xffff;
-            dst_word[0] = tmp;
-            tmp = (((dst_word[1]) * ia) >> 8) + (src[1] << 8);
-            if (tmp > 0xffff) tmp = 0xffff;
             dst_word[1] = tmp;
         }
     }

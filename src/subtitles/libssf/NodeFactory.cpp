@@ -171,12 +171,4 @@ namespace ssf
 			}
 		}
 	}
-
-	void NodeFactory::Dump(OutputStream& s) const
-	{
-		if(!m_root) return;
-
-		POSITION pos = m_root->m_nodes.GetHeadPosition();
-		while(pos) m_root->m_nodes.GetNext(pos)->Dump(s);
-	}
 }

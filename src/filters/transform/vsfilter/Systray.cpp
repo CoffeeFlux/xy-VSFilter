@@ -27,8 +27,6 @@
 // hWnd == INVALID_HANDLE_VALUE - get name, hWnd != INVALID_HANDLE_VALUE - show ppage
 static TCHAR* CallPPage(IFilterGraph* pGraph, int idx, HWND hWnd);
 
-static HHOOK g_hHook = (HHOOK)INVALID_HANDLE_VALUE;
-
 static UINT WM_DVSPREVSUB = RegisterWindowMessage(TEXT("WM_DVSPREVSUB"));
 static UINT WM_DVSNEXTSUB = RegisterWindowMessage(TEXT("WM_DVSNEXTSUB"));
 static UINT WM_DVSHIDESUB = RegisterWindowMessage(TEXT("WM_DVSHIDESUB"));
@@ -36,27 +34,6 @@ static UINT WM_DVSSHOWSUB = RegisterWindowMessage(TEXT("WM_DVSSHOWSUB"));
 static UINT WM_DVSSHOWHIDESUB = RegisterWindowMessage(TEXT("WM_DVSSHOWHIDESUB"));
 static UINT s_uTaskbarRestart = RegisterWindowMessage(TEXT("TaskbarCreated"));
 static UINT WM_NOTIFYICON = RegisterWindowMessage(TEXT("MYWM_NOTIFYICON"));
-
-LRESULT CALLBACK HookProc(UINT code, WPARAM wParam, LPARAM lParam)
-{
-	MSG* msg = (MSG*)lParam;
-
-	if(msg->message == WM_KEYDOWN)
-	{
-		switch(msg->wParam)
-		{
-		case VK_F13: PostMessage(HWND_BROADCAST, WM_DVSPREVSUB, 0, 0); break;
-		case VK_F14: PostMessage(HWND_BROADCAST, WM_DVSNEXTSUB, 0, 0); break;
-		case VK_F15: PostMessage(HWND_BROADCAST, WM_DVSHIDESUB, 0, 0); break;
-		case VK_F16: PostMessage(HWND_BROADCAST, WM_DVSSHOWSUB, 0, 0); break;
-		case VK_F17: PostMessage(HWND_BROADCAST, WM_DVSSHOWHIDESUB, 0, 0); break;
-		default: break;
-		}
-	}
-
-	// Always call next hook in chain 
-	return CallNextHookEx(g_hHook, code,  wParam, lParam);
-} 
 
 static BOOL CALLBACK enumWindowCallback(HWND hwnd, LPARAM lparam)
 {
@@ -131,12 +108,6 @@ int CSystrayWindow::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if(CWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-	if(g_hHook == INVALID_HANDLE_VALUE)
-	{
-		AFX_MANAGE_STATE(AfxGetStaticModuleState());
-//		g_hHook = SetWindowsHookEx(WH_GETMESSAGE, (HOOKPROC)HookProc, AfxGetInstanceHandle(), 0);
-	}
-
 	SetTimer(1, 5000, NULL);
 
 	PostMessage(s_uTaskbarRestart);
@@ -158,12 +129,6 @@ void CSystrayWindow::OnDestroy()
 	tnid.hWnd = m_hWnd;
 	tnid.uID = IDI_ICON1; 
 	Shell_NotifyIcon(NIM_DELETE, &tnid); 
-
-	if(g_hHook != INVALID_HANDLE_VALUE)
-	{
-		UnhookWindowsHookEx(g_hHook);
-		g_hHook = (HHOOK)INVALID_HANDLE_VALUE;
-	}
 
 	PostQuitMessage(0); 
 }

@@ -27,19 +27,14 @@ public:
     ~CGolombBuffer();
 
     UINT64 BitRead(int nBits, bool fPeek = false);
-    UINT64 UExpGolombRead();
-    INT64 SExpGolombRead();
     void BitByteAlign();
 
     inline BYTE ReadByte() { return (BYTE)BitRead(8); };
     inline short ReadShort() { return (short)BitRead(16); };
-    inline DWORD ReadDword() { return (DWORD)BitRead(32); };
     void ReadBuffer(BYTE* pDest, int nSize);
 
     void Reset();
-    void Reset(BYTE* pNewBuffer, int nNewSize);
 
-    void SetSize(int nValue) { m_nSize = nValue; };
     int GetSize() const { return m_nSize; };
     int RemainingSize() const { return m_nSize - m_nBitPos; };
     bool IsEOF() const { return m_nBitPos >= m_nSize; };

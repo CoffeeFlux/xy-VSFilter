@@ -607,15 +607,6 @@ namespace ssf
 
 	///////////////////////////////////////////////////////////////////////////
 
-	static __forceinline void pixmix_c(DWORD* dst, DWORD color, DWORD alpha)
-	{
-		int a = ((alpha * (color>>24)) >> 6) & 0xff;
-		int ia = 0xff - a;
-
-		*dst = ((((*dst & 0x00ff00ff)*ia + (color & 0x00ff00ff)*a) & 0xff00ff00) >> 8)
-			| ((((*dst>>8) & 0x00ff00ff)*ia + ((color>>8) & 0x000000ff)*a) & 0xff00ff00);
-	}
-
 	static __forceinline void pixmix_sse2(DWORD* dst, DWORD color, DWORD alpha)
 	{
 		alpha = ((alpha * (color>>24)) >> 6) & 0xff;

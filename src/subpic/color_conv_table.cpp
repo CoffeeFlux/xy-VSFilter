@@ -437,37 +437,12 @@ DWORD func(int a8, int r8, int g8, int b8)                                      
     return (y<<YUV_POS.y) | (u<<YUV_POS.u) | (v<<YUV_POS.v);                              \
 }
 
-#define DEFINE_RGB2Y_FUNC(func, RGB_LEVEL, YUV_LEVEL, Kr, Kg, Kb)                            \
-DWORD func(int r8, int g8, int b8)                                                           \
-{                                                                                            \
-    const int INT_Kr = int(Kr*FRACTION_SCALE+0.5);                                           \
-    const int INT_Kg = int(Kg*FRACTION_SCALE+0.5);                                           \
-    const int INT_Kb = int(Kb*FRACTION_SCALE+0.5);                                           \
-    const int Y_CU   = int(0.5/(1-Kb)*4096+0.5);                                             \
-    const int Y_CV   = int(0.5/(1-Kr)*4096+0.5);                                             \
-    const int Y_SCALE= int(1.0*YUV_LEVEL.y_size/RGB_LEVEL.size*4096+0.5);                    \
-    const int U_SCALE= int(1.0*YUV_LEVEL.u_size/RGB_LEVEL.size*4096+0.5);                    \
-                                                                                             \
-    int y = INT_Kr*r8 + INT_Kg*g8 + INT_Kb*b8 - RGB_LEVEL.low;                               \
-    y = Y_SCALE == 4096 ? y : (y>>12)*Y_SCALE;                                               \
-    y = (y + (YUV_LEVEL.y_low*FRACTION_SCALE + FRACTION_SCALE/2))>>FRACTION_BITS;            \
-    y = clip(y, 255);                                                                        \
-    return y;                                                                                \
-}
-
 DWORD RGB_PC_TO_YUV_TV_601 (int r8, int g8, int b8);
 DWORD RGB_PC_TO_YUV_PC_601 (int r8, int g8, int b8);
 DWORD RGB_PC_TO_YUV_TV_709 (int r8, int g8, int b8);
 DWORD RGB_PC_TO_YUV_PC_709 (int r8, int g8, int b8);
 DWORD RGB_PC_TO_YUV_TV_2020(int r8, int g8, int b8);
 DWORD RGB_PC_TO_YUV_PC_2020(int r8, int g8, int b8);
-
-DWORD RGB_TV_TO_YUV_TV_601 (int r8, int g8, int b8);
-DWORD RGB_TV_TO_YUV_PC_601 (int r8, int g8, int b8);
-DWORD RGB_TV_TO_YUV_TV_709 (int r8, int g8, int b8);
-DWORD RGB_TV_TO_YUV_PC_709 (int r8, int g8, int b8);
-DWORD RGB_TV_TO_YUV_TV_2020(int r8, int g8, int b8);
-DWORD RGB_TV_TO_YUV_PC_2020(int r8, int g8, int b8);
 
 DWORD RGB_PC_TO_UYV_TV_601 (int r8, int g8, int b8);
 DWORD RGB_PC_TO_UYV_PC_601 (int r8, int g8, int b8);
@@ -476,40 +451,12 @@ DWORD RGB_PC_TO_UYV_PC_709 (int r8, int g8, int b8);
 DWORD RGB_PC_TO_UYV_TV_2020(int r8, int g8, int b8);
 DWORD RGB_PC_TO_UYV_PC_2020(int r8, int g8, int b8);
 
-DWORD RGB_TV_TO_UYV_TV_601 (int r8, int g8, int b8);
-DWORD RGB_TV_TO_UYV_PC_601 (int r8, int g8, int b8);
-DWORD RGB_TV_TO_UYV_TV_709 (int r8, int g8, int b8);
-DWORD RGB_TV_TO_UYV_PC_709 (int r8, int g8, int b8);
-DWORD RGB_TV_TO_UYV_TV_2020(int r8, int g8, int b8);
-DWORD RGB_TV_TO_UYV_PC_2020(int r8, int g8, int b8);
-
 DWORD PREMUL_ARGB_PC_TO_AYUV_TV_601 (int a8, int r8, int g8, int b8);
 DWORD PREMUL_ARGB_PC_TO_AYUV_PC_601 (int a8, int r8, int g8, int b8);
 DWORD PREMUL_ARGB_PC_TO_AYUV_TV_709 (int a8, int r8, int g8, int b8);
 DWORD PREMUL_ARGB_PC_TO_AYUV_PC_709 (int a8, int r8, int g8, int b8);
 DWORD PREMUL_ARGB_PC_TO_AYUV_TV_2020(int a8, int r8, int g8, int b8);
 DWORD PREMUL_ARGB_PC_TO_AYUV_PC_2020(int a8, int r8, int g8, int b8);
-
-DWORD PREMUL_ARGB_TV_TO_AYUV_TV_601 (int a8, int r8, int g8, int b8);
-DWORD PREMUL_ARGB_TV_TO_AYUV_PC_601 (int a8, int r8, int g8, int b8);
-DWORD PREMUL_ARGB_TV_TO_AYUV_TV_709 (int a8, int r8, int g8, int b8);
-DWORD PREMUL_ARGB_TV_TO_AYUV_PC_709 (int a8, int r8, int g8, int b8);
-DWORD PREMUL_ARGB_TV_TO_AYUV_TV_2020(int a8, int r8, int g8, int b8);
-DWORD PREMUL_ARGB_TV_TO_AYUV_PC_2020(int a8, int r8, int g8, int b8);
-
-DWORD RGB_PC_TO_Y_TV_601 (int r8, int g8, int b8);
-DWORD RGB_PC_TO_Y_PC_601 (int r8, int g8, int b8);
-DWORD RGB_PC_TO_Y_TV_709 (int r8, int g8, int b8);
-DWORD RGB_PC_TO_Y_PC_709 (int r8, int g8, int b8);
-DWORD RGB_PC_TO_Y_TV_2020(int r8, int g8, int b8);
-DWORD RGB_PC_TO_Y_PC_2020(int r8, int g8, int b8);
-
-DWORD RGB_TV_TO_Y_TV_601 (int r8, int g8, int b8);
-DWORD RGB_TV_TO_Y_PC_601 (int r8, int g8, int b8);
-DWORD RGB_TV_TO_Y_TV_709 (int r8, int g8, int b8);
-DWORD RGB_TV_TO_Y_PC_709 (int r8, int g8, int b8);
-DWORD RGB_TV_TO_Y_TV_2020(int r8, int g8, int b8);
-DWORD RGB_TV_TO_Y_PC_2020(int r8, int g8, int b8);
 
 DWORD YUV_TV_TO_RGB_PC_601 (int y, int u, int v);
 DWORD YUV_PC_TO_RGB_PC_601 (int y, int u, int v);
@@ -536,14 +483,11 @@ public:
 
     typedef DWORD (*R8G8B8ToYuvFunc)(int r8, int g8, int b8);
     typedef DWORD (*PreMulArgbToAyuvFunc)(int a8, int r8, int g8, int b8);
-    typedef R8G8B8ToYuvFunc R8G8B8ToY;
     typedef R8G8B8ToYuvFunc Y8U8V8ToRGBFunc;
 
     R8G8B8ToYuvFunc      r8g8b8_to_yuv_func;
     R8G8B8ToYuvFunc      r8g8b8_to_uyv_func;
     PreMulArgbToAyuvFunc pre_mul_argb_to_ayuv_func;
-    R8G8B8ToY            r8g8b8_to_y_func;
-    Y8U8V8ToRGBFunc      y8u8v8_to_rgb_func;
 
     YuvMatrixType _yuv_type;
     YuvRangeType  _range_type;
@@ -562,8 +506,6 @@ bool ConvFunc::InitConvFunc(YuvMatrixType yuv_type, YuvRangeType range)
         r8g8b8_to_yuv_func        = RGB_PC_TO_YUV_TV_601;
         r8g8b8_to_uyv_func        = RGB_PC_TO_UYV_TV_601;
         pre_mul_argb_to_ayuv_func = PREMUL_ARGB_PC_TO_AYUV_TV_601;
-        r8g8b8_to_y_func          = RGB_PC_TO_Y_TV_601;
-        y8u8v8_to_rgb_func        = YUV_TV_TO_RGB_PC_601;
 
         _yuv_type   = yuv_type;
         _range_type = range;
@@ -573,8 +515,6 @@ bool ConvFunc::InitConvFunc(YuvMatrixType yuv_type, YuvRangeType range)
         r8g8b8_to_yuv_func        = RGB_PC_TO_YUV_TV_709;
         r8g8b8_to_uyv_func        = RGB_PC_TO_UYV_TV_709;
         pre_mul_argb_to_ayuv_func = PREMUL_ARGB_PC_TO_AYUV_TV_709;
-        r8g8b8_to_y_func          = RGB_PC_TO_Y_TV_709;
-        y8u8v8_to_rgb_func        = YUV_TV_TO_RGB_PC_709;
 
         _yuv_type   = yuv_type;
         _range_type = range;
@@ -584,8 +524,6 @@ bool ConvFunc::InitConvFunc(YuvMatrixType yuv_type, YuvRangeType range)
         r8g8b8_to_yuv_func        = RGB_PC_TO_YUV_TV_2020;
         r8g8b8_to_uyv_func        = RGB_PC_TO_UYV_TV_2020;
         pre_mul_argb_to_ayuv_func = PREMUL_ARGB_PC_TO_AYUV_TV_2020;
-        r8g8b8_to_y_func          = RGB_PC_TO_Y_TV_2020;
-        y8u8v8_to_rgb_func        = YUV_TV_TO_RGB_PC_2020;
 
         _yuv_type   = yuv_type;
         _range_type = range;
@@ -595,8 +533,6 @@ bool ConvFunc::InitConvFunc(YuvMatrixType yuv_type, YuvRangeType range)
         r8g8b8_to_yuv_func        = RGB_PC_TO_YUV_PC_601;
         r8g8b8_to_uyv_func        = RGB_PC_TO_UYV_PC_601;
         pre_mul_argb_to_ayuv_func = PREMUL_ARGB_PC_TO_AYUV_PC_601;
-        r8g8b8_to_y_func          = RGB_PC_TO_Y_PC_601;
-        y8u8v8_to_rgb_func        = YUV_PC_TO_RGB_PC_601;
 
         _yuv_type   = yuv_type;
         _range_type = range;
@@ -606,8 +542,6 @@ bool ConvFunc::InitConvFunc(YuvMatrixType yuv_type, YuvRangeType range)
         r8g8b8_to_yuv_func        = RGB_PC_TO_YUV_PC_709;
         r8g8b8_to_uyv_func        = RGB_PC_TO_UYV_PC_709;
         pre_mul_argb_to_ayuv_func = PREMUL_ARGB_PC_TO_AYUV_PC_709;
-        r8g8b8_to_y_func          = RGB_PC_TO_Y_PC_709;
-        y8u8v8_to_rgb_func        = YUV_PC_TO_RGB_PC_709;
 
         _yuv_type   = yuv_type;
         _range_type = range;
@@ -617,8 +551,6 @@ bool ConvFunc::InitConvFunc(YuvMatrixType yuv_type, YuvRangeType range)
         r8g8b8_to_yuv_func        = RGB_PC_TO_YUV_PC_2020;
         r8g8b8_to_uyv_func        = RGB_PC_TO_UYV_PC_2020;
         pre_mul_argb_to_ayuv_func = PREMUL_ARGB_PC_TO_AYUV_PC_2020;
-        r8g8b8_to_y_func          = RGB_PC_TO_Y_PC_2020;
-        y8u8v8_to_rgb_func        = YUV_PC_TO_RGB_PC_2020;
 
         _yuv_type   = yuv_type;
         _range_type = range;
@@ -628,8 +560,6 @@ bool ConvFunc::InitConvFunc(YuvMatrixType yuv_type, YuvRangeType range)
         r8g8b8_to_yuv_func        = RGB_PC_TO_YUV_TV_601;
         r8g8b8_to_uyv_func        = RGB_PC_TO_UYV_TV_601;
         pre_mul_argb_to_ayuv_func = PREMUL_ARGB_PC_TO_AYUV_TV_601;
-        r8g8b8_to_y_func          = RGB_PC_TO_Y_TV_601;
-        y8u8v8_to_rgb_func        = YUV_TV_TO_RGB_PC_601;
 
         _yuv_type   = ColorConvTable::BT601;
         _range_type = ColorConvTable::RANGE_TV;
@@ -760,91 +690,9 @@ DWORD ColorConvTable::Argb2Ayuv( DWORD argb )
     return (argb & 0xff000000) | s_default_conv_set.r8g8b8_to_yuv_func(r, g, b);
 }
 
-DWORD ColorConvTable::Argb2Ayuv_TV_BT601( DWORD argb )
-{
-    int r = (argb & 0x00ff0000) >> 16;
-    int g = (argb & 0x0000ff00) >> 8;
-    int b = (argb & 0x000000ff);
-    return (argb & 0xff000000) | RGB_PC_TO_YUV_TV_601(r, g, b);
-}
-
-DWORD ColorConvTable::Ayuv2Auyv( DWORD ayuv )
-{
-    int y = (ayuv & 0x00ff0000) >> 8;
-    int u = (ayuv & 0x0000ff00) << 8;
-    return (ayuv & 0xff0000ff)| u | y;
-}
-
 DWORD ColorConvTable::PreMulArgb2Ayuv( int a8, int r8, int g8, int b8 )
 {
     return s_default_conv_set.pre_mul_argb_to_ayuv_func(a8, r8, g8, b8);
-}
-
-DWORD ColorConvTable::Rgb2Y( int r8, int g8, int b8 )
-{
-    return s_default_conv_set.r8g8b8_to_y_func(r8, g8, b8);
-}
-
-DWORD ColorConvTable::Ayuv2Argb_TV_BT601( DWORD ayuv )
-{
-    int y = (ayuv & 0x00ff0000) >> 16;
-    int u = (ayuv & 0x0000ff00) >> 8;
-    int v = (ayuv & 0x000000ff);
-    return (ayuv & 0xff000000) | YUV_TV_TO_RGB_PC_601(y, u, v);
-}
-
-DWORD ColorConvTable::Ayuv2Argb_TV_BT709( DWORD ayuv )
-{
-    int y = (ayuv & 0x00ff0000) >> 16;
-    int u = (ayuv & 0x0000ff00) >> 8;
-    int v = (ayuv & 0x000000ff);
-    return (ayuv & 0xff000000) | YUV_TV_TO_RGB_PC_709(y, u, v);
-}
-
-DWORD ColorConvTable::Ayuv2Argb_TV_BT2020( DWORD ayuv )
-{
-    int y = (ayuv & 0x00ff0000) >> 16;
-    int u = (ayuv & 0x0000ff00) >> 8;
-    int v = (ayuv & 0x000000ff);
-    return (ayuv & 0xff000000) | YUV_TV_TO_RGB_PC_2020(y, u, v);
-}
-
-DWORD ColorConvTable::Ayuv2Argb( DWORD ayuv )
-{
-    int y = (ayuv & 0x00ff0000) >> 16;
-    int u = (ayuv & 0x0000ff00) >> 8;
-    int v = (ayuv & 0x000000ff);
-    return (ayuv & 0xff000000) | s_default_conv_set.y8u8v8_to_rgb_func(y, u, v);
-}
-
-DWORD ColorConvTable::A8Y8U8V8_To_ARGB_TV_BT601( int a8, int y8, int u8, int v8 )
-{
-    return (a8<<24) | YUV_TV_TO_RGB_PC_601(y8, u8, v8);
-}
-
-DWORD ColorConvTable::A8Y8U8V8_To_ARGB_PC_BT601( int a8, int y8, int u8, int v8 )
-{
-    return (a8<<24) | YUV_PC_TO_RGB_PC_601(y8, u8, v8);
-}
-
-DWORD ColorConvTable::A8Y8U8V8_To_ARGB_TV_BT709( int a8, int y8, int u8, int v8 )
-{
-    return (a8<<24) | YUV_TV_TO_RGB_PC_709(y8, u8, v8);
-}
-
-DWORD ColorConvTable::A8Y8U8V8_To_ARGB_PC_BT709( int a8, int y8, int u8, int v8 )
-{
-    return (a8<<24) | YUV_PC_TO_RGB_PC_709(y8, u8, v8);
-}
-
-DWORD ColorConvTable::A8Y8U8V8_To_ARGB_TV_BT2020( int a8, int y8, int u8, int v8 )
-{
-    return (a8<<24) | YUV_TV_TO_RGB_PC_2020(y8, u8, v8);
-}
-
-DWORD ColorConvTable::A8Y8U8V8_To_ARGB_PC_BT2020( int a8, int y8, int u8, int v8 )
-{
-    return (a8<<24) | YUV_PC_TO_RGB_PC_2020(y8, u8, v8);
 }
 
 DWORD ColorConvTable::A8Y8U8V8_PC_To_TV( int a8, int y8, int u8, int v8 )
@@ -976,26 +824,12 @@ DEFINE_RGB2YUV_FUNC(RGB_PC_TO_YUV_PC_709,  RGB_LVL_PC, YUV_LVL_PC, 0.2126, 0.715
 DEFINE_RGB2YUV_FUNC(RGB_PC_TO_YUV_TV_2020, RGB_LVL_PC, YUV_LVL_TV, 0.2627, 0.678 , 0.0593, POS_YUV)
 DEFINE_RGB2YUV_FUNC(RGB_PC_TO_YUV_PC_2020, RGB_LVL_PC, YUV_LVL_PC, 0.2627, 0.678 , 0.0593, POS_YUV)
 
-DEFINE_RGB2YUV_FUNC(RGB_TV_TO_YUV_TV_601,  RGB_LVL_TV, YUV_LVL_TV, 0.299 , 0.587 , 0.114 , POS_YUV)
-DEFINE_RGB2YUV_FUNC(RGB_TV_TO_YUV_PC_601,  RGB_LVL_TV, YUV_LVL_PC, 0.299 , 0.587 , 0.114 , POS_YUV)
-DEFINE_RGB2YUV_FUNC(RGB_TV_TO_YUV_TV_709,  RGB_LVL_TV, YUV_LVL_TV, 0.2126, 0.7152, 0.0722, POS_YUV)
-DEFINE_RGB2YUV_FUNC(RGB_TV_TO_YUV_PC_709,  RGB_LVL_TV, YUV_LVL_PC, 0.2126, 0.7152, 0.0722, POS_YUV)
-DEFINE_RGB2YUV_FUNC(RGB_TV_TO_YUV_TV_2020, RGB_LVL_TV, YUV_LVL_TV, 0.2627, 0.678 , 0.0593, POS_YUV)
-DEFINE_RGB2YUV_FUNC(RGB_TV_TO_YUV_PC_2020, RGB_LVL_TV, YUV_LVL_PC, 0.2627, 0.678 , 0.0593, POS_YUV)
-
 DEFINE_RGB2YUV_FUNC(RGB_PC_TO_UYV_TV_601,  RGB_LVL_PC, YUV_LVL_TV, 0.299 , 0.587 , 0.114 , POS_UYV)
 DEFINE_RGB2YUV_FUNC(RGB_PC_TO_UYV_PC_601,  RGB_LVL_PC, YUV_LVL_PC, 0.299 , 0.587 , 0.114 , POS_UYV)
 DEFINE_RGB2YUV_FUNC(RGB_PC_TO_UYV_TV_709,  RGB_LVL_PC, YUV_LVL_TV, 0.2126, 0.7152, 0.0722, POS_UYV)
 DEFINE_RGB2YUV_FUNC(RGB_PC_TO_UYV_PC_709,  RGB_LVL_PC, YUV_LVL_PC, 0.2126, 0.7152, 0.0722, POS_UYV)
 DEFINE_RGB2YUV_FUNC(RGB_PC_TO_UYV_TV_2020, RGB_LVL_PC, YUV_LVL_TV, 0.2627, 0.678 , 0.0593, POS_UYV)
 DEFINE_RGB2YUV_FUNC(RGB_PC_TO_UYV_PC_2020, RGB_LVL_PC, YUV_LVL_PC, 0.2627, 0.678 , 0.0593, POS_UYV)
-
-DEFINE_RGB2YUV_FUNC(RGB_TV_TO_UYV_TV_601,  RGB_LVL_TV, YUV_LVL_TV, 0.299 , 0.587 , 0.114 , POS_UYV)
-DEFINE_RGB2YUV_FUNC(RGB_TV_TO_UYV_PC_601,  RGB_LVL_TV, YUV_LVL_PC, 0.299 , 0.587 , 0.114 , POS_UYV)
-DEFINE_RGB2YUV_FUNC(RGB_TV_TO_UYV_TV_709,  RGB_LVL_TV, YUV_LVL_TV, 0.2126, 0.7152, 0.0722, POS_UYV)
-DEFINE_RGB2YUV_FUNC(RGB_TV_TO_UYV_PC_709,  RGB_LVL_TV, YUV_LVL_PC, 0.2126, 0.7152, 0.0722, POS_UYV)
-DEFINE_RGB2YUV_FUNC(RGB_TV_TO_UYV_TV_2020, RGB_LVL_TV, YUV_LVL_TV, 0.2627, 0.678 , 0.0593, POS_UYV)
-DEFINE_RGB2YUV_FUNC(RGB_TV_TO_UYV_PC_2020, RGB_LVL_TV, YUV_LVL_PC, 0.2627, 0.678 , 0.0593, POS_UYV)
 
 DEFINE_YUV2RGB_FUNC(YUV_TV_TO_RGB_PC_601,  RGB_LVL_PC, YUV_LVL_TV, 0.299 , 0.587 , 0.114 )
 DEFINE_YUV2RGB_FUNC(YUV_PC_TO_RGB_PC_601,  RGB_LVL_PC, YUV_LVL_PC, 0.299 , 0.587 , 0.114 )
@@ -1017,24 +851,3 @@ DEFINE_PREMUL_ARGB2AYUV_FUNC(PREMUL_ARGB_PC_TO_AYUV_TV_709,  RGB_LVL_PC, YUV_LVL
 DEFINE_PREMUL_ARGB2AYUV_FUNC(PREMUL_ARGB_PC_TO_AYUV_PC_709,  RGB_LVL_PC, YUV_LVL_PC, 0.2126, 0.7152, 0.0722, POS_YUV)
 DEFINE_PREMUL_ARGB2AYUV_FUNC(PREMUL_ARGB_PC_TO_AYUV_TV_2020, RGB_LVL_PC, YUV_LVL_TV, 0.2627, 0.678 , 0.0593, POS_YUV)
 DEFINE_PREMUL_ARGB2AYUV_FUNC(PREMUL_ARGB_PC_TO_AYUV_PC_2020, RGB_LVL_PC, YUV_LVL_PC, 0.2627, 0.678 , 0.0593, POS_YUV)
-
-DEFINE_PREMUL_ARGB2AYUV_FUNC(PREMUL_ARGB_TV_TO_AYUV_TV_601,  RGB_LVL_TV, YUV_LVL_TV, 0.299 , 0.587 , 0.114 , POS_YUV)
-DEFINE_PREMUL_ARGB2AYUV_FUNC(PREMUL_ARGB_TV_TO_AYUV_PC_601,  RGB_LVL_TV, YUV_LVL_PC, 0.299 , 0.587 , 0.114 , POS_YUV)
-DEFINE_PREMUL_ARGB2AYUV_FUNC(PREMUL_ARGB_TV_TO_AYUV_TV_709,  RGB_LVL_TV, YUV_LVL_TV, 0.2126, 0.7152, 0.0722, POS_YUV)
-DEFINE_PREMUL_ARGB2AYUV_FUNC(PREMUL_ARGB_TV_TO_AYUV_PC_709,  RGB_LVL_TV, YUV_LVL_PC, 0.2126, 0.7152, 0.0722, POS_YUV)
-DEFINE_PREMUL_ARGB2AYUV_FUNC(PREMUL_ARGB_TV_TO_AYUV_TV_2020, RGB_LVL_TV, YUV_LVL_TV, 0.2627, 0.678 , 0.0593, POS_YUV)
-DEFINE_PREMUL_ARGB2AYUV_FUNC(PREMUL_ARGB_TV_TO_AYUV_PC_2020, RGB_LVL_TV, YUV_LVL_PC, 0.2627, 0.678 , 0.0593, POS_YUV)
-
-DEFINE_RGB2Y_FUNC(RGB_PC_TO_Y_TV_601,  RGB_LVL_PC, YUV_LVL_TV, 0.299 , 0.587 , 0.114 )
-DEFINE_RGB2Y_FUNC(RGB_PC_TO_Y_PC_601,  RGB_LVL_PC, YUV_LVL_PC, 0.299 , 0.587 , 0.114 )
-DEFINE_RGB2Y_FUNC(RGB_PC_TO_Y_TV_709,  RGB_LVL_PC, YUV_LVL_TV, 0.2126, 0.7152, 0.0722)
-DEFINE_RGB2Y_FUNC(RGB_PC_TO_Y_PC_709,  RGB_LVL_PC, YUV_LVL_PC, 0.2126, 0.7152, 0.0722)
-DEFINE_RGB2Y_FUNC(RGB_PC_TO_Y_TV_2020, RGB_LVL_PC, YUV_LVL_TV, 0.2627, 0.678 , 0.0593)
-DEFINE_RGB2Y_FUNC(RGB_PC_TO_Y_PC_2020, RGB_LVL_PC, YUV_LVL_PC, 0.2627, 0.678 , 0.0593)
-
-DEFINE_RGB2Y_FUNC(RGB_TV_TO_Y_TV_601,  RGB_LVL_TV, YUV_LVL_TV, 0.299 , 0.587 , 0.114 )
-DEFINE_RGB2Y_FUNC(RGB_TV_TO_Y_PC_601,  RGB_LVL_TV, YUV_LVL_PC, 0.299 , 0.587 , 0.114 )
-DEFINE_RGB2Y_FUNC(RGB_TV_TO_Y_TV_709,  RGB_LVL_TV, YUV_LVL_TV, 0.2126, 0.7152, 0.0722)
-DEFINE_RGB2Y_FUNC(RGB_TV_TO_Y_PC_709,  RGB_LVL_TV, YUV_LVL_PC, 0.2126, 0.7152, 0.0722)
-DEFINE_RGB2Y_FUNC(RGB_TV_TO_Y_TV_2020, RGB_LVL_TV, YUV_LVL_TV, 0.2627, 0.678 , 0.0593)
-DEFINE_RGB2Y_FUNC(RGB_TV_TO_Y_PC_2020, RGB_LVL_TV, YUV_LVL_PC, 0.2627, 0.678 , 0.0593)
