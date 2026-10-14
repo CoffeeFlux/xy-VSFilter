@@ -20,6 +20,22 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust now also performs screen-layout collision placement and adjacent-
+  segment retention. Collision scans preserve list order and repeat until clear;
+  duplicate active entries, reverse playback and layer selection retain their
+  existing behavior. Native border inflation, cache-hit border adjustment and
+  final record construction remain in order. Checked arithmetic declines before
+  changing stored records or the caller's rectangle, retaining the native path.
+  The **43,275 histories / 749,175 operations** continue to match on arm64 and
+  under x64 execution with **201,789 Rust retention operations / 370,587 Rust
+  placements**, and **zero fallbacks** in the representable comparison corpus.
+  Exact returned rectangles, all retained records, errno and Windows LastError
+  are compared. Separate Rust/FFI tests verify that arithmetic declines leave
+  outputs and records intact; unrepresentable native arithmetic is not executed
+  or counted as compatibility evidence.
+  Rust 1.85 tests (109 core, 72 FFI), strict Clippy, default syntax and Python
+  harness checks pass. The **570-case** renderer corpus includes the collision
+  and reverse-seek controls. Windows/Miri and full renderer checks are pending.
 * Safe Rust owns the screen-layout allocator's ordered rectangle records, first
   matching segment/entry lookup, record removal and segment updates. Native
   rectangle geometry, collision traversal, border adjustment, segment-distance

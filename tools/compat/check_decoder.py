@@ -1402,7 +1402,7 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "webvtt_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring model with host iswspace; Windows comparison required",
         "layout_rects_compile_command": layout_compile,
         "layout_rects_result": layout_result.stdout, "layout_rects_stderr": layout_result.stderr,
-        "layout_rects_scope": "Complete pinned CScreenLayoutAllocator methods and class record layout; actual ATL CRect/list/array on Windows, controlled models on portable hosts; exact returned rectangles and full ordered retained records after each operation; native geometry and segment-distance arithmetic retained; representable arithmetic, finite collision sequences and successful allocation only",
+        "layout_rects_scope": "Complete pinned CScreenLayoutAllocator methods and class record layout; actual ATL CRect/list/array on Windows, controlled models on portable hosts; exact returned rectangles and full ordered retained records after each operation; Rust collision passes and segment retention, native border geometry; errno/Windows LastError; representable arithmetic, finite collision sequences and successful allocation only",
         "text_writer_compile_command": writer_compile,
         "text_writer_result": writer_result.stdout, "text_writer_stderr": writer_result.stderr,
         "text_writer_scope": "Complete pinned CTextFile::WriteString; native ATL strings/UTF-8 conversion on Windows, modeled UTF-8 and 16-bit Windows write layout on portable hosts; controlled native write boundaries, exact bytes/default-string arguments, errno/LastError and callback interruptions/source mutation; allocation failures and OS file persistence excluded",

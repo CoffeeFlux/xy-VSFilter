@@ -1625,6 +1625,7 @@ void CScreenLayoutAllocator::AdvanceToSegment(int segment, const CAtlArray<int>&
     TRACE_RENDERER_REQUEST("Begin AdvanceToSegment. m_subrects.size:"
         <<m_subrects.GetCount()<<" sa.size:"<<sa.GetCount());
 #ifdef XY_VSFILTER_RUST_TEXT
+    if(m_subrects.Advance(segment, sa)) return;
     for(size_t i = 0; i < m_subrects.GetCount(); )
     {
         const SubRect sr = m_subrects.Get<SubRect>(i);
@@ -1689,37 +1690,42 @@ CRect CScreenLayoutAllocator::AllocRect(CSubtitle* s, int segment, int entry, in
 #endif
     CRect r = s->m_rect + CRect(0, s->m_topborder, 0, s->m_bottomborder);
     bool fSearchDown = s->m_scrAlignment > 3;
-    bool fOK;
-    do
-    {
-        fOK = true;
 #ifdef XY_VSFILTER_RUST_TEXT
-        for(size_t i = 0; i < m_subrects.GetCount(); i++)
-        {
-            const SubRect sr = m_subrects.Get<SubRect>(i);
-#else
-        pos = m_subrects.GetHeadPosition();
-        while(pos)
-        {
-            SubRect& sr = m_subrects.GetNext(pos);
+    if(!m_subrects.Place(r, layer, fSearchDown))
 #endif
-            if(layer == sr.layer && !(r & sr.r).IsRectEmpty())
+    {
+        bool fOK;
+        do
+        {
+            fOK = true;
+#ifdef XY_VSFILTER_RUST_TEXT
+            for(size_t i = 0; i < m_subrects.GetCount(); i++)
             {
-                if(fSearchDown)
+                const SubRect sr = m_subrects.Get<SubRect>(i);
+#else
+            pos = m_subrects.GetHeadPosition();
+            while(pos)
+            {
+                SubRect& sr = m_subrects.GetNext(pos);
+#endif
+                if(layer == sr.layer && !(r & sr.r).IsRectEmpty())
                 {
-                    r.bottom = sr.r.bottom + r.Height();
-                    r.top    = sr.r.bottom;
+                    if(fSearchDown)
+                    {
+                        r.bottom = sr.r.bottom + r.Height();
+                        r.top    = sr.r.bottom;
+                    }
+                    else
+                    {
+                        r.top    = sr.r.top - r.Height();
+                        r.bottom = sr.r.top;
+                    }
+                    fOK = false;
                 }
-                else
-                {
-                    r.top    = sr.r.top - r.Height();
-                    r.bottom = sr.r.top;
-                }
-                fOK = false;
             }
         }
+        while(!fOK);
     }
-    while(!fOK);
     SubRect sr;
     sr.r       = r;
     sr.segment = segment;
