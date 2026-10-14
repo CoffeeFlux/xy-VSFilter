@@ -259,6 +259,14 @@
       "blur-planes-body-memory"
     ],
     [
+      "clip-mask-normal-file",
+      "clip-mask-inverse-file"
+    ],
+    [
+      "clip-mask-normal-memory",
+      "clip-mask-inverse-memory"
+    ],
+    [
       "gauss-planes-body-light-file",
       "gauss-planes-body-wide-file"
     ],
@@ -12846,6 +12854,270 @@
       "id": "arc-queue-animated-memory",
       "script": "test/compat/generated/arc-queue-animated.ass",
       "sha256": "10970619f3b28a254798607b2f6c0f0b8ca8a4d9f3bbaa175dc8561f65d980a7",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-mask-normal-file",
+      "script": "test/compat/generated/clip-mask-normal.ass",
+      "sha256": "d3947427b558b23b3a467abbeb586fa204e73a6b2298539f042974d216a614b3",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-mask-normal-memory",
+      "script": "test/compat/generated/clip-mask-normal.ass",
+      "sha256": "d3947427b558b23b3a467abbeb586fa204e73a6b2298539f042974d216a614b3",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-mask-inverse-file",
+      "script": "test/compat/generated/clip-mask-inverse.ass",
+      "sha256": "a335b4f5935ea0767f3f1ac270518a4dd1e33fcbbefec4ee289b1c8ba13d3168",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-mask-inverse-memory",
+      "script": "test/compat/generated/clip-mask-inverse.ass",
+      "sha256": "a335b4f5935ea0767f3f1ac270518a4dd1e33fcbbefec4ee289b1c8ba13d3168",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-mask-offscreen-file",
+      "script": "test/compat/generated/clip-mask-offscreen.ass",
+      "sha256": "b4cda4b1d3e4750b92671b9d967c8b7084854b878b22e014b246c2259af5a09b",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-mask-offscreen-memory",
+      "script": "test/compat/generated/clip-mask-offscreen.ass",
+      "sha256": "b4cda4b1d3e4750b92671b9d967c8b7084854b878b22e014b246c2259af5a09b",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-mask-shifted-file",
+      "script": "test/compat/generated/clip-mask-shifted.ass",
+      "sha256": "04154bec1e1d136dfd02b4b93b0173c0564e4c51ee48bbf6cc2d2f5ca1b206fa",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-mask-shifted-memory",
+      "script": "test/compat/generated/clip-mask-shifted.ass",
+      "sha256": "04154bec1e1d136dfd02b4b93b0173c0564e4c51ee48bbf6cc2d2f5ca1b206fa",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-mask-scaled-file",
+      "script": "test/compat/generated/clip-mask-scaled.ass",
+      "sha256": "8d819c8ba066233060101f4c7171ef10c643b75e765123f4cd15206b13a198f4",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-mask-scaled-memory",
+      "script": "test/compat/generated/clip-mask-scaled.ass",
+      "sha256": "8d819c8ba066233060101f4c7171ef10c643b75e765123f4cd15206b13a198f4",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-mask-empty-file",
+      "script": "test/compat/generated/clip-mask-empty.ass",
+      "sha256": "33704b42f6760fa05accaed882d45de32fccf42b8726237d8b06165bd0abcd79",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-mask-empty-memory",
+      "script": "test/compat/generated/clip-mask-empty.ass",
+      "sha256": "33704b42f6760fa05accaed882d45de32fccf42b8726237d8b06165bd0abcd79",
       "open": "memory",
       "width": 1280,
       "height": 720,
