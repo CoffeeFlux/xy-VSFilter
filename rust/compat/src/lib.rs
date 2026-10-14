@@ -26,3 +26,5 @@ pub mod segments;
 pub mod text;
 pub mod text_reader;
 pub mod timeline_search;
+
+pub mod transpose;
