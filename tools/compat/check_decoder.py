@@ -72,7 +72,7 @@ def capture_inputs():
               ROOT / "src/subtitles/TextFile.h",
               ROOT / "src/subtitles/TextFile.cpp", ROOT / "src/subtitles/STS.cpp",
               ROOT / "src/subtitles/RTS.cpp", ROOT / "tools/compat/reference.json"]
-    inputs += [ROOT / "src/filters/transform/vsfilter/csriapi.cpp"]
+    inputs += [ROOT / "src/filters/transform/vsfilter/csriapi.cpp", ROOT / "src/subtitles/libssf/Stream.cpp", ROOT / "src/subtitles/libssf/Stream.h", ROOT / "include/xy_rust_ssf_stream.h"]
     inputs += [ROOT / "src/thirdparty/boost_lib/boost/flyweight.hpp"]
     inputs += sorted((ROOT / "src/thirdparty/boost_lib/boost/flyweight").rglob("*.hpp"))
     inputs += sorted((ROOT / "tools/compat").glob("*oracle.cpp"))
@@ -984,6 +984,25 @@ public:
             csri_filename_code += filename_method + "\n"
         csri_filename_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_csri_filename.h").write_text(csri_filename_code, encoding="utf-8")
+    ssf_stream_code = '#include "ssf_stream_shell.h"\n'
+    ssf_source = original("src/subtitles/libssf/Stream.cpp", reference["commit"])
+    ssf_header = original("src/subtitles/libssf/Stream.h", reference["commit"])
+    for name, content, declaration in (("ReferenceSsf", ssf_source, ssf_header), ("CandidateSsf", (ROOT / "src/subtitles/libssf/Stream.cpp").read_bytes(), (ROOT / "src/subtitles/libssf/Stream.h").read_bytes())):
+        ssf_text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        ssf_declaration = declaration.decode("utf-8-sig").replace("\r\n", "\n")
+        ssf_stream_code += f"namespace {name} {{\n"
+        if name == "CandidateSsf":
+            ssf_stream_code += "#define XY_VSFILTER_RUST_TEXT\n"
+        ssf_stream_code += extract_definition(ssf_declaration, "class Stream").replace("protected:", "public:") + ";\n"
+        for signature in ("Stream::Stream()", "Stream::~Stream()", "bool Stream::IsWhiteSpace("):
+            ssf_stream_code += extract_definition(ssf_text, signature) + "\n"
+        ssf_stream_code += "void Stream::ThrowError(LPCTSTR message,...){ssfThrow(m_line,m_col,message);}\n"
+        ssf_class = extract_definition(ssf_declaration, "class InputStream :").replace("{", "{\npublic:", 1).replace("protected:", "public:").replace("virtual int NextByte() = 0;", "virtual int NextByte(){std::abort();}").replace("int NextChar();", "int NextChar(){return ssfNextChar();}").replace("XyRust::SsfLookahead", "XyRust::ObservedSsfLookahead")
+        ssf_stream_code += ssf_class + ";\n"
+        for signature in ("InputStream::InputStream()", "InputStream::~InputStream()", "int InputStream::PushChar()", "int InputStream::PopChar()", "int InputStream::PeekChar()", "int InputStream::GetChar()", "int InputStream::SkipWhiteSpace("):
+            ssf_stream_code += extract_definition(ssf_text, signature) + "\n"
+        ssf_stream_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_ssf_stream.h").write_text(ssf_stream_code, encoding="utf-8")
     filter_source = original("src/subtitles/xy_filter.cpp", reference["commit"])
     gauss_storage_code = '#include "gauss_storage_shell.h"\n'
     for name, content in (("ReferenceGaussStorage", filter_source), ("CandidateGaussStorage", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
@@ -1614,6 +1633,12 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
     legacy_blur_result = run([str(legacy_blur_executable)], capture_output=True, text=True)
     print(legacy_blur_result.stdout, end="", flush=True)
     print(legacy_blur_result.stderr, end="", file=sys.stderr)
+    ssf_stream_executable = destination / ("ssf-stream-oracle.exe" if os.name == "nt" else "ssf-stream-oracle")
+    ssf_stream_compile = [arg.replace("find_char_oracle.cpp", "ssf_stream_oracle.cpp").replace("find-char-oracle", "ssf-stream-oracle") for arg in find_char_compile]
+    run(ssf_stream_compile)
+    ssf_stream_result = run([str(ssf_stream_executable)], capture_output=True, text=True)
+    print(ssf_stream_result.stdout, end="", flush=True)
+    print(ssf_stream_result.stderr, end="", file=sys.stderr)
     csri_filename_executable = destination / ("csri-filename-oracle.exe" if os.name == "nt" else "csri-filename-oracle")
     csri_filename_compile = [arg.replace("find_char_oracle.cpp", "csri_filename_oracle.cpp").replace("find-char-oracle", "csri-filename-oracle") for arg in find_char_compile]
     run(csri_filename_compile)
@@ -2142,6 +2167,9 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
         "fraction_storage_compile_command": fraction_storage_compile,
         "fraction_storage_result": fraction_storage_result.stdout, "fraction_storage_stderr": fraction_storage_result.stderr,
         "fraction_storage_scope": "Whole pinned xy_be_blur and xy_calculate_filter with observed filter/transpose calls and scratch ownership under strict FP compilation. x86/x64 execute extracted native SSE kernels against Rust kernels; arm64 substitutes extracted scalar callbacks and does not establish SSE parity. Exact stage bytes/order, output/padding, initialized scratch, cache accounting, signed and fractional pass counts, reuse and native allocation fallback. Positive dimensions at least four avoid an unused native before-base cursor; zero/smaller/negative dimensions, overflowing/nonfinite pass counts, invalid backing and actual allocation failure excluded.",
+        "ssf_stream_compile_command": ssf_stream_compile,
+        "ssf_stream_result": ssf_stream_result.stdout, "ssf_stream_stderr": ssf_stream_result.stderr,
+        "ssf_stream_scope": "Whole pinned InputStream push/pop/peek/get/whitespace control flow with actual Windows ATL queue or portable deque versus Rust-owned raw-character lookahead. NextChar provider and ThrowError boundary are controlled. Comments, repeated EOF, NUL and UTF-16 values, provider interruptions with partial queued state, line/column state and ambient errors are compared. Native encoding, actual IO/SSF rendering, allocation failure, non-EOS negative characters, counter overflow and unbounded recursion excluded. CSRI only opens the RTS parser and does not validate SSF rendering.",
         "csri_filename_compile_command": csri_filename_compile,
         "csri_filename_result": csri_filename_result.stdout, "csri_filename_stderr": csri_filename_result.stderr,
         "csri_filename_scope": "Complete pinned csri_open_file and csri_close with controlled renderer, lock, CString and allocation boundaries. Windows executes actual MultiByteToWideChar; other platforms use controlled UTF-16 output replies. Exact extra-unit capacity, initialized filename bytes and untouched spare unit, first-conversion failure, accepted/rejected open, handle state, release order, repeated calls and ambient error state. Successful conversion inputs include Unicode, malformed UTF-8, embedded NUL and long names. Object/allocation exceptions, second-conversion failure and actual file IO excluded; whole Windows renderer file-open comparisons remain separate.",
