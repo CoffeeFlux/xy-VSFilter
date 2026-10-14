@@ -74,6 +74,14 @@ public:
         if(i==GetLength())return 0;return text.at(static_cast<size_t>(i));
 #endif
     }
+    wchar_t GetAt(int i)const{return (*this)[i];}
+    MicroString Left(int count)const{
+#ifdef _WIN32
+        auto result=text.Left(count);return MicroString(result.GetString(),result.GetLength());
+#else
+        return Mid(0,count);
+#endif
+    }
     int Find(wchar_t c,int pos=0)const{
 #ifdef _WIN32
         return text.Find(c,pos);

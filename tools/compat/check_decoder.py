@@ -55,7 +55,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
               ROOT / "include/xy_rust_drawing.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
-              ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
+              ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
               ROOT / "include/xy_rust_cc.h", ROOT / "src/subtitles/CCDecoder.cpp", ROOT / "src/subtitles/CCDecoder.h",
               ROOT / "include/xy_rust_segments.h",
@@ -204,6 +204,23 @@ public:
         webvtt += extract_definition(content.decode("utf-8-sig"), "static void WebVTTCueStrip(") + "\n"
         webvtt += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_webvtt.h").write_text(webvtt, encoding="utf-8")
+    encoding = '#include "encoding_shell.h"\n'
+    for name, content in (("ReferenceEncoding", font_source), ("CandidateEncoding", candidate_font)):
+        decoded = content.decode("utf-8-sig")
+        encoding += f"namespace {name} {{\n"
+        if name == "CandidateEncoding":
+            encoding += "#define XY_VSFILTER_RUST_TEXT\n"
+        for signature in ("static DWORD CharSetToCodePage(", "static int FindChar("):
+            encoding += extract_definition(decoded, signature) + "\n"
+        start = decoded.index("static CStringW ToMBCS(")
+        end = decoded.index("static CStringW RemoveSSATags(", start)
+        definition = decoded[start:end].rstrip()
+        assert definition.endswith("}")
+        if name == "CandidateEncoding":
+            assert definition.count("XyRust::Encoding convert") == 2
+            definition = definition.replace("XyRust::Encoding convert", "XyRust::ObservedEncoding convert")
+        encoding += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_encoding.h").write_text(encoding, encoding="utf-8")
     sami = '#include "sami_shell.h"\n'
     for name, content in (("ReferenceSami", font_source), ("CandidateSami", candidate_font)):
         decoded = content.decode("utf-8-sig").replace("\r\n", "\n")
@@ -822,6 +839,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     find_char_result = run([str(find_char_executable)], capture_output=True, text=True)
     print(find_char_result.stdout, end="", flush=True)
     print(find_char_result.stderr, end="", file=sys.stderr)
+    encoding_executable = destination / ("encoding-oracle.exe" if os.name == "nt" else "encoding-oracle")
+    encoding_compile = [arg.replace("find_char_oracle.cpp", "encoding_oracle.cpp").replace("find-char-oracle", "encoding-oracle") for arg in find_char_compile]
+    run(encoding_compile)
+    encoding_result = run([str(encoding_executable)], capture_output=True, text=True)
+    print(encoding_result.stdout, end="", flush=True)
+    print(encoding_result.stderr, end="", file=sys.stderr)
     microdvd_executable = destination / ("microdvd-oracle.exe" if os.name == "nt" else "microdvd-oracle")
     microdvd_compile = [arg.replace("find_char_oracle.cpp", "microdvd_oracle.cpp").replace("find-char-oracle", "microdvd-oracle") for arg in find_char_compile]
     run(microdvd_compile)
@@ -1145,6 +1168,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "webvtt_compile_command": webvtt_compile,
         "webvtt_result": webvtt_result.stdout, "webvtt_stderr": webvtt_result.stderr,
         "webvtt_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring model with host iswspace; Windows comparison required",
+        "encoding_compile_command": encoding_compile,
+        "encoding_result": encoding_result.stdout, "encoding_stderr": encoding_result.stderr,
+        "encoding_scope": "Complete ToMBCS, ToUnicode and both SSA wrappers against pinned methods; native ATL and Windows conversion APIs in Windows CI, portable conversion models elsewhere; raw UTF-16/NULs, initialized returned bytes only, failed conversions, trailing lead bytes, callback order/interruption and errno/LastError",
         "sami_compile_command": sami_compile,
         "sami_result": sami_result.stdout, "sami_stderr": sami_result.stderr,
         "sami_scope": "Whole SMI2SSA and ReplaceNoCase against pinned method/table data; native ATL CStringW and CAtlMap/CRT on Windows, portable models elsewhere; table name pointers const-qualified without changing entries; native numeric/color/trim callbacks, post-trim mutations, owned font arguments and errno; replacement-bearing NUL outcomes excluded",
