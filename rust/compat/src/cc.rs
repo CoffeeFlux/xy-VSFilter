@@ -23,9 +23,160 @@ pub fn put(buffer: &mut [u16], x: i32, y: i32, value: u16) -> bool {
     buffer[y as usize * 33 + x as usize] = value;
     true
 }
+const SPECIAL: [u16; 16] = [
+    0xae, 0xb0, 0xbd, 0xbf, 0x2122, 0xa2, 0xa3, 0x266a, 0xe0, 0xff, 0xe8, 0xe2, 0xea, 0xee, 0xf4,
+    0xfb,
+];
+const EXTENDED: [u16; 32] = [
+    0xc0, 0xc9, 0xd3, 0xda, 0xdc, 0xfc, 0x2018, 0xa1, 0x2a, 0x2019, 0x2d, 0xa9, 0x2120, 0xb7,
+    0x201c, 0x201d, 0xc1, 0xc2, 0xc7, 0xc8, 0xca, 0xcb, 0xeb, 0xce, 0xcf, 0xef, 0xd4, 0xd9, 0xf9,
+    0xdb, 0xab, 0xbb,
+];
+const MORE_EXTENDED: [u16; 32] = [
+    0xc3, 0xe3, 0xcd, 0xcc, 0xec, 0xd2, 0xf2, 0xd5, 0xf5, 0x7b, 0x7d, 0x5c, 0x5e, 0x5f, 0xa6, 0x7e,
+    0xc4, 0xe4, 0xd6, 0xf6, 0xdf, 0xa5, 0xa4, 0x7c, 0xc5, 0xe5, 0xd8, 0xf8, 0x250c, 0x2510, 0x2514,
+    0x2518,
+];
+fn basic(unit: u8) -> u16 {
+    match unit {
+        0x2a => 0xe1,
+        0x5c => 0xe9,
+        0x5e => 0xed,
+        0x5f => 0xf3,
+        0x60 => 0xfa,
+        0x7b => 0xe7,
+        0x7c => 0xf7,
+        0x7d => 0x4e,
+        0x7e => 0x6e,
+        0x7f => 0x3f,
+        _ => u16::from(unit),
+    }
+}
+
+pub struct Decoder {
+    length: usize,
+    position: usize,
+    pub action_position: usize,
+    pub value: u16,
+    pub x: i32,
+    pub y: i32,
+}
+impl Decoder {
+    pub fn new(length: i32) -> Self {
+        Self {
+            length: length.max(0) as usize,
+            position: 0,
+            action_position: 0,
+            value: 0,
+            x: 0,
+            y: 0,
+        }
+    }
+    /// 0 done, 1 put character, 2 offset cursor, 3 clear nondisplayed memory,
+    /// 4 end caption, 5 erase display, 6 move cursor. Input is loaned afresh
+    /// after each native operation, preserving source/backing aliases.
+    pub fn next(&mut self, input: &[u8]) -> u32 {
+        if input.len() < self.length {
+            return 0;
+        }
+        while self.position < self.length {
+            let mut index = self.position;
+            let unit = input[index] & 0x7f;
+            if unit >= 0x20 {
+                self.action_position = index;
+                self.position = index + 1;
+                self.value = basic(unit);
+                return 1;
+            }
+            if input[index] == 0x80 || index + 1 >= self.length {
+                self.position = index + 1;
+                continue;
+            }
+            if index + 3 < self.length
+                && input[index] == input[index + 2]
+                && input[index + 1] == input[index + 3]
+            {
+                index += 2;
+            }
+            let first = input[index];
+            let second = input[index + 1];
+            let unit = second & 0x7f;
+            self.action_position = index;
+            self.position = index + 2;
+            if first == 0x91 && (0x20..0x30).contains(&unit) {
+                continue;
+            }
+            if first == 0x91 && unit == 0x39 {
+                self.x = 1;
+                self.y = 0;
+                return 2;
+            }
+            if first == 0x91 && (0x30..0x40).contains(&unit) {
+                self.value = SPECIAL[usize::from(unit - 0x30)];
+                return 1;
+            }
+            if first == 0x92 && (0x20..0x40).contains(&unit) {
+                self.value = EXTENDED[usize::from(unit - 0x20)];
+                return 1;
+            }
+            if first == 0x13 && (0x20..0x40).contains(&unit) {
+                self.value = MORE_EXTENDED[usize::from(unit - 0x20)];
+                return 1;
+            }
+            if first == 0x94 && (second == 0xae || second == 0x20) {
+                return 3;
+            }
+            if first == 0x94 && second == 0x2f {
+                return 4;
+            }
+            if first == 0x94 && second == 0x2c {
+                return 5;
+            }
+            if first == 0x97 && [0xa1, 0xa2, 0x23].contains(&second) {
+                self.x = i32::from(second & 3);
+                self.y = 0;
+                return 2;
+            }
+            let row = match first {
+                0x91 => 0,
+                0x92 => 2,
+                0x15 => 4,
+                0x16 => 6,
+                0x97 => 8,
+                0x10 => 10,
+                0x13 => 12,
+                0x94 => 14,
+                _ => continue,
+            };
+            self.y = row + i32::from(second & 0x20 != 0);
+            self.x = if second & 0x10 != 0 {
+                i32::from((second & 0xe) << 1)
+            } else {
+                0
+            };
+            return 6;
+        }
+        0
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn raw_parity_and_duplicate_consumption_are_not_normalized() {
+        let mut decoder = Decoder::new(4);
+        assert_eq!(decoder.next(&[0x94, 0x2f, 0x94, 0x2f]), 4);
+        assert_eq!(decoder.action_position, 2);
+        assert_eq!(decoder.next(&[0x94, 0x2f, 0x94, 0x2f]), 0);
+        let mut decoder = Decoder::new(2);
+        assert_eq!(decoder.next(&[0x94, 0xaf]), 6);
+        assert_eq!((decoder.x, decoder.y), (0, 15));
+        let mut decoder = Decoder::new(3);
+        assert_eq!(decoder.next(&[0x80, 0x91, 0x39]), 2);
+        assert_eq!((decoder.x, decoder.y), (1, 0));
+    }
+
     #[test]
     fn wrapping_is_single_step_and_row_terminators_are_preserved() {
         assert_eq!(move_cursor(200, 14), Some([0, 15]));

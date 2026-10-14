@@ -136,6 +136,36 @@ void CCDecoder::DecodeCC(BYTE *buff, int len, __int64 time)
         }
     }
 
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::CaptionDecoder decoder(len);
+    for (;;) {
+        const uint32_t action = decoder.Next(buff);
+        const int index = decoder.Field(0);
+        switch (action) {
+            case 0: return;
+            case 1: PutChar(static_cast<WCHAR>(decoder.Field(1))); break;
+            case 2: OffsetCursor(decoder.Field(2), decoder.Field(3)); break;
+            case 3: memset(m_buff, 0, sizeof(m_buff)); break;
+            case 4:
+                if (memcmp(m_disp, m_buff, sizeof(m_disp)) != 0) {
+                    if (m_fEndOfCaption) SaveDisp(time + (index / 2) * 1000 / 30);
+                    m_fEndOfCaption = true;
+                    memcpy(m_disp, m_buff, sizeof(m_disp));
+                    m_time = time + (index / 2) * 1000 / 30;
+                }
+                break;
+            case 5:
+                if (m_fEndOfCaption) {
+                    m_fEndOfCaption = false;
+                    SaveDisp(time + (index / 2) * 1000 / 30);
+                }
+                memset(m_disp, 0, sizeof(m_disp));
+                break;
+            case 6: MoveCursor(decoder.Field(2), decoder.Field(3)); break;
+            default: return;
+        }
+    }
+#else
     for (int i = 0; i < len; i++)
     {
         BYTE c = buff[i] & 0x7f;
@@ -340,6 +370,7 @@ void CCDecoder::DecodeCC(BYTE *buff, int len, __int64 time)
             i++;
         }
     }
+#endif
 }
 
 void CCDecoder::ExtractCC(BYTE *buff, int len, __int64 time)
