@@ -1,6 +1,62 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 use alloc::boxed::Box;
 use xy_vsfilter_compat::realtext::Tags;
+use xy_vsfilter_compat::realtext_attributes::Attributes;
+
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_realtext_attributes_create(position: u32) -> *mut Attributes {
+    Box::into_raw(Box::new(Attributes::new(position)))
+}
+
+/// # Safety
+/// owner is live and uniquely borrowed; input is an initialized aligned u16
+/// span disjoint from owner. Its borrow ends before native callbacks resume.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_attributes_next(
+    owner: *mut Attributes,
+    input: *const u16,
+    length: usize,
+    ignore: u32,
+    response: u32,
+) -> u32 {
+    // SAFETY: disjoint immutable input and unique live state, supplied by bridge.
+    unsafe {
+        let state = &mut *owner;
+        state.next(units(input, length), ignore != 0, response != 0)
+    }
+}
+
+/// # Safety
+/// owner remains live and immutable. Queries return position, requested unit,
+/// name length/unit and value length/unit; out-of-range queries return zero.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_attributes_field(
+    owner: *const Attributes,
+    field: u32,
+    index: usize,
+) -> usize {
+    // SAFETY: immutable query before the unique owner is released.
+    let state = unsafe { &*owner };
+    match field {
+        0 => state.position as usize,
+        1 => usize::from(state.character),
+        2 => state.name.len(),
+        3 => usize::from(state.name.get(index).copied().unwrap_or(0)),
+        4 => state.value.len(),
+        5 => usize::from(state.value.get(index).copied().unwrap_or(0)),
+        _ => 0,
+    }
+}
+
+/// # Safety
+/// Release the unique owner exactly once, after all other operations.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_attributes_release(owner: *mut Attributes) {
+    if !owner.is_null() {
+        // SAFETY: the RAII adapter transfers its uniquely owned allocation back.
+        drop(unsafe { Box::from_raw(owner) });
+    }
+}
 
 // SAFETY required by every caller below: nonempty spans are initialized aligned
 // u16 arrays, disjoint from the live uniquely owned Tags state. They remain
@@ -34,7 +90,10 @@ pub unsafe extern "C" fn xy_vsfilter_realtext_begin(
     flags: u32,
 ) -> u32 {
     // SAFETY: disjoint native input and exclusively accessed live owner.
-    unsafe { (&mut *owner).begin(units(name, length), flags) as u32 }
+    unsafe {
+        let state = &mut *owner;
+        state.begin(units(name, length), flags) as u32
+    }
 }
 
 /// # Safety
@@ -46,7 +105,10 @@ pub unsafe extern "C" fn xy_vsfilter_realtext_attribute_kind(
     length: usize,
 ) -> u32 {
     // SAFETY: immutable live owner and initialized native name.
-    unsafe { (&*owner).attribute_kind(units(name, length)) }
+    unsafe {
+        let state = &*owner;
+        state.attribute_kind(units(name, length))
+    }
 }
 
 /// # Safety
@@ -64,7 +126,8 @@ pub unsafe extern "C" fn xy_vsfilter_realtext_attribute(
 ) {
     // SAFETY: uniquely borrowed owner, disjoint immutable native strings.
     unsafe {
-        (&mut *owner).attribute(
+        let state = &mut *owner;
+        state.attribute(
             units(name, name_length),
             units(value, value_length),
             numeric != 0,
@@ -79,7 +142,8 @@ pub unsafe extern "C" fn xy_vsfilter_realtext_attribute(
 pub unsafe extern "C" fn xy_vsfilter_realtext_end(owner: *mut Tags) {
     // SAFETY: bridge exclusively owns this live object.
     unsafe {
-        (&mut *owner).end_font();
+        let state = &mut *owner;
+        state.end_font();
     }
 }
 
@@ -93,7 +157,8 @@ pub unsafe extern "C" fn xy_vsfilter_realtext_field(
     index: usize,
 ) -> usize {
     // SAFETY: immutable access to the retained owner.
-    let result = unsafe { (&*owner).result() };
+    let state = unsafe { &*owner };
+    let result = state.result();
     match field {
         0 => result.len(),
         1 => usize::from(result.get(index).copied().unwrap_or(0)),
@@ -143,6 +208,35 @@ mod tests {
             assert_eq!(xy_vsfilter_realtext_field(owner, 1, len - 2), 0xd800);
             assert_eq!(xy_vsfilter_realtext_field(owner, 1, usize::MAX), 0);
             xy_vsfilter_realtext_release(owner);
+        }
+    }
+
+    #[test]
+    fn attribute_input_loans_end_before_native_callbacks() {
+        let owner = xy_vsfilter_realtext_attributes_create(0);
+        let mut input = [97u16, 61, 49, 62];
+        // SAFETY: uniquely owned state, initialized input loaned only for each
+        // call, bounded queries and one release. Native storage changes between
+        // callbacks while the owned parser remains live.
+        unsafe {
+            assert_eq!(
+                xy_vsfilter_realtext_attributes_next(owner, input.as_ptr(), 4, 0, 0),
+                1
+            );
+            input[0] = 98;
+            let mut action = 1;
+            while action == 1 {
+                action = xy_vsfilter_realtext_attributes_next(owner, input.as_ptr(), 4, 0, 0);
+            }
+            assert_eq!(action, 2);
+            input.fill(7);
+            assert_eq!(xy_vsfilter_realtext_attributes_field(owner, 3, 0), 98);
+            assert_eq!(xy_vsfilter_realtext_attributes_field(owner, 5, 0), 49);
+            assert_eq!(
+                xy_vsfilter_realtext_attributes_field(owner, 5, usize::MAX),
+                0
+            );
+            xy_vsfilter_realtext_attributes_release(owner);
         }
     }
 }
