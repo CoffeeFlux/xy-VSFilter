@@ -269,6 +269,22 @@ public:
 
     const STSSegment* GetSegment(int iSegment) {return iSegment >= 0 && iSegment < (int)m_segments.GetCount() ? &m_segments[iSegment] : NULL;}
 
+    // Internal value/scalar access surface. Snapshots own their strings/members;
+    // no caller retains a pointer into the document arrays through this surface.
+    size_t GetEntryCount() const;
+    STSEntry GetEntrySnapshot(int i) const;
+    REFERENCE_TIME GetEntryEnd(int i) const;
+    int GetEntryLayer(int i) const;
+    int GetEntryReadOrder(int i) const;
+    CString GetEntryEffect(int i) const;
+    bool GetSegmentEntryCount(int iSegment, size_t& count) const;
+    bool FindNextSegment(REFERENCE_TIME t, double fps,
+        int* iSegment = NULL, int* nSegments = NULL);
+    bool SearchSubs2Snapshot(REFERENCE_TIME t, double fps, STSSegment& snapshot,
+        int* iSegment = NULL, int* nSegments = NULL);
+    bool IsSegmentAnimated(unsigned int iSegment) const;
+    void OrSegmentAnimated(int iSegment, bool animated);
+
     STSStyle* GetStyle(int i);
     bool      GetStyle(int i, STSStyle* const stss);
     int       GetCharSet(int i);

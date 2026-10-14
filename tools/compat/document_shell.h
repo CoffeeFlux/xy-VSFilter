@@ -5,12 +5,19 @@
 #include <cmath>
 #define TIME 0
 #define FRAME 1
+#define UNITS 10000000
 #define UNITS_FLOAT 10000000.0
 #define TRACE_SUB(message) ((void)0)
 #include <cstdint>
 #include <climits>
 #include <iostream>
 #include <vector>
+#include <memory>
+#include <type_traits>
+#include <cstdlib>
+#include <sstream>
+#include <fstream>
+#include <stdexcept>
 using REFERENCE_TIME = int64_t;
 using std::min;
 using std::max;
@@ -29,10 +36,30 @@ public:
  T& GetAt(size_t i) { return this->at(i); }
  void Copy(const CAtlArray& a) { *this=a; }
 };
+// Immutable arena values make record relocation defined for qsort. This models
+// raw code units, not CString object layout, refcounts or native allocation.
+// Replacing a field obtains a new handle, so saved records remain independent.
+struct UnitString {
+ const std::vector<uint16_t>* value=nullptr;
+ static const std::vector<uint16_t>* store(const std::vector<uint16_t>& units) {
+  static std::vector<std::unique_ptr<const std::vector<uint16_t>>> arena;
+  arena.push_back(std::make_unique<const std::vector<uint16_t>>(units));
+  return arena.back().get();
+ }
+ UnitString& operator=(const std::vector<uint16_t>& units) {value=store(units);return *this;}
+ UnitString& operator=(std::initializer_list<uint16_t> units) {return *this=std::vector<uint16_t>(units);}
+ operator const std::vector<uint16_t>&() const {return *value;}
+ bool operator==(const std::vector<uint16_t>& units) const {return *value==units;}
+ void clear() {*this=std::vector<uint16_t>();}
+};
+static_assert(std::is_trivially_copyable<UnitString>::value,"qsort string shell must be trivially copyable");
 struct STSEntry {
- std::vector<uint16_t> str,style,actor,effect;
+ UnitString str;
  bool fUnicode;
+ UnitString style,actor,effect;
  int marginRect[4],layer;
  REFERENCE_TIME start,end;
  int readorder;
 };
+
+static_assert(std::is_trivially_copyable<STSEntry>::value,"qsort record shell must be trivially copyable");

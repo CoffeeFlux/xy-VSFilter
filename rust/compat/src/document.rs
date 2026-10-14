@@ -59,6 +59,9 @@ pub enum Refusal {
     /// Native entry counts and segment entry indices are signed 32-bit values.
     EntryCountOverflow,
     SegmentIndex,
+    EntryIndex,
+    InvalidPermutation,
+    TimeCountMismatch,
     /// Selected timeline count exceeds the native signed-midpoint domain.
     TimelineCountOverflow,
 }
@@ -240,6 +243,73 @@ impl Document {
             );
         }
         Ok(Some(n))
+    }
+
+    /// Stores caller-prepared code units without normalization or conversion.
+    /// Native SetStr preparation uses None and retains the stored Unicode flag;
+    /// ConvertUnicode's changed branch supplies Some(target) after conversion.
+    /// Conversion/no-op decisions, charset lookup and errors remain the adapter's
+    /// responsibility. Neither operation rebuilds segments or resets animation.
+    pub fn set_prepared_text(
+        &mut self,
+        index: usize,
+        text: Vec<u16>,
+        unicode: Option<bool>,
+    ) -> Result<(), Refusal> {
+        let entry = self.entries.get_mut(index).ok_or(Refusal::EntryIndex)?;
+        entry.text = text;
+        if let Some(unicode) = unicode {
+            entry.unicode = unicode;
+        }
+        Ok(())
+    }
+
+    /// Accepts the native CRT's computed ordering as original storage indices.
+    /// This does not select a Rust sorting algorithm or establish CRT equal-key
+    /// permutations. Payloads move without cloning; readorder stays unchanged.
+    /// As in native Sort, even the identity permutation rebuilds segments.
+    pub fn reorder_entries(&mut self, order: &[usize]) -> Result<(), Refusal> {
+        if order.len() != self.entries.len() {
+            return Err(Refusal::InvalidPermutation);
+        }
+        let mut seen = vec![false; self.entries.len()];
+        for &index in order {
+            let slot = seen.get_mut(index).ok_or(Refusal::InvalidPermutation)?;
+            if *slot {
+                return Err(Refusal::InvalidPermutation);
+            }
+            *slot = true;
+        }
+        let mut slots: Vec<_> = core::mem::take(&mut self.entries)
+            .into_iter()
+            .map(Some)
+            .collect();
+        self.entries = order
+            .iter()
+            .map(|&index| {
+                slots[index]
+                    .take()
+                    .expect("permutation validated before mutation")
+            })
+            .collect();
+        self.rebuild_segments();
+        Ok(())
+    }
+
+    /// Installs already-evaluated times in storage order and rebuilds segments.
+    /// Reversed and equal endpoints are retained. The adapter owns mode guards,
+    /// actual CRT arithmetic, partial native failure behavior and mode publication
+    /// before the native rebuild callback. This owner invokes no callbacks.
+    pub fn replace_entry_times(&mut self, times: &[(i64, i64)]) -> Result<(), Refusal> {
+        if times.len() != self.entries.len() {
+            return Err(Refusal::TimeCountMismatch);
+        }
+        for (entry, &(start, end)) in self.entries.iter_mut().zip(times) {
+            entry.start = start;
+            entry.end = end;
+        }
+        self.rebuild_segments();
+        Ok(())
     }
 
     /// Rebuild uses storage order rather than readorder; animation resets.
@@ -444,6 +514,106 @@ mod tests {
         assert_eq!(d.query_time(Entry, 0).unwrap().index, 0);
         assert_eq!(d.query_time(Entry, 10).unwrap().index, 2);
         assert_eq!(d.query_time(Entry, -1).unwrap().index, -1);
+    }
+
+    #[test]
+    fn prepared_text_handoffs_retain_timeline_and_set_flag_only_when_requested() {
+        let mut d = Document::default();
+        d.add_prepared(entry(0, 10, -1), AddMode::Add).unwrap();
+        d.feedback_animation(0, true).unwrap();
+        let segments = d.segments().to_vec();
+        d.set_prepared_text(0, vec![0, 0xdc00, 10], None).unwrap();
+        assert_eq!(d.entries()[0].text, [0, 0xdc00, 10]);
+        assert!(!d.entries()[0].unicode);
+        d.set_prepared_text(0, vec![], Some(true)).unwrap();
+        assert!(d.entries()[0].text.is_empty());
+        assert!(d.entries()[0].unicode);
+        assert_eq!(d.segments(), segments);
+        let before = d.clone();
+        assert_eq!(
+            d.set_prepared_text(1, vec![1], Some(false)),
+            Err(Refusal::EntryIndex)
+        );
+        assert_eq!(d, before);
+    }
+
+    #[test]
+    fn reorder_moves_payload_allocations_and_rebuilds_storage_order() {
+        let mut d = Document::default();
+        d.add_prepared(entry(0, 10, 9), AddMode::Add).unwrap();
+        d.add_prepared(entry(0, 10, 1), AddMode::Add).unwrap();
+        d.feedback_animation(0, true).unwrap();
+        let text_ptr = d.entries()[0].text.as_ptr();
+        let actor_ptr = d.entries()[0].actor.as_ptr();
+        d.reorder_entries(&[1, 0]).unwrap();
+        assert_eq!(d.entries()[1].text.as_ptr(), text_ptr);
+        assert_eq!(d.entries()[1].actor.as_ptr(), actor_ptr);
+        assert_eq!(
+            d.entries().iter().map(|e| e.readorder).collect::<Vec<_>>(),
+            [1, 9]
+        );
+        assert_eq!(d.segments()[0].entries, [0, 1]);
+        assert!(!d.segments()[0].animated);
+        d.feedback_animation(0, true).unwrap();
+        d.reorder_entries(&[0, 1]).unwrap();
+        assert!(!d.segments()[0].animated);
+    }
+
+    #[test]
+    fn invalid_permutations_and_time_counts_leave_complete_owner_unchanged() {
+        let mut d = Document::default();
+        d.add_prepared(entry(0, 10, -1), AddMode::Add).unwrap();
+        d.add_prepared(entry(2, 8, -1), AddMode::Add).unwrap();
+        d.feedback_animation(1, true).unwrap();
+        let before = d.clone();
+        for order in [&[][..], &[0][..], &[0, 0][..], &[0, 2][..], &[0, 1, 2][..]] {
+            assert_eq!(d.reorder_entries(order), Err(Refusal::InvalidPermutation));
+            assert_eq!(d, before);
+        }
+        assert_eq!(
+            d.replace_entry_times(&[(1, 2)]),
+            Err(Refusal::TimeCountMismatch)
+        );
+        assert_eq!(d, before);
+        d.remove_all_entries();
+        let stale = d.clone();
+        assert_eq!(d.reorder_entries(&[0]), Err(Refusal::InvalidPermutation));
+        assert_eq!(d, stale);
+        assert_eq!(
+            d.replace_entry_times(&[(1, 2)]),
+            Err(Refusal::TimeCountMismatch)
+        );
+        assert_eq!(d, stale);
+        d.reorder_entries(&[]).unwrap();
+        assert!(d.segments().is_empty());
+    }
+
+    #[test]
+    fn supplied_times_retain_reversed_zero_and_extreme_endpoints() {
+        let mut d = Document::default();
+        for _ in 0..3 {
+            d.add_prepared(entry(0, 10, -1), AddMode::EntryOnly)
+                .unwrap();
+        }
+        d.rebuild_segments();
+        d.feedback_animation(0, true).unwrap();
+        let times = [(i64::MIN, i64::MAX), (4, 4), (8, 6)];
+        d.replace_entry_times(&times).unwrap();
+        assert_eq!(
+            d.entries()
+                .iter()
+                .map(|e| (e.start, e.end))
+                .collect::<Vec<_>>(),
+            times
+        );
+        assert_eq!(
+            d.segments()
+                .iter()
+                .map(|s| (s.start, s.end))
+                .collect::<Vec<_>>(),
+            [(i64::MIN, 4), (4, 6), (6, 8), (8, i64::MAX)]
+        );
+        assert!(d.segments().iter().all(|s| s.entries == [0] && !s.animated));
     }
 
     #[test]

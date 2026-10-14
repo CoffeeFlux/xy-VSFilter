@@ -17,7 +17,34 @@
         "src/subtitles/SubtitleInputPin.cpp"
       ],
       "method": "Read git diff pinned-reference -- these paths (no native execution); RTS.h has existing Rust path/layout changes; STS.cpp/RTS.cpp contain prior Rust leaves and require pinned harness extraction.",
-      "status": "Source comparison only; no whole document differential validation."
+      "status": "Source comparison only; no whole document differential validation.",
+      "qualification": "This unchanged-at-candidate list describes the original e8f02d capture only. STS.h now contains the native-backed facade declarations; it is no longer unchanged from reference."
+    },
+    "initial_capture_commit": "e8f02d55825d70347c2088610796675af75a1cbe",
+    "current_location_review": {
+      "base_head": "eca923ebacdaa71f9fc666ddccafaacf44bcccb0",
+      "source_state": "native caller-isolation changes in working tree, not yet committed",
+      "location_remap": [
+        {
+          "path": "src/subtitles/STS.h",
+          "original_sha256": "ea2bd73a5875d5271292cd03a0741c73b8d20617943bf802102bf6de87a29ff4",
+          "current_sha256": "21bfe055c2ba1b760b9bc1442cc785203a5bfbf07e8a42a181eccae9984d56ea",
+          "remap": "difflib.SequenceMatcher(autojunk=False) on original capture/current source lines; edited/deleted spans mapped to replacement span and reviewed against facade edits"
+        },
+        {
+          "path": "src/subtitles/STS.cpp",
+          "original_sha256": "ef601e96fd5e3fa04435215e495c547da7f9de8bbfdc3969ce9d7cad4c6a2516",
+          "current_sha256": "6105ed6f5e32d3ae5b64ff3f3d333dcffa4f1f787a43711e593be2f5cd6d6df4",
+          "remap": "difflib.SequenceMatcher(autojunk=False) on original capture/current source lines; edited/deleted spans mapped to replacement span and reviewed against facade edits"
+        },
+        {
+          "path": "src/subtitles/RTS.cpp",
+          "original_sha256": "5a5bbe632988ac712d10cfc6cc3a0a1879c0d0730e9a747c1dd9f3d1eefbbaa2",
+          "current_sha256": "39e1997599b7b8483412c727e0e32343bbd6b705c271a4425080a528cb49d9ff",
+          "remap": "difflib.SequenceMatcher(autojunk=False) on original capture/current source lines; edited/deleted spans mapped to replacement span and reviewed against facade edits"
+        }
+      ],
+      "evidence": "Manual source review of facade edit plus mapped original assertions; no native execution or new Windows/host validation. Original capture candidate_commit and reference-source review remain historical provenance."
     }
   },
   "evidence_policy": [
@@ -78,19 +105,19 @@
         "Empty_behavior": "Not reset by Empty",
         "reviewed_access_locations": [
           {
-            "source": "src/subtitles/RTS.cpp:3633",
+            "source": "src/subtitles/RTS.cpp:3628",
             "reviewed_scope_ids": [
               "rts-metadata"
             ]
           },
           {
-            "source": "src/subtitles/RTS.cpp:3858",
+            "source": "src/subtitles/RTS.cpp:3853",
             "reviewed_scope_ids": [
               "rts-metadata"
             ]
           },
           {
-            "source": "src/subtitles/STS.cpp:3961",
+            "source": "src/subtitles/STS.cpp:4027",
             "reviewed_scope_ids": [
               "open"
             ]
@@ -110,13 +137,13 @@
         "Empty_behavior": "Not reset by Empty",
         "reviewed_access_locations": [
           {
-            "source": "src/subtitles/RTS.cpp:3814",
+            "source": "src/subtitles/RTS.cpp:3809",
             "reviewed_scope_ids": [
               "rts-metadata"
             ]
           },
           {
-            "source": "src/subtitles/RTS.cpp:3817",
+            "source": "src/subtitles/RTS.cpp:3812",
             "reviewed_scope_ids": [
               "rts-metadata"
             ]
@@ -128,7 +155,7 @@
             ]
           },
           {
-            "source": "src/subtitles/STS.cpp:3956",
+            "source": "src/subtitles/STS.cpp:4022",
             "reviewed_scope_ids": [
               "open"
             ]
@@ -240,7 +267,7 @@
             ]
           },
           {
-            "source": "src/subtitles/STS.cpp:3957",
+            "source": "src/subtitles/STS.cpp:4023",
             "reviewed_scope_ids": [
               "open"
             ]
@@ -356,7 +383,7 @@
             ]
           },
           {
-            "source": "src/subtitles/STS.cpp:3958",
+            "source": "src/subtitles/STS.cpp:4024",
             "reviewed_scope_ids": [
               "open"
             ]
@@ -388,7 +415,7 @@
             ]
           },
           {
-            "source": "src/subtitles/STS.cpp:3959",
+            "source": "src/subtitles/STS.cpp:4025",
             "reviewed_scope_ids": [
               "open"
             ]
@@ -414,19 +441,19 @@
         "Empty_behavior": "Not reset by Empty",
         "reviewed_access_locations": [
           {
-            "source": "src/subtitles/RTS.cpp:3839",
+            "source": "src/subtitles/RTS.cpp:3834",
             "reviewed_scope_ids": [
               "rts-metadata"
             ]
           },
           {
-            "source": "src/subtitles/RTS.cpp:3840",
+            "source": "src/subtitles/RTS.cpp:3835",
             "reviewed_scope_ids": [
               "rts-metadata"
             ]
           },
           {
-            "source": "src/subtitles/STS.cpp:3960",
+            "source": "src/subtitles/STS.cpp:4026",
             "reviewed_scope_ids": [
               "open"
             ]
@@ -628,19 +655,19 @@
             ]
           },
           {
-            "source": "src/subtitles/STS.cpp:3972",
+            "source": "src/subtitles/STS.cpp:4038",
             "reviewed_scope_ids": [
               "open"
             ]
           },
           {
-            "source": "src/subtitles/STS.cpp:4067",
+            "source": "src/subtitles/STS.cpp:4133",
             "reviewed_scope_ids": [
               "serialize"
             ]
           },
           {
-            "source": "src/subtitles/STS.cpp:4233",
+            "source": "src/subtitles/STS.cpp:4299",
             "reviewed_scope_ids": [
               "serialize"
             ]
@@ -771,10 +798,11 @@
         "Empty_behavior": "Not reset by Empty",
         "reviewed_access_locations": [
           {
-            "source": "src/subtitles/RTS.cpp:3470",
+            "source": "src/subtitles/RTS.cpp:3465",
             "reviewed_scope_ids": [
               "rts-query-render",
-              "rts-metadata"
+              "rts-metadata",
+              "native-entry-segment-facade"
             ]
           },
           {
@@ -802,7 +830,7 @@
             ]
           },
           {
-            "source": "src/subtitles/STS.cpp:4056",
+            "source": "src/subtitles/STS.cpp:4122",
             "reviewed_scope_ids": [
               "serialize"
             ]
@@ -874,7 +902,7 @@
             ]
           },
           {
-            "source": "src/subtitles/STS.cpp:4057",
+            "source": "src/subtitles/STS.cpp:4123",
             "reviewed_scope_ids": [
               "serialize"
             ]
@@ -900,19 +928,19 @@
         "Empty_behavior": "Not reset by Empty",
         "reviewed_access_locations": [
           {
-            "source": "src/subtitles/RTS.cpp:3577",
+            "source": "src/subtitles/RTS.cpp:3572",
             "reviewed_scope_ids": [
               "rts-metadata"
             ]
           },
           {
-            "source": "src/subtitles/RTS.cpp:3578",
+            "source": "src/subtitles/RTS.cpp:3573",
             "reviewed_scope_ids": [
               "rts-metadata"
             ]
           },
           {
-            "source": "src/subtitles/RTS.cpp:3579",
+            "source": "src/subtitles/RTS.cpp:3574",
             "reviewed_scope_ids": [
               "rts-metadata"
             ]
@@ -974,7 +1002,7 @@
             ]
           },
           {
-            "source": "src/subtitles/STS.cpp:3690",
+            "source": "src/subtitles/STS.cpp:3756",
             "reviewed_scope_ids": [
               "default-style"
             ]
@@ -1036,13 +1064,13 @@
             ]
           },
           {
-            "source": "src/subtitles/STS.cpp:3695",
+            "source": "src/subtitles/STS.cpp:3761",
             "reviewed_scope_ids": [
               "default-style"
             ]
           },
           {
-            "source": "src/subtitles/STS.cpp:3700",
+            "source": "src/subtitles/STS.cpp:3766",
             "reviewed_scope_ids": [
               "default-style"
             ]
@@ -1461,13 +1489,17 @@
       "alias_lifetime": "Empty invalidates native entry/segment/style pointers. Copy source may alias destination.",
       "callback_reentry_and_contract": "Copy calls virtual Empty before reading source; RTS Empty Deinit executes first. Self-copy observes emptied source. Destructor calls base Empty after RTS destructor Deinit. Empty only resets screen size/arrays/map; other metadata retained. Copy copies listed fields only, omitting path/lcid/simple/PAR/color/layout.",
       "required_facade": "Explicit lifecycle operations and native virtual-call adapter; no universal reset of metadata.",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/STS.cpp:3045-3090",
+        "src/subtitles/STS.cpp:3123-3129"
+      ]
     },
     {
       "id": "style-copy",
       "locations": [
         "src/subtitles/STS.cpp:3091-3120",
-        "src/subtitles/STS.h:295"
+        "src/subtitles/STS.h:311"
       ],
       "operation_groups": [
         "DOC-02",
@@ -1484,7 +1516,11 @@
       "alias_lifetime": "Source style pointers borrowed during enumeration; destination owns new copies",
       "callback_reentry_and_contract": "Free then sequential AddStyle; allocation failure can leave partial result; insertion history and self-alias behavior matter.",
       "required_facade": "ordered style snapshot/add adapter and entry rename operation",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/STS.cpp:3091-3120",
+        "src/subtitles/STS.h:295"
+      ]
     },
     {
       "id": "adds",
@@ -1506,7 +1542,10 @@
       "alias_lifetime": "CAtlArray references may move during mutation; no persistent native loans in replacement",
       "callback_reentry_and_contract": "Add prepares text/style, drops some values, chooses readorder and incrementally updates segments; entry-only path differs in zero duration and does not build segments. Existing Rust helper reseeds transient state.",
       "required_facade": "owning add/add_entry_only; remove transient reseeding",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/STS.cpp:3137-3306"
+      ]
     },
     {
       "id": "microdvd",
@@ -1528,7 +1567,10 @@
       "alias_lifetime": "Reference to last actual stored entry only until next array mutation",
       "callback_reentry_and_contract": "min(old end, MS2RT(start)) before next Add; previous dropped Add may make this an earlier entry. Segments change at existing rebuild, not correction.",
       "required_facade": "set_last_stored_entry_end_min",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/STS.cpp:1752-1763"
+      ]
     },
     {
       "id": "style-renaming",
@@ -1550,14 +1592,17 @@
       "alias_lifetime": "CreateDefaultStyle returns pointer into document; AddStyle takes ownership and may delete supplied pointer",
       "callback_reentry_and_contract": "Duplicate different style renames old map entry and all matching stored entries before installing new style; equal value deletes incoming. Unknown-style loop mutates sequentially, tracks previous key, prompts and cancel suppresses later prompts.",
       "required_facade": "rename_entry_styles + per-entry ordered access; style owner remains native in D2a; dialogs outside Rust loan",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/STS.cpp:3316-3412"
+      ]
     },
     {
       "id": "default-style",
       "locations": [
         "src/subtitles/STS.cpp:3309-3314",
         "src/subtitles/STS.cpp:3414-3430",
-        "src/subtitles/STS.cpp:3687-3718"
+        "src/subtitles/STS.cpp:3753-3784"
       ],
       "operation_groups": [
         "DOC-04",
@@ -1574,12 +1619,17 @@
       "alias_lifetime": "GetStyle returns native mutable pointer (defaultStyle or map value); bool overload copies whole STSStyle",
       "callback_reentry_and_contract": "Forced default bypasses lookup; missing named style falls back to Default then document default. Preserve no automatic segment/cache callback.",
       "required_facade": "copy style value/charset; native STSStyle adapter; explicit default/force operations",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/STS.cpp:3309-3314",
+        "src/subtitles/STS.cpp:3414-3430",
+        "src/subtitles/STS.cpp:3687-3718"
+      ]
     },
     {
       "id": "text",
       "locations": [
-        "src/subtitles/STS.cpp:3720-3785"
+        "src/subtitles/STS.cpp:3786-3851"
       ],
       "operation_groups": [
         "DOC-05"
@@ -1595,13 +1645,16 @@
       "alias_lifetime": "Returned CString values own copies; references internal to operation only",
       "callback_reentry_and_contract": "GetStrW/GetStrWA distinct encoding/SSA conversion; Unicode change and SetStr mutate entry; preserve raw code units and no added notification.",
       "required_facade": "bounded text copy-out and edit/conversion status",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/STS.cpp:3720-3785"
+      ]
     },
     {
       "id": "sort-convert",
       "locations": [
         "src/subtitles/STS.cpp:3432-3458",
-        "src/subtitles/STS.cpp:3788-3810"
+        "src/subtitles/STS.cpp:3854-3876"
       ],
       "operation_groups": [
         "DOC-06",
@@ -1619,7 +1672,11 @@
       "alias_lifetime": "qsort moves records and changes index identity",
       "callback_reentry_and_contract": "Two native qsort comparators; conversions start then end per entry, update mode then rebuild; do not substitute Rust stable sort/saturating casts.",
       "required_facade": "sort/conversion coarse operation with pinned numeric/order adapter initially",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/STS.cpp:3432-3458",
+        "src/subtitles/STS.cpp:3788-3810"
+      ]
     },
     {
       "id": "search-translate",
@@ -1640,12 +1697,16 @@
       "alias_lifetime": "SearchSubs returns const pointer; SearchSubs2 mutable pointer; GetSegment const pointer into reallocatable native array",
       "callback_reentry_and_contract": "Search variants have different gap/endpoint rules and outputs; Translate invalid-index sentinels and frame/time llround behavior must remain.",
       "required_facade": "bounded snapshots returning exact index/count/times; no native mutable loans",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/STS.cpp:3461-3685",
+        "src/subtitles/STS.h:278"
+      ]
     },
     {
       "id": "rebuild",
       "locations": [
-        "src/subtitles/STS.cpp:3812-3887"
+        "src/subtitles/STS.cpp:3878-3953"
       ],
       "operation_groups": [
         "DOC-07",
@@ -1662,12 +1723,15 @@
       "alias_lifetime": "Removes all segments then rebuilds; invalidates segment pointers",
       "callback_reentry_and_contract": "OnChanged after rebuild including empty result; log order observed in source. Rust paths currently copy built segments into native owner.",
       "required_facade": "rebuild persistent Rust owner; release borrow then native OnChanged; retire segment reseeding",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/STS.cpp:3812-3887"
+      ]
     },
     {
       "id": "clear",
       "locations": [
-        "src/subtitles/STS.cpp:4258-4266"
+        "src/subtitles/STS.cpp:4324-4332"
       ],
       "operation_groups": [
         "DOC-01"
@@ -1682,12 +1746,15 @@
       "alias_lifetime": "RemoveAllEntries invalidates entries but leaves segments and cache untouched",
       "callback_reentry_and_contract": "Do not repair stale segments/cache implicitly; existing callers choose rebuild point.",
       "required_facade": "clear_entries_only/is_empty",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/STS.cpp:4258-4266"
+      ]
     },
     {
       "id": "open",
       "locations": [
-        "src/subtitles/STS.cpp:3889-4001"
+        "src/subtitles/STS.cpp:3955-4067"
       ],
       "operation_groups": [
         "DOC-01",
@@ -1706,7 +1773,10 @@
       "alias_lifetime": "File lifetime spans parser; sidecar and temp file native adapters; Empty dispatched virtually",
       "callback_reentry_and_contract": "Empty before file open and again CTextFile Open; probe/retry Empty/Seek order; partial parse dialog and break; successful metadata assignments, sidecar import, rebuild callback, unknown styles then size fallback. Memory Open temp file write/delete retained.",
       "required_facade": "native file/UI adapters calling coarse owner operations; exact error/reset order",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/STS.cpp:3889-4001"
+      ]
     },
     {
       "id": "parser-metadata",
@@ -1728,12 +1798,16 @@
       "alias_lifetime": "ret references document only during parse; default-style pointer can be mutated",
       "callback_reentry_and_contract": "Header writes screen/wrap/collisions/scaled border/PAR/color/layout/name state through candidate lexical locations. Parse failure can retain fields because Empty is selective; not a universal metadata reset.",
       "required_facade": "metadata get/set operations preserving assignment order; default style adapter; Add entry facade",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/STS.cpp:2386-2809",
+        "src/subtitles/STS.cpp:3006-3038"
+      ]
     },
     {
       "id": "serialize",
       "locations": [
-        "src/subtitles/STS.cpp:4004-4256"
+        "src/subtitles/STS.cpp:4070-4322"
       ],
       "operation_groups": [
         "DOC-10",
@@ -1749,7 +1823,10 @@
       "alias_lifetime": "STSEntry& and map pointers borrowed throughout output loops",
       "callback_reentry_and_contract": "SaveAs directly reads entries and styles as well as accessors; serialization stays native but these reads migrate. Output sidecar and failure/partial files remain format behavior.",
       "required_facade": "entry copy and ordered style enumeration snapshots; metadata snapshots; translation/text copy",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/STS.cpp:4004-4256"
+      ]
     },
     {
       "id": "rts-cache",
@@ -1769,10 +1846,14 @@
       "owner": "entry index identity, style/text, metadata; native render cache",
       "host_path": "all renderer hosts",
       "native_lock_context": "Renderer receives provider lock at construction; these methods do not independently prove it held",
-      "alias_lifetime": "GetSubtitle caches by entry index; local copies of entries; style values copied",
+      "alias_lifetime": "GetSubtitle caches by entry index; GetEntrySnapshot owns local entry values, GetEntryEffect copies effect string. OnChanged reads GetEntryCount. Style values remain copied from native style owner.",
       "callback_reentry_and_contract": "OnChanged clears indexed subtitle cache and SLA and sizes cache to entry count. Entry index and raw end-time cache eviction are observable.",
-      "required_facade": "read_entry_copy/entry_count/text/style/metadata copy; callback after owner borrow release",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "required_facade": "Native-backed GetEntryCount/GetEntryEffect/GetEntrySnapshot; text/style/metadata remain native adapters; no storage ownership switch.",
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/RTS.cpp:1996-2026",
+        "src/subtitles/RTS.cpp:3084-3214"
+      ]
     },
     {
       "id": "rts-reset-tag",
@@ -1793,13 +1874,16 @@
       "alias_lifetime": "Native STSStyle* lookup then value copy, no Rust loan across parser",
       "callback_reentry_and_contract": "Named reset fallback uses original style; preserve lookup key raw text and native style value.",
       "required_facade": "lookup_style_copy/raw-name adapter",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/RTS.cpp:2826-2835"
+      ]
     },
     {
       "id": "rts-query-render",
       "locations": [
-        "src/subtitles/RTS.cpp:3260-3373",
-        "src/subtitles/RTS.cpp:3470"
+        "src/subtitles/RTS.cpp:3260-3368",
+        "src/subtitles/RTS.cpp:3465"
       ],
       "operation_groups": [
         "DOC-08",
@@ -1809,24 +1893,30 @@
       "access_kind": [
         "read",
         "write",
-        "view"
+        "owned-snapshot",
+        "scalar"
       ],
       "owner": "segments, entries; animation; native SLA/cache",
       "host_path": "ISubPicProvider scheduling/RenderEx via DirectShow, Xy, CSRI, plugins",
       "native_lock_context": "Methods do not acquire lock here; callers/provider Lock protocol must be proven",
-      "alias_lifetime": "ParseScript holds STSSegment* across GetSubtitle and OR mutation; GetNext traverses borrowed pointers",
+      "alias_lifetime": "ParseScript owns STSSegment snapshot across GetSubtitle; ordered members copied into SLA/render list. Animation feedback uses selected segment index through OrSegmentAnimated after successful GetSubtitle. GetNext reads scalar member count; FindNextSegment uses borrowed SearchSubs result only transiently within STS facade.",
       "callback_reentry_and_contract": "POSITION = segment index+1; renderer qsort uses layer/readorder; m_sla.AdvanceToSegment receives same ordered members. Animation is monotone OR at each successful subtitle before later effects.",
-      "required_facade": "segment snapshot + entry snapshots + explicit or_segment_animated after GetSubtitle; preserve index/order/cache behavior",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "required_facade": "Native-backed FindNextSegment/GetSegmentEntryCount/IsSegmentAnimated/SearchSubs2Snapshot/GetEntryEnd/GetEntryLayer/GetEntryReadOrder/GetEntrySnapshot/OrSegmentAnimated now route RTS accesses; canonical native arrays remain in STS.",
+      "evidence_status": "original source assertions remapped and native facade edit source-reviewed; allocation failure, reentry and Windows/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/RTS.cpp:3260-3373",
+        "src/subtitles/RTS.cpp:3470"
+      ],
+      "original_capture_alias_lifetime": "ParseScript holds STSSegment* across GetSubtitle and OR mutation; GetNext traverses borrowed pointers"
     },
     {
       "id": "rts-metadata",
       "locations": [
         "src/subtitles/RTS.cpp:3096-3172",
-        "src/subtitles/RTS.cpp:3577-3580",
-        "src/subtitles/RTS.cpp:3633",
-        "src/subtitles/RTS.cpp:3809-3868",
-        "src/subtitles/RTS.cpp:3470"
+        "src/subtitles/RTS.cpp:3572-3575",
+        "src/subtitles/RTS.cpp:3628",
+        "src/subtitles/RTS.cpp:3804-3863",
+        "src/subtitles/RTS.cpp:3465"
       ],
       "operation_groups": [
         "DOC-10",
@@ -1842,7 +1932,14 @@
       "alias_lifetime": "GetStreamInfo allocates copied name for host; Reload path used through Open/Empty",
       "callback_reentry_and_contract": "Preserve layout_size.cy copied into both native layout axes; simple/lcid initialized-state uncertainty; Reload status and stored path behavior.",
       "required_facade": "metadata copy/get; reload orchestration native; raw UTF-16 name copy",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/RTS.cpp:3096-3172",
+        "src/subtitles/RTS.cpp:3577-3580",
+        "src/subtitles/RTS.cpp:3633",
+        "src/subtitles/RTS.cpp:3809-3868",
+        "src/subtitles/RTS.cpp:3470"
+      ]
     },
     {
       "id": "stream-segment",
@@ -1865,7 +1962,11 @@
       "alias_lifetime": "Helper/document pointer alive under caller pin lifetime; host/base callbacks occur after mutation",
       "callback_reentry_and_contract": "WebVTT retains entries; others clear_entries then CreateSegments/OnChanged then helper base NewSegment, then outer base NewSegment.",
       "required_facade": "clear_entries_only + rebuild; release Rust borrows before virtual/base callbacks",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/SubtitleInputPin.cpp:145-155",
+        "src/subtitles/SubtitleInputPin.cpp:594-608"
+      ]
     },
     {
       "id": "stream-sample",
@@ -1888,7 +1989,11 @@
       "alias_lifetime": "IMediaSample data borrowed during helper call; Add must copy; no retained sample pointer",
       "callback_reentry_and_contract": "Timestamp offset m_tStart; native wcstol readorder, raw style key; duplicate WebVTT behavior. GAB2 can Open entire memory document. InvalidateSubtitle after helper receives under lock.",
       "required_facade": "add owning value/metadata set/open adapter; return before native invalidation callback",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/SubtitleInputPin.cpp:158-283",
+        "src/subtitles/SubtitleInputPin.cpp:615-636"
+      ]
     },
     {
       "id": "stream-connect",
@@ -1912,7 +2017,11 @@
       "alias_lifetime": "helper owns stream and releases on disconnect; codec-private bytes borrowed only during Open",
       "callback_reentry_and_contract": "Text/Subtitle constructors assign metadata/defaults then optional codec-private Open; publication/removal callbacks occur in pin lifecycle.",
       "required_facade": "constructor/metadata/default style operations and memory Open; audit host callback/destruction order",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/SubtitleInputPin.cpp:444-538",
+        "src/subtitles/SubtitleInputPin.cpp:564-591"
+      ]
     },
     {
       "id": "usf",
@@ -1935,7 +2044,10 @@
       "alias_lifetime": "new style pointers handed to AddStyle; text and metadata copied",
       "callback_reentry_and_contract": "USF metadata defaults set before style/text conversion; screen size used for margins.",
       "required_facade": "metadata setters/read; AddStyle native adapter; Add owning records",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/USFSubtitles.cpp:250-384"
+      ]
     },
     {
       "id": "csri",
@@ -1958,7 +2070,11 @@
       "alias_lifetime": "inst owns RTS and lock; close destroys RTS then lock; host instance calls lifetime unknown",
       "callback_reentry_and_contract": "File/memory Open construct/parse before publish; rendering provider paths; public signatures fixed.",
       "required_facade": "opaque document inside existing RTS; no ABI change; review close/render coordination",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/filters/transform/vsfilter/csriapi.cpp:48-122",
+        "src/filters/transform/vsfilter/csriapi.cpp:149-176"
+      ]
     },
     {
       "id": "plugins",
@@ -1982,7 +2098,12 @@
       "alias_lifetime": "native provider refcount/lifetime wraps renderer; Open temporary renderer published on success",
       "callback_reentry_and_contract": "playres and matrix/range read for rendering output; host ABI unchanged.",
       "required_facade": "Open facade, metadata snapshot, provider render snapshots; audit plugin MT/lifetime",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/filters/transform/vsfilter/plugins.cpp:227-230",
+        "src/filters/transform/vsfilter/plugins.cpp:376-391",
+        "src/filters/transform/vsfilter/plugins.cpp:284"
+      ]
     },
     {
       "id": "captions",
@@ -2011,7 +2132,14 @@
       "alias_lifetime": "GetSTS returns mutable document reference; no external call found, reachability unknown; destructor sorts/saves before field destruction",
       "callback_reentry_and_contract": "CreateDefaultStyle; Add with integer-cast timing; destructor IsEmpty/Sort/SaveAs four encodings.",
       "required_facade": "owning add/default operations/sort/export snapshots; preserve GetSTS internal compatibility or route all aliases",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/subtitles/CCDecoder.h:28-48",
+        "src/subtitles/CCDecoder.cpp:31-51",
+        "src/subtitles/CCDecoder.cpp:98",
+        "src/subtitles/CCDecoder.cpp:125",
+        "src/subtitles/VobSubFileRipper.cpp:500"
+      ]
     },
     {
       "id": "DirectVobSubFilter-settings",
@@ -2033,7 +2161,11 @@
       "alias_lifetime": "pRTS dynamic cast within selected stream lifetime; prove retention under other locks",
       "callback_reentry_and_contract": "Sets default style, PAR/scaling fields, reads color metadata/playres; Xy force-default setter present; do not conflate both settings paths.",
       "required_facade": "metadata/default-style bounded operations; preserve native option invalidation",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/filters/transform/vsfilter/DirectVobSubFilter.cpp:1693-1790",
+        "src/filters/transform/vsfilter/DirectVobSubFilter.cpp:1598"
+      ]
     },
     {
       "id": "xy_sub_filter-settings",
@@ -2055,7 +2187,11 @@
       "alias_lifetime": "pRTS dynamic cast within selected stream lifetime; prove retention under other locks",
       "callback_reentry_and_contract": "Sets default style, PAR/scaling fields, reads color metadata/playres; Xy force-default setter present; do not conflate both settings paths.",
       "required_facade": "metadata/default-style bounded operations; preserve native option invalidation",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/filters/transform/vsfilter/xy_sub_filter.cpp:1713-1785",
+        "src/filters/transform/vsfilter/xy_sub_filter.cpp:1605"
+      ]
     },
     {
       "id": "DirectVobSubFilter-style-api",
@@ -2078,7 +2214,11 @@
       "alias_lifetime": "GetCurStyles map pair pointer used in loop; SubStyle.style is caller-owned native STSStyle; never retain pointer",
       "callback_reentry_and_contract": "Count exact match; native ATL order; names >=64 fail after possible earlier output; setters validate all names then sequentially assign nonnull pointers (duplicates possible), OnOptionChanged only if changed.",
       "required_facade": "ordered style copy adapter and sequential updates; release owner borrows before OnOptionChanged",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/filters/transform/vsfilter/DirectVobSubFilter.cpp:2305-2418",
+        "src/filters/transform/vsfilter/IDirectVobSubXy.h:215-219"
+      ]
     },
     {
       "id": "xy_sub_filter-style-api",
@@ -2101,7 +2241,11 @@
       "alias_lifetime": "GetCurStyles map pair pointer used in loop; SubStyle.style is caller-owned native STSStyle; never retain pointer",
       "callback_reentry_and_contract": "Count exact match; native ATL order; names >=64 fail after possible earlier output; setters validate all names then sequentially assign nonnull pointers (duplicates possible), OnOptionChanged only if changed.",
       "required_facade": "ordered style copy adapter and sequential updates; release owner borrows before OnOptionChanged",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/filters/transform/vsfilter/xy_sub_filter.cpp:510-658",
+        "src/filters/transform/vsfilter/IDirectVobSubXy.h:215-219"
+      ]
     },
     {
       "id": "xy-simple",
@@ -2120,7 +2264,37 @@
       "alias_lifetime": "rts pointer dynamic cast under filter lock; document lifetime proof pending",
       "callback_reentry_and_contract": "Calls renderer IsSimple (m_simple), indeterminate on some stream paths.",
       "required_facade": "metadata initialized-state-aware query; no invented parity",
-      "evidence_status": "source-reviewed; native/host validation pending"
+      "evidence_status": "source-reviewed; native/host validation pending",
+      "original_capture_locations": [
+        "src/filters/transform/vsfilter/xy_sub_filter.cpp:576-580"
+      ]
+    },
+    {
+      "id": "native-entry-segment-facade",
+      "locations": [
+        "src/subtitles/STS.h:280-294",
+        "src/subtitles/STS.cpp:3687-3752",
+        "src/subtitles/RTS.cpp:3260-3368",
+        "src/subtitles/RTS.cpp:3465"
+      ],
+      "operation_groups": [
+        "DOC-07",
+        "DOC-08",
+        "DOC-11"
+      ],
+      "access_kind": [
+        "read",
+        "write",
+        "owned-snapshot",
+        "scalar"
+      ],
+      "owner": "Native CSimpleTextSubtitle CAtlArray entries/segments remain authoritative; facade isolates RTS callers only",
+      "host_path": "Existing RTS scheduling/rendering/cache paths for all hosts",
+      "native_lock_context": "No new lock introduced; existing supplied-provider/host locks and unresolved lifetime graph unchanged",
+      "alias_lifetime": "Entry copies and ParseScript segment snapshot own native values. SearchSubs2 borrowed pointer is copied only inside wrapper; FindNextSegment retains no pointer. Scheduling count/animation reads copy scalars. Feedback uses index, not a writable segment loan.",
+      "callback_reentry_and_contract": "RTS native qsort, read order, POSITION/index and reviewed animation-OR point preserved by source edit. No explicit document/host callback found in reviewed ParseScript/GetSubtitle path; this does not prove allocator/reentry or concurrent invalidation behavior. ParseScript segment copying adds allocation, whose failure effects require validation.",
+      "required_facade": "GetEntryCount/GetEntrySnapshot/GetEntryEnd/GetEntryLayer/GetEntryReadOrder/GetEntryEffect/GetSegmentEntryCount/FindNextSegment/SearchSubs2Snapshot/IsSegmentAnimated/OrSegmentAnimated",
+      "evidence_status": "native facade source-reviewed only; Windows compilation/rendering parity and failure/reentry/lifetime validation pending"
     }
   ],
   "minimal_D2a_facade": [
@@ -2152,7 +2326,7 @@
       "id": "REENTRY-01",
       "question": "OnChanged/Deinit, host invalidation, OnOptionChanged and modal UI must execute without Rust loans. Preserve native callback ordering and establish compatible same-thread/cross-thread reentry behavior.",
       "source": [
-        "src/subtitles/STS.cpp:3885",
+        "src/subtitles/STS.cpp:3951",
         "src/subtitles/RTS.cpp:2006-2026",
         "src/subtitles/SubtitleInputPin.cpp:631",
         "src/filters/transform/vsfilter/DirectVobSubFilter.cpp:2413"
@@ -2162,7 +2336,7 @@
       "id": "VIEW-01",
       "question": "Snapshot lifetime across GetSubtitle and style/tag callbacks; segment index may be stale after reentry. Define behavior using reference sequences before choosing generation checks or rejection.",
       "source": [
-        "src/subtitles/RTS.cpp:3329-3373"
+        "src/subtitles/RTS.cpp:3326-3368"
       ]
     },
     {
@@ -2170,8 +2344,8 @@
       "question": "m_simple and m_lcid are not initialized by explicit constructor assignments; do not read/compare indeterminate scalar storage. Candidate deterministic policy needs explicit unresolved-reference accounting. CSize m_layout_size follows native member construction, not an invented document reset.",
       "source": [
         "src/subtitles/STS.cpp:3045-3060",
-        "src/subtitles/RTS.cpp:3819",
-        "src/subtitles/RTS.cpp:3858"
+        "src/subtitles/RTS.cpp:3814",
+        "src/subtitles/RTS.cpp:3853"
       ]
     },
     {
@@ -2187,8 +2361,8 @@
       "question": "Pin toolset/SDK/ATL/static CRT and measure qsort, subtraction edge behavior, llround and recoverable exceptions on Windows x86/x64. Source reading alone cannot fix results.",
       "source": [
         "src/subtitles/STS.cpp:3432-3458",
-        "src/subtitles/STS.cpp:3788-3804",
-        "src/subtitles/RTS.cpp:3316-3321"
+        "src/subtitles/STS.cpp:3854-3870",
+        "src/subtitles/RTS.cpp:3313-3318"
       ]
     },
     {
@@ -2219,7 +2393,8 @@
     }
   ],
   "generated": {
-    "candidate_commit": "e8f02d55825d70347c2088610796675af75a1cbe",
+    "candidate_commit": "eca923ebacdaa71f9fc666ddccafaacf44bcccb0",
+    "capture_scope": "Working-tree source hashes; candidate_commit is capture base HEAD, not a claim that uncommitted source is in that commit.",
     "source_files": [
       {
         "path": "src/decss/VobFile.cpp",
@@ -2427,7 +2602,7 @@
       },
       {
         "path": "src/subtitles/RTS.cpp",
-        "sha256": "5a5bbe632988ac712d10cfc6cc3a0a1879c0d0730e9a747c1dd9f3d1eefbbaa2"
+        "sha256": "39e1997599b7b8483412c727e0e32343bbd6b705c271a4425080a528cb49d9ff"
       },
       {
         "path": "src/subtitles/RTS.h",
@@ -2459,11 +2634,11 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "sha256": "ef601e96fd5e3fa04435215e495c547da7f9de8bbfdc3969ce9d7cad4c6a2516"
+        "sha256": "6105ed6f5e32d3ae5b64ff3f3d333dcffa4f1f787a43711e593be2f5cd6d6df4"
       },
       {
         "path": "src/subtitles/STS.h",
-        "sha256": "ea2bd73a5875d5271292cd03a0741c73b8d20617943bf802102bf6de87a29ff4"
+        "sha256": "21bfe055c2ba1b760b9bc1442cc785203a5bfbf07e8a42a181eccae9984d56ea"
       },
       {
         "path": "src/subtitles/SubtitleInputPin.cpp",
@@ -7120,9 +7295,9 @@
         "path": "src/subtitles/RTS.cpp",
         "line": 2023,
         "tokens": [
-          "m_entries"
+          "GetEntryCount"
         ],
-        "source": "m_subtitleCache.ReleaseMemory(m_entries.GetCount());",
+        "source": "m_subtitleCache.ReleaseMemory(GetEntryCount());",
         "reviewed_scope_ids": [
           "rts-cache"
         ],
@@ -7812,9 +7987,9 @@
         "path": "src/subtitles/RTS.cpp",
         "line": 3137,
         "tokens": [
-          "m_entries"
+          "GetEntryEffect"
         ],
-        "source": "ParseEffect(sub, m_entries.GetAt(entry).effect);",
+        "source": "ParseEffect(sub, GetEntryEffect(entry));",
         "reviewed_scope_ids": [
           "rts-cache",
           "rts-metadata"
@@ -7890,10 +8065,10 @@
         "path": "src/subtitles/RTS.cpp",
         "line": 3190,
         "tokens": [
-          "STSEntry",
-          "m_entries"
+          "GetEntrySnapshot",
+          "STSEntry"
         ],
-        "source": "STSEntry stse = m_entries.GetAt(entry);",
+        "source": "STSEntry stse = GetEntrySnapshot(entry);",
         "reviewed_scope_ids": [
           "rts-cache"
         ],
@@ -7903,12 +8078,12 @@
         "path": "src/subtitles/RTS.cpp",
         "line": 3265,
         "tokens": [
-          "STSSegment",
-          "SearchSubs"
+          "FindNextSegment"
         ],
-        "source": "const STSSegment* stss = SearchSubs(rt, fps, &iSegment, NULL);",
+        "source": "if(!FindNextSegment(rt, fps, &iSegment, NULL)) {",
         "reviewed_scope_ids": [
-          "rts-query-render"
+          "rts-query-render",
+          "native-entry-segment-facade"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
@@ -7916,12 +8091,12 @@
         "path": "src/subtitles/RTS.cpp",
         "line": 3276,
         "tokens": [
-          "GetSegment",
-          "STSSegment"
+          "GetSegmentEntryCount"
         ],
-        "source": "const STSSegment *stss = GetSegment(iSegment);",
+        "source": "bool found = GetSegmentEntryCount(iSegment, count);",
         "reviewed_scope_ids": [
-          "rts-query-render"
+          "rts-query-render",
+          "native-entry-segment-facade"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
@@ -7929,11 +8104,12 @@
         "path": "src/subtitles/RTS.cpp",
         "line": 3279,
         "tokens": [
-          "GetSegment"
+          "GetSegmentEntryCount"
         ],
-        "source": "stss = GetSegment(iSegment);",
+        "source": "found = GetSegmentEntryCount(iSegment, count);",
         "reviewed_scope_ids": [
-          "rts-query-render"
+          "rts-query-render",
+          "native-entry-segment-facade"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
@@ -7945,7 +8121,8 @@
         ],
         "source": "return TranslateSegmentStart((int)pos - 1, fps);",
         "reviewed_scope_ids": [
-          "rts-query-render"
+          "rts-query-render",
+          "native-entry-segment-facade"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
@@ -7957,7 +8134,8 @@
         ],
         "source": "return TranslateSegmentEnd((int)pos - 1, fps);",
         "reviewed_scope_ids": [
-          "rts-query-render"
+          "rts-query-render",
+          "native-entry-segment-facade"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
@@ -7969,7 +8147,8 @@
         ],
         "source": "TranslateSegmentStartEnd(iSegment, fps, tempStart, tempEnd);",
         "reviewed_scope_ids": [
-          "rts-query-render"
+          "rts-query-render",
+          "native-entry-segment-facade"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
@@ -7977,141 +8156,163 @@
         "path": "src/subtitles/RTS.cpp",
         "line": 3307,
         "tokens": [
-          "m_segments"
+          "IsSegmentAnimated"
         ],
-        "source": "if(iSegment<m_segments.GetCount())",
+        "source": "return IsSegmentAnimated(iSegment);",
         "reviewed_scope_ids": [
-          "rts-query-render"
+          "rts-query-render",
+          "native-entry-segment-facade"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/RTS.cpp",
-        "line": 3308,
+        "line": 3325,
         "tokens": [
-          "m_segments"
+          "STSSegment"
         ],
-        "source": "return m_segments[iSegment].animated;",
+        "source": "STSSegment snapshot;",
         "reviewed_scope_ids": [
-          "rts-query-render"
+          "rts-query-render",
+          "native-entry-segment-facade"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/RTS.cpp",
-        "line": 3329,
+        "line": 3326,
         "tokens": [
-          "STSSegment",
-          "SearchSubs2"
+          "SearchSubs2Snapshot"
         ],
-        "source": "STSSegment* stss = SearchSubs2(rt, fps, &segment);",
+        "source": "if(!SearchSubs2Snapshot(rt, fps, snapshot, &segment)) return S_FALSE;",
         "reviewed_scope_ids": [
-          "rts-query-render"
+          "rts-query-render",
+          "native-entry-segment-facade"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/RTS.cpp",
-        "line": 3339,
+        "line": 3335,
         "tokens": [
-          "STSEntry",
-          "m_entries"
+          "GetEntryEnd"
         ],
-        "source": "STSEntry& stse = m_entries.GetAt(key);",
+        "source": "if(GetEntryEnd(key) <= rt)",
         "reviewed_scope_ids": [
-          "rts-query-render"
+          "rts-query-render",
+          "native-entry-segment-facade"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/RTS.cpp",
-        "line": 3355,
+        "line": 3350,
         "tokens": [
-          "m_entries"
+          "GetEntryLayer"
         ],
-        "source": "ls.layer     = m_entries.GetAt(stss->subs[i]).layer;",
+        "source": "ls.layer     = GetEntryLayer(snapshot.subs[i]);",
         "reviewed_scope_ids": [
-          "rts-query-render"
+          "rts-query-render",
+          "native-entry-segment-facade"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/RTS.cpp",
-        "line": 3356,
+        "line": 3351,
         "tokens": [
-          "m_entries"
+          "GetEntryReadOrder"
         ],
-        "source": "ls.readorder = m_entries.GetAt(stss->subs[i]).readorder;",
+        "source": "ls.readorder = GetEntryReadOrder(snapshot.subs[i]);",
         "reviewed_scope_ids": [
-          "rts-query-render"
+          "rts-query-render",
+          "native-entry-segment-facade"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/RTS.cpp",
-        "line": 3357,
+        "line": 3352,
         "tokens": [
           "Add"
         ],
         "source": "subs.Add(ls);",
         "reviewed_scope_ids": [
-          "rts-query-render"
+          "rts-query-render",
+          "native-entry-segment-facade"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/RTS.cpp",
-        "line": 3365,
+        "line": 3360,
         "tokens": [
-          "STSEntry",
-          "m_entries"
+          "GetEntrySnapshot",
+          "STSEntry"
         ],
-        "source": "STSEntry stse = m_entries.GetAt(entry);",
+        "source": "STSEntry stse = GetEntrySnapshot(entry);",
         "reviewed_scope_ids": [
-          "rts-query-render"
+          "rts-query-render",
+          "native-entry-segment-facade"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/RTS.cpp",
-        "line": 3367,
+        "line": 3362,
         "tokens": [
           "TranslateStart"
         ],
         "source": "REFERENCE_TIME start = TranslateStart(entry, fps);",
         "reviewed_scope_ids": [
-          "rts-query-render"
+          "rts-query-render",
+          "native-entry-segment-facade"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/RTS.cpp",
-        "line": 3369,
+        "line": 3364,
         "tokens": [
           "TranslateEnd"
         ],
         "source": "m_delay = (int)RT2MS(TranslateEnd(entry, fps) - start);",
         "reviewed_scope_ids": [
-          "rts-query-render"
+          "rts-query-render",
+          "native-entry-segment-facade"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/RTS.cpp",
-        "line": 3470,
+        "line": 3368,
+        "tokens": [
+          "OrSegmentAnimated"
+        ],
+        "source": "OrSegmentAnimated(segment, s->m_fAnimated2);",
+        "reviewed_scope_ids": [
+          "rts-query-render",
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/RTS.cpp",
+        "line": 3465,
         "tokens": [
           "m_collisions"
         ],
         "source": "r = m_sla.AllocRect(s, segment, entry, stse.layer, m_collisions);",
         "reviewed_scope_ids": [
           "rts-query-render",
-          "rts-metadata"
+          "rts-metadata",
+          "native-entry-segment-facade"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/RTS.cpp",
-        "line": 3547,
+        "line": 3542,
         "tokens": [
           "IsEmpty"
         ],
@@ -8121,7 +8322,7 @@
       },
       {
         "path": "src/subtitles/RTS.cpp",
-        "line": 3577,
+        "line": 3572,
         "tokens": [
           "m_layout_size"
         ],
@@ -8133,7 +8334,7 @@
       },
       {
         "path": "src/subtitles/RTS.cpp",
-        "line": 3578,
+        "line": 3573,
         "tokens": [
           "m_layout_size"
         ],
@@ -8145,7 +8346,7 @@
       },
       {
         "path": "src/subtitles/RTS.cpp",
-        "line": 3579,
+        "line": 3574,
         "tokens": [
           "m_layout_size"
         ],
@@ -8157,7 +8358,7 @@
       },
       {
         "path": "src/subtitles/RTS.cpp",
-        "line": 3633,
+        "line": 3628,
         "tokens": [
           "m_simple"
         ],
@@ -8169,7 +8370,7 @@
       },
       {
         "path": "src/subtitles/RTS.cpp",
-        "line": 3814,
+        "line": 3809,
         "tokens": [
           "m_name"
         ],
@@ -8181,7 +8382,7 @@
       },
       {
         "path": "src/subtitles/RTS.cpp",
-        "line": 3817,
+        "line": 3812,
         "tokens": [
           "m_name"
         ],
@@ -8193,7 +8394,7 @@
       },
       {
         "path": "src/subtitles/RTS.cpp",
-        "line": 3839,
+        "line": 3834,
         "tokens": [
           "m_path"
         ],
@@ -8205,7 +8406,7 @@
       },
       {
         "path": "src/subtitles/RTS.cpp",
-        "line": 3840,
+        "line": 3835,
         "tokens": [
           "IsEmpty",
           "Open",
@@ -8219,7 +8420,7 @@
       },
       {
         "path": "src/subtitles/RTS.cpp",
-        "line": 3858,
+        "line": 3853,
         "tokens": [
           "m_simple"
         ],
@@ -12358,7 +12559,308 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3687,
+        "line": 3689,
+        "tokens": [
+          "CSimpleTextSubtitle",
+          "GetEntryCount"
+        ],
+        "source": "size_t CSimpleTextSubtitle::GetEntryCount() const",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3691,
+        "tokens": [
+          "m_entries"
+        ],
+        "source": "return m_entries.GetCount();",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3694,
+        "tokens": [
+          "CSimpleTextSubtitle",
+          "GetEntrySnapshot",
+          "STSEntry"
+        ],
+        "source": "STSEntry CSimpleTextSubtitle::GetEntrySnapshot(int i) const",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3696,
+        "tokens": [
+          "m_entries"
+        ],
+        "source": "return m_entries.GetAt(i);",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3699,
+        "tokens": [
+          "CSimpleTextSubtitle",
+          "GetEntryEnd"
+        ],
+        "source": "REFERENCE_TIME CSimpleTextSubtitle::GetEntryEnd(int i) const",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3701,
+        "tokens": [
+          "m_entries"
+        ],
+        "source": "return m_entries.GetAt(i).end;",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3704,
+        "tokens": [
+          "CSimpleTextSubtitle",
+          "GetEntryLayer"
+        ],
+        "source": "int CSimpleTextSubtitle::GetEntryLayer(int i) const",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3706,
+        "tokens": [
+          "m_entries"
+        ],
+        "source": "return m_entries.GetAt(i).layer;",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3709,
+        "tokens": [
+          "CSimpleTextSubtitle",
+          "GetEntryReadOrder"
+        ],
+        "source": "int CSimpleTextSubtitle::GetEntryReadOrder(int i) const",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3711,
+        "tokens": [
+          "m_entries"
+        ],
+        "source": "return m_entries.GetAt(i).readorder;",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3714,
+        "tokens": [
+          "CSimpleTextSubtitle",
+          "GetEntryEffect"
+        ],
+        "source": "CString CSimpleTextSubtitle::GetEntryEffect(int i) const",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3716,
+        "tokens": [
+          "m_entries"
+        ],
+        "source": "return m_entries.GetAt(i).effect;",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3719,
+        "tokens": [
+          "CSimpleTextSubtitle",
+          "GetSegmentEntryCount"
+        ],
+        "source": "bool CSimpleTextSubtitle::GetSegmentEntryCount(int iSegment, size_t& count) const",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3721,
+        "tokens": [
+          "m_segments"
+        ],
+        "source": "if(iSegment < 0 || iSegment >= (int)m_segments.GetCount()) return false;",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3722,
+        "tokens": [
+          "m_segments"
+        ],
+        "source": "count = m_segments[iSegment].subs.GetCount();",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3726,
+        "tokens": [
+          "CSimpleTextSubtitle",
+          "FindNextSegment"
+        ],
+        "source": "bool CSimpleTextSubtitle::FindNextSegment(REFERENCE_TIME t, double fps,",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3729,
+        "tokens": [
+          "SearchSubs"
+        ],
+        "source": "return SearchSubs(t, fps, iSegment, nSegments) != NULL;",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3732,
+        "tokens": [
+          "CSimpleTextSubtitle",
+          "SearchSubs2Snapshot"
+        ],
+        "source": "bool CSimpleTextSubtitle::SearchSubs2Snapshot(REFERENCE_TIME t, double fps,",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3733,
+        "tokens": [
+          "STSSegment"
+        ],
+        "source": "STSSegment& snapshot, int* iSegment, int* nSegments)",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3735,
+        "tokens": [
+          "STSSegment",
+          "SearchSubs2"
+        ],
+        "source": "const STSSegment* segment = SearchSubs2(t, fps, iSegment, nSegments);",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3741,
+        "tokens": [
+          "CSimpleTextSubtitle",
+          "IsSegmentAnimated"
+        ],
+        "source": "bool CSimpleTextSubtitle::IsSegmentAnimated(unsigned int iSegment) const",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3743,
+        "tokens": [
+          "m_segments"
+        ],
+        "source": "return iSegment < m_segments.GetCount() ? m_segments[iSegment].animated : false;",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3746,
+        "tokens": [
+          "CSimpleTextSubtitle",
+          "OrSegmentAnimated"
+        ],
+        "source": "void CSimpleTextSubtitle::OrSegmentAnimated(int iSegment, bool animated)",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3750,
+        "tokens": [
+          "m_segments"
+        ],
+        "source": "m_segments.GetAt(iSegment).animated |= animated;",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3753,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetStyle"
@@ -12371,7 +12873,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3690,
+        "line": 3756,
         "tokens": [
           "m_fForcedDefaultStyle"
         ],
@@ -12383,7 +12885,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3692,
+        "line": 3758,
         "tokens": [
           "m_entries",
           "m_styles"
@@ -12396,7 +12898,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3693,
+        "line": 3759,
         "tokens": [
           "m_styles"
         ],
@@ -12408,7 +12910,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3695,
+        "line": 3761,
         "tokens": [
           "m_defaultStyle"
         ],
@@ -12420,7 +12922,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3700,
+        "line": 3766,
         "tokens": [
           "m_defaultStyle"
         ],
@@ -12432,7 +12934,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3707,
+        "line": 3773,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetStyle"
@@ -12445,7 +12947,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3709,
+        "line": 3775,
         "tokens": [
           "GetStyle"
         ],
@@ -12457,7 +12959,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3714,
+        "line": 3780,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetCharSet"
@@ -12470,7 +12972,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3716,
+        "line": 3782,
         "tokens": [
           "GetStyle"
         ],
@@ -12482,7 +12984,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3720,
+        "line": 3786,
         "tokens": [
           "CSimpleTextSubtitle",
           "IsEntryUnicode"
@@ -12495,7 +12997,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3722,
+        "line": 3788,
         "tokens": [
           "m_entries"
         ],
@@ -12507,7 +13009,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3725,
+        "line": 3791,
         "tokens": [
           "CSimpleTextSubtitle",
           "ConvertUnicode"
@@ -12520,7 +13022,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3727,
+        "line": 3793,
         "tokens": [
           "STSEntry",
           "m_entries"
@@ -12533,7 +13035,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3731,
+        "line": 3797,
         "tokens": [
           "GetCharSet"
         ],
@@ -12545,7 +13047,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3741,
+        "line": 3807,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetStrW"
@@ -12558,7 +13060,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3743,
+        "line": 3809,
         "tokens": [
           "STSEntry",
           "m_entries"
@@ -12571,7 +13073,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3744,
+        "line": 3810,
         "tokens": [
           "GetCharSet"
         ],
@@ -12583,7 +13085,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3757,
+        "line": 3823,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetStrWA"
@@ -12596,7 +13098,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3759,
+        "line": 3825,
         "tokens": [
           "STSEntry",
           "m_entries"
@@ -12609,7 +13111,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3760,
+        "line": 3826,
         "tokens": [
           "GetCharSet"
         ],
@@ -12621,7 +13123,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3773,
+        "line": 3839,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetStr"
@@ -12634,7 +13136,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3775,
+        "line": 3841,
         "tokens": [
           "STSEntry",
           "m_entries"
@@ -12647,7 +13149,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3779,
+        "line": 3845,
         "tokens": [
           "GetCharSet"
         ],
@@ -12659,7 +13161,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3780,
+        "line": 3846,
         "tokens": [
           "GetCharSet"
         ],
@@ -12671,7 +13173,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3790,
+        "line": 3856,
         "tokens": [
           "STSEntry"
         ],
@@ -12683,7 +13185,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3791,
+        "line": 3857,
         "tokens": [
           "STSEntry"
         ],
@@ -12695,7 +13197,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3792,
+        "line": 3858,
         "tokens": [
           "STSEntry"
         ],
@@ -12707,7 +13209,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3798,
+        "line": 3864,
         "tokens": [
           "STSEntry"
         ],
@@ -12719,7 +13221,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3801,
+        "line": 3867,
         "tokens": [
           "CSimpleTextSubtitle",
           "Sort"
@@ -12732,7 +13234,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3803,
+        "line": 3869,
         "tokens": [
           "STSEntry",
           "m_entries"
@@ -12745,7 +13247,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3804,
+        "line": 3870,
         "tokens": [
           "CreateSegments"
         ],
@@ -12757,7 +13259,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3812,
+        "line": 3878,
         "tokens": [
           "CSimpleTextSubtitle",
           "CreateSegments"
@@ -12770,7 +13272,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3814,
+        "line": 3880,
         "tokens": [
           "m_segments"
         ],
@@ -12782,7 +13284,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3819,
+        "line": 3885,
         "tokens": [
           "m_entries"
         ],
@@ -12794,7 +13296,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3820,
+        "line": 3886,
         "tokens": [
           "STSEntry",
           "m_entries"
@@ -12807,7 +13309,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3821,
+        "line": 3887,
         "tokens": [
           "Add"
         ],
@@ -12819,7 +13321,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3825,
+        "line": 3891,
         "tokens": [
           "STSSegment"
         ],
@@ -12831,7 +13333,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3827,
+        "line": 3893,
         "tokens": [
           "Add"
         ],
@@ -12843,7 +13345,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3828,
+        "line": 3894,
         "tokens": [
           "Add",
           "m_segments"
@@ -12856,7 +13358,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3832,
+        "line": 3898,
         "tokens": [
           "m_entries"
         ],
@@ -12868,7 +13370,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3835,
+        "line": 3901,
         "tokens": [
           "STSSegment",
           "m_segments"
@@ -12881,7 +13383,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3837,
+        "line": 3903,
         "tokens": [
           "m_entries"
         ],
@@ -12893,7 +13395,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3838,
+        "line": 3904,
         "tokens": [
           "m_entries"
         ],
@@ -12905,7 +13407,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3840,
+        "line": 3906,
         "tokens": [
           "STSEntry",
           "m_entries"
@@ -12918,7 +13420,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3853,
+        "line": 3919,
         "tokens": [
           "Add",
           "STSSegment"
@@ -12931,7 +13433,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3860,
+        "line": 3926,
         "tokens": [
           "m_entries"
         ],
@@ -12943,7 +13445,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3862,
+        "line": 3928,
         "tokens": [
           "STSEntry",
           "m_entries"
@@ -12956,7 +13458,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3878,
+        "line": 3944,
         "tokens": [
           "Add"
         ],
@@ -12968,7 +13470,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3882,
+        "line": 3948,
         "tokens": [
           "Add",
           "m_segments"
@@ -12981,7 +13483,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3885,
+        "line": 3951,
         "tokens": [
           "OnChanged"
         ],
@@ -12993,7 +13495,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3886,
+        "line": 3952,
         "tokens": [
           "m_segments"
         ],
@@ -13005,7 +13507,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3889,
+        "line": 3955,
         "tokens": [
           "CSimpleTextSubtitle",
           "Open"
@@ -13018,7 +13520,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3891,
+        "line": 3957,
         "tokens": [
           "Empty"
         ],
@@ -13030,7 +13532,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3894,
+        "line": 3960,
         "tokens": [
           "Open"
         ],
@@ -13042,7 +13544,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3897,
+        "line": 3963,
         "tokens": [
           "IsEmpty"
         ],
@@ -13054,7 +13556,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3904,
+        "line": 3970,
         "tokens": [
           "Open"
         ],
@@ -13066,7 +13568,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3915,
+        "line": 3981,
         "tokens": [
           "CSimpleTextSubtitle",
           "Open"
@@ -13079,7 +13581,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3917,
+        "line": 3983,
         "tokens": [
           "Empty"
         ],
@@ -13091,7 +13593,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3936,
+        "line": 4002,
         "tokens": [
           "Open"
         ],
@@ -13103,7 +13605,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3939,
+        "line": 4005,
         "tokens": [
           "m_entries"
         ],
@@ -13115,7 +13617,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3946,
+        "line": 4012,
         "tokens": [
           "Empty"
         ],
@@ -13127,7 +13629,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3951,
+        "line": 4017,
         "tokens": [
           "Empty"
         ],
@@ -13139,7 +13641,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3954,
+        "line": 4020,
         "tokens": [
           "Open"
         ],
@@ -13151,7 +13653,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3956,
+        "line": 4022,
         "tokens": [
           "m_name"
         ],
@@ -13163,7 +13665,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3957,
+        "line": 4023,
         "tokens": [
           "m_subtitleType"
         ],
@@ -13175,7 +13677,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3958,
+        "line": 4024,
         "tokens": [
           "m_mode"
         ],
@@ -13187,7 +13689,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3959,
+        "line": 4025,
         "tokens": [
           "m_encoding"
         ],
@@ -13199,7 +13701,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3960,
+        "line": 4026,
         "tokens": [
           "m_path"
         ],
@@ -13211,7 +13713,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3961,
+        "line": 4027,
         "tokens": [
           "m_simple"
         ],
@@ -13223,7 +13725,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3964,
+        "line": 4030,
         "tokens": [
           "Open"
         ],
@@ -13235,7 +13737,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3967,
+        "line": 4033,
         "tokens": [
           "Sort"
         ],
@@ -13247,7 +13749,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3968,
+        "line": 4034,
         "tokens": [
           "CreateSegments"
         ],
@@ -13259,7 +13761,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3970,
+        "line": 4036,
         "tokens": [
           "ChangeUnknownStylesToDefault"
         ],
@@ -13271,7 +13773,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3972,
+        "line": 4038,
         "tokens": [
           "m_dstScreenSize"
         ],
@@ -13283,7 +13785,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3980,
+        "line": 4046,
         "tokens": [
           "CSimpleTextSubtitle",
           "Open"
@@ -13296,7 +13798,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3997,
+        "line": 4063,
         "tokens": [
           "Open"
         ],
@@ -13308,7 +13810,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4004,
+        "line": 4070,
         "tokens": [
           "CSimpleTextSubtitle",
           "SaveAs"
@@ -13321,7 +13823,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4056,
+        "line": 4122,
         "tokens": [
           "m_collisions"
         ],
@@ -13333,7 +13835,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4057,
+        "line": 4123,
         "tokens": [
           "m_fScaledBAS"
         ],
@@ -13345,7 +13847,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4067,
+        "line": 4133,
         "tokens": [
           "m_dstScreenSize"
         ],
@@ -13357,7 +13859,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4074,
+        "line": 4140,
         "tokens": [
           "m_styles"
         ],
@@ -13369,7 +13871,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4079,
+        "line": 4145,
         "tokens": [
           "m_styles"
         ],
@@ -13381,7 +13883,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4121,
+        "line": 4187,
         "tokens": [
           "m_entries"
         ],
@@ -13393,7 +13895,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4140,
+        "line": 4206,
         "tokens": [
           "Sort"
         ],
@@ -13405,7 +13907,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4142,
+        "line": 4208,
         "tokens": [
           "m_entries"
         ],
@@ -13417,7 +13919,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4144,
+        "line": 4210,
         "tokens": [
           "STSEntry",
           "m_entries"
@@ -13430,7 +13932,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4148,
+        "line": 4214,
         "tokens": [
           "TranslateStart"
         ],
@@ -13442,7 +13944,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4151,
+        "line": 4217,
         "tokens": [
           "TranslateEnd"
         ],
@@ -13454,7 +13956,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4163,
+        "line": 4229,
         "tokens": [
           "GetStrW"
         ],
@@ -13466,7 +13968,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4164,
+        "line": 4230,
         "tokens": [
           "GetStrWA"
         ],
@@ -13478,7 +13980,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4212,
+        "line": 4278,
         "tokens": [
           "Sort"
         ],
@@ -13490,7 +13992,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4220,
+        "line": 4286,
         "tokens": [
           "m_styles"
         ],
@@ -13502,7 +14004,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4233,
+        "line": 4299,
         "tokens": [
           "m_dstScreenSize"
         ],
@@ -13514,7 +14016,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4258,
+        "line": 4324,
         "tokens": [
           "CSimpleTextSubtitle",
           "IsEmpty"
@@ -13527,7 +14029,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4260,
+        "line": 4326,
         "tokens": [
           "IsEmpty",
           "m_entries"
@@ -13540,7 +14042,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4263,
+        "line": 4329,
         "tokens": [
           "CSimpleTextSubtitle",
           "RemoveAllEntries"
@@ -13553,7 +14055,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4265,
+        "line": 4331,
         "tokens": [
           "m_entries"
         ],
@@ -14276,7 +14778,141 @@
       },
       {
         "path": "src/subtitles/STS.h",
-        "line": 280,
+        "line": 282,
+        "tokens": [
+          "GetEntryCount"
+        ],
+        "source": "size_t GetEntryCount() const;",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.h",
+        "line": 283,
+        "tokens": [
+          "GetEntrySnapshot",
+          "STSEntry"
+        ],
+        "source": "STSEntry GetEntrySnapshot(int i) const;",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.h",
+        "line": 284,
+        "tokens": [
+          "GetEntryEnd"
+        ],
+        "source": "REFERENCE_TIME GetEntryEnd(int i) const;",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.h",
+        "line": 285,
+        "tokens": [
+          "GetEntryLayer"
+        ],
+        "source": "int GetEntryLayer(int i) const;",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.h",
+        "line": 286,
+        "tokens": [
+          "GetEntryReadOrder"
+        ],
+        "source": "int GetEntryReadOrder(int i) const;",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.h",
+        "line": 287,
+        "tokens": [
+          "GetEntryEffect"
+        ],
+        "source": "CString GetEntryEffect(int i) const;",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.h",
+        "line": 288,
+        "tokens": [
+          "GetSegmentEntryCount"
+        ],
+        "source": "bool GetSegmentEntryCount(int iSegment, size_t& count) const;",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.h",
+        "line": 289,
+        "tokens": [
+          "FindNextSegment"
+        ],
+        "source": "bool FindNextSegment(REFERENCE_TIME t, double fps,",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.h",
+        "line": 291,
+        "tokens": [
+          "STSSegment",
+          "SearchSubs2Snapshot"
+        ],
+        "source": "bool SearchSubs2Snapshot(REFERENCE_TIME t, double fps, STSSegment& snapshot,",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.h",
+        "line": 293,
+        "tokens": [
+          "IsSegmentAnimated"
+        ],
+        "source": "bool IsSegmentAnimated(unsigned int iSegment) const;",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.h",
+        "line": 294,
+        "tokens": [
+          "OrSegmentAnimated"
+        ],
+        "source": "void OrSegmentAnimated(int iSegment, bool animated);",
+        "reviewed_scope_ids": [
+          "native-entry-segment-facade"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.h",
+        "line": 296,
         "tokens": [
           "GetStyle"
         ],
@@ -14286,7 +14922,7 @@
       },
       {
         "path": "src/subtitles/STS.h",
-        "line": 281,
+        "line": 297,
         "tokens": [
           "GetStyle"
         ],
@@ -14296,7 +14932,7 @@
       },
       {
         "path": "src/subtitles/STS.h",
-        "line": 282,
+        "line": 298,
         "tokens": [
           "GetCharSet"
         ],
@@ -14306,7 +14942,7 @@
       },
       {
         "path": "src/subtitles/STS.h",
-        "line": 283,
+        "line": 299,
         "tokens": [
           "IsEntryUnicode"
         ],
@@ -14316,7 +14952,7 @@
       },
       {
         "path": "src/subtitles/STS.h",
-        "line": 284,
+        "line": 300,
         "tokens": [
           "ConvertUnicode"
         ],
@@ -14326,7 +14962,7 @@
       },
       {
         "path": "src/subtitles/STS.h",
-        "line": 286,
+        "line": 302,
         "tokens": [
           "GetStrW"
         ],
@@ -14336,7 +14972,7 @@
       },
       {
         "path": "src/subtitles/STS.h",
-        "line": 287,
+        "line": 303,
         "tokens": [
           "GetStrWA"
         ],
@@ -14346,7 +14982,7 @@
       },
       {
         "path": "src/subtitles/STS.h",
-        "line": 289,
+        "line": 305,
         "tokens": [
           "GetStrW"
         ],
@@ -14356,7 +14992,7 @@
       },
       {
         "path": "src/subtitles/STS.h",
-        "line": 291,
+        "line": 307,
         "tokens": [
           "SetStr"
         ],
@@ -14366,7 +15002,7 @@
       },
       {
         "path": "src/subtitles/STS.h",
-        "line": 293,
+        "line": 309,
         "tokens": [
           "CSimpleTextSubtitle"
         ],
@@ -14376,7 +15012,7 @@
       },
       {
         "path": "src/subtitles/STS.h",
-        "line": 295,
+        "line": 311,
         "tokens": [
           "CopyStyles"
         ],
@@ -20127,6 +20763,6 @@
       }
     ]
   },
-  "inventory_status": "Reviewed operation/caller contracts recorded; lexical candidate list is intentionally overinclusive. Lock/lifetime/reentry and host reachability questions remain explicit D0 handoff items, not resolved safety or parity evidence.",
+  "inventory_status": "Original D0 assertions remapped to current source with a reviewed native caller-isolation scope; native arrays/styles/metadata remain authoritative. Generated candidates include facade method calls. No native parity, lock/lifetime certification or subsystem closure claim.",
   "boundary_design_proposal": "docs/rust-document-boundary.md (source review and unvalidated design; unresolved lifetime/lock/reentry decisions remain)"
 }

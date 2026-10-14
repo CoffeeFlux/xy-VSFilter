@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 FIELDS = 'm_entries m_segments m_styles m_simple m_name m_lcid m_subtitleType m_mode m_encoding m_path m_dstScreenSize m_defaultWrapStyle m_collisions m_fScaledBAS m_layout_size m_fForcedDefaultStyle m_defaultStyle m_ePARCompensationType m_dPARCompensation m_eYCbCrMatrix m_eYCbCrRange'.split()
-METHODS = 'Copy CopyStyles Empty IsEmpty Sort RemoveAllEntries CreateSegments Open SaveAs Add AddSTSEntryOnly CreateDefaultStyle ChangeUnknownStylesToDefault AddStyle SetDefaultStyle GetDefaultStyle SetForceDefaultStyle ConvertToTimeBased ConvertToFrameBased TranslateStart TranslateEnd SearchSub TranslateSegmentStart TranslateSegmentEnd TranslateSegmentStartEnd SearchSubs SearchSubs2 GetSegment GetStyle GetCharSet IsEntryUnicode ConvertUnicode GetStrW GetStrWA SetStr OnChanged'.split()
+METHODS = 'Copy CopyStyles Empty IsEmpty Sort RemoveAllEntries CreateSegments Open SaveAs Add AddSTSEntryOnly CreateDefaultStyle ChangeUnknownStylesToDefault AddStyle SetDefaultStyle GetDefaultStyle SetForceDefaultStyle ConvertToTimeBased ConvertToFrameBased TranslateStart TranslateEnd SearchSub TranslateSegmentStart TranslateSegmentEnd TranslateSegmentStartEnd SearchSubs SearchSubs2 GetSegment GetStyle GetCharSet IsEntryUnicode ConvertUnicode GetStrW GetStrWA SetStr OnChanged GetEntryCount GetEntrySnapshot GetEntryEnd GetEntryLayer GetEntryReadOrder GetEntryEffect GetSegmentEntryCount FindNextSegment SearchSubs2Snapshot IsSegmentAnimated OrSegmentAnimated'.split()
 PATTERN = re.compile(r'\b(' + '|'.join(FIELDS + METHODS + ['CSimpleTextSubtitle', 'STSEntry', 'STSSegment']) + r')\b')
 
 def scan(reviewed):
@@ -53,7 +53,7 @@ def main():
     target = ROOT / 'docs/rust-document-inventory.json'
     data = json.loads(target.read_text())
     files, records = scan(data['reviewed_accesses'])
-    generated = {'candidate_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(), 'source_files': files, 'candidates': records}
+    generated = {'candidate_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(), 'capture_scope': 'Working-tree source hashes; candidate_commit is capture base HEAD, not a claim that uncommitted source is in that commit.', 'source_files': files, 'candidates': records}
     if args.check:
         if any(data['generated'][key] != generated[key] for key in ('source_files', 'candidates')):
             raise SystemExit('Document lexical inventory is stale; regenerate and review changed source.')

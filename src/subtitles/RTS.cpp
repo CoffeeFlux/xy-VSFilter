@@ -2004,7 +2004,7 @@ void CRenderedTextSubtitle::OnChanged()
         m_subtitleCache.SetAt(i, NULL);
     }
     m_subtitleCacheEntry.RemoveAll();
-    m_subtitleCache.ReleaseMemory(m_entries.GetCount());
+    m_subtitleCache.ReleaseMemory(GetEntryCount());
 
     m_sla.Empty();
 }
@@ -3118,7 +3118,7 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
     m_kend                  = 0;
     m_nPolygon              = 0;
     m_polygonBaselineOffset = 0;
-    ParseEffect(sub, m_entries.GetAt(entry).effect);
+    ParseEffect(sub, GetEntryEffect(entry));
     while(!str.IsEmpty())
     {
         bool fParsed = false;
@@ -3171,7 +3171,7 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
     if(sub->m_effects[EF_ORG] && (sub->m_effects[EF_MOVE] || sub->m_effects[EF_BANNER] || sub->m_effects[EF_SCROLL]))
         sub->m_fAnimated = true;
     sub->m_scrAlignment = abs(sub->m_scrAlignment);
-    STSEntry stse = m_entries.GetAt(entry);
+    STSEntry stse = GetEntrySnapshot(entry);
     CRect marginRect = stse.marginRect;
     if(marginRect.left   == 0) marginRect.left   = orgstss.marginRect.get().left;
     if(marginRect.top    == 0) marginRect.top    = orgstss.marginRect.get().top;
@@ -3246,8 +3246,7 @@ STDMETHODIMP_(POSITION) CRenderedTextSubtitle::GetStartPosition(REFERENCE_TIME r
     m_fps = fps;
 
     int iSegment;
-    const STSSegment* stss = SearchSubs(rt, fps, &iSegment, NULL);
-    if(stss==NULL) {
+    if(!FindNextSegment(rt, fps, &iSegment, NULL)) {
         TRACE_PARSER("No subtitle at "<<XY_LOG_VAR_2_STR(RT2MS(rt)));
         return NULL;
     }
@@ -3257,12 +3256,13 @@ STDMETHODIMP_(POSITION) CRenderedTextSubtitle::GetStartPosition(REFERENCE_TIME r
 STDMETHODIMP_(POSITION) CRenderedTextSubtitle::GetNext(POSITION pos)
 {
     int iSegment = (int)pos;
-    const STSSegment *stss = GetSegment(iSegment);
-    while(stss && stss->subs.GetCount() == 0) {
+    size_t count;
+    bool found = GetSegmentEntryCount(iSegment, count);
+    while(found && count == 0) {
         iSegment++;
-        stss = GetSegment(iSegment);
+        found = GetSegmentEntryCount(iSegment, count);
     }
-    return(stss ? (POSITION)(iSegment+1) : NULL);
+    return(found ? (POSITION)(iSegment+1) : NULL);
 }
 
 STDMETHODIMP_(REFERENCE_TIME) CRenderedTextSubtitle::GetStart(POSITION pos, double fps)
@@ -3288,10 +3288,7 @@ STDMETHODIMP_(VOID) CRenderedTextSubtitle::GetStartStop(POSITION pos, double fps
 STDMETHODIMP_(bool) CRenderedTextSubtitle::IsAnimated(POSITION pos)
 {
     unsigned int iSegment = (int)pos-1;
-    if(iSegment<m_segments.GetCount())
-        return m_segments[iSegment].animated;
-    else
-        return false;
+    return IsSegmentAnimated(iSegment);
     //return(true);
 }
 
@@ -3309,9 +3306,8 @@ HRESULT CRenderedTextSubtitle::ParseScript(REFERENCE_TIME rt, double fps, CSubti
     TRACE_RENDERER_REQUEST("Begin search subtitle segment");
     //fix me: check input and log error
     int segment;
-    //const
-    STSSegment* stss = SearchSubs2(rt, fps, &segment);
-    if(!stss) return S_FALSE;
+    STSSegment snapshot;
+    if(!SearchSubs2Snapshot(rt, fps, snapshot, &segment)) return S_FALSE;
     // clear any cached subs that has been passed
     {
         TRACE_RENDERER_REQUEST("Begin clear parsed subtitle cache. m_subtitleCache.size:"<<m_subtitleCacheEntry.GetCount());
@@ -3320,8 +3316,7 @@ HRESULT CRenderedTextSubtitle::ParseScript(REFERENCE_TIME rt, double fps, CSubti
         {
             POSITION pos_old = pos;
             int key = m_subtitleCacheEntry.GetNext(pos);
-            STSEntry& stse = m_entries.GetAt(key);
-            if(stse.end <= rt)
+            if(GetEntryEnd(key) <= rt)
             {
                 delete m_subtitleCache.GetAt(key);
                 m_subtitleCache.SetAt(key, NULL);
@@ -3329,15 +3324,15 @@ HRESULT CRenderedTextSubtitle::ParseScript(REFERENCE_TIME rt, double fps, CSubti
             }
         }
     }
-    m_sla.AdvanceToSegment(segment, stss->subs);
-    TRACE_RENDERER_REQUEST("Begin copy LSub. subs.size:"<<stss->subs.GetCount());
+    m_sla.AdvanceToSegment(segment, snapshot.subs);
+    TRACE_RENDERER_REQUEST("Begin copy LSub. subs.size:"<<snapshot.subs.GetCount());
     CAtlArray<LSub> subs;
-    for(int i = 0, j = stss->subs.GetCount(); i < j; i++)
+    for(int i = 0, j = snapshot.subs.GetCount(); i < j; i++)
     {
         LSub ls;
-        ls.idx       = stss->subs[i];
-        ls.layer     = m_entries.GetAt(stss->subs[i]).layer;
-        ls.readorder = m_entries.GetAt(stss->subs[i]).readorder;
+        ls.idx       = snapshot.subs[i];
+        ls.layer     = GetEntryLayer(snapshot.subs[i]);
+        ls.readorder = GetEntryReadOrder(snapshot.subs[i]);
         subs.Add(ls);
     }
     TRACE_RENDERER_REQUEST("Begin sort LSub.");
@@ -3346,7 +3341,7 @@ HRESULT CRenderedTextSubtitle::ParseScript(REFERENCE_TIME rt, double fps, CSubti
     for(int i = 0, j = subs.GetCount(); i < j; i++)
     {
         int entry = subs[i].idx;
-        STSEntry stse = m_entries.GetAt(entry);
+        STSEntry stse = GetEntrySnapshot(entry);
         {
             REFERENCE_TIME start = TranslateStart(entry, fps);
             m_time = (int)RT2MS(rt - start);
@@ -3354,7 +3349,7 @@ HRESULT CRenderedTextSubtitle::ParseScript(REFERENCE_TIME rt, double fps, CSubti
         }
         CSubtitle* s = GetSubtitle(entry);
         if(!s) continue;
-        stss->animated |= s->m_fAnimated2;
+        OrSegmentAnimated(segment, s->m_fAnimated2);
         CRect clipRect  = s->m_clip & CRect(0,0, (m_size.cx>>3), (m_size.cy>>3));
         CRect r         = s->m_rect;
         CSize spaceNeeded = r.Size();

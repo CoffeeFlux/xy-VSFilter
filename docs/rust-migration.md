@@ -376,6 +376,31 @@ later unrelated check fails. Superseded documentation-only runs `38608195241`
 and `38610117782` were cancelled after confirming their code matched the
 already-passing `19032c76` baseline; cancellations are not validation passes.
 
+At `eca923eb`, run `38614673476` passes the prepared-owner comparison,
+Windows primitive probe and complete Python harness suite on both Windows x86
+and x64; Miri also passes. This confirms the controlled-dialog OK/Cancel fix in
+both architectures. The longer campaigns remain running at this evidence capture,
+so this is not a full-matrix pass.
+
+[Verified primitive observations](rust-document-primitives-evidence.json) retain
+both architectures' exact source, generated-header, binary and repeated-trace
+hashes, toolchain/header/library provenance and focused CI status. Each trace has
+53,438 lines. The 37 map histories, 35,484 document sorts, 17,742 renderer sorts,
+162 bounded conversion observations and eight direct rounding cases match across
+architectures. Header/library hashes are reported provenance; retained sources,
+generated header, binary and stdout/stderr were independently rehashed locally.
+The build uses MSVC 14.44.35207 and SDK 10.0.26100.0; this is still an observed,
+unfrozen environment rather than a selected historical release baseline.
+
+Native CString compares stored `A\0B` equal to `A`, and even two equal-key
+records swap under the observed CRT sort. A stable Rust sort or full-vector
+style-name equality would therefore change measured behavior. The current core
+rename contract still excludes embedded-NUL names; the probe is evidence for
+extending that contract, not a completed string/map/sorting port. All-key
+permutations through seven entries do not establish the CRT algorithm for larger
+arrays. Invalid floating inputs, comparator overflow and allocation failure
+remain outside these reference observations.
+
 The prior RLE fixture failure remains an integration gate pending CI. A focused
 correction makes owner snapshots use exact allocation-base identity, and avoids
 inventing offset observations for zero-byte copies at adjacent-region boundaries.
@@ -385,6 +410,50 @@ fatal native ASan/UBSan builds. [Focused evidence](rle-fixture-address-evidence.
 records this fixture-only change; it does not establish that the original CI
 failure is resolved or that the full matrix passes. Production RLE code is
 unchanged.
+
+### Next D2a increment: mutation handoffs and renderer access
+
+The safe owner adds prepared text replacement (retaining the Unicode flag for
+SetStr, optionally changing it for ConvertUnicode), validated entry permutations
+that move payloads without cloning, and bulk already-converted time pairs. Text
+edits retain segments and animation; reorder/time commits rebuild them. Invalid
+indexes/permutations/counts refuse without changing the owner. These handoffs
+retain native preparation, CRT decisions, mode guards and callback/error
+orchestration; they are not full safe ports of sorting or numeric conversion.
+
+[Local mutation evidence](rust-document-mutations-local-evidence.json) records
+142 sequences, 1,989 mutation/control operations and 95,472 TIME queries:
+97,461 full snapshots match, with two repeatable native captures, native replay
+and direct original-versus-Rust comparison. Twenty-seven full native Sort/frame
+conversion controls supply only permutations, rounded scalar pairs or no-op
+markers to Rust; expected entry payloads and segments are not fed to it.
+Histories include 32-entry equal/mixed-key sorts, positive/negative half rounding,
+negative-FPS reversed endpoints, repeated no-op conversions, raw prepared text
+edits, copy/restore, animation reset and later insertion. The portable record
+shell is trivially copyable for defined qsort relocation and remains an explicit
+approximation of ATL layout. Native ASan/UBSan, changed-content/length controls,
+159 core and 110 FFI tests, Clippy and formatting pass. The Python suite passes
+49 tests with four Windows skips. This evidence is exact-source working-tree
+validation, not exact-commit Windows validation of this increment.
+
+The [facade contract](rust-document-facade.md) now has its first native-backed
+consumer implementation. RTS no longer directly reads entry/segment arrays or
+retains borrowed segment search results. It uses value/scalar operations and
+explicit indexed animation feedback. Scheduling avoids allocating snapshots;
+ParseScript copies selected members and reports animation after GetSubtitle at
+the original point. Storage is still native, and no Rust boundary was added.
+The inventory records updated exact source locations with original capture
+provenance retained. Windows build/render validation is pending for this cut;
+new snapshot allocation-failure behavior and exceptional reentry remain open.
+
+The Windows primitive runner now also builds an actual-ATL facade probe in its
+`facade/` artifact directory. It extracts the current record/segment declarations
+and facade methods, compares native search results to pinned search bodies, and
+checks copied values, untouched absent outputs, scalar scheduling and animation
+OR. Member/string snapshots are mutated and retained across document mutation to
+check independence. Local generation passes; native compilation/execution and
+integrated DLL parity remain required. The small shell does not execute the
+full renderer, allocation failures or concurrent/reentrant mutation.
 
 ## Independent audit and unsafe boundary
 

@@ -35,4 +35,23 @@ class HarnessFailures(unittest.TestCase):
         with self.assertRaises(subprocess.TimeoutExpired):
             document_check.run([sys.executable,'-c','import time; time.sleep(10)'],timeout=0.05)
 
+class NativeControlReplayChecks(unittest.TestCase):
+    def test_control_stream_accepts_only_permutations_times_and_native_noops(self):
+        original='S 0\nV 1 25\nV 1 25\nE 0 31 -1\n'
+        replay='O 3 2 0 1\nT 3 -1 0 0 1 1 2\nP\nE 0 31 -1\n'
+        document_check.validate_replay(original,replay)
+        changed=[
+            replay.replace('O 3 2 0 1','O 3 2 0 0'),
+            replay.replace('O 3 2 0 1','O 2 2 0 1'),
+            replay.replace('O 3 2 0 1','T 0'),
+            replay.replace('T 3 -1 0 0 1 1 2','T 2 -1 0'),
+            replay.replace('T 3 -1 0 0 1 1 2','T 1 0 9223372036854775808'),
+            replay.replace('T 3 -1 0 0 1 1 2','T 4097'),
+            replay.replace('E 0 31 -1','E 0 32 -1'),
+            replay+'P\n',
+        ]
+        for mutated in changed:
+            with self.subTest(mutated=mutated),self.assertRaises(RuntimeError):
+                document_check.validate_replay(original,mutated)
+
 if __name__=='__main__':unittest.main()

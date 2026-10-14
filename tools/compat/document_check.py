@@ -3,7 +3,8 @@
 
 Runs pinned native method bodies/tails against a safe Rust owner without C ABI.
 This deliberately bypasses text/style/WebVTT preparation, styles/metadata owners,
-allocation failures, host callbacks/reentry, ordering/conversion and rendering.
+allocation failures, host callbacks/reentry and rendering. Sorting/rounding stay
+native; their generated permutations/time pairs exercise safe ownership handoffs.
 Windows x86/x64 ATL/host integration and exact pixels remain required.
 """
 import argparse
@@ -55,6 +56,9 @@ public:
  void AddPrepared(STSEntry sub);void EntryOnly(STSEntry sub);void CreateSegments();
  void RemoveAllEntries();void ClearPrepared();void CorrectLast(REFERENCE_TIME bound);
  void Feedback(size_t index,bool value);
+ void Sort(bool fRestoreReadorder);void ConvertToTimeBased(double fps);void ConvertToFrameBased(double fps);
+ void SetPrepared(int i,const std::vector<uint16_t>& str,int flag);
+ void ReplayOrder(const std::vector<size_t>& order);void ReplayTimes(const std::vector<std::pair<REFERENCE_TIME,REFERENCE_TIME>>& times);
  void RenamePrepared(const std::vector<uint16_t>& name,const std::vector<uint16_t>& name3);
 };''', method(source,'static bool SegmentCompStart(')]
     add = method(source,'void CSimpleTextSubtitle::Add(')
@@ -81,14 +85,38 @@ public:
     feedback = 'stss->animated |= s->m_fAnimated2;'
     if feedback not in raw['src/subtitles/RTS.cpp'].decode('utf-8-sig'): raise RuntimeError('feedback seam changed')
     parts += ['void OriginalDocument::Feedback(size_t index,bool value){auto* stss=&m_segments.at(index);struct Animation {bool m_fAnimated2;} animation{value};auto* s=&animation;'+feedback+'}']
+    for signature in ['template <typename T> int SGN', 'static int comp1(', 'static int comp2(',
+                      'void CSimpleTextSubtitle::Sort(', 'void CSimpleTextSubtitle::ConvertToTimeBased(',
+                      'void CSimpleTextSubtitle::ConvertToFrameBased(']:
+        parts += [method(source,signature).replace('CSimpleTextSubtitle::','OriginalDocument::')]
+    setstr=method(source,'void CSimpleTextSubtitle::SetStr(')
+    assignment='stse.str = str;'
+    if assignment not in setstr:raise RuntimeError('prepared SetStr assignment seam changed')
+    convert=method(source,'void CSimpleTextSubtitle::ConvertUnicode(')
+    flag_assignment='stse.fUnicode = fUnicode;'
+    if flag_assignment not in convert:raise RuntimeError('ConvertUnicode flag seam changed')
+    parts += ['void OriginalDocument::SetPrepared(int i,const std::vector<uint16_t>& str,int flag){STSEntry& stse=m_entries.GetAt(i);'+assignment+'if(flag>=0){bool fUnicode=flag!=0;'+flag_assignment+'}}']
+    # Bounded value handoff around native-selected ordering. This is not a
+    # replacement reference ordering algorithm; full native Sort runs separately.
+    sort_body=method(source,'void CSimpleTextSubtitle::Sort(')
+    rebuild=sort_body[sort_body.index('    CreateSegments();'):]
+    parts += ['void OriginalDocument::ReplayOrder(const std::vector<size_t>& order){if(order.size()!=m_entries.GetCount())throw std::runtime_error("order count");std::vector<bool> seen(order.size(),false);for(auto i:order){if(i>=order.size()||seen[i])throw std::runtime_error("order bijection");seen[i]=true;}auto before=m_entries;m_entries.RemoveAll();for(auto i:order)m_entries.Add(before[i]);\n'+rebuild]
+    timebody=method(source,'void CSimpleTextSubtitle::ConvertToTimeBased(')
+    loop=method(timebody,'for(int i = 0, j = m_entries.GetCount();')
+    loop=loop.replace('std::llround(stse.start * UNITS_FLOAT / fps)','times[i].first').replace('std::llround(stse.end * UNITS_FLOAT / fps)','times[i].second')
+    if 'llround' in loop:raise RuntimeError('time assignment extraction seam changed')
+    parts += ['void OriginalDocument::ReplayTimes(const std::vector<std::pair<REFERENCE_TIME,REFERENCE_TIME>>& times){if(times.size()!=m_entries.GetCount())throw std::runtime_error("time count");'+loop+'\n'+rebuild]
     generated = '\n'.join(parts)
     (destination/'original_document.h').write_text(generated,newline='')
     return {'reference_commit':REFERENCE,'reference_sources':{p:hashlib.sha256(b).hexdigest() for p,b in raw.items()},
             'extracted_header_sha256':hashlib.sha256(generated.encode()).hexdigest(),
             'seams':['Add suffix from readorder assignment (initialized prepared record)', 'AddSTSEntryOnly suffix from readorder assignment',
                      'CreateSegments and RemoveAllEntries complete bodies','Empty entries/segments tail only',
-                     'MicroDVD end correction with precomputed MS2RT bound','AddStyle entry rename loop only','RTS renderer animation OR assignment','SearchSub/SearchSubs/SearchSubs2 and native translation bodies, TIME mode only'],
-            'storage_shell':'portable std::vector/value approximation, including on Windows; not ATL/host parity'}
+                     'MicroDVD end correction with precomputed MS2RT bound','AddStyle entry rename loop only','RTS renderer animation OR assignment','SearchSub/SearchSubs/SearchSubs2 and native translation bodies, query wrapper temporarily fixes TIME even after native conversion metadata becomes FRAME'],
+            'storage_shell':'portable std::vector arrays plus immutable trivially-copyable raw-unit handles, including on Windows; not CString/ATL layout or allocation parity',
+            'native_retained_controls':'full extracted platform qsort Sort and llround conversion methods choose permutations/time pairs; Rust replays bounded handoffs, not CRT algorithms',
+            'adapter_constants':{'UNITS':10000000,'UNITS_FLOAT':10000000.0},
+            'additional_seams':['SetStr prepared assignment and optional ConvertUnicode flag assignment; native preparation/conversion bypassed','Sort full body controls plus permutation-copy/rebuild adapter','ConvertToTimeBased/ConvertToFrameBased full bodies select native rounded values; replay assignment loop substitutes supplied time pairs, then rebuilds']}
 
 def corpus():
     sequences=[]
@@ -115,6 +143,30 @@ def corpus():
         ['C','A 0 1 -9223372036854775808 -9223372036854775807 -1',
          'A 0 2 9223372036854775806 9223372036854775807 0','R','L 0','R','C'],
     ]
+    # Native-selected permutations/time values become owner handoff inputs.
+    # Equal comparator keys intentionally exercise the platform's unstable qsort.
+    sequences += [
+        ['C']+[f'A 1 {i+1} 0 100 0 0' for i in range(7)]+
+            ['R','F 0 1','K','E 0 31 -1','E 3 0 0','S 0','E 6 32 1','S 1','B','S 1','C'],
+        ['C','A 1 1 7 12 9 0','A 1 2 0 4 1 0','A 1 3 7 10 0 0',
+         'R','F 0 1','S 0','A 0 4 2 8 1','E 1 0 -1','S 1','K','D','O 0','B','C'],
+        ['C','A 1 1 -10000001 10000001 0','A 1 2 1 3 9','R','F 0 1',
+         'V 0 25','V 1 25','V 1 25','K','E 0 42 0','V 0 25','V 0 25','B','V 1 29.97','V 0 29.97','C'],
+        ['C','A 1 1 1000000 3000000 0','A 1 2 -3000000 -1000000 0','R','V 1 -60','V 0 -60','C'],
+        ['C','A 1 1 200000 600000 0','A 1 2 -600000 -200000 0','R','V 1 25','V 0 25','C'],
+        ['C','O 0','T 0','V 1 25','V 1 25','V 0 25','C'],
+        ['C','A 0 1 0 10 0','F 0 1','K','T 1 3 3','E 0 0 -1','T 1 8 2','B','C'],
+    ]
+    # Larger bounded handoffs exercise native qsort partition paths without
+    # importing its ordering into Rust or multiplying the smaller corpus.
+    sequences += [
+        ['C']+[f'A 1 {i+1} 0 100 0 0' for i in range(32)]+
+            ['R','F 0 1','K','S 0','F 0 1','S 1','E 15 73 -1',
+             'A 0 40 25 75 0 0','S 0','B','S 1','C'],
+        ['C']+[f'A 1 {i+1} {i%4} {100+i%5} {i%3} {i%2}' for i in range(32)]+
+            ['R','F 0 1','K','S 0','F 0 1','S 1','E 17 74 0',
+             'A 0 41 2 80 1 0','S 0','B','S 1','C'],
+    ]
     # Observe seeks against each persistent mutation, including stale segments.
     expanded=[]
     for sequence in sequences:
@@ -125,6 +177,25 @@ def corpus():
                 for mode in range(3):history.append(f'Q {mode} {time}')
         expanded.append(history)
     return expanded
+
+def validate_replay(original, replay):
+    source_lines,replay_lines=original.splitlines(),replay.splitlines()
+    if len(source_lines)!=len(replay_lines):raise RuntimeError('native replay line count mismatch')
+    for original_line,replay_line in zip(source_lines,replay_lines):
+        before,after=original_line.split(),replay_line.split()
+        if before[0]=='S':
+            if not after or after[0]!='O':raise RuntimeError('Sort replay must be permutation')
+            count=int(after[1]);order=list(map(int,after[2:]))
+            if not 0<=count<=4096:raise RuntimeError('native replay exceeds bounded record count')
+            if count!=len(order) or sorted(order)!=list(range(count)):raise RuntimeError('invalid native replay permutation')
+        elif before[0]=='V':
+            if after==['P']:continue
+            if not after or after[0]!='T':raise RuntimeError('conversion replay must be times or no-op')
+            count=int(after[1]);times=list(map(int,after[2:]))
+            if not 0<=count<=4096:raise RuntimeError('native replay exceeds bounded record count')
+            if len(times)!=2*count or any(x<-(1<<63) or x>=(1<<63) for x in times):raise RuntimeError('invalid native replay times')
+        elif original_line!=replay_line:
+            raise RuntimeError('native replay changed uncontrolled operation')
 
 def compare(a,b):
     left,right=a.splitlines(),b.splitlines()
@@ -167,11 +238,20 @@ def main():
         run(cargo_command)
         seq=corpus();ops=[op for s in seq for op in s];data='\n'.join(ops)+'\n'
         (args.output/'operations.txt').write_text(data,newline='')
-        reference=run([str(native_binary)],input=data)
-        repeat=run([str(native_binary)],input=data)
+        replay_path=args.output/'replay-operations.txt'
+        repeat_replay_path=args.output/'repeat-replay-operations.txt'
+        reference=run([str(native_binary),'--replay-output',str(replay_path.resolve())],input=data)
+        repeat=run([str(native_binary),'--replay-output',str(repeat_replay_path.resolve())],input=data)
         compare(reference.stdout,repeat.stdout)
+        if replay_path.read_bytes()!=repeat_replay_path.read_bytes():raise RuntimeError('unstable native control replay')
         if reference.stderr!=repeat.stderr:raise RuntimeError('unstable callback counts')
-        candidate=run([str(candidate_binary)],input=data)
+        replay_data=replay_path.read_text()
+        validate_replay(data,replay_data)
+        replay_reference=run([str(native_binary)],input=replay_data)
+        compare(reference.stdout,replay_reference.stdout)
+        if reference.stderr!=replay_reference.stderr:raise RuntimeError('replay callback counts differ')
+        candidate=run([str(candidate_binary)],input=replay_data)
+        # Compare directly against full native S/V methods, not just adapter replay.
         compare(reference.stdout,candidate.stdout)
         negative_controls={}
         lines=reference.stdout.splitlines()
@@ -188,6 +268,12 @@ def main():
                       mutations_and_control_ops=sum(not op.startswith('Q ') for op in ops),negative_mismatch_control=negative,
                       native_binary_sha256=hashlib.sha256(native_binary.read_bytes()).hexdigest(),
                       candidate_binary_sha256=hashlib.sha256(candidate_binary.read_bytes()).hexdigest(),
+                      native_replay_equal=True,native_control_replay_repeat_equal=True,
+                      replay_operations_sha256=hashlib.sha256(replay_path.read_bytes()).hexdigest(),
+                      native_control_operations=sum(op.startswith(('S ','V ')) for op in ops),
+                      control_handoffs=[{'operation_index':i,'native_operation':original,'replay_operation':replayed}
+                                        for i,(original,replayed) in enumerate(zip(ops,replay_data.splitlines()))
+                                        if original.startswith(('S ','V '))],
                       cargo_build_command=cargo_command,rust_target=args.target or 'toolchain host',
                       native_sanitizers=sanitizers,negative_controls=negative_controls,
                       platform=platform.platform(),machine=platform.machine(),subprocess_timeout_seconds=60,
@@ -207,7 +293,9 @@ def main():
                               'rename loop only on NUL-free style names: native style-map ordering/duplicate naming and embedded-NUL comparison excluded',
                               'callback counts observed only; reentry, callbacks copying full host state excluded',
                               'queries use integer TIME mode only, no frame/FPS conversion claim',
-                              'no allocation failures, sorting/conversion, native integration or rendering'])
+                              'replay transport is bounded to 4096 records per control operation',
+                              'native qsort/llround retained: only ordering/time handoffs are Rust-owned; portable value shells approximate CString/ATL storage and layout',
+                              'no allocation failures, production native integration or rendering'])
         (args.output/'report.json').write_text(json.dumps(report,indent=2)+'\n')
         print(f'{len(seq)} document sequences / {len(ops)} complete state comparisons passed; negative mismatch control passed')
 if __name__=='__main__':main()
