@@ -935,6 +935,44 @@ static void sort_lifecycle() {
     }
     doc.expected=NULL;
 }
+static void base_empty_lifecycle() {
+    TraceDocument doc(0);
+    const wchar_t rawName[]={L'E',0,0xd800,L'N'},rawPath[]={L'P',0,0xdcff,L'X'};
+    doc.Name(CString(rawName,4));doc.Path(CString(rawPath,4));doc.Screen(CSize(123,456));
+    doc.Wrap(-1);doc.Collisions(1);doc.Scaled(true);doc.SetForceDefaultStyle(true);doc.PAR(1.75);
+    STSStyle defaultValue;defaultValue.fontName=CString(rawName,4);defaultValue.fontSize=-0.0;
+    check(doc.SetDefaultStyle(defaultValue),"Empty fixture default set");
+    const CString name=doc.Name(),path=doc.Path();const MetadataValue metadata=doc.Metadata();
+    const int mode=doc.Mode(),wrap=doc.Wrap(),collisions=doc.Collisions();const exttype type=doc.Type();
+    const CTextFile::enc encoding=doc.Encoding();const bool scaled=doc.Scaled(),simple=doc.m_simple;
+    const LCID lcid=doc.m_lcid;const CSize layout=doc.m_layout_size;
+    named_add(doc,L"EmptyA",named_value(1));named_add(doc,L"EmptyB",named_value(2));
+    for(int i=0;i<3;++i){const wchar_t payload[]={wchar_t(L'A'+i),0,wchar_t(0xd800+i),L'Z'};
+        doc.AddSTSEntryOnly(CStringW(payload,4),true,i*10,i*10+20,CString(i%2?L"EmptyB":L"EmptyA"));}
+    doc.CreateSegments();doc.Animate(0);
+    doc.AddSTSEntryOnly(CStringW(rawPath,4),true,60,70,CString(L"EmptyB")); // valid stale animated segments
+    check(doc.Segment(0).animated&&doc.Entries()==4,"Empty fixture stale animated state");
+    printf("empty-stage empty-populated\n");doc.Dump("empty-populated");
+    const unsigned notifications=change_events[0],empties=empty_events[0];
+    auto cleared=[&](const char* stage){
+        check(doc.Entries()==0&&doc.Segments()==0&&doc.NamedCount()==0&&doc.Screen()==CSize(0,0),"Empty clears only owned collections/screen");
+        check(same_identity(doc.Name(),name)&&same_identity(doc.Path(),path)&&same_metadata(doc.Metadata(),metadata)
+            &&doc.Mode()==mode&&doc.Type()==type&&doc.Encoding()==encoding&&doc.Wrap()==wrap&&doc.Collisions()==collisions&&doc.Scaled()==scaled
+            &&doc.m_simple==simple&&doc.m_lcid==lcid&&doc.m_layout_size==layout,"Empty retains initialized identity/metadata");
+        STSStyle actual;check(doc.GetDefaultStyle(actual)&&actual==defaultValue&&same_identity(actual.fontName,defaultValue.fontName),"Empty retains complete default");
+        uint64_t bits;std::memcpy(&bits,&actual.fontSize,8);check(bits==UINT64_C(0x8000000000000000),"Empty preserves default signedzero");
+        printf("empty-stage %s\n",stage);doc.Dump(stage);
+    };
+    doc.Empty();cleared("empty-cleared");doc.Empty();cleared("empty-repeated");
+    check(empty_events[0]==empties+2&&change_events[0]==notifications,"Repeated virtual Empty exactly twice without OnChanged");
+    named_add(doc,L"Reused",named_value(3));
+    doc.AddSTSEntryOnly(CStringW(rawName,4),true,0,20,CString(L"Reused"));
+    doc.AddSTSEntryOnly(CStringW(rawPath,4),true,10,30,CString(L"Reused"));
+    doc.CreateSegments();check(change_events[0]==notifications+1&&doc.Entries()==2&&doc.NamedCount()==1&&doc.Segments()>0,"Empty owner reusable with rebuilt callback");
+    printf("empty-stage empty-reused\n");doc.Dump("empty-reused");
+    doc.Empty();cleared("empty-final");
+    check(empty_events[0]==empties+3&&change_events[0]==notifications+1,"Final Empty no notification");
+}
 int main() {
     try {
         if(!AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0))throw std::runtime_error("AfxWinInit failed");
@@ -949,6 +987,7 @@ int main() {
         named_style_lifecycle();
         prepared_style_conflicts();
         sort_lifecycle();
+        base_empty_lifecycle();
         named_style_exports();
         {
             TraceDocument source(0),destination(1);populate(source);populate(destination);

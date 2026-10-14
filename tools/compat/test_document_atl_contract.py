@@ -80,6 +80,104 @@ public:
         self.assertEqual(code.count('\n'), text.count('\n'))
         with self.assertRaises(ValueError): contract.closing('{', 0)
 
+    def test_csize_zero_argument_source_only_and_exact_hashes(self):
+        text = """#ifndef SYNTHETIC_SIZE_H
+#define SYNTHETIC_SIZE_H
+class CSize : public SyntheticBase {
+public:
+ CSize() noexcept;
+ CSize(int width, int height);
+ void Ignore() { CSize(); }
+};
+inline CSize::CSize() noexcept { /* } */ }
+#endif
+"""
+        rows = contract.select_csize_definitions(text, 'atltypes.h')
+        self.assertEqual([r['kind'] for r in rows], ['declaration', 'declaration', 'definition'])
+        self.assertEqual(contract.csize_source_contract(rows)['complete'], True)
+        for row in rows:
+            self.assertEqual(row['source_utf8_sha256'], contract.sha(text.encode()))
+            self.assertEqual(row['sha256_utf8'], contract.sha(row['excerpt'].encode()))
+            self.assertTrue(row['conditional_context'][0]['include_guard'])
+        self.assertFalse(any('Ignore' in r['excerpt'] for r in rows))
+        self.assertFalse(any('CSize(int' in r['excerpt'] for r in rows))
+
+    def test_csize_inline_definition_is_also_its_declaration(self):
+        text = 'class CSize : public SyntheticBase { public: CSize(void) noexcept { marker = 42; } int marker; };'
+        rows = contract.select_csize_definitions(text, 'atltypes.h')
+        self.assertTrue(contract.csize_source_contract(rows)['complete'])
+        body = next(r for r in rows if r['kind'] == 'definition')
+        self.assertEqual(body['excerpt'], 'CSize(void) noexcept { marker = 42; }')
+        self.assertNotIn('int marker', body['excerpt'])
+        # Selection records source; it deliberately does not interpret values.
+        self.assertNotIn('initial_value', body)
+
+    def test_csize_alternatives_and_unknown_conditions_never_pass(self):
+        text = """class CSize { public: CSize(); };
+#if SELECTED_BRANCH
+inline CSize::CSize() { first(); }
+#else
+inline CSize::CSize() { second(); }
+#endif
+"""
+        rows = contract.select_csize_definitions(text, 'atltypes.h')
+        status = contract.csize_source_contract(rows)
+        self.assertFalse(status['complete'])
+        self.assertFalse(status['source_capture_complete'])
+        self.assertEqual(status['default_definition_count'], 2)
+        self.assertFalse(status['active_conditions_resolved'])
+        self.assertEqual(status['active_conditions_unresolved'][1]['conditional_context'][0]['branch'], '#else')
+        one = contract.select_csize_definitions('class CSize { public: CSize(); };\n#if FEATURE\nCSize::CSize() {}\n#endif', 'afx.inl')
+        status = contract.csize_source_contract(one)
+        self.assertTrue(status['source_capture_complete'])
+        self.assertFalse(status['complete'])
+        self.assertFalse(status['active_conditions_resolved'])
+
+    def test_csize_context_ignores_comments_and_retains_continuations(self):
+        text = '/*\n#if COMMENT_ONLY\n*/\nclass CSize { public: CSize(); };\n#if FEATURE && \\\n OTHER_FEATURE\nCSize::CSize() {}\n#endif'
+        rows = contract.select_csize_definitions(text, 'atltypes.h')
+        status = contract.csize_source_contract(rows)
+        self.assertFalse(status['complete'])
+        context = status['active_conditions_unresolved'][0]['conditional_context']
+        self.assertEqual(len(context), 1)
+        self.assertIn('OTHER_FEATURE', context[0]['directive'])
+        self.assertNotIn('COMMENT_ONLY', context[0]['directive'])
+
+    def test_csize_only_first_header_scaffolding_is_an_include_guard(self):
+        genuine = '// header comment\n#pragma once\n#ifndef SYNTHETIC_GUARD\n/* comment */\n#define SYNTHETIC_GUARD\nclass CSize { public: CSize() {} };\n#endif'
+        self.assertTrue(contract.csize_source_contract(contract.select_csize_definitions(genuine, 'atltypes.h'))['complete'])
+        late = 'void earlier_declaration();\n#ifndef FEATURE_SWITCH\n#define FEATURE_SWITCH\nclass CSize { public: CSize() {} };\n#endif'
+        rows = contract.select_csize_definitions(late, 'atltypes.h')
+        self.assertFalse(rows[0]['conditional_context'][0]['include_guard'])
+        status = contract.csize_source_contract(rows)
+        self.assertFalse(status['complete'])
+        self.assertFalse(status['active_conditions_resolved'])
+
+    def test_csize_constructor_internal_conditions_remain_unresolved(self):
+        text = 'class CSize { public: CSize(); };\nCSize::CSize() {\n#ifdef INTERNAL_FEATURE\n first();\n#else\n second();\n#endif\n}'
+        rows = contract.select_csize_definitions(text, 'afx.inl')
+        status = contract.csize_source_contract(rows)
+        self.assertTrue(status['source_capture_complete'])
+        self.assertFalse(status['complete'])
+        self.assertFalse(status['active_conditions_resolved'])
+        unresolved = status['active_conditions_unresolved'][0]
+        self.assertEqual(unresolved['conditional_context'], [])
+        self.assertEqual([r['directive'] for r in unresolved['internal_conditions']],
+                         ['#ifdef INTERNAL_FEATURE', '#else', '#endif'])
+        self.assertEqual(unresolved['internal_conditions'][0]['first_line'], 3)
+        deleted = contract.select_csize_definitions('class CSize { public: ~CSize() {} };', 'atltypes.h')
+        self.assertFalse(contract.csize_source_contract(deleted)['source_capture_complete'])
+
+    def test_csize_missing_deleted_and_unsupported_source_stay_unresolved(self):
+        self.assertFalse(contract.csize_source_contract([])['complete'])
+        rows = contract.select_csize_definitions('class CSize { public: CSize() = delete; };', 'atltypes.h')
+        self.assertFalse(contract.csize_source_contract(rows)['complete'])
+        with self.assertRaises(ValueError):
+            contract.select_csize_definitions('class CSize { public: CSize() : base{1,2} {} };', 'atltypes.h')
+        text = 'class CSize { public: CSize() { ' + ('do_work();\n' * 50) + '} };'
+        with self.assertRaises(ValueError):
+            contract.select_csize_definitions(text, 'atltypes.h')
+
     def trace(self):
         rows = [{'event': 'provenance', 'pointer_bits': 64, 'cstring_type': 'ATL::CStringT<wchar_t, StrTraitMFC<wchar_t>>'}]
         seq = 0

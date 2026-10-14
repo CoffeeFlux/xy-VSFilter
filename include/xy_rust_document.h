@@ -70,6 +70,13 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_entry_header_v1(uint64_t, uint32
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_segment_header_v1(uint64_t, uint32_t index, uint8_t*, size_t);
 // Query modes: 0 entry, 1 next segment, 2 containing segment; integer TIME only.
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_query_time_v1(uint64_t, uint32_t mode, int64_t time, uint8_t*, size_t);
+// Base Empty: reset only screen size(0,0), clear named map retaining bins,
+// detach segments then entries; retire style values, segments, entries in that
+// order AFTER admission. Other metadata/default/identity remains untouched.
+// Caller retains virtual Empty/Deinit ordering. Map key/node drops and allocation
+// reentry remain inside map mutation; this does not claim native deletion timing.
+// Diagnostic clear_storage/named_style_clear and Copy's separate clear remain.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_empty_v1(uint64_t owner);
 // Narrow prepared conflict relocation: header16 old-unit-count:u32@0,
 // new-unit-count:u32@4, previous-style-byte-length:u64@8, then old/new raw
 // UTF16LE arrays and one exact initialized style wire. Native classification,

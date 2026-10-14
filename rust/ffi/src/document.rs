@@ -9,8 +9,8 @@ use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::ptr;
 use xy_vsfilter_compat::document::{
-    AddMode, Document, IdentityField, InterpretationField, MetadataField, Refusal, ScriptField,
-    StyleRenameError,
+    AddMode, Document, IdentityField, InterpretationField, MetadataField, Refusal, RetiredEmpty,
+    ScriptField, StyleRenameError,
 };
 use xy_vsfilter_compat::document_style as style_wire;
 use xy_vsfilter_compat::document_wire::{self as wire, Counts, EntryHeader, SegmentHeader};
@@ -193,6 +193,24 @@ pub extern "C" fn xy_vsfilter_document_copy_selected_state_v1(
         .copy_selected_state(destination, source)
         .map_err(registry_error)));
     drop(retired);
+    OK
+}
+/// Coherent base Empty only; virtual callbacks remain in the native caller.
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_empty_v1(owner: u64) -> u32 {
+    let retired = required!(admitted(|registry| Ok(registry
+        .document_mut(owner)
+        .map_err(registry_error)?
+        .empty())));
+    let RetiredEmpty {
+        styles,
+        segments,
+        entries,
+    } = retired;
+    // Explicit payload destruction order, entirely after registry admission.
+    drop(styles);
+    drop(segments);
+    drop(entries);
     OK
 }
 /// # Safety
@@ -1274,6 +1292,129 @@ mod tests {
             assert_eq!(xy_vsfilter_document_destroy_v1(target), OK);
             assert_ne!(read_snapshot(snapshot), style);
             assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
+            // Base Empty preserves unrelated state and immutable old replies.
+            let owner = create();
+            let raw = [65u8, 0, 0, 0, 0, 216];
+            assert_eq!(
+                xy_vsfilter_document_set_identity_v1(owner, 0, raw.as_ptr(), raw.len()),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_set_identity_v1(owner, 1, raw.as_ptr(), raw.len()),
+                OK
+            );
+            for field in 0..3 {
+                assert_eq!(
+                    xy_vsfilter_document_set_interpretation_v1(owner, field, -3),
+                    OK
+                );
+                assert_eq!(xy_vsfilter_document_set_metadata_v1(owner, field, -4), OK);
+            }
+            for field in 0..5 {
+                assert_eq!(
+                    xy_vsfilter_document_set_script_field_v1(
+                        owner,
+                        field,
+                        if field == 4 { 1 } else { -5 }
+                    ),
+                    OK
+                );
+            }
+            assert_eq!(xy_vsfilter_document_set_metadata_v1(owner, 3, 1), OK);
+            assert_eq!(
+                xy_vsfilter_document_set_par_bits_v1(owner, 0x7ff0000000000042),
+                OK
+            );
+            let value = [0u8; style_wire::HEADER_BYTES];
+            assert_eq!(
+                xy_vsfilter_document_set_default_style_v1(owner, value.as_ptr(), value.len()),
+                OK
+            );
+            admitted(|registry| {
+                let d = registry.document_mut(owner).map_err(registry_error)?;
+                for key in 0..65 {
+                    d.named_styles_mut()
+                        .insert(vec![key], Some(style_wire::decode(&value).unwrap()));
+                }
+                d.add_prepared(wire::decode_entry(&entry(0, 10)).unwrap(), AddMode::Add)
+                    .unwrap();
+                d.feedback_animation(0, true).unwrap();
+                Ok(())
+            })
+            .unwrap();
+            let entry_snapshot = open_snapshot(owner, 0);
+            let segment_snapshot = open_snapshot(owner, 1);
+            let name_snapshot = open_snapshot(owner, 5);
+            let style_snapshot = open_snapshot(owner, 4);
+            let sort_snapshot = open_snapshot(owner, 7);
+            let snapshots = [
+                entry_snapshot,
+                segment_snapshot,
+                name_snapshot,
+                style_snapshot,
+                sort_snapshot,
+            ];
+            let old_bytes: Vec<_> = snapshots.iter().map(|&id| read_snapshot(id)).collect();
+            assert_eq!(xy_vsfilter_document_remove_entries_v1(owner), OK);
+            let before = state(owner);
+            let bins = before.named_styles().bin_count();
+            assert_eq!(xy_vsfilter_document_empty_v1(entry_snapshot), BAD_HANDLE);
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_empty_v1(owner))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(state(owner), before);
+            assert_eq!(xy_vsfilter_document_empty_v1(owner), OK);
+            let after = state(owner);
+            assert_eq!(after.script_size(), Some([0, 0]));
+            assert!(after.entries().is_empty() && after.segments().is_empty());
+            assert_eq!(after.named_styles().count(), 0);
+            assert_eq!(after.named_styles().bin_count(), bins);
+            assert_eq!(
+                after.identity(IdentityField::Name),
+                before.identity(IdentityField::Name)
+            );
+            assert_eq!(
+                after.identity(IdentityField::Path),
+                before.identity(IdentityField::Path)
+            );
+            assert_eq!(after.default_style(), before.default_style());
+            assert_eq!(after.par_bits(), before.par_bits());
+            assert_eq!(after.forced_default(), before.forced_default());
+            assert_eq!(after.scaled_bas(), before.scaled_bas());
+            for field in [
+                MetadataField::PARType,
+                MetadataField::ColorMatrix,
+                MetadataField::ColorRange,
+            ] {
+                assert_eq!(after.metadata(field), before.metadata(field));
+            }
+            for field in [
+                InterpretationField::Mode,
+                InterpretationField::SubtitleType,
+                InterpretationField::Encoding,
+            ] {
+                assert_eq!(after.interpretation(field), before.interpretation(field));
+            }
+            for field in [ScriptField::Wrap, ScriptField::Collisions] {
+                assert_eq!(after.script_field(field), before.script_field(field));
+            }
+            assert_eq!(xy_vsfilter_document_empty_v1(owner), OK);
+            assert_eq!(state(owner), after);
+            assert_eq!(
+                xy_vsfilter_document_copy_selected_state_v1(owner, owner),
+                OK
+            );
+            assert_eq!(xy_vsfilter_document_copy_storage_v1(owner, owner), OK);
+            assert_eq!(state(owner), after);
+            assert_eq!(xy_vsfilter_document_destroy_v1(owner), OK);
+            assert_eq!(xy_vsfilter_document_empty_v1(owner), BAD_HANDLE);
+            for (id, bytes) in snapshots.into_iter().zip(old_bytes) {
+                assert_eq!(read_snapshot(id), bytes);
+                assert_eq!(xy_vsfilter_document_snapshot_drop_v1(id), OK);
+            }
             // Scalar Sort snapshots never borrow strings or live owner storage.
             let owner = create();
             let empty = open_snapshot(owner, 7);

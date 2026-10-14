@@ -50,6 +50,21 @@ def extract_definition(source, signature):
     return extract_method(source[start:], signature)
 
 
+def extract_fenced_method(source, signature, next_signature):
+    """Keep alternative preprocessor branches verbatim between known methods.
+
+    Counting raw braces cannot delimit methods whose #if/#else branches each
+    open the same conditional block. These adjacent signatures are explicit
+    source-contract boundaries, not a general C++ parser.
+    """
+    start = source.index(signature)
+    end = source.index(next_signature, start + len(signature))
+    method = source[start:end].rstrip()
+    if not method.endswith("}"):
+        raise ValueError("method fence no longer immediately follows body: " + signature)
+    return method
+
+
 def capture_inputs():
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h", ROOT / "include/xy_rust_writer.h", ROOT / "include/xy_rust_seek.h",
@@ -573,7 +588,9 @@ public:
     insertion += segment_class.replace("STSSegment", "InsertionSegment").replace("CAtlArray<int>", "ObservedArray<int>") + ";\n"
     insertion += extract_method(font_source.decode("utf-8-sig"), "static bool SegmentCompStart(").replace("STSSegment", "InsertionSegment") + "\n"
     for name, content in (("OriginalInsertion", font_source), ("CandidateInsertion", candidate_font)):
-        method = extract_method(content.decode("utf-8-sig"), "void CSimpleTextSubtitle::Add(")
+        method = extract_fenced_method(content.decode("utf-8-sig"),
+                                      "void CSimpleTextSubtitle::Add(",
+                                      "void CSimpleTextSubtitle::AddSTSEntryOnly(")
         insertion += f"INSERTION_SHELL({name})\n#define STSSegment InsertionSegment\n"
         if name == "CandidateInsertion":
             insertion += "#define XY_VSFILTER_RUST_TEXT\n" + document_count_bindings
