@@ -3,6 +3,7 @@
 #include "find_char_shell.h"
 #include "xy_rust_microdvd.h"
 #include "xy_rust_mpl2.h"
+#include "xy_rust_remove_tags.h"
 #include <cstring>
 #include <algorithm>
 #include <csignal>
@@ -105,6 +106,14 @@ public:
         return count;
 #endif
     }
+    int Delete(int start,int count){
+#ifdef _WIN32
+        return text.Delete(start,count);
+#else
+        start=std::max(0,std::min(start,GetLength()));count=std::max(0,std::min(count,GetLength()-start));
+        text.erase(static_cast<size_t>(start),static_cast<size_t>(count));return GetLength();
+#endif
+    }
     void MakeLower(){
         microObserve(4,GetString());
 #ifdef _WIN32
@@ -174,8 +183,15 @@ static int microScan(const wchar_t* text,const wchar_t* fmt,int* x,wchar_t* c,un
 #endif
     if(result!=3){fprintf(stderr,"Fixture outside successful move-scan scope\n");std::abort();}return result;
 }
+static uint64_t removeHandled=0,removeFallbacks=0,removeSteps=0;
 static uint64_t mplHandled=0,mplFallbacks=0;
 namespace XyRust {
+class ObservedRemoveTags : public RemoveTags {
+public:
+    template<class String> explicit ObservedRemoveTags(const String& input):RemoveTags(input){if(Handled())++removeHandled;else ++removeFallbacks;}
+    unsigned Step(int reply){++removeSteps;return RemoveTags::Step(reply);}
+};
+
 class ObservedMPL2 : public MPL2 {
 public:
     template<class String> bool Convert(const String& input,String& output){bool result=MPL2::Convert(input,output);if(result)++mplHandled;else ++mplFallbacks;return result;}

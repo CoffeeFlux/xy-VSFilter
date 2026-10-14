@@ -27,6 +27,7 @@
 #include "xy_rust_find_char.h"
 #include "xy_rust_microdvd.h"
 #include "xy_rust_mpl2.h"
+#include "xy_rust_remove_tags.h"
 #include "xy_rust_webvtt.h"
 #include "xy_rust_fields.h"
 #include "xy_rust_segments.h"
@@ -662,6 +663,20 @@ static CStringW MBCSSSAToUnicode(CStringW str, int CharSet)
 
 static CStringW RemoveSSATags(CStringW str, bool fUnicode, int CharSet)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::RemoveTags convert(str);
+    if(convert.Handled())
+    {
+        int reply = 0;
+        for(;;)
+        {
+            const unsigned action = convert.Step(reply);
+            CStringW current = convert.Text<CStringW>();
+            if(action == 0) return current;
+            reply = FindChar(current, action == 1 ? '{' : '}', convert.Position(), fUnicode, CharSet);
+        }
+    }
+#endif
     str.Replace (L"{\\i1}", L"<i>");
     str.Replace (L"{\\i}", L"</i>");
 
@@ -1320,7 +1335,14 @@ static CStringW MicroDVD2SSA(CStringW str, bool fUnicode, int CharSet)
         case 1: reply = FindChar(str, '|', start, fUnicode, CharSet); break;
         case 2: line = str.Mid(start, count); reply = line.GetLength(); break;
         case 3: reply = FindChar(line, '{', start, fUnicode, CharSet); break;
-        case 4: convert.Append(line.Mid(start, count), convert.Field(2)); break;
+        case 4:
+            {
+                // Retain CString's fragment-append behavior at embedded NULs.
+                CStringW literal;
+                literal += line.Mid(start, count);
+                convert.Append(literal, convert.Field(2));
+            }
+            break;
         case 5: reply = FindChar(line, '}', start, fUnicode, CharSet); break;
         case 6:
             {

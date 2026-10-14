@@ -20,6 +20,23 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns `RemoveSSATags` text, brace-removal state and ordered text
+  substitutions. Italic tags are converted before brace removal; the first
+  charset-aware closing brace wins, an unterminated tail survives, and `\N`,
+  `\n`, then `\h` substitutions run afterward. Native `FindChar` callbacks
+  remain between owned mutations. Embedded-NUL replacement inputs retain the
+  existing native path.
+  Fatal ASan/UBSan comparisons passed **238,307 complete conversions** on arm64
+  and under x64 execution: **233,048 changed strings**, **1,840,611 output UTF-16
+  units**, **3,243,361 callback observation values**, **112 interruptions**,
+  **238,051 Rust owners / 995,085 steps** and **256 stable native NUL fallbacks**.
+  Nested/unclosed tags, every nonzero UTF-16 value and both charset-search modes
+  are covered. Replacement-bearing NUL outcomes remain excluded. Rust 1.85 tests
+  (83 core, 56 FFI), strict Clippy, default syntax and corpus freshness pass.
+  Windows/Miri validation is pending. This helper is used by `GetStrW`/`GetStrWA`;
+  the CSRI rendering corpus alone does not establish text-export compatibility.
+  Input encoding conversion, allocation failure timing and full export/host
+  integration remain separate work.
 * Safe Rust performs MPL2's leading-slash and pipe-slash preprocessing, retaining
   native handling for embedded-NUL replacement inputs. It also implements the
   Unicode `FindChar` branch: searches start at the requested code-unit offset,
@@ -57,8 +74,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   in `f5d1ae8d` identified reference fixture 22, ordinary `{f:Arial}`: the test
   wrapper forwarded `Mid(start)` as `Mid(start, INT_MAX)`, unlike the real
   one-argument ATL overload. The wrapper now uses the exact overload. Neither
-  failed run counts as passing evidence; corrected Windows/rendering validation
-  remains pending. Fixture failure diagnostics and earlier text-adapter execution
+  failed run counts as passing evidence. The rerun at `91b97d13` then reached
+  a reference/candidate output difference for embedded-NUL fixture 22310.
+  Literal fragments now pass through the original native CString append boundary
+  before being copied into the Rust-owned output, preserving its truncation
+  semantics without treating the portable string model as authoritative.
+  Corrected Windows/rendering validation remains pending. Fixture failure diagnostics and earlier text-adapter execution
   remain in the harness for faster, reviewable failures.
   Native tag conversion, input/line strings, allocation failure timing and host integration
   remain to be migrated or separately validated.
@@ -78,8 +99,14 @@ unresolved reference outcomes requiring investigation, never matching results.
   to representable results. Eight MicroDVD scripts and an italic visible-change
   control expand the rendering corpus to **398 cases**. Rust 1.85 tests (77 core,
   52 FFI), strict Clippy, default syntax checks and Python harness checks pass.
-  Windows/Miri and complete rendering validation are pending; full converters,
-  native string ownership, allocation failure timing and host integration remain.
+  Candidate `21bea95d` passed all four portable platforms, Miri and both Windows
+  DLL jobs, each matching **398 cases / 4,586 frames** and **32 mutations / 224
+  frames**, including the new MicroDVD scripts and visible italic controls.
+  Dialogs, exports and dependencies match, and both logs confirm Rust-enabled
+  `STS.cpp` compilation. [Charset-search evidence](find-char-evidence.json) records
+  verified hashes and stable local validation. This evidence predates the Unicode
+  branch and converter increments above. Allocation failure timing and full
+  host integration remain outside these comparisons.
 * Safe Rust owns the UTF-16 text produced by caption `SaveDisp`, preserving
   spaces between nonempty fragments, row newlines, and bounded strings spanning
   row boundaries. Native timestamp truncation and subtitle insertion remain in

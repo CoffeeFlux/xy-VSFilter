@@ -113,3 +113,5 @@ mod find_char;
 mod microdvd;
 
 mod mpl2;
+
+mod remove_tags;
