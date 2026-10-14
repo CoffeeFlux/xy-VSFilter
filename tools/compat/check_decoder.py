@@ -855,6 +855,18 @@ public:
         legacy_blur_code += extract_definition(text, "bool Rasterizer::IsItReallyBlur(")
         legacy_blur_code += extract_definition(text, "bool Rasterizer::OldFixedPointBlur(").replace("memcpy(", "checkedLegacyCopy(") + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_legacy_blur.h").write_text(legacy_blur_code, encoding="utf-8")
+    gauss_planes_code = '#include "gauss_planes_shell.h"\n'
+    for name, content in (("ReferenceGaussPlanes", raster_source), ("CandidateGaussPlanes", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+        text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        gauss_planes_code += f"namespace {name} {{\nGAUSS_PLANES_CLASS\n"
+        if name == "CandidateGaussPlanes":
+            gauss_planes_code += "#define XY_VSFILTER_RUST_TEXT\n"
+        gauss_planes_code += re.search(r"const float Rasterizer::GAUSSIAN_BLUR_THREHOLD = [^;]+;", text).group(0) + "\n"
+        definition = extract_definition(text, "bool Rasterizer::GaussianBlur(")
+        definition = definition.replace("xy_malloc(", "gaussPlaneAllocate(").replace("memset(", "gaussPlaneSet(").replace("memcpy(", "gaussPlaneCopy(")
+        definition = definition.replace("XyRust::PlaneAllocation", "XyRust::ObservedGaussPlaneAllocation")
+        gauss_planes_code += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_gauss_planes.h").write_text(gauss_planes_code, encoding="utf-8")
     filter_source = original("src/subtitles/xy_filter.cpp", reference["commit"])
     gauss_storage_code = '#include "gauss_storage_shell.h"\n'
     for name, content in (("ReferenceGaussStorage", filter_source), ("CandidateGaussStorage", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
@@ -1406,6 +1418,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     gauss_storage_result = run([str(gauss_storage_executable)], capture_output=True, text=True)
     print(gauss_storage_result.stdout, end="", flush=True)
     print(gauss_storage_result.stderr, end="", file=sys.stderr)
+    gauss_planes_executable = destination / ("gauss-planes-oracle.exe" if os.name == "nt" else "gauss-planes-oracle")
+    gauss_planes_compile = [arg.replace("find_char_oracle.cpp", "gauss_planes_oracle.cpp").replace("find-char-oracle", "gauss-planes-oracle") for arg in find_char_compile]
+    run(gauss_planes_compile)
+    gauss_planes_result = run([str(gauss_planes_executable)], capture_output=True, text=True)
+    print(gauss_planes_result.stdout, end="", flush=True)
+    print(gauss_planes_result.stderr, end="", file=sys.stderr)
     pipe_line_executable = destination / ("pipe-line-oracle.exe" if os.name == "nt" else "pipe-line-oracle")
     pipe_line_compile = [arg.replace("find_char_oracle.cpp", "pipe_line_oracle.cpp").replace("find-char-oracle", "pipe-line-oracle") for arg in find_char_compile]
     run(pipe_line_compile)
@@ -1795,6 +1813,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "path_align_compile_command": path_align_compile,
         "path_align_result": path_align_result.stdout, "path_align_stderr": path_align_result.stderr,
         "path_align_scope": "Complete pinned PathData::AlignLeftTop over initialized point/type buffers; actual Windows POINT/ATL geometry; exact guarded buffers, origin/size, errno/FP/Windows error state; native cleanup modeled, outputs disjoint and representable arithmetic only",
+        "gauss_planes_compile_command": gauss_planes_compile,
+        "gauss_planes_result": gauss_planes_result.stdout, "gauss_planes_stderr": gauss_planes_result.stderr,
+        "gauss_planes_scope": "Whole pinned GaussianBlur with controlled coefficient factories and Gaussian kernel. Exact metadata, initialized-byte masks and values, untouched padding, native memset/memcpy footprints, source aliases and ignored extra input border, retained shared lifetimes and cache accounting. Every modeled copy checks extents and source initialization; unwritten bytes are never read. Second-plane failure modeled; first-plane failure, source/output object aliasing, inconsistent geometry and actual OOM excluded.",
         "gauss_storage_compile_command": gauss_storage_compile,
         "gauss_storage_result": gauss_storage_result.stdout, "gauss_storage_stderr": gauss_storage_result.stderr,
         "gauss_storage_scope": "Complete pinned xy_gaussian_blur with controlled byte/float, filter and transpose callbacks; exact region offsets, callback arguments, initialized scratch handoff, output/padding bytes, logical cache accounting and successful native fallback after modeled Rust decline. Unwritten scratch bytes are never read or compared. Invalid kernel/dimension domains and actual allocation failure are excluded; underlying filter arithmetic has separate leaf comparisons.",
