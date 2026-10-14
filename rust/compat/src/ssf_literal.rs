@@ -2,6 +2,26 @@
 // Derived from Gabest's SSF parser, Copyright (C) 2003-2006 Gabest.
 //! Control flow of the pinned SSF quoted-string and brace-block parsers.
 //! Native stream, append, commit and error callbacks run between steps.
+use alloc::vec::Vec;
+
+/// Temporary literal text has no externally visible aliases before commit.
+#[derive(Default)]
+pub struct Text {
+    units: Vec<u16>,
+}
+impl Text {
+    pub fn append(&mut self, value: u16) -> bool {
+        if self.units.len() >= i32::MAX as usize || self.units.try_reserve(1).is_err() {
+            return false;
+        }
+        self.units.push(value);
+        true
+    }
+    pub fn units(&self) -> &[u16] {
+        &self.units
+    }
+}
+
 #[repr(C)]
 pub struct Literal {
     phase: u32,

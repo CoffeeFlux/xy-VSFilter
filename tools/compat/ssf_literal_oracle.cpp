@@ -19,8 +19,8 @@ static void effects(std::vector<int64_t>& out){const int error=errno,flags=std::
 #endif
     out.insert(out.end(),{error,flags,last});
 }
-template<class File>static LiteralResult execute(const std::vector<int>& input,bool block,int fail,bool after,bool skew,bool count){
-    LiteralContext context;context.input=input;context.fail=fail;context.after=after;context.skew=skew;literalContext=&context;
+template<class File>static LiteralResult execute(const std::vector<int>& input,bool block,int fail,bool after,bool skew,bool count,int decline){
+    LiteralContext context;context.input=input;context.fail=fail;context.after=after;context.skew=skew;context.textDecline=decline;literalContext=&context;
     InputStream stream;Definition definition;File file;LiteralResult result;
     for(int retry=0;retry<2;++retry){
         seed();int error=0;
@@ -33,9 +33,10 @@ template<class File>static LiteralResult execute(const std::vector<int>& input,b
     }
     result.events=context.events;result.attempts=context.attempt;return result;
 }
-static int compare(const std::vector<int>& input,bool block,int fail=-1,bool after=false,bool skew=false){
-    const auto a=execute<ReferenceLiteral::File>(input,block,fail,after,skew,true),b=execute<CandidateLiteral::File>(input,block,fail,after,skew,false);
+static int compare(const std::vector<int>& input,bool block,int fail=-1,bool after=false,bool skew=false,int decline=-2){
+    const auto a=execute<ReferenceLiteral::File>(input,block,fail,after,skew,true,decline),b=execute<CandidateLiteral::File>(input,block,fail,after,skew,false,decline);
     if(!(a==b)){fprintf(stderr,"SSF literal mismatch history=%llu block=%d fail=%d after=%d skew=%d\n",(unsigned long long)histories,block,fail,after,skew);for(int c:input)fprintf(stderr,"%d,",c);fprintf(stderr,"\n");std::abort();}
+    if(literalTextOwners!=literalTextReleases)std::abort();
     ++histories;fields+=a.values.size()+a.events.size();return a.attempts;
 }
 static void faults(const std::vector<int>& input,bool block){
@@ -67,10 +68,16 @@ int main(){
     }
     for(const auto& input:std::vector<std::vector<int>>{{},{-1},{0},{65},{34,65,92,10,65,34},{39,65,10,39},{123,123,92,125,125,125},{32,9,34,0,0xd800,0xdc00,34},{32,58,61,123,0,125},{34,0x10000,0x1ffff,34},{123,0x10000,0x1ffff,125},{34,-2,34},{123,-2,125}})
         for(bool block:{false,true})faults(input,block);
+    for(const auto& input:std::vector<std::vector<int>>{{34,34},{34,65,0,0xd800,0xdc00,92,34,34},{123,65,123,125,92,125,125},{34,65,92},{123,65,92},{34,65,10},{123,123}}){
+        for(bool block:{false,true})for(int decline:{-1,0,1,2,4,6}){
+            const int attempts=compare(input,block,-1,false,false,decline);
+            for(int fail=0;fail<attempts;++fail)for(bool after:{false,true})compare(input,block,fail,after,false,decline);
+        }
+    }
     for(int depth:{1,2,63,1024}){
         std::vector<int> input(depth+1,123);input.push_back(65);input.insert(input.end(),depth+1,125);
         compare(input,true);
     }
-    if(!histories||!commits||!errors||!interruptions||!literalSteps)std::abort();
-    printf("%llu exact SSF quoted-string/block histories / %llu callback, destination and ambient-error fields passed (%llu completed parses / %llu native parse errors / %llu before-or-after callback interruptions / %llu Rust transitions; whole pinned methods, all UTF-16 values direct and escaped, both quote styles, nested braces, embedded NUL/surrogates, raw provider values, differing Peek/Get including transient EOS, repeated calls and partial commit state; actual Windows CStringW append or portable string boundary, controlled stream/definition/error callbacks; allocation failure, depth beyond native integer range, locale/comment handling within the controlled stream and actual IO excluded)\n",(unsigned long long)histories,(unsigned long long)fields,(unsigned long long)commits,(unsigned long long)errors,(unsigned long long)interruptions,(unsigned long long)literalSteps);
+    if(!histories||!commits||!errors||!interruptions||!literalSteps||!literalTextOwners||!literalTextCopies||!literalTextAppends||!literalTextDeclines||literalTextOwners!=literalTextReleases)std::abort();
+    printf("%llu exact SSF quoted-string/block histories / %llu callback, destination and ambient-error fields passed (%llu completed parses / %llu native parse errors / %llu before-or-after callback interruptions / %llu Rust transitions / %llu Rust text owners and releases / %llu Rust appends / %llu native text copies / %llu modeled storage declines; whole pinned methods, all UTF-16 values direct and escaped, both quote styles, nested braces, embedded NUL/surrogates, raw provider values, differing Peek/Get including transient EOS, repeated calls and partial commit state; actual Windows CStringW or portable string boundary, copied commit text, native fallback retains written prefixes, controlled stream/definition/error callbacks; allocation failure, depth beyond native integer range, locale/comment handling within the controlled stream and actual IO excluded)\n",(unsigned long long)histories,(unsigned long long)fields,(unsigned long long)commits,(unsigned long long)errors,(unsigned long long)interruptions,(unsigned long long)literalSteps,(unsigned long long)literalTextOwners,(unsigned long long)literalTextAppends,(unsigned long long)literalTextCopies,(unsigned long long)literalTextDeclines);
 }

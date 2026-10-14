@@ -16,6 +16,15 @@
 #include <atlstr.h>
 #else
 typedef char16_t WCHAR;
+class CStringW {
+    std::u16string value;
+public:
+    CStringW(){}
+    CStringW(const WCHAR* input,int length):value(input,input+length){}
+    void operator+=(WCHAR c){value+=c;}
+    int GetLength()const{return static_cast<int>(value.size());}
+    WCHAR operator[](int i)const{return value.at(i);}
+};
 #endif
 #ifdef _T
 #undef _T
@@ -27,6 +36,7 @@ struct LiteralContext {
     size_t position=0;
     int fail=-1,attempt=0;
     bool after=false,skew=false;
+    int textDecline=-2,textAttempt=0;
     std::vector<int64_t> events;
 };
 static LiteralContext* literalContext=NULL;
@@ -38,11 +48,7 @@ static int literalBegin(int operation){
 }
 static void literalEnd(int attempt){if(attempt==literalContext->fail&&literalContext->after)throw LiteralInterrupted(2);}
 class LiteralString {
-#ifdef _WIN32
     CStringW value;
-#else
-    std::u16string value;
-#endif
 public:
     void operator+=(WCHAR c){
         const int attempt=literalBegin(4);
@@ -52,11 +58,7 @@ public:
     }
     std::vector<int64_t> Units()const{
         std::vector<int64_t> result;
-#ifdef _WIN32
         for(int i=0;i<value.GetLength();++i)result.push_back(value[i]);
-#else
-        for(const auto c:value)result.push_back(c);
-#endif
         return result;
     }
 };
@@ -88,7 +90,7 @@ struct Definition {
     enum {string=1,block=2};
     int status=17;
     std::vector<int64_t> value={70,0,71};
-    void SetAsValue(int kind,const LiteralString& text){
+    template<class T>void SetAsValue(int kind,const T& text){
         const int attempt=literalBegin(5);const auto units=text.Units();
         literalContext->events.insert(literalContext->events.end(),{kind,static_cast<int64_t>(units.size())});
         literalContext->events.insert(literalContext->events.end(),units.begin(),units.end());
@@ -104,3 +106,25 @@ public:
     uint32_t Next(int last){++literalSteps;return SsfLiteral::Next(last);}
 };
 }
+
+#include "xy_rust_ssf_literal_text.h"
+static uint64_t literalTextOwners=0,literalTextReleases=0,literalTextAppends=0,literalTextDeclines=0,literalTextCopies=0;
+static void* literalTextCreate(){
+    if(literalContext->textDecline==-1){++literalTextDeclines;return NULL;}
+    void* result=xy_vsfilter_ssf_literal_text_create();if(result)++literalTextOwners;return result;
+}
+static void literalTextRelease(void* owner){if(owner)++literalTextReleases;xy_vsfilter_ssf_literal_text_release(owner);}
+static uint32_t literalTextAppend(void* owner,uint16_t value){
+    if(literalContext->textAttempt++==literalContext->textDecline){++literalTextDeclines;return 0;}
+    ++literalTextAppends;return xy_vsfilter_ssf_literal_text_append(owner,value);
+}
+static const uint16_t* literalTextData(const void* owner){++literalTextCopies;return xy_vsfilter_ssf_literal_text_data(owner);}
+template<class Storage>class LiteralStringRust {
+    Storage value;
+public:
+    void operator+=(WCHAR c){const int attempt=literalBegin(4);literalContext->events.push_back(c);value+=c;literalEnd(attempt);}
+    std::vector<int64_t> Units()const{
+        const CStringW copy=static_cast<CStringW>(value);std::vector<int64_t> result;
+        for(int i=0;i<copy.GetLength();++i)result.push_back(copy[i]);return result;
+    }
+};
