@@ -44,6 +44,10 @@ CHdmvSub::~CHdmvSub()
 {
     Reset();
 
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (m_segmentStorage.Ready()) m_segmentStorage.Reset();
+    else
+#endif
     delete [] m_pSegBuffer;
     delete m_pCurrentPresentationSegment;
 }
@@ -52,7 +56,15 @@ CHdmvSub::~CHdmvSub()
 void CHdmvSub::AllocSegment(int nSize)
 {
     if (nSize > m_nTotalSegBuffer) {
+#ifdef XY_VSFILTER_RUST_TEXT
+        if (m_segmentStorage.Ready()) m_segmentStorage.Reset();
+        else
+#endif
         delete [] m_pSegBuffer;
+#ifdef XY_VSFILTER_RUST_TEXT
+        if (m_segmentStorage.Allocate(nSize)) m_pSegBuffer = m_segmentStorage.Data();
+        else
+#endif
         m_pSegBuffer = DEBUG_NEW BYTE[nSize];
         m_nTotalSegBuffer = nSize;
     }

@@ -20,6 +20,28 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Rust owns HDMV's reusable segment buffer. AllocSegment retains its native
+  grow-only capacity, resets only position/declared size, and preserves existing
+  initialized tails on smaller reuse. Fatal ASan/UBSan and ordinary comparisons
+  pass on both local architectures: **26,968 whole ParseSample calls /
+  3,717,607 retained state fields / 1,674,567 initialized bytes / 233,633 unwritten
+  cells tracked without reads / 1,487,237 allocation-reader-dispatch observations /
+  3,968 rejections / 7,404 growths / 19,564 capacity reuses / 3,762 Rust owners,
+  loans and releases / 3,672 modeled Rust declines**. Tests use whole pinned
+  constructor/destructor, AllocSegment and byte-sample parser with real reference
+  and candidate Golomb readers, every segment tag, split/short/multiple packets,
+  null/empty calls and signed/unsigned length boundaries up to **65,535 bytes**.
+  Segment/presentation consumers and Reset remain controlled callbacks; **six
+  partial-initialization dispatch observations** compare masks and initialized
+  bytes only, not actual partial-tail consumption. Negative caller lengths,
+  source-buffer aliases, native debug traps and actual OOM are excluded. Default
+  syntax and Python checks pass. Rust remains at the tested 144-core/97-FFI clip
+  increment. The **782-case text corpus** is unchanged and does not prove HDMV
+  host playback; Windows/Miri and broader playback sequences remain pending.
+* The original Gaussian-output commit (`38c0f17f`) passed its Windows renderer
+  workflow (`38562954358`), but its portable workflow (`38562954477`) failed.
+  It remains incompletely validated. The corrected vector-mask commit reruns
+  the full suite, including the Gaussian metadata regression and RLE report fix.
 * Gaussian pass scratch (`e5355dce`) completed all four portable targets, Miri,
   and both Windows renderer jobs: **762 cases / 7,970 frames**, **32 mutations /
   224 frames**, exports and declared platform requirements matched on each

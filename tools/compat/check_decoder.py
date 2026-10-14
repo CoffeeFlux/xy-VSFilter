@@ -66,7 +66,7 @@ def capture_inputs():
               ROOT / "src/subtitles/Rasterizer.cpp", ROOT / "include/xy_rust_mask.h", ROOT / "include/xy_rust_bilinear.h", ROOT / "include/xy_rust_be_blur.h", ROOT / "include/xy_rust_gauss_integer.h", ROOT / "include/xy_rust_be_filter.h", ROOT / "include/xy_rust_transpose.h", ROOT / "include/xy_rust_byte_float.h",
               ROOT / "src/subtitles/xy_filter.cpp", ROOT / "src/subtitles/VobSubImage.cpp", ROOT / "include/xy_rust_vobsub.h",
               ROOT / "src/dsutil/GolombBuffer.cpp", ROOT / "src/dsutil/GolombBuffer.h",
-              ROOT / "src/subtitles/CompositionObject.cpp", ROOT / "src/subtitles/CompositionObject.h", ROOT / "include/xy_rust_byte_storage.h",
+              ROOT / "src/subtitles/HdmvSub.cpp", ROOT / "src/subtitles/HdmvSub.h", ROOT / "src/subtitles/CompositionObject.cpp", ROOT / "src/subtitles/CompositionObject.h", ROOT / "include/xy_rust_byte_storage.h",
               ROOT / "include/xy_rust_timeline_search.h",
               ROOT / "src/subtitles/TextFile.h",
               ROOT / "src/subtitles/TextFile.cpp", ROOT / "src/subtitles/STS.cpp",
@@ -929,6 +929,27 @@ public:
             golomb += extract_method(content.decode("utf-8-sig"), signature).replace("CGolombBuffer", name).replace("1ui64", "UINT64_C(1)") + "\n"
         golomb += "#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_golomb.h").write_text(golomb, encoding="utf-8")
+    segment_golomb = golomb.replace('#include "golomb_shell.h"\n', '').replace("memcpy(", "rleCopy(")
+    (destination / "segment_golomb.h").write_text(segment_golomb, encoding="utf-8")
+    hdmv_storage = '#include "hdmv_storage_shell.h"\n'
+    reference_segment_header = original("src/subtitles/HdmvSub.h", reference["commit"])
+    for name, content, hdmv_segment_header, reader in (("ReferenceSegment", original("src/subtitles/HdmvSub.cpp", reference["commit"]), reference_segment_header, "ReferenceGolomb"), ("CandidateSegment", (ROOT / "src/subtitles/HdmvSub.cpp").read_bytes(), (ROOT / "src/subtitles/HdmvSub.h").read_bytes(), "CandidateGolomb")):
+        text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        hdmv_segment_header = hdmv_segment_header.decode("utf-8-sig").replace("\r\n", "\n")
+        if name == "CandidateSegment":
+            hdmv_storage += "#define XY_VSFILTER_RUST_TEXT\n"
+        hdmv_storage += f"namespace {name} {{\ntypedef TrackedSegmentReader<{reader}> CGolombBuffer;\nclass CHdmvSub:public CBaseSub {{public:\n"
+        hdmv_storage += extract_method(hdmv_segment_header, "enum HDMV_SEGMENT_TYPE") + ";\n"
+        start = hdmv_segment_header.index("    HDMV_SEGMENT_TYPE            m_nCurSegment;")
+        end = hdmv_segment_header.index("    HDMV_PRESENTATION_SEGMENT*           m_pCurrentPresentationSegment;", start)
+        hdmv_storage += hdmv_segment_header[start:end]
+        hdmv_storage += "DummyPresentation* m_pCurrentPresentationSegment;CHdmvSub();~CHdmvSub();void AllocSegment(int);HRESULT ParseSample(BYTE*,int,REFERENCE_TIME,REFERENCE_TIME);\nSEGMENT_CALLBACKS\n};\n"
+        for signature in ("CHdmvSub::CHdmvSub(void)", "CHdmvSub::~CHdmvSub()", "void CHdmvSub::AllocSegment(", "HRESULT CHdmvSub::ParseSample(BYTE*"):
+            method = extract_method(text, signature).replace("delete [] m_pSegBuffer;", "rleRelease(m_pSegBuffer);").replace("DEBUG_NEW BYTE[nSize]", "rleAllocate(nSize)")
+            hdmv_storage += method + "\n"
+        hdmv_storage += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_hdmv_storage.h").write_text(hdmv_storage, encoding="utf-8")
+
     hdmv = hdmv_source.decode("utf-8-sig").split("#include", 1)[0]
     hdmv += '#include "hdmv_shell.h"\n#include "original_golomb.h"\n'
     hdmv += """
@@ -1456,6 +1477,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     gauss_planes_result = run([str(gauss_planes_executable)], capture_output=True, text=True)
     print(gauss_planes_result.stdout, end="", flush=True)
     print(gauss_planes_result.stderr, end="", file=sys.stderr)
+    hdmv_storage_executable = destination / ("hdmv-storage-oracle.exe" if os.name == "nt" else "hdmv-storage-oracle")
+    hdmv_storage_compile = [arg.replace("find_char_oracle.cpp", "hdmv_storage_oracle.cpp").replace("find-char-oracle", "hdmv-storage-oracle") for arg in find_char_compile]
+    run(hdmv_storage_compile)
+    hdmv_storage_result = run([str(hdmv_storage_executable)], capture_output=True, text=True)
+    print(hdmv_storage_result.stdout, end="", flush=True)
+    print(hdmv_storage_result.stderr, end="", file=sys.stderr)
     clip_mask_executable = destination / ("clip-mask-oracle.exe" if os.name == "nt" else "clip-mask-oracle")
     clip_mask_compile = [arg.replace("find_char_oracle.cpp", "clip_mask_oracle.cpp").replace("find-char-oracle", "clip-mask-oracle") for arg in find_char_compile]
     run(clip_mask_compile)
@@ -1857,6 +1884,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "path_align_compile_command": path_align_compile,
         "path_align_result": path_align_result.stdout, "path_align_stderr": path_align_result.stderr,
         "path_align_scope": "Complete pinned PathData::AlignLeftTop over initialized point/type buffers; actual Windows POINT/ATL geometry; exact guarded buffers, origin/size, errno/FP/Windows error state; native cleanup modeled, outputs disjoint and representable arithmetic only",
+        "hdmv_storage_compile_command": hdmv_storage_compile,
+        "hdmv_storage_result": hdmv_storage_result.stdout, "hdmv_storage_stderr": hdmv_storage_result.stderr,
+        "hdmv_storage_scope": "Whole pinned constructor/destructor, AllocSegment and byte-sample ParseSample with real reference/candidate Golomb readers. All segment tags, split/short/multiple packets, retained capacity/tails, exact initialized masks and bytes, null/empty calls and modeled Rust decline to successful native allocation. Presentation/segment consumers and Reset are controlled; partial-tail dispatch observes metadata only, never uninitialized bytes. Negative caller lengths, source-buffer aliasing, native debug traps and actual OOM excluded.",
         "clip_mask_compile_command": clip_mask_compile,
         "clip_mask_result": clip_mask_result.stdout, "clip_mask_stderr": clip_mask_result.stderr,
         "clip_mask_scope": "Whole pinned PaintBaseClipper with controlled polygon producer, exact native geometry, normal/inverse narrowing including all input byte values, offscreen/empty/reuse, modeled mask-allocation failure, retained shared owners and logical cache accounting. Both implementations are skipped before execution if final row cursors would exceed actual backing; these exclusions are not passes. Native overflowing geometry, invalid backings, object allocation failure and actual OOM excluded.",
