@@ -3,6 +3,7 @@ param(
     [Parameter(Mandatory=$true)][string]$Baseline,
     [ValidateRange(0,256)][int]$MutationCount = 0,
     [uint32]$MutationSeed = 12345,
+    [switch]$RustDocumentOwner,
     [string]$Output = ""
 )
 $ErrorActionPreference = "Stop"
@@ -29,6 +30,7 @@ $candidateStatus = @(& git -C $candidateRoot status --porcelain)
     windows_sdk_version = $env:WindowsSDKVersion
     mutation_count = $MutationCount
     mutation_seed = $MutationSeed
+    document_storage = if ($RustDocumentOwner) { "rust-experimental" } else { "native" }
 } | ConvertTo-Json -Depth 10 | Set-Content "$evidence\build-info.json" -Encoding utf8
 & git -C $candidateRoot diff --binary "--output=$evidence\candidate-working-tree.patch" HEAD
 
@@ -37,6 +39,7 @@ function Build-Native([string]$Root, [string]$Label, [bool]$Rust) {
         "/p:Configuration=Release", "/p:Platform=$Platform", "/p:BuildProjectReferences=false",
         "/bl:$evidence\$Label.binlog", "/fl", "/flp:logfile=$evidence\$Label.log;verbosity=normal")
     if ($Rust) { $arguments += "/p:RustTextDecoder=true" }
+    if ($Rust -and $RustDocumentOwner) { $arguments += "/p:RustDocumentOwnerExperimental=true" }
     & msbuild @arguments
     if ($LASTEXITCODE -ne 0) { throw "$Label native build failed ($LASTEXITCODE)" }
 }
@@ -54,6 +57,9 @@ try {
     & "$PSScriptRoot\build_rust_windows.ps1" -Platform $Platform
     Build-Native $baselineRoot "baseline" $false
     Build-Native $candidateRoot "candidate" $true
+    if ($RustDocumentOwner -and !(Select-String -Path "$evidence\candidate.log" -SimpleMatch "XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL" -Quiet)) {
+        throw "Experimental owner macro absent from candidate build log"
+    }
     foreach ($name in @("VSFilter.dll", "XySubFilter.dll", "xy_sub_filter_consumer.dll")) {
         $original = Find-Dll $baselineRoot $name
         $candidate = Find-Dll $candidateRoot $name

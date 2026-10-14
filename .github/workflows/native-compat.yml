@@ -17,6 +17,7 @@ on:
       - '.github/workflows/native-compat.yml'
       - 'rust/**'
       - 'include/xy_rust_text.h'
+      - 'include/xy_rust_document.h'
       - 'include/xy_rust_ass.h'
       - 'include/xy_rust_reader.h'
       - 'include/xy_rust_drawing.h'
@@ -51,6 +52,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        platform: [x64, Win32]
+        document_storage: [native, rust-experimental]
         include:
           - platform: x64
             arch: x64
@@ -111,12 +114,13 @@ jobs:
         env:
           XY_MUTATION_COUNT: ${{ github.event_name == 'workflow_dispatch' && format('{0}', inputs.mutation_count) || '32' }}
           XY_MUTATION_SEED: ${{ github.event_name == 'workflow_dispatch' && format('{0}', inputs.mutation_seed) || '12345' }}
+          XY_RUST_DOCUMENT_OWNER: ${{ matrix.document_storage == 'rust-experimental' && 'true' || 'false' }}
         run: |
-          & candidate\tools\compat\run_native_comparison.ps1 -Platform ${{ matrix.platform }} -Baseline "$pwd\baseline" -MutationCount ([int]$env:XY_MUTATION_COUNT) -MutationSeed ([uint32]$env:XY_MUTATION_SEED)
+          & candidate\tools\compat\run_native_comparison.ps1 -Platform ${{ matrix.platform }} -Baseline "$pwd\baseline" -MutationCount ([int]$env:XY_MUTATION_COUNT) -MutationSeed ([uint32]$env:XY_MUTATION_SEED) -RustDocumentOwner:($env:XY_RUST_DOCUMENT_OWNER -eq 'true')
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: renderer-evidence-${{ matrix.platform }}
+          name: renderer-evidence-${{ matrix.platform }}${{ matrix.document_storage == 'rust-experimental' && '-rust-document' || '' }}
           path: |
             candidate/artifacts/native/
             candidate/bin/lib*/**/Release/*.dll

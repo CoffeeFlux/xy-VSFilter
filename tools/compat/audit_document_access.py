@@ -12,9 +12,10 @@ import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-FIELDS = 'm_entries m_segments m_styles m_simple m_name m_lcid m_subtitleType m_mode m_encoding m_path m_dstScreenSize m_defaultWrapStyle m_collisions m_fScaledBAS m_layout_size m_fForcedDefaultStyle m_defaultStyle m_ePARCompensationType m_dPARCompensation m_eYCbCrMatrix m_eYCbCrRange'.split()
+FIELDS = 'm_entries m_segments m_document m_styles m_simple m_name m_lcid m_subtitleType m_mode m_encoding m_path m_dstScreenSize m_defaultWrapStyle m_collisions m_fScaledBAS m_layout_size m_fForcedDefaultStyle m_defaultStyle m_ePARCompensationType m_dPARCompensation m_eYCbCrMatrix m_eYCbCrRange'.split()
 METHODS = 'Copy CopyStyles Empty IsEmpty Sort RemoveAllEntries CreateSegments Open SaveAs Add AddSTSEntryOnly CreateDefaultStyle ChangeUnknownStylesToDefault AddStyle SetDefaultStyle GetDefaultStyle SetForceDefaultStyle ConvertToTimeBased ConvertToFrameBased TranslateStart TranslateEnd SearchSub TranslateSegmentStart TranslateSegmentEnd TranslateSegmentStartEnd SearchSubs SearchSubs2 GetSegment GetStyle GetCharSet IsEntryUnicode ConvertUnicode GetStrW GetStrWA SetStr OnChanged GetEntryCount GetEntrySnapshot GetEntryEnd GetEntryLayer GetEntryReadOrder GetEntryEffect GetSegmentEntryCount FindNextSegment SearchSubs2Snapshot IsSegmentAnimated OrSegmentAnimated'.split()
-PATTERN = re.compile(r'\b(' + '|'.join(FIELDS + METHODS + ['CSimpleTextSubtitle', 'STSEntry', 'STSSegment']) + r')\b')
+METHODS.append('GetSegmentCount')
+PATTERN = re.compile(r'\b(' + '|'.join(FIELDS + METHODS + ['CSimpleTextSubtitle', 'STSEntry', 'STSSegment', 'DocumentOwner', 'DocumentReply']) + r')\b')
 
 def scan(reviewed):
     records = []

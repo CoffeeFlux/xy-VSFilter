@@ -236,7 +236,7 @@ still requires D4/D5 below and all remaining ownership/fallback accounting.
 | D0 — Freeze the contract | Exact operation/callsite inventory, owner/alias graph and retained-adapter list for DOC-01 through DOC-11 | Source review across STS, RTS, format importers and both style APIs; explicitly track unresolved behavior. Status: in progress. |
 | D1 — Capture complete lifecycles | A pinned-reference document harness for create → add → edit/style-change → copy → sort → seek → clear/reopen → destroy | Compare full initialized document/segment state, observable callback/error order and caller snapshots; use real ATL/CRT on Windows. Include failed operations and repeated calls, with failures never counted as parity. Status: in progress; prepared-record sequence harness passes locally, full native lifecycle remains open. |
 | D2 — Implement the Rust owner | Safe Rust entries, styles, metadata and segments; coherent document operations reuse existing helpers | Owner/copy/edit/drop tests, raw UTF-16 preservation, bounded access, no native mutable views; native field/type/alias compatibility reviewed. Status: D2a core in progress; prepared entries/segments and TIME queries implemented, production integration pending. |
-| D3 — Route every caller | Importers, renderer, style interfaces and export paths use document operations or bounded snapshots | Enumerate and eliminate direct authoritative CAtlArray/CAtlMap entry/style/segment accesses in the Rust-enabled build; preserve callback/lock order and public ABI. Retire superseded fine-grained FFI crossings. Status: planned. |
+| D3 — Route every caller | Importers, renderer, style interfaces and export paths use document operations or bounded snapshots | Enumerate and eliminate direct authoritative CAtlArray/CAtlMap entry/style/segment accesses in the Rust-enabled build; preserve callback/lock order and public ABI. Retire superseded fine-grained FFI crossings. Status: entries/segments routed in opt-in experimental build; Windows validation pending; styles/metadata remain native. |
 | D4 — Establish parity | Document lifecycle and integrated DLL comparisons on Windows x86/x64 at one exact candidate commit | Exact records, ordering, times, errors, rendering output and style API behavior; existing corpus/mutations, targeted lifecycle/malformed fixtures, Miri and relevant native checks. Resolve mismatches; no undocumented native document fallback. Status: planned. |
 | D5 — Close and hand off | Written ownership/access review and applicable consumer validation | Aegisub load/render/seek/reload/close, relevant player/style-edit lifecycles and architecture results. Record finite corpus scope and bounded retained adapters. Until the real-host check is complete, report core-complete/host-validation-pending, never closed. Status: planned. |
 
@@ -560,6 +560,75 @@ blocks from 343 to 345. It adds no raw-memory primitive; the core remains entire
 safe. Canonical production entry/segment arrays are still native, with no owner
 retired in this increment. Connecting the native wrapper, preparation/lifecycle
 operations and all remaining callers remains the next integration milestone.
+
+At `b9875011`, [verified Windows evidence](rust-document-cstring-windows-evidence.json)
+now confirms the 100,352-state comparison with actual ATL CString equality on
+both architectures, all 256 primitive string comparisons and sixteen assignment
+checks, and the native CRITICAL_SECTION admission probe. Miri also passes.
+Those results cover the prepared owner and candidate admission mechanism before
+the native class routing described below; they do not validate that routing.
+
+### Experimental native document integration
+
+`/p:RustTextDecoder=true /p:RustDocumentOwnerExperimental=true` now selects an
+opt-in native renderer variant. Its CSimpleTextSubtitle stores a single native
+RAII adapter holding a Rust registry ID. Both canonical CAtlArray members are
+compiled out, along with the borrowed segment-pointer methods and the old
+Segments, SegmentInsertion and TimelineSearch reseeding bridges in STS. This
+variant has one canonical Rust owner; native record/segment snapshots and native
+sort temporaries are values, not persistent mirrors. The default build remains
+unchanged in ownership.
+
+All STS entry/segment accesses route through the adapter: parser Add suffixes,
+MicroDVD correction, Copy/Empty, style renaming/default assignment, native text
+conversion/editing, sorting, endpoint conversion, lookup, SaveAs, logging and
+renderer scalar/snapshot/animation operations. Native styles/default style and
+document metadata remain separate owners. Native Copy still calls virtual Empty
+and copies metadata/styles before storage; self-copy therefore sees the emptied
+source. Native qsort keeps the actual STSEntry width and original comparators,
+then passes a permutation to Rust so original payloads/margins remain intact.
+Frame conversion keeps native llround and start-before-end publication. Rebuild
+releases Rust access before OnChanged. Disabled logging does not materialize
+segment snapshots. TIME search also preserves the original output-write order
+when index/count pointers alias.
+
+`RustDocumentOwner.h` bounds LE wire values, preserves complete native CString
+lengths and raw UTF-16 units, and materializes native values after each Rust call.
+Every call uses the shared recursive native gate. Reply IDs are move-only and
+survive owner destruction; no pointer into canonical Rust storage escapes. This
+increment adds no Rust unsafe code. The existing C ABI caller contract and native
+wrapper lifetime still apply.
+
+Internal failures in this experimental adapter throw a private status exception;
+failed destruction terminates rather than continuing with an unresolved owner.
+These outcomes are **not** approved public compatibility behavior. Allocator
+reentry/recoverable OOM, partial native Copy allocation failures, dialog-driven
+replacement between style snapshot and assignment, and host publication/close
+lifetime remain gates before any default switch. Native subtraction comparators
+remain native; unvalidated overflow histories are not counted as parity.
+
+Source review and include-stripped preprocessing find no active canonical array
+or old reseeding-bridge tokens in experimental STS/RTS code with logging enabled
+or disabled. This is not Windows compilation or runtime evidence. The inventory
+records both build variants and remapped source locations. Windows CI now runs
+native and experimental storage variants separately on x86 and x64, using the
+same pinned reference, export/dependency checks, COM cases and exact-frame corpus.
+Experimental artifacts use the `renderer-evidence-ARCH-rust-document` name;
+`summarize_evidence.py --document-storage rust-experimental` requires matching
+build metadata and the experimental macro in the compiler log. Native-only
+evidence cannot satisfy that selection. Actual Windows owner compilation and
+full renderer results are pending for this integration.
+
+The focused Windows probe also compiles the exact adapter against actual ATL
+types and compares its complete records, segment membership and scalar results
+with extracted pinned storage methods. It exercises copying, clearing,
+rebuilding, text/style edits, animation and snapshots that outlive their owner.
+The current experimental lookup facade is checked with aliased output pointers
+in TIME and bounded FRAME cases; a negative control changes a string suffix
+after an embedded NUL to verify that full stored values are compared. This
+probe covers prepared storage operations, not native parsing, metadata or the
+whole public class ABI. Local source generation and Python checks pass; actual
+Windows execution remains required.
 
 ## Independent audit and unsafe boundary
 

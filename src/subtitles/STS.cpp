@@ -41,11 +41,16 @@
 #include "xy_rust_font_records.h"
 #include "xy_rust_webvtt.h"
 #include "xy_rust_fields.h"
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 #include "xy_rust_segments.h"
 #include "xy_rust_segment_insert.h"
 #include "xy_rust_timeline_search.h"
 #endif
+#endif
 #include "STS.h"
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+#include "RustDocumentOwner.h"
+#endif
 #include <atlbase.h>
 
 #include "RealTextParser.h"
@@ -1627,8 +1632,12 @@ static bool OpenMicroDVD(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
         {
             if(fCheck2 && !ret.IsEmpty())
             {
-                STSEntry& stse = ret.m_entries[ret.m_entries.GetCount()-1];
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                ret.m_document->CorrectLastEnd(MS2RT(start));
+#else
+                STSEntry& stse = ret.m_entries[ret.GetEntryCount()-1];
                 stse.end = min(stse.end, MS2RT(start));
+#endif
                 fCheck2 = false;
             }
 
@@ -2867,6 +2876,9 @@ static int nOpenFuncts = countof(OpenFuncts);
 //
 
 CSimpleTextSubtitle::CSimpleTextSubtitle()
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    : m_document(new XyRust::DocumentOwner)
+#endif
 {
     m_subtitleType         = EXTSRT;
     m_mode                 = TIME;
@@ -2903,8 +2915,12 @@ void CSimpleTextSubtitle::Copy(CSimpleTextSubtitle& sts)
     m_defaultStyle                 = sts.m_defaultStyle;
     m_fForcedDefaultStyle          = sts.m_fForcedDefaultStyle;
     CopyStyles     (sts.m_styles  );
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    m_document->CopyFrom(*sts.m_document);
+#else
     m_segments.Copy(sts.m_segments);
     m_entries.Copy (sts.m_entries );
+#endif
 }
 
 void CSTSStyleMap::Free()
@@ -2947,8 +2963,12 @@ void CSimpleTextSubtitle::Empty()
 {
     m_dstScreenSize = CSize(0, 0);
     m_styles.Free();
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    m_document->Clear();
+#else
     m_segments.RemoveAll();
     m_entries.RemoveAll();
+#endif
 }
 
 static bool SegmentCompStart(const STSSegment& segment, REFERENCE_TIME start)
@@ -2964,7 +2984,7 @@ void CSimpleTextSubtitle::Add(CStringW str, bool fUnicode, REFERENCE_TIME start,
         <<" actor:"<<actor.GetString()<<" effect:"<<effect.GetString()
         <<" (l:"<<marginRect.left<<",t:"<<marginRect.top<<",r:"<<marginRect.right<<",b:"<<marginRect.bottom
         <<" layer:"<<layer<<" readorder:"<<readorder
-        <<" entries:"<<m_entries.GetCount()<<" seg:"<<m_segments.GetCount());
+        <<" entries:"<<GetEntryCount()<<" seg:"<<GetSegmentCount());
 
     FastTrim(str);
     if (str.IsEmpty() || start > end) return;
@@ -2992,13 +3012,16 @@ void CSimpleTextSubtitle::Add(CStringW str, bool fUnicode, REFERENCE_TIME start,
     sub.layer      = layer;
     sub.start      = start;
     sub.end        = end;
-    sub.readorder  = readorder < 0 ? (int)m_entries.GetCount() : readorder;
+    sub.readorder  = readorder < 0 ? (int)GetEntryCount() : readorder;
 
-    int n = (int)m_entries.GetCount();
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    m_document->AddPrepared(sub, m_subtitleType == EXTVTT ? 2 : 0);
+#else
+    int n = (int)GetEntryCount();
 
     if (start == end) return;
 
-    size_t segmentsCount = m_segments.GetCount();
+    size_t segmentsCount = GetSegmentCount();
 
     if (segmentsCount == 0) { // First segment
         n = (int)m_entries.Add(sub);
@@ -3026,8 +3049,8 @@ void CSimpleTextSubtitle::Add(CStringW str, bool fUnicode, REFERENCE_TIME start,
         size_t i = segment - segmentsStart;
 #ifdef XY_VSFILTER_RUST_TEXT
         XyRust::SegmentInsertion insertion;
-        for (size_t j = 0; j < m_entries.GetCount(); ++j) insertion.Order(m_entries.GetAt(j).readorder);
-        for (size_t j = 0; j < m_segments.GetCount(); ++j) {
+        for (size_t j = 0; j < GetEntryCount(); ++j) insertion.Order(m_entries.GetAt(j).readorder);
+        for (size_t j = 0; j < GetSegmentCount(); ++j) {
             const STSSegment& existing = m_segments[j];
             insertion.Segment(existing.start, existing.end);
             for (size_t k = 0; k < existing.subs.GetCount(); ++k) insertion.Sub(existing.subs[k]);
@@ -3052,7 +3075,7 @@ void CSimpleTextSubtitle::Add(CStringW str, bool fUnicode, REFERENCE_TIME start,
         }
 
         REFERENCE_TIME lastEnd = _I64_MAX;
-        for (; i < m_segments.GetCount() && m_segments[i].start < end; i++) {
+        for (; i < GetSegmentCount() && m_segments[i].start < end; i++) {
             STSSegment& s = m_segments[i];
 
             if (lastEnd < s.start) {
@@ -3102,6 +3125,7 @@ void CSimpleTextSubtitle::Add(CStringW str, bool fUnicode, REFERENCE_TIME start,
         }
 #endif
     }
+#endif
 }
 
 void CSimpleTextSubtitle::AddSTSEntryOnly( CStringW str, bool fUnicode, REFERENCE_TIME start, REFERENCE_TIME end, CString style /*= _T("Default")*/, const CString& actor /*= _T("")*/, const CString& effect /*= _T("")*/, const CRect& marginRect /*= CRect(0,0,0,0)*/, int layer /*= 0*/, int readorder /*= -1*/ )
@@ -3124,8 +3148,12 @@ void CSimpleTextSubtitle::AddSTSEntryOnly( CStringW str, bool fUnicode, REFERENC
     sub.layer      = layer;
     sub.start      = start;
     sub.end        = end;
-    sub.readorder  = readorder < 0 ? m_entries.GetCount() : readorder;
+    sub.readorder  = readorder < 0 ? GetEntryCount() : readorder;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    m_document->AddPrepared(sub, 1);
+#else
     m_entries.Add(sub);
+#endif
     return;
 }
 
@@ -3135,9 +3163,13 @@ void CSimpleTextSubtitle::ChangeUnknownStylesToDefault()
     bool fReport = true;
     CString last_style = _T("!@dkdfjlakfkjjklezdv^5132ae");
     bool last_style_changed_to_unknow = false;
-    for(size_t i = 0; i < m_entries.GetCount(); i++)
+    for(size_t i = 0; i < GetEntryCount(); i++)
     {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        STSEntry stse = m_document->Entry((int)i);
+#else
         STSEntry& stse = m_entries.GetAt(i);
+#endif
 
         STSStyle* val;
         if (last_style == stse.style)
@@ -3147,6 +3179,9 @@ void CSimpleTextSubtitle::ChangeUnknownStylesToDefault()
             if (last_style_changed_to_unknow)
             {
                 stse.style = g_default_style;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                m_document->SetStyle((int)i, stse.style);
+#endif
             }
         }
         else
@@ -3168,6 +3203,9 @@ void CSimpleTextSubtitle::ChangeUnknownStylesToDefault()
                 }
 
                 stse.style = g_default_style;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                m_document->SetStyle((int)i, stse.style);
+#endif
             }
         }
     }
@@ -3217,11 +3255,15 @@ void CSimpleTextSubtitle::AddStyle(CString name, STSStyle* style)
         m_styles.RemoveKey(name);
         m_styles[name3] = val;
 
-        for (size_t j = 0, count = m_entries.GetCount(); j < count; j++)
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        m_document->RenameStyle(name, name3);
+#else
+        for (size_t j = 0, count = GetEntryCount(); j < count; j++)
         {
             STSEntry& stse = m_entries.GetAt(j);
             if(stse.style == name) stse.style = name3;
         }
+#endif
     }
 
     m_styles[name] = style;
@@ -3240,10 +3282,11 @@ void CSimpleTextSubtitle::SetForceDefaultStyle( bool value )
     m_fForcedDefaultStyle = value;
 }
 
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 const STSSegment* CSimpleTextSubtitle::SearchSubs(REFERENCE_TIME t, double fps, /*[out]*/ int* iSegment, int* nSegments)
 {
 #ifdef XY_VSFILTER_RUST_TEXT
-    const int count = static_cast<int>(m_segments.GetCount());
+    const int count = static_cast<int>(GetSegmentCount());
     if (nSegments) *nSegments = count;
     XyRust::TimelineSearch search(1, t, count);
     while (search.Pending()) search.Supply(TranslateSegmentEnd(search.Index(), fps));
@@ -3256,7 +3299,7 @@ const STSSegment* CSimpleTextSubtitle::SearchSubs(REFERENCE_TIME t, double fps, 
     }
     return NULL;
 #else
-    int segmentsCount = m_segments.GetCount();
+    int segmentsCount = GetSegmentCount();
     int i = 0, j = segmentsCount - 1;
 
     if(nSegments) *nSegments = segmentsCount;
@@ -3304,7 +3347,7 @@ const STSSegment* CSimpleTextSubtitle::SearchSubs(REFERENCE_TIME t, double fps, 
 STSSegment* CSimpleTextSubtitle::SearchSubs2(REFERENCE_TIME t, double fps, /*[out]*/ int* iSegment, int* nSegments)
 {
 #ifdef XY_VSFILTER_RUST_TEXT
-    const int count = static_cast<int>(m_segments.GetCount());
+    const int count = static_cast<int>(GetSegmentCount());
     if (iSegment) *iSegment = -1;
     if (nSegments) *nSegments = count;
     XyRust::TimelineSearch search(2, t, count);
@@ -3317,7 +3360,7 @@ STSSegment* CSimpleTextSubtitle::SearchSubs2(REFERENCE_TIME t, double fps, /*[ou
     }
     return search.Found() ? &m_segments[search.Result()] : NULL;
 #else
-    int segmentsCount = m_segments.GetCount();
+    int segmentsCount = GetSegmentCount();
     int i = 0, j = segmentsCount - 1;
 
     if(iSegment) *iSegment = -1;
@@ -3360,45 +3403,100 @@ STSSegment* CSimpleTextSubtitle::SearchSubs2(REFERENCE_TIME t, double fps, /*[ou
 #endif
 }
 
+#endif
+
 REFERENCE_TIME CSimpleTextSubtitle::TranslateStart(int i, double fps)
 {
-    int n = m_entries.GetCount();
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    int n = (int)GetEntryCount();
+    return(i < 0 || n <= i ? -1 :
+        m_mode == TIME ? m_document->EntryStart(i) :
+        m_mode == FRAME ? std::llround(m_document->EntryStart(i) * UNITS_FLOAT / fps) :
+        0);
+#else
+    int n = GetEntryCount();
     return(i < 0 || n <= i ? -1 :
         m_mode == TIME ? m_entries.GetAt(i).start :
         m_mode == FRAME ? std::llround(m_entries.GetAt(i).start * UNITS_FLOAT / fps) :
         0);
+#endif
 }
 
 REFERENCE_TIME CSimpleTextSubtitle::TranslateEnd(int i, double fps)
 {
-    int n = m_entries.GetCount();
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    int n = (int)GetEntryCount();
+    return(i < 0 || n <= i ? -1 :
+        m_mode == TIME ? m_document->EntryEnd(i) :
+        m_mode == FRAME ? std::llround(m_document->EntryEnd(i) * UNITS_FLOAT / fps) :
+        0);
+#else
+    int n = GetEntryCount();
     return(i < 0 || n <= i ? -1 :
         m_mode == TIME ? m_entries.GetAt(i).end :
         m_mode == FRAME ? std::llround(m_entries.GetAt(i).end * UNITS_FLOAT / fps) :
         0);
+#endif
 }
 
 REFERENCE_TIME CSimpleTextSubtitle::TranslateSegmentStart(int i, double fps)
 {
-    int n = m_segments.GetCount();
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    int n = (int)GetSegmentCount();
+    return(i < 0 || n <= i ? -1 :
+        m_mode == TIME ? m_document->SegmentStart(i) :
+        m_mode == FRAME ? std::llround(m_document->SegmentStart(i) * UNITS_FLOAT / fps) :
+        0);
+#else
+    int n = GetSegmentCount();
     return(i < 0 || n <= i ? -1 :
         m_mode == TIME ? m_segments[i].start :
         m_mode == FRAME ? std::llround(m_segments[i].start * UNITS_FLOAT / fps) :
         0);
+#endif
 }
 
 REFERENCE_TIME CSimpleTextSubtitle::TranslateSegmentEnd(int i, double fps)
 {
-    int n = m_segments.GetCount();
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    int n = (int)GetSegmentCount();
+    return(i < 0 || n <= i ? -1 :
+        m_mode == TIME ? m_document->SegmentEnd(i) :
+        m_mode == FRAME ? std::llround(m_document->SegmentEnd(i) * UNITS_FLOAT / fps) :
+        0);
+#else
+    int n = GetSegmentCount();
     return(i < 0 || n <= i ? -1 :
         m_mode == TIME ? m_segments[i].end :
         m_mode == FRAME ? std::llround(m_segments[i].end * UNITS_FLOAT / fps) :
         0);
+#endif
 }
 
 void CSimpleTextSubtitle::TranslateSegmentStartEnd(int i, double fps, /*out*/REFERENCE_TIME& start, /*out*/REFERENCE_TIME& end)
 {
-    int n = m_segments.GetCount();
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    int n = (int)GetSegmentCount();
+    if(i < 0 || n <= i)
+    {
+        start=-1;
+        end=-1;
+    }
+    else
+    {
+        if(m_mode == TIME)
+        {
+            start = m_document->SegmentStart(i);
+            end = m_document->SegmentEnd(i);
+        }
+        else //m_mode == FRAME
+        {
+            start = std::llround(m_document->SegmentStart(i) * UNITS_FLOAT / fps);
+            end = std::llround(m_document->SegmentEnd(i) * UNITS_FLOAT / fps);
+        }
+    }
+#else
+    int n = GetSegmentCount();
     if(i < 0 || n <= i)
     {
         start=-1;
@@ -3417,72 +3515,182 @@ void CSimpleTextSubtitle::TranslateSegmentStartEnd(int i, double fps, /*out*/REF
             end = std::llround(m_segments[i].end * UNITS_FLOAT / fps);
         }
     }
+#endif
 }
 
-// Native-backed document access surface. Keep borrowed array views local to
-// these operations; returned snapshots contain independent native values.
+// Document access surface: native arrays by default, persistent Rust storage
+// in the experimental build. Returned snapshots contain owned native values.
 size_t CSimpleTextSubtitle::GetEntryCount() const
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return m_document->Count();
+#else
     return m_entries.GetCount();
+#endif
+}
+
+size_t CSimpleTextSubtitle::GetSegmentCount() const
+{
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return m_document->SegmentCount();
+#else
+    return m_segments.GetCount();
+#endif
 }
 
 STSEntry CSimpleTextSubtitle::GetEntrySnapshot(int i) const
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return m_document->Entry(i);
+#else
     return m_entries.GetAt(i);
+#endif
 }
 
 REFERENCE_TIME CSimpleTextSubtitle::GetEntryEnd(int i) const
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return m_document->EntryEnd(i);
+#else
     return m_entries.GetAt(i).end;
+#endif
 }
 
 int CSimpleTextSubtitle::GetEntryLayer(int i) const
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return m_document->EntryLayer(i);
+#else
     return m_entries.GetAt(i).layer;
+#endif
 }
 
 int CSimpleTextSubtitle::GetEntryReadOrder(int i) const
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return m_document->EntryReadOrder(i);
+#else
     return m_entries.GetAt(i).readorder;
+#endif
 }
 
 CString CSimpleTextSubtitle::GetEntryEffect(int i) const
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return m_document->EntryEffect(i);
+#else
     return m_entries.GetAt(i).effect;
+#endif
 }
 
 bool CSimpleTextSubtitle::GetSegmentEntryCount(int iSegment, size_t& count) const
 {
-    if(iSegment < 0 || iSegment >= (int)m_segments.GetCount()) return false;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return m_document->SegmentEntryCount(iSegment, count);
+#else
+    if(iSegment < 0 || iSegment >= (int)GetSegmentCount()) return false;
     count = m_segments[iSegment].subs.GetCount();
     return true;
+#endif
 }
 
 bool CSimpleTextSubtitle::FindNextSegment(REFERENCE_TIME t, double fps,
     int* iSegment, int* nSegments)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    if(m_mode == TIME) {
+        const XyRust::DocumentQuery query = m_document->Query(1, t);
+        if(nSegments) *nSegments = (int)query.count;
+        if(iSegment) *iSegment = query.index;
+        if(!query.found) {
+            if(query.count == 0) TRACE_SUB("No subtitles at "<<XY_LOG_VAR_2_STR(t));
+            else TRACE_SUB("No subtitles at "<<XY_LOG_VAR_2_STR(RT2MS(t)));
+        }
+        return query.found;
+    }
+    const int segmentsCount = (int)GetSegmentCount();
+    int i = 0, j = segmentsCount - 1;
+    if(nSegments) *nSegments = segmentsCount;
+    if(segmentsCount <= 0) {
+        if(iSegment) *iSegment = 0;
+        TRACE_SUB("No subtitles at "<<XY_LOG_VAR_2_STR(t));
+        return false;
+    }
+    if(t >= TranslateSegmentEnd(j, fps)) { i = j; j++; }
+    if(t < TranslateSegmentEnd(i, fps)) { j = i; i--; }
+    while(i < j-1) {
+        int mid = (i+j)>>1;
+        REFERENCE_TIME midt = TranslateSegmentEnd(mid, fps);
+        if(t < midt) j = mid; else i = mid;
+    }
+    if(iSegment) *iSegment = j;
+    if(j < segmentsCount) return true;
+    TRACE_SUB("No subtitles at "<<XY_LOG_VAR_2_STR(RT2MS(t)));
+    return false;
+#else
     return SearchSubs(t, fps, iSegment, nSegments) != NULL;
+#endif
 }
 
 bool CSimpleTextSubtitle::SearchSubs2Snapshot(REFERENCE_TIME t, double fps,
     STSSegment& snapshot, int* iSegment, int* nSegments)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    if(m_mode == TIME) {
+        const XyRust::DocumentQuery query = m_document->Query(2, t);
+        if(iSegment) *iSegment = -1;
+        if(nSegments) *nSegments = (int)query.count;
+        // Match native SearchSubs2's conditional final write, even when the
+        // caller aliases iSegment and nSegments (a failed nonempty query leaves
+        // the count in that shared output).
+        if(query.count == 0 || query.found) {
+            if(iSegment) *iSegment = query.index;
+        }
+        return query.found ? m_document->Segment(query.index, snapshot) : false;
+    }
+    const int segmentsCount = (int)GetSegmentCount();
+    int i = 0, j = segmentsCount - 1;
+    if(iSegment) *iSegment = -1;
+    if(nSegments) *nSegments = segmentsCount;
+    if(segmentsCount <= 0) { if(iSegment) *iSegment = 0; return false; }
+    if(t >= TranslateSegmentEnd(j, fps)) { i = j; j++; }
+    if(t < TranslateSegmentEnd(i, fps)) { j = i; i--; }
+    while(i < j-1) {
+        int mid = (i+j)>>1;
+        REFERENCE_TIME midt = TranslateSegmentEnd(mid, fps);
+        if(t < midt) j = mid; else i = mid;
+    }
+    if(j < segmentsCount && t >= TranslateSegmentStart(j, fps)) {
+        if(iSegment) *iSegment = j;
+        return m_document->Segment(j, snapshot);
+    }
+    return false;
+#else
     const STSSegment* segment = SearchSubs2(t, fps, iSegment, nSegments);
     if(!segment) return false;
     snapshot = *segment;
     return true;
+#endif
 }
 
 bool CSimpleTextSubtitle::IsSegmentAnimated(unsigned int iSegment) const
 {
-    return iSegment < m_segments.GetCount() ? m_segments[iSegment].animated : false;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return m_document->IsAnimated(iSegment);
+#else
+    return iSegment < GetSegmentCount() ? m_segments[iSegment].animated : false;
+#endif
 }
 
 void CSimpleTextSubtitle::OrSegmentAnimated(int iSegment, bool animated)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    m_document->AnimationOr(iSegment, animated);
+#else
     // Callers must use the index selected for this render sequence. An invalid
     // index is a contract failure, never a silently discarded feedback update.
     m_segments.GetAt(iSegment).animated |= animated;
+#endif
 }
 
 STSStyle* CSimpleTextSubtitle::GetStyle(int i)
@@ -3490,7 +3698,11 @@ STSStyle* CSimpleTextSubtitle::GetStyle(int i)
     STSStyle* style = NULL;
     if (!m_fForcedDefaultStyle)
     {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        if (!m_styles.Lookup(m_document->Entry(i).style, style) &&
+#else
         if (!m_styles.Lookup(m_entries.GetAt(i).style, style) &&
+#endif
             !m_styles.Lookup(         g_default_style, style))
         {
             style = &m_defaultStyle;
@@ -3520,7 +3732,11 @@ int CSimpleTextSubtitle::GetCharSet(int i)
 
 CStringW CSimpleTextSubtitle::GetStrW(int i, bool fSSA)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    STSEntry stse = m_document->Entry(i);
+#else
     STSEntry const& stse = m_entries.GetAt(i);
+#endif
     int CharSet = GetCharSet(i);
 
     CStringW str = stse.str;
@@ -3536,12 +3752,25 @@ CStringW CSimpleTextSubtitle::GetStrW(int i, bool fSSA)
 
 void CSimpleTextSubtitle::CreateSegments()
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    m_document->Rebuild();
+    OnChanged();
+#if ENABLE_XY_LOG_TEXT_SUBTITLE
+    CAtlArray<STSSegment> segments;
+    for(size_t i = 0, count = GetSegmentCount(); i < count; i++) {
+        STSSegment segment;
+        m_document->Segment((int)i, segment);
+        segments.Add(segment);
+    }
+    LogSegments(segments);
+#endif
+#else
     m_segments.RemoveAll();
 
 #ifdef XY_VSFILTER_RUST_TEXT
     {
         XyRust::Segments segments;
-        for (size_t i = 0; i < m_entries.GetCount(); ++i) {
+        for (size_t i = 0; i < GetEntryCount(); ++i) {
             const STSEntry& entry = m_entries.GetAt(i);
             segments.Add(entry.start, entry.end);
         }
@@ -3554,13 +3783,13 @@ void CSimpleTextSubtitle::CreateSegments()
         }
     }
 #else
-    if(m_entries.GetCount()>0)
+    if(GetEntryCount()>0)
     {
         size_t start, mid, end;
         CAtlArray<STSSegment> tempSegments;//if add to m_segments directly, then remove empty entities can be a
                                            //complex operation when having large segmentCount and lots of empty entities
-        std::vector<REFERENCE_TIME> breakpoints(2*m_entries.GetCount());
-        for(size_t i = 0; i < m_entries.GetCount(); i++)
+        std::vector<REFERENCE_TIME> breakpoints(2*GetEntryCount());
+        for(size_t i = 0; i < GetEntryCount(); i++)
         {
             STSEntry& stse = m_entries.GetAt(i);
             breakpoints[2*i]=stse.start;
@@ -3582,7 +3811,7 @@ void CSimpleTextSubtitle::CreateSegments()
 
         size_t segmentCount = tempSegments.GetCount();
 
-        for(size_t i = 0; i < m_entries.GetCount(); i++)
+        for(size_t i = 0; i < GetEntryCount(); i++)
         {
             STSEntry& stse = m_entries.GetAt(i);
             start = 0;
@@ -3609,6 +3838,7 @@ void CSimpleTextSubtitle::CreateSegments()
 #endif
     OnChanged();
     LogSegments(m_segments);
+#endif
 }
 
 bool CSimpleTextSubtitle::Open(CString fn, int CharSet, CString name)
@@ -3661,7 +3891,7 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
         XY_LOG_INFO("Open '"<<f->GetFilePath().GetString()<<"' with "<<func_name[i]<<" begin" );
         if(!OpenFuncts[i].open(f, *this, CharSet) /*|| !GetCount()*/)
         {
-            if(m_entries.GetCount() > 0)
+            if(GetEntryCount() > 0)
             {
                 CString lastLine;
                 size_t n = CountLines(f, pos, f->GetPosition(), lastLine);
@@ -3717,12 +3947,20 @@ bool CSimpleTextSubtitle::Open(BYTE* data, int len, int CharSet, CString name)
 
 bool CSimpleTextSubtitle::IsEmpty()
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return m_document->Count() == 0;
+#else
     return m_entries.IsEmpty();
+#endif
 }
 
 void CSimpleTextSubtitle::RemoveAllEntries()
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    m_document->RemoveEntries();
+#else
     m_entries.RemoveAll();
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////

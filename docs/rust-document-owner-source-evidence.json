@@ -1,0 +1,68 @@
+{
+  "scope": "Preprocessor branch/token audit with includes removed; not Windows compile, link, runtime or ownership proof",
+  "checks": [
+    {
+      "file": "src/subtitles/STS.h",
+      "logging": 0,
+      "source_sha256": "b112b8aad3f6cef010730b04f0fa79b1cb71f60f7def6feac82ae75d8ea254c0",
+      "preprocessed_sha256": "5155ff372c210dede21a0e03948670f28ea3e33be72483cb65fad97da05a2b82",
+      "active_native_array_tokens": 0,
+      "active_reseeding_bridge_tokens": 0
+    },
+    {
+      "file": "src/subtitles/STS.cpp",
+      "logging": 0,
+      "source_sha256": "6080640ba6a4b2e2cd5c91d0dfb2aa6870dba232843818e307a5b3e58051d981",
+      "preprocessed_sha256": "a104c71cff64ce14bd4972e0ad93278f48044289e1641d7887e83d29eb42ca51",
+      "active_native_array_tokens": 0,
+      "active_reseeding_bridge_tokens": 0
+    },
+    {
+      "file": "src/subtitles/RTS.cpp",
+      "logging": 0,
+      "source_sha256": "39e1997599b7b8483412c727e0e32343bbd6b705c271a4425080a528cb49d9ff",
+      "preprocessed_sha256": "bcd96ae9caac7a048689fd3649f21e0a73aa6d4f7750ca58558d14d8e74c7686",
+      "active_native_array_tokens": 0,
+      "active_reseeding_bridge_tokens": 0
+    },
+    {
+      "file": "src/subtitles/STS.h",
+      "logging": 1,
+      "source_sha256": "b112b8aad3f6cef010730b04f0fa79b1cb71f60f7def6feac82ae75d8ea254c0",
+      "preprocessed_sha256": "5155ff372c210dede21a0e03948670f28ea3e33be72483cb65fad97da05a2b82",
+      "active_native_array_tokens": 0,
+      "active_reseeding_bridge_tokens": 0
+    },
+    {
+      "file": "src/subtitles/STS.cpp",
+      "logging": 1,
+      "source_sha256": "6080640ba6a4b2e2cd5c91d0dfb2aa6870dba232843818e307a5b3e58051d981",
+      "preprocessed_sha256": "83d2e0e03caea1fea0f9f2cef5e108378de077fb92f3b539f530280176a10144",
+      "active_native_array_tokens": 0,
+      "active_reseeding_bridge_tokens": 0
+    },
+    {
+      "file": "src/subtitles/RTS.cpp",
+      "logging": 1,
+      "source_sha256": "39e1997599b7b8483412c727e0e32343bbd6b705c271a4425080a528cb49d9ff",
+      "preprocessed_sha256": "bcd96ae9caac7a048689fd3649f21e0a73aa6d4f7750ca58558d14d8e74c7686",
+      "active_native_array_tokens": 0,
+      "active_reseeding_bridge_tokens": 0
+    }
+  ],
+  "wrapper_sha256": "e98157efab6b678daec8b7a2c769bf79abadccce47d15d23cce25bc34a917f75",
+  "native_owner_retirement": {
+    "default": 0,
+    "experimental": 2,
+    "styles_and_metadata_remain_native": true
+  },
+  "default_branch_check": {
+    "base_commit": "b987501185e313ca6a745a8e690e5f9ddf5d4907",
+    "result": "Existing Rust-text/native-storage STS.cpp preprocessing matches after replacing direct count-helper calls with native counts and removing the new GetSegmentCount implementation.",
+    "limits": "Includes stripped; source equivalence normalization, not compiled Windows equivalence."
+  },
+  "independent_reviews": [
+    "Native routing: prepared Add, Copy/self-copy, sort payload identity, endpoint rounding order, text Unicode flags, export/read paths",
+    "Native wrapper: raw-unit length/offset/signed decoding, bounded sizes, snapshot lifetimes and per-call gate scope"
+  ]
+}

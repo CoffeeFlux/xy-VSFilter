@@ -11,6 +11,16 @@
       <PreprocessorDefinitions>XY_VSFILTER_RUST_TEXT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
+  <!-- Persistent owner integration is deliberately separate from the existing
+       leaf migration build until full native compatibility gates pass. -->
+  <ItemDefinitionGroup Condition="'$(RustDocumentOwnerExperimental)'=='true'">
+    <ClCompile>
+      <PreprocessorDefinitions>XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <Target Name="ValidateRustDocumentOwner" BeforeTargets="PrepareForBuild" Condition="'$(RustDocumentOwnerExperimental)'=='true'">
+    <Error Condition="'$(RustTextDecoder)'!='true'" Text="RustDocumentOwnerExperimental requires RustTextDecoder=true and a complete rebuild of all native projects." />
+  </Target>
   <Target Name="ValidateRustTextDecoder" BeforeTargets="PrepareForBuild" Condition="'$(RustTextDecoder)'=='true'">
     <Error Condition="'$(Configuration)'!='Release' And '$(Configuration)'!='Release Unicode'" Text="RustTextDecoder currently supports Release (/MT) only. Build the reference with the same configuration." />
     <Error Condition="'$(XyRustTarget)'==''" Text="RustTextDecoder supports Win32 and x64 only." />

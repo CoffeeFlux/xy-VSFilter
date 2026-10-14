@@ -84,14 +84,17 @@ def summarize_comparison(root, base, name, reference, mutation_count):
     return summary
 
 
-def summarize_native(run, platform, candidate, reference):
-    root = ROOT / f"artifacts/ci-{run}/renderer-evidence-{platform}"
+def summarize_native(run, platform, candidate, reference, document_storage="native"):
+    assert document_storage in ("native", "rust-experimental")
+    suffix = "-rust-document" if document_storage == "rust-experimental" else ""
+    root = ROOT / f"artifacts/ci-{run}/renderer-evidence-{platform}{suffix}"
     build_path = one(root, "build-info.json")
     base, build = build_path.parent, load(build_path)
     assert build["candidate_commit"] == candidate
     assert build["reference_commit"] == reference
     assert not build["candidate_status"]
     assert build["platform"] == platform
+    assert build.get("document_storage", "native") == document_storage, "Wrong document storage variant"
     entry = {
         "run_url": f"https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/{run}",
         "build": build, "checks": {}, "dlls": {},
@@ -159,6 +162,8 @@ def summarize_native(run, platform, candidate, reference):
                                                 "settings_environment": com["settings_environment"]}
     log = (base / "candidate.log").read_text(errors="replace")
     assert "XY_VSFILTER_RUST_TEXT" in log and "xy_vsfilter_ffi.lib" in log
+    if document_storage == "rust-experimental":
+        assert "XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL" in log
     entry["candidate_log_sha256"] = sha(base / "candidate.log")
     return entry
 
@@ -196,6 +201,8 @@ def main():
     parser.add_argument("portable", help="Portable workflow run ID")
     parser.add_argument("output", type=Path, help="New summary path, relative to the repository")
     parser.add_argument("native", nargs="+", help="Native run ID or RUN/Win32 or RUN/x64")
+    parser.add_argument("--document-storage", choices=["native", "rust-experimental"], default="native",
+                        help="Select separate native or experimental document-owner artifacts")
     args = parser.parse_args()
     if sys.flags.optimize:
         parser.error("Run without -O: evidence validation assertions must remain enabled")
@@ -206,6 +213,7 @@ def main():
     reference = load(ROOT / "tools/compat/reference.json")["commit"]
     result = {
         "schema": 1, "reference_commit": reference, "candidate_commit": args.candidate,
+        "document_storage": args.document_storage,
         "native_runs": [],
         "portable_run_url": f"https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/{args.portable}",
         "portable": [],
@@ -224,7 +232,7 @@ def main():
         run, _, platform = selector.partition("/")
         assert run.isdecimal() and platform in ("", "Win32", "x64"), "Invalid native run selector"
         for selected in ([platform] if platform else ["Win32", "x64"]):
-            result["native_runs"].append(summarize_native(run, selected, args.candidate, reference))
+            result["native_runs"].append(summarize_native(run, selected, args.candidate, reference, args.document_storage))
     result["portable"] = summarize_portable(args.portable, args.candidate, reference)
     with output.open("x", encoding="utf-8", newline="\n") as stream:
         json.dump(result, stream, indent=2)
