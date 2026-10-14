@@ -37,7 +37,7 @@ inventory is incomplete, so there is no defensible overall percentage today.
 | Work package | Implemented/verified pieces | Required closure work | State |
 | --- | --- | --- | --- |
 | Text input, encodings and attachments | Reader/writer buffers, seek targets, charset sequence, embedded-font records | Full input/file/archive/network lifetime inventory; retained CRT/code-page boundaries and public containers | Partial |
-| ASS/SSA documents and timeline | Header/style/dialogue field state, field scanners, timeline lookup/insertion pieces | Own entries/styles/events; sorting, editing and frame/time conversions; complete document lifecycle parity | Partial; next primary closure target |
+| ASS/SSA documents and timeline | Header/style/dialogue field state, field scanners, timeline lookup/insertion pieces | Own entries/styles/events; sorting, editing and frame/time conversions; complete document lifecycle parity | Partial; shared document owner/timeline is first, ASS frontend next |
 | Other text formats | RealText, SAMI, SubRip, MicroDVD, WebVTT and other parser pieces | Complete per-format path checklist, USF and remaining legacy formats, public document storage and malformed-input recovery | Partial |
 | ASS tags, layout and text preparation | Tag lexer, text runs/escape preparation, collision records, placement and width/dimension decisions | Tag interpretation/interactions, native word traversal, karaoke/transforms and cache state | Partial |
 | Fonts, shaping and glyph paths | Font records, path staging, ellipse/arc helpers, selected Arabic handling | GDI/font fallback/metrics, shaping and kerning; persistent path ownership including all copy/reallocation paths | Partial; Windows APIs retained behind bounded adapters |
@@ -69,6 +69,115 @@ safe-core lines, 3,542 FFI lines and 8,588 compatibility-tool lines. These count
 show implementation and validation activity, not elapsed-time attribution or
 completion percentage. Most of the much larger documentation diff is generated
 evidence. No reliable active-work-versus-CI timing ledger was collected.
+
+## Execution plan: close the document subsystem first
+
+Plan baseline: `19032c76`, following the independent audit. This replaces the
+previous practice of selecting the next convenient portable leaf. Existing
+validated work remains available; new production work stays focused on the
+active package, apart from fixes required to keep the validation baseline usable.
+The currently recorded RLE comparison failure must be resolved or explicitly
+isolated with evidence before a new integrated candidate is called green.
+
+The eleven work packages above remain the complete planning map. Execution
+proceeds through these larger outcomes:
+
+| Sequence | Outcome | Dependency and finish boundary |
+| --- | --- | --- |
+| 1 | Shared subtitle document store and timeline | Rust owns persistent entries, styles, document metadata and segments, including all mutations and caller handoffs. Text-format parsers and rendering engines are callers. |
+| 2 | Complete ASS/SSA input and output | Connect existing header/style/dialogue pieces through full parse/recovery, attachments, encoding boundaries and serialization to the closed document store. Include file/memory open and existing output behavior. |
+| 3 | ASS interpretation and layout | Own tag execution, word/line/subtitle state, karaoke/transforms, collision/layout decisions and relevant cache invalidation through the glyph-request boundary. |
+| 4 | Fonts/paths, rasterization and effects | Close font/GDI adapters and path ownership, then raster state, clipping, borders/shadows/blur and all native writable-plane lifetimes. These are separately closable packages. |
+| 5 | Surfaces, caches and compositing | Close output-frame/queue ownership and every supported pixel format, pitch/orientation, alpha and color conversion route. |
+| 6 | Remaining formats and hosts | Close other text frontends, bitmap/caption pipelines and SSF in named packages; complete DirectShow/XySubFilter, AviSynth, VirtualDub and real-application lifecycle coverage. |
+
+Host compatibility, text I/O and dependency/native-boundary accounting run
+through every applicable milestone; they are not postponed until sequence 6.
+The broad order after the first two outcomes is provisional and can change when
+an actual dependency warrants it. No supported format, host or option leaves
+scope. A shared document milestone does not imply that its input parsers or
+renderers are fully migrated.
+
+### First package boundary
+
+The owner is the document currently represented by CSimpleTextSubtitle in
+`src/subtitles/STS.h` and `STS.cpp`. Inputs are subtitle records, style changes,
+metadata and document operations. Outputs are ordered active entries/styles,
+segment/timing results and bounded snapshots for native rendering/serialization.
+Persistent application data and its reads/writes belong to safe Rust. Windows
+file/code-page/CRT services may remain explicit bounded adapters, with their
+contracts and measured behavior recorded. Platform adapters cannot hide native
+document ownership, sorting, mutation or recovery logic.
+
+Native caller updates are part of this package: the direct entry/segment/style
+accesses in RTS.cpp, the MicroDVD previous-entry correction in STS.cpp, and style
+count/enumeration/editing in DirectVobSubFilter.cpp and xy_sub_filter.cpp. Public
+DLL signatures and data-transfer contracts remain unchanged. Native temporary
+snapshots may own copied output; no caller gets a long-lived writable pointer
+into the authoritative Rust document. Avoid a persistent duplicate native
+model that merely mirrors Rust data. Internal C++ interfaces can change with
+all their callers; public ABI behavior is held fixed.
+
+The initial operation inventory is below. Freeze exact callsites, alias/lifetime
+contracts and evidence expectations in D0; newly discovered work is added
+visibly rather than silently changing completion counts.
+
+| Unit | Operations and observable state | Initial status |
+| --- | --- | --- |
+| DOC-01 | Construction, destruction, Empty, RemoveAllEntries, IsEmpty; retained/reset metadata | Native lifecycle; mapped |
+| DOC-02 | Copy, CopyStyles, self-copy and copy independence; partial failure and callbacks | Native lifecycle; mapped |
+| DOC-03 | Add and AddSTSEntryOnly; text/style preparation, readorder, zero-duration differences, incremental segments | Rust timeline helpers; native records/preparation |
+| DOC-04 | AddStyle, default/forced styles and unknown-style handling; duplicate names, renaming and enumeration order | Native owners and host-visible mutation |
+| DOC-05 | SetStr, GetStrW/GetStrWA, ConvertUnicode; charset lookup, string flags and raw UTF-16 | Existing conversion helpers; native entry mutation |
+| DOC-06 | Sort in both modes; equal-key permutations and entry-index/readorder identity | Native CRT sort; ordering evidence needed |
+| DOC-07 | CreateSegments and incremental insertion; boundaries, ordered members, animation flags | Rust logic; native persistent segments |
+| DOC-08 | SearchSub/SearchSubs/SearchSubs2, GetSegment and translations; forward/backward seeks and endpoint rules | Rust search helpers; native returned views |
+| DOC-09 | Frame/time mode conversion; operation order, rounding, partial updates and segment rebuild | Native lifecycle/conversion |
+| DOC-10 | Format import/open/reset and SaveAs/export handoffs; parser failure and metadata effects | Native callers; must use new owner |
+| DOC-11 | Render/cache handoff and OnChanged; style API snapshots/updates and renderer animation feedback | Native direct accesses across components |
+
+These eleven operation groups are unequal and are not a progress percentage.
+They cover the shared owner; the implementation of each independent format
+parser, serializer and rasterizer remains in its named package. All such callers
+must nevertheless use the new owner correctly for this package to close.
+
+### Milestones and acceptance gates
+
+| Milestone | Deliverable | Required evidence before advancing |
+| --- | --- | --- |
+| D0 — Freeze the contract | Exact operation/callsite inventory, owner/alias graph and retained-adapter list for DOC-01 through DOC-11 | Source review across STS, RTS, format importers and both style APIs; explicitly track unresolved behavior. Status: in progress. |
+| D1 — Capture complete lifecycles | A pinned-reference document harness for create → add → edit/style-change → copy → sort → seek → clear/reopen → destroy | Compare full initialized document/segment state, observable callback/error order and caller snapshots; use real ATL/CRT on Windows. Include failed operations and repeated calls, with failures never counted as parity. Status: planned. |
+| D2 — Implement the Rust owner | Safe Rust entries, styles, metadata and segments; coherent document operations reuse existing helpers | Owner/copy/edit/drop tests, raw UTF-16 preservation, bounded access, no native mutable views; native field/type/alias compatibility reviewed. Status: planned. |
+| D3 — Route every caller | Importers, renderer, style interfaces and export paths use document operations or bounded snapshots | Enumerate and eliminate direct authoritative CAtlArray/CAtlMap entry/style/segment accesses in the Rust-enabled build; preserve callback/lock order and public ABI. Retire superseded fine-grained FFI crossings. Status: planned. |
+| D4 — Establish parity | Document lifecycle and integrated DLL comparisons on Windows x86/x64 at one exact candidate commit | Exact records, ordering, times, errors, rendering output and style API behavior; existing corpus/mutations, targeted lifecycle/malformed fixtures, Miri and relevant native checks. Resolve mismatches; no undocumented native document fallback. Status: planned. |
+| D5 — Close and hand off | Written ownership/access review and applicable consumer validation | Aegisub load/render/seek/reload/close, relevant player/style-edit lifecycles and architecture results. Record finite corpus scope and bounded retained adapters. Until the real-host check is complete, report core-complete/host-validation-pending, never closed. Status: planned. |
+
+Important compatibility cases already visible in source include self-copy after
+Empty, RemoveAllEntries leaving segments intact, different zero-duration
+handling between the two add methods, style-map enumeration exposed to hosts,
+renaming existing styles when a duplicate differs, and renderer updates to
+segment animation flags. Equal-key CRT sorting, float conversion and native
+map traversal require measured ordering before selecting Rust equivalents.
+Ordinary Rust sorting/map/string conventions cannot substitute for that evidence.
+
+### Working and reporting cadence
+
+Implement related document operations as reviewable changes within a milestone;
+do not start unrelated ports while this package is active. Run focused checks
+during development and the full Windows matrix at coherent integration gates
+or when a shared boundary changes. Reuse existing oracles and corpus evidence;
+add tests for new behavior, ownership or failure contracts rather than repeating
+implementation details. Address a failing baseline before treating later matrix
+results as a clean integration gate.
+
+Each progress update names the active milestone, operation groups advanced,
+authoritative native owners/accesses removed, remaining native fallbacks, and
+the exact commit/platforms validated. Test totals remain supporting evidence.
+D0/D1 should establish enough scope to revise effort estimates; no date or
+whole-repository percentage is promised before that measurement. Windows CI
+supports development here. Local Windows is needed for the real-host gate or a
+specific native/debugging question CI cannot resolve, not simply because the
+next source file contains Windows types.
 
 ## Independent audit and unsafe boundary
 
