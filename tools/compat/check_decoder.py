@@ -1001,6 +1001,9 @@ public:
         ssf_stream_code += ssf_class + ";\n"
         for signature in ("InputStream::InputStream()", "InputStream::~InputStream()", "int InputStream::PushChar()", "int InputStream::PopChar()", "int InputStream::PeekChar()", "int InputStream::GetChar()", "int InputStream::SkipWhiteSpace("):
             ssf_stream_code += extract_definition(ssf_text, signature) + "\n"
+        ssf_stream_code += extract_definition(ssf_declaration, "class OutputStream :").replace("{", "{\npublic:", 1).replace("protected:", "public:") + ";\n"
+        for signature in ("OutputStream::OutputStream(", "OutputStream::~OutputStream()", "void OutputStream::PutChar("):
+            ssf_stream_code += extract_definition(ssf_text, signature) + "\n"
         ssf_stream_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_ssf_stream.h").write_text(ssf_stream_code, encoding="utf-8")
     filter_source = original("src/subtitles/xy_filter.cpp", reference["commit"])
@@ -1639,6 +1642,12 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
     ssf_stream_result = run([str(ssf_stream_executable)], capture_output=True, text=True)
     print(ssf_stream_result.stdout, end="", flush=True)
     print(ssf_stream_result.stderr, end="", file=sys.stderr)
+    ssf_output_executable = destination / ("ssf-output-oracle.exe" if os.name == "nt" else "ssf-output-oracle")
+    ssf_output_compile = [arg.replace("find_char_oracle.cpp", "ssf_output_oracle.cpp").replace("find-char-oracle", "ssf-output-oracle") for arg in find_char_compile]
+    run(ssf_output_compile)
+    ssf_output_result = run([str(ssf_output_executable)], capture_output=True, text=True)
+    print(ssf_output_result.stdout, end="", flush=True)
+    print(ssf_output_result.stderr, end="", file=sys.stderr)
     csri_filename_executable = destination / ("csri-filename-oracle.exe" if os.name == "nt" else "csri-filename-oracle")
     csri_filename_compile = [arg.replace("find_char_oracle.cpp", "csri_filename_oracle.cpp").replace("find-char-oracle", "csri-filename-oracle") for arg in find_char_compile]
     run(csri_filename_compile)
@@ -2167,6 +2176,9 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
         "fraction_storage_compile_command": fraction_storage_compile,
         "fraction_storage_result": fraction_storage_result.stdout, "fraction_storage_stderr": fraction_storage_result.stderr,
         "fraction_storage_scope": "Whole pinned xy_be_blur and xy_calculate_filter with observed filter/transpose calls and scratch ownership under strict FP compilation. x86/x64 execute extracted native SSE kernels against Rust kernels; arm64 substitutes extracted scalar callbacks and does not establish SSE parity. Exact stage bytes/order, output/padding, initialized scratch, cache accounting, signed and fractional pass counts, reuse and native allocation fallback. Positive dimensions at least four avoid an unused native before-base cursor; zero/smaller/negative dimensions, overflowing/nonfinite pass counts, invalid backing and actual allocation failure excluded.",
+        "ssf_output_compile_command": ssf_output_compile,
+        "ssf_output_result": ssf_output_result.stdout, "ssf_output_stderr": ssf_output_result.stderr,
+        "ssf_output_scope": "Whole pinned OutputStream construction/destruction and PutChar with controlled virtual NextByte. Every UTF-16 code unit in all six encodings with and without first-character BOM state, repeated calls, byte order and historical left shifts; partial writes after callback exceptions, encoding mutation and bounded reentrant output. Exact callback/state/error traces. PutString formatting, actual IO and SSF rendering excluded. Native BOM recursion retained; safe Rust returns copied scalar output plan, and no Rust borrow spans callbacks.",
         "ssf_stream_compile_command": ssf_stream_compile,
         "ssf_stream_result": ssf_stream_result.stdout, "ssf_stream_stderr": ssf_stream_result.stderr,
         "ssf_stream_scope": "Whole pinned InputStream push/pop/peek/get/whitespace control flow with actual Windows ATL queue or portable deque versus Rust-owned raw-character lookahead and safe Rust comment/peek state transitions. NextChar provider and ThrowError boundary are controlled. Comments, repeated and nonsticky EOF, NUL and UTF-16 values, provider interruptions with partial queued state, line/column state and ambient errors are compared. Native encoding, actual IO/SSF rendering, allocation failure, non-EOS negative characters, counter overflow and unbounded recursion excluded. CSRI only opens the RTS parser and does not validate SSF rendering.",

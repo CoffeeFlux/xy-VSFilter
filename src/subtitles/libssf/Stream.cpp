@@ -290,6 +290,12 @@ namespace ssf
 			}
 		}
 
+#ifdef XY_VSFILTER_RUST_TEXT
+        const uint64_t output = xy_vsfilter_ssf_output(c, static_cast<uint32_t>(m_encoding));
+        const unsigned count = static_cast<unsigned>(output >> 48);
+        for(unsigned i = 0; i < count; ++i)
+            NextByte(static_cast<int>((output >> (16 * i)) & 0xffff));
+#else
 		switch(m_encoding)
 		{
 		case utf8: 
@@ -325,6 +331,7 @@ namespace ssf
 			NextByte(c);
 			break;
 		}
+#endif
 	}
 
 	void OutputStream::PutString(LPCWSTR fmt, ...)
