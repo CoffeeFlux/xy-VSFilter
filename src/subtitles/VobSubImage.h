@@ -22,6 +22,9 @@
 #pragma once
 
 #include <atlcoll.h>
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "xy_rust_byte_storage.h"
+#endif
 
 struct COutline {
     CAtlArray<CPoint> pa;
@@ -42,6 +45,9 @@ class CVobSubImage
 
 private:
     CSize org;
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::ByteStorage m_temp1Storage, m_temp2Storage;
+#endif
     RGBQUAD* lpTemp1;
     RGBQUAD* lpTemp2;
 

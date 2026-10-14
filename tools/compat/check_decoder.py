@@ -64,7 +64,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_hdmv.h",
               ROOT / "include/xy_rust_dvb.h", ROOT / "include/xy_rust_golomb.h", ROOT / "include/xy_rust_fill.h",
               ROOT / "src/subtitles/Rasterizer.cpp", ROOT / "include/xy_rust_mask.h", ROOT / "include/xy_rust_bilinear.h", ROOT / "include/xy_rust_be_blur.h", ROOT / "include/xy_rust_gauss_integer.h", ROOT / "include/xy_rust_be_filter.h", ROOT / "include/xy_rust_transpose.h", ROOT / "include/xy_rust_byte_float.h",
-              ROOT / "src/subtitles/xy_filter.cpp", ROOT / "src/subtitles/VobSubImage.cpp", ROOT / "include/xy_rust_vobsub.h",
+              ROOT / "src/subtitles/xy_filter.cpp", ROOT / "src/subtitles/VobSubImage.cpp", ROOT / "src/subtitles/VobSubImage.h", ROOT / "include/xy_rust_vobsub.h",
               ROOT / "src/dsutil/GolombBuffer.cpp", ROOT / "src/dsutil/GolombBuffer.h",
               ROOT / "src/subtitles/DVBSub.cpp", ROOT / "src/subtitles/DVBSub.h", ROOT / "src/subtitles/HdmvSub.cpp", ROOT / "src/subtitles/HdmvSub.h", ROOT / "src/subtitles/CompositionObject.cpp", ROOT / "src/subtitles/CompositionObject.h", ROOT / "include/xy_rust_byte_storage.h",
               ROOT / "include/xy_rust_timeline_search.h",
@@ -1039,6 +1039,23 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         hdmv += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     hdmv += "#endif\n"
     (destination / "original_hdmv.h").write_text(hdmv, encoding="utf-8")
+    vobsub_storage = '#include "vobsub_storage_shell.h"\n'
+    reference_vob_storage_header = original("src/subtitles/VobSubImage.h", reference["commit"])
+    for name, content, vob_storage_header in (("ReferenceVobStorage", vobsub_source, reference_vob_storage_header), ("CandidateVobStorage", (ROOT / "src/subtitles/VobSubImage.cpp").read_bytes(), (ROOT / "src/subtitles/VobSubImage.h").read_bytes())):
+        text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        vob_storage_header = vob_storage_header.decode("utf-8-sig").replace("\r\n", "\n")
+        if name == "CandidateVobStorage":
+            vobsub_storage += "#define XY_VSFILTER_RUST_TEXT\n"
+        vobsub_storage += f"namespace {name} {{\nclass CVobSubImage {{public:\n"
+        start = vob_storage_header.index("    CSize org;")
+        end = vob_storage_header.index("    size_t nOffset[2], nPlane;", start)
+        vobsub_storage += vob_storage_header[start:end].replace("XyRust::ByteStorage", "XyRust::ObservedVobStorage")
+        vobsub_storage += "VOB_STORAGE_EXTRA_FIELDS\nCVobSubImage();virtual ~CVobSubImage();bool Alloc(int,int);void Free();\n};\n"
+        for signature in ("CVobSubImage::CVobSubImage()", "CVobSubImage::~CVobSubImage()", "bool CVobSubImage::Alloc(", "void CVobSubImage::Free()"):
+            method = extract_method(text, signature).replace("DEBUG_NEW RGBQUAD[w * h]", "vobAllocate(w * h)").replace("DEBUG_NEW RGBQUAD[(w + 2) * (h + 2)]", "vobAllocate((w + 2) * (h + 2))").replace("delete [] lpTemp1;", "rleRelease(reinterpret_cast<BYTE*>(lpTemp1));")
+            vobsub_storage += method + "\n"
+        vobsub_storage += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_vobsub_storage.h").write_text(vobsub_storage, encoding="utf-8")
     vobsub = '#include "vobsub_packet_shell.h"\n'
     for name, content in (("ReferenceVobSub", vobsub_source), ("CandidateVobSub", (ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
         vobsub += f"VOBSUB_PACKET_SHELL({name})\n#define CVobSubImage {name}\n"
@@ -1507,6 +1524,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     gauss_planes_result = run([str(gauss_planes_executable)], capture_output=True, text=True)
     print(gauss_planes_result.stdout, end="", flush=True)
     print(gauss_planes_result.stderr, end="", file=sys.stderr)
+    vobsub_storage_executable = destination / ("vobsub-storage-oracle.exe" if os.name == "nt" else "vobsub-storage-oracle")
+    vobsub_storage_compile = [arg.replace("find_char_oracle.cpp", "vobsub_storage_oracle.cpp").replace("find-char-oracle", "vobsub-storage-oracle") for arg in find_char_compile]
+    run(vobsub_storage_compile)
+    vobsub_storage_result = run([str(vobsub_storage_executable)], capture_output=True, text=True)
+    print(vobsub_storage_result.stdout, end="", flush=True)
+    print(vobsub_storage_result.stderr, end="", file=sys.stderr)
     dvb_storage_executable = destination / ("dvb-storage-oracle.exe" if os.name == "nt" else "dvb-storage-oracle")
     dvb_storage_compile = [arg.replace("find_char_oracle.cpp", "dvb_storage_oracle.cpp").replace("find-char-oracle", "dvb-storage-oracle") for arg in find_char_compile]
     run(dvb_storage_compile)
@@ -1515,6 +1538,15 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     print(dvb_storage_result.stderr, end="", file=sys.stderr)
     clip_fade_executable = destination / ("clip-fade-oracle.exe" if os.name == "nt" else "clip-fade-oracle")
     clip_fade_compile = [arg.replace("find_char_oracle.cpp", "clip_fade_oracle.cpp").replace("find-char-oracle", "clip-fade-oracle") for arg in find_char_compile]
+    # Ambient FP flags are observable in this oracle. Ordinary optimized Linux
+    # early-return conversion scheduling differs before any Rust fade call;
+    # retain that unresolved result separately instead of masking its flags.
+    if os.name == "nt":
+        clip_fade_compile += ["/fp:strict"]
+    elif sys.platform == "darwin":
+        clip_fade_compile += ["-ffp-model=strict"]
+    else:
+        clip_fade_compile += ["-frounding-math", "-ftrapping-math", "-fno-tree-vectorize", "-fno-tree-slp-vectorize"]
     run(clip_fade_compile)
     clip_fade_result = run([str(clip_fade_executable)], capture_output=True, text=True)
     print(clip_fade_result.stdout, end="", flush=True)
@@ -1926,12 +1958,15 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "path_align_compile_command": path_align_compile,
         "path_align_result": path_align_result.stdout, "path_align_stderr": path_align_result.stderr,
         "path_align_scope": "Complete pinned PathData::AlignLeftTop over initialized point/type buffers; actual Windows POINT/ATL geometry; exact guarded buffers, origin/size, errno/FP/Windows error state; native cleanup modeled, outputs disjoint and representable arithmetic only",
+        "vobsub_storage_compile_command": vobsub_storage_compile,
+        "vobsub_storage_result": vobsub_storage_result.stdout, "vobsub_storage_stderr": vobsub_storage_result.stderr,
+        "vobsub_storage_scope": "Whole pinned constructor/destructor/Alloc/Free, exact allocated and initialized byte masks, both capacity predicates, partial component writes, active-plane reset, zero-size native allocations, negative-dimension reuse, retained org after Free and first/second modeled CMemoryException cleanup. Native allocation and exception boundaries controlled. Negative allocation counts excluded before either implementation; overflowing arithmetic, actual OOM and pixel consumers are outside this ownership increment; native uninitialized nOffset is never observed.",
         "dvb_storage_compile_command": dvb_storage_compile,
         "dvb_storage_result": dvb_storage_result.stdout, "dvb_storage_stderr": dvb_storage_result.stderr,
         "dvb_storage_scope": "Whole pinned constructor/destructor/Reset/AddToBuffer with controlled allocation/deletion, successful memcpy_s and page-container boundaries. Exact initialization masks and bytes, all marker bytes and ignored fourth byte, short logical inputs with aligned four-byte physical backing, consumed prefix retention, growth/copy/release order, restart/reuse, retained-capacity size-limit bypass and mixed Rust/native fallback histories. Negative/overflowing sizes, invalid physical backing, overlapping copies, aliases invalidated by growth, native debug traps and actual OOM excluded.",
         "clip_fade_compile_command": clip_fade_compile,
         "clip_fade_result": clip_fade_result.stdout, "clip_fade_stderr": clip_fade_result.stderr,
-        "clip_fade_scope": "Whole pinned PaintBannerClipper/PaintScrollClipper with controlled initialized base-mask producer. Native float conversions and ordering, integer divisions, overlapping fades, signed/offscreen/reversed endpoints, empty-interval clearing, all source bytes, reuse and null returns. Zero-divisor cases with non-null base output are excluded before either call, never passes; overflowing native arithmetic/conversions, invalid backing and actual OOM excluded.",
+        "clip_fade_scope": "Whole pinned PaintBannerClipper/PaintScrollClipper under FP-observable compilation; ordinary optimized Linux early-return FP-flag mismatch remains separately recorded. Controlled initialized base-mask producer. Native float conversions and ordering, integer divisions, overlapping fades, signed/offscreen/reversed endpoints, empty-interval clearing, all source bytes, reuse and null returns. Zero-divisor cases with non-null base output are excluded before either call, never passes; overflowing native arithmetic/conversions, invalid backing and actual OOM excluded.",
         "hdmv_storage_compile_command": hdmv_storage_compile,
         "hdmv_storage_result": hdmv_storage_result.stdout, "hdmv_storage_stderr": hdmv_storage_result.stderr,
         "hdmv_storage_scope": "Whole pinned constructor/destructor, AllocSegment and byte-sample ParseSample with real reference/candidate Golomb readers. All segment tags, split/short/multiple packets, retained capacity/tails, exact initialized masks and bytes, null/empty calls and modeled Rust decline to successful native allocation. Presentation/segment consumers and Reset are controlled; partial-tail dispatch observes metadata only, never uninitialized bytes. Negative caller lengths, source-buffer aliasing, native debug traps and actual OOM excluded.",

@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "candidate_commit": "6fbb5ea2b752606affc4a724e45f973c46b15fec",
+  "status": "unresolved ordinary optimized Linux ambient FP flags; not a parity pass",
+  "job_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38566940593/job/115861903331",
+  "job_log_sha256": "c9f712189b818780e29b464c814570dc8f0372985da0faf7cd2b2474f4c11977",
+  "case": {
+    "method": "PaintBannerClipper",
+    "width": 1,
+    "height": 1,
+    "fade_parameter": -3,
+    "scale": 0.25,
+    "base_mask_is_null": true,
+    "reference_fp_flags": 36,
+    "candidate_fp_flags": 4
+  },
+  "observation": "The base-mask producer returns null, so both methods return before any Rust fade call. Ordinary optimization can change whether the preceding native float-to-int conversion is evaluated before that return. This observation does not establish ordinary optimized ambient-flag parity.",
+  "followup": "The full caller oracle now requests FP-observable compilation, matching the existing ellipse-oracle approach. New CI results are required; no flags are masked and the failed job remains failed. Actual Windows DLL rendering uses production build flags."
+}

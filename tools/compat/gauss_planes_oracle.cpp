@@ -20,7 +20,7 @@ static void compare(const Overlay& input,double strength,double sx,double sy,int
         const auto sa=gaussPlaneSnapshot(*a,true),sb=gaussPlaneSnapshot(*b);
         if(ra!=rb||!(ea==eb)||ta!=tb||da!=db||sa!=sb||original!=gaussPlaneSnapshot(input)){
             fprintf(stderr,"return=%d/%d effects=%d trace=%d delta=%zu/%zu snapshot=%d source=%d\n",ra,rb,ea==eb,ta==tb,da,db,sa==sb,original==gaussPlaneSnapshot(input));
-            for(size_t i=0;i<std::min(sa.size(),sb.size());++i)if(sa[i]!=sb[i]){fprintf(stderr,"first different snapshot field %zu: %llu/%llu\n",i,(unsigned long long)sa[i],(unsigned long long)sb[i]);break;}
+            for(size_t i=0;i<(std::min)(sa.size(),sb.size());++i)if(sa[i]!=sb[i]){fprintf(stderr,"first different snapshot field %zu: %llu/%llu\n",i,(unsigned long long)sa[i],(unsigned long long)sb[i]);break;}
             fprintf(stderr,"Gaussian planes mismatch call=%llu strength=%g scale=%g,%g fail=%d flags=%d/%d\n",(unsigned long long)calls,strength,sx,sy,fail,ea.flags,eb.flags);std::abort();
         }
         ++calls;failures+=!ra;fields+=sa.size();observations+=ta.size();

@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "candidate_commit": "6fbb5ea2b752606affc4a724e45f973c46b15fec",
+  "job_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38566940506/job/115861902964",
+  "report_sha256": "4021653db7f34df68964471e97eaa8540992828397ab02e35dd2551b0fd08c4a",
+  "status": "failed visible control; not a passing renderer campaign",
+  "cases": 798,
+  "rendered_frames": 8330,
+  "all_case_verdicts_equal": true,
+  "failed_controls": [
+    {
+      "candidate": false,
+      "cases": [
+        "clip-fade-scroll-control-file",
+        "clip-fade-scroll-up-file"
+      ],
+      "reference-0": false
+    },
+    {
+      "candidate": false,
+      "cases": [
+        "clip-fade-scroll-control-memory",
+        "clip-fade-scroll-up-memory"
+      ],
+      "reference-0": false
+    }
+  ],
+  "observation": "Scroll control/up fixtures produced no changed frames in either renderer at the original start/midpoint/end sampling times. The control therefore correctly failed despite equal reference/candidate case bytes.",
+  "correction": "Retain both scroll and banner distinct-frame controls and add early motion sample times to every clip-fade case. Corrected visibility and full renderer results require new CI; the old failed campaign is not relabeled."
+}
