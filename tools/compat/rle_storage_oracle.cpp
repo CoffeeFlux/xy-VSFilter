@@ -14,7 +14,8 @@ last=GetLastError();
 template<class Object> static std::vector<uint64_t> snapshot(Object& object,bool count){
     std::vector<uint64_t> result={static_cast<uint64_t>(object.GetRLEDataSize()),static_cast<uint64_t>(object.m_nRLEPos),object.IsRLEComplete()?1u:0u,object.GetRLEData()?1u:0u};
     if(object.GetRLEData()){
-        size_t offset;const auto& region=rleRegion(object.GetRLEData(),object.GetRLEDataSize(),offset);requireRle(!offset);rleGuards(region);
+        const auto& region=rleBaseRegion(object.GetRLEData());
+        requireRle(object.GetRLEDataSize()>=0&&static_cast<size_t>(object.GetRLEDataSize())<=region.count);rleGuards(region);
         for(size_t i=0;i<region.count;++i){result.push_back(region.initialized[i]);if(region.initialized[i]){result.push_back(region.data[i]);initializedBytes+=count;}else unwrittenCells+=count;}
     }
     result.push_back(object.m_Palette.GetCount());
@@ -72,7 +73,32 @@ static void history(int total,int first,unsigned salt,bool decline){
     rleEvents.clear();delete a;const auto trace=rleEvents;rleEvents.clear();delete b;requireRle(trace==rleEvents);
     requireRle(rleRegions.size()==1&&rleRegions[0].data==input.data());rleRegions.clear();
 }
+static void adjacentRegionControl(){
+    // Deterministically model adjacent addresses, independently of the host
+    // allocator. The empty owner starts exactly at another region's end.
+    BYTE storage[64]={};
+    requireRle(rleRegions.empty());
+    rleRegions.push_back({storage,16,NULL,NULL,std::vector<bool>(16,true)});
+    rleRegions.push_back({storage+16,0,NULL,NULL,{}});
+    rleRegions.push_back({storage+32,16,NULL,NULL,std::vector<bool>(16,true)});
+    ReferenceRle::CompositionObject object;
+    palette(object,0);
+    object.m_pRLEData=storage+16;
+    const auto empty=snapshot(object,false);
+    // Four RLE fields, palette count, 256 colors and three color metadata fields.
+    requireRle(empty.size()==264);
+    rleEvents.clear();
+    rleCopy(storage+16,storage+48,0);
+    requireRle(rleEvents==std::vector<int64_t>({3,0,0,0}));
+    // Nonempty copies must still retain their actual offsets and data checks.
+    rleEvents.clear();
+    rleCopy(storage+33,storage+2,3);
+    requireRle(rleEvents==std::vector<int64_t>({3,1,2,3}));
+    object.m_pRLEData=NULL;
+    rleRegions.clear();rleEvents.clear();
+}
 int main(){
+    adjacentRegionControl();
     for(int total:{0,1,2,3,7,15,16,17,31,32,33,127,255,256,257,1024})
         for(int first=0;first<=total;first+=std::max(1,total/17))for(unsigned salt:{0u,1u,17u,255u})for(bool decline:{false,true})history(total,first,salt,decline);
     for(int first:{0,1,15,16,17,127,2047,4096})history(4096,first,first,false);

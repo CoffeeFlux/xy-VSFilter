@@ -12,6 +12,7 @@ pub mod ass_tags;
 pub mod be_blur;
 pub mod be_filter;
 pub mod bilinear;
+pub mod document;
 pub mod drawing;
 pub mod drawing_tokens;
 pub mod dvb;

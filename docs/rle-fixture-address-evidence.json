@@ -1,0 +1,119 @@
+{
+  "complete": true,
+  "scope": "Focused fixture correction; not full CI or document integration",
+  "input_sha256": {
+    "tools/compat/check_decoder.py": "813c1c2f3fa30d4adafc491e6ba3ae60449349103cf667b320ec5b158383bbd2",
+    "tools/compat/rle_storage_oracle.cpp": "730d709d87307d4fa08c95675b718562ffc1fd17e025ca477a17315cbfc93b5b",
+    "tools/compat/rle_storage_shell.h": "c6f2bd49c7f913ebe175d9da3e1e182fe9ec02e5ec95f605cf2cda9d614fbaa5",
+    "include/xy_rust_byte_storage.h": "46d99801e8c1073f482e713376bc6bb29387dab0889bc24ac6c78e6192d90ff4",
+    "include/xy_rust_plane.h": "ac797b792a9b84dc2e5c168bead81d971b0058fed07d3ec7fa41f929de82da2a",
+    "src/subtitles/CompositionObject.cpp": "e662d84d61f7128859151377b26de2048ecf2f8a51ae5ffaa33c7f3a6ee5a47a",
+    "src/subtitles/CompositionObject.h": "95f714491b7b219f286b1fceb455048b4f46861ff4b1b0039eab2d8bdc1f439c"
+  },
+  "generated_header_sha256": "dc1ec1a30819bbf313ca1f03912ac1006f9f5eeb285b28c0bac3c3dc1901cd7e",
+  "negative_control_before_fix": {
+    "exit_code": 134,
+    "reason": "adjacentRegionControl rejected by old range-based snapshot lookup"
+  },
+  "runs": [
+    {
+      "architecture": "arm64",
+      "native_sanitizers": false,
+      "command": [
+        "c++",
+        "-arch",
+        "arm64",
+        "-std=c++11",
+        "-O2",
+        "-I/Users/ryan/git/xy-VSFilter/artifacts/rle-fixture-validation",
+        "-I/Users/ryan/git/xy-VSFilter/include",
+        "-I/Users/ryan/git/xy-VSFilter/tools/compat",
+        "/Users/ryan/git/xy-VSFilter/tools/compat/rle_storage_oracle.cpp",
+        "/Users/ryan/git/xy-VSFilter/target/release/libxy_vsfilter_ffi.a",
+        "-lSystem",
+        "-o",
+        "/Users/ryan/git/xy-VSFilter/artifacts/rle-fixture-validation/arm64"
+      ],
+      "library_sha256": "99200f845353309a243db18b89eedc9cae67d8017bbb3d6c370f36f2c6eafe80",
+      "binary_sha256": "43297a43cafa7ef255024282dd4b9037a5fcaf100d092b586a3859f3e962a5fd",
+      "output": "29120 exact RLE storage mutation calls passed (13487977 state fields / 3300483 initialized bytes / 1305173 unwritten cells tracked without reads / 286912 logical allocation-copy observations / 17312 complete deep copies / 11772 Rust owners, loans and releases / 11700 modeled Rust declines to native allocation; 9728 incomplete-copy fixtures excluded, 4160 modeled assertion diagnostics; whole pinned Set/Append/destructor/Copy and accessors, chunking, bounded disjoint source aliases, reuse, zero-sized allocation, palette state and errno/FP/Windows error state; partial-tail consumption/copy, source replacement aliasing, negative or overflowing lengths and actual OOM excluded)\n",
+      "stderr": ""
+    },
+    {
+      "architecture": "arm64",
+      "native_sanitizers": true,
+      "command": [
+        "c++",
+        "-arch",
+        "arm64",
+        "-std=c++11",
+        "-O1",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-I/Users/ryan/git/xy-VSFilter/artifacts/rle-fixture-validation",
+        "-I/Users/ryan/git/xy-VSFilter/include",
+        "-I/Users/ryan/git/xy-VSFilter/tools/compat",
+        "/Users/ryan/git/xy-VSFilter/tools/compat/rle_storage_oracle.cpp",
+        "/Users/ryan/git/xy-VSFilter/target/release/libxy_vsfilter_ffi.a",
+        "-lSystem",
+        "-o",
+        "/Users/ryan/git/xy-VSFilter/artifacts/rle-fixture-validation/arm64-sanitize"
+      ],
+      "library_sha256": "99200f845353309a243db18b89eedc9cae67d8017bbb3d6c370f36f2c6eafe80",
+      "binary_sha256": "031f1579ec3a874ea45f5c51832478f989162e32df4934b2256352da65366548",
+      "output": "29120 exact RLE storage mutation calls passed (13487977 state fields / 3300483 initialized bytes / 1305173 unwritten cells tracked without reads / 286912 logical allocation-copy observations / 17312 complete deep copies / 11772 Rust owners, loans and releases / 11700 modeled Rust declines to native allocation; 9728 incomplete-copy fixtures excluded, 4160 modeled assertion diagnostics; whole pinned Set/Append/destructor/Copy and accessors, chunking, bounded disjoint source aliases, reuse, zero-sized allocation, palette state and errno/FP/Windows error state; partial-tail consumption/copy, source replacement aliasing, negative or overflowing lengths and actual OOM excluded)\n",
+      "stderr": ""
+    },
+    {
+      "architecture": "x86_64",
+      "native_sanitizers": false,
+      "command": [
+        "c++",
+        "-arch",
+        "x86_64",
+        "-std=c++11",
+        "-O2",
+        "-I/Users/ryan/git/xy-VSFilter/artifacts/rle-fixture-validation",
+        "-I/Users/ryan/git/xy-VSFilter/include",
+        "-I/Users/ryan/git/xy-VSFilter/tools/compat",
+        "/Users/ryan/git/xy-VSFilter/tools/compat/rle_storage_oracle.cpp",
+        "/Users/ryan/git/xy-VSFilter/target/x86_64-apple-darwin/release/libxy_vsfilter_ffi.a",
+        "-lSystem",
+        "-o",
+        "/Users/ryan/git/xy-VSFilter/artifacts/rle-fixture-validation/x86_64"
+      ],
+      "library_sha256": "a6a16b3fc2279571fa031c6729704576c7120ec75b8a743a23f27a11dc2bf67e",
+      "binary_sha256": "63fa2294827b675467b11d6134548930ecac6e9a471a4e7b8edd5ebc73983f70",
+      "output": "29120 exact RLE storage mutation calls passed (13487977 state fields / 3300483 initialized bytes / 1305173 unwritten cells tracked without reads / 286912 logical allocation-copy observations / 17312 complete deep copies / 11772 Rust owners, loans and releases / 11700 modeled Rust declines to native allocation; 9728 incomplete-copy fixtures excluded, 4160 modeled assertion diagnostics; whole pinned Set/Append/destructor/Copy and accessors, chunking, bounded disjoint source aliases, reuse, zero-sized allocation, palette state and errno/FP/Windows error state; partial-tail consumption/copy, source replacement aliasing, negative or overflowing lengths and actual OOM excluded)\n",
+      "stderr": ""
+    },
+    {
+      "architecture": "x86_64",
+      "native_sanitizers": true,
+      "command": [
+        "c++",
+        "-arch",
+        "x86_64",
+        "-std=c++11",
+        "-O1",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-I/Users/ryan/git/xy-VSFilter/artifacts/rle-fixture-validation",
+        "-I/Users/ryan/git/xy-VSFilter/include",
+        "-I/Users/ryan/git/xy-VSFilter/tools/compat",
+        "/Users/ryan/git/xy-VSFilter/tools/compat/rle_storage_oracle.cpp",
+        "/Users/ryan/git/xy-VSFilter/target/x86_64-apple-darwin/release/libxy_vsfilter_ffi.a",
+        "-lSystem",
+        "-o",
+        "/Users/ryan/git/xy-VSFilter/artifacts/rle-fixture-validation/x86_64-sanitize"
+      ],
+      "library_sha256": "a6a16b3fc2279571fa031c6729704576c7120ec75b8a743a23f27a11dc2bf67e",
+      "binary_sha256": "f6d1297e35b1805fb783d928fa496774c9b29b43f3f95fb88ac675840fffdd05",
+      "output": "29120 exact RLE storage mutation calls passed (13487977 state fields / 3300483 initialized bytes / 1305173 unwritten cells tracked without reads / 286912 logical allocation-copy observations / 17312 complete deep copies / 11772 Rust owners, loans and releases / 11700 modeled Rust declines to native allocation; 9728 incomplete-copy fixtures excluded, 4160 modeled assertion diagnostics; whole pinned Set/Append/destructor/Copy and accessors, chunking, bounded disjoint source aliases, reuse, zero-sized allocation, palette state and errno/FP/Windows error state; partial-tail consumption/copy, source replacement aliasing, negative or overflowing lengths and actual OOM excluded)\n",
+      "stderr": ""
+    }
+  ],
+  "source_inputs_stable": true
+}

@@ -64,11 +64,23 @@ jobs:
         run: cargo clippy -p xy-vsfilter-ffi --lib --release --features native-runtime --locked --offline --target ${{ matrix.target }} -- -D warnings
       - run: python tools/compat/make_corpus.py --check
       - run: python -m unittest discover -s tools/compat -p "test_*.py" -v
+      - name: Compare owned document lifecycle with pinned native suffixes
+        run: python tools/compat/document_check.py --target ${{ matrix.target }} --output artifacts/document/${{ matrix.target }}
+      - name: Observe Windows ATL and CRT document primitives
+        if: runner.os == 'Windows'
+        run: python tools/compat/document_windows_probe.py --output-dir artifacts/document-primitives/${{ matrix.target }}
       - name: Compare original C++ with Rust through the C ABI
         run: python tools/compat/check_decoder.py --target ${{ matrix.target }}
       - name: Sanitize the native decoder boundary
         if: runner.os != 'Windows'
         run: python tools/compat/check_decoder.py --target ${{ matrix.target }} --sanitize
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: document-evidence-${{ matrix.target }}
+          path: |
+            artifacts/document/**
+            artifacts/document-primitives/**
       - uses: actions/upload-artifact@v4
         if: always()
         with:

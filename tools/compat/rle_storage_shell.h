@@ -91,6 +91,10 @@ static void observedRleRelease(void* owner){
 static void* rleCopy(void* destination,const void* source,size_t count){
     // Copy's palette array is initialized separately and has a fixed footprint.
     size_t a,b;auto& dst=rleRegion(destination,count,a);const auto& src=rleRegion(source,count,b);
+    // A zero-byte copy touches no cell. Its address may be both one region's
+    // end and another's base, so offsets inferred by range lookup are not an
+    // observable copy property. Still validate both addresses above.
+    if(!count){rleEvents.insert(rleEvents.end(),{3,0,0,0});return std::memcpy(destination,source,count);}
     requireRle(&dst!=&src||a+count<=b||b+count<=a);
     for(size_t i=0;i<count;++i)requireRle(src.initialized[b+i]);
     rleEvents.insert(rleEvents.end(),{3,static_cast<int64_t>(a),static_cast<int64_t>(b),static_cast<int64_t>(count)});
