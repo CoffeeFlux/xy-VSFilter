@@ -183,7 +183,9 @@ public:
 #ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     CString        m_name;
 #endif
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     LCID           m_lcid;
+#endif
 #ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     exttype        m_subtitleType;
 #endif
@@ -332,6 +334,8 @@ public:
     void OrSegmentAnimated(int iSegment, bool animated);
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    LCID GetDocumentLCID() const;
+    void SetDocumentLCID(LCID value);
     bool GetDocumentForcedDefaultStyle() const;
     void SetDocumentForcedDefaultStyle(bool value);
     EPARCompensationType GetDocumentPARType() const;

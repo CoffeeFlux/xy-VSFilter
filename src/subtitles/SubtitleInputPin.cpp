@@ -540,7 +540,11 @@ STDMETHODIMP_(CSubtitleInputPinHelper*) CSubtitleInputPin::CreateHelper( const C
 #else
             pRTS->m_name = name;
 #endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            pRTS->SetDocumentLCID(lcid);
+#else
             pRTS->m_lcid = lcid;
+#endif
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
             pRTS->SetDocumentScreenSize(CSize(384, 288));
 #else

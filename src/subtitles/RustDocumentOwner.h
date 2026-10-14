@@ -354,14 +354,16 @@ public:
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_copy_selected_state_v1(id_,source.id_);}));
     }
     int32_t Metadata(uint32_t field) const {
-        DocumentDetail::Shape(field <= 3); std::array<uint8_t,4> out{};
+        DocumentDetail::Shape(field <= 4); std::array<uint8_t,4> out{};
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_get_metadata_v1(id_,field,out.data(),out.size());}));
         return DocumentDetail::I32(DocumentDetail::Load(out,0,4));
     }
     void SetMetadata(uint32_t field, int32_t value) {
-        DocumentDetail::Shape(field <= 3);
+        DocumentDetail::Shape(field <= 4);
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_set_metadata_v1(id_,field,value);}));
     }
+    uint32_t LCIDValue() const { return static_cast<uint32_t>(Metadata(4)); }
+    void SetLCID(uint32_t value) { SetMetadata(4, DocumentDetail::I32(value)); }
     double PARCompensation() const {
         static_assert(sizeof(double) == sizeof(uint64_t), "Native PAR bit transport width");
         std::array<uint8_t,8> out{};
