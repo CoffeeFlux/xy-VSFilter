@@ -18,6 +18,58 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
+## Progress accounting
+
+Baseline for this ledger: `641ec00e6c7c8620f391584ccd0cc6b3e054f1d2`
+(2026-10-14). Earlier conversational estimates around 10% were uncalibrated;
+withdraw them as a completion measure. Neither test histories, commit counts,
+Rust line counts nor native files with Rust calls establish a port percentage.
+The evidence log below tracks small increments; this ledger tracks the larger
+outcomes needed to finish. These are planning domains, not equally sized units.
+
+A domain closes only after its production paths and ownership are inventoried,
+its application logic is migrated (with explicitly bounded platform adapters),
+retained fallbacks are accounted for, and the applicable Windows x86/x64 and
+consumer checks pass. Individual functions can be validated while their domain
+remains partial. No full domain below is claimed closed yet. The behavior
+inventory is incomplete, so there is no defensible overall percentage today.
+
+| Work package | Implemented/verified pieces | Required closure work | State |
+| --- | --- | --- | --- |
+| Text input, encodings and attachments | Reader/writer buffers, seek targets, charset sequence, embedded-font records | Full input/file/archive/network lifetime inventory; retained CRT/code-page boundaries and public containers | Partial |
+| ASS/SSA documents and timeline | Header/style/dialogue field state, field scanners, timeline lookup/insertion pieces | Own entries/styles/events; sorting, editing and frame/time conversions; complete document lifecycle parity | Partial; next primary closure target |
+| Other text formats | RealText, SAMI, SubRip, MicroDVD, WebVTT and other parser pieces | Complete per-format path checklist, USF and remaining legacy formats, public document storage and malformed-input recovery | Partial |
+| ASS tags, layout and text preparation | Tag lexer, text runs/escape preparation, collision records, placement and width/dimension decisions | Tag interpretation/interactions, native word traversal, karaoke/transforms and cache state | Partial |
+| Fonts, shaping and glyph paths | Font records, path staging, ellipse/arc helpers, selected Arabic handling | GDI/font fallback/metrics, shaping and kerning; persistent path ownership including all copy/reallocation paths | Partial; Windows APIs retained behind bounded adapters |
+| Rasterization and effects | Edge/row/coverage logic, blur kernels and many plane/scratch owners, clipping pieces | Complete renderer object/state inventory, remaining native control flow and alias/copy lifetimes; every active path and fallback | Partial |
+| Surfaces, caches and final compositing | Selected bitmap/composite owners and pixel operations | Subpicture queues/caches, all RGB/YUV and high-bit-depth routes, pitch/orientation and frame lifetime | Partial |
+| Bitmap subtitles and captions | Bit readers, RLE/packet pieces, HDMV/DVB buffers, caption packet/decoder work | DVD/PGS/DVB end-to-end state, palette and host playback, file/ripper paths; staged VobSub ownership remains disabled | Partial |
+| SSF | Stream/lookahead/BOM/UTF-16, output encoding, split search, literal parsing/text buffers, Arabic mapping | Node/definition ownership, numeric parsing, remaining parser states, layout/rendering; preserve blank-rendering reference behavior | Partial |
+| Public hosts and ABI | Existing native adapters retained; CSRI differential rendering, exports/dependencies, disconnected COM checks | Complete Aegisub/player integration; DirectShow graphs, XySubFilter/consumer, AviSynth, VirtualDub, configuration and lifecycle tests | Partial verification; adapters largely native |
+| Supporting code and dependencies | Selected utility boundaries covered by component checks | Whole dependency/settings/I/O inventory and explicit retained-native boundary review | Mostly native; scope inventory incomplete |
+
+Execution changes: choose work by closure targets rather than simply the next
+portable leaf. Start with ASS/SSA document ownership: enumerate every creation,
+copy, edit, sort, seek and render handoff; retain already validated field parsers;
+close the surrounding lifecycle incrementally. Keep the necessary reference
+comparisons, but group closely related implementation changes into reviewable
+module milestones and reuse existing evidence. Report package transitions,
+newly owned lifetimes, Windows validation status and outstanding blockers.
+Do not claim all malformed input is covered by any finite test corpus.
+
+For scale only, a reproducible source count at this baseline finds 83,405 physical
+C/C++ lines in `src/subtitles`, `src/subpic`,
+`src/filters/transform/vsfilter`, `src/filters/transform/basevideofilter`,
+`src/dsutil` and `src/decss` (238 files, comments/headers/retained native branches
+included). It excludes other directories and third-party code; it is not a
+remaining-work denominator. `rust/compat/src` has 9,278 physical lines and
+`rust/ffi/src` 8,400, including tests. In the ten-hour commit range
+`d6ea50763ac5fbfa61838da7bbc4f191b622faa3..641ec00e`, 75 commits added 3,437
+safe-core lines, 3,542 FFI lines and 8,588 compatibility-tool lines. These counts
+show implementation and validation activity, not elapsed-time attribution or
+completion percentage. Most of the much larger documentation diff is generated
+evidence. No reliable active-work-versus-CI timing ledger was collected.
+
 ## What has been implemented
 
 * Temporary SSF quoted-string and brace-block text now belongs to a safe Rust
