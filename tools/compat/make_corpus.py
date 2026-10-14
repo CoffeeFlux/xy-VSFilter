@@ -290,6 +290,21 @@ def text_run_variants():
         yield "text-runs-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
 
 
+
+def wrap_width_variants():
+    body = b"one two three four five six seven eight nine ten eleven twelve"
+    cases = [("style-" + str(style), ("{\\q" + str(style) + "}").encode("ascii") + body)
+             for style in range(4)]
+    cases += [
+        ("oversized-word", br"{\q0}WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW then small words"),
+        ("hard-break-tail", br"{\q3}a very long series of words\Nshort tail with more words"),
+        ("negative-spacing", br"{\q3\fsp-24}one two three four five six seven"),
+        ("zero-scale", br"{\q0\fscx0}one two three four five"),
+    ]
+    for name, payload in cases:
+        yield "wrap-width-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
+
+
 def layout_rect_variants():
     prefix = SEED[:SEED.index(b"Dialogue:")]
     for name, alignment, second_layer, border, collisions, multiline in (
@@ -568,7 +583,8 @@ def make_cases(files):
                                                     ("old-subrip-pipes", "old-subrip-control"),
                                                     ("vplayer-pipes", "vplayer-control"),
                                                     ("layout-rect-bottom", "layout-rect-split-layers"),
-                                                    ("text-runs-soft-wrap-zero", "text-runs-soft-wrap-two"))
+                                                    ("text-runs-soft-wrap-zero", "text-runs-soft-wrap-two"),
+                                                    ("wrap-width-style-0", "wrap-width-style-2"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -584,6 +600,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in legacy_pipe_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in layout_rect_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in text_run_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in wrap_width_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in realtext_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_header_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_style_variants()]

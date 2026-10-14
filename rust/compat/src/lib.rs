@@ -90,3 +90,5 @@ pub mod text_writer;
 pub mod layout_rects;
 
 pub mod text_runs;
+
+pub mod wrap_width;

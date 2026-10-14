@@ -53,7 +53,7 @@ def extract_definition(source, signature):
 def capture_inputs():
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h", ROOT / "include/xy_rust_writer.h",
-              ROOT / "include/xy_rust_drawing.h", ROOT / "include/xy_rust_layout.h", ROOT / "include/xy_rust_text_runs.h", ROOT / "src/subtitles/RTS.h",
+              ROOT / "include/xy_rust_drawing.h", ROOT / "include/xy_rust_layout.h", ROOT / "include/xy_rust_text_runs.h", ROOT / "include/xy_rust_wrap.h", ROOT / "src/subtitles/RTS.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
               ROOT / "include/xy_rust_pipe_line.h", ROOT / "include/xy_rust_subrip_cue.h", ROOT / "include/xy_rust_sami_file.h", ROOT / "include/xy_rust_microdvd_style.h", ROOT / "include/xy_rust_font_records.h", ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
@@ -209,6 +209,20 @@ public:
             definition = definition.replace("XyRust::TextRuns runs", "XyRust::ObservedTextRuns runs")
         text_runs += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_text_runs.h").write_text(text_runs, encoding="utf-8")
+    wrap_width = '#include "wrap_width_shell.h"\n'
+    for name, content in (("ReferenceWrap", layout_source), ("CandidateWrap", (ROOT / "src/subtitles/RTS.cpp").read_bytes())):
+        wrap_width += f"namespace {name} {{\n"
+        wrap_width += "class CSubtitle { public: WrapWords m_words; int m_wrapStyle; int GetFullLineWidth(POSITION); int GetWrapWidth(POSITION,int); };\n"
+        if name == "CandidateWrap":
+            wrap_width += "#define XY_VSFILTER_RUST_TEXT\n"
+        for signature in ("int CSubtitle::GetFullLineWidth(", "int CSubtitle::GetWrapWidth("):
+            definition = extract_definition(content.decode("utf-8-sig"), signature)
+            if name == "CandidateWrap" and "GetWrapWidth" in signature:
+                assert definition.count("XyRust::WrapWidth wrap") == 1
+                definition = definition.replace("XyRust::WrapWidth wrap", "XyRust::ObservedWrapWidth wrap")
+            wrap_width += definition + "\n"
+        wrap_width += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_wrap_width.h").write_text(wrap_width, encoding="utf-8")
     realtext_source = original("src/subtitles/RealTextParser.cpp", reference["commit"])
     realtext_header = original("src/subtitles/RealTextParser.h", reference["commit"])
     realtext_class = extract_method(realtext_header.decode("utf-8-sig"), "class CRealTextParser")
@@ -1033,6 +1047,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     text_runs_result = run([str(text_runs_executable)], capture_output=True, text=True)
     print(text_runs_result.stdout, end="", flush=True)
     print(text_runs_result.stderr, end="", file=sys.stderr)
+    wrap_executable = destination / ("wrap-width-oracle.exe" if os.name == "nt" else "wrap-width-oracle")
+    wrap_compile = [arg.replace("find_char_oracle.cpp", "wrap_width_oracle.cpp").replace("find-char-oracle", "wrap-width-oracle") for arg in find_char_compile]
+    run(wrap_compile)
+    wrap_result = run([str(wrap_executable)], capture_output=True, text=True)
+    print(wrap_result.stdout, end="", flush=True)
+    print(wrap_result.stderr, end="", file=sys.stderr)
     layout_executable = destination / ("layout-rects-oracle.exe" if os.name == "nt" else "layout-rects-oracle")
     layout_compile = [arg.replace("find_char_oracle.cpp", "layout_rects_oracle.cpp").replace("find-char-oracle", "layout-rects-oracle") for arg in find_char_compile]
     if os.name == "nt":
@@ -1421,6 +1441,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "text_runs_compile_command": text_runs_compile,
         "text_runs_result": text_runs_result.stdout, "text_runs_stderr": text_runs_result.stderr,
         "text_runs_scope": "Complete pinned CRenderedTextSubtitle::ParseString; actual ATL strings on Windows, portable strings elsewhere; Rust escape preparation with native NUL fallback; modeled CText constructor and word-list boundaries, exact word arguments/float bits, live karaoke/scaling state, callback mutations/interruption and partial output; replacement-bearing NUL fixtures, native font metrics and allocation failures excluded",
+        "wrap_width_compile_command": wrap_compile,
+        "wrap_width_result": wrap_result.stdout, "wrap_width_stderr": wrap_result.stderr,
+        "wrap_width_scope": "Complete pinned CSubtitle::GetWrapWidth and native GetFullLineWidth; native word metrics modeled, actual ATL list on Windows; exact result and ordered word traversal, errno/Windows LastError; representable arithmetic only; full-line accumulation and native font metrics retained",
         "layout_rects_compile_command": layout_compile,
         "layout_rects_result": layout_result.stdout, "layout_rects_stderr": layout_result.stderr,
         "layout_rects_scope": "Complete pinned CScreenLayoutAllocator methods and class record layout; actual ATL CRect/list/array on Windows, controlled models on portable hosts; exact returned rectangles and full ordered retained records after each operation; Rust collision passes and segment retention, native border geometry; errno/Windows LastError; representable arithmetic, finite collision sequences and successful allocation only",

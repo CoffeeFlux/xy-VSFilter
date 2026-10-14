@@ -177,6 +177,14 @@
     [
       "text-runs-soft-wrap-zero-memory",
       "text-runs-soft-wrap-two-memory"
+    ],
+    [
+      "wrap-width-style-0-file",
+      "wrap-width-style-2-file"
+    ],
+    [
+      "wrap-width-style-0-memory",
+      "wrap-width-style-2-memory"
     ]
   ],
   "cases": [
@@ -10470,6 +10478,358 @@
       "id": "text-runs-karaoke-memory",
       "script": "test/compat/generated/text-runs-karaoke.ass",
       "sha256": "9faf51e0ffc5119f284841b93b581bd7f7a0e8ed676d8cff3c9a90897dd27769",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "wrap-width-style-0-file",
+      "script": "test/compat/generated/wrap-width-style-0.ass",
+      "sha256": "f389257eae9f0e405f07f3530a780b3cfc5c3899c385a29de141caba35851210",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "wrap-width-style-0-memory",
+      "script": "test/compat/generated/wrap-width-style-0.ass",
+      "sha256": "f389257eae9f0e405f07f3530a780b3cfc5c3899c385a29de141caba35851210",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "wrap-width-style-1-file",
+      "script": "test/compat/generated/wrap-width-style-1.ass",
+      "sha256": "d484cff6c5ebd028894a275c56f716e389f44c15d9c4aaa66aaf55f44cfda794",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "wrap-width-style-1-memory",
+      "script": "test/compat/generated/wrap-width-style-1.ass",
+      "sha256": "d484cff6c5ebd028894a275c56f716e389f44c15d9c4aaa66aaf55f44cfda794",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "wrap-width-style-2-file",
+      "script": "test/compat/generated/wrap-width-style-2.ass",
+      "sha256": "824c30c028a610baff6fb37900879dce6e40129abf9963078b2c5b5539900b38",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "wrap-width-style-2-memory",
+      "script": "test/compat/generated/wrap-width-style-2.ass",
+      "sha256": "824c30c028a610baff6fb37900879dce6e40129abf9963078b2c5b5539900b38",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "wrap-width-style-3-file",
+      "script": "test/compat/generated/wrap-width-style-3.ass",
+      "sha256": "b70998ba679947d911bac7600025c9df13bdd2cbadf4c0e8f5125a1ed3d01001",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "wrap-width-style-3-memory",
+      "script": "test/compat/generated/wrap-width-style-3.ass",
+      "sha256": "b70998ba679947d911bac7600025c9df13bdd2cbadf4c0e8f5125a1ed3d01001",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "wrap-width-oversized-word-file",
+      "script": "test/compat/generated/wrap-width-oversized-word.ass",
+      "sha256": "f3c1147a0204242041e80f05cd442430b303326d2e4120fd5edaea1cebf4f726",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "wrap-width-oversized-word-memory",
+      "script": "test/compat/generated/wrap-width-oversized-word.ass",
+      "sha256": "f3c1147a0204242041e80f05cd442430b303326d2e4120fd5edaea1cebf4f726",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "wrap-width-hard-break-tail-file",
+      "script": "test/compat/generated/wrap-width-hard-break-tail.ass",
+      "sha256": "977f7178047e0a03830fc67c5374572ea77ecd853e64e7d51afeef8048235335",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "wrap-width-hard-break-tail-memory",
+      "script": "test/compat/generated/wrap-width-hard-break-tail.ass",
+      "sha256": "977f7178047e0a03830fc67c5374572ea77ecd853e64e7d51afeef8048235335",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "wrap-width-negative-spacing-file",
+      "script": "test/compat/generated/wrap-width-negative-spacing.ass",
+      "sha256": "7493e9aecaf58de1b05f4fda4c44ebf4af0e44b8e628a8fd1695d8aba3282d6f",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "wrap-width-negative-spacing-memory",
+      "script": "test/compat/generated/wrap-width-negative-spacing.ass",
+      "sha256": "7493e9aecaf58de1b05f4fda4c44ebf4af0e44b8e628a8fd1695d8aba3282d6f",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "wrap-width-zero-scale-file",
+      "script": "test/compat/generated/wrap-width-zero-scale.ass",
+      "sha256": "e9417637224bfbc121f8e16558ec0c9f725da738840d5cfac942fec477f6573c",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "wrap-width-zero-scale-memory",
+      "script": "test/compat/generated/wrap-width-zero-scale.ass",
+      "sha256": "e9417637224bfbc121f8e16558ec0c9f725da738840d5cfac942fec477f6573c",
       "open": "memory",
       "width": 1280,
       "height": 720,

@@ -143,3 +143,5 @@ mod text_writer;
 mod layout_rects;
 
 mod text_runs;
+
+mod wrap_width;
