@@ -160,7 +160,11 @@ public:
         if name == "CandidateRealText":
             realtext += "#define XY_VSFILTER_RUST_TEXT\n"
         for signature in signatures:
-            realtext += extract_definition(content.decode("utf-8-sig"), signature) + "\n"
+            definition = extract_definition(content.decode("utf-8-sig"), signature)
+            if signature == "std::wstring CRealTextParser::StringToLower(":
+                brace = definition.index("{") + 1
+                definition = definition[:brace] + '\n    realTextAttributeHook(2, p_crszString);\n' + definition[brace:]
+            realtext += definition + "\n"
         realtext += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_realtext.h").write_text(realtext, encoding="utf-8")
     webvtt = '#include "webvtt_shell.h"\n'
@@ -851,6 +855,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     realtext_result = run([str(realtext_executable)], capture_output=True, text=True)
     print(realtext_result.stdout, end="", flush=True)
     print(realtext_result.stderr, end="", file=sys.stderr)
+    realtext_attributes_executable = destination / ("realtext-attributes-oracle.exe" if os.name == "nt" else "realtext-attributes-oracle")
+    realtext_attributes_compile = [arg.replace("fill_oracle.cpp", "realtext_attributes_oracle.cpp").replace("fill-oracle", "realtext-attributes-oracle") for arg in fill_compile]
+    run(realtext_attributes_compile)
+    realtext_attributes_result = run([str(realtext_attributes_executable)], capture_output=True, text=True)
+    print(realtext_attributes_result.stdout, end="", flush=True)
+    print(realtext_attributes_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -894,6 +904,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "vobsub_scale_result": vobsub_scale_result.stdout, "vobsub_scale_stderr": vobsub_scale_result.stderr,
         "vobsub_outline_compile_command": vobsub_outline_compile,
         "vobsub_outline_result": vobsub_outline_result.stdout, "vobsub_outline_stderr": vobsub_outline_result.stderr,
+        "realtext_attributes_compile_command": realtext_attributes_compile,
+        "realtext_attributes_result": realtext_attributes_result.stdout, "realtext_attributes_stderr": realtext_attributes_result.stderr,
+        "realtext_attributes_instrumentation": "iswspace wrapper and StringToLower entry hook observe native call order, cursor/map state, injected exceptions and live-input changes",
         "realtext_compile_command": realtext_compile,
         "realtext_result": realtext_result.stdout, "realtext_stderr": realtext_result.stderr,
         "realtext_source_sha256": hashlib.sha256(realtext_source).hexdigest(),

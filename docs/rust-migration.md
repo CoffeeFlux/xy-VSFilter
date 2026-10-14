@@ -20,6 +20,25 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust now owns the RealText attribute parser's names, values and cursor
+  state. It retains missing-equals recovery, whitespace skipping even inside
+  quotes, either quote ending a quoted value, raw NULs and duplicate map keys.
+  Native whitespace classification, lowercasing and map assignments occur at
+  their original checkpoints. The native cursor is published before each
+  callback, and input is borrowed afresh afterward, preserving live changes.
+  Fatal ASan/UBSan comparisons passed **153,946 cases** on arm64 and under x64
+  execution: **101,814 successful returns**, **82,729 changed maps**, **1,187,159
+  native callback operations**, **488 injected interruptions** and **772 live
+  input mutations**. Failures compare partial maps and exact cursor positions.
+  The tag-output oracle and **58 complete parser cases** also pass with both
+  RealText replacements active. Rust 1.85 tests (63 core, 40 FFI), strict Clippy
+  on both the pinned and current toolchains, and default-branch syntax checks
+  pass. Windows/Miri validation is pending. Input/output allocation failures
+  still need separate validation; native classification and map storage remain.
+  This increment also corrects a Clippy 1.85 `needless_borrow` failure in the
+  initial tag-output bridge: local checks had used a newer Clippy. Run
+  `rustup run 1.85.0 cargo clippy --workspace --all-targets --locked --offline -- -D warnings`
+  to match CI. Failed portable run `38508021393` is not counted as passing.
 * Safe Rust owns RealText `RenderTags` output as raw UTF-16. It preserves tag
   precedence, the shared bold/italic ignore flag, both font open/close emissions,
   ordered unescaped attributes and suppression of formatting-only output.
@@ -50,9 +69,13 @@ unresolved reference outcomes requiring investigation, never matching results.
   trimming**. Every post-newline UTF-16 code unit is compared. Windows uses
   installed ATL strings; portable trimming uses the host whitespace classifier,
   so comparisons are within each platform. Rust tests (61 core, 38 FFI), strict
-  Clippy and both default-branch syntax checks pass. Windows/Miri validation is
-  pending. This does not resolve the separately recorded WebVTT insertion
-  outcome or establish complete WebVTT host parity.
+  Clippy and both default-branch syntax checks pass. Candidate `431c9d50` passed
+  all four CI platforms, Miri and both Windows DLL jobs. Each DLL job matched
+  **370 cases / 4,430 frames** and **32 mutations / 224 frames**, plus dialogs,
+  visible controls, exports and dependencies. Both logs confirm Rust-enabled
+  `STS.cpp` compilation. [Cue-prefix evidence](webvtt-prefix-evidence.json)
+  records verified hashes and stable local validation. This does not resolve
+  the separate WebVTT insertion outcome or establish complete WebVTT host parity.
 * Safe Rust owns the UTF-16 text produced by `SubRipper2SSA`, applying the six
   original case-sensitive italic/bold/underline replacements in their original
   order. The native public string interface remains unchanged; the source is
@@ -69,7 +92,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   Rust tests (60 core, 37 FFI), strict Clippy and default-branch syntax checks
   pass. The renderer corpus now has **370 cases / 4,510 scheduled frames**, with
   eight new SRT files and visible italic/underline control pairs in file and
-  memory modes. Windows/Miri and actual renderer validation are pending.
+  memory modes. Candidate `db1f0e92` passed all four CI platforms, Miri and both
+  Windows DLL jobs. Each DLL job matched **370 cases / 4,430 rendered frames**
+  and **32 mutations / 224 frames**, plus the new visible controls, dialogs,
+  exports and dependencies. Both logs confirm Rust-enabled `STS.cpp` compilation.
+  [SubRip evidence](subrip-evidence.json) records verified source/DLL hashes,
+  stable local validation and the exact fallback limits.
 * Safe Rust selects DVD polygon-to-ASS commands and formats their signed decimal
   coordinates into a bounded UTF-16 buffer. Native public `CStringW` output,
   position/header formatting, prefix appends, final suffix and exception

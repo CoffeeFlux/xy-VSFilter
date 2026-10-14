@@ -17,9 +17,40 @@ void XY_REALTEXT_CDECL xy_vsfilter_realtext_attribute(void*, const uint16_t*, si
 void XY_REALTEXT_CDECL xy_vsfilter_realtext_end(void*);
 size_t XY_REALTEXT_CDECL xy_vsfilter_realtext_field(const void*, uint32_t, size_t);
 void XY_REALTEXT_CDECL xy_vsfilter_realtext_release(void*);
+void* XY_REALTEXT_CDECL xy_vsfilter_realtext_attributes_create(uint32_t);
+uint32_t XY_REALTEXT_CDECL xy_vsfilter_realtext_attributes_next(void*, const uint16_t*, size_t, uint32_t, uint32_t);
+size_t XY_REALTEXT_CDECL xy_vsfilter_realtext_attributes_field(const void*, uint32_t, size_t);
+void XY_REALTEXT_CDECL xy_vsfilter_realtext_attributes_release(void*);
 }
 #undef XY_REALTEXT_CDECL
 namespace XyRust {
+class RealTextAttributes {
+    void* owner;
+    RealTextAttributes(const RealTextAttributes&);
+    RealTextAttributes& operator=(const RealTextAttributes&);
+    std::wstring String(uint32_t field)const{
+        const size_t length=xy_vsfilter_realtext_attributes_field(owner,field,0);
+        std::wstring result(length,L'\0');
+        for(size_t i=0;i<length;++i)result[i]=static_cast<wchar_t>(xy_vsfilter_realtext_attributes_field(owner,field+1,i));
+        return result;
+    }
+public:
+    explicit RealTextAttributes(uint32_t position):owner(xy_vsfilter_realtext_attributes_create(position)){}
+    ~RealTextAttributes(){xy_vsfilter_realtext_attributes_release(owner);}
+    uint32_t Next(const std::wstring& input,bool ignore,bool response){
+#ifdef _WIN32
+        static_assert(sizeof(wchar_t)==sizeof(uint16_t),"native strings must contain UTF-16 units");
+        return xy_vsfilter_realtext_attributes_next(owner,reinterpret_cast<const uint16_t*>(input.data()),input.size(),ignore?1:0,response?1:0);
+#else
+        const std::vector<uint16_t> units(input.begin(),input.end());
+        return xy_vsfilter_realtext_attributes_next(owner,units.data(),units.size(),ignore?1:0,response?1:0);
+#endif
+    }
+    uint32_t Position()const{return static_cast<uint32_t>(xy_vsfilter_realtext_attributes_field(owner,0,0));}
+    wchar_t Character()const{return static_cast<wchar_t>(xy_vsfilter_realtext_attributes_field(owner,1,0));}
+    std::wstring Name()const{return String(2);}
+    std::wstring Value()const{return String(4);}
+};
 class RealTextTags {
     void* owner;
     RealTextTags(const RealTextTags&);

@@ -317,6 +317,22 @@ bool CRealTextParser::GetString(std::wstring& p_rszLine, unsigned int& p_riPos, 
 
 bool CRealTextParser::GetAttributes(std::wstring& p_rszLine, unsigned int& p_riPos, std::map<std::wstring, std::wstring>& p_rmapAttributes)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::RealTextAttributes parser(p_riPos);
+    bool response = false;
+    for (;;) {
+        const uint32_t action = parser.Next(p_rszLine, m_bTryToIgnoreErrors, response);
+        p_riPos = parser.Position();
+        if (action == 1) {
+            response = ::iswspace(parser.Character()) != 0;
+        } else if (action == 2) {
+            const std::wstring name = parser.Name(), value = parser.Value();
+            p_rmapAttributes[StringToLower(name)] = value;
+        } else {
+            return action == 3;
+        }
+    }
+#else
     if (!SkipSpaces(p_rszLine, p_riPos)) {
         return false;
     }
@@ -387,6 +403,7 @@ bool CRealTextParser::GetAttributes(std::wstring& p_rszLine, unsigned int& p_riP
     }
 
     return p_rszLine.length() > p_riPos;
+#endif
 }
 
 int CRealTextParser::GetTimecode(const std::wstring& p_crszTimecode)
