@@ -29,6 +29,36 @@ pub unsafe extern "C" fn xy_vsfilter_plane_release(owner: *mut Plane) {
 mod tests {
     use super::*;
     #[test]
+    fn two_word_history_loans_survive_fixed_blur_phases_and_reverse_release() {
+        let pixels = xy_vsfilter_plane_create(16);
+        let sums = xy_vsfilter_plane_create(16);
+        assert!(!pixels.is_null() && !sums.is_null());
+        // SAFETY: separately allocated initialized word views, each bounded
+        // filter borrow ends before the next phase and final owner release.
+        unsafe {
+            let p = xy_vsfilter_plane_loan(pixels).cast::<u16>();
+            let s = xy_vsfilter_plane_loan(sums).cast::<u16>();
+            core::ptr::write_bytes(p, 0, 8);
+            core::ptr::write_bytes(s, 0, 8);
+            for phase in 0..3 {
+                let output = crate::be_blur::xy_vsfilter_be_blur_group(
+                    0x1010_1010_1010_1010,
+                    8,
+                    16 | (32 << 16),
+                    p,
+                    s,
+                    phase,
+                    1,
+                );
+                if phase == 2 {
+                    assert_eq!(output.pixels, 0x1010_1010_1010_1010);
+                }
+            }
+            xy_vsfilter_plane_release(sums);
+            xy_vsfilter_plane_release(pixels);
+        }
+    }
+    #[test]
     fn aligned_output_loan_supports_independent_word_scratch_in_bilinear_filter() {
         let pixels = xy_vsfilter_plane_create(4);
         let columns = xy_vsfilter_plane_create(8);

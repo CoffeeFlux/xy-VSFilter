@@ -626,6 +626,21 @@ static void xyRustBeBlur(unsigned char* buf, WORD* columns, WORD* sums,
 
 static void be_blur(unsigned char *buf, unsigned *tmp_base, int w, int h, int stride)
 {   
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (w >= 2 && w <= INT32_MAX / 2 && h >= 2) {
+        XyRust::PlanePair columns(w*sizeof(WORD));
+        if(columns.Ready()) {
+            WORD* pixels = reinterpret_cast<WORD*>(columns.First());
+            WORD* sums = reinterpret_cast<WORD*>(columns.Second());
+            memset(pixels, 0, w*sizeof(WORD));
+            memset(sums, 0, w*sizeof(WORD));
+            xyRustBeBlur(buf, pixels, sums, w, h, stride, true);
+            columns.Reset();
+            return;
+        }
+        columns.Reset();
+    }
+#endif
     WORD *col_pix_buf_base = reinterpret_cast<WORD*>(xy_malloc(w*sizeof(WORD)));
     WORD *col_sum_buf_base = reinterpret_cast<WORD*>(xy_malloc(w*sizeof(WORD)));
     if(!col_sum_buf_base || !col_pix_buf_base)
@@ -742,6 +757,21 @@ static void be_blur(unsigned char *buf, unsigned *tmp_base, int w, int h, int st
  */
 static void be_blur_c(unsigned char *buf, unsigned *tmp_base, int w, int h, int stride)
 {   
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (w >= 2 && w <= INT32_MAX / 2 && h >= 2) {
+        XyRust::PlanePair columns(w*sizeof(WORD));
+        if(columns.Ready()) {
+            WORD* pixels = reinterpret_cast<WORD*>(columns.First());
+            WORD* sums = reinterpret_cast<WORD*>(columns.Second());
+            memset(pixels, 0, w*sizeof(WORD));
+            memset(sums, 0, w*sizeof(WORD));
+            xyRustBeBlur(buf, pixels, sums, w, h, stride, false);
+            columns.Reset();
+            return;
+        }
+        columns.Reset();
+    }
+#endif
     WORD *col_pix_buf_base = reinterpret_cast<WORD*>(xy_malloc(w*sizeof(WORD)));
     WORD *col_sum_buf_base = reinterpret_cast<WORD*>(xy_malloc(w*sizeof(WORD)));
     if(!col_sum_buf_base || !col_pix_buf_base)

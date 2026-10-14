@@ -38,4 +38,14 @@ public:
         destination.reset(data,PlaneDeleter(transferred,count));
     }
 };
+class PlanePair {
+    PlaneAllocation first,second;
+    PlanePair(const PlanePair&);PlanePair& operator=(const PlanePair&);
+public:
+    explicit PlanePair(size_t count):first(count),second(count){}
+    bool Ready()const{return first.Ready()&&second.Ready();}
+    uint8_t* First()const{return first.Data();}
+    uint8_t* Second()const{return second.Data();}
+    void Reset(){second.Reset();first.Reset();}
+};
 }

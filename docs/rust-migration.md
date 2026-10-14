@@ -20,6 +20,20 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Rust owns both fixed-blur column-history buffers when the validated grouped
+  filter path can acquire the complete pair. Both buffers keep native zero
+  initialization, word layout and sum-before-pixel release order. Decline resets
+  any temporary Rust allocations before entering the existing native allocation
+  path. Fatal ASan/UBSan comparisons pass: **43,860 scalar cases / 359,301,120
+  bytes / 89,856 Rust owners** on arm64; **87,720 cases / 718,602,240 bytes /
+  179,712 Rust owners** under x64 execution, including **43,860 actual SSE
+  comparisons**. Final column histories, overlapping rows, negative/zero stride
+  and repeated passes match. Allocation-failure fixtures deliberately select the
+  native fallback (**180 arm64 / 360 x64 cases**); this does not validate actual
+  allocation exhaustion while creating a Rust pair. The FFI test exercises two
+  independent word-history loans through all grouped-blur phases and reverse
+  release. Rust 1.85 tests (142 core, 94 FFI), strict Clippy and default syntax
+  pass. The corpus remains **754 cases**; Windows/Miri and DLL checks are pending.
 * Rust owns the bilinear filter's aligned temporary column history as well as
   the output planes. The existing native zero initialization, word-sized view,
   filter/fallback arithmetic and release points remain; logical cache accounting

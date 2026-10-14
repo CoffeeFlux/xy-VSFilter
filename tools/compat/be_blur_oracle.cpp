@@ -38,8 +38,9 @@ static Outcome execute(bool candidate,bool vector,int width,int height,int pitch
     // possibly unwritten contents; release them outside the observed call.
     for(size_t i=0;i<blurAllocations.size();++i)if(blurAllocations[i].pointer) {
         blurEvents.push_back(2);blurEvents.push_back(i);
-        std::free(blurAllocations[i].pointer);blurAllocations[i].pointer=nullptr;
+        if(blurAllocations[i].rust)std::abort();g_xy_malloc_used_size-=blurAllocations[i].size;std::free(blurAllocations[i].pointer);blurAllocations[i].pointer=nullptr;
     }
+    if(g_xy_malloc_used_size)std::abort();
     out.events=blurEvents;out.history=blurHistory;return out;
 }
 static void fixture(bool vector,int width,int height,int pitch,unsigned pattern,int fail=-1,int passes=1) {
@@ -75,6 +76,7 @@ int main() {
     }
     if(!different){fprintf(stderr,"Blur grouped-read alias control failed\n");return 1;}
 #endif
-    printf("%llu exact fixed-blur comparisons passed (%llu bytes including padding/guards, %llu visibly changed cases, %llu actual SSE comparisons, %llu injected allocation-failure cases; column histories, scalar/SSE boundaries, overlapping rows, negative/zero stride and repeated passes)\n",
-        static_cast<unsigned long long>(comparisons),static_cast<unsigned long long>(bytes_compared),static_cast<unsigned long long>(changed),static_cast<unsigned long long>(vector_comparisons),static_cast<unsigned long long>(failures));
+    if(!blurOwners||blurOwners!=blurLoans||blurOwners!=blurReleases)std::abort();
+    printf("%llu exact fixed-blur comparisons passed (%llu bytes including padding/guards, %llu visibly changed cases, %llu actual SSE comparisons, %llu native-fallback allocation-failure cases / %llu Rust scratch owners, loans and releases; column histories, scalar/SSE boundaries, overlapping rows, negative/zero stride and repeated passes)\n",
+        static_cast<unsigned long long>(comparisons),static_cast<unsigned long long>(bytes_compared),static_cast<unsigned long long>(changed),static_cast<unsigned long long>(vector_comparisons),static_cast<unsigned long long>(failures),static_cast<unsigned long long>(blurOwners));
 }
