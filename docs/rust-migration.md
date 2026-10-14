@@ -20,6 +20,21 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust float-to-float transposition handles disjoint positive-pitch
+  layouts containing finite normal values or signed zeros. It moves initialized
+  bit patterns through the same owned matrix storage as byte transposition;
+  source/output padding is not borrowed. NaNs, infinities, subnormals, aliases,
+  unusual layouts and allocation refusal retain native handling. SSE destination
+  alignment is checked before using the Rust path. The Windows x86 component
+  oracle explicitly uses `/arch:IA32`, matching the project's scalar build mode.
+  Local fatal ASan/UBSan tests passed **343,260 scalar comparisons** on arm64
+  and **463,800 comparisons** under x64 execution, including **120,540 actual
+  SSE comparisons**, **18,000 nearby/alias cases**, **17,154 Rust-handled calls**
+  and **687,726 fallback calls**. Tests compare all output bits and floating-point
+  exception flags, including special-value fallback behavior. Byte transpose
+  regression tests still pass. Rust tests (45 core, 23 FFI), strict Clippy and
+  default native branch syntax checks pass. Windows/Miri validation is pending
+  for this increment; float-to-byte conversion remains native.
 * Safe Rust byte-matrix transposition handles positive-pitch, non-overlapping
   layouts behind the existing switch. Native active source rows are copied into
   owned Rust storage; safe Rust transposes and adds the original zero extension.
@@ -34,7 +49,7 @@ unresolved reference outcomes requiring investigation, never matching results.
   excluded from parity counts. Rust tests (45 core, 22 FFI), strict Clippy and
   default native branch syntax checks pass; boundary tests use intentionally
   uninitialized pitch gaps and output. Windows/Miri validation is pending for
-  this increment. Float transposes remain native.
+  this increment. Float transposition is a separate increment above.
 * Safe Rust weighted horizontal filtering covers fractional blur arithmetic
   behind the existing switch. Scalar full-width products and narrowing remain
   distinct from SSE word products and saturating additions. The original

@@ -347,6 +347,8 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         if name == "CandidateTranspose":
             transpose += "#define XY_VSFILTER_RUST_TEXT\n"
         transpose += extract_definition(content.decode("utf-8-sig"), "void xy_byte_2_byte_transpose_c(") + "\n"
+        transpose += extract_definition(content.decode("utf-8-sig"), "void xy_float_2_float_transpose_c(") + "\n"
+        transpose += "#if TRANSPOSE_NATIVE_SSE\n" + extract_definition(content.decode("utf-8-sig"), "void xy_float_2_float_transpose_sse(") + "\n#endif\n"
         transpose += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_transpose.h").write_text(transpose, encoding="utf-8")
     filters = '#include "be_filter_shell.h"\n'
@@ -597,6 +599,15 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     transpose_result = run([str(transpose_executable)], capture_output=True, text=True)
     print(transpose_result.stdout, end="", flush=True)
     print(transpose_result.stderr, end="", file=sys.stderr)
+    float_transpose_executable = destination / ("float-transpose-oracle.exe" if os.name == "nt" else "float-transpose-oracle")
+    float_transpose_compile = [arg.replace("fill_oracle.cpp", "float_transpose_oracle.cpp").replace("fill-oracle", "float-transpose-oracle") for arg in fill_compile]
+    if os.name == "nt" and args.target and args.target.startswith("i686-"):
+        # Match common.props' NoExtensions mode for scalar x87 copies.
+        float_transpose_compile.insert(1, "/arch:IA32")
+    run(float_transpose_compile)
+    float_transpose_result = run([str(float_transpose_executable)], capture_output=True, text=True)
+    print(float_transpose_result.stdout, end="", flush=True)
+    print(float_transpose_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -629,6 +640,8 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "xy_filter_source_sha256": hashlib.sha256(filter_source).hexdigest(),
         "weighted_filter_compile_command": weighted_compile,
         "weighted_filter_result": weighted_result.stdout, "weighted_filter_stderr": weighted_result.stderr,
+        "float_transpose_compile_command": float_transpose_compile,
+        "float_transpose_result": float_transpose_result.stdout, "float_transpose_stderr": float_transpose_result.stderr,
         "transpose_compile_command": transpose_compile,
         "transpose_result": transpose_result.stdout, "transpose_stderr": transpose_result.stderr,
         "be_filter_compile_command": filter_compile,

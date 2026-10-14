@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-//! Byte transposition for the disjoint, positive-pitch matrix layout.
+//! Initialized-element transposition for the disjoint, positive-pitch matrix layout.
 use alloc::vec::Vec;
 
 pub struct Layout {
@@ -52,14 +52,14 @@ impl Layout {
 
     /// Input is packed initialized rows. Output is packed transposed rows,
     /// including the original zero extension but excluding native pitch gaps.
-    pub fn transpose(&self, input: &[u8]) -> Option<Vec<u8>> {
+    pub fn transpose<T: Copy + Default>(&self, input: &[T]) -> Option<Vec<T>> {
         if input.len() != self.width.checked_mul(self.height)? {
             return None;
         }
         let count = self.width.checked_mul(self.destination_width)?;
         let mut output = Vec::new();
         output.try_reserve_exact(count).ok()?;
-        output.resize(count, 0);
+        output.resize(count, T::default());
         for x in 0..self.width {
             for y in 0..self.height {
                 output[x * self.destination_width + y] = input[y * self.width + x];

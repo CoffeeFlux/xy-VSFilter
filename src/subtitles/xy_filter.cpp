@@ -718,6 +718,11 @@ void xy_float_2_float_transpose_c(float *dst, int dst_width, int dst_stride,
     const float *src, int width, int height, int src_stride)
 {
     ASSERT(dst_width >= height);
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (xy_vsfilter_word_transpose(reinterpret_cast<uint32_t*>(dst), dst_width, dst_stride, reinterpret_cast<const uint32_t*>(src), width, height, src_stride)) {
+        return;
+    }
+#endif
     PUINT8 dst_byte = reinterpret_cast<PUINT8>(dst);
     const float* src_end = src + width;
     PCUINT8 src2_end = reinterpret_cast<PCUINT8>(src) + height*src_stride;
@@ -749,6 +754,11 @@ void xy_float_2_float_transpose_sse(float *dst, int dst_width, int dst_stride,
 
     ASSERT( (((intptr_t)dst|dst_stride)&15)==0 );
     ASSERT(dst_width >= height);
+#ifdef XY_VSFILTER_RUST_TEXT
+    if ((((reinterpret_cast<uintptr_t>(dst) | static_cast<uintptr_t>(dst_stride)) & 15) == 0) && xy_vsfilter_word_transpose(reinterpret_cast<uint32_t*>(dst), dst_width, dst_stride, reinterpret_cast<const uint32_t*>(src), width, height, src_stride)) {
+        return;
+    }
+#endif
     PUINT8 dst_byte = reinterpret_cast<PUINT8>(dst);
     SrcT* src_end = src + width;
     PCUINT8 src2_end1 = reinterpret_cast<PCUINT8>(src) + (height&~3)*src_stride;
