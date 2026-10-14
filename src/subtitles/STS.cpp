@@ -29,6 +29,7 @@
 #include "xy_rust_mpl2.h"
 #include "xy_rust_remove_tags.h"
 #include "xy_rust_case_replace.h"
+#include "xy_rust_sami.h"
 #include "xy_rust_webvtt.h"
 #include "xy_rust_fields.h"
 #include "xy_rust_segments.h"
@@ -1571,6 +1572,48 @@ static CStringW SMI2SSA(CStringW str, int CharSet)
 
     CStringW lstr = str;
     lstr.MakeLower();
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::Sami convert(str, lstr);
+    if(convert.Handled())
+    {
+        while(convert.Step() != 0)
+        {
+            CStringW args = convert.Text<CStringW>(1);
+            CStringW arg ;
+
+            args.Remove('\"'); args.Remove('#');    // may include 2 * " + #
+            arg.TrimLeft(); arg.TrimRight(L" >");
+
+            for (;;)
+            {
+                args.TrimLeft();
+                arg = args.SpanExcluding(L" \t>");
+                args = args.Mid(arg.GetLength());
+
+                if(arg.IsEmpty())
+                    break;
+                if (arg.Find(L"color=") == 0 )
+                {
+                    DWORD color;
+
+                    arg = arg.Mid(6);   // delete "color="
+                    if ( arg.IsEmpty())
+                        continue;
+
+                    DWORD val;
+                    if(g_colors.Lookup(CString(arg), val))
+                        color = (DWORD)val;
+                    else if((color = wcstol(arg, NULL, 16) ) == 0)
+                        color = 0x00ffffff;  // default is white
+
+                    arg.Format(L"%02x%02x%02x", color&0xff, (color>>8)&0xff, (color>>16)&0xff);
+                    convert.Insert(CStringW(L"{\\c&H") + arg + L"&}", 5 + arg.GetLength() + 2);
+                }
+            }
+        }
+        return convert.Text<CStringW>(0);
+    }
+#endif
 
     // maven@maven.de
     // now parse line

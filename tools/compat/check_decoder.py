@@ -55,7 +55,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
               ROOT / "include/xy_rust_drawing.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
-              ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
+              ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
               ROOT / "include/xy_rust_cc.h", ROOT / "src/subtitles/CCDecoder.cpp", ROOT / "src/subtitles/CCDecoder.h",
               ROOT / "include/xy_rust_segments.h",
@@ -204,6 +204,30 @@ public:
         webvtt += extract_definition(content.decode("utf-8-sig"), "static void WebVTTCueStrip(") + "\n"
         webvtt += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_webvtt.h").write_text(webvtt, encoding="utf-8")
+    sami = '#include "sami_shell.h"\n'
+    for name, content in (("ReferenceSami", font_source), ("CandidateSami", candidate_font)):
+        decoded = content.decode("utf-8-sig").replace("\r\n", "\n")
+        sami += f"namespace {name} {{\n"
+        start = decoded.index("static struct htmlcolor")
+        end = decoded.index("\n};", start) + 3
+        table = decoded[start:end]
+        assert table.count("TCHAR* name;") == 1
+        # Table contents are verbatim; names are immutable in this harness.
+        sami += table.replace("TCHAR* name;", "const TCHAR* name;") + "\n"
+        sami += "static SamiColors g_colors(htmlcolors, sizeof(htmlcolors)/sizeof(*htmlcolors));\n"
+        if name == "CandidateSami":
+            sami += "#define XY_VSFILTER_RUST_TEXT\n"
+        sami += extract_definition(decoded, "static void ReplaceNoCase(") + "\n"
+        start = decoded.index("static CStringW SMI2SSA(")
+        end = decoded.index("static bool OpenSami(", start)
+        definition = decoded[start:end].rstrip()
+        assert definition.endswith("}")
+        if name == "CandidateSami":
+            bridge = "XyRust::Sami convert"
+            assert definition.count(bridge) == 1
+            definition = definition.replace(bridge, "XyRust::ObservedSami convert")
+        sami += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_sami.h").write_text(sami, encoding="utf-8")
     microdvd = '#include "microdvd_shell.h"\n'
     for name, content in (("ReferenceMicroDVD", font_source), ("CandidateMicroDVD", candidate_font)):
         microdvd += f"namespace {name} {{\n"
@@ -820,6 +844,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     case_replace_result = run([str(case_replace_executable)], capture_output=True, text=True)
     print(case_replace_result.stdout, end="", flush=True)
     print(case_replace_result.stderr, end="", file=sys.stderr)
+    sami_executable = destination / ("sami-oracle.exe" if os.name == "nt" else "sami-oracle")
+    sami_compile = [arg.replace("microdvd_oracle.cpp", "sami_oracle.cpp").replace("microdvd-oracle", "sami-oracle") for arg in microdvd_compile]
+    run(sami_compile)
+    sami_result = run([str(sami_executable)], capture_output=True, text=True)
+    print(sami_result.stdout, end="", flush=True)
+    print(sami_result.stderr, end="", file=sys.stderr)
     run(fill_compile)
     fill_result = run([str(fill_executable)], capture_output=True, text=True)
     print(fill_result.stdout, end="", flush=True)
@@ -1113,6 +1143,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "webvtt_compile_command": webvtt_compile,
         "webvtt_result": webvtt_result.stdout, "webvtt_stderr": webvtt_result.stderr,
         "webvtt_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring model with host iswspace; Windows comparison required",
+        "sami_compile_command": sami_compile,
+        "sami_result": sami_result.stdout, "sami_stderr": sami_result.stderr,
+        "sami_scope": "Whole SMI2SSA and ReplaceNoCase against pinned method/table data; native ATL CStringW and CAtlMap/CRT on Windows, portable models elsewhere; table name pointers const-qualified without changing entries; native numeric/color callbacks and errno; replacement-bearing NUL outcomes excluded",
         "case_replace_compile_command": case_replace_compile,
         "case_replace_result": case_replace_result.stdout, "case_replace_stderr": case_replace_result.stderr,
         "case_replace_scope": "Whole ReplaceNoCase with native lowercase checkpoint, mutable caller text, source/from/to aliases and source mutations during lowercase; Windows ATL/CRT in CI; empty-needle nonterminating and replacement-bearing NUL outcomes excluded",

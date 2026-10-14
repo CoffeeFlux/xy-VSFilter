@@ -132,6 +132,45 @@ public:
         text.erase(static_cast<size_t>(start),static_cast<size_t>(count));return GetLength();
 #endif
     }
+    bool IsEmpty()const{return GetLength()==0;}
+    int Remove(wchar_t unit){
+#ifdef _WIN32
+        return text.Remove(unit);
+#else
+        const auto old=text.size();text.erase(std::remove(text.begin(),text.end(),unit),text.end());return static_cast<int>(old-text.size());
+#endif
+    }
+    void TrimLeft(){
+#ifdef _WIN32
+        text.TrimLeft();
+#else
+        size_t i=0;while(i<text.size() && text[i] && std::iswspace(text[i]))++i;text.erase(0,i);
+#endif
+    }
+    void TrimRight(const wchar_t* chars){
+#ifdef _WIN32
+        text.TrimRight(chars);
+#else
+        while(!text.empty() && text.back() && std::wcschr(chars,text.back()))text.pop_back();
+#endif
+    }
+    MicroString SpanExcluding(const wchar_t* chars)const{
+#ifdef _WIN32
+        auto result=text.SpanExcluding(chars);return MicroString(result.GetString(),result.GetLength());
+#else
+        return MicroString(text.data(),static_cast<int>(std::wcscspn(text.c_str(),chars)));
+#endif
+    }
+    friend MicroString operator+(const MicroString& a,const MicroString& b){MicroString result=a;result+=b;return result;}
+    friend MicroString operator+(const MicroString& a,const wchar_t* b){MicroString result=a;result+=b;return result;}
+    template<class Value> void Format(const wchar_t* fmt,Value x,Value y,Value z){
+        microObserve(5,fmt);
+#ifdef _WIN32
+        text.Format(fmt,x,y,z);
+#else
+        wchar_t buf[256];std::swprintf(buf,256,fmt,x,y,z);text=buf;
+#endif
+    }
     void MakeLower(){
         microObserve(4,GetString());
 #ifdef _WIN32

@@ -89,6 +89,14 @@
     [
       "sami-format-italic-memory",
       "sami-format-control-memory"
+    ],
+    [
+      "sami-format-font-black-file",
+      "sami-format-font-zero-file"
+    ],
+    [
+      "sami-format-font-black-memory",
+      "sami-format-font-zero-memory"
     ]
   ],
   "cases": [
@@ -9882,6 +9890,150 @@
       "id": "sami-format-unicode-memory",
       "script": "test/compat/generated/sami-format-unicode.smi",
       "sha256": "8b53d1e807b3c057e63ea1e6be9e323f12407906a760e604922d0257220ad484",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-format-font-black-file",
+      "script": "test/compat/generated/sami-format-font-black.smi",
+      "sha256": "e5e15db64dc218bbf04da912f503e0e9435c674ed71630ea93e559f9e8034fad",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-format-font-black-memory",
+      "script": "test/compat/generated/sami-format-font-black.smi",
+      "sha256": "e5e15db64dc218bbf04da912f503e0e9435c674ed71630ea93e559f9e8034fad",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-format-font-zero-file",
+      "script": "test/compat/generated/sami-format-font-zero.smi",
+      "sha256": "f1a2e198f88dbd05d15d12ae9fd402672c7a7b68e642bf896160786b6894f808",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-format-font-zero-memory",
+      "script": "test/compat/generated/sami-format-font-zero.smi",
+      "sha256": "f1a2e198f88dbd05d15d12ae9fd402672c7a7b68e642bf896160786b6894f808",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-format-font-multiple-file",
+      "script": "test/compat/generated/sami-format-font-multiple.smi",
+      "sha256": "47cbb5b4b05be395efc228985adb56665cb3782cda6aad32aa516148245e14c4",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-format-font-multiple-memory",
+      "script": "test/compat/generated/sami-format-font-multiple.smi",
+      "sha256": "47cbb5b4b05be395efc228985adb56665cb3782cda6aad32aa516148245e14c4",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-format-font-unclosed-file",
+      "script": "test/compat/generated/sami-format-font-unclosed.smi",
+      "sha256": "7035e6bb9a98df1ca54abb9723fb7c49cefd99bdff347d0e320ea635ffd207c4",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-format-font-unclosed-memory",
+      "script": "test/compat/generated/sami-format-font-unclosed.smi",
+      "sha256": "7035e6bb9a98df1ca54abb9723fb7c49cefd99bdff347d0e320ea635ffd207c4",
       "open": "memory",
       "width": 1280,
       "height": 720,

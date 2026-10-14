@@ -20,6 +20,28 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns SAMI's original-case and lowercase buffers, outer tag scan,
+  color-fragment insertion and tag deletion. Native preprocessing, font-argument
+  extraction operations, the original color table/lookup, `wcstol` and hexadecimal
+  formatting remain in order. An unterminated font tag still removes one unit
+  beyond its original end, including the first unit of an inserted color command.
+  Named black and numeric zero retain their different reference behavior.
+  Fatal ASan/UBSan comparisons passed **97,199 whole conversions** on arm64 and
+  under x64 execution: **95,789 changed strings**, **2,534,822 output UTF-16
+  units**, **36,952,311 callback observation values**, **18 interruptions** and
+  **77,418 matching errno changes**. The oracle observed **96,935 Rust owners /
+  260,067 steps / 146,536 color insertions**, plus **256 native NUL fallbacks**;
+  interruptions before owner creation account for the remaining calls. It covers
+  every named reference color, repeated/malformed attributes, unterminated tags,
+  every nonzero UTF-16 value and ordered entity/style preprocessing. Windows uses
+  actual ATL strings/maps and CRT conversions; portable models and counts are
+  environment-specific. Replacement-bearing NUL outcomes are excluded.
+  Four added SAMI font fixtures and a named-black/numeric-zero visible control
+  expand the rendering corpus to **430 cases**. Rust 1.85 tests (86 core, 58 FFI),
+  strict Clippy, default syntax, corpus freshness and Python checks pass.
+  Windows/Miri and complete rendering validation are pending. Native font-argument
+  processing, color/numeric conversion, file parsing, allocation failure timing
+  and full host integration remain separate work.
 * Safe Rust owns `ReplaceNoCase` replacement/output construction after the
   original native lowercase call. It preserves source case outside replacements,
   leaves the needle's case untouched and never searches newly inserted text.
@@ -51,8 +73,15 @@ unresolved reference outcomes requiring investigation, never matching results.
   Nested/unclosed tags, every nonzero UTF-16 value and both charset-search modes
   are covered. Replacement-bearing NUL outcomes remain excluded. Rust 1.85 tests
   (83 core, 56 FFI), strict Clippy, default syntax and corpus freshness pass.
-  Windows/Miri validation is pending. This helper is used by `GetStrW`/`GetStrWA`;
-  the CSRI rendering corpus alone does not establish text-export compatibility.
+  Corrected candidate `8e7b8522` passed all four portable platforms, Miri and
+  both Windows DLL jobs, each matching **410 cases / 4,658 frames** and **32
+  mutations / 224 frames**, plus dialogs, visible controls, exports and
+  dependencies. Both logs confirm Rust-enabled `STS.cpp` compilation.
+  [Converter-batch evidence](text-converters-evidence.json) records verified
+  hashes, stable local validation, and the corrected earlier harness/NUL failures.
+  It covers this helper plus MicroDVD, MPL2 and Unicode search below. This helper
+  is used by `GetStrW`/`GetStrWA`; CSRI rendering alone does not establish
+  text-export compatibility.
   Input encoding conversion, allocation failure timing and full export/host
   integration remain separate work.
 * Safe Rust performs MPL2's leading-slash and pipe-slash preprocessing, retaining
@@ -70,7 +99,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   conversions** still match. Six MPL2 fixtures, including UTF-16 input and a
   visible italic control, expand the rendering corpus to **410 cases**.
   Rust 1.85 tests (81 core, 55 FFI), strict Clippy, default syntax and Python
-  harness checks pass. Windows/Miri and whole-renderer validation are pending.
+  harness checks pass. The corrected `8e7b8522` converter-batch evidence above
+  provides complete portable, Miri and Windows DLL validation.
 * Safe Rust owns MicroDVD conversion's line/tag state, output code units and
   style restore mask. The native adapter retains `FindChar`, `CStringW::Mid`,
   tag classification, case conversion, numeric scans and formatting. Unknown
@@ -97,10 +127,10 @@ unresolved reference outcomes requiring investigation, never matching results.
   Literal fragments now pass through the original native CString append boundary
   before being copied into the Rust-owned output, preserving its truncation
   semantics without treating the portable string model as authoritative.
-  Corrected candidate `8e7b8522` passed both Windows portable jobs
-  (x64 job `115709602067`, x86 job `115709602301`) and Miri (`115709601874`).
-  Complete portable/rendering evidence is still pending. Fixture failure
-  diagnostics and earlier text-adapter execution remain in the harness.
+  Corrected candidate `8e7b8522` passed all portable, Miri and Windows DLL jobs,
+  as recorded in the converter-batch evidence above. Earlier failed runs remain
+  recorded and are not counted as passing. Fixture failure diagnostics and
+  earlier text-adapter execution remain in the harness.
   Native tag conversion, input/line strings, allocation failure timing and host integration
   remain to be migrated or separately validated.
 * Safe Rust owns the charset-aware `FindChar` loop used by MicroDVD and other
