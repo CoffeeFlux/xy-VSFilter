@@ -20,6 +20,21 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust DVD nibble extraction and variable-length run-code decoding preserve
+  each of the four stopping thresholds and the separate fill-to-end case. Values
+  cross the C ABI one nibble at a time, retaining native read/draw interleaving
+  when output overlaps upcoming input bytes. Offset updates, alternating-plane
+  traversal, coordinate updates, allocation and trimming remain native.
+  The extracted complete decode loop, nibble reader and drawing method passed
+  **85,168 exact comparisons** on arm64 and under x64 execution with fatal
+  ASan/UBSan. Tests compare **3,457,842 full state/pixel boundary observations**,
+  including **222 injected native interruptions**, **8,000 input/output alias
+  cases**, **842,868 Rust nibble calls** and **715,720 Rust code steps**. Every
+  four-nibble prefix is covered; a control confirms that aliasing changes later
+  consumed nibbles. Packet metadata, allocation and trim calls are observed
+  substitutes in this loop oracle, not evidence for those implementations.
+  Rust tests (52 core, 29 FFI), strict Clippy and both default native branch syntax
+  checks pass. Windows/Miri validation is pending for this increment.
 * Safe Rust DVD pixel-run clipping and filling preserve the original left-edge
   length retention, including runs ending exactly at the left edge, right-edge
   truncation, initial rejection order and pixel indexing. Palette reads remain

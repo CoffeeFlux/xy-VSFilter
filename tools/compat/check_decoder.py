@@ -358,6 +358,17 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         vobsub_pixels += extract_definition(content.decode("utf-8-sig"), "void CVobSubImage::DrawPixels(") + "\n"
         vobsub_pixels += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_vobsub_pixels.h").write_text(vobsub_pixels, encoding="utf-8")
+    vobsub_rle = '#include "vobsub_rle_shell.h"\n'
+    for name, content in (("ReferenceVobRle", vobsub_source), ("CandidateVobRle", (ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
+        vobsub_rle += f"VOBSUB_RLE_SHELL({name})\n#define CVobSubImage {name}\n"
+        if name == "CandidateVobRle":
+            vobsub_rle += "#define XY_VSFILTER_RUST_TEXT\n"
+        for signature in ("bool CVobSubImage::Decode(", "BYTE CVobSubImage::GetNibble(", "void CVobSubImage::DrawPixels("):
+            definition = extract_definition(content.decode("utf-8-sig"), signature)
+            definition = definition.replace("CVobSubImage::GetNibble(", "CVobSubImage::GetNibbleImpl(", 1).replace("CVobSubImage::DrawPixels(", "CVobSubImage::DrawPixelsImpl(", 1)
+            vobsub_rle += definition + "\n"
+        vobsub_rle += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_vobsub_rle.h").write_text(vobsub_rle, encoding="utf-8")
     byte_float = '#include "byte_float_shell.h"\n'
     for name, content in (("ReferenceByteFloat", filter_source), ("CandidateByteFloat", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
         byte_float += f"namespace {name} {{\n"
@@ -671,6 +682,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     vobsub_pixels_result = run([str(vobsub_pixels_executable)], capture_output=True, text=True)
     print(vobsub_pixels_result.stdout, end="", flush=True)
     print(vobsub_pixels_result.stderr, end="", file=sys.stderr)
+    vobsub_rle_executable = destination / ("vobsub-rle-oracle.exe" if os.name == "nt" else "vobsub-rle-oracle")
+    vobsub_rle_compile = [arg.replace("fill_oracle.cpp", "vobsub_rle_oracle.cpp").replace("fill-oracle", "vobsub-rle-oracle") for arg in fill_compile]
+    run(vobsub_rle_compile)
+    vobsub_rle_result = run([str(vobsub_rle_executable)], capture_output=True, text=True)
+    print(vobsub_rle_result.stdout, end="", flush=True)
+    print(vobsub_rle_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -706,6 +723,8 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "vobsub_packet_result": vobsub_result.stdout, "vobsub_packet_stderr": vobsub_result.stderr,
         "vobsub_pixels_compile_command": vobsub_pixels_compile,
         "vobsub_pixels_result": vobsub_pixels_result.stdout, "vobsub_pixels_stderr": vobsub_pixels_result.stderr,
+        "vobsub_rle_compile_command": vobsub_rle_compile,
+        "vobsub_rle_result": vobsub_rle_result.stdout, "vobsub_rle_stderr": vobsub_rle_result.stderr,
         "weighted_filter_compile_command": weighted_compile,
         "weighted_filter_result": weighted_result.stdout, "weighted_filter_stderr": weighted_result.stderr,
         "gauss_integer_compile_command": integer_gauss_compile,
