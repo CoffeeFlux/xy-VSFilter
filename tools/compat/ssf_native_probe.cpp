@@ -56,6 +56,12 @@ int wmain(int argc,wchar_t** argv){
             POSITION position=subtitles.GetHeadPosition();
             while(position){
                 const ssf::Subtitle* subtitle=subtitles.GetNext(position);
+                POSITION run=subtitle->m_text.GetHeadPosition();
+                while(run){
+                    const ssf::Text& text=subtitle->m_text.GetNext(run);printf("text units");
+                    for(int i=0;i<text.str.GetLength();++i)printf(" %04x",static_cast<unsigned>(text.str[i]));
+                    printf("\n");
+                }
                 const ssf::RenderedSubtitle* rendered=renderer.Lookup(subtitle,CSize(320,180),desc.vidrect);
                 printf("rendered %u glyphs",rendered?1:0);
                 if(rendered){

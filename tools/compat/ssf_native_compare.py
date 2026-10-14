@@ -47,7 +47,7 @@ def inspect(directory, returncode, timed_out=False):
         return result
     if len(segments) != 1 or int(segments[0]) == 0 or [int(f[0]) for f in frames] != list(range(6)) or [int(d[0]) for d in dumps] != list(range(6)):
         return result
-    if int(frames[0][1]) != 0 or int(frames[2][1]) == 0 or not re.search(rb"^rendered 1 glyphs [0-9a-f]{4}", trace, re.M):
+    if any(int(frame[1]) != 0 for frame in frames) or not re.search(rb"^text units [0-9a-f]{4}", trace, re.M) or re.search(rb"^rendered 1 glyphs [0-9a-f]{4}", trace, re.M):
         result["status"] = "control_failed"
         return result
     for index, count in dumps:
@@ -67,7 +67,7 @@ def inspect(directory, returncode, timed_out=False):
             result["status"] = "control_failed"
             return result
         result["files"][name] = sha(path)
-    result.update(status="complete", frames=6, changed_pixels=[int(frame[1]) for frame in frames], segments=int(segments[0]))
+    result.update(status="complete", blank_frame_observations=6, visible_rendering_parity_frames=0, changed_pixels=[int(frame[1]) for frame in frames], segments=int(segments[0]))
     return result
 
 
@@ -111,7 +111,7 @@ def main():
     harness = {name: sha(ROOT / name) for name in HARNESS}
     report = {"complete": False, "passed": False, "reference_commit": reference, "candidate_commit": commit,
               "platform": args.platform, "probes": probes, "harness_sources": harness, "cases": [],
-              "scope": "Actual separately linked libssf parser, node dump in six encodings, font/GDI renderer and raw RGBA pixels; WCHAR input with bounded valid SSF fixtures. Each side repeated in fresh processes. DirectShow, host playback, byte-stream decoding and malformed-document coverage remain separate."}
+              "scope": "Actual separately linked libssf parser, parsed text and node dump in six encodings. Native renderer traces and blank RGBA frames are characterized separately: the pinned FontCache::Create returns NULL after successful CreateFontIndirect. No visible rendering parity is established. WCHAR input with bounded valid SSF fixtures, each side repeated in fresh processes. DirectShow, host playback, byte-stream decoding and malformed-document coverage remain separate."}
     path = args.output / "report.json"
     path.write_text(json.dumps(report, indent=2) + "\n")
     for name, text in cases().items():
@@ -139,7 +139,7 @@ def main():
         a = by_name["plain"]["captures"][side]["files"]
         b = by_name["comments"]["captures"][side]["files"]
         c = by_name["arabic"]["captures"][side]["files"]
-        report["controls"][side] = a == b and a["frame-2.bgra"] != c["frame-2.bgra"]
+        report["controls"][side] = a == b and a["dump-5.units"] != c["dump-5.units"]
     report["inputs_unchanged"] = (probes == {"reference": sha(args.reference), "candidate": sha(args.candidate)}
                                     and harness == {name: sha(ROOT / name) for name in HARNESS}
                                     and all(c["input_sha256"] == sha(args.output / c["id"] / "input.utf16") for c in report["cases"])
@@ -151,7 +151,7 @@ def main():
     path.write_text(json.dumps(report, indent=2) + "\n")
     if not report["passed"]:
         raise SystemExit("SSF controls or source stability failed")
-    print(f"{len(report['cases'])} native SSF cases / {len(report['cases']) * 6} frames matched, with repeated parser, dump, glyph and pixel traces")
+    print(f"{len(report['cases'])} native SSF parser/dump cases matched; {len(report['cases']) * 6} blank-frame observations, zero visible rendering parity frames")
 
 
 if __name__ == "__main__":
