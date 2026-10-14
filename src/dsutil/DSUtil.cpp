@@ -23,7 +23,6 @@
 #include <Vfw.h>
 #include "DSUtil.h"
 #include "Mpeg2Def.h"
-#include "vd.h"
 #include "..\..\..\include\moreuuids.h"
 #include <emmintrin.h>
 #include <math.h>
@@ -728,19 +727,6 @@ REFERENCE_TIME HMSF2RT(DVD_HMSF_TIMECODE hmsf, double fps)
 
 void memsetd(void* dst, unsigned int c, size_t nbytes)
 {
-#ifndef _WIN64
-	if (!(g_cpuid.m_flags & g_cpuid.sse2)) {
-		__asm {
-			mov eax, c
-			mov ecx, nbytes
-			shr ecx, 2
-			mov edi, dst
-			cld
-			rep stosd
-		}
-		return;
-	}
-#endif
 	size_t n = nbytes / 4;
 	size_t o = n - (n % 4);
 

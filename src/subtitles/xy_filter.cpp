@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "../dsutil/vd.h"
 
 typedef const UINT8 CUINT8, *PCUINT8;
 typedef const UINT CUINT, *PCUINT;

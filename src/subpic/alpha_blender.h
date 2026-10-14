@@ -57,8 +57,8 @@ public:
     {
         return s_default_alpha_blender->AlphaBlend(src_plans, dst_plans, dst_pos, size);
     }
-    static BaseAlphaBlender* SetupDefaultAlphaBlender(int src_type, int dst_type, int cpu_flags);
-    static BaseAlphaBlender* CreateAlphaBlender(int src_type, int dst_type, int cpu_flags);
+    static BaseAlphaBlender* SetupDefaultAlphaBlender(int src_type, int dst_type);
+    static BaseAlphaBlender* CreateAlphaBlender(int src_type, int dst_type);
 
     static inline void ClipTopLeftToZero(CPoint *src_point, CPoint *dst_point);
     static inline void LimitPoint( int limit_x, int limit_y, CPoint &p );

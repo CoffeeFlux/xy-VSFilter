@@ -40,7 +40,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IncludePath>$(SolutionDir)src\filters\BaseClasses;$(SolutionDir)src\thirdparty\VirtualDub\h\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)src\filters\BaseClasses;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -68,8 +68,7 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="text.cpp" />
-    <ClCompile Include="vd.cpp" />
-    <ClCompile Include="vd_asm.cpp" />
+    <ClCompile Include="blit.cpp" />
     <ClCompile Include="xy_utils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -85,8 +84,7 @@
     <ClInclude Include="SharedInclude.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="text.h" />
-    <ClInclude Include="vd.h" />
-    <ClInclude Include="vd_asm.h" />
+    <ClInclude Include="blit.h" />
     <ClInclude Include="xy_utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

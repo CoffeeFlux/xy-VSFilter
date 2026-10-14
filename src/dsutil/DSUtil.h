@@ -24,7 +24,7 @@
 #include "NullRenderers.h"
 //#include "MediaTypes.h"
 #include "MediaTypeEx.h"
-#include "vd.h"
+#include "blit.h"
 #include "text.h"
 
 // reference time helpers

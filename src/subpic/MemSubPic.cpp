@@ -112,7 +112,6 @@ static void SaveNvxx2File(SubPicDesc& spd, const CRect& cRect, const char * file
 // alpha blend functions
 // 
 #include "xy_intrinsics.h"
-#include "../dsutil/vd.h"
 
 #ifndef _WIN64
 static void AlphaBlt_YUY2_MMX(int w, int h, BYTE* d, int dstpitch, PCUINT8 s, int srcpitch)

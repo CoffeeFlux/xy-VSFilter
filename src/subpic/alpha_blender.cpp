@@ -26,15 +26,15 @@
 
 BaseAlphaBlender* BaseAlphaBlender::s_default_alpha_blender = NULL;
 
-BaseAlphaBlender* BaseAlphaBlender::SetupDefaultAlphaBlender( int src_type, int dst_type, int cpu_flags )
+BaseAlphaBlender* BaseAlphaBlender::SetupDefaultAlphaBlender( int src_type, int dst_type )
 {
     static ::boost::scoped_ptr<BaseAlphaBlender> s_auto_cleaner;
-    s_default_alpha_blender = CreateAlphaBlender(src_type, dst_type, cpu_flags);
+    s_default_alpha_blender = CreateAlphaBlender(src_type, dst_type);
     s_auto_cleaner.reset(s_default_alpha_blender);
     return s_default_alpha_blender;
 }
 
-BaseAlphaBlender* BaseAlphaBlender::CreateAlphaBlender( int src_type, int dst_type, int cpu_flags )
+BaseAlphaBlender* BaseAlphaBlender::CreateAlphaBlender( int src_type, int dst_type )
 {
     if (src_type==MSP_RGBA && dst_type==MSP_RGB32)
     {

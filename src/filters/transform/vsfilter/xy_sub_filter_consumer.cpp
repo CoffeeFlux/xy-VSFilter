@@ -875,7 +875,7 @@ STDMETHODIMP XySubFilterConsumer::Connect( ISubRenderProvider *subtitleRenderer 
 
         m_provider = subtitleRenderer;
 
-        BaseAlphaBlender::SetupDefaultAlphaBlender(MSP_RGBA, MSP_RGB32, g_cpuid.m_flags);
+        BaseAlphaBlender::SetupDefaultAlphaBlender(MSP_RGBA, MSP_RGB32);
         return S_OK;
     }
     else

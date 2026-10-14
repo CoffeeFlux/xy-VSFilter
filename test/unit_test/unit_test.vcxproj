@@ -47,13 +47,13 @@
   <PropertyGroup>
     <OutDir>$(OutDir)$(Configuration)\</OutDir>
     <TargetName>$(ProjectName)</TargetName>
-    <IncludePath>$(SolutionDir)src\thirdparty\gtest\include;$(SolutionDir)src\subtitles;$(SolutionDir)src\thirdparty\boost_lib\;$(SolutionDir)src\subpic\;$(SolutionDir)src\filters\transform\vsfilter\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)src\thirdparty\gtest\include;$(SolutionDir)src\subtitles;$(SolutionDir)src\thirdparty\boost_lib\;$(SolutionDir)src\subpic\;$(SolutionDir)src\filters\transform\vsfilter\;$(SolutionDir)src\thirdparty\VirtualDub\h\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>
       <AdditionalLibraryDirectories>$(OutDir);$(OutDir)..</AdditionalLibraryDirectories>
-      <AdditionalDependencies Condition="'$(Configuration)'=='Debug'">gtestDU.lib;subtitlesD.lib;subpicD.lib;strmbaseD.lib;delayimp.lib;VSFilter.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalDependencies Condition="'$(Configuration)'=='Release'">gtestRU.lib;subtitlesR.lib;subpicR.lib;strmbaseR.lib;delayimp.lib;VSFilter.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'=='Debug'">gtestDU.lib;subtitlesD.lib;subpicD.lib;dsutilD.lib;KasumiD.lib;systemD.lib;strmbaseD.lib;delayimp.lib;VSFilter.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'=='Release'">gtestRU.lib;subtitlesR.lib;subpicR.lib;dsutilR.lib;KasumiR.lib;systemR.lib;strmbaseR.lib;delayimp.lib;VSFilter.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
     <ClCompile>
@@ -71,6 +71,7 @@
     <ClCompile Include="main.cpp">
       <AssemblerOutput>AssemblyAndSourceCode</AssemblerOutput>
     </ClCompile>
+    <ClCompile Include="blit_test.cpp" />
     <ClCompile Include="memory_open_test.cpp" />
     <ClCompile Include="overall_test.cpp" />
   </ItemGroup>

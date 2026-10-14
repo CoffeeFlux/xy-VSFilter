@@ -1786,9 +1786,6 @@ void AlphaBlt8bppSingleAlphaSse2(byte* pY,
 
 ///////////////////////////////////////////////////////////////////////////
 
-// For CPUID usage in Rasterizer::Draw
-#include "../dsutil/vd.h"
-
 void OverlapRegion(tSpanBuffer& dst, const tSpanBuffer& src, int dx, int dy)
 {
     tSpanBuffer temp;

@@ -59,7 +59,6 @@
 
 #include <streams.h>
 #include "..\..\DSUtil\DSUtil.h"
-#include "..\..\dsutil\vd.h"
 
 #include <xmmintrin.h>
 #include <emmintrin.h>

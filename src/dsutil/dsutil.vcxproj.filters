@@ -36,7 +36,7 @@
     <ClCompile Include="text.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="vd.cpp">
+    <ClCompile Include="blit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GolombBuffer.cpp">
@@ -49,9 +49,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="xy_utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="vd_asm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -77,7 +74,7 @@
     <ClInclude Include="text.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="vd.h">
+    <ClInclude Include="blit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SharedInclude.h">
@@ -96,9 +93,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="xy_utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vd_asm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
