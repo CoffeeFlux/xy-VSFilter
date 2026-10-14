@@ -20,6 +20,34 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust now scans caption packet headers and owns snapshots of both fields
+  before native decoding begins. The native path remains when the declared
+  input span cannot cover reads made by the original parser. No count-byte or
+  parity normalization is added. Whole pinned extraction matches locally in
+  ordinary and fatal ASan/UBSan builds on arm64 and x64: **46,256 histories /
+  7,135,808 allocation, callback and state observations / 74,328 Rust packet
+  plans / 18,184 bounded native parsing fallbacks**. Allocation and initialized
+  output masks remain compared; internal read/write order is not compared for
+  immutable input. The earlier storage-only observation total is separate.
+  The complete extractor also runs through the complete decoder and display
+  logic: **1,080 histories / 879 emitted subtitle records / 90 callback
+  mutations** match, including mutations of source bytes after extraction.
+  The existing **149,740 caption sequences / 170,720 DecodeCC calls** still
+  match. Raw file I/O, actual allocation failure, extraction callback exceptions,
+  short physical backing and unrepresentable native arithmetic remain excluded.
+  **148 core / 103 FFI tests**, formatting, Clippy, 29 Python checks (three
+  local skips) and default native syntax pass. Miri and Windows execution for
+  this parser increment are pending.
+
+* `composite-integration-evidence.json` now archives the complete passing stage
+  at `fe6928d4`: all four portable jobs, Miri, both Windows renderer jobs and the
+  exact-commit local sanitizer campaign. This integrates shifted bitmap and
+  composite-mask ownership and the corrected native allocator alignment. Each
+  Windows architecture matched **798 cases / 8,426 frames**, **32 mutation
+  cases / 224 frames**, ten scoped COM pairs and two candidate-only ID controls.
+  Later coefficient, caption and CSRI filename changes require separate evidence;
+  earlier failed jobs remain failed.
+
 * `csri_open_file` now owns its temporary UTF-16 filename buffer in Rust while
   preserving both Win32 conversion calls, the extra unused character, renderer
   construction/open order, failure returns and cleanup. Complete pinned open
@@ -33,7 +61,11 @@ unresolved reference outcomes requiring investigation, never matching results.
   controlled. Object/allocation exceptions, second-conversion failure and
   actual file I/O are excluded here; whole-renderer file-open cases are separate.
   Default native syntax and 29 Python checks (three local skips) pass; Rust
-  sources remain at **146 core / 102 FFI tests**. Windows execution is pending.
+  sources at that increment remain **146 core / 102 FFI tests**. Initial
+  Windows fixture jobs `115924888551` / `115924888814` failed because the helper
+  typedef `OpenFile` collided with the SDK function; the fixture now uses
+  CSRI-specific names. The production source is unchanged by that repair, and
+  corrected Windows execution remains pending.
 
 * `CCDecoder::ExtractCC` now owns both temporary caption-field buffers through
   Rust while retaining the native packet loop, decoder calls and release order.

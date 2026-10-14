@@ -7,6 +7,10 @@
 #include <string>
 #include <vector>
 #include "xy_rust_cc.h"
+#include "xy_rust_byte_storage.h"
+// Normalize native unaligned little-endian DWORD reads; fixtures provide
+// complete initialized backing for every scanned header and packet field.
+static uint32_t ccReadDword(const void* p){uint32_t value;std::memcpy(&value,p,4);return value;}
 #ifdef _WIN32
 #ifndef NOMINMAX
 #define NOMINMAX

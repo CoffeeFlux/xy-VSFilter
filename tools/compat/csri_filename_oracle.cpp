@@ -14,9 +14,9 @@ const unsigned long last=GetLastError();
 const unsigned long last=0;
 #endif
 filenameEvents.insert(filenameEvents.end(),{static_cast<uint64_t>(error),static_cast<uint64_t>(flags),last});}
-typedef csri_inst* (*OpenFile)(csri_rend*,const char*,csri_openflag*);
-typedef void (*CloseFile)(csri_inst*);
-static std::vector<uint64_t> execute(OpenFile open,CloseFile close,const std::string& name,bool accepted,bool failed,bool decline,bool count){
+typedef csri_inst* (*CsriFilenameOpenFn)(csri_rend*,const char*,csri_openflag*);
+typedef void (*CsriFilenameCloseFn)(csri_inst*);
+static std::vector<uint64_t> execute(CsriFilenameOpenFn open,CsriFilenameCloseFn close,const std::string& name,bool accepted,bool failed,bool decline,bool count){
     filenameRequire(filenameRegions.empty()&&!filenameInstances&&!filenameLocks&&!filenameRenderers);filenameEvents.clear();filenameOpen=accepted;filenameConversionFailure=failed;filenameDecline=decline;filenameConversions=0;
     csri_rend renderer="ignored renderer";csri_openflag flags;
     for(int repeat=0;repeat<2;++repeat){

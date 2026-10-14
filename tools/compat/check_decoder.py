@@ -187,8 +187,10 @@ public:
             cc += "#define XY_VSFILTER_RUST_TEXT\n"
         for signature in ("CCDecoder::CCDecoder(", "CCDecoder::~CCDecoder(", "void CCDecoder::MoveCursor(",
                           "void CCDecoder::OffsetCursor(", "void CCDecoder::PutChar(", "void CCDecoder::SaveDisp(",
-                          "void CCDecoder::DecodeCC("):
-            cc += extract_definition(content.decode("utf-8-sig"), signature) + "\n"
+                          "void CCDecoder::DecodeCC(", "void CCDecoder::ExtractCC("):
+            cc_method = extract_definition(content.decode("utf-8-sig"), signature)
+            cc_method = cc_method.replace("*(DWORD *)&buff[i]", "ccReadDword(&buff[i])").replace("*(DWORD *)&buff[i + 4]", "ccReadDword(&buff[i + 4])")
+            cc += cc_method + "\n"
         cc += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_cc.h").write_text(cc, encoding="utf-8")
     layout_source = original("src/subtitles/RTS.cpp", reference["commit"])
@@ -965,7 +967,7 @@ public:
         cc_packet_code += f"namespace {name} {{\nPACKET_CLASS\n"
         if name == "CandidatePacket":
             cc_packet_code += "#define XY_VSFILTER_RUST_TEXT\n"
-        packet_method = extract_definition(packet_text, "void CCDecoder::ExtractCC(")
+        packet_method = extract_definition(packet_text, "void CCDecoder::ExtractCC(").replace("XyRust::CaptionPacket", "XyRust::ObservedCaptionPacket")
         packet_method = packet_method.replace("*(DWORD *)&buff[i]", "packetWord(&buff[i])").replace("*(DWORD *)&buff[i + 4]", "packetWord(&buff[i + 4])").replace("new BYTE[nBytes]", "packetNew(nBytes)")
         for field in (1, 2):
             packet_method = packet_method.replace(f"pData{field}[nBytes{field}++] = buff[i++];", f"packetPut(pData{field}, nBytes{field}++, buff[i++]);").replace(f"delete [] pData{field}", f"packetDelete(pData{field})")
@@ -2054,7 +2056,7 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
         "cc_compile_command": cc_compile,
         "cc_result": cc_result.stdout, "cc_stderr": cc_result.stderr,
         "cc_text_instrumentation": "candidate CaptionText handled/declined queries counted; complete SaveDisp with fixture Add boundary and native ATL strings on Windows",
-        "cc_scope": "owned byte-loop command state, exact raw-byte tables/duplicate consumption, cursor normalization, initialized cell update and owned SaveDisp text; native display transitions/timestamp arithmetic retained; complete DecodeCC with fixture subtitle sink, real Windows ATL strings and portable UTF-16 string model; raw logging/files and native arithmetic overflow outside fixtures",
+        "cc_scope": "owned byte-loop command state, exact raw-byte tables/duplicate consumption, cursor normalization, initialized cell update and owned SaveDisp text; native display transitions/timestamp arithmetic retained; complete ExtractCC through DecodeCC with fixture subtitle sink and checked-memcpy normalization of unaligned DWORD reads, real Windows ATL strings and portable UTF-16 string model; raw logging/files and native arithmetic overflow outside fixtures",
         "cc_source_sha256": hashlib.sha256(cc_source).hexdigest(), "cc_header_sha256": hashlib.sha256(cc_header).hexdigest(),
         "realtext_document_compile_command": realtext_document_compile,
         "realtext_document_result": realtext_document_result.stdout, "realtext_document_stderr": realtext_document_result.stderr,
@@ -2145,7 +2147,7 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
         "csri_filename_scope": "Complete pinned csri_open_file and csri_close with controlled renderer, lock, CString and allocation boundaries. Windows executes actual MultiByteToWideChar; other platforms use controlled UTF-16 output replies. Exact extra-unit capacity, initialized filename bytes and untouched spare unit, first-conversion failure, accepted/rejected open, handle state, release order, repeated calls and ambient error state. Successful conversion inputs include Unicode, malformed UTF-8, embedded NUL and long names. Object/allocation exceptions, second-conversion failure and actual file IO excluded; whole Windows renderer file-open comparisons remain separate.",
         "cc_packet_compile_command": cc_packet_compile,
         "cc_packet_result": cc_packet_result.stdout, "cc_packet_stderr": cc_packet_result.stderr,
-        "cc_packet_scope": "Whole pinned ExtractCC with guarded allocation and controlled DecodeCC callback. Native unaligned DWORD loads normalized to checked memcpy for portable execution. Every count byte, odd rounding, first-marker stop, both field orders, 0x800 cursor cutoff, short logical lengths with larger initialized physical backing, output initialization masks, mutable callback bytes, native fallback, repeated calls and ambient error state. Short physical backing is excluded before both implementations, never passes. Actual allocation failures, callback exceptions and caption-ripper integration remain outside scope; byte-loop decoding has separate comparisons.",
+        "cc_packet_scope": "Safe Rust owns the bounded packet scan and field snapshots; short declared spans retain the native fallback. Whole pinned ExtractCC with guarded allocation and controlled DecodeCC callback. Internal read/write ordering is not compared because the input is immutable during extraction; allocation, initialized outputs and callbacks are compared. Native unaligned DWORD loads normalized to checked memcpy for portable execution. Every count byte, odd rounding, first-marker stop, both field orders, 0x800 cursor cutoff, short logical lengths with larger initialized physical backing, output initialization masks, mutable callback bytes, native fallback, repeated calls and ambient error state. Short physical backing is excluded before both implementations, never passes. Actual allocation failures, callback exceptions and caption-ripper integration remain outside scope; byte-loop decoding has separate comparisons.",
         "coeff_storage_compile_command": coeff_storage_compile,
         "coeff_storage_result": coeff_storage_result.stdout, "coeff_storage_stderr": coeff_storage_result.stderr,
         "coeff_storage_scope": "Whole pinned GaussianCoefficients constructor, copy, init and destructor under strict FP. Exact float bits, signed zero/tiny sigma and negative-width metadata, retained old table, deep-copy independence, same-key early return, allocation order and cache accounting. Native allocation failure and Rust decline are modeled; positive-count null-source copies are excluded before both, never passes. Physical prefix and padding remain unwritten and unread. Copy allocation failure, nonfinite/overflowing sigma and actual OOM excluded; Vendored Boost flyweight caching, alias identity, copy/assignment and final release are compared; actual renderer integration requires Windows.",
