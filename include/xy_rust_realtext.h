@@ -10,6 +10,7 @@
 #define XY_REALTEXT_CDECL
 #endif
 extern "C" {
+uint32_t XY_REALTEXT_CDECL xy_vsfilter_realtext_format(int32_t, int32_t, int32_t*);
 void* XY_REALTEXT_CDECL xy_vsfilter_realtext_timeline_create();
 uint32_t XY_REALTEXT_CDECL xy_vsfilter_realtext_timeline_select(void*, int32_t, uint32_t, uint32_t);
 void XY_REALTEXT_CDECL xy_vsfilter_realtext_timeline_advance(void*, int32_t, int32_t);

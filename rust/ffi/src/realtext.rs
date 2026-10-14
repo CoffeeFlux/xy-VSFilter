@@ -8,6 +8,29 @@ use xy_vsfilter_compat::realtext_text::Text;
 use xy_vsfilter_compat::realtext_timecode::Timecode;
 use xy_vsfilter_compat::realtext_timeline::Timeline;
 
+/// # Safety
+/// For accepted precision, output provides four aligned writable i32 slots.
+/// On declined precision it may be null and is not accessed. Successful calls
+/// initialize every slot.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_format(
+    time: i32,
+    precision: i32,
+    output: *mut i32,
+) -> u32 {
+    let Some(parts) = xy_vsfilter_compat::realtext_format::components(time, precision) else {
+        return 0;
+    };
+    for (index, part) in parts.into_iter().enumerate() {
+        // SAFETY: caller supplies four writable aligned slots; no prior values
+        // are read and every in-bounds slot is initialized exactly once.
+        unsafe {
+            output.add(index).write(part);
+        }
+    }
+    1
+}
+
 #[no_mangle]
 pub extern "C" fn xy_vsfilter_realtext_timeline_create() -> *mut Timeline {
     Box::into_raw(Box::new(Timeline::default()))
@@ -457,6 +480,24 @@ pub unsafe extern "C" fn xy_vsfilter_realtext_release(owner: *mut Tags) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn timestamp_components_initialize_all_output_without_reading_it() {
+        let mut output = [core::mem::MaybeUninit::<i32>::uninit(); 4];
+        // SAFETY: four aligned writable slots; success initializes all of them.
+        // Declined precision does not access its null output pointer.
+        unsafe {
+            assert_eq!(
+                xy_vsfilter_realtext_format(-3_723_999, 1, output.as_mut_ptr().cast()),
+                1
+            );
+            assert_eq!(output.map(|part| part.assume_init()), [-1, -2, -3, -49]);
+            assert_eq!(
+                xy_vsfilter_realtext_format(999, i32::MIN, core::ptr::null_mut()),
+                0
+            );
+        }
+    }
+
     #[test]
     fn timeline_owns_history_across_native_line_insertions() {
         let owner = xy_vsfilter_realtext_timeline_create();
