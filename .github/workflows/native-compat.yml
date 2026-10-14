@@ -69,11 +69,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Compile actual style API helper against reference and candidate headers
+      - name: Compile style API and lifecycle probes against reference and candidate headers
         shell: pwsh
         run: |
           & python tools\compat\document_style_api_compile.py --reference-root "$pwd\baseline-compile" --platform ${{ matrix.platform }} --output "artifacts\document-style-api-compile\${{ matrix.platform }}"
-          if ($LASTEXITCODE -ne 0) { throw "Style API helper compile-only check failed; inspect report.json" }
+          if ($LASTEXITCODE -ne 0) { throw "Document probe compile-only check failed; inspect report.json" }
       - uses: actions/upload-artifact@v4
         if: always()
         with:

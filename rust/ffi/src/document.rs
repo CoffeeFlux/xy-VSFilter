@@ -10,6 +10,7 @@ use alloc::vec::Vec;
 use core::ptr;
 use xy_vsfilter_compat::document::{
     AddMode, Document, IdentityField, InterpretationField, MetadataField, Refusal, ScriptField,
+    StyleRenameError,
 };
 use xy_vsfilter_compat::document_style as style_wire;
 use xy_vsfilter_compat::document_wire::{self as wire, Counts, EntryHeader, SegmentHeader};
@@ -191,6 +192,31 @@ pub extern "C" fn xy_vsfilter_document_copy_selected_state_v1(
     let retired = required!(admitted(|registry| registry
         .copy_selected_state(destination, source)
         .map_err(registry_error)));
+    drop(retired);
+    OK
+}
+/// # Safety
+/// Packet follows the byte-buffer contract and exact v1 style-rename encoding.
+/// Native classification/CRT naming are complete; incoming Put remains native.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_commit_style_rename_v1(
+    owner: u64,
+    input: *const u8,
+    length: usize,
+) -> u32 {
+    // SAFETY: caller supplies the documented live packet region.
+    let input = required!(unsafe { copy_input(input, length) });
+    let mut prepared = required!(wire::decode_style_rename(&input).map_err(wire_error));
+    let retired = required!(admitted(|registry| {
+        registry
+            .document_mut(owner)
+            .map_err(registry_error)?
+            .commit_style_rename(&prepared.old, &prepared.new, &mut prepared.previous)
+            .map_err(|error| match error {
+                StyleRenameError::CountOverflow => COUNT_OVERFLOW,
+                StyleRenameError::InvalidPreparedValue => INVALID_INPUT,
+            })
+    }));
     drop(retired);
     OK
 }
@@ -1241,6 +1267,94 @@ mod tests {
             assert_eq!(xy_vsfilter_document_destroy_v1(source), OK);
             assert_eq!(xy_vsfilter_document_destroy_v1(target), OK);
             assert_ne!(read_snapshot(snapshot), style);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
+            // Prepared conflict relocation consumes one fully validated packet.
+            let owner = create();
+            let mut base = [0u8; style_wire::HEADER_BYTES];
+            base[36] = 1;
+            let old_value = style_wire::decode(&base).unwrap();
+            base[36] = 2;
+            let new_value = style_wire::decode(&base).unwrap();
+            base[36] = 3;
+            let captured = style_wire::decode(&base).unwrap();
+            let request = wire::PreparedStyleRename {
+                old: vec![65, 0, 0xd800],
+                new: vec![66, 0, 0xdcff],
+                previous: Some(captured.clone()),
+            };
+            admitted(|registry| {
+                let d = registry.document_mut(owner).map_err(registry_error)?;
+                d.named_styles_mut()
+                    .insert(request.old.clone(), Some(old_value));
+                d.named_styles_mut()
+                    .insert(request.new.clone(), Some(new_value));
+                let mut e = wire::decode_entry(&entry(0, 10)).unwrap();
+                e.style = request.old.clone();
+                d.add_prepared(e, AddMode::Add).unwrap();
+                d.feedback_animation(0, true).unwrap();
+                Ok(())
+            })
+            .unwrap();
+            let before = state(owner);
+            let snapshot = open_snapshot(owner, 0);
+            let snapshot_bytes = read_snapshot(snapshot);
+            let mut packet = wire::encode_style_rename(&request).unwrap();
+            for length in 0..packet.len() {
+                assert_eq!(
+                    xy_vsfilter_document_commit_style_rename_v1(owner, packet.as_ptr(), length),
+                    INVALID_INPUT
+                );
+                assert_eq!(state(owner), before);
+            }
+            let mut invalid = packet.clone();
+            invalid[..4].copy_from_slice(&u32::MAX.to_le_bytes());
+            assert_eq!(
+                xy_vsfilter_document_commit_style_rename_v1(owner, invalid.as_ptr(), invalid.len()),
+                COUNT_OVERFLOW
+            );
+            assert_eq!(state(owner), before);
+            invalid = packet.clone();
+            invalid[8..16].copy_from_slice(&u64::MAX.to_le_bytes());
+            assert_eq!(
+                xy_vsfilter_document_commit_style_rename_v1(owner, invalid.as_ptr(), invalid.len()),
+                COUNT_OVERFLOW
+            );
+            assert_eq!(state(owner), before);
+            assert_eq!(
+                xy_vsfilter_document_commit_style_rename_v1(
+                    snapshot,
+                    packet.as_ptr(),
+                    packet.len()
+                ),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_commit_style_rename_v1(
+                        owner,
+                        packet.as_ptr(),
+                        packet.len()
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(state(owner), before);
+            assert_eq!(
+                xy_vsfilter_document_commit_style_rename_v1(owner, packet.as_ptr(), packet.len()),
+                OK
+            );
+            packet.fill(0);
+            let after = state(owner);
+            assert!(after.named_styles().get(&request.old).is_none());
+            assert_eq!(
+                after.named_styles().get(&request.new),
+                Some(&Some(captured))
+            );
+            assert_eq!(after.entries()[0].style, request.new);
+            assert_eq!(after.segments(), before.segments());
+            assert_eq!(read_snapshot(snapshot), snapshot_bytes);
+            assert_eq!(xy_vsfilter_document_destroy_v1(owner), OK);
+            assert_eq!(read_snapshot(snapshot), snapshot_bytes);
             assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
             // Copy's selected header tail preserves every excluded owner field.
             let source = create();

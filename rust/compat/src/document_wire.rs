@@ -307,6 +307,74 @@ pub fn decode_counts(bytes: &[u8]) -> Result<Counts, Error> {
     Ok(counts)
 }
 
+/// Conflict relocation packet, not a complete AddStyle request. Names remain
+/// full raw units; map-key truncation and entry-name comparison are core choices.
+/// Header16: old units:u32@0, new units:u32@4, style bytes:u64@8, then both
+/// UTF16LE arrays and exactly one existing non-null style wire.
+pub const STYLE_RENAME_HEADER_BYTES: usize = 16;
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PreparedStyleRename {
+    pub old: Vec<u16>,
+    pub new: Vec<u16>,
+    /// Pending owned input; consumed only after core preflight succeeds.
+    pub previous: Option<crate::document_style::StyleValue>,
+}
+fn style_error(error: crate::document_style::Error) -> Error {
+    use crate::document_style::Error as S;
+    match error {
+        S::InvalidShape => Error::InvalidShape,
+        S::InvalidBool => Error::InvalidBool,
+        S::NonzeroReserved => Error::NonzeroReserved,
+        S::CountOverflow => Error::CountOverflow,
+        S::LengthOverflow => Error::LengthOverflow,
+    }
+}
+fn style_rename_shape(old: u32, new: u32, style: u64) -> Result<(usize, usize), Error> {
+    let names_end = total(STYLE_RENAME_HEADER_BYTES, &[old, new], 2)?;
+    let style = usize::try_from(style).map_err(|_| Error::LengthOverflow)?;
+    let end = names_end
+        .checked_add(style)
+        .filter(|&n| n <= isize::MAX as usize)
+        .ok_or(Error::LengthOverflow)?;
+    Ok((names_end, end))
+}
+pub fn encode_style_rename(value: &PreparedStyleRename) -> Result<Vec<u8>, Error> {
+    let old = count(value.old.len())?;
+    let new = count(value.new.len())?;
+    let style = crate::document_style::encode(value.previous.as_ref().ok_or(Error::InvalidShape)?)
+        .map_err(style_error)?;
+    let (_, length) = style_rename_shape(old, new, style.len() as u64)?;
+    let mut bytes = Vec::with_capacity(length);
+    bytes.extend_from_slice(&old.to_le_bytes());
+    bytes.extend_from_slice(&new.to_le_bytes());
+    bytes.extend_from_slice(&(style.len() as u64).to_le_bytes());
+    for unit in value.old.iter().chain(&value.new) {
+        bytes.extend_from_slice(&unit.to_le_bytes());
+    }
+    bytes.extend_from_slice(&style);
+    Ok(bytes)
+}
+pub fn decode_style_rename(bytes: &[u8]) -> Result<PreparedStyleRename, Error> {
+    let old = u32_at(bytes, 0)?;
+    let new = u32_at(bytes, 4)?;
+    let style = u64::from_le_bytes(read(bytes, 8)?);
+    let (names_end, length) = style_rename_shape(old, new, style)?;
+    exact(bytes, length)?;
+    let old_end = STYLE_RENAME_HEADER_BYTES + old as usize * 2;
+    let units = |part: &[u8]| {
+        part.chunks_exact(2)
+            .map(|b| u16::from_le_bytes([b[0], b[1]]))
+            .collect()
+    };
+    // Validate the entire style before allocating name arrays.
+    let previous = crate::document_style::decode(&bytes[names_end..]).map_err(style_error)?;
+    Ok(PreparedStyleRename {
+        old: units(&bytes[STYLE_RENAME_HEADER_BYTES..old_end]),
+        new: units(&bytes[old_end..names_end]),
+        previous: Some(previous),
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -529,5 +597,43 @@ mod tests {
             member_count: u32::MAX,
         };
         assert_eq!(encode_segment_header(&h), Err(Error::CountOverflow));
+    }
+    #[test]
+    fn prepared_style_rename_packet_exact_shape_and_raw_units() {
+        let mut style = alloc::vec![0u8;crate::document_style::HEADER_BYTES+4];
+        style[64..68].copy_from_slice(&2u32.to_le_bytes());
+        style[192..].copy_from_slice(&[0, 216, 255, 220]);
+        style[72..80].copy_from_slice(&0x7ff0000000000042u64.to_le_bytes());
+        let request = PreparedStyleRename {
+            old: alloc::vec![65, 0, 0xd800],
+            new: alloc::vec![66, 0, 0xdcff],
+            previous: Some(crate::document_style::decode(&style).unwrap()),
+        };
+        let bytes = encode_style_rename(&request).unwrap();
+        assert_eq!(&bytes[..4], &3u32.to_le_bytes());
+        assert_eq!(&bytes[4..8], &3u32.to_le_bytes());
+        assert_eq!(&bytes[8..16], &(style.len() as u64).to_le_bytes());
+        assert_eq!(decode_style_rename(&bytes).unwrap(), request);
+        for length in 0..bytes.len() {
+            assert!(
+                decode_style_rename(&bytes[..length]).is_err(),
+                "prefix {length}"
+            );
+        }
+        let mut extra = bytes.clone();
+        extra.push(0);
+        assert_eq!(decode_style_rename(&extra), Err(Error::InvalidShape));
+        let mut huge = bytes.clone();
+        huge[..4].copy_from_slice(&u32::MAX.to_le_bytes());
+        assert_eq!(decode_style_rename(&huge), Err(Error::CountOverflow));
+        huge = bytes.clone();
+        huge[8..16].copy_from_slice(&u64::MAX.to_le_bytes());
+        assert_eq!(decode_style_rename(&huge), Err(Error::LengthOverflow));
+        let mut invalid = bytes;
+        invalid[16 + 12 + 56] = 2;
+        assert_eq!(decode_style_rename(&invalid), Err(Error::InvalidBool));
+        let mut missing = request;
+        missing.previous = None;
+        assert_eq!(encode_style_rename(&missing), Err(Error::InvalidShape));
     }
 }

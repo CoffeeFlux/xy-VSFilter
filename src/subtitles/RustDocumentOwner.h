@@ -415,6 +415,22 @@ public:
         const auto key = DocumentDetail::Units(name);
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_named_style_put_v1(id_,key.data(),key.size(),nullptr,0);}));
     }
+    // Native classification and CRT naming have finished. Keep incoming-style
+    // insertion/deletion in the caller after its conflict CString scope ends.
+    template<class Style> void CommitStyleRename(const CString& old, const CString& replacement, const Style& previous) {
+        const auto old_bytes = DocumentDetail::Units(old), new_bytes = DocumentDetail::Units(replacement);
+        const auto style = DocumentDetail::StyleBytes(previous);
+        const size_t total = DocumentDetail::AddSize(DocumentDetail::AddSize(
+            DocumentDetail::AddSize(16,old_bytes.size()),new_bytes.size()),style.size());
+        DocumentDetail::Bytes packet(16,0); packet.reserve(total);
+        DocumentDetail::Put(packet,0,DocumentDetail::Count(old_bytes.size()/2),4);
+        DocumentDetail::Put(packet,4,DocumentDetail::Count(new_bytes.size()/2),4);
+        DocumentDetail::Put(packet,8,static_cast<uint64_t>(style.size()),8);
+        packet.insert(packet.end(),old_bytes.begin(),old_bytes.end());
+        packet.insert(packet.end(),new_bytes.begin(),new_bytes.end());
+        packet.insert(packet.end(),style.begin(),style.end());
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_commit_style_rename_v1(id_,packet.data(),packet.size());}));
+    }
     void RemoveNamedStyle(const CString& name) {
         const auto key = DocumentDetail::Units(name);
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_named_style_remove_v1(id_,key.data(),key.size());}));

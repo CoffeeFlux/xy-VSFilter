@@ -3755,9 +3755,7 @@ void CSimpleTextSubtitle::AddStyle(CString name, STSStyle* style)
         }
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
         while(HasNamedStyle(name3));
-        m_document->RemoveNamedStyle(name);
-        m_document->PutNamedStyle(name3, previous);
-        m_document->RenameStyle(name, name3);
+        m_document->CommitStyleRename(name, name3, previous);
 #else
         while(m_styles.Lookup(name3));
 

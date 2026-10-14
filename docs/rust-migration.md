@@ -1008,6 +1008,41 @@ constructor-default evidence. Native parsing, CRT, callbacks, dialogs, file I/O
 and host orchestration also remain in scope. This is not whole-document closure
 or authorization to switch default production.
 
+### Prepared AddStyle conflict boundary
+
+The experimental AddStyle conflict path now commits removal of the old key,
+reinsertion of the captured previous style at the native-selected name, and
+matching entry-style renames through one `CommitStyleRename` packet. Native
+classification, equality, CRT suffix generation and collision lookup remain in
+place, as does final incoming-style insertion/deletion. Diagnostic primitive
+exports remain available. This consolidates an existing owner boundary; the
+opt-in retired field/container count remains 18.
+
+The full native lifecycle probe adds repeated numeric conflicts, full logical
+embedded-NUL suffix names selecting R12 then R2, and exact animated segment
+invariance. A bounded 128-style grow/Empty history then traces only the small
+post-Empty conflict table, exercising removal-triggered shrink before
+reinsertion. Strict required stages and segment observations reject incomplete
+traces; archival opt-outs require the hash-verified older probe source.
+
+Local validation passes 189 core and 117 FFI tests, formatting, Clippy, and 93
+Python tests with four Windows-only skips. Generation-only extraction and eight
+include-stripped default/Rust-text preprocessing comparisons pass. These checks
+do not establish native compilation or runtime parity. Exact-code Windows full
+lifecycle, style API, rendering and host gates remain pending, including native
+allocation failure and allocator reentry behavior. The packet stages owned input
+before registry admission and retires values outside it; internal map key drops
+and allocations retain the existing qualification. See the source-scoped
+prepared-style record in [the document inventory](rust-document-inventory.json)
+and measured [FFI boundary](rust-document-ffi-boundary.json).
+
+The earlier `dc11cd69` x64 experimental lifecycle comparison completed with
+equal repeated traces. Its job then failed in the pinned style API probe before
+video setup or style calls: the constructor search-path readback was missing.
+Failure-only diagnostics now record bounded resource/profile values and registry
+query statuses. They retain the setup assertion and leave successful traces
+unchanged; that runtime gate remains unresolved.
+
 ### Coarse selected-state Copy boundary
 
 Native Copy still invokes virtual Empty first, then reads the source. The opt-in
@@ -1058,13 +1093,13 @@ Neither count measures the amount of application behavior replaced.
 The reproducible [Rust unsafe inventory](rust-unsafe-inventory.json) uses
 `python3 tools/compat/audit_rust_boundary.py OUTPUT.json`. It masks comments and
 literals, separates cfg(test) items, and includes all platform/feature branches.
-At the current frozen working-tree sources based on `4f1264a4` (exact file
+At the current frozen working-tree sources based on `5aa0abb4` (exact file
 hashes recorded by the regenerated inventory):
 
 | Layer | Production source inventory | Meaning |
 | --- | --- | --- |
-| `rust/compat` | 0 unsafe blocks/functions/impls; 7,436 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
-| `rust/ffi` | 358 explicit unsafe blocks, 301 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,194 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
+| `rust/compat` | 0 unsafe blocks/functions/impls; 7,577 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
+| `rust/ffi` | 359 explicit unsafe blocks, 302 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,216 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
 | Tests | 119 unsafe blocks in FFI tests | Exercise valid and deliberately bounded ownership/alias/initialization contracts; not production code |
 
 Unsafe-function declarations and blocks overlap and must not be added as

@@ -39,6 +39,12 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
          + b"".join(b"copy-state-stage " + stage + b"\n" for stage in (
              b"copy-source-before", b"copy-source-mutated", b"copy-destination-after", b"copy-source-after",
              b"copy-empty-key-source", b"copy-empty-key-result", b"copy-empty-key-source-after"))
+         + b"".join(b"style-rename-stage " + stage + b"\n" for stage in (
+             b"numeric-repeat-12", b"numeric-repeat-13", b"raw-nul-before", b"raw-nul-to12",
+             b"raw-nul-to2", b"shrink-post-empty", b"shrink-before", b"shrink-after"))
+         + b"".join(b"style-rename-segments " + stage + b" count=2 animated=1\n" for stage in (
+             b"numeric-original", b"numeric-repeat-12", b"numeric-repeat-13", b"named-final",
+             b"raw-nul-before", b"raw-nul-to12", b"raw-nul-to2", b"shrink-before", b"shrink-after"))
          + b"saved-file ssa exists=1 bytes=1 41\nsaved-file ass exists=1 bytes=1 41\n"
          + b"saved-file srt exists=1 bytes=1 41\nsaved-file srt-sidecar exists=1 bytes=1 41\n"
          + b"saved-file ssa-sidecar exists=0\nsaved-file ass-sidecar exists=0\n"
@@ -152,6 +158,17 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
         with self.assertRaises(ValueError):compare_traces([reordered]*4,64)
         changed=TRACE.replace(b"copy-state-stage copy-empty-key-result\n",b"copy-state-stage copy-empty-key-result\nname Default2\n")
         with self.assertRaises(ValueError):compare_traces([TRACE,TRACE,changed,changed],64)
+
+    def test_style_rename_stages_and_segment_invariants(self):
+        legacy = b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith(b"style-rename-"))
+        with self.assertRaises(ValueError): compare_traces([legacy]*4,64)
+        compare_traces([legacy]*4,64,require_style_rename_stages=False)
+        for token in (b"style-rename-stage shrink-after\n", b"style-rename-segments raw-nul-to2 count=2 animated=1\n"):
+            with self.assertRaises(ValueError): compare_traces([TRACE.replace(token,b"")]*4,64)
+        for replacement in (b"count=0 animated=1", b"count=2 animated=0", b"count=2 animated=3"):
+            with self.assertRaises(ValueError): compare_traces([TRACE.replace(b"count=2 animated=1",replacement)]*4,64)
+        changed=TRACE.replace(b"style-rename-stage shrink-after\n",b"style-rename-stage shrink-after\nstyle value changed\n")
+        with self.assertRaises(ValueError): compare_traces([TRACE,TRACE,changed,changed],64)
 
     def test_rejects_repeat_nondeterminism(self):
         changed = TRACE.replace(b"callback changed", b"callback empty")

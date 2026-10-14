@@ -23,7 +23,8 @@ enum {
     XY_DOCUMENT_V1_ENTRY_HEADER_BYTES = 64,
     XY_DOCUMENT_V1_SEGMENT_HEADER_BYTES = 32,
     XY_DOCUMENT_V1_QUERY_BYTES = 16,
-    XY_DOCUMENT_V1_COUNTS_BYTES = 8
+    XY_DOCUMENT_V1_COUNTS_BYTES = 8,
+    XY_DOCUMENT_V1_STYLE_RENAME_HEADER_BYTES = 16
 };
 // Buffer contract: nonzero input length/output capacity requires a live readable/
 // writable range for that entire size, at most PTRDIFF_MAX. Bytes need no extra
@@ -68,6 +69,16 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_entry_header_v1(uint64_t, uint32
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_segment_header_v1(uint64_t, uint32_t index, uint8_t*, size_t);
 // Query modes: 0 entry, 1 next segment, 2 containing segment; integer TIME only.
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_query_time_v1(uint64_t, uint32_t mode, int64_t time, uint8_t*, size_t);
+// Narrow prepared conflict relocation: header16 old-unit-count:u32@0,
+// new-unit-count:u32@4, previous-style-byte-length:u64@8, then old/new raw
+// UTF16LE arrays and one exact initialized style wire. Native classification,
+// equality and CRT naming remain outside; incoming Put/delete stays after its
+// native conflict scope. Operation: remove(old), put(new,captured previous),
+// rename matching entry styles (CString prefix comparison, full replacement).
+// Aliased keys/existing new keys/missing old keys follow those operations;
+// no stale-plan retry. Input/count errors leave owner unchanged. Retired style
+// values/entry names drop after admission; map keys/allocations still occur inside.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_commit_style_rename_v1(uint64_t owner, const uint8_t* packet, size_t packet_bytes);
 // Render metadata fields:0 PAR type,1 color matrix,2 color range (raw i32),
 // 3 forced default style(strict0/1). Initially absent until native initialization.
 // Get writes4 LE bytes; absence => UNRESOLVED_REFERENCE, output unchanged.

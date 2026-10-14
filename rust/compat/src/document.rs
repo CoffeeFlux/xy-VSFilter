@@ -152,6 +152,38 @@ pub struct RetiredSelectedState {
     pub name: Vec<u16>,
     pub default_style: Option<crate::document_style::StyleValue>,
 }
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum StyleRenameError {
+    CountOverflow,
+    InvalidPreparedValue,
+}
+/// Style values and replaced entry names leave admission before destruction.
+/// Map key/node drops and allocations still occur inside map mutation.
+#[derive(Debug)]
+pub struct RetiredStyleRename {
+    pub map_values: Vec<Option<crate::document_style::StyleValue>>,
+    pub entry_names: Vec<Vec<u16>>,
+}
+fn cstring_prefix(value: &[u16]) -> &[u16] {
+    &value[..value.iter().position(|&u| u == 0).unwrap_or(value.len())]
+}
+fn style_rename_count(
+    count: usize,
+    old_present: bool,
+    new_present_after_remove: bool,
+) -> Result<(), StyleRenameError> {
+    let remaining = count
+        .checked_sub(usize::from(old_present))
+        .ok_or(StyleRenameError::CountOverflow)?;
+    let final_count = remaining
+        .checked_add(usize::from(!new_present_after_remove))
+        .ok_or(StyleRenameError::CountOverflow)?;
+    if count > i32::MAX as usize || final_count > i32::MAX as usize {
+        Err(StyleRenameError::CountOverflow)
+    } else {
+        Ok(())
+    }
+}
 /// Clone creates independent storage; it does not emulate native Copy callbacks
 /// or the selective field assignments in native Copy.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -583,6 +615,59 @@ impl Document {
         let entry = self.entries.last_mut()?;
         entry.end = entry.end.min(max_end);
         Some(entry.end)
+    }
+    /// Prepared conflict relocation only. Native classification/equality/CRT
+    /// naming precede this operation; incoming AddStyle insertion follows it.
+    /// No stale-plan reclassification or candidate-absence assertion is added.
+    pub fn commit_style_rename(
+        &mut self,
+        old: &[u16],
+        new: &[u16],
+        previous: &mut Option<crate::document_style::StyleValue>,
+    ) -> Result<RetiredStyleRename, StyleRenameError> {
+        if previous.is_none() {
+            return Err(StyleRenameError::InvalidPreparedValue);
+        }
+        if old.len() > i32::MAX as usize || new.len() > i32::MAX as usize {
+            return Err(StyleRenameError::CountOverflow);
+        }
+        let old_present = self.named_styles.get(old).is_some();
+        let alias = cstring_prefix(old) == cstring_prefix(new);
+        let new_present_after_remove =
+            self.named_styles.get(new).is_some() && !(alias && old_present);
+        style_rename_count(
+            self.named_styles.count(),
+            old_present,
+            new_present_after_remove,
+        )?;
+        let matches = self
+            .entries
+            .iter()
+            .filter(|entry| cstring_prefix(&entry.style) == cstring_prefix(old))
+            .count();
+        let key = new.to_vec();
+        let mut retired = RetiredStyleRename {
+            map_values: Vec::with_capacity(2),
+            entry_names: Vec::with_capacity(matches),
+        };
+        let previous = previous
+            .take()
+            .ok_or(StyleRenameError::InvalidPreparedValue)?;
+        if let Some(value) = self.named_styles.remove(old) {
+            retired.map_values.push(value);
+        }
+        if let Some(value) = self.named_styles.insert(key, Some(previous)) {
+            retired.map_values.push(value);
+        }
+        for entry in &mut self.entries {
+            if cstring_prefix(&entry.style) == cstring_prefix(old) {
+                let replacement = new.to_vec();
+                retired
+                    .entry_names
+                    .push(core::mem::replace(&mut entry.style, replacement));
+            }
+        }
+        Ok(retired)
     }
     /// The prepared entry-rename suffix of pinned native AddStyle uses Unicode
     /// CString equality: compare raw u16 units only through the first NUL on
@@ -1239,5 +1324,102 @@ mod tests {
         destination.replace_selected_state(absent.clone());
         assert_eq!(destination.selected_state(), absent);
         assert_eq!(destination.named_styles(), before.named_styles());
+    }
+    fn rename_value(id: u8) -> crate::document_style::StyleValue {
+        let mut bytes = alloc::vec![0u8;crate::document_style::HEADER_BYTES];
+        bytes[36] = id;
+        crate::document_style::decode(&bytes).unwrap()
+    }
+    #[test]
+    fn prepared_style_rename_overwrite_alias_missing_and_retirement() {
+        for (old, new, old_present) in [
+            (alloc::vec![65], alloc::vec![66, 0, 0xd800], true),
+            (alloc::vec![65, 0, 0xd800], alloc::vec![65, 0, 0xdcff], true),
+            (alloc::vec![65], alloc::vec![66], false),
+            (alloc::vec![0, 0xd800], alloc::vec![0, 0xdcff], true),
+        ] {
+            let mut d = Document::default();
+            if old_present {
+                d.named_styles_mut()
+                    .insert(old.clone(), Some(rename_value(1)));
+            }
+            let alias = cstring_prefix(&old) == cstring_prefix(&new);
+            if !alias {
+                d.named_styles_mut()
+                    .insert(new.clone(), Some(rename_value(2)));
+            }
+            let mut record = entry(0, 10, -1);
+            record.style = old.clone();
+            d.add_prepared(record, AddMode::Add).unwrap();
+            d.feedback_animation(0, true).unwrap();
+            let segments = d.segments().to_vec();
+            let mut pending = Some(rename_value(3));
+            let retired = d.commit_style_rename(&old, &new, &mut pending).unwrap();
+            assert!(pending.is_none());
+            assert_eq!(d.named_styles().count(), 1);
+            assert_eq!(d.named_styles().get(&new), Some(&Some(rename_value(3))));
+            assert_eq!(d.entries()[0].style, new);
+            assert_eq!(retired.entry_names, alloc::vec![old.clone()]);
+            assert_eq!(d.segments(), segments);
+            let expected = if old_present && !alias {
+                alloc::vec![Some(rename_value(1)), Some(rename_value(2))]
+            } else if old_present {
+                alloc::vec![Some(rename_value(1))]
+            } else {
+                alloc::vec![Some(rename_value(2))]
+            };
+            assert_eq!(retired.map_values, expected);
+        }
+    }
+    #[test]
+    fn prepared_style_rename_shrinks_on_remove_before_reinsert() {
+        let mut d = Document::default();
+        let old = alloc::vec![5000];
+        let new = alloc::vec![6000];
+        d.named_styles_mut()
+            .insert(old.clone(), Some(rename_value(1)));
+        for key in 1..200 {
+            d.named_styles_mut()
+                .insert(alloc::vec![key], Some(rename_value(2)));
+        }
+        let bins = d.named_styles().bin_count();
+        assert!(bins >= 68);
+        let threshold = (0.25f32 * bins as f32) as usize;
+        for key in 1..200 {
+            if d.named_styles().count() == threshold {
+                break;
+            }
+            d.named_styles_mut().remove(&[key]);
+        }
+        assert_eq!(d.named_styles().bin_count(), bins);
+        assert_eq!(d.named_styles().count(), threshold);
+        d.commit_style_rename(&old, &new, &mut Some(rename_value(3)))
+            .unwrap();
+        assert_eq!(d.named_styles().count(), threshold);
+        assert!(d.named_styles().bin_count() < bins);
+    }
+    #[test]
+    fn prepared_style_rename_preflight_rejects_without_consumption() {
+        let mut d = Document::default();
+        d.named_styles_mut()
+            .insert(alloc::vec![65], Some(rename_value(1)));
+        let before = d.clone();
+        let mut none = None;
+        assert_eq!(
+            d.commit_style_rename(&[65], &[66], &mut none).unwrap_err(),
+            StyleRenameError::InvalidPreparedValue
+        );
+        assert_eq!(d, before);
+        let max = i32::MAX as usize;
+        assert_eq!(
+            style_rename_count(max, false, false),
+            Err(StyleRenameError::CountOverflow)
+        );
+        assert_eq!(style_rename_count(max, true, false), Ok(()));
+        assert_eq!(style_rename_count(max, false, true), Ok(()));
+        assert_eq!(
+            style_rename_count(usize::MAX, true, true),
+            Err(StyleRenameError::CountOverflow)
+        );
     }
 }
