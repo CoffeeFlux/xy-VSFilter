@@ -3693,6 +3693,73 @@ void CSimpleTextSubtitle::OrSegmentAnimated(int iSegment, bool animated)
 #endif
 }
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+size_t CSimpleTextSubtitle::GetStyleCount() const
+{
+    return m_styles.GetCount();
+}
+
+bool CSimpleTextSubtitle::HasNamedStyle(LPCWSTR name) const
+{
+    return m_styles.Lookup(name) != NULL;
+}
+
+bool CSimpleTextSubtitle::GetNamedStyleCopy(const CString& name, STSStyle& value) const
+{
+    STSStyle* style = NULL;
+    // Named renderer reset explicitly falls back for both absent and null values.
+    if(!m_styles.Lookup(name, style) || !style) return false;
+    value = *style;
+    return true;
+}
+
+bool CSimpleTextSubtitle::GetEntryStyleCopy(int i, STSStyle& value)
+{
+    return GetStyle(i, &value);
+}
+
+bool CSimpleTextSubtitle::SetExistingStyleValue(LPCWSTR name, const STSStyle* value)
+{
+    STSStyle* style = NULL;
+    if(!m_styles.Lookup(name, style)) return false;
+    ASSERT(style);
+    // Preserve the second lookup/assert even when the caller skips this row.
+    if(value) *style = *value;
+    return true;
+}
+
+void CSimpleTextSubtitle::ResetDefaultStyle(int CharSet)
+{
+    CreateDefaultStyle(CharSet);
+}
+
+bool CSimpleTextSubtitle::GetStyleNameAt(size_t ordinal, CString& name) const
+{
+    POSITION pos = m_styles.GetStartPosition();
+    while(pos)
+    {
+        const CSTSStyleMap::CPair* pair = m_styles.GetNext(pos);
+        if(!pair) return false;
+        if(ordinal == 0) { name = pair->m_key; return true; }
+        ordinal--;
+    }
+    return false;
+}
+
+bool CSimpleTextSubtitle::GetStyleValueAt(size_t ordinal, STSStyle& value) const
+{
+    POSITION pos = m_styles.GetStartPosition();
+    while(pos)
+    {
+        const CSTSStyleMap::CPair* pair = m_styles.GetNext(pos);
+        if(!pair) return false;
+        if(ordinal == 0) { value = *pair->m_value; return true; }
+        ordinal--;
+    }
+    return false;
+}
+#endif
+
 STSStyle* CSimpleTextSubtitle::GetStyle(int i)
 {
     STSStyle* style = NULL;

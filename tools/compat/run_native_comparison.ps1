@@ -102,6 +102,12 @@ try {
             --environment-label "GitHub windows-2022; VS2022 Release $Platform; mutation seed $MutationSeed"
         if ($LASTEXITCODE -ne 0) { throw "Mutation comparison has failures; preserve and reduce its cases" }
     }
+    if ($RustDocumentOwner) {
+        & python "$PSScriptRoot\document_style_api_check.py" --reference-root $baselineRoot `
+            --candidate-root $candidateRoot --platform $Platform --owner-experimental `
+            --output "$evidence\document-style-api"
+        if ($LASTEXITCODE -ne 0) { throw "Style API comparison failed; inspect $evidence\document-style-api\report.json" }
+    }
 } finally {
     Pop-Location
 }

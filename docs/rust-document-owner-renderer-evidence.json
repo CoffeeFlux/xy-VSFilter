@@ -1,0 +1,2044 @@
+{
+  "schema": 1,
+  "candidate_commit": "30d087bd28241519dfddd908cb7bdc14725f4b66",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "document_storage": "rust-experimental",
+  "scope": "First full native renderer validation with canonical STS entries/segments compiled out; Windows x86 and x64. Styles/default style/metadata remain native. Predates linked full-class lifecycle gate.",
+  "native": {
+    "x64": {
+      "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38623532573",
+      "build": {
+        "mutation_seed": 12345,
+        "candidate_status": [],
+        "platform": "x64",
+        "rustc": [
+          "rustc 1.85.0 (4d91de4e4 2025-02-17)",
+          "binary: rustc",
+          "commit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688",
+          "commit-date: 2025-02-17",
+          "host: x86_64-pc-windows-msvc",
+          "release: 1.85.0",
+          "LLVM version: 19.1.7"
+        ],
+        "mutation_count": 32,
+        "msvc_tools_version": "14.44.35207",
+        "candidate_commit": "30d087bd28241519dfddd908cb7bdc14725f4b66",
+        "cargo": [
+          "cargo 1.85.0 (d73d2caf9 2024-12-31)"
+        ],
+        "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+        "document_storage": "rust-experimental",
+        "configuration": "Release",
+        "windows_sdk_version": "10.0.26100.0\\"
+      },
+      "checks": {
+        "smoke": {
+          "report_sha256": "4dc61bd21bf11a471bbf56907b7da9f6bdd3e5bf95876020f393239c392b7403",
+          "case_count": 1,
+          "rendered_frames": 10,
+          "changed_frames": 6,
+          "case_verdicts": {
+            "equal": 1
+          },
+          "candidate_statuses": {
+            "ok": 1
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "aff943a1c633c5a1aca2d2f504b0b17c5a7f19b3d3bbffaa215d1889fff2da25",
+          "dialog_observations": {},
+          "timeline_observations": {}
+        },
+        "csri": {
+          "report_sha256": "2fc79932acd3543604e909149253a77873d6839b1295f99705b2954692d298c8",
+          "case_count": 798,
+          "rendered_frames": 8426,
+          "changed_frames": 5624,
+          "case_verdicts": {
+            "equal": 798
+          },
+          "candidate_statuses": {
+            "ok": 780,
+            "open_rejected": 18
+          },
+          "distinct_frame_controls": [
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-file",
+                "font-valid-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-memory",
+                "font-valid-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-file",
+                "drawing-state-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-memory",
+                "drawing-state-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "raster-be-one-file",
+                "raster-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "raster-be-one-memory",
+                "raster-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "raster-be-fraction-high-file",
+                "raster-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "raster-be-fraction-high-memory",
+                "raster-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "raster-gaussian-medium-file",
+                "raster-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "raster-gaussian-medium-memory",
+                "raster-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "subrip-format-italic-file",
+                "subrip-format-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "subrip-format-italic-memory",
+                "subrip-format-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "subrip-format-underline-file",
+                "subrip-format-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "subrip-format-underline-memory",
+                "subrip-format-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "realtext-format-italic-file",
+                "realtext-format-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "realtext-format-italic-memory",
+                "realtext-format-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "microdvd-format-italic-file",
+                "microdvd-format-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "microdvd-format-italic-memory",
+                "microdvd-format-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "mpl2-format-italic-file",
+                "mpl2-format-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "mpl2-format-italic-memory",
+                "mpl2-format-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "sami-format-italic-file",
+                "sami-format-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "sami-format-italic-memory",
+                "sami-format-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "sami-format-font-black-file",
+                "sami-format-font-zero-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "sami-format-font-black-memory",
+                "sami-format-font-zero-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "encoding-western-file",
+                "encoding-western-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "encoding-western-memory",
+                "encoding-western-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "ass-style-v5-box-file",
+                "ass-style-v5-outline-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "ass-style-v5-box-memory",
+                "ass-style-v5-outline-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "ass-header-scaled-substring-file",
+                "ass-header-scaled-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "ass-header-scaled-substring-memory",
+                "ass-header-scaled-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "microdvd-style-italic-file",
+                "microdvd-style-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "microdvd-style-italic-memory",
+                "microdvd-style-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "sami-file-title-skips-sync-file",
+                "sami-file-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "sami-file-title-skips-sync-memory",
+                "sami-file-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "subrip-cue-number-in-caption-file",
+                "subrip-cue-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "subrip-cue-number-in-caption-memory",
+                "subrip-cue-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "old-subrip-pipes-file",
+                "old-subrip-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "old-subrip-pipes-memory",
+                "old-subrip-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "vplayer-pipes-file",
+                "vplayer-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "vplayer-pipes-memory",
+                "vplayer-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "layout-rect-bottom-file",
+                "layout-rect-split-layers-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "layout-rect-bottom-memory",
+                "layout-rect-split-layers-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "text-runs-soft-wrap-zero-file",
+                "text-runs-soft-wrap-two-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "text-runs-soft-wrap-zero-memory",
+                "text-runs-soft-wrap-two-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "wrap-width-style-0-file",
+                "wrap-width-style-2-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "wrap-width-style-0-memory",
+                "wrap-width-style-2-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "line-layout-align-1-file",
+                "line-layout-align-9-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "line-layout-align-1-memory",
+                "line-layout-align-9-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-storage-control-file",
+                "drawing-storage-fractional-scale-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-storage-control-memory",
+                "drawing-storage-fractional-scale-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "span-merge-control-file",
+                "span-merge-horizontal-border-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "span-merge-control-memory",
+                "span-merge-horizontal-border-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "arc-queue-control-file",
+                "arc-queue-round-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "arc-queue-control-memory",
+                "arc-queue-round-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "path-buffer-control-file",
+                "path-buffer-spaced-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "path-buffer-control-memory",
+                "path-buffer-spaced-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "scan-row-single-file",
+                "scan-row-hole-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "scan-row-single-memory",
+                "scan-row-hole-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "span-coverage-phase-0-file",
+                "span-coverage-phase-7-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "span-coverage-phase-0-memory",
+                "span-coverage-phase-7-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "variance-control-file",
+                "variance-diagonal-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "variance-control-memory",
+                "variance-diagonal-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "blur-planes-control-file",
+                "blur-planes-body-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "blur-planes-control-memory",
+                "blur-planes-body-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "clip-fade-banner-control-file",
+                "clip-fade-banner-edge-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "clip-fade-banner-control-memory",
+                "clip-fade-banner-edge-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "clip-fade-scroll-control-file",
+                "clip-fade-scroll-up-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "clip-fade-scroll-control-memory",
+                "clip-fade-scroll-up-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "clip-mask-normal-file",
+                "clip-mask-inverse-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "clip-mask-normal-memory",
+                "clip-mask-inverse-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "gauss-planes-body-light-file",
+                "gauss-planes-body-wide-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "gauss-planes-body-light-memory",
+                "gauss-planes-body-wide-memory"
+              ],
+              "reference-0": true
+            }
+          ],
+          "manifest_sha256": "9a83e1dddc8b734cad7a6a76a7abc00dfba9cc6d8f4190a57cf41a2ee916a0eb",
+          "dialog_observations": {
+            "field-tab-prefixes-file": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\tDefault\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-tab-prefixes-memory": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\tDefault\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-unicode-style-space-file": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\u2003Default\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-unicode-style-space-memory": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\u2003Default\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ]
+          },
+          "timeline_observations": {
+            "timeline-overlap-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-order-reversed-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-order-reversed-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-duplicates-and-zero-file": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-duplicates-and-zero-memory": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-touching-and-gaps-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-touching-and-gaps-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-nested-layers-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "timeline-nested-layers-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "timeline-reversed-and-empty-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-reversed-and-empty-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-equal-starts-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-starts-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-ends-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-ends-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-overlap-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 11
+            },
+            "incremental-overlap-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 11
+            },
+            "incremental-out-of-order-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 8
+            },
+            "incremental-out-of-order-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 8
+            },
+            "incremental-gaps-bridged-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-gaps-bridged-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-nested-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-nested-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-touching-file": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-touching-memory": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-zero-and-reversed-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-zero-and-reversed-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-duplicates-file": {
+              "frame_count": 47,
+              "changed_frames": 22,
+              "distinct_frame_hashes": 2
+            },
+            "incremental-duplicates-memory": {
+              "frame_count": 47,
+              "changed_frames": 22,
+              "distinct_frame_hashes": 2
+            },
+            "incremental-empty-text-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-empty-text-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            }
+          }
+        },
+        "mutation-results": {
+          "report_sha256": "fd4a00f85b9ba8419e9eff5d0f21863262932928c4428ac085c4de936c3a4104",
+          "case_count": 32,
+          "rendered_frames": 224,
+          "changed_frames": 160,
+          "case_verdicts": {
+            "equal": 32
+          },
+          "candidate_statuses": {
+            "ok": 32
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "90e89279db719c739c6a1363611c04225b3486f03fee6ad9ceaca20e084ce43c",
+          "dialog_observations": {},
+          "timeline_observations": {}
+        },
+        "com-contracts": {
+          "report_sha256": "504565622be44da021355aae7d7176e243c719e0f5221c852195975a8daa38d5",
+          "cases": 10,
+          "passed": true,
+          "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+          "headers": {
+            "src/filters/transform/vsfilter/DirectVobSubFilter.h": {
+              "reference_sha256": "d0ad74ce5efb68be080cd77c75f9288489cc2c79499941c83e2c238a9e8ddaf9",
+              "candidate_sha256": "d0ad74ce5efb68be080cd77c75f9288489cc2c79499941c83e2c238a9e8ddaf9"
+            },
+            "src/filters/transform/vsfilter/xy_sub_filter.h": {
+              "reference_sha256": "61b2cb40e906d4147255400be2142ff912c58628feb1da03d1fd68bea29d6a4d",
+              "candidate_sha256": "61b2cb40e906d4147255400be2142ff912c58628feb1da03d1fd68bea29d6a4d"
+            },
+            "src/filters/transform/vsfilter/auto_load_helper.h": {
+              "reference_sha256": "b280254485e02444630a996804e14ef10a97cbcd1f8ee707f919f03e5b59c488",
+              "candidate_sha256": "d37e2ed8ac0142ea7862b1d475a0ae74d1018e0f29ee802c4edf40a76069a102"
+            },
+            "src/filters/transform/vsfilter/xy_sub_filter_consumer.h": {
+              "reference_sha256": "67f5cb83a9c83df388069feea50b7db5f7200971b0b50ae11abd39de1c5294a0",
+              "candidate_sha256": "67f5cb83a9c83df388069feea50b7db5f7200971b0b50ae11abd39de1c5294a0"
+            },
+            "src/filters/transform/vsfilter/IDirectVobSub.h": {
+              "reference_sha256": "c0d693a5c0fc3d91c68f41f539ad8c0f13e6dfe0b19941c99b7ad6d5b15f165f",
+              "candidate_sha256": "c0d693a5c0fc3d91c68f41f539ad8c0f13e6dfe0b19941c99b7ad6d5b15f165f"
+            },
+            "src/filters/transform/vsfilter/XyOptions.h": {
+              "reference_sha256": "9efa9e222e74a84fcdac202be5ddfd13b32ee49b837b9b2649f7bbcc6cf4618c",
+              "candidate_sha256": "9efa9e222e74a84fcdac202be5ddfd13b32ee49b837b9b2649f7bbcc6cf4618c"
+            }
+          },
+          "reference_exclusions": [
+            "XySubFilterAutoLoader QueryId/FindPin; see docs/autoloader-pin-id-scope.json"
+          ],
+          "candidate_only_controls": 2,
+          "settings_environment": "Private volatile HKCU per worker, removed by parent after termination; native constructor writes are isolated."
+        }
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "84a27c3f09cb0d719d9eda44878694f94595dada4c14ceb22a2e4e614f9ec4ff",
+          "baseline_sha256": "37818ecbf47c7ea849e22330da9c5ab243208fb4cde676a2901f8c4d18906d69",
+          "candidate_sha256": "3914d65af55fa54b514e71d694dd972f83189d49b01fa1cec7eed775ec373b05"
+        },
+        "XySubFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "70a7daaf1cbd89db83662b6014439fe736474ef9fe6ad152a955d625901c74b2",
+          "baseline_sha256": "83d5c16db641278ddf70acf5984206cc72aaadd36fe7f963e9d63dc1a4a330dd",
+          "candidate_sha256": "b7d4b88a9f6de02729f7f5cabbb66ce080e3c294ec399421eef917ef9ee71c5b"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "d0b61ec5540588c5f5e14949472e20c26b17713b3700e75d9fc088d2bcc176b9",
+          "baseline_sha256": "0f285e61d1e3f99988201a143169d6f72160264e9ff1acb9b33c49054c1e3161",
+          "candidate_sha256": "84a49fcba214bc9a15cc9301dbd7d0e039ab8a9967b94d5effb8fc2c3f1e879c"
+        }
+      },
+      "candidate_log_sha256": "370eaf9301bce8e652f0cae9bc34e8580193ddeacb3ca4cc1c3ca99534697f35",
+      "job_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38623532573/job/116056816549",
+      "job_conclusion": "success"
+    },
+    "Win32": {
+      "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38623532573",
+      "build": {
+        "cargo": [
+          "cargo 1.85.0 (d73d2caf9 2024-12-31)"
+        ],
+        "configuration": "Release",
+        "windows_sdk_version": "10.0.26100.0\\",
+        "candidate_status": [],
+        "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+        "msvc_tools_version": "14.44.35207",
+        "rustc": [
+          "rustc 1.85.0 (4d91de4e4 2025-02-17)",
+          "binary: rustc",
+          "commit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688",
+          "commit-date: 2025-02-17",
+          "host: x86_64-pc-windows-msvc",
+          "release: 1.85.0",
+          "LLVM version: 19.1.7"
+        ],
+        "platform": "Win32",
+        "mutation_count": 32,
+        "candidate_commit": "30d087bd28241519dfddd908cb7bdc14725f4b66",
+        "document_storage": "rust-experimental",
+        "mutation_seed": 12345
+      },
+      "checks": {
+        "smoke": {
+          "report_sha256": "aa70947547d40d58083d0d5f433644f646e50b2a769b83d3b2d79a5195af4c47",
+          "case_count": 1,
+          "rendered_frames": 10,
+          "changed_frames": 6,
+          "case_verdicts": {
+            "equal": 1
+          },
+          "candidate_statuses": {
+            "ok": 1
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "aff943a1c633c5a1aca2d2f504b0b17c5a7f19b3d3bbffaa215d1889fff2da25",
+          "dialog_observations": {},
+          "timeline_observations": {}
+        },
+        "csri": {
+          "report_sha256": "9e7725c06aab32d3952c7caec24df56112ecc45b2b618b7a53357da50662a631",
+          "case_count": 798,
+          "rendered_frames": 8426,
+          "changed_frames": 5624,
+          "case_verdicts": {
+            "equal": 798
+          },
+          "candidate_statuses": {
+            "ok": 780,
+            "open_rejected": 18
+          },
+          "distinct_frame_controls": [
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-file",
+                "font-valid-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "font-valid-attached-memory",
+                "font-valid-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-file",
+                "drawing-state-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-state-spline-close-twice-memory",
+                "drawing-state-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "raster-be-one-file",
+                "raster-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "raster-be-one-memory",
+                "raster-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "raster-be-fraction-high-file",
+                "raster-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "raster-be-fraction-high-memory",
+                "raster-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "raster-gaussian-medium-file",
+                "raster-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "raster-gaussian-medium-memory",
+                "raster-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "subrip-format-italic-file",
+                "subrip-format-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "subrip-format-italic-memory",
+                "subrip-format-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "subrip-format-underline-file",
+                "subrip-format-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "subrip-format-underline-memory",
+                "subrip-format-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "realtext-format-italic-file",
+                "realtext-format-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "realtext-format-italic-memory",
+                "realtext-format-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "microdvd-format-italic-file",
+                "microdvd-format-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "microdvd-format-italic-memory",
+                "microdvd-format-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "mpl2-format-italic-file",
+                "mpl2-format-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "mpl2-format-italic-memory",
+                "mpl2-format-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "sami-format-italic-file",
+                "sami-format-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "sami-format-italic-memory",
+                "sami-format-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "sami-format-font-black-file",
+                "sami-format-font-zero-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "sami-format-font-black-memory",
+                "sami-format-font-zero-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "encoding-western-file",
+                "encoding-western-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "encoding-western-memory",
+                "encoding-western-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "ass-style-v5-box-file",
+                "ass-style-v5-outline-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "ass-style-v5-box-memory",
+                "ass-style-v5-outline-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "ass-header-scaled-substring-file",
+                "ass-header-scaled-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "ass-header-scaled-substring-memory",
+                "ass-header-scaled-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "microdvd-style-italic-file",
+                "microdvd-style-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "microdvd-style-italic-memory",
+                "microdvd-style-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "sami-file-title-skips-sync-file",
+                "sami-file-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "sami-file-title-skips-sync-memory",
+                "sami-file-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "subrip-cue-number-in-caption-file",
+                "subrip-cue-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "subrip-cue-number-in-caption-memory",
+                "subrip-cue-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "old-subrip-pipes-file",
+                "old-subrip-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "old-subrip-pipes-memory",
+                "old-subrip-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "vplayer-pipes-file",
+                "vplayer-control-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "vplayer-pipes-memory",
+                "vplayer-control-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "layout-rect-bottom-file",
+                "layout-rect-split-layers-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "layout-rect-bottom-memory",
+                "layout-rect-split-layers-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "text-runs-soft-wrap-zero-file",
+                "text-runs-soft-wrap-two-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "text-runs-soft-wrap-zero-memory",
+                "text-runs-soft-wrap-two-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "wrap-width-style-0-file",
+                "wrap-width-style-2-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "wrap-width-style-0-memory",
+                "wrap-width-style-2-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "line-layout-align-1-file",
+                "line-layout-align-9-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "line-layout-align-1-memory",
+                "line-layout-align-9-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-storage-control-file",
+                "drawing-storage-fractional-scale-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "drawing-storage-control-memory",
+                "drawing-storage-fractional-scale-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "span-merge-control-file",
+                "span-merge-horizontal-border-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "span-merge-control-memory",
+                "span-merge-horizontal-border-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "arc-queue-control-file",
+                "arc-queue-round-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "arc-queue-control-memory",
+                "arc-queue-round-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "path-buffer-control-file",
+                "path-buffer-spaced-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "path-buffer-control-memory",
+                "path-buffer-spaced-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "scan-row-single-file",
+                "scan-row-hole-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "scan-row-single-memory",
+                "scan-row-hole-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "span-coverage-phase-0-file",
+                "span-coverage-phase-7-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "span-coverage-phase-0-memory",
+                "span-coverage-phase-7-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "variance-control-file",
+                "variance-diagonal-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "variance-control-memory",
+                "variance-diagonal-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "blur-planes-control-file",
+                "blur-planes-body-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "blur-planes-control-memory",
+                "blur-planes-body-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "clip-fade-banner-control-file",
+                "clip-fade-banner-edge-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "clip-fade-banner-control-memory",
+                "clip-fade-banner-edge-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "clip-fade-scroll-control-file",
+                "clip-fade-scroll-up-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "clip-fade-scroll-control-memory",
+                "clip-fade-scroll-up-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "clip-mask-normal-file",
+                "clip-mask-inverse-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "clip-mask-normal-memory",
+                "clip-mask-inverse-memory"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "gauss-planes-body-light-file",
+                "gauss-planes-body-wide-file"
+              ],
+              "reference-0": true
+            },
+            {
+              "candidate": true,
+              "cases": [
+                "gauss-planes-body-light-memory",
+                "gauss-planes-body-wide-memory"
+              ],
+              "reference-0": true
+            }
+          ],
+          "manifest_sha256": "9a83e1dddc8b734cad7a6a76a7abc00dfba9cc6d8f4190a57cf41a2ee916a0eb",
+          "dialog_observations": {
+            "field-tab-prefixes-file": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\tDefault\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-tab-prefixes-memory": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\tDefault\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-unicode-style-space-file": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\u2003Default\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ],
+            "field-unicode-style-space-memory": [
+              {
+                "class": "#32770",
+                "controls": [
+                  {
+                    "class": "Button",
+                    "id": 1,
+                    "style": 1342373889,
+                    "text": "OK"
+                  },
+                  {
+                    "class": "Button",
+                    "id": 2,
+                    "style": 1342242816,
+                    "text": "Cancel"
+                  },
+                  {
+                    "class": "Static",
+                    "id": 20,
+                    "style": 1342308355,
+                    "text": null
+                  },
+                  {
+                    "class": "Static",
+                    "id": 65535,
+                    "style": 1342316672,
+                    "text": "Unknown style found: \"\u2003Default\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+                  }
+                ],
+                "response": "cancel",
+                "title": "Warning"
+              }
+            ]
+          },
+          "timeline_observations": {
+            "timeline-overlap-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-order-reversed-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-overlap-order-reversed-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 6
+            },
+            "timeline-duplicates-and-zero-file": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-duplicates-and-zero-memory": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-touching-and-gaps-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-touching-and-gaps-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-nested-layers-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "timeline-nested-layers-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "timeline-reversed-and-empty-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-reversed-and-empty-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 2
+            },
+            "timeline-equal-starts-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-starts-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-ends-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "timeline-equal-ends-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-overlap-file": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 11
+            },
+            "incremental-overlap-memory": {
+              "frame_count": 47,
+              "changed_frames": 35,
+              "distinct_frame_hashes": 11
+            },
+            "incremental-out-of-order-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 8
+            },
+            "incremental-out-of-order-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 8
+            },
+            "incremental-gaps-bridged-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-gaps-bridged-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 5
+            },
+            "incremental-nested-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-nested-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-touching-file": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-touching-memory": {
+              "frame_count": 47,
+              "changed_frames": 28,
+              "distinct_frame_hashes": 4
+            },
+            "incremental-zero-and-reversed-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-zero-and-reversed-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-duplicates-file": {
+              "frame_count": 47,
+              "changed_frames": 22,
+              "distinct_frame_hashes": 2
+            },
+            "incremental-duplicates-memory": {
+              "frame_count": 47,
+              "changed_frames": 22,
+              "distinct_frame_hashes": 2
+            },
+            "incremental-empty-text-file": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            },
+            "incremental-empty-text-memory": {
+              "frame_count": 47,
+              "changed_frames": 41,
+              "distinct_frame_hashes": 3
+            }
+          }
+        },
+        "mutation-results": {
+          "report_sha256": "cc8b9cfbb52f85cd7538ddf278be7847ea29242bbe134c9272098041698b7955",
+          "case_count": 32,
+          "rendered_frames": 224,
+          "changed_frames": 160,
+          "case_verdicts": {
+            "equal": 32
+          },
+          "candidate_statuses": {
+            "ok": 32
+          },
+          "distinct_frame_controls": [],
+          "manifest_sha256": "692b4dcb930f2117e85805fead2e88d7a3e21f3894da6b3b27f6313f2afeef40",
+          "dialog_observations": {},
+          "timeline_observations": {}
+        },
+        "com-contracts": {
+          "report_sha256": "594e0f771448f26072402028ad19e9e212b4fbd6df91fcbf7522f2d2d97d3ca0",
+          "cases": 10,
+          "passed": true,
+          "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+          "headers": {
+            "src/filters/transform/vsfilter/DirectVobSubFilter.h": {
+              "reference_sha256": "d0ad74ce5efb68be080cd77c75f9288489cc2c79499941c83e2c238a9e8ddaf9",
+              "candidate_sha256": "d0ad74ce5efb68be080cd77c75f9288489cc2c79499941c83e2c238a9e8ddaf9"
+            },
+            "src/filters/transform/vsfilter/xy_sub_filter.h": {
+              "reference_sha256": "61b2cb40e906d4147255400be2142ff912c58628feb1da03d1fd68bea29d6a4d",
+              "candidate_sha256": "61b2cb40e906d4147255400be2142ff912c58628feb1da03d1fd68bea29d6a4d"
+            },
+            "src/filters/transform/vsfilter/auto_load_helper.h": {
+              "reference_sha256": "b280254485e02444630a996804e14ef10a97cbcd1f8ee707f919f03e5b59c488",
+              "candidate_sha256": "d37e2ed8ac0142ea7862b1d475a0ae74d1018e0f29ee802c4edf40a76069a102"
+            },
+            "src/filters/transform/vsfilter/xy_sub_filter_consumer.h": {
+              "reference_sha256": "67f5cb83a9c83df388069feea50b7db5f7200971b0b50ae11abd39de1c5294a0",
+              "candidate_sha256": "67f5cb83a9c83df388069feea50b7db5f7200971b0b50ae11abd39de1c5294a0"
+            },
+            "src/filters/transform/vsfilter/IDirectVobSub.h": {
+              "reference_sha256": "c0d693a5c0fc3d91c68f41f539ad8c0f13e6dfe0b19941c99b7ad6d5b15f165f",
+              "candidate_sha256": "c0d693a5c0fc3d91c68f41f539ad8c0f13e6dfe0b19941c99b7ad6d5b15f165f"
+            },
+            "src/filters/transform/vsfilter/XyOptions.h": {
+              "reference_sha256": "9efa9e222e74a84fcdac202be5ddfd13b32ee49b837b9b2649f7bbcc6cf4618c",
+              "candidate_sha256": "9efa9e222e74a84fcdac202be5ddfd13b32ee49b837b9b2649f7bbcc6cf4618c"
+            }
+          },
+          "reference_exclusions": [
+            "XySubFilterAutoLoader QueryId/FindPin; see docs/autoloader-pin-id-scope.json"
+          ],
+          "candidate_only_controls": 2,
+          "settings_environment": "Private volatile HKCU per worker, removed by parent after termination; native constructor writes are isolated."
+        }
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "f9aea567f2b60758f01cfa9886d72d31f80b1798fbd41f69efd00cc572f2681c",
+          "baseline_sha256": "83c46532473b8607a395b872938183adcdd830cf599b14aeabc21dc23703a7ac",
+          "candidate_sha256": "e3e95d27c2eba462c82af3188a410b18fad116f22276b567d7b7dc15e44aff0f"
+        },
+        "XySubFilter.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "d8cd7823d3b6d58469d5cdeb1e7f647d0aefb1c33c1d3d6c3064eb9dd72d5d5c",
+          "baseline_sha256": "910bc8f7fed2874ca24dcfe89205cc194748985f202e35d5087c16891257a4fd",
+          "candidate_sha256": "1ac044c6da8aee29401a47ab6b2c6620003d97eee17d4550609dba4e0d60bce8"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "exports_equal": true,
+          "no_added_imports_or_changed_platform_headers": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "e666b77b86ebf78670a821a32ef94257d7671059d660f18001c9641876d1625d",
+          "baseline_sha256": "2c55dcec3280bd3cdafbbed63babfb03047620022adc5441c181a8d257357350",
+          "candidate_sha256": "28e6c484dd1bd4d9380687f661d864d5d9c6c2111f0763940db80251a3cc3438"
+        }
+      },
+      "candidate_log_sha256": "6c046d15b0a578d7d370d9ea7ace656b8c8192e4c68437f2e2dba7201e8d269b",
+      "job_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38623532573/job/116056817446",
+      "job_conclusion": "success"
+    }
+  },
+  "remaining": [
+    "Full linked native class lifecycle gate pending",
+    "Style/default-style/metadata ownership remains native",
+    "Allocator, dialog reentry, host lifetime and real Aegisub/player gates remain unresolved"
+  ]
+}

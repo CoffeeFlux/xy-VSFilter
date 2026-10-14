@@ -299,6 +299,19 @@ public:
     bool IsSegmentAnimated(unsigned int iSegment) const;
     void OrSegmentAnimated(int iSegment, bool animated);
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    // Native-backed value access. Style/default storage remains canonical here;
+    // enumeration copies only one requested row and exposes no map/pointee loan.
+    size_t GetStyleCount() const;
+    bool HasNamedStyle(LPCWSTR name) const;
+    bool GetNamedStyleCopy(const CString& name, STSStyle& value) const;
+    bool GetEntryStyleCopy(int i, STSStyle& value);
+    bool SetExistingStyleValue(LPCWSTR name, const STSStyle* value);
+    void ResetDefaultStyle(int CharSet);
+    bool GetStyleNameAt(size_t ordinal, CString& name) const;
+    bool GetStyleValueAt(size_t ordinal, STSStyle& value) const;
+#endif
+
     STSStyle* GetStyle(int i);
     bool      GetStyle(int i, STSStyle* const stss);
     int       GetCharSet(int i);

@@ -1,0 +1,118 @@
+{
+  "schema": 1,
+  "candidate_commit": "046736721ff293b675be69f5776246d6f5746a44",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "scope": "Linked actual native class methods with initialized state; x64 native control and experimental Rust entry/segment owner. x86 pending. Not style/default/metadata migration or real-host validation.",
+  "runs": {
+    "native": {
+      "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38625712104",
+      "build": {
+        "rustc": [
+          "rustc 1.85.0 (4d91de4e4 2025-02-17)",
+          "binary: rustc",
+          "commit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688",
+          "commit-date: 2025-02-17",
+          "host: x86_64-pc-windows-msvc",
+          "release: 1.85.0",
+          "LLVM version: 19.1.7"
+        ],
+        "document_storage": "native",
+        "msvc_tools_version": "14.44.35207",
+        "windows_sdk_version": "10.0.26100.0\\",
+        "cargo": [
+          "cargo 1.85.0 (d73d2caf9 2024-12-31)"
+        ],
+        "mutation_count": 32,
+        "platform": "x64",
+        "candidate_status": [],
+        "candidate_commit": "046736721ff293b675be69f5776246d6f5746a44",
+        "mutation_seed": 12345,
+        "configuration": "Release",
+        "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62"
+      },
+      "lifecycle": {
+        "report_sha256": "2e6ad6651af8722e6a06014c8e942228f67f7bedff6c66300fa3f989048e0096",
+        "equal": true,
+        "trace_lines": 702,
+        "limits": [
+          "Bounded normal lifecycles and initialized metadata only",
+          "No allocator-failure, concurrent close, or dialog-reentry parity",
+          "Not a real Aegisub/player host test"
+        ],
+        "library_hash_scope": "Build-library hashes are runner-reported; executables, source headers and traces rehashed"
+      },
+      "renderer_counts": {
+        "smoke": {
+          "report_sha256": "425742ebc02a0e61800ee96d4435828a8e0fa0ec115a77c413c64a6a05415e5d",
+          "case_count": 1,
+          "rendered_frames": 10
+        },
+        "csri": {
+          "report_sha256": "b7c2dbbac0c453886dcffff6232c950228dc2c83ee44e86e80eebb19f193c8b2",
+          "case_count": 798,
+          "rendered_frames": 8426
+        },
+        "mutation-results": {
+          "report_sha256": "fe92d66e1b71f0a67a77028744ef9bc46d73286cfe66fcaad46a9c8158bc753f",
+          "case_count": 32,
+          "rendered_frames": 224
+        }
+      }
+    },
+    "owner": {
+      "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38625712104",
+      "build": {
+        "configuration": "Release",
+        "document_storage": "rust-experimental",
+        "msvc_tools_version": "14.44.35207",
+        "windows_sdk_version": "10.0.26100.0\\",
+        "candidate_commit": "046736721ff293b675be69f5776246d6f5746a44",
+        "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+        "rustc": [
+          "rustc 1.85.0 (4d91de4e4 2025-02-17)",
+          "binary: rustc",
+          "commit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688",
+          "commit-date: 2025-02-17",
+          "host: x86_64-pc-windows-msvc",
+          "release: 1.85.0",
+          "LLVM version: 19.1.7"
+        ],
+        "cargo": [
+          "cargo 1.85.0 (d73d2caf9 2024-12-31)"
+        ],
+        "mutation_seed": 12345,
+        "candidate_status": [],
+        "mutation_count": 32,
+        "platform": "x64"
+      },
+      "lifecycle": {
+        "report_sha256": "947c39def3ed965e41ff915999c5a0eed59a94c0bea90141ca17a4bb641e135b",
+        "equal": true,
+        "trace_lines": 702,
+        "limits": [
+          "Bounded normal lifecycles and initialized metadata only",
+          "No allocator-failure, concurrent close, or dialog-reentry parity",
+          "Not a real Aegisub/player host test"
+        ],
+        "library_hash_scope": "Build-library hashes are runner-reported; executables, source headers and traces rehashed"
+      },
+      "renderer_counts": {
+        "smoke": {
+          "report_sha256": "0a314c17c4c782f576e7ba9f1783e07e86885eb738285a96ce4ac2da9ddb7e69",
+          "case_count": 1,
+          "rendered_frames": 10
+        },
+        "csri": {
+          "report_sha256": "8a3283b46be505946239321575b70535d2ad87ae8c092ab97b2c6934a85269c1",
+          "case_count": 798,
+          "rendered_frames": 8426
+        },
+        "mutation-results": {
+          "report_sha256": "db07a3eb0b1612641651b297944e1b00f885b1934a5dc0bc2db759d37a497782",
+          "case_count": 32,
+          "rendered_frames": 224
+        }
+      }
+    }
+  }
+}
