@@ -59,6 +59,27 @@ def variants():
             yield name + "-no-bom", data
         else:
             yield name, data
+    # Font-independent asymmetric edges make blur changes visible. Fractional
+    # strengths also exercise the separable filter after render-resolution scaling.
+    for name, tags in {
+        "control": br"\be0\blur0",
+        "be-one": br"\be1",
+        "be-three": br"\be3",
+        "be-fraction-low": br"\be.125",
+        "be-fraction-high": br"\be.375",
+        "be-mixed": br"\be.625",
+        "be-mixed-repeat": br"\be1.125",
+        "be-multiple": br"\be2.75",
+        "gaussian-small": br"\blur.5",
+        "gaussian-medium": br"\blur1.5",
+        "gaussian-large": br"\blur3.25",
+        "combined": br"\be1.125\blur1.5\bord2\shad1",
+        "animated": br"\be0\blur0\t(0,2000,\be1.75\blur2)",
+        "clipped": br"\be.375\blur1.5\clip(280,140,310,165)",
+    }.items():
+        drawing = (br"{\an7\pos(280.125,140.375)\bord0\shad0\p1" + tags
+                   + br"}m 0 0 l 41 0 41 3 5 3 5 31 0 31{\p0}")
+        yield "raster-" + name, SEED.replace(br"{\pos(320,180)\bord2}COMPAT_TEXT", drawing)
     plain = SEED.replace(b"COMPAT_TEXT", b"Compatibility")
     # Exercise CreateSegments through the actual DLL, with overlapping glyphs
     # so entry order changes affect pixels. Sample every boundary below, then
@@ -258,10 +279,20 @@ def make_cases(files):
             "sha256": hashlib.sha256(dict(files)[path]).hexdigest(), "open": "memory",
             "width": width, "height": height, "stride_padding": padding, "bottom_up": bottom_up,
             "fill_seed": 173, "times": ["0", "1", "2", "4", "2"]})
+    for name in ("raster-be-mixed", "raster-gaussian-medium"):
+        path = DEST / "generated" / (name + ".ass")
+        for width, height, padding, bottom_up in ((641, 359, 12, False), (640, 360, 0, True)):
+            cases.append({"id": f"{name}-geometry-{width}-{height}", "script": path.relative_to(ROOT).as_posix(),
+                "sha256": hashlib.sha256(dict(files)[path]).hexdigest(), "open": "memory",
+                "width": width, "height": height, "stride_padding": padding, "bottom_up": bottom_up,
+                "fill_seed": 173, "times": ["0", "1", "2", "3.9999999", "4", "2", "1"]})
     return {"schema": 1, "description": "Starter differential corpus; not exhaustive compatibility evidence.",
             "expect_distinct_frames": [[a + "-" + mode, b + "-" + mode]
                                        for a, b in (("font-valid-attached", "font-valid-control"),
-                                                    ("drawing-state-spline-close-twice", "drawing-state-control"))
+                                                    ("drawing-state-spline-close-twice", "drawing-state-control"),
+                                                    ("raster-be-one", "raster-control"),
+                                                    ("raster-be-fraction-high", "raster-control"),
+                                                    ("raster-gaussian-medium", "raster-control"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 

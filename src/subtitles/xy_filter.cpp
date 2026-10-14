@@ -2,6 +2,7 @@
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_be_filter.h"
 #include "xy_rust_transpose.h"
+#include "xy_rust_byte_float.h"
 #endif
 #include "../dsutil/vd.h"
 
@@ -640,6 +641,11 @@ void xy_filter_sse(float *dst, int width, int height, int stride, const float *f
 void xy_byte_2_float_c(float *dst, int dst_width, int dst_stride, 
     PCUINT8 src, int width, int height, int stride)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (xy_vsfilter_byte_float(reinterpret_cast<uint32_t*>(dst), dst_width, dst_stride, src, width, height, stride)) {
+        return;
+    }
+#endif
     PUINT8 dst_byte = reinterpret_cast<PUINT8>(dst);
 
     PCUINT8 src_end = src + height*stride;
@@ -669,6 +675,11 @@ void xy_byte_2_float_sse(float *dst, int dst_width, int dst_stride,
 {
     ASSERT( dst_width>=width );
     ASSERT( ((reinterpret_cast<intptr_t>(dst)|dst_stride)&15)==0 );
+#ifdef XY_VSFILTER_RUST_TEXT
+    if ((((reinterpret_cast<uintptr_t>(dst) | static_cast<uintptr_t>(dst_stride)) & 15) == 0) && xy_vsfilter_byte_float(reinterpret_cast<uint32_t*>(dst), dst_width, dst_stride, src, width, height, stride)) {
+        return;
+    }
+#endif
     PUINT8 dst_byte = reinterpret_cast<PUINT8>(dst);
 
     PCUINT8 src_end = src + height*stride;

@@ -60,7 +60,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_segment_insert.h",
               ROOT / "include/xy_rust_hdmv.h",
               ROOT / "include/xy_rust_dvb.h", ROOT / "include/xy_rust_golomb.h", ROOT / "include/xy_rust_fill.h",
-              ROOT / "src/subtitles/Rasterizer.cpp", ROOT / "include/xy_rust_mask.h", ROOT / "include/xy_rust_bilinear.h", ROOT / "include/xy_rust_be_blur.h", ROOT / "include/xy_rust_be_filter.h", ROOT / "include/xy_rust_transpose.h",
+              ROOT / "src/subtitles/Rasterizer.cpp", ROOT / "include/xy_rust_mask.h", ROOT / "include/xy_rust_bilinear.h", ROOT / "include/xy_rust_be_blur.h", ROOT / "include/xy_rust_be_filter.h", ROOT / "include/xy_rust_transpose.h", ROOT / "include/xy_rust_byte_float.h",
               ROOT / "src/subtitles/xy_filter.cpp",
               ROOT / "src/dsutil/GolombBuffer.cpp", ROOT / "src/dsutil/GolombBuffer.h",
               ROOT / "src/subtitles/CompositionObject.cpp",
@@ -341,6 +341,15 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         hdmv += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     hdmv += "#endif\n"
     (destination / "original_hdmv.h").write_text(hdmv, encoding="utf-8")
+    byte_float = '#include "byte_float_shell.h"\n'
+    for name, content in (("ReferenceByteFloat", filter_source), ("CandidateByteFloat", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
+        byte_float += f"namespace {name} {{\n"
+        if name == "CandidateByteFloat":
+            byte_float += "#define XY_VSFILTER_RUST_TEXT\n"
+        byte_float += extract_definition(content.decode("utf-8-sig"), "void xy_byte_2_float_c(") + "\n"
+        byte_float += "#if BYTE_FLOAT_NATIVE_SSE\n" + extract_definition(content.decode("utf-8-sig"), "void xy_byte_2_float_sse(") + "\n#endif\n"
+        byte_float += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_byte_float.h").write_text(byte_float, encoding="utf-8")
     transpose = '#include "transpose_shell.h"\n'
     for name, content in (("ReferenceTranspose", filter_source), ("CandidateTranspose", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
         transpose += f"namespace {name} {{\n"
@@ -608,6 +617,14 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     float_transpose_result = run([str(float_transpose_executable)], capture_output=True, text=True)
     print(float_transpose_result.stdout, end="", flush=True)
     print(float_transpose_result.stderr, end="", file=sys.stderr)
+    byte_float_executable = destination / ("byte-float-oracle.exe" if os.name == "nt" else "byte-float-oracle")
+    byte_float_compile = [arg.replace("fill_oracle.cpp", "byte_float_oracle.cpp").replace("fill-oracle", "byte-float-oracle") for arg in fill_compile]
+    if os.name == "nt" and args.target and args.target.startswith("i686-"):
+        byte_float_compile.insert(1, "/arch:IA32")
+    run(byte_float_compile)
+    byte_float_result = run([str(byte_float_executable)], capture_output=True, text=True)
+    print(byte_float_result.stdout, end="", flush=True)
+    print(byte_float_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -640,6 +657,8 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "xy_filter_source_sha256": hashlib.sha256(filter_source).hexdigest(),
         "weighted_filter_compile_command": weighted_compile,
         "weighted_filter_result": weighted_result.stdout, "weighted_filter_stderr": weighted_result.stderr,
+        "byte_float_compile_command": byte_float_compile,
+        "byte_float_result": byte_float_result.stdout, "byte_float_stderr": byte_float_result.stderr,
         "float_transpose_compile_command": float_transpose_compile,
         "float_transpose_result": float_transpose_result.stdout, "float_transpose_stderr": float_transpose_result.stderr,
         "transpose_compile_command": transpose_compile,
