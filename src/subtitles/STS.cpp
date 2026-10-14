@@ -28,6 +28,7 @@
 #include "xy_rust_microdvd.h"
 #include "xy_rust_mpl2.h"
 #include "xy_rust_remove_tags.h"
+#include "xy_rust_case_replace.h"
 #include "xy_rust_webvtt.h"
 #include "xy_rust_fields.h"
 #include "xy_rust_segments.h"
@@ -1538,6 +1539,10 @@ static void ReplaceNoCase(CStringW& str, CStringW from, CStringW to)
 {
     CStringW lstr = str;
     lstr.MakeLower();
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::CaseReplace convert;
+    if(convert.Convert(str, lstr, from, to)) return;
+#endif
 
     int i, j, k;
 

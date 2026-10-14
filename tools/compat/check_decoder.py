@@ -55,7 +55,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
               ROOT / "include/xy_rust_drawing.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
-              ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
+              ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
               ROOT / "include/xy_rust_cc.h", ROOT / "src/subtitles/CCDecoder.cpp", ROOT / "src/subtitles/CCDecoder.h",
               ROOT / "include/xy_rust_segments.h",
@@ -209,7 +209,7 @@ public:
         microdvd += f"namespace {name} {{\n"
         if name == "CandidateMicroDVD":
             microdvd += "#define XY_VSFILTER_RUST_TEXT\n"
-        for signature in ("static DWORD CharSetToCodePage(", "static int FindChar(", "static CStringW MicroDVD2SSA(", "static CStringW MPL22SSA(", "static CStringW RemoveSSATags("):
+        for signature in ("static DWORD CharSetToCodePage(", "static int FindChar(", "static CStringW MicroDVD2SSA(", "static CStringW MPL22SSA(", "static CStringW RemoveSSATags(", "static void ReplaceNoCase("):
             decoded = content.decode("utf-8-sig")
             if signature == "static CStringW MicroDVD2SSA(":
                 # Its unmatched braces inside tag literals defeat brace counting.
@@ -231,6 +231,10 @@ public:
                 bridge = "XyRust::RemoveTags convert"
                 assert definition.count(bridge) == 1
                 definition = definition.replace(bridge, "XyRust::ObservedRemoveTags convert")
+            if name == "CandidateMicroDVD" and signature == "static void ReplaceNoCase(":
+                bridge = "XyRust::CaseReplace convert"
+                assert definition.count(bridge) == 1
+                definition = definition.replace(bridge, "XyRust::ObservedCaseReplace convert")
             microdvd += definition + "\n"
         microdvd += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_microdvd.h").write_text(microdvd, encoding="utf-8")
@@ -810,6 +814,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     remove_tags_result = run([str(remove_tags_executable)], capture_output=True, text=True)
     print(remove_tags_result.stdout, end="", flush=True)
     print(remove_tags_result.stderr, end="", file=sys.stderr)
+    case_replace_executable = destination / ("case-replace-oracle.exe" if os.name == "nt" else "case-replace-oracle")
+    case_replace_compile = [arg.replace("microdvd_oracle.cpp", "case_replace_oracle.cpp").replace("microdvd-oracle", "case-replace-oracle") for arg in microdvd_compile]
+    run(case_replace_compile)
+    case_replace_result = run([str(case_replace_executable)], capture_output=True, text=True)
+    print(case_replace_result.stdout, end="", flush=True)
+    print(case_replace_result.stderr, end="", file=sys.stderr)
     run(fill_compile)
     fill_result = run([str(fill_executable)], capture_output=True, text=True)
     print(fill_result.stdout, end="", flush=True)
@@ -1103,6 +1113,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "webvtt_compile_command": webvtt_compile,
         "webvtt_result": webvtt_result.stdout, "webvtt_stderr": webvtt_result.stderr,
         "webvtt_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring model with host iswspace; Windows comparison required",
+        "case_replace_compile_command": case_replace_compile,
+        "case_replace_result": case_replace_result.stdout, "case_replace_stderr": case_replace_result.stderr,
+        "case_replace_scope": "Whole ReplaceNoCase with native lowercase checkpoint, mutable caller text, source/from/to aliases and source mutations during lowercase; Windows ATL/CRT in CI; empty-needle nonterminating and replacement-bearing NUL outcomes excluded",
         "remove_tags_compile_command": remove_tags_compile,
         "remove_tags_result": remove_tags_result.stdout, "remove_tags_stderr": remove_tags_result.stderr,
         "remove_tags_scope": "Whole RemoveSSATags composed with both FindChar paths; native replacement-free NUL fallback; replacement-bearing NUL outcomes excluded; native Windows ATL/CRT and charset APIs in CI",

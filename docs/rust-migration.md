@@ -20,6 +20,24 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns `ReplaceNoCase` replacement/output construction after the
+  original native lowercase call. It preserves source case outside replacements,
+  leaves the needle's case untouched and never searches newly inserted text.
+  Empty needles, embedded NULs or source-length changes during lowercase retain
+  the native loop. Same-length caller mutations use fresh source data with the
+  original lowercase snapshot.
+  Fatal ASan/UBSan comparisons passed **288,330 calls** on arm64 and under x64
+  execution: **178,951 changed strings**, **3,419,309 output UTF-16 units**,
+  **4,047,187 callback observation values**, **12 interruptions**, **18 source
+  mutations**, **46 source/argument aliases**, **288,049 Rust conversions** and
+  **269 native fallbacks**. Every nonzero UTF-16 value, deletion/expansion,
+  nonrecursive replacement and stable replacement-free NULs are covered.
+  Nonterminating empty-needle and replacement-bearing NUL outcomes are excluded.
+  Six SAMI scripts and an italic visible-change control expand the rendering
+  corpus to **422 cases**. Rust 1.85 tests (84 core, 57 FFI), strict Clippy,
+  default syntax, corpus freshness and Python harness checks pass. Windows/Miri
+  and complete rendering validation are pending. Native lowercase, SAMI tag/color
+  parsing, allocation failure timing and full host integration remain.
 * Safe Rust owns `RemoveSSATags` text, brace-removal state and ordered text
   substitutions. Italic tags are converted before brace removal; the first
   charset-aware closing brace wins, an unterminated tail survives, and `\N`,
@@ -79,8 +97,10 @@ unresolved reference outcomes requiring investigation, never matching results.
   Literal fragments now pass through the original native CString append boundary
   before being copied into the Rust-owned output, preserving its truncation
   semantics without treating the portable string model as authoritative.
-  Corrected Windows/rendering validation remains pending. Fixture failure diagnostics and earlier text-adapter execution
-  remain in the harness for faster, reviewable failures.
+  Corrected candidate `8e7b8522` passed both Windows portable jobs
+  (x64 job `115709602067`, x86 job `115709602301`) and Miri (`115709601874`).
+  Complete portable/rendering evidence is still pending. Fixture failure
+  diagnostics and earlier text-adapter execution remain in the harness.
   Native tag conversion, input/line strings, allocation failure timing and host integration
   remain to be migrated or separately validated.
 * Safe Rust owns the charset-aware `FindChar` loop used by MicroDVD and other

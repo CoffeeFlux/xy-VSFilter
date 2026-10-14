@@ -81,6 +81,14 @@
     [
       "mpl2-format-italic-memory",
       "mpl2-format-control-memory"
+    ],
+    [
+      "sami-format-italic-file",
+      "sami-format-control-file"
+    ],
+    [
+      "sami-format-italic-memory",
+      "sami-format-control-memory"
     ]
   ],
   "cases": [
@@ -9658,6 +9666,222 @@
       "id": "mpl2-format-unicode-memory",
       "script": "test/compat/generated/mpl2-format-unicode.mpl",
       "sha256": "ca2197ae1d6e3c8f4a851ce899b06223d1c39ff7f0fe702513115216a117e183",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-format-control-file",
+      "script": "test/compat/generated/sami-format-control.smi",
+      "sha256": "8014971698c11feb8f31ea7a798877b94d71faf97d321e5a7a7f5a27e6b44d1e",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-format-control-memory",
+      "script": "test/compat/generated/sami-format-control.smi",
+      "sha256": "8014971698c11feb8f31ea7a798877b94d71faf97d321e5a7a7f5a27e6b44d1e",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-format-italic-file",
+      "script": "test/compat/generated/sami-format-italic.smi",
+      "sha256": "8b758bee08365e48097af6e199b9717093bd84d961c74d60e038000ae31e327a",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-format-italic-memory",
+      "script": "test/compat/generated/sami-format-italic.smi",
+      "sha256": "8b758bee08365e48097af6e199b9717093bd84d961c74d60e038000ae31e327a",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-format-uppercase-file",
+      "script": "test/compat/generated/sami-format-uppercase.smi",
+      "sha256": "9612d7bed39dd749a34b1f4503834debc5db886fa1c73892b9d226b276457685",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-format-uppercase-memory",
+      "script": "test/compat/generated/sami-format-uppercase.smi",
+      "sha256": "9612d7bed39dd749a34b1f4503834debc5db886fa1c73892b9d226b276457685",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-format-entities-file",
+      "script": "test/compat/generated/sami-format-entities.smi",
+      "sha256": "5edfe956fca84732631f0d975ccbc1eac9b8a99fd5d22e91d03d344d215db9b6",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-format-entities-memory",
+      "script": "test/compat/generated/sami-format-entities.smi",
+      "sha256": "5edfe956fca84732631f0d975ccbc1eac9b8a99fd5d22e91d03d344d215db9b6",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-format-mixed-file",
+      "script": "test/compat/generated/sami-format-mixed.smi",
+      "sha256": "143877dc843312fee5029cdb63911bf954317af60c862dd9bdf6854d4bec11f7",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-format-mixed-memory",
+      "script": "test/compat/generated/sami-format-mixed.smi",
+      "sha256": "143877dc843312fee5029cdb63911bf954317af60c862dd9bdf6854d4bec11f7",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-format-unicode-file",
+      "script": "test/compat/generated/sami-format-unicode.smi",
+      "sha256": "8b53d1e807b3c057e63ea1e6be9e323f12407906a760e604922d0257220ad484",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-format-unicode-memory",
+      "script": "test/compat/generated/sami-format-unicode.smi",
+      "sha256": "8b53d1e807b3c057e63ea1e6be9e323f12407906a760e604922d0257220ad484",
       "open": "memory",
       "width": 1280,
       "height": 720,

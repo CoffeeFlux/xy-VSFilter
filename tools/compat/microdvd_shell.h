@@ -4,6 +4,7 @@
 #include "xy_rust_microdvd.h"
 #include "xy_rust_mpl2.h"
 #include "xy_rust_remove_tags.h"
+#include "xy_rust_case_replace.h"
 #include <cstring>
 #include <algorithm>
 #include <csignal>
@@ -27,10 +28,12 @@ static void microDiagnostics(){
 #endif
 }
 static uint64_t microSearches=0,microSteps=0,microTagCallbacks=0;
+static void (*microHook)(unsigned)=NULL;
 static void microObserve(unsigned kind,const wchar_t* text){
     ++microTagCallbacks;searchObserve(kind,0);
     while(*text)searchEvents.push_back(static_cast<uint16_t>(*text++));
     searchEvents.push_back(0x10000);
+    if(microHook)microHook(kind);
 }
 class MicroString {
 #ifdef _WIN32
@@ -75,6 +78,21 @@ public:
 #else
         if(pos<0 || pos>=GetLength())return -1;
         const wchar_t* p=std::wcschr(text.c_str()+pos,c);return p?static_cast<int>(p-text.c_str()):-1;
+#endif
+    }
+    int Find(const wchar_t* needle,int pos=0)const{
+#ifdef _WIN32
+        return text.Find(needle,pos);
+#else
+        if(pos<0 || pos>=GetLength())return -1;
+        const wchar_t* p=std::wcsstr(text.c_str()+pos,needle);return p?static_cast<int>(p-text.c_str()):-1;
+#endif
+    }
+    int Insert(int pos,const wchar_t* value){
+#ifdef _WIN32
+        return text.Insert(pos,value);
+#else
+        pos=std::max(0,std::min(pos,GetLength()));text.insert(static_cast<size_t>(pos),value);return GetLength();
 #endif
     }
     MicroString Mid(int start)const{
@@ -183,9 +201,15 @@ static int microScan(const wchar_t* text,const wchar_t* fmt,int* x,wchar_t* c,un
 #endif
     if(result!=3){fprintf(stderr,"Fixture outside successful move-scan scope\n");std::abort();}return result;
 }
+static uint64_t replaceHandled=0,replaceFallbacks=0;
 static uint64_t removeHandled=0,removeFallbacks=0,removeSteps=0;
 static uint64_t mplHandled=0,mplFallbacks=0;
 namespace XyRust {
+class ObservedCaseReplace : public CaseReplace {
+public:
+    template<class String> bool Convert(String& source,const String& lowered,const String& from,const String& to){bool result=CaseReplace::Convert(source,lowered,from,to);if(result)++replaceHandled;else ++replaceFallbacks;return result;}
+};
+
 class ObservedRemoveTags : public RemoveTags {
 public:
     template<class String> explicit ObservedRemoveTags(const String& input):RemoveTags(input){if(Handled())++removeHandled;else ++removeFallbacks;}

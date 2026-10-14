@@ -62,3 +62,5 @@ pub mod microdvd;
 pub mod mpl2;
 
 pub mod remove_tags;
+
+pub mod case_replace;
