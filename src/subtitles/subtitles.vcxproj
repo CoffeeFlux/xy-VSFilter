@@ -52,7 +52,6 @@
   <ItemGroup>
     <ClCompile Include="BaseSub.cpp" />
     <ClCompile Include="cache_manager.cpp" />
-    <ClCompile Include="CCDecoder.cpp" />
     <ClCompile Include="CompositionObject.cpp" />
     <ClCompile Include="draw_item.cpp" />
     <ClCompile Include="DVBSub.cpp" />
@@ -93,7 +92,6 @@
   <ItemGroup>
     <ClInclude Include="BaseSub.h" />
     <ClInclude Include="cache_manager.h" />
-    <ClInclude Include="CCDecoder.h" />
     <ClInclude Include="CompositionObject.h" />
     <ClInclude Include="draw_item.h" />
     <ClInclude Include="DVBSub.h" />

@@ -58,7 +58,6 @@
   <ItemGroup>
     <ClCompile Include="DSMPropertyBag.cpp" />
     <ClCompile Include="DSUtil.cpp" />
-    <ClCompile Include="FontInstaller.cpp" />
     <ClCompile Include="GolombBuffer.cpp" />
     <ClCompile Include="H264Nalu.cpp" />
     <ClCompile Include="HdmvClipInfo.cpp" />
@@ -76,7 +75,6 @@
   <ItemGroup>
     <ClInclude Include="DSMPropertyBag.h" />
     <ClInclude Include="DSUtil.h" />
-    <ClInclude Include="FontInstaller.h" />
     <ClInclude Include="GolombBuffer.h" />
     <ClInclude Include="H264Nalu.h" />
     <ClInclude Include="HdmvClipInfo.h" />

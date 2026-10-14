@@ -21,9 +21,6 @@
     <ClCompile Include="DSUtil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FontInstaller.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MediaTypeEx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -63,9 +60,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DSUtil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FontInstaller.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MediaTypeEx.h">
