@@ -55,7 +55,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
               ROOT / "include/xy_rust_drawing.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
-              ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
+              ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
               ROOT / "include/xy_rust_cc.h", ROOT / "src/subtitles/CCDecoder.cpp", ROOT / "src/subtitles/CCDecoder.h",
               ROOT / "include/xy_rust_segments.h",
@@ -209,7 +209,7 @@ public:
         microdvd += f"namespace {name} {{\n"
         if name == "CandidateMicroDVD":
             microdvd += "#define XY_VSFILTER_RUST_TEXT\n"
-        for signature in ("static DWORD CharSetToCodePage(", "static int FindChar(", "static CStringW MicroDVD2SSA("):
+        for signature in ("static DWORD CharSetToCodePage(", "static int FindChar(", "static CStringW MicroDVD2SSA(", "static CStringW MPL22SSA("):
             decoded = content.decode("utf-8-sig")
             if signature == "static CStringW MicroDVD2SSA(":
                 # Its unmatched braces inside tag literals defeat brace counting.
@@ -223,6 +223,10 @@ public:
                 bridge = "XyRust::MicroDVD convert"
                 assert definition.count(bridge) == 1
                 definition = definition.replace(bridge, "XyRust::ObservedMicroDVD convert")
+            if name == "CandidateMicroDVD" and signature == "static CStringW MPL22SSA(":
+                bridge = "XyRust::MPL2 convert"
+                assert definition.count(bridge) == 1
+                definition = definition.replace(bridge, "XyRust::ObservedMPL2 convert")
             microdvd += definition + "\n"
         microdvd += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_microdvd.h").write_text(microdvd, encoding="utf-8")
@@ -237,6 +241,8 @@ public:
                 bridge = "XyRust::FindChar search"
                 assert definition.count(bridge) == 1
                 definition = definition.replace(bridge, "XyRust::ObservedSearch search")
+                assert definition.count("XyRust::FindUnicode(") == 1
+                definition = definition.replace("XyRust::FindUnicode(", "XyRust::ObservedUnicode(")
             find_char += definition + "\n"
         find_char += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_find_char.h").write_text(find_char, encoding="utf-8")
@@ -773,6 +779,27 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     fill_executable = destination / ("fill-oracle.exe" if os.name == "nt" else "fill-oracle")
     fill_compile = [arg.replace("hdmv_oracle.cpp", "fill_oracle.cpp")
                     .replace("hdmv-oracle", "fill-oracle") for arg in hdmv_compile]
+    # Check text adapters before the longer pixel campaigns for faster feedback.
+    find_char_executable = destination / ("find-char-oracle.exe" if os.name == "nt" else "find-char-oracle")
+    find_char_compile = [arg.replace("fill_oracle.cpp", "find_char_oracle.cpp").replace("fill-oracle", "find-char-oracle") for arg in fill_compile]
+    if os.name == "nt":
+        find_char_compile += ["/D_UNICODE", "/DUNICODE", "gdi32.lib"]
+    run(find_char_compile)
+    find_char_result = run([str(find_char_executable)], capture_output=True, text=True)
+    print(find_char_result.stdout, end="", flush=True)
+    print(find_char_result.stderr, end="", file=sys.stderr)
+    microdvd_executable = destination / ("microdvd-oracle.exe" if os.name == "nt" else "microdvd-oracle")
+    microdvd_compile = [arg.replace("find_char_oracle.cpp", "microdvd_oracle.cpp").replace("find-char-oracle", "microdvd-oracle") for arg in find_char_compile]
+    run(microdvd_compile)
+    microdvd_result = run([str(microdvd_executable)], capture_output=True, text=True)
+    print(microdvd_result.stdout, end="", flush=True)
+    print(microdvd_result.stderr, end="", file=sys.stderr)
+    mpl2_executable = destination / ("mpl2-oracle.exe" if os.name == "nt" else "mpl2-oracle")
+    mpl2_compile = [arg.replace("microdvd_oracle.cpp", "mpl2_oracle.cpp").replace("microdvd-oracle", "mpl2-oracle") for arg in microdvd_compile]
+    run(mpl2_compile)
+    mpl2_result = run([str(mpl2_executable)], capture_output=True, text=True)
+    print(mpl2_result.stdout, end="", flush=True)
+    print(mpl2_result.stderr, end="", file=sys.stderr)
     run(fill_compile)
     fill_result = run([str(fill_executable)], capture_output=True, text=True)
     print(fill_result.stdout, end="", flush=True)
@@ -900,20 +927,6 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     vobsub_path_result = run([str(vobsub_path_executable)], capture_output=True, text=True)
     print(vobsub_path_result.stdout, end="", flush=True)
     print(vobsub_path_result.stderr, end="", file=sys.stderr)
-    find_char_executable = destination / ("find-char-oracle.exe" if os.name == "nt" else "find-char-oracle")
-    find_char_compile = [arg.replace("fill_oracle.cpp", "find_char_oracle.cpp").replace("fill-oracle", "find-char-oracle") for arg in fill_compile]
-    if os.name == "nt":
-        find_char_compile += ["/D_UNICODE", "/DUNICODE", "gdi32.lib"]
-    run(find_char_compile)
-    find_char_result = run([str(find_char_executable)], capture_output=True, text=True)
-    print(find_char_result.stdout, end="", flush=True)
-    print(find_char_result.stderr, end="", file=sys.stderr)
-    microdvd_executable = destination / ("microdvd-oracle.exe" if os.name == "nt" else "microdvd-oracle")
-    microdvd_compile = [arg.replace("find_char_oracle.cpp", "microdvd_oracle.cpp").replace("find-char-oracle", "microdvd-oracle") for arg in find_char_compile]
-    run(microdvd_compile)
-    microdvd_result = run([str(microdvd_executable)], capture_output=True, text=True)
-    print(microdvd_result.stdout, end="", flush=True)
-    print(microdvd_result.stderr, end="", file=sys.stderr)
     subrip_executable = destination / ("subrip-oracle.exe" if os.name == "nt" else "subrip-oracle")
     subrip_compile = [arg.replace("fill_oracle.cpp", "subrip_oracle.cpp").replace("fill-oracle", "subrip-oracle") for arg in fill_compile]
     run(subrip_compile)
@@ -1080,12 +1093,15 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "webvtt_compile_command": webvtt_compile,
         "webvtt_result": webvtt_result.stdout, "webvtt_stderr": webvtt_result.stderr,
         "webvtt_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring model with host iswspace; Windows comparison required",
+        "mpl2_compile_command": mpl2_compile,
+        "mpl2_result": mpl2_result.stdout, "mpl2_stderr": mpl2_result.stderr,
+        "mpl2_scope": "Whole MPL22SSA composed with MicroDVD and FindChar; native NUL-without-replacement fallback; tag/replacement-bearing NUL outcomes excluded; Windows ATL/CRT and charset APIs in CI",
         "microdvd_compile_command": microdvd_compile,
         "microdvd_result": microdvd_result.stdout, "microdvd_stderr": microdvd_result.stderr,
         "microdvd_scope": "Complete MicroDVD2SSA and charset scanner against pinned reference; Windows ATL/CRT and charset APIs in CI, portable models locally; valid numeric scans, native callback interruptions, raw UTF-16 and embedded NULs",
         "find_char_compile_command": find_char_compile,
         "find_char_result": find_char_result.stdout, "find_char_stderr": find_char_result.stderr,
-        "find_char_scope": "Native charset-aware FindChar and Unicode CString path; actual Windows ATL, charset and lead-byte APIs in Windows CI, portable model elsewhere; classification order and injected interruptions; representable charset arithmetic only",
+        "find_char_scope": "Native charset-aware FindChar and Unicode NUL/start/sentinel comparisons; actual Windows ATL, charset and lead-byte APIs in Windows CI, portable model elsewhere; classification order and injected interruptions; representable charset arithmetic only",
         "subrip_compile_command": subrip_compile,
         "subrip_result": subrip_result.stdout, "subrip_stderr": subrip_result.stderr,
         "subrip_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring replacement model; Windows comparison required",

@@ -73,6 +73,14 @@
     [
       "microdvd-format-italic-memory",
       "microdvd-format-control-memory"
+    ],
+    [
+      "mpl2-format-italic-file",
+      "mpl2-format-control-file"
+    ],
+    [
+      "mpl2-format-italic-memory",
+      "mpl2-format-control-memory"
     ]
   ],
   "cases": [
@@ -9434,6 +9442,222 @@
       "id": "microdvd-format-mixed-memory",
       "script": "test/compat/generated/microdvd-format-mixed.sub",
       "sha256": "d2670a0cd0310d9d0377aa08a18581dd9c288bb7176f747964c1794c3c97fc61",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "mpl2-format-control-file",
+      "script": "test/compat/generated/mpl2-format-control.mpl",
+      "sha256": "200289a7060934ab8bd05e82e5d97ebcb1a000bafd71c68c37b0e4492fc9246c",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "mpl2-format-control-memory",
+      "script": "test/compat/generated/mpl2-format-control.mpl",
+      "sha256": "200289a7060934ab8bd05e82e5d97ebcb1a000bafd71c68c37b0e4492fc9246c",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "mpl2-format-italic-file",
+      "script": "test/compat/generated/mpl2-format-italic.mpl",
+      "sha256": "ee44a09f6e73603763121c99c37509ccca7d792af353d3e037db66049546d5d7",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "mpl2-format-italic-memory",
+      "script": "test/compat/generated/mpl2-format-italic.mpl",
+      "sha256": "ee44a09f6e73603763121c99c37509ccca7d792af353d3e037db66049546d5d7",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "mpl2-format-interior-slash-file",
+      "script": "test/compat/generated/mpl2-format-interior-slash.mpl",
+      "sha256": "2aeefa5678eb95cf8c102625f65c32419a34788606f680afebf035d27924d08e",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "mpl2-format-interior-slash-memory",
+      "script": "test/compat/generated/mpl2-format-interior-slash.mpl",
+      "sha256": "2aeefa5678eb95cf8c102625f65c32419a34788606f680afebf035d27924d08e",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "mpl2-format-empty-lines-file",
+      "script": "test/compat/generated/mpl2-format-empty-lines.mpl",
+      "sha256": "a81cfd25ca9e7469e43887ddc74992452b1f210577cc7afedf1f1bd0f6706bf0",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "mpl2-format-empty-lines-memory",
+      "script": "test/compat/generated/mpl2-format-empty-lines.mpl",
+      "sha256": "a81cfd25ca9e7469e43887ddc74992452b1f210577cc7afedf1f1bd0f6706bf0",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "mpl2-format-mixed-file",
+      "script": "test/compat/generated/mpl2-format-mixed.mpl",
+      "sha256": "a99e38ead1f5da46398d1d6f3aefe0484c06ec58d48a2bb5f1859928b525d380",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "mpl2-format-mixed-memory",
+      "script": "test/compat/generated/mpl2-format-mixed.mpl",
+      "sha256": "a99e38ead1f5da46398d1d6f3aefe0484c06ec58d48a2bb5f1859928b525d380",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "mpl2-format-unicode-file",
+      "script": "test/compat/generated/mpl2-format-unicode.mpl",
+      "sha256": "ca2197ae1d6e3c8f4a851ce899b06223d1c39ff7f0fe702513115216a117e183",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "mpl2-format-unicode-memory",
+      "script": "test/compat/generated/mpl2-format-unicode.mpl",
+      "sha256": "ca2197ae1d6e3c8f4a851ce899b06223d1c39ff7f0fe702513115216a117e183",
       "open": "memory",
       "width": 1280,
       "height": 720,

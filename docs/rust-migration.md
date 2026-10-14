@@ -20,6 +20,22 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust performs MPL2's leading-slash and pipe-slash preprocessing, retaining
+  native handling for embedded-NUL replacement inputs. It also implements the
+  Unicode `FindChar` branch: searches start at the requested code-unit offset,
+  stop at the next NUL, can match the implicit terminator, and reject a start at
+  `GetLength` even when searching for NUL. Negative native starts retain the
+  existing native path.
+  Fatal ASan/UBSan comparisons passed **185,177 whole MPL2 conversions** on arm64
+  and under x64 execution: **180,932 changed strings**, **3,563,191 output UTF-16
+  units**, **8,633,053 callback observation values**, **199 interruptions**,
+  **184,921 Rust preparations** and **256 stable NUL fallbacks**. Replacement-
+  bearing NUL outcomes are excluded. The **487,996 scanner comparisons** now
+  include **101,110 observed Rust Unicode searches**, and all **171,094 MicroDVD
+  conversions** still match. Six MPL2 fixtures, including UTF-16 input and a
+  visible italic control, expand the rendering corpus to **410 cases**.
+  Rust 1.85 tests (81 core, 55 FFI), strict Clippy, default syntax and Python
+  harness checks pass. Windows/Miri and whole-renderer validation are pending.
 * Safe Rust owns MicroDVD conversion's line/tag state, output code units and
   style restore mask. The native adapter retains `FindChar`, `CStringW::Mid`,
   tag classification, case conversion, numeric scans and formatting. Unknown
@@ -36,8 +52,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   restrict arithmetic to representable results. Windows CI uses actual ATL/CRT;
   portable string/format models are preliminary evidence only. Rust 1.85 tests
   (79 core, 53 FFI), strict Clippy, default syntax and corpus freshness pass.
-  Windows/Miri and complete rendering validation are pending. Native tag
-  conversion, input/line strings, allocation failure timing and host integration
+  Miri passed for `794d9609`; its initial Windows x64 portable comparison stopped
+  with native process exit `0xc0000409` and no fixture diagnostic. This is not
+  passing evidence. The harness now reports fixture context for CRT rejection,
+  abort and uncaught exceptions, and runs these adapters before long pixel
+  campaigns. Investigation and Windows/rendering validation remain pending.
+  Native tag conversion, input/line strings, allocation failure timing and host integration
   remain to be migrated or separately validated.
 * Safe Rust owns the charset-aware `FindChar` loop used by MicroDVD and other
   text paths: lead-byte skipping, nested style depth, the original search offset,
@@ -70,8 +90,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   oracle still passes **149,740 sequences / 170,720 DecodeCC calls**, with
   **78,850 Rust text selections and zero native fallbacks** across bounded cases.
   Rust 1.85 tests (75 core, 51 FFI), strict Clippy and default syntax checks pass.
-  Windows/Miri validation is pending. The native display backing, subtitle sink
-  and file/ripper interfaces remain separate migration/integration work.
+  Candidate `830bd308` passed all four portable platforms, Miri and both Windows
+  DLL jobs, each matching **382 cases / 4,490 frames** and **32 mutations / 224
+  frames**, plus dialogs, visible controls, exports and dependencies. Both logs
+  confirm Rust-enabled `CCDecoder.cpp` compilation. [Display evidence](cc-display-evidence.json)
+  records verified hashes and stable local validation. Native display backing,
+  subtitle sink and file/ripper interfaces remain separate integration work.
 * Safe Rust owns the `DecodeCC` byte-loop state, character tables and command
   selection. Raw parity bytes are matched exactly; doubled controls consume both
   pairs and retain the second pair's timestamp index. Ignored controls, trailing
