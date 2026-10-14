@@ -145,6 +145,22 @@
     [
       "subrip-cue-number-in-caption-memory",
       "subrip-cue-control-memory"
+    ],
+    [
+      "old-subrip-pipes-file",
+      "old-subrip-control-file"
+    ],
+    [
+      "old-subrip-pipes-memory",
+      "old-subrip-control-memory"
+    ],
+    [
+      "vplayer-pipes-file",
+      "vplayer-control-file"
+    ],
+    [
+      "vplayer-pipes-memory",
+      "vplayer-control-memory"
     ]
   ],
   "cases": [
@@ -9290,6 +9306,294 @@
       "id": "subrip-cue-final-no-newline-memory",
       "script": "test/compat/generated/subrip-cue-final-no-newline.srt",
       "sha256": "cf7a09f54ca07c80e90449d48819595854b9b8ee1fd57c51fd0d7c83fac449dd",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "old-subrip-control-file",
+      "script": "test/compat/generated/old-subrip-control.sub",
+      "sha256": "cf2f2f4719f6574f79481a41c08d4b0086395b251f330662490df666dbc5d081",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "old-subrip-control-memory",
+      "script": "test/compat/generated/old-subrip-control.sub",
+      "sha256": "cf2f2f4719f6574f79481a41c08d4b0086395b251f330662490df666dbc5d081",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "old-subrip-pipes-file",
+      "script": "test/compat/generated/old-subrip-pipes.sub",
+      "sha256": "2dc6be8f1c713636c24ea6c1c2a2515305f354f8bd1d87a23fd62a77e8fac83d",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "old-subrip-pipes-memory",
+      "script": "test/compat/generated/old-subrip-pipes.sub",
+      "sha256": "2dc6be8f1c713636c24ea6c1c2a2515305f354f8bd1d87a23fd62a77e8fac83d",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "old-subrip-repeated-pipes-file",
+      "script": "test/compat/generated/old-subrip-repeated-pipes.sub",
+      "sha256": "4b72eb3888780701ef1d5340fd7435edade115bcd0bfcb5403643b432a4c3516",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "old-subrip-repeated-pipes-memory",
+      "script": "test/compat/generated/old-subrip-repeated-pipes.sub",
+      "sha256": "4b72eb3888780701ef1d5340fd7435edade115bcd0bfcb5403643b432a4c3516",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "old-subrip-unicode-file",
+      "script": "test/compat/generated/old-subrip-unicode.sub",
+      "sha256": "39049fd1cee07df4525160395b47c41fcbcbdeabeafbc3ea2532214d3c6b8f3f",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "old-subrip-unicode-memory",
+      "script": "test/compat/generated/old-subrip-unicode.sub",
+      "sha256": "39049fd1cee07df4525160395b47c41fcbcbdeabeafbc3ea2532214d3c6b8f3f",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "vplayer-control-file",
+      "script": "test/compat/generated/vplayer-control.txt",
+      "sha256": "5ee04bb8fe79520a96d9e303347a6ee64c34a9a3f7b89f7f9ecd47dde9998565",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "vplayer-control-memory",
+      "script": "test/compat/generated/vplayer-control.txt",
+      "sha256": "5ee04bb8fe79520a96d9e303347a6ee64c34a9a3f7b89f7f9ecd47dde9998565",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "vplayer-pipes-file",
+      "script": "test/compat/generated/vplayer-pipes.txt",
+      "sha256": "fa9272912ed6c416cf8fcbe572a35add2ac84d6dca7f46067737d04af729dcf9",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "vplayer-pipes-memory",
+      "script": "test/compat/generated/vplayer-pipes.txt",
+      "sha256": "fa9272912ed6c416cf8fcbe572a35add2ac84d6dca7f46067737d04af729dcf9",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "vplayer-repeated-pipes-file",
+      "script": "test/compat/generated/vplayer-repeated-pipes.txt",
+      "sha256": "a80eb92ccd05b5eb1b8d40323e546cfc617ad9a6ff013691c11434ace6c248cf",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "vplayer-repeated-pipes-memory",
+      "script": "test/compat/generated/vplayer-repeated-pipes.txt",
+      "sha256": "a80eb92ccd05b5eb1b8d40323e546cfc617ad9a6ff013691c11434ace6c248cf",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "vplayer-unicode-file",
+      "script": "test/compat/generated/vplayer-unicode.txt",
+      "sha256": "6bfc9ed8f2a1ab57583d8b192377c01528f1d2657880a2ce284a1668e0aeb49f",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "vplayer-unicode-memory",
+      "script": "test/compat/generated/vplayer-unicode.txt",
+      "sha256": "6bfc9ed8f2a1ab57583d8b192377c01528f1d2657880a2ce284a1668e0aeb49f",
       "open": "memory",
       "width": 1280,
       "height": 720,

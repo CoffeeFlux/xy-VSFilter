@@ -276,6 +276,20 @@ def subrip_cue_variants():
         yield "subrip-cue-" + name + ".srt", ("1\r\n" + timing + body).encode("ascii")
 
 
+def legacy_pipe_variants():
+    for kind, header, suffix in (("old-subrip", "{0:0:0}{0:0:4}", ".sub"),
+                                 ("vplayer", "0:0:0:", ".txt")):
+        for name, payload in {
+            "control": "Formatting sample second line",
+            "pipes": "Formatting sample|second line",
+            "repeated-pipes": "Formatting sample||second line|",
+            "unicode": "Formatting \u03b1sample|second line",
+        }.items():
+            text = header + payload + "\r\n"
+            data = b"\xff\xfe" + text.encode("utf-16le") if name == "unicode" else text.encode("ascii")
+            yield kind + "-" + name + suffix, data
+
+
 def realtext_variants():
     for name, payload in {
         "control": "Formatting sample<br/>second line",
@@ -511,7 +525,9 @@ def make_cases(files):
                                                     ("ass-header-scaled-substring", "ass-header-scaled-control"),
                                                     ("microdvd-style-italic", "microdvd-style-control"),
                                                     ("sami-file-title-skips-sync", "sami-file-control"),
-                                                    ("subrip-cue-number-in-caption", "subrip-cue-control"))
+                                                    ("subrip-cue-number-in-caption", "subrip-cue-control"),
+                                                    ("old-subrip-pipes", "old-subrip-control"),
+                                                    ("vplayer-pipes", "vplayer-control"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -524,6 +540,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in incremental_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in subrip_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in subrip_cue_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in legacy_pipe_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in realtext_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_header_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_style_variants()]

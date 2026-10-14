@@ -20,6 +20,35 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns the legacy SubRip and VPlayer line buffers and pipe-replacement
+  cursor. Each search retains native FindChar/IsUnicode callback order, DBCS
+  handling and inline charset changes; numeric scans, payload slicing, timestamp
+  calculations, failed-read handling and final Add remain native.
+  Fatal ASan/UBSan comparisons passed **328,298 complete file parses** on arm64
+  and under x64 execution: **33,798 accepted / 293,952 rejected / 548 interrupted**,
+  **34,122 Add records / 35,872 emitted newlines**, **43,456,970 callback
+  observation values**, and **328,026 Rust owners / 606,526 search replies**.
+  Every UTF-16 value is tested in Unicode and packed-byte modes, with all caller
+  charsets, repeated pipes, malformed delimiters, partial scans and input positions.
+  The native macOS C-locale scanner rejects many lines with non-ASCII payloads;
+  those are preserved outcomes, not Windows parsing evidence. Windows uses actual
+  ATL strings, CRT scans and codepage APIs. File/trim/Add boundaries are controlled
+  and numeric fixtures use representable arithmetic.
+  Eight legacy-format scripts and two pipe-layout visible controls expand renderer
+  validation to **554 cases**. Rust 1.85 tests (105 core, 69 FFI), strict Clippy,
+  default syntax and Python harness checks pass. Windows/Miri and full renderer
+  validation are pending; native numeric/file/sink and host behavior remain.
+* SubRip cue helper run
+  [38535443165](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38535443165)
+  passed on Windows x64 but failed compilation on Win32: the test string wrapper
+  lacked ATL's exact `char` concatenation overload, making `tmp + '\n'` ambiguous.
+  Adding that overload delegates to the actual ATL operation on Windows. The
+  Win32 failure is not passing evidence; full validation uses the corrected shell.
+* MicroDVD named-style Windows x86/x64 renderer checks passed **506 cases /
+  5,442 frames** per architecture, plus **32 mutation cases / 224 frames**, with
+  matching dialogs, visible controls, exports and declared dependencies. All four
+  platform reports and Miri passed; isolated local ASan/UBSan evidence is complete.
+  See [verified named-style evidence](microdvd-style-evidence.json).
 * Safe Rust owns SubRip caption accumulation and the persistent blank-line flag.
   A standalone numeric line terminates a caption only after a blank line has
   occurred, including when other text intervenes. That numbering line is consumed.
@@ -80,8 +109,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   allocation failures are excluded.
   Six named-style MicroDVD scripts and an italic visible control expand renderer
   validation to **506 cases**. Rust 1.85 tests (100 core, 66 FFI), strict Clippy,
-  default syntax and Python harness checks pass. Windows/Miri and full renderer
-  validation are pending. Native numeric/case behavior, the file loader/style
+  default syntax and Python harness checks pass. Completed Windows/Miri and
+  renderer evidence is linked above. Native numeric/case behavior, the file loader/style
   map and real-host integration remain separate work.
 * Embedded-font buffering Windows x86/x64 renderer checks passed **494 cases /
   5,370 frames** per architecture, plus **32 mutation cases / 224 frames**, with
@@ -103,8 +132,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   registration is modeled in the extracted harness; the existing attached-font
   rendering fixtures remain the DLL integration check.
   Rust 1.85 tests (98 core, 65 FFI), strict Clippy, default syntax and corpus
-  freshness pass. Windows/Miri and full renderer validation are pending. Native
-  file/trim behavior, OS font resources and real host integration remain separate.
+  freshness pass. Completed Windows/Miri and renderer evidence is linked above.
+  Native file/trim behavior, OS font resources and real host integration remain separate.
 * ASS header Windows x86/x64 renderer checks passed **494 cases / 5,370 frames**
   per architecture, plus **32 mutation cases / 224 frames**, with matching
   dialogs, visible controls, exports and declared dependencies. All four
@@ -131,8 +160,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   boundaries; their full integration is not established by this extracted test.
   Eight header scripts and a scaled-border visible control expand renderer
   validation to **494 cases**. Rust 1.85 tests (96 core, 64 FFI), strict Clippy,
-  default syntax and Python harness checks pass. Windows/Miri and full renderer
-  validation are pending. Native numeric/floating behavior, line/file ownership,
+  default syntax and Python harness checks pass. Completed Windows/Miri and
+  renderer evidence is linked above. Native numeric/floating behavior, line/file ownership,
   font registration and complete host integration remain separate work.
 * Safe Rust owns ASS style remainder buffers, version-dependent field order and
   integer normalization. Legacy outline-color remapping, alpha clamping, negative

@@ -144,6 +144,13 @@ public:
     MicroString& operator+=(const MicroString& p){text+=p.text;return *this;}
     MicroString& operator+=(const wchar_t* p){text+=p;return *this;}
     MicroString& operator+=(wchar_t p){text+=p;return *this;}
+    friend MicroString operator+(const MicroString& prefix,char suffix){
+#ifdef _WIN32
+        auto result=prefix.text+suffix;return MicroString(result.GetString(),result.GetLength());
+#else
+        MicroString result(prefix);result+=static_cast<wchar_t>(suffix);return result;
+#endif
+    }
     friend MicroString operator+(const MicroString& prefix,wchar_t suffix){
 #ifdef _WIN32
         auto result=prefix.text+suffix;return MicroString(result.GetString(),result.GetLength());

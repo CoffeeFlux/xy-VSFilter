@@ -82,3 +82,5 @@ pub mod microdvd_style;
 pub mod sami_file;
 
 pub mod subrip_cue;
+
+pub mod pipe_line;
