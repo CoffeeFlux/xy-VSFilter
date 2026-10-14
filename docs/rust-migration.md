@@ -20,6 +20,22 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust selects circular outline segments for `GrabSegment`, preserving
+  zero-direction skipping, the first repeated direction, wrapped midpoint
+  indices, signed coordinate rounding and the returned previous-corner index.
+  Native output clearing and paired point/direction appends retain their order.
+  Only the entries actually used by selection are read; unused native entries
+  need not be initialized. Copying selected interior points remains live after
+  append callbacks, and the original pre-append point count stays fixed.
+  Local fatal ASan/UBSan comparisons passed **86,376 cases** on arm64 and under
+  x64 execution, including **9,811 no-segment assertions**, **168 injected append
+  interruptions**, **697,820 point/direction append attempts** and **2,344 input
+  mutations during append callbacks**. There were **76,562 Rust selections** and
+  **9,814 native fallbacks**. Tests compare ordered events, partial paired arrays,
+  return values and mutated input. Unsupported counts, layouts and arithmetic
+  retain native handling; container operations are modeled in the oracle.
+  Rust tests (56 core, 34 FFI), strict Clippy and both default native branch syntax
+  checks pass. Windows/Miri validation is pending for this increment.
 * Safe Rust creates DVD outline masks from alpha, finds the original zero-to-one
   starting transitions, and advances the integer outline walker. It preserves
   equality-to-one neighbor tests, marked-byte wrapping, point locations and turn
