@@ -42,6 +42,8 @@ template<typename T> struct DrawingArray : std::vector<T> {
     void Add(const T& item) { this->push_back(item); }
     void SetCount(size_t count) { this->resize(count); }
     void RemoveAll() { this->clear(); }
+    void Copy(const DrawingArray& source){this->assign(source.begin(),source.end());}
+    T* GetData(){return this->data();}
 };
 
 #define DRAWING_SHELL(Name) \
@@ -50,6 +52,7 @@ public: \
     CStringW m_str; \
     DrawingArray<BYTE> m_pathTypesOrg; \
     DrawingArray<CPoint> m_pathPointsOrg; \
+    XyRust::DrawingPath m_pathOrg; \
     std::vector<uint64_t> requests; \
     explicit Name(const std::vector<DrawingToken>& tokens) : m_str(tokens) {} \
     bool GetPOINT(CStringW& token, CPoint& p) { \

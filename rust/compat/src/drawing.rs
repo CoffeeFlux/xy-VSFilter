@@ -23,7 +23,7 @@ pub struct Vertex {
     pub point: Point,
 }
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct Drawing {
     vertices: Vec<Vertex>,
     first_move: Option<usize>,
@@ -33,6 +33,19 @@ pub struct Drawing {
 }
 
 impl Drawing {
+    pub fn clear(&mut self) {
+        *self = Self::default();
+    }
+
+    pub fn set_point(&mut self, index: usize, point: Point) -> bool {
+        if let Some(vertex) = self.vertices.get_mut(index) {
+            vertex.point = point;
+            true
+        } else {
+            false
+        }
+    }
+
     pub fn vertices(&self) -> &[Vertex] {
         &self.vertices
     }

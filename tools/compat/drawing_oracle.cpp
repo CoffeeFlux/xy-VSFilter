@@ -9,12 +9,14 @@ static void check(const std::vector<DrawingToken>& tokens, bool cached=false) {
     OriginalDrawing original(tokens);
     CandidateDrawing candidate(tokens);
     if (cached) {
-        original.m_pathTypesOrg.Add(PT_MOVETO); candidate.m_pathTypesOrg.Add(PT_MOVETO);
-        original.m_pathPointsOrg.Add(CPoint(7, 9)); candidate.m_pathPointsOrg.Add(CPoint(7, 9));
+        original.m_pathTypesOrg.Add(PT_MOVETO);original.m_pathPointsOrg.Add(CPoint(7, 9));
+        candidate.m_pathOrg.Command(109);candidate.m_pathOrg.Point(7,9);candidate.m_pathOrg.NoPoint();candidate.m_pathOrg.Finish();
     }
     const bool a = original.ParseStr(), b = candidate.ParseStr();
-    if (a != b || original.m_pathTypesOrg != candidate.m_pathTypesOrg ||
-        original.m_pathPointsOrg != candidate.m_pathPointsOrg || original.requests != candidate.requests) {
+    DrawingArray<BYTE> types;DrawingArray<CPoint> points;
+    for(size_t i=0;i<candidate.m_pathOrg.Count();++i){types.Add(candidate.m_pathOrg.Type(i));points.Add(candidate.m_pathOrg.GetPoint<CPoint>(i));}
+    if (a != b || original.m_pathTypesOrg != types ||
+        original.m_pathPointsOrg != points || original.requests != candidate.requests) {
         fprintf(stderr, "Drawing mismatch at comparison %llu:", static_cast<unsigned long long>(comparisons));
         for (const auto& token : tokens) fprintf(stderr, " %04x/%zu", static_cast<unsigned>(token.command), token.points.size());
         fprintf(stderr, "\n"); exit(1);

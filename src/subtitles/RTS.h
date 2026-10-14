@@ -31,6 +31,7 @@
 #include "xy_int_map.h"
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_layout.h"
+#include "xy_rust_drawing.h"
 #endif
 
 //how hard positioned is the ass cmd 
@@ -152,8 +153,12 @@ class CPolygon : public CWord
 protected:
     double            m_scalex, m_scaley;
     int               m_baseline;
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::DrawingPath m_pathOrg;
+#else
     CAtlArray<BYTE>   m_pathTypesOrg;
     CAtlArray<CPoint> m_pathPointsOrg;
+#endif
 
     virtual bool CreatePath(PathData* path_data);
 

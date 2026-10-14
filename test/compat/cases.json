@@ -193,6 +193,14 @@
     [
       "line-layout-align-1-memory",
       "line-layout-align-9-memory"
+    ],
+    [
+      "drawing-storage-control-file",
+      "drawing-storage-fractional-scale-file"
+    ],
+    [
+      "drawing-storage-control-memory",
+      "drawing-storage-fractional-scale-memory"
     ]
   ],
   "cases": [
@@ -11718,6 +11726,270 @@
       "id": "drawing-prepare-tab-memory",
       "script": "test/compat/generated/drawing-prepare-tab.ass",
       "sha256": "c8a86684e6358559db395bbf47237ac12d28b2b53fc418a58f7506daa6f474e2",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-storage-control-file",
+      "script": "test/compat/generated/drawing-storage-control.ass",
+      "sha256": "4a4d7b3b788c99552bab2682ab53c3cf47f52597a1259b8fb618ac7d52b9ae67",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-storage-control-memory",
+      "script": "test/compat/generated/drawing-storage-control.ass",
+      "sha256": "4a4d7b3b788c99552bab2682ab53c3cf47f52597a1259b8fb618ac7d52b9ae67",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-storage-fractional-scale-file",
+      "script": "test/compat/generated/drawing-storage-fractional-scale.ass",
+      "sha256": "9d23a453e90792af6381176d1f41f3b73db7d5b29d3522ea70ccb40285baed2a",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-storage-fractional-scale-memory",
+      "script": "test/compat/generated/drawing-storage-fractional-scale.ass",
+      "sha256": "9d23a453e90792af6381176d1f41f3b73db7d5b29d3522ea70ccb40285baed2a",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-storage-drawing-scale-two-file",
+      "script": "test/compat/generated/drawing-storage-drawing-scale-two.ass",
+      "sha256": "71d231175036d83d6a2f943fee07110b7956c18df79de3fe473978c8549e356b",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-storage-drawing-scale-two-memory",
+      "script": "test/compat/generated/drawing-storage-drawing-scale-two.ass",
+      "sha256": "71d231175036d83d6a2f943fee07110b7956c18df79de3fe473978c8549e356b",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-storage-spline-copy-file",
+      "script": "test/compat/generated/drawing-storage-spline-copy.ass",
+      "sha256": "03d414e10e1ff90a8467c66c282253c2201502125293986ab081ac42ef6f9c1a",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-storage-spline-copy-memory",
+      "script": "test/compat/generated/drawing-storage-spline-copy.ass",
+      "sha256": "03d414e10e1ff90a8467c66c282253c2201502125293986ab081ac42ef6f9c1a",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-storage-vector-clip-file",
+      "script": "test/compat/generated/drawing-storage-vector-clip.ass",
+      "sha256": "6cb0b8a0276cb7d4659b57e836c1336a7ab8cd17d41adac07852a2fe7926dd9a",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-storage-vector-clip-memory",
+      "script": "test/compat/generated/drawing-storage-vector-clip.ass",
+      "sha256": "6cb0b8a0276cb7d4659b57e836c1336a7ab8cd17d41adac07852a2fe7926dd9a",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-storage-inverse-clip-file",
+      "script": "test/compat/generated/drawing-storage-inverse-clip.ass",
+      "sha256": "859cb06aab81044e0e0a1519165af109f56ab55a90204d0395a3b5a87fb693b9",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "drawing-storage-inverse-clip-memory",
+      "script": "test/compat/generated/drawing-storage-inverse-clip.ass",
+      "sha256": "859cb06aab81044e0e0a1519165af109f56ab55a90204d0395a3b5a87fb693b9",
       "open": "memory",
       "width": 1280,
       "height": 720,
