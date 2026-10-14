@@ -20,6 +20,31 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns SubRip caption accumulation and the persistent blank-line flag.
+  A standalone numeric line terminates a caption only after a blank line has
+  occurred, including when other text intervenes. That numbering line is consumed.
+  Failed reads carrying nonempty text still contribute to the final caption.
+  Native timestamp/number scanning, trimming, CString fragment concatenation,
+  formatting conversion, final Add and return behavior remain ordered.
+  Fatal ASan/UBSan comparisons passed **142,942 complete file parses** on arm64
+  and under x64 execution: **139,331 accepted / 3,559 rejected / 52 interrupted**,
+  **205,319 Add records**, **87,136,853 callback observation values**, and
+  **205,351 Rust cue owners / 134,916 blank-line notices / 677,611 boundary
+  decisions / 611,130 appended fragments**. Tests include every UTF-16 value,
+  counted NULs, partial scans, nonstandard separators and input position.
+  File/trim/Add boundaries are controlled in the harness; Windows uses actual
+  secure CRT scans and ATL strings, portable builds use wide scanf equivalents.
+  Overflowing numeric scans and replacement-bearing NUL fixtures are excluded.
+  Eight cue-level scripts and a numeric-caption visible control expand renderer
+  validation to **538 cases**. Rust 1.85 tests (103 core, 68 FFI), strict Clippy,
+  default syntax and Python harness checks pass. Windows/Miri and full renderer
+  validation are pending; native file decoding and final subtitle storage remain.
+* The first SAMI file Windows helper run
+  [38534766416](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38534766416)
+  failed to compile because the Windows `max` macro expanded the test shell's
+  `numeric_limits::max()` expression. Parenthesizing that function name fixes the
+  harness without changing the production parser. Those two failed jobs are not
+  passing SAMI evidence; complete validation will use the corrected candidate.
 * Safe Rust owns SAMI file caption storage, comment/title state and start times.
   Native detection/read-ahead/seek, line trimming and uppercase, digit callbacks,
   timestamp arithmetic, SMI conversion and Add ordering remain intact. A title
@@ -58,6 +83,11 @@ unresolved reference outcomes requiring investigation, never matching results.
   default syntax and Python harness checks pass. Windows/Miri and full renderer
   validation are pending. Native numeric/case behavior, the file loader/style
   map and real-host integration remain separate work.
+* Embedded-font buffering Windows x86/x64 renderer checks passed **494 cases /
+  5,370 frames** per architecture, plus **32 mutation cases / 224 frames**, with
+  matching dialogs, visible controls, exports and declared dependencies. All four
+  platform reports and Miri passed; isolated local ASan/UBSan evidence is complete.
+  See [verified font-record evidence](font-records-evidence.json).
 * Safe Rust owns embedded-font record buffering and `LoadUUEFont` line decisions.
   Exact section prefixes still terminate after consuming their header; lowercase
   variants and `[V4++ Styles]` are still treated as record data. `fontname:` flushes
