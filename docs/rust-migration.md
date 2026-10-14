@@ -70,6 +70,62 @@ show implementation and validation activity, not elapsed-time attribution or
 completion percentage. Most of the much larger documentation diff is generated
 evidence. No reliable active-work-versus-CI timing ledger was collected.
 
+## Independent audit and unsafe boundary
+
+The user-requested independent audit is recorded in
+[rust-progress-audit.json](rust-progress-audit.json), pinned to `138ed962`.
+It confirms substantial incremental implementation but no closed end-to-end
+planning domain and no defensible overall completion percentage. Its source
+inventory includes assembly and is taken from Git objects, so its 241-file
+baseline scope differs from the 238-file C/C++ working-tree scale count above.
+Neither count measures the amount of application behavior replaced.
+
+The reproducible [Rust unsafe inventory](rust-unsafe-inventory.json) uses
+`python3 tools/compat/audit_rust_boundary.py OUTPUT.json`. It masks comments and
+literals, separates cfg(test) items, and includes all platform/feature branches.
+At the measured Rust sources (unchanged between `641ec00e` and `138ed962`):
+
+| Layer | Production source inventory | Meaning |
+| --- | --- | --- |
+| `rust/compat` | 0 unsafe blocks/functions/impls; 6,203 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
+| `rust/ffi` | 325 explicit unsafe blocks, 273 unsafe function declarations, one unsafe allocator impl; 4,091 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
+| Tests | 112 unsafe blocks in FFI tests | Exercise valid and deliberately bounded ownership/alias/initialization contracts; not production code |
+
+Unsafe-function declarations and blocks overlap and must not be added as
+independent operations. Counts describe review surface, not soundness or a
+percentage of safe behavior. No unchecked-index calls, transmute, inline Rust
+assembly or mutable Rust statics were found by this lexical inventory. The
+workspace has no external Cargo dependencies; the Rust allocation library,
+Windows CRT/OS and retained native dependencies are still trusted boundaries.
+
+There are three distinct kinds of migration credit:
+
+* Application logic operating on owned Rust data with bounded slices: strongest
+  local ownership/access progress, still requiring correct native input/output
+  adapters. Examples include SSF lookahead and literal text.
+* Rust-owned allocations loaned as writable pointers to native algorithms:
+  allocation/lifetime progress, but native readers/writers must still respect
+  bounds, initialization, aliasing and lifetime. Ownership alone does not close
+  memory safety for the component.
+* Retained native code and fallback paths: their scope remains open even when
+  neighboring functions or buffers have moved to Rust.
+
+The present hybrid cannot yet be certified a memory-safe Aegisub dependency.
+Closing a package requires accounting for every native read/write and retained
+fallback, shrinking the cross-language interface, and reviewing the remaining
+unsafe contracts at both ends. Existing Miri tests cover Rust-side scenarios;
+Linux Miri does not execute C++ or the Windows CRT allocator. Native ASan/UBSan
+campaigns instrument the C++ fixtures, not the linked Rust static library.
+Windows unit tests separately cover the production allocator. These checks are
+useful evidence and do not prove every caller contract.
+
+At `641ec00e`, Miri job `115987025493` and both native SSF jobs in run
+`38603105887` pass, including the corrected malformed-literal controls. The
+macOS leaf job `115987026117` failed an existing RLE comparison at call 29108;
+the fixture explicitly aborted on a mismatch. That failure is unresolved and
+this commit is not claimed to have passed the full CI matrix. Its log is retained
+locally in `artifacts/job-115987026117.log` for follow-up.
+
 ## What has been implemented
 
 * Temporary SSF quoted-string and brace-block text now belongs to a safe Rust
