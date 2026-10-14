@@ -76,7 +76,14 @@ public:
         const wchar_t* p=std::wcschr(text.c_str()+pos,c);return p?static_cast<int>(p-text.c_str()):-1;
 #endif
     }
-    MicroString Mid(int start,int count=0x7fffffff)const{
+    MicroString Mid(int start)const{
+#ifdef _WIN32
+        auto result=text.Mid(start);return MicroString(result.GetString(),result.GetLength());
+#else
+        return Mid(start,GetLength());
+#endif
+    }
+    MicroString Mid(int start,int count)const{
 #ifdef _WIN32
         auto result=text.Mid(start,count);return MicroString(result.GetString(),result.GetLength());
 #else

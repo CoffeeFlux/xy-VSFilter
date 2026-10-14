@@ -53,10 +53,13 @@ unresolved reference outcomes requiring investigation, never matching results.
   portable string/format models are preliminary evidence only. Rust 1.85 tests
   (79 core, 53 FFI), strict Clippy, default syntax and corpus freshness pass.
   Miri passed for `794d9609`; its initial Windows x64 portable comparison stopped
-  with native process exit `0xc0000409` and no fixture diagnostic. This is not
-  passing evidence. The harness now reports fixture context for CRT rejection,
-  abort and uncaught exceptions, and runs these adapters before long pixel
-  campaigns. Investigation and Windows/rendering validation remain pending.
+  with native process exit `0xc0000409` and no fixture diagnostic. Diagnostics
+  in `f5d1ae8d` identified reference fixture 22, ordinary `{f:Arial}`: the test
+  wrapper forwarded `Mid(start)` as `Mid(start, INT_MAX)`, unlike the real
+  one-argument ATL overload. The wrapper now uses the exact overload. Neither
+  failed run counts as passing evidence; corrected Windows/rendering validation
+  remains pending. Fixture failure diagnostics and earlier text-adapter execution
+  remain in the harness for faster, reviewable failures.
   Native tag conversion, input/line strings, allocation failure timing and host integration
   remain to be migrated or separately validated.
 * Safe Rust owns the charset-aware `FindChar` loop used by MicroDVD and other
