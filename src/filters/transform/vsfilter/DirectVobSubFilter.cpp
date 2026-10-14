@@ -1755,19 +1755,36 @@ void CDirectVobSubFilter::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyl
                 XY_LOG_ERROR("Failed to set default style");
             }
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+			pRTS->SetDocumentPARType(static_cast<CSimpleTextSubtitle::EPARCompensationType>(m_xy_int_opt[INT_ASPECT_RATIO_SETTINGS]));
+#else
 			pRTS->m_ePARCompensationType = static_cast<CSimpleTextSubtitle::EPARCompensationType>(m_xy_int_opt[INT_ASPECT_RATIO_SETTINGS]);
+#endif
 			if (m_CurrentVIH2.dwPictAspectRatioX != 0 && m_CurrentVIH2.dwPictAspectRatioY != 0&& m_CurrentVIH2.bmiHeader.biWidth != 0 && m_CurrentVIH2.bmiHeader.biHeight != 0)
 			{
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+				pRTS->SetDocumentPARCompensation(((double)abs(m_CurrentVIH2.bmiHeader.biWidth) / (double)abs(m_CurrentVIH2.bmiHeader.biHeight)) /
+					((double)abs((long)m_CurrentVIH2.dwPictAspectRatioX) / (double)abs((long)m_CurrentVIH2.dwPictAspectRatioY)));
+#else
 				pRTS->m_dPARCompensation = ((double)abs(m_CurrentVIH2.bmiHeader.biWidth) / (double)abs(m_CurrentVIH2.bmiHeader.biHeight)) /
 					((double)abs((long)m_CurrentVIH2.dwPictAspectRatioX) / (double)abs((long)m_CurrentVIH2.dwPictAspectRatioY));
+#endif
 
 			}
 			else
 			{
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+				pRTS->SetDocumentPARCompensation(1.00);
+#else
 				pRTS->m_dPARCompensation = 1.00;
+#endif
 			}
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            switch(pRTS->GetDocumentColorMatrix())
+#else
             switch(pRTS->m_eYCbCrMatrix)
+#endif
             {
             case CSimpleTextSubtitle::YCbCrMatrix_BT601:
                 m_video_yuv_matrix_decided_by_sub = ColorConvTable::BT601;
@@ -1782,7 +1799,11 @@ void CDirectVobSubFilter::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyl
                 m_video_yuv_matrix_decided_by_sub = ColorConvTable::NONE;
                 break;
             }
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            switch(pRTS->GetDocumentColorRange())
+#else
             switch(pRTS->m_eYCbCrRange)
+#endif
             {
             case CSimpleTextSubtitle::YCbCrRange_PC:
                 m_video_yuv_range_decided_by_sub = ColorConvTable::RANGE_PC;

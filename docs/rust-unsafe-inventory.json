@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "candidate_commit": "301aa033827300562796cf599e90a6f609729dbc",
+  "candidate_commit": "dc11cd69045f708f43f096ccb2dddafd4dfe9b73",
   "method": "Lexical source inventory with comments/string/character literals masked and cfg(test) item bodies excluded from production. All platform and feature branches included, not one compiled target. Source hashes identify the measured files; the inventory script may be uncommitted. Block counts and unsafe-function declarations overlap and must not be added as independent operations. Operation categories can overlap and omit raw-pointer dereferences; they are examples, not an exhaustive soundness classification.",
   "limitations": "Not a proof of soundness or a migration completion percentage. Does not measure C/C++/assembly, native libraries, standard-library internals, borrow correctness at native callsites or dynamic path coverage.",
   "crates": {
@@ -18,8 +18,8 @@
         "test_trait": 0,
         "test_other": 0
       },
-      "physical_lines_including_tests": 11594,
-      "nonblank_code_lines_excluding_tests": 7362,
+      "physical_lines_including_tests": 11680,
+      "nonblank_code_lines_excluding_tests": 7398,
       "production_extern_functions": 0,
       "operations": {
         "raw_shared_slice_construction": 0,
@@ -364,9 +364,9 @@
         },
         {
           "path": "rust/compat/src/document.rs",
-          "sha256": "2cabacdb1e703949fe72c026b1aa8524a15b1aec045c1f61924a840af174eca6",
-          "physical_lines_including_tests": 1030,
-          "nonblank_code_lines_excluding_tests": 434,
+          "sha256": "e5257fd3c0ccd521f4878b5ac33253e6c082830945f1999a71001c49f010263d",
+          "physical_lines_including_tests": 1116,
+          "nonblank_code_lines_excluding_tests": 470,
           "counts": {
             "production_block": 0,
             "production_function": 0,
@@ -2497,8 +2497,8 @@
     "ffi": {
       "file_count": 69,
       "totals": {
-        "production_block": 356,
-        "production_function": 299,
+        "production_block": 358,
+        "production_function": 301,
         "production_impl": 2,
         "production_trait": 0,
         "production_other": 0,
@@ -2508,9 +2508,9 @@
         "test_trait": 0,
         "test_other": 0
       },
-      "physical_lines_including_tests": 10974,
-      "nonblank_code_lines_excluding_tests": 5117,
-      "production_extern_functions": 364,
+      "physical_lines_including_tests": 11184,
+      "nonblank_code_lines_excluding_tests": 5188,
+      "production_extern_functions": 368,
       "operations": {
         "raw_shared_slice_construction": 62,
         "raw_mutable_slice_construction": 22,
@@ -3405,12 +3405,12 @@
         },
         {
           "path": "rust/ffi/src/document.rs",
-          "sha256": "c173ff770cc408983c01d1df8cad349a8ec9a8911f48bd62de9fb0bcb1f42b01",
-          "physical_lines_including_tests": 2184,
-          "nonblank_code_lines_excluding_tests": 869,
+          "sha256": "c6eed22b222dd863cc7be480aa827191609516fef83586589c50ece8595024d7",
+          "physical_lines_including_tests": 2394,
+          "nonblank_code_lines_excluding_tests": 940,
           "counts": {
-            "production_block": 30,
-            "production_function": 26,
+            "production_block": 32,
+            "production_function": 28,
             "production_impl": 0,
             "production_trait": 0,
             "production_other": 0,
@@ -3462,177 +3462,172 @@
               "test": false
             },
             {
-              "line": 225,
+              "line": 220,
               "kind": "function",
               "test": false
             },
             {
-              "line": 245,
+              "line": 240,
               "kind": "block",
               "test": false
             },
             {
-              "line": 265,
+              "line": 256,
               "kind": "function",
               "test": false
             },
             {
-              "line": 280,
+              "line": 268,
               "kind": "block",
               "test": false
             },
             {
-              "line": 310,
+              "line": 302,
               "kind": "function",
               "test": false
             },
             {
-              "line": 324,
+              "line": 322,
               "kind": "block",
               "test": false
             },
             {
-              "line": 331,
+              "line": 342,
               "kind": "function",
               "test": false
             },
             {
-              "line": 349,
+              "line": 357,
               "kind": "block",
               "test": false
             },
             {
-              "line": 376,
+              "line": 387,
               "kind": "function",
-              "test": false
-            },
-            {
-              "line": 394,
-              "kind": "block",
               "test": false
             },
             {
               "line": 401,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 408,
               "kind": "function",
               "test": false
             },
             {
-              "line": 415,
+              "line": 426,
               "kind": "block",
               "test": false
             },
             {
-              "line": 417,
-              "kind": "block",
-              "test": false
-            },
-            {
-              "line": 452,
+              "line": 453,
               "kind": "function",
               "test": false
             },
             {
-              "line": 464,
+              "line": 471,
               "kind": "block",
               "test": false
             },
             {
-              "line": 488,
+              "line": 478,
               "kind": "function",
               "test": false
             },
             {
-              "line": 504,
+              "line": 492,
               "kind": "block",
               "test": false
             },
             {
-              "line": 532,
+              "line": 494,
               "kind": "block",
               "test": false
             },
             {
-              "line": 547,
+              "line": 529,
               "kind": "function",
               "test": false
             },
             {
-              "line": 562,
+              "line": 541,
               "kind": "block",
               "test": false
             },
             {
-              "line": 569,
+              "line": 565,
               "kind": "function",
               "test": false
             },
             {
-              "line": 587,
+              "line": 581,
               "kind": "block",
               "test": false
             },
             {
-              "line": 594,
-              "kind": "function",
-              "test": false
-            },
-            {
-              "line": 616,
+              "line": 609,
               "kind": "block",
               "test": false
             },
             {
-              "line": 623,
+              "line": 624,
               "kind": "function",
+              "test": false
+            },
+            {
+              "line": 639,
+              "kind": "block",
               "test": false
             },
             {
               "line": 646,
-              "kind": "block",
-              "test": false
-            },
-            {
-              "line": 653,
               "kind": "function",
               "test": false
             },
             {
-              "line": 710,
+              "line": 664,
               "kind": "block",
               "test": false
             },
             {
-              "line": 717,
+              "line": 671,
               "kind": "function",
               "test": false
             },
             {
-              "line": 727,
+              "line": 693,
               "kind": "block",
               "test": false
             },
             {
-              "line": 735,
+              "line": 700,
               "kind": "function",
               "test": false
             },
             {
-              "line": 753,
+              "line": 723,
               "kind": "block",
               "test": false
             },
             {
-              "line": 769,
+              "line": 730,
               "kind": "function",
               "test": false
             },
             {
-              "line": 785,
+              "line": 787,
               "kind": "block",
               "test": false
             },
             {
-              "line": 805,
+              "line": 794,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 804,
               "kind": "block",
               "test": false
             },
@@ -3642,37 +3637,27 @@
               "test": false
             },
             {
-              "line": 827,
+              "line": 830,
               "kind": "block",
               "test": false
             },
             {
-              "line": 837,
+              "line": 846,
               "kind": "function",
               "test": false
             },
             {
-              "line": 845,
+              "line": 862,
               "kind": "block",
               "test": false
             },
             {
-              "line": 856,
-              "kind": "function",
-              "test": false
-            },
-            {
-              "line": 867,
+              "line": 882,
               "kind": "block",
               "test": false
             },
             {
-              "line": 868,
-              "kind": "block",
-              "test": false
-            },
-            {
-              "line": 897,
+              "line": 889,
               "kind": "function",
               "test": false
             },
@@ -3682,7 +3667,7 @@
               "test": false
             },
             {
-              "line": 915,
+              "line": 914,
               "kind": "function",
               "test": false
             },
@@ -3692,72 +3677,107 @@
               "test": false
             },
             {
-              "line": 975,
+              "line": 933,
               "kind": "function",
+              "test": false
+            },
+            {
+              "line": 944,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 945,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 974,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 981,
+              "kind": "block",
               "test": false
             },
             {
               "line": 992,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 999,
               "kind": "block",
               "test": false
             },
             {
-              "line": 1005,
+              "line": 1052,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1069,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1082,
               "kind": "function",
               "test": true
             },
             {
-              "line": 1009,
+              "line": 1086,
               "kind": "block",
               "test": true
             },
             {
-              "line": 1031,
+              "line": 1108,
               "kind": "function",
               "test": true
             },
             {
-              "line": 1034,
+              "line": 1111,
               "kind": "block",
               "test": true
             },
             {
-              "line": 1046,
+              "line": 1123,
               "kind": "function",
               "test": true
             },
             {
-              "line": 1050,
+              "line": 1127,
               "kind": "block",
               "test": true
             },
             {
-              "line": 1055,
+              "line": 1132,
               "kind": "function",
               "test": true
             },
             {
-              "line": 1059,
+              "line": 1136,
               "kind": "block",
               "test": true
             },
             {
-              "line": 1064,
+              "line": 1141,
               "kind": "block",
               "test": true
             },
             {
-              "line": 1088,
+              "line": 1165,
               "kind": "block",
               "test": true
             },
             {
-              "line": 1097,
+              "line": 1174,
               "kind": "block",
               "test": true
             }
           ],
-          "production_extern_functions": 37,
+          "production_extern_functions": 41,
           "operations": {
             "raw_shared_slice_construction": 1,
             "raw_mutable_slice_construction": 0,
@@ -8565,5 +8585,5 @@
     "sha256": "aae18efd3d4cb93ef4ff84b39d189855bdd36596b98279d35284e034c616161e",
     "scope": "Earlier historical audit measurement retained by identity; current counts regenerated, not extrapolated."
   },
-  "capture_scope": "Actual frozen working-tree hashes; candidate_commit baseHEAD does not assert source belongs to that commit."
+  "capture_scope": "Actual frozen working-tree hashes; candidate_commit baseHEAD does not assert uncommittedsource belongs to commit."
 }

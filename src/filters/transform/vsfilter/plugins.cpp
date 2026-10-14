@@ -385,8 +385,16 @@ public:
 				if(rts->Open(CString(fn), CharSet)) SetFileName(fn);
 				else m_pSubPicProvider = NULL;
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                m_script_selected_yuv = rts->GetDocumentColorMatrix();
+#else
                 m_script_selected_yuv = rts->m_eYCbCrMatrix;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                m_script_selected_range = rts->GetDocumentColorRange();
+#else
                 m_script_selected_range = rts->m_eYCbCrRange;
+#endif
 			}
 		}
 

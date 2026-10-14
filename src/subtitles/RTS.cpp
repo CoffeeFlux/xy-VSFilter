@@ -3105,6 +3105,29 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 #else
     GetStyle(entry, &stss);
 #endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    if (stss.fontScaleX == stss.fontScaleY && GetDocumentPARCompensation() != 1.0)
+    {
+        switch(GetDocumentPARType())
+        {
+        case EPCTUpscale:
+            if (GetDocumentPARCompensation() < 1.0)
+                stss.fontScaleY /= GetDocumentPARCompensation();
+            else
+                stss.fontScaleX *= GetDocumentPARCompensation();
+            break;
+        case EPCTDownscale:
+            if (GetDocumentPARCompensation() < 1.0)
+                stss.fontScaleX *= GetDocumentPARCompensation();
+            else
+                stss.fontScaleY /= GetDocumentPARCompensation();
+            break;
+        case EPCTAccurateSize:
+            stss.fontScaleX *= GetDocumentPARCompensation();
+            break;
+        }
+    }
+#else
     if (stss.fontScaleX == stss.fontScaleY && m_dPARCompensation != 1.0)
     {
         switch(m_ePARCompensationType)
@@ -3126,6 +3149,7 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
             break;
         }
     }
+#endif
     orgstss = stss;
     sub->m_clip.SetRect(0, 0, m_size.cx>>3, m_size.cy>>3);
     sub->m_scrAlignment = -stss.scrAlignment;

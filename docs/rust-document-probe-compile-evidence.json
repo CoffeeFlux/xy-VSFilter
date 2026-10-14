@@ -1,0 +1,208 @@
+{
+  "schema": 1,
+  "kind": "actual-native-probe-compile-only-evidence",
+  "candidate_commit": "dc11cd69045f708f43f096ccb2dddafd4dfe9b73",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "workflow_run": 38645033463,
+  "workflow_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38645033463",
+  "architectures": {
+    "Win32": {
+      "job_id": 116129661080,
+      "report": "artifacts/ci-38645033463/document-style-api-compile-Win32/report.json",
+      "report_sha256": "7ed3c2c9a1c54cd21ecad9f9aa52ff7df0e0594701b0be66325e1af9ca09093e",
+      "complete": true,
+      "compiled_objects": 9,
+      "tracked_sources_clean": true,
+      "heads_unchanged": true,
+      "inputs_unchanged": true,
+      "repository_headers_verified": 1769,
+      "external_header_hashes_runner_reported": 423,
+      "all_included_headers_sha256": "29bc92917b3c152020fe674edac9af498337e56712bc1cb604b4d7da5c265219",
+      "source_sha256": {
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\baseline-compile\\src\\common.props": "9105a9b4187927f956fd8b55cea255c952608a1c99519fd771be52fc7c358ecd",
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\baseline-compile\\src\\filters\\transform\\vsfilter\\VSFilter.props": "c1077dd422088a7e5ce586a026f0c418d5731bf94380ca4d9996d4c3948e1a7e",
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\baseline-compile\\src\\filters\\transform\\vsfilter\\VSFilter.vcxproj": "fb14faef5670a609a9a4b0913ea805943a97e070982d644459698ffe86727a24",
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\baseline-compile\\src\\filters\\transform\\vsfilter\\xy_sub_filter.vcxproj": "e59f6508cde068694d0e94d4ed73e4c9af855c54a31a73434acb5f55c7107843",
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\src\\common.props": "1d7c27a6e73748a6cfdcb4750e860f92caeb8d16a5a4922feb960ee42ed1d508",
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\src\\filters\\transform\\vsfilter\\VSFilter.props": "05d1f91b6b158945649070ed27141b97885d7de1ad443f7ee9aed2d0ca31573f",
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\src\\filters\\transform\\vsfilter\\VSFilter.vcxproj": "fb14faef5670a609a9a4b0913ea805943a97e070982d644459698ffe86727a24",
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\src\\filters\\transform\\vsfilter\\xy_sub_filter.vcxproj": "e59f6508cde068694d0e94d4ed73e4c9af855c54a31a73434acb5f55c7107843",
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\tools\\compat\\document_style_api_probe.cpp": "841677058e418f8643637c5a0f76e8fe2cebbcf68c51f0a8d70a9790386f2f3e",
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\tools\\compat\\document_native_lifecycle.cpp": "3f549780487ad0f165988e1053457575d0ec5f56fd04facfaf12a060a5516703",
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\tools\\compat\\document_native_lifecycle.py": "fb9cf4cf03ef121e37224b0f7f18582f62f094362fa9e49d33605352c181df1f",
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\tools\\compat\\document_style_api_compile.py": "14152a6ef7584676a8a987d7190dcb55cce0bcd90bfc05c7c7bc62220dd5e990"
+      },
+      "objects_and_logs_verified": {
+        "reference-VSFilter": {
+          "object_sha256": "fdba3eeeb3e2dd4290e8faa0446e2ef258ed2dacf1fb2cd3ededb95e8968c15c",
+          "object_header": "MSVC extended COFF/LTCG",
+          "machine": "0x14c",
+          "stdout_sha256": "12120d76c5f62a13c00b56524ec25912e4b8da26f484bc2b385cdd694d304ff5",
+          "stderr_sha256": "4abd17eda59dbad0286f86d1dfe6dae2e84693133b14e8fca4ee883f0e224749"
+        },
+        "reference-XySubFilter": {
+          "object_sha256": "5e5f13a87b7ba2657aaa079ede50a4995ba15c1142ca89d703e089e45921aca5",
+          "object_header": "MSVC extended COFF/LTCG",
+          "machine": "0x14c",
+          "stdout_sha256": "e4eaf337cdda548462deb528fbac1b44197c65998e0725a273566008a3fe60e8",
+          "stderr_sha256": "4abd17eda59dbad0286f86d1dfe6dae2e84693133b14e8fca4ee883f0e224749"
+        },
+        "candidate-native-VSFilter": {
+          "object_sha256": "3879c6e7d58aaafb07c70557196356ab2e84b2ed4dc0509aa319d7b11b695417",
+          "object_header": "MSVC extended COFF/LTCG",
+          "machine": "0x14c",
+          "stdout_sha256": "3b41f72515d82eb74eba7667159b41780acb19c6d088405a46e84baa73d7d8db",
+          "stderr_sha256": "4abd17eda59dbad0286f86d1dfe6dae2e84693133b14e8fca4ee883f0e224749"
+        },
+        "candidate-native-XySubFilter": {
+          "object_sha256": "b3d8ed248e0f0873c12f5c40906c328c7d8c55ecd226df0102037855b6f6e298",
+          "object_header": "MSVC extended COFF/LTCG",
+          "machine": "0x14c",
+          "stdout_sha256": "7279f69663d90ee7638ae827c5e8daf9d74b79462b9fb77020e68fbb72b9edc1",
+          "stderr_sha256": "4abd17eda59dbad0286f86d1dfe6dae2e84693133b14e8fca4ee883f0e224749"
+        },
+        "candidate-experimental-VSFilter": {
+          "object_sha256": "dafffe91ef113c568ec7851e3bf0f5e009550554cd897354e6c5fb1ad8bf2c94",
+          "object_header": "MSVC extended COFF/LTCG",
+          "machine": "0x14c",
+          "stdout_sha256": "3b41f72515d82eb74eba7667159b41780acb19c6d088405a46e84baa73d7d8db",
+          "stderr_sha256": "4abd17eda59dbad0286f86d1dfe6dae2e84693133b14e8fca4ee883f0e224749"
+        },
+        "candidate-experimental-XySubFilter": {
+          "object_sha256": "02b651b3088ff56c832062ec5f3d5c905f72ffb415fda319fe411644aff9d1af",
+          "object_header": "MSVC extended COFF/LTCG",
+          "machine": "0x14c",
+          "stdout_sha256": "7279f69663d90ee7638ae827c5e8daf9d74b79462b9fb77020e68fbb72b9edc1",
+          "stderr_sha256": "4abd17eda59dbad0286f86d1dfe6dae2e84693133b14e8fca4ee883f0e224749"
+        },
+        "reference-lifecycle": {
+          "object_sha256": "f26572b09fca785e0d4f809fa01416d9fce7efa97bc94ce7a98cfb947db4402e",
+          "object_header": "COFF",
+          "machine": "0x14c",
+          "stdout_sha256": "269c6503e62a490a0594afcbb017ce8f52f2ee5ec3ee8fe07d44c25feb73d496",
+          "stderr_sha256": "4abd17eda59dbad0286f86d1dfe6dae2e84693133b14e8fca4ee883f0e224749"
+        },
+        "candidate-native-lifecycle": {
+          "object_sha256": "5f16289153803caa5b450130887f19cf13c1b4e2d031bdc7e416bfb056dce06e",
+          "object_header": "COFF",
+          "machine": "0x14c",
+          "stdout_sha256": "75dbee5c0e50cba1447d103872abe8598f63da2a31b7d9b777a8d261095df5c9",
+          "stderr_sha256": "4abd17eda59dbad0286f86d1dfe6dae2e84693133b14e8fca4ee883f0e224749"
+        },
+        "candidate-experimental-lifecycle": {
+          "object_sha256": "e0e19b58aed6c0adac9e4592655640cf38bc260527572482c3ec3e68b78d888d",
+          "object_header": "COFF",
+          "machine": "0x14c",
+          "stdout_sha256": "c0e55c44728b4acf0e9ec3d96ce0a20837506802eec1fdd72797549bb63a1323",
+          "stderr_sha256": "4abd17eda59dbad0286f86d1dfe6dae2e84693133b14e8fca4ee883f0e224749"
+        }
+      },
+      "compiler_runner_reported": {
+        "path": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x86\\cl.EXE",
+        "sha256": "303bfbe5523af2e925871a1bc7fd2ec5f199a69208a3b6716724c3e6d6b6962d"
+      }
+    },
+    "x64": {
+      "job_id": 116129661083,
+      "report": "artifacts/ci-38645033463/document-style-api-compile-x64/report.json",
+      "report_sha256": "0385e0fafea15431f920f4408180b8e049159bd0dbf89de4e228ec881c70aab4",
+      "complete": true,
+      "compiled_objects": 9,
+      "tracked_sources_clean": true,
+      "heads_unchanged": true,
+      "inputs_unchanged": true,
+      "repository_headers_verified": 1769,
+      "external_header_hashes_runner_reported": 422,
+      "all_included_headers_sha256": "2a6408b8db64f2eacbfe48cf5e40aefe1601f4305e6fd996cd8c6aafb023d328",
+      "source_sha256": {
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\baseline-compile\\src\\common.props": "9105a9b4187927f956fd8b55cea255c952608a1c99519fd771be52fc7c358ecd",
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\baseline-compile\\src\\filters\\transform\\vsfilter\\VSFilter.props": "c1077dd422088a7e5ce586a026f0c418d5731bf94380ca4d9996d4c3948e1a7e",
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\baseline-compile\\src\\filters\\transform\\vsfilter\\VSFilter.vcxproj": "fb14faef5670a609a9a4b0913ea805943a97e070982d644459698ffe86727a24",
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\baseline-compile\\src\\filters\\transform\\vsfilter\\xy_sub_filter.vcxproj": "e59f6508cde068694d0e94d4ed73e4c9af855c54a31a73434acb5f55c7107843",
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\src\\common.props": "1d7c27a6e73748a6cfdcb4750e860f92caeb8d16a5a4922feb960ee42ed1d508",
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\src\\filters\\transform\\vsfilter\\VSFilter.props": "05d1f91b6b158945649070ed27141b97885d7de1ad443f7ee9aed2d0ca31573f",
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\src\\filters\\transform\\vsfilter\\VSFilter.vcxproj": "fb14faef5670a609a9a4b0913ea805943a97e070982d644459698ffe86727a24",
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\src\\filters\\transform\\vsfilter\\xy_sub_filter.vcxproj": "e59f6508cde068694d0e94d4ed73e4c9af855c54a31a73434acb5f55c7107843",
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\tools\\compat\\document_style_api_probe.cpp": "841677058e418f8643637c5a0f76e8fe2cebbcf68c51f0a8d70a9790386f2f3e",
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\tools\\compat\\document_native_lifecycle.cpp": "3f549780487ad0f165988e1053457575d0ec5f56fd04facfaf12a060a5516703",
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\tools\\compat\\document_native_lifecycle.py": "fb9cf4cf03ef121e37224b0f7f18582f62f094362fa9e49d33605352c181df1f",
+        "D:\\a\\xy-VSFilter\\xy-VSFilter\\tools\\compat\\document_style_api_compile.py": "14152a6ef7584676a8a987d7190dcb55cce0bcd90bfc05c7c7bc62220dd5e990"
+      },
+      "objects_and_logs_verified": {
+        "reference-VSFilter": {
+          "object_sha256": "cbbf66f0bb80f57db54bf47b1ba6a80089b9094a9d47e25226aa3751ca029755",
+          "object_header": "MSVC extended COFF/LTCG",
+          "machine": "0x8664",
+          "stdout_sha256": "c21c290e694c137e140c1a15b04aa24139801e34c9be4f59577fe2c6a45b7a08",
+          "stderr_sha256": "4e7885024d0443dda3c5c7cd6a4a67be65409f71157cef0be14c406d97c68254"
+        },
+        "reference-XySubFilter": {
+          "object_sha256": "0e0b7536816114d7c84de4a272dd14e6867e638d729b440430c8be5b4b1a52d9",
+          "object_header": "MSVC extended COFF/LTCG",
+          "machine": "0x8664",
+          "stdout_sha256": "732e85476f581c66c595a5c9fc91527d99ea3605dd4540b2e0a5a78c6455cef4",
+          "stderr_sha256": "4e7885024d0443dda3c5c7cd6a4a67be65409f71157cef0be14c406d97c68254"
+        },
+        "candidate-native-VSFilter": {
+          "object_sha256": "1b455708f9b851fd421505309b7b4d0f8bd1579706b98254fbfb5b2d612cd6fd",
+          "object_header": "MSVC extended COFF/LTCG",
+          "machine": "0x8664",
+          "stdout_sha256": "a51e5d2794cf2c44c48f8175642927c1eef85461de811bbee6a068e257c6eb26",
+          "stderr_sha256": "4e7885024d0443dda3c5c7cd6a4a67be65409f71157cef0be14c406d97c68254"
+        },
+        "candidate-native-XySubFilter": {
+          "object_sha256": "9c6cda868fa4f828e1c7907676d15b781f2ea69101dd87f1091704bdddc0ff76",
+          "object_header": "MSVC extended COFF/LTCG",
+          "machine": "0x8664",
+          "stdout_sha256": "727632e61a3e340bdaf11b672af573391e1f3a18cf4659c7e5d452fed57f79e2",
+          "stderr_sha256": "4e7885024d0443dda3c5c7cd6a4a67be65409f71157cef0be14c406d97c68254"
+        },
+        "candidate-experimental-VSFilter": {
+          "object_sha256": "994e508cd66f917302167a217ab4624effd26bc53b000b2e04118cdd2ee9b570",
+          "object_header": "MSVC extended COFF/LTCG",
+          "machine": "0x8664",
+          "stdout_sha256": "a51e5d2794cf2c44c48f8175642927c1eef85461de811bbee6a068e257c6eb26",
+          "stderr_sha256": "4e7885024d0443dda3c5c7cd6a4a67be65409f71157cef0be14c406d97c68254"
+        },
+        "candidate-experimental-XySubFilter": {
+          "object_sha256": "e07cc4ec4e73410ebc5e708a958816d589ecccf8d8ff5a138f6b8269ee26b5c9",
+          "object_header": "MSVC extended COFF/LTCG",
+          "machine": "0x8664",
+          "stdout_sha256": "727632e61a3e340bdaf11b672af573391e1f3a18cf4659c7e5d452fed57f79e2",
+          "stderr_sha256": "4e7885024d0443dda3c5c7cd6a4a67be65409f71157cef0be14c406d97c68254"
+        },
+        "reference-lifecycle": {
+          "object_sha256": "4ab79a8765e8a70e4d68ebdacf5a2f98e192be67cbb66bbab9c7846d3dd16cf9",
+          "object_header": "COFF",
+          "machine": "0x8664",
+          "stdout_sha256": "82b5d470797b35d3309c5f8e8452a28b0574aa30586d10b919947e45a4cb86ef",
+          "stderr_sha256": "4e7885024d0443dda3c5c7cd6a4a67be65409f71157cef0be14c406d97c68254"
+        },
+        "candidate-native-lifecycle": {
+          "object_sha256": "3696a66317eda98aba8a133daa480a14bbbfe974bf7b6acea22751e703b7a0ba",
+          "object_header": "COFF",
+          "machine": "0x8664",
+          "stdout_sha256": "7fd3f82aa599cb97e8843fae4ee806cb0ea4914b0882d4fc6fd35b7b1ce21794",
+          "stderr_sha256": "4e7885024d0443dda3c5c7cd6a4a67be65409f71157cef0be14c406d97c68254"
+        },
+        "candidate-experimental-lifecycle": {
+          "object_sha256": "07d04cceb8f545a5fa76aa015ff0039703c99e426639a2caa662e167517ed9aa",
+          "object_header": "COFF",
+          "machine": "0x8664",
+          "stdout_sha256": "5a3219b2e736fcaece612ce4f609a51ea4027984e530ec267c8d11888fb2e095",
+          "stderr_sha256": "4e7885024d0443dda3c5c7cd6a4a67be65409f71157cef0be14c406d97c68254"
+        }
+      },
+      "compiler_runner_reported": {
+        "path": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\cl.EXE",
+        "sha256": "fe251ef50a1545b1b0835ee17b1e785459712b38d79e45b5c1d3d28970a36619"
+      }
+    }
+  },
+  "verification": "Read-only artifact/source rehash and object-header inspection; no native binary or compiler rerun.",
+  "limits": [
+    "Compile-only, no link/runtime/behavior/rendering or production approval.",
+    "Selected repository headers and probe/project/props source checked against exact Git objects with Windows newline normalization; external MSVC/SDK/MFC header/compiler file hashes remain runner-reported.",
+    "This dc11 capture predates the next PAR/color/forced-metadata source changes."
+  ]
+}

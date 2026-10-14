@@ -1791,10 +1791,22 @@ void XySubFilter::SetSubtitle( ISubStream* pSubStream, bool fApplyDefStyle /*= t
             }
             pRTS->SetForceDefaultStyle(m_xy_bool_opt[BOOL_FORCE_DEFAULT_STYLE]);
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            pRTS->SetDocumentPARType(CSimpleTextSubtitle::EPCTDisabled);
+#else
             pRTS->m_ePARCompensationType = CSimpleTextSubtitle::EPCTDisabled;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            pRTS->SetDocumentPARCompensation(1.00);
+#else
             pRTS->m_dPARCompensation = 1.00;
+#endif
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            switch(pRTS->GetDocumentColorMatrix())
+#else
             switch(pRTS->m_eYCbCrMatrix)
+#endif
             {
             case CSimpleTextSubtitle::YCbCrMatrix_BT601:
                 m_video_yuv_matrix_decided_by_sub = ColorConvTable::BT601;
@@ -1809,7 +1821,11 @@ void XySubFilter::SetSubtitle( ISubStream* pSubStream, bool fApplyDefStyle /*= t
                 m_video_yuv_matrix_decided_by_sub = ColorConvTable::NONE;
                 break;
             }
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            switch(pRTS->GetDocumentColorRange())
+#else
             switch(pRTS->m_eYCbCrRange)
+#endif
             {
             case CSimpleTextSubtitle::YCbCrRange_PC:
                 m_video_yuv_range_decided_by_sub = ColorConvTable::RANGE_PC;

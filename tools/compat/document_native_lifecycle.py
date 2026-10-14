@@ -36,7 +36,7 @@ def git(root, *args):
     return subprocess.check_output(["git", "-C", str(root), *args], timeout=60).decode().strip()
 
 
-def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True):
+def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True):
     lines = data.splitlines()
     if not lines or lines[0] != f"provenance pointer_bits={pointer_bits}".encode():
         raise ValueError("missing or incorrect native architecture provenance")
@@ -93,6 +93,29 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
             if len(matches) != 1 or b" height=" not in matches[0]:
                 raise ValueError(f"missing/duplicate layout callback observation {stage}")
 
+    if require_metadata_stages:
+        stages = ("metadata-constructed", "metadata-supplied", "metadata-copy-forced-only",
+                  "metadata-copy-independent", "metadata-empty", "metadata-self-copy",
+                  "metadata-forced-style", "metadata-unforced-style", "metadata-color-none",
+                  "metadata-color-tv601", "metadata-color-tv709", "metadata-color-tv2020",
+                  "metadata-color-pc601", "metadata-color-pc709", "metadata-color-pc2020",
+                  "metadata-color-unrecognized", "metadata-color-repeated", "metadata-fallback-srt",
+                  "metadata-fallback-microdvd")
+        shape = rb"^metadata-(?:stage|callback) [^ ]+ forced=[01] par-type=-?\d+ par-bits [0-9a-f]{16} matrix=-?\d+ range=-?\d+$"
+        positions = []
+        for stage in stages:
+            matches = [(index, line) for index, line in enumerate(lines)
+                       if line.startswith(f"metadata-stage {stage} ".encode())]
+            if len(matches) != 1 or not re.fullmatch(shape, matches[0][1]):
+                raise ValueError(f"missing/duplicate initialized metadata stage {stage}")
+            positions.append(matches[0][0])
+        if positions != sorted(positions):
+            raise ValueError("initialized metadata stage order differs")
+        for stage in stages[8:]:
+            matches = [line for line in lines if line.startswith(f"metadata-callback {stage} ".encode())]
+            if len(matches) != 1 or not re.fullmatch(shape, matches[0]):
+                raise ValueError(f"missing/duplicate metadata callback {stage}")
+
     if require_named_stages:
         for stage in ("named-initial", "named-equal-duplicate", "named-conflict-collision",
                       "named-numeric-collision", "named-copy-replace", "named-copy-independent",
@@ -108,11 +131,11 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
 
 
 
-def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True):
+def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True):
     if len(traces) != 4:
         raise ValueError("two reference and two candidate executions required")
     for trace in traces:
-        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages)
+        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages, require_metadata_stages=require_metadata_stages)
     if any(trace != traces[0] for trace in traces[1:]):
         raise ValueError("native lifecycle traces differ or are nondeterministic")
 

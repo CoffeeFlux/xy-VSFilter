@@ -63,6 +63,17 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_entry_header_v1(uint64_t, uint32
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_segment_header_v1(uint64_t, uint32_t index, uint8_t*, size_t);
 // Query modes: 0 entry, 1 next segment, 2 containing segment; integer TIME only.
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_query_time_v1(uint64_t, uint32_t mode, int64_t time, uint8_t*, size_t);
+// Render metadata fields:0 PAR type,1 color matrix,2 color range (raw i32),
+// 3 forced default style(strict0/1). Initially absent until native initialization.
+// Get writes4 LE bytes; absence => UNRESOLVED_REFERENCE, output unchanged.
+// PAR compensation is separately supplied/stored as opaque u64 double bits;
+// get writes8 LE bytes. No floating-point evaluation/normalization occurs here.
+// Prepared copy/clear retain all fields; native full Copy assigns only the
+// forced-default field and retains destination PAR/color at its original points.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_set_metadata_v1(uint64_t owner, uint32_t field, int32_t value);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_get_metadata_v1(uint64_t owner, uint32_t field, uint8_t*, size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_set_par_bits_v1(uint64_t owner, uint64_t bits);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_get_par_bits_v1(uint64_t owner, uint8_t*, size_t);
 // Script fields:0 width,1 height,2 wrap,3 collisions (raw signed i32),4 scaled
 // borders/shadows (strict0/1). Initially absent until native initialization.
 // Absent get => UNRESOLVED_REFERENCE with unchanged output. Scalar get writes4

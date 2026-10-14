@@ -9,7 +9,7 @@ use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::ptr;
 use xy_vsfilter_compat::document::{
-    AddMode, Document, IdentityField, InterpretationField, Refusal, ScriptField,
+    AddMode, Document, IdentityField, InterpretationField, MetadataField, Refusal, ScriptField,
 };
 use xy_vsfilter_compat::document_style as style_wire;
 use xy_vsfilter_compat::document_wire::{self as wire, Counts, EntryHeader, SegmentHeader};
@@ -189,6 +189,83 @@ pub extern "C" fn xy_vsfilter_document_copy_default_style_v1(destination: u64, s
         .copy_default_style(destination, source)
         .map_err(registry_error)));
     drop(retired);
+    OK
+}
+fn metadata_field(field: u32) -> Result<MetadataField, u32> {
+    match field {
+        0 => Ok(MetadataField::PARType),
+        1 => Ok(MetadataField::ColorMatrix),
+        2 => Ok(MetadataField::ColorRange),
+        _ => Err(INVALID_INPUT),
+    }
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_set_metadata_v1(owner: u64, field: u32, value: i32) -> u32 {
+    if field > 3 || (field == 3 && value != 0 && value != 1) {
+        return INVALID_INPUT;
+    }
+    status(admitted(|registry| {
+        let document = registry.document_mut(owner).map_err(registry_error)?;
+        if field == 3 {
+            document.replace_forced_default(value != 0);
+        } else {
+            document.replace_metadata(metadata_field(field)?, value);
+        }
+        Ok(())
+    }))
+}
+/// # Safety
+/// Output follows the byte-buffer contract, capacity >=4; LE signed i32.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_get_metadata_v1(
+    owner: u64,
+    field: u32,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 4));
+    if field > 3 {
+        return INVALID_INPUT;
+    }
+    let value = required!(admitted(|registry| {
+        let document = registry.document(owner).map_err(registry_error)?;
+        if field == 3 {
+            document.forced_default().map(i32::from)
+        } else {
+            document.metadata(metadata_field(field)?)
+        }
+        .ok_or(UNRESOLVED_REFERENCE)
+    }));
+    // SAFETY: output validated above and registry loan has ended.
+    unsafe { write_output(output, &value.to_le_bytes()) };
+    OK
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_set_par_bits_v1(owner: u64, bits: u64) -> u32 {
+    status(admitted(|registry| {
+        registry
+            .document_mut(owner)
+            .map_err(registry_error)?
+            .replace_par_bits(bits);
+        Ok(())
+    }))
+}
+/// # Safety
+/// Output follows the byte-buffer contract, capacity >=8; opaque LE u64 bits.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_get_par_bits_v1(
+    owner: u64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let bits = required!(admitted(|registry| registry
+        .document(owner)
+        .map_err(registry_error)?
+        .par_bits()
+        .ok_or(UNRESOLVED_REFERENCE)));
+    // SAFETY: output validated above and registry loan has ended.
+    unsafe { write_output(output, &bits.to_le_bytes()) };
     OK
 }
 fn script_field(field: u32) -> Result<ScriptField, u32> {
@@ -1162,6 +1239,139 @@ mod tests {
             assert_eq!(xy_vsfilter_document_destroy_v1(target), OK);
             assert_ne!(read_snapshot(snapshot), style);
             assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
+            // Render metadata transports opaque integer and floating-point bits.
+            let owner = create();
+            let destination = create();
+            let mut output = [0xa5; 8];
+            assert_eq!(
+                xy_vsfilter_document_get_par_bits_v1(owner, output.as_mut_ptr(), 8),
+                UNRESOLVED_REFERENCE
+            );
+            assert_eq!(output, [0xa5; 8]);
+            for field in 0..4 {
+                assert_eq!(
+                    xy_vsfilter_document_get_metadata_v1(owner, field, output.as_mut_ptr(), 4),
+                    UNRESOLVED_REFERENCE
+                );
+                assert_eq!(output, [0xa5; 8]);
+                let value = if field == 3 { 1 } else { i32::MIN };
+                assert_eq!(
+                    xy_vsfilter_document_set_metadata_v1(owner, field, value),
+                    OK
+                );
+                assert_eq!(
+                    xy_vsfilter_document_set_metadata_v1(
+                        destination,
+                        field,
+                        if field == 3 { 0 } else { i32::MAX }
+                    ),
+                    OK
+                );
+                assert_eq!(
+                    xy_vsfilter_document_get_metadata_v1(owner, field, output.as_mut_ptr(), 4),
+                    OK
+                );
+                assert_eq!(i32::from_le_bytes(output[..4].try_into().unwrap()), value);
+                output.fill(0xa5);
+            }
+            assert_eq!(
+                xy_vsfilter_document_set_par_bits_v1(destination, 0x3ff0000000000000),
+                OK
+            );
+            for bits in [
+                0u64,
+                1 << 63,
+                1,
+                u64::MAX,
+                0x7ff0000000000000,
+                0xfff0000000000000,
+                0x7ff0000000000001,
+                0x7ff8000000000042,
+            ] {
+                assert_eq!(xy_vsfilter_document_set_par_bits_v1(owner, bits), OK);
+                assert_eq!(
+                    xy_vsfilter_document_get_par_bits_v1(owner, output.as_mut_ptr(), 8),
+                    OK
+                );
+                assert_eq!(u64::from_le_bytes(output), bits);
+            }
+            output.fill(0xa5);
+            let before = state(owner);
+            for invalid in [-1, 2, i32::MIN, i32::MAX] {
+                assert_eq!(
+                    xy_vsfilter_document_set_metadata_v1(owner, 3, invalid),
+                    INVALID_INPUT
+                );
+                assert_eq!(state(owner), before);
+            }
+            assert_eq!(
+                xy_vsfilter_document_set_metadata_v1(owner, 4, 0),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_get_metadata_v1(owner, 4, output.as_mut_ptr(), 4),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_get_metadata_v1(owner, 0, output.as_mut_ptr(), 3),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_get_par_bits_v1(owner, output.as_mut_ptr(), 7),
+                INVALID_INPUT
+            );
+            assert_eq!(output, [0xa5; 8]);
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_set_par_bits_v1(owner, 0))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_get_metadata_v1(
+                        owner,
+                        0,
+                        output.as_mut_ptr(),
+                        4
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(output, [0xa5; 8]);
+            assert_eq!(state(owner), before);
+            let reply = open_snapshot(owner, 5);
+            assert_eq!(
+                xy_vsfilter_document_set_metadata_v1(reply, 0, 0),
+                BAD_HANDLE
+            );
+            assert_eq!(xy_vsfilter_document_set_par_bits_v1(reply, 0), BAD_HANDLE);
+            assert_eq!(
+                xy_vsfilter_document_get_par_bits_v1(reply, output.as_mut_ptr(), 8),
+                BAD_HANDLE
+            );
+            assert_eq!(output, [0xa5; 8]);
+            assert_eq!(xy_vsfilter_document_copy_storage_v1(destination, owner), OK);
+            assert_eq!(xy_vsfilter_document_clear_storage_v1(destination), OK);
+            assert_eq!(xy_vsfilter_document_remove_entries_v1(destination), OK);
+            assert_eq!(state(destination).par_bits(), Some(0x3ff0000000000000));
+            assert_eq!(state(destination).forced_default(), Some(false));
+            for field in [
+                MetadataField::PARType,
+                MetadataField::ColorMatrix,
+                MetadataField::ColorRange,
+            ] {
+                assert_eq!(state(destination).metadata(field), Some(i32::MAX));
+            }
+            assert_eq!(state(owner).clone(), before);
+            assert_eq!(xy_vsfilter_document_set_metadata_v1(owner, 0, -1), OK);
+            assert_eq!(
+                state(destination).metadata(MetadataField::PARType),
+                Some(i32::MAX)
+            );
+            assert_eq!(xy_vsfilter_document_destroy_v1(owner), OK);
+            assert_eq!(xy_vsfilter_document_destroy_v1(destination), OK);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(reply), OK);
             // Script values preserve raw integers; only the Boolean is shaped.
             let owner = create();
             let destination = create();

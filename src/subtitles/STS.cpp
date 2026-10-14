@@ -2413,8 +2413,16 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 #define XY_ASS_HEADER(key, id) (entry == (key))
 #endif
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    ret.SetDocumentColorMatrix(CSimpleTextSubtitle::YCbCrMatrix_BT601);
+#else
     ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT601;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    ret.SetDocumentColorRange(CSimpleTextSubtitle::YCbCrRange_TV);
+#else
     ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_TV;
+#endif
 
     CStringW buff;
     while(true)
@@ -2800,49 +2808,133 @@ if(sver <= 4)   style->scrAlignment = (style->scrAlignment&4) ? ((style->scrAlig
             const unsigned matrix = headers.Value(buff, 2);
             switch(matrix)
             {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            case 1: ret.SetDocumentColorMatrix(CSimpleTextSubtitle::YCbCrMatrix_AUTO); ret.SetDocumentColorRange(CSimpleTextSubtitle::YCbCrRange_AUTO); break;
+#else
             case 1: ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_AUTO; ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_AUTO; break;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            case 2: ret.SetDocumentColorMatrix(CSimpleTextSubtitle::YCbCrMatrix_BT601); ret.SetDocumentColorRange(CSimpleTextSubtitle::YCbCrRange_TV); break;
+#else
             case 2: ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT601; ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_TV; break;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            case 3: ret.SetDocumentColorMatrix(CSimpleTextSubtitle::YCbCrMatrix_BT709); ret.SetDocumentColorRange(CSimpleTextSubtitle::YCbCrRange_TV); break;
+#else
             case 3: ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT709; ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_TV; break;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            case 4: ret.SetDocumentColorMatrix(CSimpleTextSubtitle::YCbCrMatrix_BT2020); ret.SetDocumentColorRange(CSimpleTextSubtitle::YCbCrRange_TV); break;
+#else
             case 4: ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT2020; ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_TV; break;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            case 5: ret.SetDocumentColorMatrix(CSimpleTextSubtitle::YCbCrMatrix_BT601); ret.SetDocumentColorRange(CSimpleTextSubtitle::YCbCrRange_PC); break;
+#else
             case 5: ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT601; ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_PC; break;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            case 6: ret.SetDocumentColorMatrix(CSimpleTextSubtitle::YCbCrMatrix_BT709); ret.SetDocumentColorRange(CSimpleTextSubtitle::YCbCrRange_PC); break;
+#else
             case 6: ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT709; ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_PC; break;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            case 7: ret.SetDocumentColorMatrix(CSimpleTextSubtitle::YCbCrMatrix_BT2020); ret.SetDocumentColorRange(CSimpleTextSubtitle::YCbCrRange_PC); break;
+#else
             case 7: ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT2020; ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_PC; break;
+#endif
             }
 #else
             if (buff.Left(4)==L"none")
             {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                ret.SetDocumentColorMatrix(CSimpleTextSubtitle::YCbCrMatrix_AUTO);
+#else
                 ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_AUTO;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                ret.SetDocumentColorRange(CSimpleTextSubtitle::YCbCrRange_AUTO);
+#else
                 ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_AUTO;
+#endif
             }
             else if (buff.Left(6)==L"tv.601")
             {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                ret.SetDocumentColorMatrix(CSimpleTextSubtitle::YCbCrMatrix_BT601);
+#else
                 ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT601;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                ret.SetDocumentColorRange(CSimpleTextSubtitle::YCbCrRange_TV);
+#else
                 ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_TV;
+#endif
             }
             else if (buff.Left(6)==L"tv.709")
             {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                ret.SetDocumentColorMatrix(CSimpleTextSubtitle::YCbCrMatrix_BT709);
+#else
                 ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT709;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                ret.SetDocumentColorRange(CSimpleTextSubtitle::YCbCrRange_TV);
+#else
                 ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_TV;
+#endif
             }
             else if (buff.Left(7)==L"tv.2020")
             {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                ret.SetDocumentColorMatrix(CSimpleTextSubtitle::YCbCrMatrix_BT2020);
+#else
                 ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT2020;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                ret.SetDocumentColorRange(CSimpleTextSubtitle::YCbCrRange_TV);
+#else
                 ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_TV;
+#endif
             }
             else if (buff.Left(6)==L"pc.601")
             {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                ret.SetDocumentColorMatrix(CSimpleTextSubtitle::YCbCrMatrix_BT601);
+#else
                 ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT601;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                ret.SetDocumentColorRange(CSimpleTextSubtitle::YCbCrRange_PC);
+#else
                 ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_PC;
+#endif
             }
             else if (buff.Left(6)==L"pc.709")
             {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                ret.SetDocumentColorMatrix(CSimpleTextSubtitle::YCbCrMatrix_BT709);
+#else
                 ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT709;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                ret.SetDocumentColorRange(CSimpleTextSubtitle::YCbCrRange_PC);
+#else
                 ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_PC;
+#endif
             }
             else if (buff.Left(7)==L"pc.2020")
             {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                ret.SetDocumentColorMatrix(CSimpleTextSubtitle::YCbCrMatrix_BT2020);
+#else
                 ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT2020;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                ret.SetDocumentColorRange(CSimpleTextSubtitle::YCbCrRange_PC);
+#else
                 ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_PC;
+#endif
             }
 #endif
         }
@@ -3208,11 +3300,31 @@ CSimpleTextSubtitle::CSimpleTextSubtitle()
 #else
     m_encoding             = CTextFile::DEFAULT_ENCODING;
 #endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentPARType(EPCTDisabled);
+#else
     m_ePARCompensationType = EPCTDisabled;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentPARCompensation(1.0);
+#else
     m_dPARCompensation     = 1.0;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentColorMatrix(YCbCrMatrix_AUTO);
+#else
     m_eYCbCrMatrix         = YCbCrMatrix_AUTO;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentColorRange(YCbCrRange_AUTO);
+#else
     m_eYCbCrRange          = YCbCrRange_AUTO;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentForcedDefaultStyle(false);
+#else
     m_fForcedDefaultStyle  = false;
+#endif
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     ResetDefaultStyle(DEFAULT_CHARSET);
 #else
@@ -3274,7 +3386,11 @@ void CSimpleTextSubtitle::Copy(CSimpleTextSubtitle& sts)
 #else
     m_defaultStyle                 = sts.m_defaultStyle;
 #endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentForcedDefaultStyle(sts.GetDocumentForcedDefaultStyle());
+#else
     m_fForcedDefaultStyle          = sts.m_fForcedDefaultStyle;
+#endif
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     CopyNamedStylesFrom(sts);
 #else
@@ -3730,7 +3846,11 @@ bool CSimpleTextSubtitle::GetDefaultStyle(STSStyle& s)
 
 void CSimpleTextSubtitle::SetForceDefaultStyle( bool value )
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentForcedDefaultStyle(value);
+#else
     m_fForcedDefaultStyle = value;
+#endif
 }
 
 void CSimpleTextSubtitle::ConvertToTimeBased(double fps)
@@ -4250,6 +4370,56 @@ void CSimpleTextSubtitle::OrSegmentAnimated(int iSegment, bool animated)
 }
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+bool CSimpleTextSubtitle::GetDocumentForcedDefaultStyle() const
+{
+    return m_document->Metadata(3) != 0;
+}
+
+void CSimpleTextSubtitle::SetDocumentForcedDefaultStyle(bool value)
+{
+    m_document->SetMetadata(3, value ? 1 : 0);
+}
+
+CSimpleTextSubtitle::EPARCompensationType CSimpleTextSubtitle::GetDocumentPARType() const
+{
+    return static_cast<EPARCompensationType>(m_document->Metadata(0));
+}
+
+void CSimpleTextSubtitle::SetDocumentPARType(EPARCompensationType value)
+{
+    m_document->SetMetadata(0, static_cast<int32_t>(value));
+}
+
+double CSimpleTextSubtitle::GetDocumentPARCompensation() const
+{
+    return m_document->PARCompensation();
+}
+
+void CSimpleTextSubtitle::SetDocumentPARCompensation(double value)
+{
+    m_document->SetPARCompensation(value);
+}
+
+CSimpleTextSubtitle::YCbCrMatrix CSimpleTextSubtitle::GetDocumentColorMatrix() const
+{
+    return static_cast<YCbCrMatrix>(m_document->Metadata(1));
+}
+
+void CSimpleTextSubtitle::SetDocumentColorMatrix(YCbCrMatrix value)
+{
+    m_document->SetMetadata(1, static_cast<int32_t>(value));
+}
+
+CSimpleTextSubtitle::YCbCrRange CSimpleTextSubtitle::GetDocumentColorRange() const
+{
+    return static_cast<YCbCrRange>(m_document->Metadata(2));
+}
+
+void CSimpleTextSubtitle::SetDocumentColorRange(YCbCrRange value)
+{
+    m_document->SetMetadata(2, static_cast<int32_t>(value));
+}
+
 CSize CSimpleTextSubtitle::GetDocumentScreenSize() const
 {
     return m_document->ScreenSize();
@@ -4438,7 +4608,7 @@ bool CSimpleTextSubtitle::GetStyle(int i, STSStyle* const stss)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     NamedStyleLookup state = NamedStyleLookup::Missing;
-    if(!m_fForcedDefaultStyle)
+    if(!GetDocumentForcedDefaultStyle())
     {
         state = LookupNamedStyle(m_document->Entry(i).style, stss);
         if(state == NamedStyleLookup::Missing) state = LookupNamedStyle(g_default_style, stss);
@@ -4458,7 +4628,7 @@ int CSimpleTextSubtitle::GetCharSet(int i)
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     STSStyle value;
     NamedStyleLookup state = NamedStyleLookup::Missing;
-    if(!m_fForcedDefaultStyle)
+    if(!GetDocumentForcedDefaultStyle())
     {
         state = LookupNamedStyle(m_document->Entry(i).style, &value);
         if(state == NamedStyleLookup::Missing) state = LookupNamedStyle(g_default_style, &value);
