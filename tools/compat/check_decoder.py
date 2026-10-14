@@ -54,7 +54,7 @@ def capture_inputs():
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h", ROOT / "include/xy_rust_writer.h", ROOT / "include/xy_rust_seek.h",
               ROOT / "include/xy_rust_drawing.h", ROOT / "include/xy_rust_layout.h", ROOT / "include/xy_rust_text_runs.h", ROOT / "include/xy_rust_wrap.h", ROOT / "include/xy_rust_line_layout.h", ROOT / "src/subtitles/RTS.h",
-              ROOT / "include/xy_rust_drawing_tokens.h", ROOT / "include/xy_rust_path_align.h", ROOT / "include/xy_rust_path_buffer.h", ROOT / "include/xy_rust_spans.h", ROOT / "include/xy_rust_arc_queue.h", ROOT / "include/xy_rust_ellipse.h",
+              ROOT / "include/xy_rust_drawing_tokens.h", ROOT / "include/xy_rust_path_align.h", ROOT / "include/xy_rust_path_buffer.h", ROOT / "include/xy_rust_spans.h", ROOT / "include/xy_rust_edges.h", ROOT / "src/subtitles/Rasterizer.h", ROOT / "include/xy_rust_arc_queue.h", ROOT / "include/xy_rust_ellipse.h",
               ROOT / "src/subtitles/xy_widen_region.cpp", ROOT / "src/subtitles/xy_circular_array_queue.h",
               ROOT / "include/xy_rust_pipe_line.h", ROOT / "include/xy_rust_subrip_cue.h", ROOT / "include/xy_rust_sami_file.h", ROOT / "include/xy_rust_microdvd_style.h", ROOT / "include/xy_rust_font_records.h", ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
@@ -787,6 +787,35 @@ public:
             definition = definition.replace("__int64", "int64_t")
         storage_code += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_ellipse_storage.h").write_text(storage_code, encoding="utf-8")
+    edge_code = '#include "edge_storage_shell.h"\n'
+    for name, content in (("ReferenceEdges", raster_source), ("CandidateEdges", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+        text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        edge_code += f"namespace {name} {{\n"
+        raw_edges = "#define EDGE_OWNER\n#define EDGE_HEAD(i) mpScanBuffer[i]\n#define EDGE_NEXT(i) static_cast<unsigned>(mpEdgeBuffer[i].next)\n#define EDGE_POS(i) mpEdgeBuffer[i].posandflag\n#define EDGE_CHECK\n"
+        if name == "CandidateEdges":
+            edge_code += "#define XY_VSFILTER_RUST_TEXT\n#ifdef XY_VSFILTER_RUST_TEXT\n#define EDGE_OWNER XyRust::ObservedEdgeStorage m_edges;\n#define EDGE_HEAD(i) m_edges.Head(i)\n#define EDGE_NEXT(i) m_edges.Next(i)\n#define EDGE_POS(i) m_edges.Position(i)\n#define EDGE_CHECK if(!m_edges.Ready() || m_edges.Capacity()!=mEdgeHeapSize || m_edges.Rows()!=static_cast<unsigned>(mHeight))std::abort();\n#else\n" + raw_edges + "#endif\n"
+        else:
+            edge_code += raw_edges
+        edge_code += "EDGE_SCAN_CLASS\n"
+        edge_code += extract_definition(text, "void ScanLineData::_ReallocEdgeBuffer(") + "\n"
+        if name == "CandidateEdges":
+            edge_code += extract_definition(text, "void ScanLineData::_AddEdge(") + "\n"
+        else:
+            start = text.index("            mpEdgeBuffer[mEdgeNext].next = mpScanBuffer[iy];")
+            end = text.index("mpScanBuffer[iy] = mEdgeNext++;", start) + len("mpScanBuffer[iy] = mEdgeNext++;")
+            insertion = text[start:end].replace("iy", "row").replace("(ix << 1) | flag", "position")
+            edge_code += "void ScanLineData::_AddEdge(int row,int position) {\n" + insertion + "\n}\n"
+        definition = extract_definition(text, "bool ScanLineData::ScanConvert(")
+        if name == "CandidateEdges":
+            assert definition.count("    m_edges.Reset();") == 1
+            definition = definition.replace("    m_edges.Reset();", "    Checkpoint();\n    m_edges.Reset();")
+        else:
+            assert definition.count("    free(mpEdgeBuffer);") == 1
+            definition = definition.replace("    free(mpEdgeBuffer);", "    Checkpoint();\n    free(mpEdgeBuffer);")
+        if os.name != "nt":
+            definition = definition.replace("__int64", "int64_t").replace("0x4000000040000000i64", "0x4000000040000000LL")
+        edge_code += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n#undef EDGE_OWNER\n#undef EDGE_HEAD\n#undef EDGE_NEXT\n#undef EDGE_POS\n#undef EDGE_CHECK\n"
+    (destination / "original_edge_storage.h").write_text(edge_code, encoding="utf-8")
     filter_source = original("src/subtitles/xy_filter.cpp", reference["commit"])
     vobsub_source = original("src/subtitles/VobSubImage.cpp", reference["commit"])
     golomb = '#pragma once\n#include "golomb_shell.h"\n'
@@ -1294,6 +1323,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     ellipse_storage_result = run([str(ellipse_storage_executable)], capture_output=True, text=True)
     print(ellipse_storage_result.stdout, end="", flush=True)
     print(ellipse_storage_result.stderr, end="", file=sys.stderr)
+    edges_executable = destination / ("edge-storage-oracle.exe" if os.name == "nt" else "edge-storage-oracle")
+    edges_compile = [arg.replace("find_char_oracle.cpp", "edge_storage_oracle.cpp").replace("find-char-oracle", "edge-storage-oracle") for arg in find_char_compile]
+    run(edges_compile)
+    edges_result = run([str(edges_executable)], capture_output=True, text=True)
+    print(edges_result.stdout, end="", flush=True)
+    print(edges_result.stderr, end="", file=sys.stderr)
     pipe_line_executable = destination / ("pipe-line-oracle.exe" if os.name == "nt" else "pipe-line-oracle")
     pipe_line_compile = [arg.replace("find_char_oracle.cpp", "pipe_line_oracle.cpp").replace("find-char-oracle", "pipe-line-oracle") for arg in find_char_compile]
     run(pipe_line_compile)
@@ -1683,6 +1718,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "path_align_compile_command": path_align_compile,
         "path_align_result": path_align_result.stdout, "path_align_stderr": path_align_result.stderr,
         "path_align_scope": "Complete pinned PathData::AlignLeftTop over initialized point/type buffers; actual Windows POINT/ATL geometry; exact guarded buffers, origin/size, errno/FP/Windows error state; native cleanup modeled, outputs disjoint and representable arithmetic only",
+        "edge_storage_compile_command": edges_compile,
+        "edge_storage_result": edges_result.stdout, "edge_storage_stderr": edges_result.stderr,
+        "edge_storage_scope": "Complete pinned ScanConvert and realloc with controlled line/curve emission; original insertion statements extracted from the integer line evaluator. Exact initialized heads/edges, growth, traversal, sorting/winding, output spans/capacity and state across reuse/empty calls. Geometry production and allocator failures modeled/excluded; no uninitialized edge-zero/tail, invalid links/cycles or native constructor state is counted as parity.",
         "ellipse_storage_compile_command": ellipse_storage_compile,
         "ellipse_storage_result": ellipse_storage_result.stdout, "ellipse_storage_stderr": ellipse_storage_result.stderr,
         "ellipse_storage_scope": "Complete pinned XyEllipse initialization/query/destruction including native floating-point intersection tables, compiled with FP-observable settings recorded in the command; ordinary optimized x64 ambient flag mismatch is unresolved and is not counted as a pass. Compare valid centered arc indices, initialized negative matrix rows, float/double fields, returned intersections and errno/FP/Windows error state; center-coordinate native overloads tested for nonnegative relative offsets, candidate negative offsets separately checked against direct native indexed values. No uninitialized row, out-of-range query, OOM or unsupported arithmetic is counted as parity.",

@@ -25,6 +25,9 @@
 #include <vector>
 #include "../SubPic/ISubPic.h"
 #include "xy_malloc.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "xy_rust_edges.h"
+#endif
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -93,11 +96,15 @@ private:
     unsigned mEdgeNext;
 
     unsigned int* mpScanBuffer;
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::EdgeStorage m_edges;
+#endif
 
     typedef unsigned char byte;
 
 private:
     void _ReallocEdgeBuffer(unsigned edges);
+    void _AddEdge(int row, int position);
     void _EvaluateBezier(const PathData& path_data, int ptbase, bool fBSpline);
     void _EvaluateLine(const PathData& path_data, int pt1idx, int pt2idx);
     void _EvaluateLine(int x0, int y0, int x1, int y1);	

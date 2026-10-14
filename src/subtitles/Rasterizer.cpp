@@ -3460,7 +3460,28 @@ ScanLineData::~ScanLineData()
 void ScanLineData::_ReallocEdgeBuffer(unsigned edges)
 {
     mEdgeHeapSize = edges;
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (m_edges.Ready())
+    {
+        m_edges.Resize(edges);
+        return;
+    }
+#endif
     mpEdgeBuffer = (Edge*)realloc(mpEdgeBuffer, sizeof(Edge)*edges);
+}
+
+void ScanLineData::_AddEdge(int row, int position)
+{
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (m_edges.Ready()) m_edges.Insert(mEdgeNext, row, position);
+    else
+#endif
+    {
+        mpEdgeBuffer[mEdgeNext].next = mpScanBuffer[row];
+        mpEdgeBuffer[mEdgeNext].posandflag = position;
+        mpScanBuffer[row] = mEdgeNext;
+    }
+    ++mEdgeNext;
 }
 
 void ScanLineData::_EvaluateBezier(const PathData& path_data, int ptbase, bool fBSpline)
@@ -3594,10 +3615,7 @@ void ScanLineData::_EvaluateLine(int x0, int y0, int x1, int y1)
         while (iy <= y1) {
             int ix = (int)((xacc + 32768) >> 16);
 
-            mpEdgeBuffer[mEdgeNext].next = mpScanBuffer[iy];
-            mpEdgeBuffer[mEdgeNext].posandflag = (ix << 1) | flag;
-
-            mpScanBuffer[iy] = mEdgeNext++;
+            _AddEdge(iy, (ix << 1) | flag);
 
             ++iy;
             xacc += invslope;
@@ -3622,10 +3640,20 @@ bool ScanLineData::ScanConvert(const PathData& path_data, const CSize& size)
     // Initialize edge buffer.  We use edge 0 as a sentinel.
     mEdgeNext = 1;
     mEdgeHeapSize = 2048;
-    mpEdgeBuffer = (Edge*)malloc(sizeof(Edge)*mEdgeHeapSize);
-    // Initialize scanline list.
-    mpScanBuffer = DEBUG_NEW unsigned int[mHeight];
-    memset(mpScanBuffer, 0, mHeight*sizeof(unsigned int));
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (m_edges.Initialize(mHeight, mEdgeHeapSize))
+    {
+        mpEdgeBuffer = NULL;
+        mpScanBuffer = NULL;
+    }
+    else
+#endif
+    {
+        mpEdgeBuffer = (Edge*)malloc(sizeof(Edge)*mEdgeHeapSize);
+        // Initialize scanline list.
+        mpScanBuffer = DEBUG_NEW unsigned int[mHeight];
+        memset(mpScanBuffer, 0, mHeight*sizeof(unsigned int));
+    }
     // Scan convert the outline.  Yuck, Bezier curves....
     // Unfortunately, Windows 95/98 GDI has a bad habit of giving us text
     // paths with all but the first figure left open, so we can't rely
@@ -3677,9 +3705,19 @@ bool ScanLineData::ScanConvert(const PathData& path_data, const CSize& size)
     {
         int count = 0;
         // Detangle scanline into edge heap.
-        for(unsigned ptr = (unsigned)(mpScanBuffer[y]&0xffffffff); ptr; ptr = mpEdgeBuffer[ptr].next)
+#ifdef XY_VSFILTER_RUST_TEXT
+        if (m_edges.Ready())
         {
-            heap.push_back(mpEdgeBuffer[ptr].posandflag);
+            for(unsigned ptr = m_edges.Head(static_cast<size_t>(y)); ptr; ptr = m_edges.Next(ptr))
+                heap.push_back(m_edges.Position(ptr));
+        }
+        else
+#endif
+        {
+            for(unsigned ptr = (unsigned)(mpScanBuffer[y]&0xffffffff); ptr; ptr = mpEdgeBuffer[ptr].next)
+            {
+                heap.push_back(mpEdgeBuffer[ptr].posandflag);
+            }
         }
         // Sort edge heap.  Note that we conveniently made the opening edges
         // one more than closing edges at the same spot, so we won't have any
@@ -3709,6 +3747,9 @@ bool ScanLineData::ScanConvert(const PathData& path_data, const CSize& size)
         heap.clear();
     }
     // Dump the edge and scan buffers, since we no longer need them.
+#ifdef XY_VSFILTER_RUST_TEXT
+    m_edges.Reset();
+#endif
     free(mpEdgeBuffer);
     delete [] mpScanBuffer;
     // All done!

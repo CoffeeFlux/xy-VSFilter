@@ -108,3 +108,5 @@ pub mod ellipse_arc;
 pub mod ellipse_matrix;
 
 pub mod path_buffer;
+
+pub mod edge_storage;
