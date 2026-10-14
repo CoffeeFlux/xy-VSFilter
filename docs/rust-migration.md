@@ -20,6 +20,22 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* SSF Arabic range classification and both character-replacement overloads now
+  run in safe Rust with the exact pinned 256-row table. Zero mappings and
+  neighbor decisions based solely on the `0x0600..0x06ff` range are retained;
+  presentation forms and raw UTF-16 units are not normalized. Complete pinned
+  methods match locally in ordinary and fatal ASan/UBSan builds on arm64 and
+  x64: **5,144,576 comparisons / 1,836,966 changed code units / 525,065 handled
+  zero results / 2,493,808 out-of-range results / 32,768 repeated replacements**.
+  Instrumentation confirms **65,536 Rust classifications / 262,144 form plans /
+  4,816,896 neighbor plans**. Every code unit is tested as the current character
+  and as each neighbor, with all four valid presentation forms and both neighbor
+  membership states. Native enum values outside those forms, font selection,
+  other shaping and actual SSF rendering remain excluded. The table retains its
+  original attribution. **149 core / 105 FFI tests**, formatting, Clippy,
+  29 Python checks (three local skips) and default native syntax pass; Windows
+  integration and Miri are pending for this increment.
+
 * SSF `OutputStream::PutChar` now uses safe Rust to calculate its exact callback
   values. Native first-character/BOM handling and virtual callbacks retain
   their order; Rust returns copied scalars before any callback begins. The
@@ -75,7 +91,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   **148 core / 103 FFI tests**, formatting, Clippy, 29 Python checks (three
   local skips) and default native syntax pass. Both Windows portable jobs
   (`115931349086`, `115931349176`) and Miri (`115931349190`) now pass; complete
-  renderer integration for this parser increment remains pending.
+  renderer integration now passes on both architectures in run `38586944662`.
+  Full evidence archival awaits completion of the portable sanitizer jobs.
 
 * `composite-integration-evidence.json` now archives the complete passing stage
   at `fe6928d4`: all four portable jobs, Miri, both Windows renderer jobs and the
@@ -105,7 +122,9 @@ unresolved reference outcomes requiring investigation, never matching results.
   CSRI-specific names. The production source is unchanged by that repair, and
   corrected Windows execution now passes in jobs `115931349086` and
   `115931349176` at `5f586dac`, including the actual UTF-8 conversion API.
-  The earlier compilation failures remain failed; renderer integration is pending.
+  The earlier compilation failures remain failed. Renderer integration passed
+  on both architectures at `625730f1` (run `38585112075`) and with the corrected
+  fixture at `5f586dac` (run `38586944662`).
 
 * `CCDecoder::ExtractCC` now owns both temporary caption-field buffers through
   Rust while retaining the native packet loop, decoder calls and release order.

@@ -23,9 +23,13 @@
 
 #include "stdafx.h"
 #include "Arabic.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "../../../include/xy_rust_ssf_arabic.h"
+#endif
 
 namespace ssf
 {
+#ifndef XY_VSFILTER_RUST_TEXT
 	static const struct arabicforms 
 	{
 		unsigned short initial, medial, final, isolated;
@@ -293,13 +297,24 @@ namespace ssf
 		{ 0x06ff, 0x06ff, 0x06ff, 0x06ff, 1, 0, 0 }
 	};
 
+#endif
+
 	bool Arabic::IsArabic(WCHAR c)
 	{
+#ifdef XY_VSFILTER_RUST_TEXT
+        return xy_vsfilter_ssf_is_arabic(c) != 0;
+#else
 		return c >= 0x600 && c <= 0x6ff;
+#endif
 	}
 
 	bool Arabic::Replace(WCHAR& c, pres_form_t pf)
 	{
+#ifdef XY_VSFILTER_RUST_TEXT
+        const uint32_t result = xy_vsfilter_ssf_arabic_form(c, static_cast<uint32_t>(pf));
+        c = static_cast<WCHAR>(result & 0xffff);
+        return (result >> 16) != 0;
+#else
 		if(!IsArabic(c)) return false;
 
 		const arabicforms& af = ArabicForms[c - 0x600];
@@ -313,15 +328,22 @@ namespace ssf
 		}
 
 		return true;
+#endif
 	}
 
 	bool Arabic::Replace(WCHAR& c, WCHAR prev, WCHAR next)
 	{
+#ifdef XY_VSFILTER_RUST_TEXT
+        const uint32_t result = xy_vsfilter_ssf_arabic_neighbors(c, prev, next);
+        c = static_cast<WCHAR>(result & 0xffff);
+        return (result >> 16) != 0;
+#else
 		if(!IsArabic(c)) return false;
 
 		bool p = IsArabic(prev);
 		bool n = IsArabic(next);
 
 		return Replace(c, p ? (n ? medi : fina) : (n ? init : isol));
+#endif
 	}
 }
