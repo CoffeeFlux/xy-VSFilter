@@ -20,7 +20,7 @@ static Outcome execute(bool candidate,int width,int height,int pitch,int xf,int 
         if(candidate)CandidateBilinear::Bilinear(out.bytes.data()+2048,width,height,pitch,xf,yf);
         else ReferenceBilinear::Bilinear(out.bytes.data()+2048,width,height,pitch,xf,yf);
     }
-    if(bilinearAllocation)std::abort();
+    if(bilinearAllocation||bilinearOwner||g_xy_malloc_used_size)std::abort();
     out.events=bilinearEvents;out.history=bilinearHistory;return out;
 }
 static void fixture(int width,int height,int pitch,int xf,int yf,unsigned pattern,bool fail,int passes=1) {
@@ -52,6 +52,7 @@ int main() {
         fixture(64,3,320,xf,yf,0,false);
     for(int pitch:{-320,-1,0,1,320})for(int xf=0;xf<=8;++xf)for(int yf=0;yf<=8;++yf)
         fixture(129,4,pitch,xf,yf,3,false,3);
-    printf("%llu exact bilinear comparisons passed (%llu bytes including padding/guards, %llu visibly changed cases, %llu injected allocation-failure cases; every 1/8-pixel factor pair, column history, row aliasing, negative/zero pitch, repeated shifts and defined native fallback)\n",
-        static_cast<unsigned long long>(comparisons),static_cast<unsigned long long>(bytes_compared),static_cast<unsigned long long>(changed),static_cast<unsigned long long>(failed_allocations));
+    if(!bilinearOwners||bilinearOwners!=bilinearLoans||bilinearOwners!=bilinearReleases)std::abort();
+    printf("%llu exact bilinear comparisons passed (%llu bytes including padding/guards, %llu visibly changed cases, %llu injected allocation-failure cases / %llu Rust aligned scratch owners, loans and releases; every 1/8-pixel factor pair, column history, row aliasing, negative/zero pitch, repeated shifts and defined native fallback)\n",
+        static_cast<unsigned long long>(comparisons),static_cast<unsigned long long>(bytes_compared),static_cast<unsigned long long>(changed),static_cast<unsigned long long>(failed_allocations),static_cast<unsigned long long>(bilinearOwners));
 }

@@ -27,7 +27,8 @@ public:
     explicit PlaneAllocation(size_t n):owner(xy_vsfilter_plane_create(n)),data(NULL),count(n){
         if(owner){data=xy_vsfilter_plane_loan(owner);g_xy_malloc_used_size+=count;}
     }
-    ~PlaneAllocation(){if(owner)PlaneDeleter(owner,count)(data);}
+    ~PlaneAllocation(){Reset();}
+    void Reset(){if(owner)PlaneDeleter(owner,count)(data);owner=NULL;data=NULL;}
     bool Ready()const{return owner!=NULL;}
     uint8_t* Data()const{return data;}
     template<class Shared> void Attach(Shared& destination){

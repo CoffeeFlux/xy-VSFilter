@@ -334,7 +334,12 @@ static void be_blur(unsigned char *buf, unsigned *tmp_base, int w, int h, int st
 
 static void Bilinear(unsigned char *buf, int w, int h, int stride, int x_factor, int y_factor)
 {   
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::PlaneAllocation rust_columns(w*sizeof(WORD));
+    WORD *col_pix_buf_base = rust_columns.Ready() ? reinterpret_cast<WORD*>(rust_columns.Data()) : reinterpret_cast<WORD*>(xy_malloc(w*sizeof(WORD)));
+#else
     WORD *col_pix_buf_base = reinterpret_cast<WORD*>(xy_malloc(w*sizeof(WORD)));
+#endif
     if(!col_pix_buf_base)
     {
         //ToDo: error handling
@@ -346,7 +351,8 @@ static void Bilinear(unsigned char *buf, int w, int h, int stride, int x_factor,
         for (int y = 0; y < h; ++y) {
             xy_vsfilter_bilinear_row(buf + y * stride, col_pix_buf_base, w, x_factor, y_factor);
         }
-        xy_free(col_pix_buf_base);
+        if(rust_columns.Ready()) rust_columns.Reset();
+        else xy_free(col_pix_buf_base);
         return;
     }
 #endif
@@ -373,6 +379,10 @@ static void Bilinear(unsigned char *buf, int w, int h, int stride, int x_factor,
             col_pix_buf[x] = temp2;
         }
     }
+#ifdef XY_VSFILTER_RUST_TEXT
+    if(rust_columns.Ready()) rust_columns.Reset();
+    else
+#endif
     xy_free(col_pix_buf_base);
 }
 
