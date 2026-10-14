@@ -1,0 +1,154 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+#pragma once
+#include "find_char_shell.h"
+#include "xy_rust_microdvd.h"
+#include <cstring>
+#include <algorithm>
+#undef CStringW
+static uint64_t microSearches=0,microSteps=0,microTagCallbacks=0;
+static void microObserve(unsigned kind,const wchar_t* text){
+    ++microTagCallbacks;searchObserve(kind,0);
+    while(*text)searchEvents.push_back(static_cast<uint16_t>(*text++));
+    searchEvents.push_back(0x10000);
+}
+class MicroString {
+#ifdef _WIN32
+    ATL::CStringW text;
+#else
+    std::wstring text;
+#endif
+public:
+    MicroString(){}
+    MicroString(const wchar_t* p):text(p){}
+    MicroString(const wchar_t* p,int n)
+#ifdef _WIN32
+        :text(p,n){}
+#else
+        :text(p,static_cast<size_t>(n)){}
+#endif
+    const wchar_t* GetString()const{
+#ifdef _WIN32
+        return text.GetString();
+#else
+        return text.c_str();
+#endif
+    }
+    operator const wchar_t*()const{return GetString();}
+    int GetLength()const{
+#ifdef _WIN32
+        return text.GetLength();
+#else
+        return static_cast<int>(text.size());
+#endif
+    }
+    wchar_t operator[](int i)const{
+#ifdef _WIN32
+        return text[i];
+#else
+        if(i==GetLength())return 0;return text.at(static_cast<size_t>(i));
+#endif
+    }
+    int Find(wchar_t c,int pos=0)const{
+#ifdef _WIN32
+        return text.Find(c,pos);
+#else
+        if(pos<0 || pos>=GetLength())return -1;
+        const wchar_t* p=std::wcschr(text.c_str()+pos,c);return p?static_cast<int>(p-text.c_str()):-1;
+#endif
+    }
+    MicroString Mid(int start,int count=0x7fffffff)const{
+#ifdef _WIN32
+        auto result=text.Mid(start,count);return MicroString(result.GetString(),result.GetLength());
+#else
+        start=std::max(0,std::min(start,GetLength()));count=std::max(0,std::min(count,GetLength()-start));
+        return MicroString(text.data()+start,count);
+#endif
+    }
+    bool operator==(const wchar_t* p)const{return std::wcscmp(GetString(),p)==0;}
+    MicroString& operator+=(const MicroString& p){text+=p.text;return *this;}
+    MicroString& operator+=(const wchar_t* p){text+=p;return *this;}
+    MicroString& operator+=(wchar_t p){text+=p;return *this;}
+    void MakeLower(){
+        microObserve(4,GetString());
+#ifdef _WIN32
+        text.MakeLower();
+#else
+        // CString's in-place lowercase stops at the first NUL.
+        for(size_t i=0;i<text.size() && text[i];++i)text[i]=wchar_t(std::towlower(text[i]));
+#endif
+    }
+    void Format(const wchar_t* fmt,const MicroString& input){
+        microObserve(5,fmt);
+#ifdef _WIN32
+        text.Format(fmt,input.GetString());
+#else
+        text=L"{\\fn";text+=input.GetString();text+=L"}";
+#endif
+    }
+    void Format(const wchar_t* fmt,int value){
+        microObserve(5,fmt);
+#ifdef _WIN32
+        text.Format(fmt,value);
+#else
+        wchar_t buf[256];std::swprintf(buf,256,fmt,value);text=buf;
+#endif
+    }
+    void Format(const wchar_t* fmt,double value){
+        microObserve(5,fmt);
+#ifdef _WIN32
+        text.Format(fmt,value);
+#else
+        wchar_t buf[512];std::swprintf(buf,512,fmt,value);text=buf;
+#endif
+    }
+    void Format(const wchar_t* fmt,int x,int y){
+        microObserve(5,fmt);
+#ifdef _WIN32
+        text.Format(fmt,x,y);
+#else
+        wchar_t buf[256];std::swprintf(buf,256,fmt,x,y);text=buf;
+#endif
+    }
+};
+static int microScan(const wchar_t* text,const wchar_t* fmt,int* out){
+    microObserve(6,text);
+#ifdef _WIN32
+    const int result=swscanf_s(text,fmt,out);
+#else
+    const int result=std::swscanf(text,fmt,out);
+#endif
+    if(result!=1){fprintf(stderr,"Fixture outside successful numeric-scan scope\n");std::abort();}return result;
+}
+static int microScan(const wchar_t* text,const wchar_t* fmt,double* out){
+    microObserve(6,text);
+#ifdef _WIN32
+    const int result=swscanf_s(text,fmt,out);
+#else
+    const int result=std::swscanf(text,fmt,out);
+#endif
+    if(result!=1){fprintf(stderr,"Fixture outside successful numeric-scan scope\n");std::abort();}return result;
+}
+static int microScan(const wchar_t* text,const wchar_t* fmt,int* x,wchar_t* c,unsigned count,int* y){
+    microObserve(6,text);
+#ifdef _WIN32
+    const int result=swscanf_s(text,fmt,x,c,count,y);
+#else
+    (void)fmt;(void)count;const int result=std::swscanf(text,L"{o:%d%lc%d",x,c,y);
+#endif
+    if(result!=3){fprintf(stderr,"Fixture outside successful move-scan scope\n");std::abort();}return result;
+}
+namespace XyRust {
+class ObservedMicroDVD : public MicroDVD {
+public:
+    explicit ObservedMicroDVD(int length):MicroDVD(length){++microSearches;}
+    unsigned Step(int reply){++microSteps;return MicroDVD::Step(reply);}
+};
+}
+#ifndef _WIN32
+#define _wcsnicmp wcsncasecmp
+#define _istupper iswupper
+typedef wchar_t TCHAR;
+#define ZeroMemory(p,n) std::memset(p,0,n)
+#endif
+#define swscanf_s microScan
+#define CStringW MicroString

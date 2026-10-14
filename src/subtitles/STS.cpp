@@ -25,6 +25,7 @@
 #include "xy_rust_text.h"
 #include "xy_rust_subrip.h"
 #include "xy_rust_find_char.h"
+#include "xy_rust_microdvd.h"
 #include "xy_rust_webvtt.h"
 #include "xy_rust_fields.h"
 #include "xy_rust_segments.h"
@@ -1224,6 +1225,98 @@ static STSStyle* GetMicroDVDStyle(CString str, int CharSet)
 
 static CStringW MicroDVD2SSA(CStringW str, bool fUnicode, int CharSet)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::MicroDVD convert(str.GetLength());
+    CStringW line;
+    int reply = 0;
+    for(;;)
+    {
+        const unsigned action = convert.Step(reply);
+        const int start = convert.Field(0), count = convert.Field(1);
+        switch(action)
+        {
+        case 0: return convert.Output<CStringW>();
+        case 1: reply = FindChar(str, '|', start, fUnicode, CharSet); break;
+        case 2: line = str.Mid(start, count); reply = line.GetLength(); break;
+        case 3: reply = FindChar(line, '{', start, fUnicode, CharSet); break;
+        case 4: convert.Append(line.Mid(start, count), convert.Field(2)); break;
+        case 5: reply = FindChar(line, '}', start, fUnicode, CharSet); break;
+        case 6:
+            {
+                CStringW code = line.Mid(start, count), ret;
+                enum {COLOR=0, FONTNAME, FONTSIZE, FONTCHARSET, BOLD, ITALIC, UNDERLINE, STRIKEOUT};
+                bool fRestore[8];
+                const unsigned previous = convert.Field(2);
+                for(int bit=0; bit<8; ++bit) fRestore[bit] = (previous & (1U<<bit)) != 0;
+                if(!_wcsnicmp(code, L"{c:$", 4))
+                {
+                    fRestore[COLOR] = (iswupper(code[1]) == 0);
+                    code.MakeLower();
+
+                    int color;
+                    swscanf_s(code, L"{c:$%x", &color);
+                    code.Format(L"{\\c&H%x&}", color);
+                    ret += code;
+                }
+                else if(!_wcsnicmp(code, L"{f:", 3))
+                {
+                    fRestore[FONTNAME] = (iswupper(code[1]) == 0);
+
+                    code.Format(L"{\\fn%s}", code.Mid(3));
+                    ret += code;
+                }
+                else if(!_wcsnicmp(code, L"{s:", 3))
+                {
+                    fRestore[FONTSIZE] = (iswupper(code[1]) == 0);
+                    code.MakeLower();
+
+                    double size;
+                    swscanf_s(code, L"{s:%lf", &size);
+                    code.Format(L"{\\fs%f}", size);
+                    ret += code;
+                }
+                else if(!_wcsnicmp(code, L"{h:", 3))
+                {
+                    fRestore[COLOR] = (_istupper(code[1]) == 0);
+                    code.MakeLower();
+
+                    int iCharSet;
+                    swscanf_s(code, L"{h:%d", &iCharSet);
+                    code.Format(L"{\\fe%d}", iCharSet);
+                    ret += code;
+                }
+                else if(!_wcsnicmp(code, L"{y:", 3))
+                {
+                    bool f = (_istupper(code[1]) == 0);
+
+                    code.MakeLower();
+
+                    ret += '{';
+                    if(code.Find('b') >= 0) {ret += L"\\b1"; fRestore[BOLD] = f;}
+                    if(code.Find('i') >= 0) {ret += L"\\i1"; fRestore[ITALIC] = f;}
+                    if(code.Find('u') >= 0) {ret += L"\\u1"; fRestore[UNDERLINE] = f;}
+                    if(code.Find('s') >= 0) {ret += L"\\s1"; fRestore[STRIKEOUT] = f;}
+                    ret += '}';
+                }
+                else if(!_wcsnicmp(code, L"{o:", 3))
+                {
+                    code.MakeLower();
+
+                    int x, y;
+                    TCHAR c;
+                    swscanf_s(code, L"{o:%d%c%d", &x, &c, 1, &y);
+                    code.Format(L"{\\move(%d,%d,0,0,0,0)}", x, y);
+                    ret += code;
+                }
+                else ret += code;
+                unsigned restore = 0;
+                for(int bit=0; bit<8; ++bit) if(fRestore[bit]) restore |= 1U<<bit;
+                convert.Append(ret, restore);
+            }
+            break;
+        }
+    }
+#else
     CStringW ret;
 
     enum {COLOR=0, FONTNAME, FONTSIZE, FONTCHARSET, BOLD, ITALIC, UNDERLINE, STRIKEOUT};
@@ -1345,6 +1438,7 @@ static CStringW MicroDVD2SSA(CStringW str, bool fUnicode, int CharSet)
     }
 
     return(ret);
+#endif
 }
 
 static bool OpenMicroDVD(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
