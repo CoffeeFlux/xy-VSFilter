@@ -55,7 +55,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
               ROOT / "include/xy_rust_drawing.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
-              ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
+              ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
               ROOT / "include/xy_rust_cc.h", ROOT / "src/subtitles/CCDecoder.cpp", ROOT / "src/subtitles/CCDecoder.h",
               ROOT / "include/xy_rust_segments.h",
@@ -204,6 +204,28 @@ public:
         webvtt += extract_definition(content.decode("utf-8-sig"), "static void WebVTTCueStrip(") + "\n"
         webvtt += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_webvtt.h").write_text(webvtt, encoding="utf-8")
+    microdvd = '#include "microdvd_shell.h"\n'
+    for name, content in (("ReferenceMicroDVD", font_source), ("CandidateMicroDVD", candidate_font)):
+        microdvd += f"namespace {name} {{\n"
+        if name == "CandidateMicroDVD":
+            microdvd += "#define XY_VSFILTER_RUST_TEXT\n"
+        for signature in ("static DWORD CharSetToCodePage(", "static int FindChar(", "static CStringW MicroDVD2SSA("):
+            decoded = content.decode("utf-8-sig")
+            if signature == "static CStringW MicroDVD2SSA(":
+                # Its unmatched braces inside tag literals defeat brace counting.
+                start = decoded.index(signature)
+                end = decoded.index("static bool OpenMicroDVD(", start)
+                definition = decoded[start:end].rstrip()
+                assert definition.endswith("}")
+            else:
+                definition = extract_definition(decoded, signature)
+            if name == "CandidateMicroDVD" and signature == "static CStringW MicroDVD2SSA(":
+                bridge = "XyRust::MicroDVD convert"
+                assert definition.count(bridge) == 1
+                definition = definition.replace(bridge, "XyRust::ObservedMicroDVD convert")
+            microdvd += definition + "\n"
+        microdvd += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_microdvd.h").write_text(microdvd, encoding="utf-8")
     find_char = '#include "find_char_shell.h"\n'
     for name, content in (("ReferenceFindChar", font_source), ("CandidateFindChar", candidate_font)):
         find_char += f"namespace {name} {{\n"
@@ -886,6 +908,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     find_char_result = run([str(find_char_executable)], capture_output=True, text=True)
     print(find_char_result.stdout, end="", flush=True)
     print(find_char_result.stderr, end="", file=sys.stderr)
+    microdvd_executable = destination / ("microdvd-oracle.exe" if os.name == "nt" else "microdvd-oracle")
+    microdvd_compile = [arg.replace("find_char_oracle.cpp", "microdvd_oracle.cpp").replace("find-char-oracle", "microdvd-oracle") for arg in find_char_compile]
+    run(microdvd_compile)
+    microdvd_result = run([str(microdvd_executable)], capture_output=True, text=True)
+    print(microdvd_result.stdout, end="", flush=True)
+    print(microdvd_result.stderr, end="", file=sys.stderr)
     subrip_executable = destination / ("subrip-oracle.exe" if os.name == "nt" else "subrip-oracle")
     subrip_compile = [arg.replace("fill_oracle.cpp", "subrip_oracle.cpp").replace("fill-oracle", "subrip-oracle") for arg in fill_compile]
     run(subrip_compile)
@@ -1052,6 +1080,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "webvtt_compile_command": webvtt_compile,
         "webvtt_result": webvtt_result.stdout, "webvtt_stderr": webvtt_result.stderr,
         "webvtt_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring model with host iswspace; Windows comparison required",
+        "microdvd_compile_command": microdvd_compile,
+        "microdvd_result": microdvd_result.stdout, "microdvd_stderr": microdvd_result.stderr,
+        "microdvd_scope": "Complete MicroDVD2SSA and charset scanner against pinned reference; Windows ATL/CRT and charset APIs in CI, portable models locally; valid numeric scans, native callback interruptions, raw UTF-16 and embedded NULs",
         "find_char_compile_command": find_char_compile,
         "find_char_result": find_char_result.stdout, "find_char_stderr": find_char_result.stderr,
         "find_char_scope": "Native charset-aware FindChar and Unicode CString path; actual Windows ATL, charset and lead-byte APIs in Windows CI, portable model elsewhere; classification order and injected interruptions; representable charset arithmetic only",

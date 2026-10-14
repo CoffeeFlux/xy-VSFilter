@@ -20,6 +20,25 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns MicroDVD conversion's line/tag state, output code units and
+  style restore mask. The native adapter retains `FindChar`, `CStringW::Mid`,
+  tag classification, case conversion, numeric scans and formatting. Unknown
+  tags still drop the closing brace, a missing opening brace still uses the
+  whole source length, charset tags still update the color restore bit, and
+  restoration happens only at line separators in the original order.
+  Fatal ASan/UBSan comparisons passed **171,094 complete conversions**, including
+  **169,535 changed strings**, **5,860,113 output UTF-16 units**, **16,663,327
+  callback observation values** and **611 injected interruptions**, on arm64
+  and under x64 execution. All **171,094 conversions** used the Rust owner;
+  **3,108,842 state steps** were observed. Every UTF-16 value, NUL tails,
+  local/global overwrites, unknown/unclosed tags, empty/trailing lines and
+  charset scans are included. Numeric fixtures assert successful scans and
+  restrict arithmetic to representable results. Windows CI uses actual ATL/CRT;
+  portable string/format models are preliminary evidence only. Rust 1.85 tests
+  (79 core, 53 FFI), strict Clippy, default syntax and corpus freshness pass.
+  Windows/Miri and complete rendering validation are pending. Native tag
+  conversion, input/line strings, allocation failure timing and host integration
+  remain to be migrated or separately validated.
 * Safe Rust owns the charset-aware `FindChar` loop used by MicroDVD and other
   text paths: lead-byte skipping, nested style depth, the original search offset,
   inline `\fe` digit scanning and empty charset reset. Native Windows code-page
@@ -68,7 +87,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   caption state. The sink is a fixture; actual Windows ATL strings are used by
   CI. Native file I/O, unrepresentable arithmetic and caption-ripper integration
   remain outside these comparisons. Rust 1.85 tests (74 core, 50 FFI), strict
-  Clippy and default syntax checks pass. Windows/Miri validation is pending.
+  Clippy and default syntax checks pass. Candidate `b998b021` passed all four
+  portable platforms, Miri and both Windows DLL jobs, each matching **382 cases /
+  4,490 frames** and **32 mutations / 224 frames**, plus dialogs, visible controls,
+  exports and dependencies. Both logs confirm Rust-enabled `CCDecoder.cpp`
+  compilation. [Command-loop evidence](cc-decoder-evidence.json) records verified
+  hashes and stable local validation.
 * Safe Rust normalizes closed-caption cursors and writes initialized cells in
   the original 16-by-33 backing. Columns at or beyond 32 advance only one row;
   rows at or beyond 16 wrap to zero. Negative coordinates clamp first. Each
