@@ -55,6 +55,8 @@ static void compare(int rx,int ry){
 int main(){
     for(int rx=0;rx<=64;++rx)for(int ry=1;ry<=64;++ry)compare(rx,ry);
     for(int rx:{0,1,2,15,63,64,65,127,128,129,255})for(int ry:{1,2,15,63,64,65,127,128,129,255})compare(rx,ry);
+    if(!ellipseScratchOwners||!ellipseScratchReads||!ellipseScratchWrites||ellipseScratchFallbacks)std::abort();
+    printf("%llu Rust ellipse scratch owners / %llu reads / %llu writes / %llu native fallbacks passed (native float computation, zero initialization and row retention preserved)\n",(unsigned long long)ellipseScratchOwners,(unsigned long long)ellipseScratchReads,(unsigned long long)ellipseScratchWrites,(unsigned long long)ellipseScratchFallbacks);
     if(!matrixOwners||!owned||!matrixFields||!intersections||!negativeOffsets||!invalidInits)std::abort();
     printf("%llu exact persistent ellipse histories passed (%llu Rust arc owners / %llu Rust matrix owners / %llu direct and translated arc queries / %llu intersection returns / %llu initialized native matrix fields / %llu candidate negative-offset checks against direct native indices / %llu rejected reinitializations; full native float fields and calculations retained, errno/FP/Windows error state under FP-observable compilation; ordinary optimized x64 ambient-flag mismatch recorded separately; valid initialized indices and successful allocation, negative unsigned native pointer-expression parity left to renderer CI, uninitialized matrix row excluded)\n",(unsigned long long)histories,(unsigned long long)owned,(unsigned long long)matrixOwners,(unsigned long long)queries,(unsigned long long)intersections,(unsigned long long)matrixFields,(unsigned long long)negativeOffsets,(unsigned long long)invalidInits);
 }

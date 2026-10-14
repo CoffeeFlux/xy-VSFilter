@@ -20,6 +20,22 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Rust owns the temporary centered coordinates used to build ellipse intersection
+  tables. It preserves the native vector's zero initialization, sentinel cell,
+  values retained between rows, write-before-clamp order and scalar reads. Native
+  float calculations and conversion remain in their original C++ expressions.
+  Fatal ASan/UBSan comparisons pass on arm64 and under x64 execution with the
+  documented FP-observable settings: **4,227 scratch owners / 67,344,335 reads /
+  25,667,755 writes / zero native fallbacks**, plus the full **4,270 ellipse
+  histories**, initialized table, coordinate and intersection comparisons.
+  [Ordinary optimized FP-flag limitations](ellipse-storage-fp-scope.json) remain
+  unresolved. Actual production Windows rendering is checked separately; invalid
+  indices, uninitialized matrix rows and native allocation failures are excluded.
+  Rust 1.85 tests (134 core, 86 FFI), strict Clippy, default syntax and Python
+  checks pass. The corpus remains **706 cases**; Windows/Miri and renderer checks
+  are pending. Native float computations, span/list control flow and host work
+  remain; persistent arc, matrix and temporary coordinate storage now have Rust
+  owners on the validated paths.
 * Rust owns ellipse intersection-matrix cells and their initialized state. Native
   floating-point calculations still produce every stored integer in their original
   order. The unwritten row remains absent; valid lookups copy scalar values and
@@ -100,8 +116,10 @@ unresolved reference outcomes requiring investigation, never matching results.
   and spare vector capacity. No universal/debug-iterator compatibility is claimed.
   Rust 1.85 tests (126 core, 81 FFI), strict Clippy, default syntax and Python
   checks pass. Six horizontal-outline scripts and a visible border control expand
-  the renderer corpus to **674 cases**. Windows/Miri and renderer checks for this
-  increment are pending; outline container ownership and host work remain.
+  the renderer corpus to **674 cases**. Windows x86/x64, Linux, macOS and Miri
+  passed; paired Windows DLLs match **674 cases / 7,090 frames**, plus **32 mutations /
+  224 frames**, on each architecture. See [span-merge evidence](span-merge-evidence.json).
+  Unresolved native span control flow and host work remain.
 * Safe Rust aligns initialized rasterizer path points and computes origin/size.
   Negative-coordinate shifts, eight-unit origin alignment, the extra size unit,
   point-write order and final native output assignments are preserved. Empty paths
