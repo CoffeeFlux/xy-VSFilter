@@ -12,6 +12,9 @@
 #include <list>
 #include "xy_rust_realtext.h"
 static std::vector<int64_t> realTextConversions;
+static std::wstring* realTextTimecodeInput=nullptr;
+static int realTextTimecodeFailure=-1,realTextTimecodeAttempts=0,realTextTimecodeMutation=0;
+static bool realTextTimecodeMutated=false;
 struct RealTextInterrupted {};
 static std::wstring* realTextInput=nullptr;
 static unsigned* realTextPosition=nullptr;
@@ -37,7 +40,17 @@ static int realTextToInt(const wchar_t* text){
     const int result=static_cast<int>(std::wcstol(text,nullptr,10));
 #endif
     realTextConversions.push_back(2);realTextConversions.push_back(result);
-    while(*text)realTextConversions.push_back(*text++);realTextConversions.push_back(0);return result;
+    while(*text)realTextConversions.push_back(*text++);realTextConversions.push_back(0);
+    if(realTextTimecodeInput){
+        if(realTextTimecodeAttempts++==realTextTimecodeFailure)throw RealTextInterrupted();
+        if(!realTextTimecodeMutated && realTextTimecodeMutation){
+            if(realTextTimecodeMutation==1 && !realTextTimecodeInput->empty())(*realTextTimecodeInput)[0]=L'3';
+            if(realTextTimecodeMutation==2)realTextTimecodeInput->clear();
+            if(realTextTimecodeMutation==3)*realTextTimecodeInput+=L":999";
+            realTextTimecodeMutated=true;
+        }
+    }
+    return result;
 }
 #define iswdigit realTextDigit
 #define iswspace realTextSpace

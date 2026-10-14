@@ -23,6 +23,7 @@ pub mod hdmv;
 pub mod mask;
 pub mod realtext;
 pub mod realtext_attributes;
+pub mod realtext_timecode;
 pub mod segment_insert;
 pub mod segments;
 pub mod subrip;

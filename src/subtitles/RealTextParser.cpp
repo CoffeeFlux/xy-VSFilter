@@ -416,6 +416,27 @@ int CRealTextParser::GetTimecode(const std::wstring& p_crszTimecode)
         iMultiplier = 1000;
     }
 
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::RealTextTimecode parser(p_crszTimecode.length());
+    for (;;) {
+        const uint32_t action = parser.Next(p_crszTimecode);
+        if (action == 0) break;
+        if (action == 2) {
+            // Retain std::wstring::at's exception if input shrinks between CRT calls.
+            (void)p_crszTimecode.at(parser.Missing());
+            return 0;
+        }
+        std::wstring szCurrentPart = parser.Part();
+        if (!parser.Last() && iMultiplier == 1) {
+            while (szCurrentPart.length() < 3) szCurrentPart += L"0";
+        }
+        iTimecode += iMultiplier * ::_wtoi(szCurrentPart.c_str());
+        if (!parser.Last()) {
+            if (iMultiplier == 1) iMultiplier = 1000;
+            else iMultiplier *= 60;
+        }
+    }
+#else
     std::wstring szCurrentPart;
 
     for (ptrdiff_t i = p_crszTimecode.length() - 1; i >= 0; --i) {
@@ -442,6 +463,7 @@ int CRealTextParser::GetTimecode(const std::wstring& p_crszTimecode)
 
     iTimecode += iMultiplier * ::_wtoi(szCurrentPart.c_str());
 
+#endif
     return iTimecode;
 }
 

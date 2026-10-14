@@ -21,9 +21,38 @@ void* XY_REALTEXT_CDECL xy_vsfilter_realtext_attributes_create(uint32_t);
 uint32_t XY_REALTEXT_CDECL xy_vsfilter_realtext_attributes_next(void*, const uint16_t*, size_t, uint32_t, uint32_t);
 size_t XY_REALTEXT_CDECL xy_vsfilter_realtext_attributes_field(const void*, uint32_t, size_t);
 void XY_REALTEXT_CDECL xy_vsfilter_realtext_attributes_release(void*);
+void* XY_REALTEXT_CDECL xy_vsfilter_realtext_timecode_create(size_t);
+uint32_t XY_REALTEXT_CDECL xy_vsfilter_realtext_timecode_next(void*, const uint16_t*, size_t);
+size_t XY_REALTEXT_CDECL xy_vsfilter_realtext_timecode_field(const void*, uint32_t, size_t);
+void XY_REALTEXT_CDECL xy_vsfilter_realtext_timecode_release(void*);
 }
 #undef XY_REALTEXT_CDECL
 namespace XyRust {
+class RealTextTimecode {
+    void* owner;
+    RealTextTimecode(const RealTextTimecode&);
+    RealTextTimecode& operator=(const RealTextTimecode&);
+public:
+    explicit RealTextTimecode(size_t length):owner(xy_vsfilter_realtext_timecode_create(length)){}
+    ~RealTextTimecode(){xy_vsfilter_realtext_timecode_release(owner);}
+    uint32_t Next(const std::wstring& input){
+#ifdef _WIN32
+        static_assert(sizeof(wchar_t)==sizeof(uint16_t),"native strings must contain UTF-16 units");
+        return xy_vsfilter_realtext_timecode_next(owner,reinterpret_cast<const uint16_t*>(input.data()),input.size());
+#else
+        const std::vector<uint16_t> units(input.begin(),input.end());
+        return xy_vsfilter_realtext_timecode_next(owner,units.data(),units.size());
+#endif
+    }
+    bool Last()const{return xy_vsfilter_realtext_timecode_field(owner,0,0)!=0;}
+    size_t Missing()const{return xy_vsfilter_realtext_timecode_field(owner,1,0);}
+    std::wstring Part()const{
+        const size_t length=xy_vsfilter_realtext_timecode_field(owner,2,0);
+        std::wstring result(length,L'\0');
+        for(size_t i=0;i<length;++i)result[i]=static_cast<wchar_t>(xy_vsfilter_realtext_timecode_field(owner,3,i));
+        return result;
+    }
+};
 class RealTextAttributes {
     void* owner;
     RealTextAttributes(const RealTextAttributes&);
