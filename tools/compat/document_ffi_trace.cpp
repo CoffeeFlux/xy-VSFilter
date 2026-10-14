@@ -56,6 +56,12 @@ static Bytes text(int id) {
     if(id!=0) for(uint16_t unit : {uint16_t(id),uint16_t(0),uint16_t(0xd800),uint16_t(0xdcff),uint16_t(0xffff)}) append(result,unit,2);
     return result;
 }
+static Bytes raw_units(std::istream& input) {
+    size_t count=0;if(!(input>>count)||count>4096)throw std::runtime_error("unit count");
+    Bytes bytes;
+    for(size_t i=0;i<count;++i){uint32_t unit=0;if(!(input>>unit)||unit>0xffff)throw std::runtime_error("unit value");append(bytes,unit,2);}
+    return bytes;
+}
 static Bytes prepared(int id,int64_t start,int64_t end,int order,int layer) {
     Bytes bytes(64),str=text(id);
     put(bytes,0,uint64_t(start),8);put(bytes,8,uint64_t(end),8);
@@ -113,6 +119,12 @@ int main() {
                     else {int64_t start=0,end=0;if(!(input>>start>>end))return 2;append(bytes,uint64_t(start),8);append(bytes,uint64_t(end),8);}
                 }
                 checked(op=='O'?xy_vsfilter_document_reorder_entries_v1(owner.id,bytes.data(),bytes.size()):xy_vsfilter_document_replace_entry_times_v1(owner.id,bytes.data(),bytes.size()));
+            } else if(op=='Y') {
+                uint32_t index=0;if(!(input>>index))return 2;Bytes value=raw_units(input);
+                checked(xy_vsfilter_document_set_prepared_style_v1(owner.id,index,value.data(),value.size()));
+            } else if(op=='J') {
+                Bytes old=raw_units(input),replacement=raw_units(input);
+                checked(xy_vsfilter_document_rename_style_cstring_v1(owner.id,old.data(),old.size(),replacement.data(),replacement.size()));
             } else if(op=='N') {
                 uint16_t old=0,replacement=0;if(!(input>>old>>replacement))return 2;Bytes count=counts(owner.id),value;append(value,replacement,2);
                 // The established corpus uses only one-unit non-NUL style names.

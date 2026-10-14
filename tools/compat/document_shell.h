@@ -3,11 +3,6 @@
 // Portable storage/value shells approximate ATL; this is not Windows integration.
 #include <algorithm>
 #include <cmath>
-#define TIME 0
-#define FRAME 1
-#define UNITS 10000000
-#define UNITS_FLOAT 10000000.0
-#define TRACE_SUB(message) ((void)0)
 #include <cstdint>
 #include <climits>
 #include <iostream>
@@ -18,6 +13,22 @@
 #include <sstream>
 #include <fstream>
 #include <stdexcept>
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#ifndef _ATL_NO_AUTOMATIC_NAMESPACE
+#define _ATL_NO_AUTOMATIC_NAMESPACE
+#endif
+#include <atlbase.h>
+#include <atlstr.h>
+#endif
+#define TIME 0
+#define FRAME 1
+#define UNITS 10000000
+#define UNITS_FLOAT 10000000.0
+#define TRACE_SUB(message) ((void)0)
+
 using REFERENCE_TIME = int64_t;
 using std::min;
 using std::max;
@@ -49,7 +60,23 @@ struct UnitString {
  UnitString& operator=(const std::vector<uint16_t>& units) {value=store(units);return *this;}
  UnitString& operator=(std::initializer_list<uint16_t> units) {return *this=std::vector<uint16_t>(units);}
  operator const std::vector<uint16_t>&() const {return *value;}
- bool operator==(const std::vector<uint16_t>& units) const {return *value==units;}
+ bool operator==(const std::vector<uint16_t>& units) const {
+#ifdef _WIN32
+  // Bind the extracted style comparison to actual Windows CStringW. Bounded
+  // construction preserves embedded NUL and unpaired UTF-16 before equality.
+  if(value->size()>INT_MAX||units.size()>INT_MAX)throw std::length_error("CString shell count");
+  std::vector<wchar_t> left_units(value->begin(),value->end()),right_units(units.begin(),units.end());
+  ATL::CStringW left,right;
+  if(!left_units.empty())left.SetString(left_units.data(),static_cast<int>(left_units.size()));
+  if(!right_units.empty())right.SetString(right_units.data(),static_cast<int>(right_units.size()));
+  return left==right;
+#else
+  // Portable approximation only; Windows full-sequence evidence is required.
+  const auto left_end=std::find(value->begin(),value->end(),uint16_t(0));
+  const auto right_end=std::find(units.begin(),units.end(),uint16_t(0));
+  return std::equal(value->begin(),left_end,units.begin(),right_end);
+#endif
+ }
  void clear() {*this=std::vector<uint16_t>();}
 };
 static_assert(std::is_trivially_copyable<UnitString>::value,"qsort string shell must be trivially copyable");

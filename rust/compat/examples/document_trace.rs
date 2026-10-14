@@ -112,6 +112,27 @@ fn main() {
             "L" => {
                 d.correct_last_end(n(1));
             }
+            "Y" => {
+                let length = n(2) as usize;
+                assert_eq!(p.len(), 3 + length);
+                let style = (0..length)
+                    .map(|i| u16::try_from(n(3 + i)).unwrap())
+                    .collect();
+                d.set_prepared_style(n(1) as usize, style).unwrap();
+            }
+            "J" => {
+                let old_length = n(1) as usize;
+                let new_length_index = 2 + old_length;
+                let new_length = n(new_length_index) as usize;
+                assert_eq!(p.len(), new_length_index + 1 + new_length);
+                let old: Vec<_> = (0..old_length)
+                    .map(|i| u16::try_from(n(2 + i)).unwrap())
+                    .collect();
+                let new: Vec<_> = (0..new_length)
+                    .map(|i| u16::try_from(n(new_length_index + 1 + i)).unwrap())
+                    .collect();
+                d.rename_style_cstring(&old, &new);
+            }
             "N" => d.rename_style(&[n(1) as u16], &[n(2) as u16]),
             "K" => saved = d.clone(),
             "B" => d = saved.clone(),

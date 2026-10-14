@@ -375,6 +375,29 @@ impl Document {
         entry.end = entry.end.min(max_end);
         Some(entry.end)
     }
+    /// The prepared entry-rename suffix of pinned native AddStyle uses Unicode
+    /// CString equality: compare raw u16 units only through the first NUL on
+    /// each side, without case folding or surrogate interpretation. The entire
+    /// supplied replacement is stored; comparison does not shorten storage.
+    /// Native style-map lookup, duplicate-style naming and preparation of name3
+    /// remain caller responsibilities. No segment rebuild or callback occurs.
+    /// Windows primitive evidence establishes the A-NUL-B versus A case; wider
+    /// raw-unit cases require the corresponding actual-ATL differential probes.
+    pub fn rename_style_cstring(&mut self, old: &[u16], new: &[u16]) {
+        let prefix = |units: &[u16]| {
+            units
+                .iter()
+                .position(|&unit| unit == 0)
+                .unwrap_or(units.len())
+        };
+        let old = &old[..prefix(old)];
+        for entry in &mut self.entries {
+            if &entry.style[..prefix(&entry.style)] == old {
+                entry.style = new.to_vec();
+            }
+        }
+    }
+
     /// Exact code-unit comparison; no case folding or style-map ownership.
     /// This is not yet a substitute for native CString comparison when a
     /// style name contains NUL; that comparison contract requires ATL evidence.
@@ -677,6 +700,64 @@ mod tests {
         assert!(destination.segments()[0].animated);
         source.clear_entries_and_segments();
         assert_eq!(destination.segments().len(), 1);
+    }
+
+    #[test]
+    fn cstring_rename_ignores_post_nul_units_but_keeps_complete_replacement() {
+        let mut d = Document::default();
+        let styles = [
+            vec![65, 0, 66],
+            vec![65],
+            vec![65, 0, 67],
+            vec![97],
+            vec![65, 66],
+            vec![65, 0xd800],
+        ];
+        for style in &styles {
+            let mut record = entry(0, 10, -1);
+            record.style = style.clone();
+            d.add_prepared(record, AddMode::EntryOnly).unwrap();
+        }
+        d.rebuild_segments();
+        d.feedback_animation(0, true).unwrap();
+        let segments = d.segments().to_vec();
+        let replacement = [78, 0, 0xdfff];
+        d.rename_style_cstring(&[65, 0, 90], &replacement);
+        for index in 0..3 {
+            assert_eq!(d.entries()[index].style, replacement);
+        }
+        for (index, style) in styles.iter().enumerate().skip(3) {
+            assert_eq!(&d.entries()[index].style, style);
+        }
+        assert_eq!(d.segments(), segments);
+        // The existing exact-unit helper remains a separate, narrower contract.
+        d.rename_style(&[78], &[1]);
+        assert_eq!(d.entries()[0].style, replacement);
+    }
+
+    #[test]
+    fn cstring_rename_compares_empty_and_unpaired_surrogate_prefixes_as_units() {
+        let mut d = Document::default();
+        for style in [
+            vec![],
+            vec![0, 0xd800],
+            vec![0xd800],
+            vec![0xd800, 0, 0xdc00],
+            vec![0xdc00],
+            vec![0xd800, 1],
+        ] {
+            let mut record = entry(0, 10, -1);
+            record.style = style;
+            d.add_prepared(record, AddMode::EntryOnly).unwrap();
+        }
+        d.rename_style_cstring(&[0, 77], &[0xdcff, 0, 0xd800]);
+        assert_eq!(d.entries()[0].style, [0xdcff, 0, 0xd800]);
+        assert_eq!(d.entries()[1].style, [0xdcff, 0, 0xd800]);
+        d.rename_style_cstring(&[0xd800, 0, 42], &[]);
+        assert!(d.entries()[2].style.is_empty());
+        assert!(d.entries()[3].style.is_empty());
+        assert_eq!(d.entries()[4].style, [0xdc00]);
+        assert_eq!(d.entries()[5].style, [0xd800, 1]);
     }
 
     #[test]
