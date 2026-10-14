@@ -1,0 +1,338 @@
+{
+  "schema": 1,
+  "scope": "Experimental private document registry and C ABI; not routed to production document owner",
+  "measured_base_commit": "9232313b5f19e37127478c49a61a0c08e9364e0e",
+  "working_tree_source_hashes": true,
+  "core_unsafe": {
+    "production_block": 0,
+    "production_function": 0,
+    "production_impl": 0,
+    "production_trait": 0,
+    "production_other": 0,
+    "test_block": 0,
+    "test_function": 0,
+    "test_impl": 0,
+    "test_trait": 0,
+    "test_other": 0
+  },
+  "ffi_total": {
+    "production_block": 343,
+    "production_function": 289,
+    "production_impl": 2,
+    "production_trait": 0,
+    "production_other": 0,
+    "test_block": 119,
+    "test_function": 4,
+    "test_impl": 0,
+    "test_trait": 0,
+    "test_other": 0
+  },
+  "new_boundary_files": [
+    {
+      "path": "rust/ffi/src/document.rs",
+      "sha256": "e2f032c5373dd92791549aebaf0461e7eb65af7f9cbb6c6201c3d41a30532f96",
+      "physical_lines_including_tests": 1055,
+      "nonblank_code_lines_excluding_tests": 473,
+      "counts": {
+        "production_block": 17,
+        "production_function": 16,
+        "production_impl": 0,
+        "production_trait": 0,
+        "production_other": 0,
+        "test_block": 7,
+        "test_function": 4,
+        "test_impl": 0,
+        "test_trait": 0,
+        "test_other": 0
+      },
+      "sites": [
+        {
+          "line": 94,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 101,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 111,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 115,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 137,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 141,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 167,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 182,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 189,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 207,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 214,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 236,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 243,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 266,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 273,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 299,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 306,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 316,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 324,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 342,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 358,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 374,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 394,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 401,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 416,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 426,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 434,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 460,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 467,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 478,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 485,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 538,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 555,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 568,
+          "kind": "function",
+          "test": true
+        },
+        {
+          "line": 572,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 594,
+          "kind": "function",
+          "test": true
+        },
+        {
+          "line": 597,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 609,
+          "kind": "function",
+          "test": true
+        },
+        {
+          "line": 613,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 618,
+          "kind": "function",
+          "test": true
+        },
+        {
+          "line": 622,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 627,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 651,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 660,
+          "kind": "block",
+          "test": true
+        }
+      ],
+      "production_extern_functions": 22,
+      "operations": {
+        "raw_shared_slice_construction": 1,
+        "raw_mutable_slice_construction": 0,
+        "box_from_raw": 0,
+        "raw_nonoverlapping_copy": 1,
+        "unchecked_index_calls": 0,
+        "transmute_calls": 0,
+        "inline_assembly": 0,
+        "mutable_statics": 0
+      }
+    },
+    {
+      "path": "rust/ffi/src/document_registry.rs",
+      "sha256": "03c4002b53893e282ea7a23481a5f2fb7767a81259527001f843ff1f0255f34d",
+      "physical_lines_including_tests": 368,
+      "nonblank_code_lines_excluding_tests": 139,
+      "counts": {
+        "production_block": 1,
+        "production_function": 0,
+        "production_impl": 1,
+        "production_trait": 0,
+        "production_other": 0,
+        "test_block": 0,
+        "test_function": 0,
+        "test_impl": 0,
+        "test_trait": 0,
+        "test_other": 0
+      },
+      "sites": [
+        {
+          "line": 131,
+          "kind": "impl",
+          "test": false
+        },
+        {
+          "line": 175,
+          "kind": "block",
+          "test": false
+        }
+      ],
+      "production_extern_functions": 0,
+      "operations": {
+        "raw_shared_slice_construction": 0,
+        "raw_mutable_slice_construction": 0,
+        "box_from_raw": 0,
+        "raw_nonoverlapping_copy": 0,
+        "unchecked_index_calls": 0,
+        "transmute_calls": 0,
+        "inline_assembly": 0,
+        "mutable_statics": 0
+      }
+    }
+  ],
+  "prior_ffi_production_blocks": 325,
+  "added_production_blocks": 18,
+  "added_unsafe_impls": 1,
+  "retired_native_owners": 0,
+  "retired_ffi_crossings": 0,
+  "review": "Independent source review of admission/destruction/output staging and C++ wire offsets; exact-source local C ABI lifecycle differential passed. This is not proof of all host or raw-buffer caller contracts.",
+  "remaining_contracts": [
+    "Native wrapper publication/destruction lifetime",
+    "Public behavior and serialization for private Busy, including CRT allocator/new-handler reentry",
+    "CString NUL-aware rename compatibility",
+    "Native preparation, mode/callback/partial-failure orchestration",
+    "Native allocation failure versus Rust allocator abort",
+    "Exact-commit Windows C ABI and Miri checks before further integration"
+  ]
+}

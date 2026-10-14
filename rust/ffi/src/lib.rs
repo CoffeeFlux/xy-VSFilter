@@ -9,6 +9,8 @@ mod ass_tags;
 mod be_blur;
 mod be_filter;
 mod bilinear;
+mod document;
+mod document_registry;
 mod drawing;
 mod drawing_tokens;
 mod dvb;

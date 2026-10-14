@@ -264,6 +264,38 @@ impl Document {
         Ok(())
     }
 
+    /// Stores already-prepared style code units, without normalization or a
+    /// segment rebuild. Native style-map decisions remain with the caller.
+    pub fn set_prepared_style(&mut self, index: usize, style: Vec<u16>) -> Result<(), Refusal> {
+        self.entries
+            .get_mut(index)
+            .ok_or(Refusal::EntryIndex)?
+            .style = style;
+        Ok(())
+    }
+
+    /// Publishes one already-evaluated endpoint without rebuilding segments.
+    /// Reversed/equal times and stale segment boundaries are deliberately kept.
+    pub fn set_entry_time(&mut self, index: usize, start: bool, value: i64) -> Result<(), Refusal> {
+        let entry = self.entries.get_mut(index).ok_or(Refusal::EntryIndex)?;
+        if start {
+            entry.start = value;
+        } else {
+            entry.end = value;
+        }
+        Ok(())
+    }
+
+    /// Successful storage-only copy in native segment-then-entry order. This
+    /// retains stale indices and animation, with independent owned payloads.
+    /// It does not emulate native Copy's Empty/styles/metadata/callback order or
+    /// allocation-failure partial state. Native self-Copy must Empty first; a
+    /// registry must handle identical handles without aliasing mutable borrows.
+    pub fn copy_storage_from(&mut self, source: &Document) {
+        self.segments = source.segments.clone();
+        self.entries = source.entries.clone();
+    }
+
     /// Accepts the native CRT's computed ordering as original storage indices.
     /// This does not select a Rust sorting algorithm or establish CRT equal-key
     /// permutations. Payloads move without cloning; readorder stays unchanged.
@@ -614,6 +646,37 @@ mod tests {
             [(i64::MIN, 4), (4, 6), (6, 8), (8, i64::MAX)]
         );
         assert!(d.segments().iter().all(|s| s.entries == [0] && !s.animated));
+    }
+
+    #[test]
+    fn direct_storage_edits_and_copy_preserve_unrebuilt_state() {
+        let mut source = Document::default();
+        source.add_prepared(entry(0, 10, 9), AddMode::Add).unwrap();
+        source.feedback_animation(0, true).unwrap();
+        source.set_prepared_style(0, vec![0, 0xd800]).unwrap();
+        source.set_entry_time(0, true, i64::MAX).unwrap();
+        source.set_entry_time(0, false, i64::MIN).unwrap();
+        assert_eq!(source.segments()[0].start, 0);
+        assert_eq!(source.segments()[0].end, 10);
+        let unchanged = source.clone();
+        assert_eq!(
+            source.set_prepared_style(1, vec![]),
+            Err(Refusal::EntryIndex)
+        );
+        assert_eq!(source.set_entry_time(1, true, 1), Err(Refusal::EntryIndex));
+        assert_eq!(source, unchanged);
+        let mut destination = Document::default();
+        destination.copy_storage_from(&source);
+        assert_eq!(destination, source);
+        source.set_prepared_style(0, vec![1]).unwrap();
+        assert_eq!(destination.entries()[0].style, [0, 0xd800]);
+        source.remove_all_entries();
+        destination.copy_storage_from(&source);
+        assert!(destination.is_empty());
+        assert_eq!(destination.segments()[0].entries, [0]);
+        assert!(destination.segments()[0].animated);
+        source.clear_entries_and_segments();
+        assert_eq!(destination.segments().len(), 1);
     }
 
     #[test]

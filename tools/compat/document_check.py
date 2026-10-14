@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Prepared-record document suffix differential; portable ATL/value approximation.
 
-Runs pinned native method bodies/tails against a safe Rust owner without C ABI.
+Runs pinned native method bodies/tails against a safe Rust owner directly and
+through the experimental private C ABI.
 This deliberately bypasses text/style/WebVTT preparation, styles/metadata owners,
 allocation failures, host callbacks/reentry and rendering. Sorting/rounding stay
 native; their generated permutations/time pairs exercise safe ownership handoffs.
@@ -12,6 +13,8 @@ import hashlib
 import itertools
 import json
 import os
+import re
+import shlex
 import platform
 from pathlib import Path
 import subprocess
@@ -203,6 +206,43 @@ def compare(a,b):
     for i,(x,y) in enumerate(zip(left,right)):
         if x!=y: raise RuntimeError(f'document state mismatch at operation {i}:\nreference {x}\ncandidate {y}')
 
+def build_ffi_trace(destination, target_dir, target):
+    cargo=['rustup','run','1.85.0','cargo','rustc','--locked','--offline','--release',
+           '-p','xy-vsfilter-ffi','--target-dir',str(target_dir)]
+    if os.name=='nt':cargo+=['--features','native-runtime']
+    if target:cargo+=['--target',target]
+    cargo+=['--','--print','native-static-libs']
+    build_env=os.environ.copy()
+    if os.name=='nt':
+        # Match build_rust_windows.ps1 and the native /MT fixture, including
+        # dependencies. Encoded flags would otherwise override RUSTFLAGS.
+        build_env.pop('CARGO_ENCODED_RUSTFLAGS',None)
+        build_env['RUSTFLAGS']='-C target-feature=+crt-static'
+    built=run(cargo,env=build_env)
+    match=re.search(r'native-static-libs: (.+)',built.stderr)
+    if not match:raise RuntimeError('Rust static link dependencies missing')
+    libraries=shlex.split(match[1])
+    library_dir=target_dir/(target or '')/'release'
+    executable=destination/('document-ffi.exe' if os.name=='nt' else 'document-ffi')
+    source=ROOT/'tools/compat/document_ffi_trace.cpp'
+    if os.name=='nt':
+        command=['cl','/nologo','/MT','/O2','/EHsc','/std:c++17','/I'+str(ROOT/'include'),
+                 str(source),str(library_dir/'xy_vsfilter_ffi.lib'),*libraries,
+                 '/Fo'+str(destination/'document-ffi.obj'),'/Fe'+str(executable)]
+    else:
+        command=['c++','-std=c++17','-O1','-g','-fsanitize=address,undefined',
+                 '-fno-sanitize-recover=all','-I'+str(ROOT/'include'),str(source),
+                 str(library_dir/'libxy_vsfilter_ffi.a'),*libraries,'-o',str(executable)]
+        if target and target.endswith('-apple-darwin'):
+            command+=['-arch',{'x86_64':'x86_64','aarch64':'arm64'}[target.split('-')[0]]]
+    run(command)
+    return executable,{'cargo_command':cargo,'compile_command':command,
+                       'rustflags':build_env.get('RUSTFLAGS'),
+                       'encoded_rustflags_present':'CARGO_ENCODED_RUSTFLAGS' in build_env,
+                       'binary_sha256':hashlib.sha256(executable.read_bytes()).hexdigest(),
+                       'static_library_sha256':hashlib.sha256((library_dir/('xy_vsfilter_ffi.lib' if os.name=='nt' else 'libxy_vsfilter_ffi.a')).read_bytes()).hexdigest(),
+                       'scope':'Experimental stable-handle C ABI lifecycle; no production native owner switch. Native fixture sanitizer does not instrument Rust library.'}
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',type=Path,required=True)
@@ -213,6 +253,8 @@ def main():
     (args.output/'report.json').write_text(json.dumps({'complete':False,'reference_commit':REFERENCE})+'\n')
     tracked=['Cargo.toml','Cargo.lock','rust/compat/Cargo.toml','tools/compat/document_check.py','tools/compat/test_document_check.py','tools/compat/document_shell.h','tools/compat/document_oracle.cpp','rust/compat/examples/document_trace.rs']
     tracked += [str(p.relative_to(ROOT)) for p in (ROOT/'rust/compat/src').rglob('*.rs')]
+    tracked += ['rust/ffi/Cargo.toml','include/xy_rust_document.h','tools/compat/document_ffi_trace.cpp']
+    tracked += [str(p.relative_to(ROOT)) for p in (ROOT/'rust/ffi/src').rglob('*.rs')]
     hashes=lambda:{p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in tracked}
     before=hashes()
     target_dir=args.target_dir.resolve()
@@ -236,6 +278,7 @@ def main():
         cargo_command=['rustup','run','1.85.0','cargo','build','--locked','--offline','--manifest-path','Cargo.toml','-p','xy-vsfilter-compat','--example','document_trace','--target-dir',str(target_dir)]
         if args.target:cargo_command.extend(['--target',args.target])
         run(cargo_command)
+        ffi_binary,ffi_report=build_ffi_trace(tmp,target_dir,args.target)
         seq=corpus();ops=[op for s in seq for op in s];data='\n'.join(ops)+'\n'
         (args.output/'operations.txt').write_text(data,newline='')
         replay_path=args.output/'replay-operations.txt'
@@ -253,6 +296,11 @@ def main():
         candidate=run([str(candidate_binary)],input=replay_data)
         # Compare directly against full native S/V methods, not just adapter replay.
         compare(reference.stdout,candidate.stdout)
+        ffi_candidate=run([str(ffi_binary)],input=replay_data)
+        if ffi_candidate.stderr:raise RuntimeError('document C ABI trace emitted unexpected stderr')
+        compare(reference.stdout,ffi_candidate.stdout)
+        ffi_report.update(equal=True,operations=len(ops),
+                          trace_sha256=hashlib.sha256(ffi_candidate.stdout.encode()).hexdigest())
         negative_controls={}
         lines=reference.stdout.splitlines()
         changed=lines.copy();changed[0]+=' 1'
@@ -264,10 +312,12 @@ def main():
         if hashes()!=before:raise RuntimeError('candidate source changed during run')
         (args.output/'reference.txt').write_text(reference.stdout,newline='')
         (args.output/'candidate.txt').write_text(candidate.stdout,newline='')
+        (args.output/'ffi-candidate.txt').write_text(ffi_candidate.stdout,newline='')
         report.update(complete=True,sequences=len(seq),operations=len(ops),queries=sum(op.startswith('Q ') for op in ops),
                       mutations_and_control_ops=sum(not op.startswith('Q ') for op in ops),negative_mismatch_control=negative,
                       native_binary_sha256=hashlib.sha256(native_binary.read_bytes()).hexdigest(),
                       candidate_binary_sha256=hashlib.sha256(candidate_binary.read_bytes()).hexdigest(),
+                      ffi=ffi_report,
                       native_replay_equal=True,native_control_replay_repeat_equal=True,
                       replay_operations_sha256=hashlib.sha256(replay_path.read_bytes()).hexdigest(),
                       native_control_operations=sum(op.startswith(('S ','V ')) for op in ops),

@@ -1,0 +1,161 @@
+{
+  "schema": 1,
+  "candidate_commit": "9232313b5f19e37127478c49a61a0c08e9364e0e",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "workflow_run": 38616770331,
+  "workflow_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38616770331",
+  "full_matrix_pass": false,
+  "scope": "Expanded prepared owner through portable shell and actual ATL native-backed facade isolation; no production Rust owner switch or full renderer parity.",
+  "results": {
+    "i686-pc-windows-msvc": {
+      "job_id": 116033737632,
+      "focused_steps": {
+        "Compare owned document lifecycle with pinned native suffixes": "success",
+        "Observe Windows ATL and CRT document primitives": "success"
+      },
+      "full_job_status_at_capture": "in_progress",
+      "full_job_conclusion_at_capture": "",
+      "document": {
+        "sequences": 142,
+        "operations": 97461,
+        "queries": 95472,
+        "mutations_and_control_ops": 1989,
+        "native_control_operations": 27,
+        "reference_repeat_equal": true,
+        "native_replay_equal": true,
+        "native_control_replay_repeat_equal": true,
+        "trace_sha256": "99a475aee00eb4c0d5b538ada974e8c3ae564224d4133063d8ecdb8f2b22627a",
+        "operations_sha256": "0fcff6b589483a13ddb12844f9be13fc8cda11782d1fb7e02890c89ac9bda05d",
+        "replay_operations_sha256": "f2a1ba57db12b5572b8cb1f3081bab0e7f0c2eb1fe2540d69072c1f214d42b0f",
+        "native_binary_sha256": "0f2f5a88fb349115af2fa10281464c843d4e001ba4ec4c5b2203f7f2863aa281",
+        "candidate_binary_sha256": "959101109ef52569b3cda8ce650267e4a46469941dd44341999fa52f3ab29f96",
+        "negative_controls": {
+          "content": true,
+          "length": true
+        },
+        "limits": [
+          "prepared records only: native acceptance and text/style/WebVTT preprocessing bypassed",
+          "clear/copy covers entries and segments only; styles/metadata lifecycle excluded",
+          "rename loop only on NUL-free style names: native style-map ordering/duplicate naming and embedded-NUL comparison excluded",
+          "callback counts observed only; reentry, callbacks copying full host state excluded",
+          "queries use integer TIME mode only, no frame/FPS conversion claim",
+          "replay transport is bounded to 4096 records per control operation",
+          "native qsort/llround retained: only ordering/time handoffs are Rust-owned; portable value shells approximate CString/ATL storage and layout",
+          "no allocation failures, production native integration or rendering"
+        ]
+      },
+      "facade": {
+        "complete": true,
+        "trace_lines": 86,
+        "trace_sha256": [
+          "9969cf3f24812593b24528b70d177142262f2b3d94e8c76d44283f80b36bc542",
+          "9969cf3f24812593b24528b70d177142262f2b3d94e8c76d44283f80b36bc542"
+        ],
+        "binary_sha256": "b33d37f8bfa6e55c302a79aff2957ac8fc849017689348e51aebdf0125df14b4",
+        "generated_sha256": "8c1e6a0f1f9119635fc7dfc5830626868c747e828a364b6ea6ac8d22af8cfb7d",
+        "probe_sha256": "e43e0d5e6e83a3d2cb828b23d44541718eb2b5d0e88727aefe2548938104d587",
+        "runner_sha256": "435da8602890987f35957a009323c0e97d4dcdb92f6f00372fbf59bf8c87ae86",
+        "candidate_source_sha256": {
+          "src/subtitles/STS.h": "21bfe055c2ba1b760b9bc1442cc785203a5bfbf07e8a42a181eccae9984d56ea",
+          "src/subtitles/STS.cpp": "6105ed6f5e32d3ae5b64ff3f3d333dcffa4f1f787a43711e593be2f5cd6d6df4",
+          "src/subtitles/RTS.cpp": "39e1997599b7b8483412c727e0e32343bbd6b705c271a4425080a528cb49d9ff"
+        },
+        "reference_source_sha256": {
+          "src/subtitles/STS.h": "ea2bd73a5875d5271292cd03a0741c73b8d20617943bf802102bf6de87a29ff4",
+          "src/subtitles/STS.cpp": "59f431e3ac36d99e2b694cdab106a530edaf7bbc8c85410f91647d3ff4578895",
+          "src/subtitles/RTS.cpp": "dd4ae1950606979b255a742279f4b64a4cd90ce8a0647135980fe08e02618ffb"
+        },
+        "repeat_equal": true,
+        "candidate_stable": true,
+        "limits": [
+          "TIME mode fixed; native non-Rust search branch only; trace logging disabled",
+          "minimal class shell, not renderer/host integration or complete class ABI",
+          "no allocation-failure or reentrant/concurrent mutation equivalence",
+          "schedule loops modeled from renderer; full GetSubtitle/ParseEffect not executed"
+        ]
+      },
+      "facade_assertions": 226,
+      "toolchain": {
+        "VCToolsVersion": "14.44.35207",
+        "WindowsSDKVersion": "10.0.26100.0\\",
+        "VSCMD_ARG_TGT_ARCH": "x86"
+      },
+      "verification": "Pinned/candidate sources checked against Git allowing checkout CRLF; all retained document traces/inputs/generated header and facade source/header/executable/repeated traces independently rehashed. Owner binaries reported hashes only (temporary native binary not retained)."
+    },
+    "x86_64-pc-windows-msvc": {
+      "job_id": 116033736773,
+      "focused_steps": {
+        "Compare owned document lifecycle with pinned native suffixes": "success",
+        "Observe Windows ATL and CRT document primitives": "success"
+      },
+      "full_job_status_at_capture": "in_progress",
+      "full_job_conclusion_at_capture": "",
+      "document": {
+        "sequences": 142,
+        "operations": 97461,
+        "queries": 95472,
+        "mutations_and_control_ops": 1989,
+        "native_control_operations": 27,
+        "reference_repeat_equal": true,
+        "native_replay_equal": true,
+        "native_control_replay_repeat_equal": true,
+        "trace_sha256": "99a475aee00eb4c0d5b538ada974e8c3ae564224d4133063d8ecdb8f2b22627a",
+        "operations_sha256": "0fcff6b589483a13ddb12844f9be13fc8cda11782d1fb7e02890c89ac9bda05d",
+        "replay_operations_sha256": "f2a1ba57db12b5572b8cb1f3081bab0e7f0c2eb1fe2540d69072c1f214d42b0f",
+        "native_binary_sha256": "5023139af80f5336b30940da1ce4455d963a67f9fe2a63764fa16f6b6ada85d8",
+        "candidate_binary_sha256": "e056741c3eff82c2437aea545ec9afb5e3366b880258fa972bfec0edb1a1d603",
+        "negative_controls": {
+          "content": true,
+          "length": true
+        },
+        "limits": [
+          "prepared records only: native acceptance and text/style/WebVTT preprocessing bypassed",
+          "clear/copy covers entries and segments only; styles/metadata lifecycle excluded",
+          "rename loop only on NUL-free style names: native style-map ordering/duplicate naming and embedded-NUL comparison excluded",
+          "callback counts observed only; reentry, callbacks copying full host state excluded",
+          "queries use integer TIME mode only, no frame/FPS conversion claim",
+          "replay transport is bounded to 4096 records per control operation",
+          "native qsort/llround retained: only ordering/time handoffs are Rust-owned; portable value shells approximate CString/ATL storage and layout",
+          "no allocation failures, production native integration or rendering"
+        ]
+      },
+      "facade": {
+        "complete": true,
+        "trace_lines": 86,
+        "trace_sha256": [
+          "dd8535f12b135a9556b8a7a7714264d088e7cc7e57deeb8294707e3990aeb087",
+          "dd8535f12b135a9556b8a7a7714264d088e7cc7e57deeb8294707e3990aeb087"
+        ],
+        "binary_sha256": "7b3c8e3fc91d532b36e0d8e3e826f26faec14ce8f21413e02085bc9ab6f56e0b",
+        "generated_sha256": "8c1e6a0f1f9119635fc7dfc5830626868c747e828a364b6ea6ac8d22af8cfb7d",
+        "probe_sha256": "e43e0d5e6e83a3d2cb828b23d44541718eb2b5d0e88727aefe2548938104d587",
+        "runner_sha256": "435da8602890987f35957a009323c0e97d4dcdb92f6f00372fbf59bf8c87ae86",
+        "candidate_source_sha256": {
+          "src/subtitles/STS.h": "21bfe055c2ba1b760b9bc1442cc785203a5bfbf07e8a42a181eccae9984d56ea",
+          "src/subtitles/STS.cpp": "6105ed6f5e32d3ae5b64ff3f3d333dcffa4f1f787a43711e593be2f5cd6d6df4",
+          "src/subtitles/RTS.cpp": "39e1997599b7b8483412c727e0e32343bbd6b705c271a4425080a528cb49d9ff"
+        },
+        "reference_source_sha256": {
+          "src/subtitles/STS.h": "ea2bd73a5875d5271292cd03a0741c73b8d20617943bf802102bf6de87a29ff4",
+          "src/subtitles/STS.cpp": "59f431e3ac36d99e2b694cdab106a530edaf7bbc8c85410f91647d3ff4578895",
+          "src/subtitles/RTS.cpp": "dd4ae1950606979b255a742279f4b64a4cd90ce8a0647135980fe08e02618ffb"
+        },
+        "repeat_equal": true,
+        "candidate_stable": true,
+        "limits": [
+          "TIME mode fixed; native non-Rust search branch only; trace logging disabled",
+          "minimal class shell, not renderer/host integration or complete class ABI",
+          "no allocation-failure or reentrant/concurrent mutation equivalence",
+          "schedule loops modeled from renderer; full GetSubtitle/ParseEffect not executed"
+        ]
+      },
+      "facade_assertions": 226,
+      "toolchain": {
+        "VCToolsVersion": "14.44.35207",
+        "WindowsSDKVersion": "10.0.26100.0\\",
+        "VSCMD_ARG_TGT_ARCH": "x64"
+      },
+      "verification": "Pinned/candidate sources checked against Git allowing checkout CRLF; all retained document traces/inputs/generated header and facade source/header/executable/repeated traces independently rehashed. Owner binaries reported hashes only (temporary native binary not retained)."
+    }
+  }
+}

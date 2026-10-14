@@ -126,3 +126,37 @@ updates/OnOptionChanged, streaming invalidation, seek/reload and close with exac
 reference provenance. This source review does not establish a race in native
 code or certify a new facade; it identifies the contracts needed to avoid
 introducing undefined Rust aliasing.
+
+## Experimental registry implementation
+
+The next private boundary implements the stable-ID alternative above in
+`rust/ffi/src/document_registry.rs`. One registry owns typed document/snapshot
+resources. A nonblocking AtomicBool guard grants access before any registry or
+Document reference is formed. IDs are checked, nonzero monotonic u64 values;
+removed IDs are never reused, including after counter exhaustion. The counter
+itself is protected by the guard, requiring no AtomicU64. Compile-time Send
+checks accompany the small unsafe Sync implementation. A higher-ranked internal
+operation cannot return references borrowing the registry.
+
+Destroy removes ownership under admission and drops the payload afterwards.
+Storage copy acquires admission once for both handles, returns replaced storage
+for destruction after release, and preserves successful storage contents. It
+is not full native Copy: native virtual Empty, metadata/styles and self-copy
+orchestration still must precede it. Snapshot values survive document removal;
+no canonical allocation pointer is exposed through the native interface.
+
+Input/output buffers remain an unsafe caller contract. The named private v1
+exports centralize raw input copying and output copying, use the safe explicit
+little-endian codec, stage inputs before admission, and stage outputs until
+canonical loans end. Declared output capacity is checked before mutation.
+The C++ lifecycle fixture exercises these exports independently of Rust struct
+layout. No production CSimpleTextSubtitle instance uses this registry yet.
+
+Admission currently returns a private Busy status immediately. It neither spins
+nor invents a public HRESULT. Native serialization and compatible handling of
+allocator/new-handler reentry remain integration gates. The existing allocator
+uses `_aligned_malloc`; allocation can invoke configured CRT behavior, so
+"no explicit host callbacks" does not prove an absence of all native reentry.
+Do not globally change CRT new-mode to simplify this contract. Native wrapper
+lookup/publication lifetime remains a separate obligation even though Rust
+integer-handle lookup and destruction no longer require a live native pointer.
