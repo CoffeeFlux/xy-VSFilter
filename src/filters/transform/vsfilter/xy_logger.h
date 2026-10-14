@@ -5,39 +5,101 @@
 #ifndef __XY_LOGGER_H_3716A27F_2940_4636_8BC9_C764648362AE__
 #define __XY_LOGGER_H_3716A27F_2940_4636_8BC9_C764648362AE__
 
-#include "log4cplus/logger.h"
-#include "log4cplus/configurator.h"
-#include "timing_logger.h"
-#include "once_logger.h"
+#include <Windows.h>
+#include <tchar.h>
 #include <stdio.h>
 #include <ostream>
+#include <sstream>
+#include <string>
+
+namespace xy_logger
+{
+#ifdef UNICODE
+  typedef std::wstring tstring;
+  typedef std::wostringstream tostringstream;
+#else
+  typedef std::string tstring;
+  typedef std::ostringstream tostringstream;
+#endif
+
+  enum LogLevel
+  {
+    TRACE_LOG_LEVEL,
+    DEBUG_LOG_LEVEL,
+    INFO_LOG_LEVEL,
+    WARN_LOG_LEVEL,
+    ERROR_LOG_LEVEL,
+    FATAL_LOG_LEVEL,
+    OFF_LOG_LEVEL
+  };
+
+  bool IsEnabledFor(LogLevel level);
+  void Write(LogLevel level, const tstring& msg, const char* file, int line);
+
+  class TimingLogger
+  {
+  public:
+    TimingLogger(const tstring& msg, const char* file=NULL, int line=-1)
+      : m_msg(msg), m_file(file), m_line(line), m_start(0)
+    {
+      if(IsEnabledFor(TRACE_LOG_LEVEL))
+      {
+        tostringstream buff;
+        m_start = GetTickCount();
+        buff<<_T("ENTER at ")<<m_start<<_T(" ms: ")<<m_msg;
+        Write(TRACE_LOG_LEVEL, buff.str(), m_file, m_line);
+      }
+    }
+
+    ~TimingLogger()
+    {
+      if(IsEnabledFor(TRACE_LOG_LEVEL))
+      {
+        tostringstream buff;
+        DWORD end = GetTickCount();
+        buff<<_T("EXIT after ")<<end-m_start<<_T(" at ")<<end<<_T(" ms:  ")<<m_msg;
+        Write(TRACE_LOG_LEVEL, buff.str(), m_file, m_line);
+      }
+    }
+  private:
+    tstring m_msg;
+    const char* m_file;
+    int m_line;
+    DWORD m_start;
+  };
+}
 
 #if ENABLE_XY_LOG
 
-#  define XY_LOG_VAR_2_STR(var) " "#var"='"<<(var)<<"' "
-#  define XY_LOG_TRACE(msg)     LOG4CPLUS_TRACE(xy_logger::g_logger, __FUNCTION__<<"\t:"<<msg)
-#  define XY_LOG_DEBUG(msg)     LOG4CPLUS_DEBUG(xy_logger::g_logger, __FUNCTION__<<"\t:"<<msg)
-#  define XY_LOG_INFO(msg)      LOG4CPLUS_INFO(xy_logger::g_logger, __FUNCTION__<<"\t:"<<msg)
-#  define XY_LOG_WARN(msg)      LOG4CPLUS_WARN(xy_logger::g_logger, __FUNCTION__<<"\t:"<<msg)
-#  define XY_LOG_ERROR(msg)     LOG4CPLUS_ERROR(xy_logger::g_logger, __FUNCTION__<<"\t:"<<msg)
-#  define XY_LOG_FATAL(msg)     LOG4CPLUS_FATAL(xy_logger::g_logger, __FUNCTION__<<"\t:"<<msg)
+#  define XY_LOG_WRITE(level, msg) do {                               \
+    if(xy_logger::IsEnabledFor(level)) {                              \
+      xy_logger::tostringstream xy_log_buff;                          \
+      xy_log_buff<<msg;                                               \
+      xy_logger::Write(level, xy_log_buff.str(), __FILE__, __LINE__); \
+    }                                                                 \
+} while(0)
 
-  extern int g_log_once_id;
+#  define XY_LOG_VAR_2_STR(var) " "#var"='"<<(var)<<"' "
+#  define XY_LOG_TRACE(msg)     XY_LOG_WRITE(xy_logger::TRACE_LOG_LEVEL, __FUNCTION__<<"\t:"<<msg)
+#  define XY_LOG_DEBUG(msg)     XY_LOG_WRITE(xy_logger::DEBUG_LOG_LEVEL, __FUNCTION__<<"\t:"<<msg)
+#  define XY_LOG_INFO(msg)      XY_LOG_WRITE(xy_logger::INFO_LOG_LEVEL, __FUNCTION__<<"\t:"<<msg)
+#  define XY_LOG_WARN(msg)      XY_LOG_WRITE(xy_logger::WARN_LOG_LEVEL, __FUNCTION__<<"\t:"<<msg)
+#  define XY_LOG_ERROR(msg)     XY_LOG_WRITE(xy_logger::ERROR_LOG_LEVEL, __FUNCTION__<<"\t:"<<msg)
+#  define XY_LOG_FATAL(msg)     XY_LOG_WRITE(xy_logger::FATAL_LOG_LEVEL, __FUNCTION__<<"\t:"<<msg)
 
 #  define CHECK_N_LOG(hr, msg) if(FAILED(hr)) XY_LOG_ERROR(msg)
 
 #  define XY_RAND_VAR2(v,line) v ## line
 #  define XY_RAND_VAR(v,line) XY_RAND_VAR2(v,line)
-#  define XY_AUTO_TIMING(msg) TimingLogger XY_RAND_VAR(t,__LINE__)(xy_logger::g_logger, \
-    ((log4cplus::tostringstream*)&(log4cplus::tostringstream()<<msg))->str(), \
+#  define XY_AUTO_TIMING(msg) xy_logger::TimingLogger XY_RAND_VAR(t,__LINE__)( \
+    [&]{ xy_logger::tostringstream xy_log_buff; xy_log_buff<<msg; return xy_log_buff.str(); }(), \
     __FILE__, __LINE__)
 
-#  define XY_LOG_ONCE(id, msg) OnceLogger(id, xy_logger::g_logger, msg, __FILE__, __LINE__)
 #  define XY_LOG_ONCE2(msg) {                    \
     static bool entered=false;                   \
     if(!entered) {                               \
       entered=true;                              \
-      LOG4CPLUS_INFO(xy_logger::g_logger, msg);  \
+      XY_LOG_WRITE(xy_logger::INFO_LOG_LEVEL, msg); \
     }                                            \
   }
 
@@ -72,7 +134,6 @@
 #  define CHECK_N_LOG(hr, msg)
 
 #  define XY_AUTO_TIMING(msg)
-#  define XY_LOG_ONCE(id, msg)
 #  define XY_DO_ONCE(expr)
 #  define DO_FOR(num, expr)
 
@@ -91,12 +152,12 @@ CString XyUuidToString(const UUID& in_uuid);
 
 namespace xy_logger
 {
-#if ENABLE_XY_LOG
-  extern log4cplus::Logger g_logger;
-#endif
 
-bool doConfigure(log4cplus::tistream& property_stream);
-bool doConfigure(const log4cplus::tstring& configFilename);
+// Reads a configuration file of "key=value" lines ('#' starts a comment):
+//   level=TRACE|DEBUG|INFO|WARN|ERROR|FATAL|OFF   (default: TRACE)
+//   file=<path>    also append log lines to this file (UTF-8)
+// Log lines always go to OutputDebugString.
+bool doConfigure(const tstring& configFilename);
 
 void write_file(const char * filename, const void * buff, int size);
 

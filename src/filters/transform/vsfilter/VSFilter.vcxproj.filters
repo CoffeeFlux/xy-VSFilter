@@ -59,9 +59,6 @@
     <ClCompile Include="xy_logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="once_logger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SubRenderOptionsImpl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -116,9 +113,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Timing_Logger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="once_logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IDirectVobSubXy.h">

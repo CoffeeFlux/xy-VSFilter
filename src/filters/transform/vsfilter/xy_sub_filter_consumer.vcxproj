@@ -63,9 +63,6 @@
   <ItemGroup>
     <ClCompile Include="DirectVobSub.cpp" />
     <ClCompile Include="DirectVobSubPropPage.cpp" />
-    <ClCompile Include="once_logger.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -84,7 +81,6 @@
     <ClInclude Include="DirectVobSubPropPage.h" />
     <ClInclude Include="IDirectVobSub.h" />
     <ClInclude Include="IDirectVobSubXy.h" />
-    <ClInclude Include="once_logger.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="StyleEditorDialog.h" />

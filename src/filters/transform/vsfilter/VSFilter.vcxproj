@@ -64,9 +64,6 @@
     <ClCompile Include="DirectVobSubFilter.cpp" />
     <ClCompile Include="DirectVobSubFilterDll.cpp" />
     <ClCompile Include="DirectVobSubPropPage.cpp" />
-    <ClCompile Include="once_logger.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="plugins.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -88,7 +85,6 @@
     <ClInclude Include="DirectVobSubPropPage.h" />
     <ClInclude Include="IDirectVobSub.h" />
     <ClInclude Include="IDirectVobSubXy.h" />
-    <ClInclude Include="once_logger.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="StyleEditorDialog.h" />
