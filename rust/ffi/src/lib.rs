@@ -131,3 +131,5 @@ mod ass_headers;
 mod font_records;
 
 mod microdvd_style;
+
+mod sami_file;

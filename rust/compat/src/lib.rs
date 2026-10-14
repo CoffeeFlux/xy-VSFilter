@@ -78,3 +78,5 @@ pub mod ass_headers;
 pub mod font_records;
 
 pub mod microdvd_style;
+
+pub mod sami_file;

@@ -20,6 +20,25 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns SAMI file caption storage, comment/title state and start times.
+  Native detection/read-ahead/seek, line trimming and uppercase, digit callbacks,
+  timestamp arithmetic, SMI conversion and Add ordering remain intact. A title
+  or comment opener suppresses its entire line, even if it closes on that line;
+  a sync marker anywhere still scans its timestamp from absolute index 12.
+  Final caption insertion and ignored failed-read text match the reference.
+  Fatal ASan/UBSan comparisons passed **152,637 complete file parses** on arm64
+  and under x64 execution: **144,539 accepted / 8,012 rejected / 86 interrupted**,
+  **350,580 Add records**, **97,841,823 callback observation values**, and
+  **144,620 Rust owners / 573,366 classifications / 560,657 appended fragments /
+  206,041 completed flushes**. Every UTF-16 value, counted NULs, comment/header
+  precedence, probe positions, native conversion and partial effects are covered.
+  File I/O, trimming and the Add sink are controlled harness boundaries;
+  timestamps use representable arithmetic and NUL fixtures avoid replacements.
+  Eight file-level SAMI scripts and a visible title-suppression control expand
+  renderer validation to **522 cases**. Rust 1.85 tests (102 core, 67 FFI), strict
+  Clippy, default syntax and Python harness checks pass. Windows/Miri and full
+  renderer validation are pending. Native file decoding, final subtitle storage
+  and real-host integration remain separate work.
 * Safe Rust owns `GetMicroDVDStyle` source and tag traversal. Searches stop at
   NUL, the first closing brace wins, an unclosed tag retains its counted tail,
   and nested tag starts are not revisited. Native one-unit lowercase, prefix
@@ -56,6 +75,11 @@ unresolved reference outcomes requiring investigation, never matching results.
   Rust 1.85 tests (98 core, 65 FFI), strict Clippy, default syntax and corpus
   freshness pass. Windows/Miri and full renderer validation are pending. Native
   file/trim behavior, OS font resources and real host integration remain separate.
+* ASS header Windows x86/x64 renderer checks passed **494 cases / 5,370 frames**
+  per architecture, plus **32 mutation cases / 224 frames**, with matching
+  dialogs, visible controls, exports and declared dependencies. All four
+  platform reports and Miri passed; isolated local ASan/UBSan evidence is complete.
+  See [verified ASS header evidence](ass-headers-evidence.json).
 * Safe Rust owns ASS header classification, acceptance/version state, collision
   and scaled-border substring decisions, and YCbCr matrix/range prefix selection.
   Native trimming, lowercase, suffix comparisons, numeric conversion, resolution
