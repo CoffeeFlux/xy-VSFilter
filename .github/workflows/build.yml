@@ -3,23 +3,29 @@ name: Build VSFilter
 on:
   push:
     branches: [ci, xy_sub_filter_rc*, vsfilter_rc*, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
-    runs-on: windows-2019
+    runs-on: windows-2022
     strategy:
       fail-fast: false
       matrix:
         include:
-          - msarch: x64
-            vsfplat: x64
+          - vsfplat: x64
             namesuf: x86-64
-          - arch: x86
-            vsfplat: Win32
+          - vsfplat: Win32
             namesuf: x86-32
     defaults:
       run:
         shell: 'bash'
+    env:
+      YASM_VERSION: '1.3.0'
+      YASM_SHA256: 'd160b1d97266f3f28a71b4420a0ad2cd088a7977c2dd3b25af155652d8d8d91f'
 
     steps:
       - name: Determine configuration
@@ -34,8 +40,7 @@ jobs:
           # only publish compatible binaries. If it's some other branch, it's probably
           # a transient testing build, so keep everything.
           # ref.: https://github.com/Cyberbeing/xy-VSFilter/pull/18#issuecomment-1302638201
-          REF="${{ github.ref }}"
-          REF="${REF#refs/heads/}"
+          REF="$GITHUB_REF_NAME"
           if [ "$REF" = "master" ] || [ "$REF" = "vsfilter_rc" ] ; then
               name="VSFilter"
               delete="XySubFilter"
@@ -47,32 +52,34 @@ jobs:
           #    delete="VSFilter"
           fi
 
-          echo "name=$name" >> $GITHUB_OUTPUT
-          echo "delete=$delete" >> $GITHUB_OUTPUT
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "delete=$delete" >> "$GITHUB_OUTPUT"
 
       - name: checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # We need full history to allow finding the tag in build prep
-          fetch-depth: 0
+          persist-credentials: false
 
       - name: install yasm
-        shell: cmd
         run: |
-          git clone --depth=1 https://github.com/ShiftMediaProject/VSYASM.git
-          .\VSYASM\install_script.bat
-
-      # VS2019 is 16.x;  VS2022 17.x
-      - name: Setup VS2019
-        uses: microsoft/setup-msbuild@v1.1
-        with:
-          msbuild-architecture: matrix.msarch
-      #    vs-version: '[16.01,16.11]'
+          yasm_dir="$(cygpath -u "$RUNNER_TEMP")/yasm"
+          mkdir -p "$yasm_dir"
+          curl -fsSL --retry 3 -o "$yasm_dir/yasm.exe" \
+              "https://github.com/yasm/yasm/releases/download/v${YASM_VERSION}/yasm-${YASM_VERSION}-win64.exe"
+          echo "${YASM_SHA256}  $yasm_dir/yasm.exe" | sha256sum -c -
+          cygpath -w "$yasm_dir" >> "$GITHUB_PATH"
 
       - name: Build xy-VSFilter and/or XySubFilter
         run: |
-          export VS160COMNTOOLS="C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Common7/Tools/"
-          bash ./build_vsfilter.sh -platform "${{ matrix.vsfplat }}" -compiler VS2019
+          vs_path="$("/c/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe" -latest -products '*' \
+              -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath)"
+          if [ -z "$vs_path" ] ; then
+              echo "Visual Studio with C++ tools not found" >&2
+              exit 1
+          fi
+          export VS170COMNTOOLS="$vs_path/Common7/Tools/"
+          # Version info in version_in.h is maintained by hand, so don't regenerate it
+          bash ./build_vsfilter.sh -platform "${{ matrix.vsfplat }}" -compiler VS2022 -voff
           cp License.txt bin/
 
       - name: Prune incompatible files
@@ -85,9 +92,10 @@ jobs:
           done
 
       - name: Publish output
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: xy-${{ steps.config.outputs.name }}_nightly_${{ matrix.namesuf }}
+          if-no-files-found: error
           path: |
             bin/lib*/*/Release
             bin/License.txt

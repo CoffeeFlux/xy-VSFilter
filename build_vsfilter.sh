@@ -3,7 +3,7 @@
 function Usage()
 {
   echo "Usage:"
-  echo -e "\t$1 [-conf "'"Release"|"Debug"'"]  [-plat platform "'"Win32"|"x64"'"] [-action build|clean|rebuild] [-proj projects] [-voff|--versioning-off] [-solution sln_file] [-compiler VS2010|VS2012|VS2013|VS2019]"
+  echo -e "\t$1 [-conf "'"Release"|"Debug"'"]  [-plat platform "'"Win32"|"x64"'"] [-action build|clean|rebuild] [-proj projects] [-voff|--versioning-off] [-solution sln_file] [-compiler VS2010|VS2012|VS2013|VS2019|VS2022]"
   echo -e "\nDefault:"
   echo -e '-conf\t\t"Release"'
   echo -e '-plat\t\t"Win32"'
@@ -17,6 +17,8 @@ function Usage()
   echo -e '-compiler\tVS2013'
   echo -e "\nVisual Studio 2019:"
   echo -e '-compiler\tVS2019'
+  echo -e "\nVisual Studio 2022:"
+  echo -e '-compiler\tVS2022'
 }
 
 script_dir=`dirname $0`
@@ -111,6 +113,8 @@ elif [ "$compiler"x == "vs2013"x ]; then
   common_tools="%VS120COMNTOOLS%"
 elif [ "$compiler"x == "vs2019"x ]; then
   common_tools="%VS160COMNTOOLS%"
+elif [ "$compiler"x == "vs2022"x ]; then
+  common_tools="%VS170COMNTOOLS%"
 else
   echo "Invalid compiler argument: $compiler"
   Usage $0
@@ -133,22 +137,23 @@ if [ "$compiler"x == "vs2010"x ]; then
 echo '
 CALL "'$common_tools'../../VC/vcvarsall.bat" '$platform_type'
 devenv "'$solution'" /'$action' "'$configuration'" /project "'$project'"
-' | cmd
+exit %ERRORLEVEL%
+' | cmd || exit 1
 
-elif [ "$compiler"x == "vs2019"x ]; then
+elif [ "$compiler"x == "vs2019"x ] || [ "$compiler"x == "vs2022"x ]; then
 echo '
 CALL "'$common_tools'../../VC/Auxiliary/Build/vcvarsall.bat" '$platform_type'
 msbuild /m /t:'$project''$action' /p:Configuration='$configuration' /p:Platform='$platform' /p:BuildProjectReferences=false "'$solution'"
-exit
-' | cmd
+exit %ERRORLEVEL%
+' | cmd || exit 1
 
 else
 
 echo '
 CALL "'$common_tools'../../VC/vcvarsall.bat" '$platform_type'
 msbuild /m /t:'$project''$action' /p:Configuration='$configuration' /p:Platform='$platform' /p:BuildProjectReferences=false "'$solution'"
-exit
-' | cmd
+exit %ERRORLEVEL%
+' | cmd || exit 1
 
 fi
 done
