@@ -20,6 +20,22 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Temporary SSF quoted-string and brace-block text now belongs to a safe Rust
+  UTF-16 vector, including embedded NUL and unpaired surrogates. Native code
+  copies the initialized contents into CStringW only for definition commit or
+  fallback. An append decline copies the existing prefix before releasing the
+  Rust owner and continuing with native append; no data loan survives mutation
+  or release. Both parser methods and the extracted actual storage adapter
+  match locally in ordinary and fatal ASan/UBSan builds on arm64 and x64:
+  **425,718 histories / 34,646,860 fields / 9,696 callback interruptions /
+  850,924 balanced Rust owners and releases / 511,957 Rust appends / 396,627
+  native text copies / 817 modeled create/append declines**. Retry and partial
+  destination state remain checked. Actual allocation failure and callback
+  reentry remain outside the controlled leaf proof. The FFI ownership test
+  copies initialized NUL/surrogate text before vector growth and release.
+  **149 core / 110 FFI tests**, formatting, Clippy, 36 Python tests (three local
+  skips), and native-default syntax pass. Windows/Miri are pending.
+
 * The native SSF driver now distinguishes declared graceful parser errors from
   incomplete runs. Five bounded malformed literal documents run through all four
   input modes (**20 expected-error cases**, in addition to 36 valid cases).
@@ -29,6 +45,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   Cross-input-mode controls also compare error traces. Other exits, timeouts,
   unexpected exceptions and missing completion remain failures. **36 Python
   tests pass (three local skips)**; Windows execution of the new error fixtures
+  stopped on the first error control in run `38601586132`: both architectures
+  returned a complete reference exception with one trailing NUL in its CString
+  length. The corrected control now requires exactly that NUL; saved-capture
+  reinspection passes without native reexecution. The original failed run is
+  retained as a failed control, not a parity pass, in
+  [ssf-error-string-scope.json](ssf-error-string-scope.json). A new Windows run
   is pending. This adds harness coverage, with no production behavior change.
   Native success-case evidence is now reverified and archived for both
   architectures in [ssf-split-native-evidence.json](ssf-split-native-evidence.json)
@@ -57,8 +79,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   handling inside the controlled stream and actual IO remain outside this leaf
   proof. Wider Rust depth has no parity claim for native integer overflow.
   **149 core / 109 FFI tests**, formatting, Clippy, 35 Python checks (three local
-  skips), and native-default syntax pass. Miri and native SSF pass on both
-  architectures at `591f80c9`; remaining leaf/renderer jobs are pending. Native SSF
+  skips), and native-default syntax pass. Windows x86/x64 leaf checks, Miri and
+  native SSF pass at `591f80c9`; remaining portable/renderer jobs are pending. Native SSF
   coverage expands to **36 cases** with escaped quotes, escaped newlines and
   nested/escaped braces in all four input modes; changed-dump controls require
   the added definitions to be observed. Visible SSF rendering remains outside

@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "../../../include/xy_rust_ssf_literal.h"
+#include "../../../include/xy_rust_ssf_literal_text.h"
 #endif
 #include "File.h"
 
@@ -155,7 +156,7 @@ namespace ssf
 	void File::ParseQuotedString(InputStream& s, Definition* pDef)
 	{
 #ifdef XY_VSFILTER_RUST_TEXT
-        CStringW v;
+        XyRust::SsfLiteralText v;
         XyRust::SsfLiteral literal(false);
         int last = 0;
         for(;;)
@@ -225,7 +226,7 @@ namespace ssf
 	void File::ParseBlock(InputStream& s, Definition* pDef)
 	{
 #ifdef XY_VSFILTER_RUST_TEXT
-        CStringW v;
+        XyRust::SsfLiteralText v;
         XyRust::SsfLiteral literal(true);
         int last = 0;
         for(;;)

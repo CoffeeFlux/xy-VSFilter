@@ -69,7 +69,7 @@ class EvidenceTests(unittest.TestCase):
         for path in list(self.root.glob("dump-*.units")) + list(self.root.glob("frame-*.bgra")):
             path.unlink()
         expected = "unterminated quoted string"
-        message = "Error (Ln 1 Col 23): " + expected
+        message = "Error (Ln 1 Col 23): " + expected + "\x00"
         trace = "ssf exception utf16" + "".join(f" {ord(c):04x}" for c in message) + "\nssf-native-v1 exception complete\n"
         path = self.root / "stdout.txt"
         path.write_text(trace, newline="\n")
@@ -83,6 +83,8 @@ class EvidenceTests(unittest.TestCase):
             self.assertEqual(MODULE.inspect(self.root, code, expected_error=expected)["status"], "incomplete")
         self.assertEqual(MODULE.inspect(self.root, 2, True, expected)["status"], "timeout")
         self.assertEqual(MODULE.inspect(self.root, 2, expected_error="unterminated block")["status"], "control_failed")
+        path.write_text(trace.replace(" 0000\n", "\n"), newline="\n")
+        self.assertEqual(MODULE.inspect(self.root, 2, expected_error=expected)["status"], "control_failed")
         path.write_text(trace.replace("ssf-native-v1 exception complete\n", ""), newline="\n")
         self.assertEqual(MODULE.inspect(self.root, 2, expected_error=expected)["status"], "incomplete")
         path.write_text(trace, newline="\n")

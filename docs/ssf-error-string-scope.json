@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "candidate_commit": "6a5fb40bbd87cf66b27302ebbeb8a59ecd23a6f7",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38601586132",
+  "scope": "Failed error-message control, not a differential parity pass. Each architecture stopped after one completed reference parse-error capture; candidate/error repetitions were not executed. Saved data reinspection performs no native execution.",
+  "explanation": "Pinned Exception::Exception reserves formatted length plus one via GetBufferSetLength and does not shorten the CString. GetLength includes one trailing NUL, which the probe correctly records. The original harness expected text without it. The corrected harness requires exactly that trailing unit, retaining raw trace equality and all completion/exit controls.",
+  "reference_source": "src/subtitles/libssf/Exception.cpp",
+  "observations": [
+    {
+      "platform": "Win32",
+      "job_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38601586132/job/115981912235",
+      "recorded_result": {
+        "returncode": 2,
+        "stdout_sha256": "a84e4464a2d2d9926085f14d76c1323ef5c9c003ff784e79fac20ecf79cbd5db",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "files": {},
+        "status": "control_failed"
+      },
+      "saved_capture_reinspection": {
+        "returncode": 2,
+        "stdout_sha256": "a84e4464a2d2d9926085f14d76c1323ef5c9c003ff784e79fac20ecf79cbd5db",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "files": {},
+        "status": "complete",
+        "expected_parse_error": "unterminated quoted string",
+        "error_message": "Error (Ln 1 Col 23): unterminated quoted string\u0000",
+        "blank_frame_observations": 0,
+        "visible_rendering_parity_frames": 0
+      },
+      "raw_stdout_sha256": "852d9bf5d78e56d17b38a3affcf125fe4bb45a34912f1f2d20762919339a492c"
+    },
+    {
+      "platform": "x64",
+      "job_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38601586132/job/115981912615",
+      "recorded_result": {
+        "returncode": 2,
+        "stdout_sha256": "a84e4464a2d2d9926085f14d76c1323ef5c9c003ff784e79fac20ecf79cbd5db",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "files": {},
+        "status": "control_failed"
+      },
+      "saved_capture_reinspection": {
+        "returncode": 2,
+        "stdout_sha256": "a84e4464a2d2d9926085f14d76c1323ef5c9c003ff784e79fac20ecf79cbd5db",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "files": {},
+        "status": "complete",
+        "expected_parse_error": "unterminated quoted string",
+        "error_message": "Error (Ln 1 Col 23): unterminated quoted string\u0000",
+        "blank_frame_observations": 0,
+        "visible_rendering_parity_frames": 0
+      },
+      "raw_stdout_sha256": "852d9bf5d78e56d17b38a3affcf125fe4bb45a34912f1f2d20762919339a492c"
+    }
+  ]
+}

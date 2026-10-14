@@ -72,7 +72,7 @@ def capture_inputs():
               ROOT / "src/subtitles/TextFile.h",
               ROOT / "src/subtitles/TextFile.cpp", ROOT / "src/subtitles/STS.cpp",
               ROOT / "src/subtitles/RTS.cpp", ROOT / "tools/compat/reference.json"]
-    inputs += [ROOT / "src/subtitles/libssf/File.cpp", ROOT / "include/xy_rust_ssf_literal.h"]
+    inputs += [ROOT / "src/subtitles/libssf/File.cpp", ROOT / "include/xy_rust_ssf_literal.h", ROOT / "include/xy_rust_ssf_literal_text.h"]
     inputs += [ROOT / "src/subtitles/libssf/Split.cpp", ROOT / "src/subtitles/libssf/Split.h", ROOT / "include/xy_rust_ssf_split.h"]
     inputs += [ROOT / "src/subtitles/libssf/Arabic.cpp", ROOT / "src/subtitles/libssf/Arabic.h", ROOT / "include/xy_rust_ssf_arabic.h"]
     inputs += [ROOT / "src/filters/transform/vsfilter/csriapi.cpp", ROOT / "src/subtitles/libssf/Stream.cpp", ROOT / "src/subtitles/libssf/Stream.h", ROOT / "include/xy_rust_ssf_stream.h"]
@@ -988,6 +988,11 @@ public:
         csri_filename_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_csri_filename.h").write_text(csri_filename_code, encoding="utf-8")
     ssf_literal_code = '#include "ssf_literal_shell.h"\n'
+    literal_adapter = extract_definition((ROOT / "include/xy_rust_ssf_literal_text.h").read_text(), "class SsfLiteralText")
+    literal_adapter = literal_adapter.replace("SsfLiteralText", "ObservedSsfLiteralText")
+    for operation in ("create", "release", "append", "data"):
+        literal_adapter = literal_adapter.replace("xy_vsfilter_ssf_literal_text_" + operation, "literalText" + operation.capitalize())
+    ssf_literal_code += "namespace XyRust {" + literal_adapter + ";}\n"
     for name, content in (("ReferenceLiteral", original("src/subtitles/libssf/File.cpp", reference["commit"])), ("CandidateLiteral", (ROOT / "src/subtitles/libssf/File.cpp").read_bytes())):
         literal_text = content.decode("utf-8-sig").replace("\r\n", "\n")
         ssf_literal_code += f"namespace {name} {{\nclass File {{public: void ParseQuotedString(InputStream&,Definition*); void ParseBlock(InputStream&,Definition*);}};\n"
@@ -1000,7 +1005,7 @@ public:
             literal_end = literal_text.index("\n\tvoid File::", literal_start + len(signature))
             literal_method = literal_text[literal_start:literal_end].rstrip()
             assert literal_method.endswith("\n\t}")
-            ssf_literal_code += literal_method.replace("CStringW", "LiteralString").replace("XyRust::SsfLiteral", "XyRust::ObservedSsfLiteral") + "\n"
+            ssf_literal_code += literal_method.replace("CStringW", "LiteralString").replace("XyRust::SsfLiteralText", "LiteralStringRust<XyRust::ObservedSsfLiteralText>").replace("XyRust::SsfLiteral", "XyRust::ObservedSsfLiteral") + "\n"
         ssf_literal_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_ssf_literal.h").write_text(ssf_literal_code, encoding="utf-8")
     ssf_split_code = '#include "ssf_split_shell.h"\n'
@@ -2295,7 +2300,7 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
         "fraction_storage_scope": "Whole pinned xy_be_blur and xy_calculate_filter with observed filter/transpose calls and scratch ownership under strict FP compilation. x86/x64 execute extracted native SSE kernels against Rust kernels; arm64 substitutes extracted scalar callbacks and does not establish SSE parity. Exact stage bytes/order, output/padding, initialized scratch, cache accounting, signed and fractional pass counts, reuse and native allocation fallback. Positive dimensions at least four avoid an unused native before-base cursor; zero/smaller/negative dimensions, overflowing/nonfinite pass counts, invalid backing and actual allocation failure excluded.",
         "ssf_literal_compile_command": ssf_literal_compile,
         "ssf_literal_result": ssf_literal_result.stdout, "ssf_literal_stderr": ssf_literal_result.stderr,
-        "ssf_literal_scope": "Complete pinned ParseQuotedString and ParseBlock. All UTF-16 units direct/escaped, both quotes, nested braces, embedded NUL, raw provider values, Peek/Get differences, before/after callback interruptions, repeated calls and partial destination commits. Windows CStringW append or portable string boundary; stream/definition/error callbacks controlled. Only parser decisions move to Rust; append, stream callbacks, definition writes and exact errors remain native. Actual allocation failure, depth beyond native integer range, locale/comment handling inside the controlled stream and actual IO excluded.",
+        "ssf_literal_scope": "Complete pinned ParseQuotedString and ParseBlock. All UTF-16 units direct/escaped, both quotes, nested braces, embedded NUL, raw provider values, Peek/Get differences, before/after callback interruptions, repeated calls and partial destination commits. Windows CStringW append or portable string boundary; stream/definition/error callbacks controlled. Parser decisions and temporary literal buffers move to Rust; stream callbacks, definition writes and exact errors remain native. Modeled create/append declines check native fallback with retained prefixes and balanced owners. Actual allocation failure, depth beyond native integer range, locale/comment handling inside the controlled stream and actual IO excluded.",
         "ssf_split_compile_command": ssf_split_compile,
         "ssf_split_result": ssf_split_result.stdout, "ssf_split_stderr": ssf_split_result.stderr,
         "ssf_split_scope": "Complete pinned Split constructors and DoSplit with controlled Add interruptions. Every UTF-16 value, embedded NUL, multi-unit/overlapping separators, separator aliases into input, Min/Def/Max, accepted-token limits, repeated clear/split and retained partial arrays. Actual Windows CStringW/ATL or portable UTF-16 string/array model (including a controlled Trim boundary). Only read-only separator search moves to Rust; trimming, public array storage and numeric conversion remain native. Actual allocation failure, invalid CString backing/state, separator aliases into cleared old arrays and unrepresentable lengths excluded.",

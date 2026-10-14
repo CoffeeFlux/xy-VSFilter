@@ -61,7 +61,9 @@ def inspect(directory, returncode, timed_out=False, expected_error=None):
             return result
         units = exception[1].split()
         message = b"".join(int(unit, 16).to_bytes(2, "little") for unit in units).decode("utf-16-le", errors="surrogatepass")
-        if not re.fullmatch(r"Error \(Ln \d+ Col \d+\): " + re.escape(expected_error), message):
+        # Pinned Exception keeps GetBufferSetLength(formatted length + 1),
+        # so its observable CString contains one trailing NUL code unit.
+        if not re.fullmatch(r"Error \(Ln \d+ Col \d+\): " + re.escape(expected_error) + "\x00", message):
             result["status"] = "control_failed"
             return result
         result.update(status="complete", expected_parse_error=expected_error, error_message=message,
