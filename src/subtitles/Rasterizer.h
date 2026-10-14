@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <boost/smart_ptr.hpp>
+#include <memory>
 #include <vector>
 #include "../SubPic/ISubPic.h"
 #include "xy_malloc.h"
@@ -63,8 +63,8 @@ public:
     int mPathPoints;
 };
 
-typedef ::boost::shared_ptr<const PathData> SharedPtrConstPathData;
-typedef ::boost::shared_ptr<PathData> SharedPtrPathData;
+typedef std::shared_ptr<const PathData> SharedPtrConstPathData;
+typedef std::shared_ptr<PathData> SharedPtrPathData;
 
 
 typedef std::pair<unsigned __int64, unsigned __int64> tSpan;
@@ -114,8 +114,8 @@ public:
     friend class ScanLineData2;
 };
 
-typedef ::boost::shared_ptr<const ScanLineData> SharedPtrConstScanLineData;
-typedef ::boost::shared_ptr<ScanLineData> SharedPtrScanLineData;
+typedef std::shared_ptr<const ScanLineData> SharedPtrConstScanLineData;
+typedef std::shared_ptr<ScanLineData> SharedPtrScanLineData;
 
 class ScanLineData2
 {
@@ -137,10 +137,10 @@ private:
     friend class Rasterizer;
 };
 
-typedef ::boost::shared_ptr<const ScanLineData2> SharedPtrConstScanLineData2;
-typedef ::boost::shared_ptr<ScanLineData2> SharedPtrScanLineData2;
+typedef std::shared_ptr<const ScanLineData2> SharedPtrConstScanLineData2;
+typedef std::shared_ptr<ScanLineData2> SharedPtrScanLineData2;
 
-typedef ::boost::shared_ptr<BYTE> SharedPtrByte;
+typedef std::shared_ptr<BYTE> SharedPtrByte;
 
 struct Overlay
 {
@@ -181,7 +181,7 @@ public:
     bool mfWideOutlineEmpty;//specially for blur
 };
 
-typedef ::boost::shared_ptr<Overlay> SharedPtrOverlay;
+typedef std::shared_ptr<Overlay> SharedPtrOverlay;
 
 struct GrayImage2
 {
@@ -192,7 +192,7 @@ public:
     SharedPtrByte data;
 };
 
-typedef ::boost::shared_ptr<GrayImage2> SharedPtrGrayImage2;
+typedef std::shared_ptr<GrayImage2> SharedPtrGrayImage2;
 
 class XyBitmap;
 class Rasterizer
