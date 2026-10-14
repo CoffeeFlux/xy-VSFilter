@@ -7,11 +7,13 @@
 #include <cerrno>
 struct FwSTSStyle {int id;};
 struct RenderState {int m_ktype,m_kstart,m_kend;double m_target_scale_x,m_target_scale_y;};
-static uint64_t runOwners=0,runSteps=0;
+static uint64_t runOwners=0,runSteps=0,runPrepared=0,runNativePrepared=0,runResets=0;
 namespace XyRust {
 class ObservedTextRuns : public TextRuns {
 public:
     template<class String> explicit ObservedTextRuns(const String& input):TextRuns(input){++runOwners;}
+    bool Prepare(int wrap){bool handled=TextRuns::Prepare(wrap);if(handled)++runPrepared;else ++runNativePrepared;return handled;}
+    template<class String> void Reset(const String& input){++runResets;TextRuns::Reset(input);}
     uint32_t Next(){++runSteps;return TextRuns::Next();}
 };
 }

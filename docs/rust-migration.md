@@ -20,8 +20,11 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
-* Safe Rust owns rendered-text run storage and traversal after native escape
-  replacement. Only ASCII space, LF and NUL split words: NUL is skipped while its
+* Safe Rust now prepares rendered-text escapes (`\N`, `\n`, `\h`) and owns
+  run storage and traversal. Soft breaks retain the exact wrap-style condition;
+  embedded-NUL strings retain native replacement before reimport into Rust.
+  Both local architectures match **161,254 Rust preparations / 5 native
+  fallbacks**, with unchanged word arguments and callback ordering. Only ASCII space, LF and NUL split words: NUL is skipped while its
   counted tail is still scanned; tabs and NBSP remain inside words. Repeated
   spaces/newlines create separate native word objects. Native CText construction,
   list insertion, live scaling/karaoke arguments and karaoke-start updates retain
@@ -35,10 +38,10 @@ unresolved reference outcomes requiring investigation, never matching results.
   list insertion are modeled boundaries; replacement-bearing NUL fixtures and
   allocation failures are excluded.
   Eight whitespace/karaoke scripts and a soft-break visible control expand
-  renderer validation to **586 cases**. Rust 1.85 tests (111 core, 73 FFI), strict
+  renderer validation to **586 cases**. Rust 1.85 tests (112 core, 74 FFI), strict
   Clippy, default syntax and Python harness checks pass. Windows/Miri and full
-  renderer checks are pending; escape replacement, font metrics, word objects
-  and full host integration remain native/separate work.
+  renderer checks for this increment are pending; NUL escape replacement, font
+  metrics, word objects and full host integration remain native/separate work.
 * Corrected SAMI, SubRip and legacy SubRip/VPlayer Windows x86/x64 renderer checks
   passed **554 cases / 5,730 frames** per architecture, plus **32 mutation cases /
   224 frames**, with matching dialogs, visible controls, exports and declared
@@ -96,7 +99,10 @@ unresolved reference outcomes requiring investigation, never matching results.
   size boundaries are covered. Windows uses actual ATL conversion; portable
   conversion and native write sinks are controlled harness boundaries.
   Rust 1.85 tests (106 core, 70 FFI), strict Clippy, default syntax and Python
-  harness checks pass. Windows/Miri and full renderer checks are pending.
+  harness checks pass. All four platform reports, Miri and Windows x86/x64
+  renderer checks passed **554 cases / 5,730 frames**, plus **32 mutation cases /
+  224 frames**, with matching controls, dialogs, exports and dependencies.
+  See [verified writer evidence](text-writer-evidence.json).
   The renderer corpus remains **554 cases** and does not exercise file saving:
   full SaveAs formatting, OS file persistence, default-codepage writes and host
   save operations still need integration coverage.
