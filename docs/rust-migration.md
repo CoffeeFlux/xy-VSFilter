@@ -109,9 +109,12 @@ file/code-page/CRT services may remain explicit bounded adapters, with their
 contracts and measured behavior recorded. Platform adapters cannot hide native
 document ownership, sorting, mutation or recovery logic.
 
-Native caller updates are part of this package: the direct entry/segment/style
-accesses in RTS.cpp, the MicroDVD previous-entry correction in STS.cpp, and style
-count/enumeration/editing in DirectVobSubFilter.cpp and xy_sub_filter.cpp. Public
+Native caller updates are part of this package: STS.cpp's format parsers and
+MicroDVD correction; RTS.cpp's renderer, cache and style-reset lookup;
+SubtitleInputPin.cpp's streamed Add/NewSegment/codec-private Open paths;
+USFSubtitles.cpp's imports; csriapi.cpp, plugins.cpp and CCDecoder.cpp; and
+DirectVobSubFilter.cpp/xy_sub_filter.cpp's settings, style APIs and metadata
+reads. Inventory metadata access as well as entries, segments and styles. Public
 DLL signatures and data-transfer contracts remain unchanged. Native temporary
 snapshots may own copied output; no caller gets a long-lived writable pointer
 into the authoritative Rust document. Avoid a persistent duplicate native
@@ -141,6 +144,91 @@ They cover the shared owner; the implementation of each independent format
 parser, serializer and rasterizer remains in its named package. All such callers
 must nevertheless use the new owner correctly for this package to close.
 
+### Review corrections and first integrated increment
+
+The user-requested [Claude review](rust-plan-review.json) covers plan commit
+`8e6509ce`. It supports the first package, but identifies missing callers and
+contracts. Its findings are review input, not validation evidence; the artifact
+records accepted findings and qualifications. In particular, few visible
+callers do not justify dropping Copy, SetStr, Sort or other lifecycle coverage.
+SaveAs still directly reads entries and styles, so its access migration belongs
+here even though serialization logic remains in the format package.
+
+D0 produces a checked-in document inventory: source location, operation,
+public/host entry path where known, read/write/view kind, owner, lifetime,
+lock held, callback/reentrancy behavior and evidence status. Generate candidate
+accesses from source and manually classify them; a token search alone cannot
+prove reachability or ownership. Record unknown reachability explicitly. Start
+with streaming Add/NewSegment and file Open/CreateSegments/render/seek because
+they exercise the main consumer paths, then cover the remaining operations.
+
+Split implementation into two integrated increments without changing the final
+document boundary:
+
+* **D2a: entries and segments.** Implement the safe owner and sequence harness
+  first, then route every entry/segment reader and writer through it. Include
+  both Add paths, duplicate/readorder behavior, clear/rebuild/search/conversion,
+  copy/sort/edit handoffs, last-stored-entry correction, style renaming, bounded
+  renderer snapshots and explicit animation feedback. The first core change is
+  create/add/query/rebuild/clear/destroy over owned records, with matching
+  reference state traces; it is not a production switch or subsystem closure.
+* **D2b: styles and document metadata.** Move canonical style/default-style and
+  metadata storage, preserve enumeration/mutation history, route every remaining
+  caller and close the full document lifecycle. Styles and metadata retained
+  during D2a are explicitly native owners; D2a cannot be reported as a fully
+  migrated document subsystem.
+
+Each increment proceeds through caller integration and exact-commit Windows
+parity before a production switch. D0/D1 work can proceed by operation group
+once its contract is recorded; do not wait for every unrelated probe before
+implementing the first safe owner. D2a's integrated gate requires removal of
+authoritative native entry/segment arrays in the Rust build, retirement of
+their temporary reseeding FFI, unchanged caller-visible ordering/callbacks,
+Miri and focused lifecycle checks, and x86/x64 renderer/streaming comparisons.
+Report removed owners, remaining metadata/style owners and boundary changes,
+not an assumed three-field completion denominator.
+
+### Contracts that must be resolved before switching ownership
+
+* **Public styles:** `SubStyle::style` carries a native `STSStyle` object with
+  CString/flyweight members. Keep that ABI and use one reviewed native
+  conversion adapter around value records; it must preserve count, name limits,
+  partial output/error order and sequential updates. Rust must never interpret
+  the C++ object layout as a Rust struct or retain its writable pointer.
+* **Ordering and numbers:** capture ATL hash/bin/rehash/chain behavior across
+  insertion, removal, duplicate renaming and copying. Preserve the resulting
+  enumeration using an explicit safe compatibility model. Probe both document
+  and renderer qsort ordering, including equal keys and native comparator edge
+  behavior, plus llround and frame/time conversion boundaries. Ordinary Rust
+  maps/sorts/casts are not substitutes. Retain toolset, SDK, ATL/CRT versions,
+  build flags and binary hashes; select a fixed reference build environment
+  before freezing these models. A runner-image update must not silently redefine
+  the reference. No known crashing/hanging reference case is reexecuted.
+* **Ownership and synchronization:** one canonical owner, bounded value/copy-out
+  operations, no native mutable loans. Audit the actual lock and lifetime graph
+  across renderer, input pin, both style APIs and destruction; different named
+  native locks do not establish exclusivity. Define compatible synchronization
+  before deriving Rust mutable access. Release Rust borrows before native
+  callbacks, and specify reentry, callback ordering and snapshot validity.
+  A mutex alone does not settle lock order or callback compatibility.
+* **Failures and effects:** distinguish status, exception, partial mutation and
+  callback outcomes. Return recoverable failures through the adapter at the
+  same observable point; do not introduce a Rust panic where the reference
+  continues. Record dialogs and their responses, file-probe/retry order,
+  `.style` sidecars and temporary-file behavior through equivalent harness seams
+  on both sides. Compare initialized fields only; explicitly track unresolved
+  reference state and candidate policy without counting it as parity.
+* **Renderer identity:** preserve entry/segment indexes, cache invalidation and
+  animation feedback timing. RemoveAllEntries leaves segments/cache state until
+  the existing rebuild/notification point; do not make it automatically tidy.
+  MicroDVD edits the last stored entry, which can differ from the last attempted
+  Add, and its segment effects wait for the existing rebuild.
+
+The document FFI review records every unsafe contract and superseded crossing.
+Require removal of the reseeding bridges and explain any added unsafe surface;
+an arbitrary unsafe-count cap is not a soundness proof. Full package closure
+still requires D4/D5 below and all remaining ownership/fallback accounting.
+
 ### Milestones and acceptance gates
 
 | Milestone | Deliverable | Required evidence before advancing |
@@ -169,6 +257,24 @@ or when a shared boundary changes. Reuse existing oracles and corpus evidence;
 add tests for new behavior, ownership or failure contracts rather than repeating
 implementation details. Address a failing baseline before treating later matrix
 results as a clean integration gate.
+
+The RLE baseline failure blocks a green integrated candidate, not independent
+D0 inventories or D1/D2 core development. CI scheduling/cancellation changes
+are proposed separately: preserve required milestone evidence, distinguish
+cancelled runs from passes, and validate any cache against complete reference
+build provenance. This plan update does not change workflow triggers.
+
+For parallel implementation, use one coordinator and up to three agents with
+separate file ownership: reference lifecycle harness/probes; safe Rust owner;
+native caller migration. First agree on record/status types, operations,
+callback timing, snapshots and ownership. Caller work can inventory accesses
+while the contract is being frozen, then implement against that contract.
+The coordinator owns shared FFI/header changes, integration and CI scheduling;
+completed work receives an independent compatibility/unsafe-contract review.
+GPT-6.1 Sol is suitable for these bounded assignments when delegated. Measure
+completed operation groups and owners retired, including integration/review
+time, before estimating acceleration. Do not launch unrelated leaf ports to
+fill available agent slots.
 
 Each progress update names the active milestone, operation groups advanced,
 authoritative native owners/accesses removed, remaining native fallbacks, and
