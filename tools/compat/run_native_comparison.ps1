@@ -62,6 +62,14 @@ try {
         & python "$PSScriptRoot\pe_dependencies.py" $original $candidate > "$evidence\$name.dependencies.json"
         if ($LASTEXITCODE -ne 0) { throw "Added imports or changed platform requirements: $name" }
     }
+    & cl /nologo /O2 /EHsc /std:c++14 /MD "$PSScriptRoot\com_contract_probe.cpp" `
+        "/Fe:$evidence\com-contract-probe.exe" "/Fo:$evidence\com-contract-probe.obj" `
+        /link ole32.lib strmiids.lib uuid.lib
+    if ($LASTEXITCODE -ne 0) { throw "COM contract probe build failed" }
+    & python "$PSScriptRoot\com_contract_compare.py" --reference-root $baselineRoot `
+        --candidate-root $candidateRoot --probe "$evidence\com-contract-probe.exe" `
+        --platform $Platform --output "$evidence\com-contracts"
+    if ($LASTEXITCODE -ne 0) { throw "COM contract comparison failed; inspect $evidence\com-contracts\report.json" }
     $original = Find-Dll $baselineRoot "VSFilter.dll"
     $candidate = Find-Dll $candidateRoot "VSFilter.dll"
     $manifest = Get-Content "$candidateRoot\test\compat\cases.json" -Raw | ConvertFrom-Json

@@ -114,6 +114,36 @@ def summarize_native(run, platform, candidate, reference):
             "baseline_sha256": sha(one(root / "baseline", name)),
             "candidate_sha256": sha(one(root / "candidate", name)),
         }
+    com_path = base / "com-contracts/report.json"
+    # Older increments predate this contract gate. Once the driver's source is
+    # present in a candidate commit, missing or failed evidence is an error.
+    has_com_probe = subprocess.run(["git", "cat-file", "-e", f"{candidate}:tools/compat/com_contract_probe.cpp"],
+                                   cwd=ROOT, capture_output=True).returncode == 0
+    if has_com_probe:
+        com = load(com_path)
+        assert com["complete"] and com["passed"] and com["inputs_unchanged"]
+        assert com["reference_commit"] == reference and com["candidate_commit"] == candidate
+        assert com["platform"] == platform and len(com["cases"]) == 10
+        assert com["probe_sha256"] == sha(base / "com-contract-probe.exe")
+        for name, digest in com["harness_sources"].items():
+            raw = subprocess.run(["git", "show", f"{candidate}:{name}"], cwd=ROOT,
+                                 check=True, capture_output=True).stdout
+            lf = raw.replace(b"\r\n", b"\n")
+            assert digest in {hashlib.sha256(data).hexdigest() for data in (raw, lf, lf.replace(b"\n", b"\r\n"))}
+        for name, hashes in com["binaries"].items():
+            assert hashes["reference"] == entry["dlls"][name]["baseline_sha256"]
+            assert hashes["candidate"] == entry["dlls"][name]["candidate_sha256"]
+        for case in com["cases"]:
+            assert case["verdict"]["kind"] == "equal"
+            traces = []
+            for side, capture in case["captures"].items():
+                assert capture["status"] == "complete" and capture["returncode"] == 0
+                path = com_path.parent / case["id"] / side / "stdout.txt"
+                assert capture["stdout_sha256"] == sha(path)
+                traces.append(path.read_bytes())
+            assert len(traces) == 4 and all(trace == traces[0] for trace in traces)
+        entry["checks"]["com-contracts"] = {"report_sha256": sha(com_path), "cases": len(com["cases"]),
+                                                "passed": True, "scope": com["scope"], "headers": com["headers"]}
     log = (base / "candidate.log").read_text(errors="replace")
     assert "XY_VSFILTER_RUST_TEXT" in log and "xy_vsfilter_ffi.lib" in log
     entry["candidate_log_sha256"] = sha(base / "candidate.log")

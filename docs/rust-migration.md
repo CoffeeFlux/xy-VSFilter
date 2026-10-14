@@ -20,6 +20,24 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Windows integration now includes a disconnected COM contract probe for all
+  five filter classes across the three DLLs: DirectVobSub, its autoloading
+  variant, XySubFilter, its autoloader, and XySubFilterConsumer. Class UUIDs come
+  from pinned headers and must match candidate headers. Each class is created
+  directly through `DllGetClassObject` in STA and MTA apartments, with two fresh
+  reference and two fresh candidate processes per case. Observations include
+  class factories, IUnknown identity, interface availability, initial state,
+  filter name/class/clock, property-page UUIDs, stream count, pin names, IDs,
+  directions and parent identity, FindPin, and enumerator reset/clone/skip.
+  No registration or persistent setting writes occur. The driver retains raw
+  traces and DLL/probe/header hashes; instability, crashes, timeouts, incomplete
+  traces and mismatches fail the gate. The evidence summarizer requires this
+  report for candidates containing the probe. Seven harness checks pass locally
+  (**27 Python tests total, three platform skips**); native compilation and
+  execution await Windows CI. This adds interface characterization, not a Rust
+  COM implementation. Custom interface methods, media negotiation, graph
+  playback, UI and real-player integration remain outstanding.
+
 * `Rasterizer::CompositeAlphaMask` now transfers a Rust output allocation into
   the existing shared result, preserving partial writes and final-alias release.
   The whole pinned caller and `Overlay::FillAlphaMash`, using extracted native
