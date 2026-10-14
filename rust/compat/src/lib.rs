@@ -84,3 +84,5 @@ pub mod sami_file;
 pub mod subrip_cue;
 
 pub mod pipe_line;
+
+pub mod text_writer;

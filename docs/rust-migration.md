@@ -20,6 +20,24 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns `CTextFile::WriteString` Unicode output buffers. Every LF gains
+  a preceding CR, including CRLF becoming CRCRLF, and UTF-16 writes preserve raw
+  code units in the selected byte order. Initial CString NUL termination, native
+  ATL UTF-8 conversion, default-encoding writes and unknown-mode behavior remain.
+  The immutable Rust byte buffer outlives its native Write call, including cleanup
+  when that callback throws; no mutable Rust loan spans the native call.
+  Fatal ASan/UBSan comparisons passed **285,517 complete writes** on arm64 and
+  under x64 execution: **3,464,046 byte/code-unit observations**, **2,008,261
+  callback observation values**, **10 interruptions / 16 source mutations**,
+  and **215,547 Rust buffers / 143,698 byte loans**. Every UTF-16 value, paired
+  and unpaired surrogates, NUL termination, repeated CR/LF and conversion-buffer
+  size boundaries are covered. Windows uses actual ATL conversion; portable
+  conversion and native write sinks are controlled harness boundaries.
+  Rust 1.85 tests (106 core, 70 FFI), strict Clippy, default syntax and Python
+  harness checks pass. Windows/Miri and full renderer checks are pending.
+  The renderer corpus remains **554 cases** and does not exercise file saving:
+  full SaveAs formatting, OS file persistence, default-codepage writes and host
+  save operations still need integration coverage.
 * Safe Rust owns the legacy SubRip and VPlayer line buffers and pipe-replacement
   cursor. Each search retains native FindChar/IsUnicode callback order, DBCS
   handling and inline charset changes; numeric scans, payload slicing, timestamp
