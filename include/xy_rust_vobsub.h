@@ -31,4 +31,6 @@ extern "C" uint32_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_outline_walk(uint8_t* gri
 struct XyVobSubSegment { int32_t begin,end,last,start_x,start_y,end_x,end_y; };
 extern "C" uint32_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_segment(const int32_t* points, size_t point_count, const int32_t* directions, size_t direction_count, int32_t start, XyVobSubSegment* output);
 extern "C" uint32_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_split(const uint32_t* lengths, const uint32_t* starts, const uint32_t* ends, size_t count, size_t* output);
+extern "C" uint32_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_path(uint8_t kind, uint8_t previous, size_t remaining);
+extern "C" uint32_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_coordinates(int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2, uint32_t count, uint16_t* output);
 #undef XY_VOBSUB_CDECL

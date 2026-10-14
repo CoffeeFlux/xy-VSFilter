@@ -1397,6 +1397,25 @@ bool CVobSubImage::Polygonize(CStringW& assstr, bool fSmooth, int scale)
     for (size_t i = 0; i < nPoints; i++) {
         CStringW s;
 
+#ifdef XY_VSFILTER_RUST_TEXT
+        static_assert(PT_MOVETO == 6 && PT_MOVETONC == 0xfe && PT_LINETO == 2 &&
+            PT_BEZIERTO == 4 && PT_BSPLINETO == 0xfc && PT_BSPLINEPATCHTO == 0xfa,
+            "Rust polygon command encoding must match native path types");
+        const uint32_t command = xy_vsfilter_vobsub_path(pathTypes[i], lastType, nPoints - i);
+        if (command & 0xff) {
+            const WCHAR prefix[] = {static_cast<WCHAR>(command & 0xff), L' ', 0};
+            assstr += prefix;
+        }
+        WCHAR coordinates[72];
+        if ((command >> 8) == 1) {
+            const uint32_t length = xy_vsfilter_vobsub_coordinates(pathPoints[i].x, pathPoints[i].y, 0, 0, 0, 0, 1, reinterpret_cast<uint16_t*>(coordinates));
+            s.SetString(coordinates, length);
+        } else if ((command >> 8) == 3) {
+            const uint32_t length = xy_vsfilter_vobsub_coordinates(pathPoints[i].x, pathPoints[i].y, pathPoints[i + 1].x, pathPoints[i + 1].y, pathPoints[i + 2].x, pathPoints[i + 2].y, 3, reinterpret_cast<uint16_t*>(coordinates));
+            s.SetString(coordinates, length);
+            i += 2;
+        }
+#else
         switch (pathTypes[i]) {
             case PT_MOVETO:
                 if (lastType != PT_MOVETO) {
@@ -1441,6 +1460,7 @@ bool CVobSubImage::Polygonize(CStringW& assstr, bool fSmooth, int scale)
                 s.Format(L"%ld %ld ", pathPoints[i].x, pathPoints[i].y);
                 break;
         }
+#endif
 
         lastType = pathTypes[i];
 

@@ -20,6 +20,25 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust selects DVD polygon-to-ASS commands and formats their signed decimal
+  coordinates into a bounded UTF-16 buffer. Native public `CStringW` output,
+  position/header formatting, prefix appends, final suffix and exception
+  propagation remain in place. A grouped curve takes the next previous-command
+  state from its **third consumed path type**, not the initial curve type;
+  unknown types, close-figure-bit variants and incomplete triples retain the
+  original empty-string append and state update. Point reads remain after the
+  prefix append, and the last-type read remains after coordinate construction.
+  Fatal ASan/UBSan comparisons passed **54,692 complete conversions** on arm64
+  and under x64 execution, comparing **738,364 string operations**, **68 injected
+  interruptions**, **7,314 callback-mutated paths**, **527 polygon rejections**
+  and **303,997 Rust commands**. Fixtures cover every byte path type, mixed
+  triples, signed coordinate limits and randomized coordinates. Windows uses
+  installed ATL `CStringW` for native formatting and candidate assignment;
+  the portable model uses `swprintf` and widens the Rust UTF-16 payload.
+  Polygon generation is a fixture boundary, not an end-to-end fitting oracle.
+  Native allocation sizes/OOM behavior remain unverified. Rust tests (59 core,
+  36 FFI), strict Clippy and both default branch syntax checks pass.
+  Windows/Miri validation is pending for this increment.
 * Safe Rust selects the split indices for DVD `SplitOutline`. It preserves the
   first strict maximum, preference for the first interior maximum on a tie,
   and 32-bit unsigned midpoint-index addition on both Windows architectures.
@@ -54,7 +73,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   return values and mutated input. Unsupported counts, layouts and arithmetic
   retain native handling; container operations are modeled in the oracle.
   Rust tests (56 core, 34 FFI), strict Clippy and both default native branch syntax
-  checks pass. Windows/Miri validation is pending for this increment.
+  checks pass. Candidate `b8b3802f` passed all four CI platforms, Miri and both
+  Windows DLL jobs, each matching **354 cases / 4,334 frames** and **32 mutations
+  / 224 frames**, dialogs, visible controls, exports and dependencies. Both logs
+  confirm Rust-enabled `VobSubImage.cpp` compilation.
+  [DVD segment evidence](vobsub-segment-evidence.json) records verified source and
+  DLL hashes, stable local validation and the remaining bitmap-host scope.
 * Safe Rust creates DVD outline masks from alpha, finds the original zero-to-one
   starting transitions, and advances the integer outline walker. It preserves
   equality-to-one neighbor tests, marked-byte wrapping, point locations and turn

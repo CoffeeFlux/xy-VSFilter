@@ -428,6 +428,14 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         vobsub_split += split_method[selection_start:selection_end] + "return {j,k};\n}\n"
         vobsub_split += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_vobsub_split.h").write_text(vobsub_split, encoding="utf-8")
+    vobsub_path = '#include "vobsub_path_shell.h"\n'
+    for name, content in (("ReferenceVobPath", vobsub_source), ("CandidateVobPath", (ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
+        vobsub_path += f"VOBSUB_PATH_SHELL({name})\n#define CVobSubImage {name}\n"
+        if name == "CandidateVobPath":
+            vobsub_path += "#define XY_VSFILTER_RUST_TEXT\n"
+        vobsub_path += extract_definition(content.decode("utf-8-sig"), "bool CVobSubImage::Polygonize(CStringW&") + "\n"
+        vobsub_path += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_vobsub_path.h").write_text(vobsub_path, encoding="utf-8")
     byte_float = '#include "byte_float_shell.h"\n'
     for name, content in (("ReferenceByteFloat", filter_source), ("CandidateByteFloat", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
         byte_float += f"namespace {name} {{\n"
@@ -781,6 +789,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     vobsub_split_result = run([str(vobsub_split_executable)], capture_output=True, text=True)
     print(vobsub_split_result.stdout, end="", flush=True)
     print(vobsub_split_result.stderr, end="", file=sys.stderr)
+    vobsub_path_executable = destination / ("vobsub-path-oracle.exe" if os.name == "nt" else "vobsub-path-oracle")
+    vobsub_path_compile = [arg.replace("fill_oracle.cpp", "vobsub_path_oracle.cpp").replace("fill-oracle", "vobsub-path-oracle") for arg in fill_compile]
+    run(vobsub_path_compile)
+    vobsub_path_result = run([str(vobsub_path_executable)], capture_output=True, text=True)
+    print(vobsub_path_result.stdout, end="", flush=True)
+    print(vobsub_path_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -824,6 +838,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "vobsub_scale_result": vobsub_scale_result.stdout, "vobsub_scale_stderr": vobsub_scale_result.stderr,
         "vobsub_outline_compile_command": vobsub_outline_compile,
         "vobsub_outline_result": vobsub_outline_result.stdout, "vobsub_outline_stderr": vobsub_outline_result.stderr,
+        "vobsub_path_compile_command": vobsub_path_compile,
+        "vobsub_path_result": vobsub_path_result.stdout, "vobsub_path_stderr": vobsub_path_result.stderr,
+        "vobsub_path_string_backend": "installed ATL CStringW" if os.name == "nt" else "swprintf/wstring with LONG-range coordinates",
         "vobsub_split_compile_command": vobsub_split_compile,
         "vobsub_split_result": vobsub_split_result.stdout, "vobsub_split_stderr": vobsub_split_result.stderr,
         "vobsub_split_cast_normalization": "none; original MSVC spelling" if os.name == "nt" else "three unsigned int functional casts per method changed to static_cast<unsigned int>",
