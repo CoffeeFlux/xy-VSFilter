@@ -102,3 +102,5 @@ pub mod path_align;
 pub mod span_merge;
 
 pub mod arc_queue;
+
+pub mod ellipse_arc;

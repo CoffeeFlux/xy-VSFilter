@@ -384,6 +384,16 @@ def arc_queue_variants():
         yield "arc-queue-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
 
 
+def ellipse_arc_variants():
+    for name, payload in {
+        "fraction-below": br"{\xbord2.124\ybord2.124}Rounded corners",
+        "fraction-above": br"{\xbord2.126\ybord2.126}Rounded corners",
+        "thin-wide": br"{\xbord14\ybord0.5\p1}m 0 0 l 64 0 64 48 0 48{\p0}",
+        "thin-tall": br"{\xbord0.5\ybord14\p1}m 0 0 l 64 0 64 48 0 48{\p0}",
+    }.items():
+        yield "ellipse-arc-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
+
+
 def layout_rect_variants():
     prefix = SEED[:SEED.index(b"Dialogue:")]
     for name, alignment, second_layer, border, collisions, multiline in (
@@ -690,6 +700,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in path_alignment_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in span_merge_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in arc_queue_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in ellipse_arc_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in realtext_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_header_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_style_variants()]
