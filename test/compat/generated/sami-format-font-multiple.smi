@@ -1,0 +1,6 @@
+<SAMI>
+<BODY>
+<SYNC Start=0><P><font color="red" color="#123456">Formatting sample</font><BR>second line
+<SYNC Start=4000><P>&nbsp;
+</BODY>
+</SAMI>

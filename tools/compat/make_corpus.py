@@ -310,6 +310,10 @@ def sami_variants():
         "entities": "Formatting&NBSP;sample&QuOt;text&QUOT;<bR>second line",
         "mixed": "<B><I>Formatting</i> sample</b><Br>second line",
         "unicode": "<I>Formatting \u03b1sample</I><BR>second line",
+        "font-black": "<font color=black>Formatting sample</font><BR>second line",
+        "font-zero": "<font color=000000>Formatting sample</font><BR>second line",
+        "font-multiple": '<font color="red" color="#123456">Formatting sample</font><BR>second line',
+        "font-unclosed": "Formatting <font color=red",
     }.items():
         text = ("<SAMI>\r\n<BODY>\r\n<SYNC Start=0><P>" + payload +
                 "\r\n<SYNC Start=4000><P>&nbsp;\r\n</BODY>\r\n</SAMI>\r\n")
@@ -371,7 +375,8 @@ def make_cases(files):
                                                     ("realtext-format-italic", "realtext-format-control"),
                                                     ("microdvd-format-italic", "microdvd-format-control"),
                                                     ("mpl2-format-italic", "mpl2-format-control"),
-                                                    ("sami-format-italic", "sami-format-control"))
+                                                    ("sami-format-italic", "sami-format-control"),
+                                                    ("sami-format-font-black", "sami-format-font-zero"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
