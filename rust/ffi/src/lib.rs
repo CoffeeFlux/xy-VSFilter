@@ -153,3 +153,5 @@ mod text_seek;
 mod path_align;
 
 mod span_merge;
+
+mod arc_queue;

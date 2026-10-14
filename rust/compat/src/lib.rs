@@ -100,3 +100,5 @@ pub mod text_seek;
 pub mod path_align;
 
 pub mod span_merge;
+
+pub mod arc_queue;

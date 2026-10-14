@@ -209,6 +209,14 @@
     [
       "span-merge-control-memory",
       "span-merge-horizontal-border-memory"
+    ],
+    [
+      "arc-queue-control-file",
+      "arc-queue-round-file"
+    ],
+    [
+      "arc-queue-control-memory",
+      "arc-queue-round-memory"
     ]
   ],
   "cases": [
@@ -12438,6 +12446,358 @@
       "id": "span-merge-scaled-memory",
       "script": "test/compat/generated/span-merge-scaled.ass",
       "sha256": "6395fe701bd702f114e54829bee1a54fd651367cbf648601252abd1d01b93e9e",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "arc-queue-control-file",
+      "script": "test/compat/generated/arc-queue-control.ass",
+      "sha256": "9713e7be451f9ddc92d6b5d9ceda4b19179e99347bd355c6e147799c47343397",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "arc-queue-control-memory",
+      "script": "test/compat/generated/arc-queue-control.ass",
+      "sha256": "9713e7be451f9ddc92d6b5d9ceda4b19179e99347bd355c6e147799c47343397",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "arc-queue-round-file",
+      "script": "test/compat/generated/arc-queue-round.ass",
+      "sha256": "e09199ed4f5bff59e260f654f9277681f816553fd42064b1796ce34e3f46fe89",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "arc-queue-round-memory",
+      "script": "test/compat/generated/arc-queue-round.ass",
+      "sha256": "e09199ed4f5bff59e260f654f9277681f816553fd42064b1796ce34e3f46fe89",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "arc-queue-tall-file",
+      "script": "test/compat/generated/arc-queue-tall.ass",
+      "sha256": "08e9c8cfe8f50ecf75b0e43c904a2012f512d1d96f47c21fd4a2d991565f37bd",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "arc-queue-tall-memory",
+      "script": "test/compat/generated/arc-queue-tall.ass",
+      "sha256": "08e9c8cfe8f50ecf75b0e43c904a2012f512d1d96f47c21fd4a2d991565f37bd",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "arc-queue-wide-file",
+      "script": "test/compat/generated/arc-queue-wide.ass",
+      "sha256": "13769f017e524777ea7598ff1b084f99f3b8dd5d3b2d657563c74c866d2a99c3",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "arc-queue-wide-memory",
+      "script": "test/compat/generated/arc-queue-wide.ass",
+      "sha256": "13769f017e524777ea7598ff1b084f99f3b8dd5d3b2d657563c74c866d2a99c3",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "arc-queue-holes-file",
+      "script": "test/compat/generated/arc-queue-holes.ass",
+      "sha256": "91756a7522a31aa622a810818ac8e94ecf73ef10c4026ce687a21c1e67528e35",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "arc-queue-holes-memory",
+      "script": "test/compat/generated/arc-queue-holes.ass",
+      "sha256": "91756a7522a31aa622a810818ac8e94ecf73ef10c4026ce687a21c1e67528e35",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "arc-queue-spline-file",
+      "script": "test/compat/generated/arc-queue-spline.ass",
+      "sha256": "35989a468e3f5e5825e4fc5c027af9bb60cc38bf4811934397bf9deeb070cf15",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "arc-queue-spline-memory",
+      "script": "test/compat/generated/arc-queue-spline.ass",
+      "sha256": "35989a468e3f5e5825e4fc5c027af9bb60cc38bf4811934397bf9deeb070cf15",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "arc-queue-rotated-file",
+      "script": "test/compat/generated/arc-queue-rotated.ass",
+      "sha256": "4fcd87260bafe6e018f9abe6c0d0e7e0b87783d8045cd2d79e66c672ec6595d5",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "arc-queue-rotated-memory",
+      "script": "test/compat/generated/arc-queue-rotated.ass",
+      "sha256": "4fcd87260bafe6e018f9abe6c0d0e7e0b87783d8045cd2d79e66c672ec6595d5",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "arc-queue-animated-file",
+      "script": "test/compat/generated/arc-queue-animated.ass",
+      "sha256": "10970619f3b28a254798607b2f6c0f0b8ca8a4d9f3bbaa175dc8561f65d980a7",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "arc-queue-animated-memory",
+      "script": "test/compat/generated/arc-queue-animated.ass",
+      "sha256": "10970619f3b28a254798607b2f6c0f0b8ca8a4d9f3bbaa175dc8561f65d980a7",
       "open": "memory",
       "width": 1280,
       "height": 720,
