@@ -1500,7 +1500,13 @@ void CVobSubImage::Scale2x()
 
     if (w > 0 && h > 0) {
         DWORD* src = (DWORD*)lpPixels;
+#ifdef XY_VSFILTER_RUST_TEXT
+        XyRust::ByteStorage scaledStorage;
+        DWORD* dst = scaledStorage.Allocate(static_cast<size_t>(w * h) * sizeof(DWORD))
+            ? reinterpret_cast<DWORD*>(scaledStorage.Data()) : DEBUG_NEW DWORD[w * h];
+#else
         DWORD* dst = DEBUG_NEW DWORD[w * h];
+#endif
 
 #ifdef XY_VSFILTER_RUST_TEXT
         if (!xy_vsfilter_vobsub_scale(reinterpret_cast<const uint32_t*>(src), reinterpret_cast<uint32_t*>(dst), w, h))
@@ -1542,6 +1548,10 @@ void CVobSubImage::Scale2x()
 
         memcpy(src, dst, w * h * 4);
 
+#ifdef XY_VSFILTER_RUST_TEXT
+        if (scaledStorage.Ready()) scaledStorage.Reset();
+        else
+#endif
         delete [] dst;
     }
 }

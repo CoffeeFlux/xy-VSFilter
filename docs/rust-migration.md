@@ -20,6 +20,22 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* `CVobSubImage::Scale2x` now uses an exclusive Rust scratch owner under the
+  normal Rust switch, without changing persistent image storage or copyability.
+  The whole pinned method matches on arm64 and x64 with fatal ASan/UBSan:
+  **149,902 image histories / 306,999,296 image-and-guard bytes / 136,512 changed
+  images / 287,498 allocation attempts / 36 modeled allocation interruptions /
+  143,731 Rust owners, loans and releases / 143,768 modeled Rust declines**.
+  Allocation/release order, repeated filtering, all five-neighbor equality
+  assignments, channel pairs, edge substitution, dimensions, errno/FP and Windows
+  error state are compared. Native allocation fallback still precedes pixel
+  reads. Ordinary arm64 checks also pass. The new FFI ownership test covers an
+  initially unwritten scratch loan, two filtering/copy-back passes and release;
+  its known center pixels are independently checked against the pinned method.
+  Rust has **146 core / 99 FFI tests**. Actual OOM, overflowing dimensions and
+  invalid source backing remain excluded. Windows integration and Miri on this
+  increment are pending; persistent VobSub ownership remains staged as below.
+
 * The initial fade renderer run (`38566940506`, x64 job `115861902964`) matched
   every case's bytes across **798 cases / 8,330 frames**, but correctly failed
   its scroll visibility control: neither renderer drew at the original sparse

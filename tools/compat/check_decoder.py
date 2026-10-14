@@ -1099,7 +1099,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         vobsub_scale += f"VOBSUB_SCALE_SHELL({name})\n#define CVobSubImage {name}\n"
         if name == "CandidateVobScale":
             vobsub_scale += "#define XY_VSFILTER_RUST_TEXT\n"
-        vobsub_scale += extract_definition(content.decode("utf-8-sig"), "void CVobSubImage::Scale2x(") + "\n"
+        scale_method = extract_definition(content.decode("utf-8-sig"), "void CVobSubImage::Scale2x(")
+        scale_method = scale_method.replace("delete [] dst;", "scaleDelete(dst);")
+        vobsub_scale += scale_method + "\n"
         vobsub_scale += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_vobsub_scale.h").write_text(vobsub_scale, encoding="utf-8")
     vobsub_outline = '#include "vobsub_outline_shell.h"\n'
@@ -1899,6 +1901,7 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "vobsub_trim_result": vobsub_trim_result.stdout, "vobsub_trim_stderr": vobsub_trim_result.stderr,
         "vobsub_scale_compile_command": vobsub_scale_compile,
         "vobsub_scale_result": vobsub_scale_result.stdout, "vobsub_scale_stderr": vobsub_scale_result.stderr,
+        "vobsub_scale_scope": "Whole pinned Scale2x with scratch allocation/deletion observed. Exclusive Rust scratch ownership under production Rust switch; native image storage remains unchanged. Repeated calls, source/image guards, exact allocation/release order, modeled Rust allocation declines and native allocation interruptions before pixel reads, errno/FP/Windows error state. Overflowing dimensions, invalid source backing and actual OOM excluded. Separate persistent VobSub ownership experiment remains disabled in production.",
         "vobsub_outline_compile_command": vobsub_outline_compile,
         "vobsub_outline_result": vobsub_outline_result.stdout, "vobsub_outline_stderr": vobsub_outline_result.stderr,
         "cc_compile_command": cc_compile,
