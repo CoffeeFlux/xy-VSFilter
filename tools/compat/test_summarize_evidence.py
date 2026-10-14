@@ -11,10 +11,10 @@ from summarize_evidence import normalize_windows_source, windows_source_bytes, p
 class WindowsHeaderProvenance(unittest.TestCase):
     def test_lifecycle_archive_requirements_follow_verified_invocations(self):
         self.assertEqual(document_lifecycle_requirements(b"old probe"),
-                         {"require_named_stages": False, "require_identity_stages": False, "require_interpretation_stages": False, "require_layout_stages": False, "require_metadata_stages": False, "require_selected_copy_stages": False, "require_style_rename_stages": False, "require_sort_stages": False, "require_base_empty_stages": False, "require_lcid_stages": False, "require_resolution_stages": False, "require_layout_size_stages": False, "require_conversion_stages": False, "require_unknown_stages": False, "require_add_style_stages": False, "require_copy_styles_stages": False})
+                         {"require_named_stages": False, "require_identity_stages": False, "require_interpretation_stages": False, "require_layout_stages": False, "require_metadata_stages": False, "require_selected_copy_stages": False, "require_style_rename_stages": False, "require_sort_stages": False, "require_base_empty_stages": False, "require_lcid_stages": False, "require_resolution_stages": False, "require_layout_size_stages": False, "require_conversion_stages": False, "require_unknown_stages": False, "require_add_style_stages": False, "require_copy_styles_stages": False, "require_text_plan_stages": False})
         source=b"int main() {\n    named_style_lifecycle();\n    identity_lifecycle();\n}"
         self.assertEqual(document_lifecycle_requirements(source),
-                         {"require_named_stages": True, "require_identity_stages": True, "require_interpretation_stages": False, "require_layout_stages": False, "require_metadata_stages": False, "require_selected_copy_stages": False, "require_style_rename_stages": False, "require_sort_stages": False, "require_base_empty_stages": False, "require_lcid_stages": False, "require_resolution_stages": False, "require_layout_size_stages": False, "require_conversion_stages": False, "require_unknown_stages": False, "require_add_style_stages": False, "require_copy_styles_stages": False})
+                         {"require_named_stages": True, "require_identity_stages": True, "require_interpretation_stages": False, "require_layout_stages": False, "require_metadata_stages": False, "require_selected_copy_stages": False, "require_style_rename_stages": False, "require_sort_stages": False, "require_base_empty_stages": False, "require_lcid_stages": False, "require_resolution_stages": False, "require_layout_size_stages": False, "require_conversion_stages": False, "require_unknown_stages": False, "require_add_style_stages": False, "require_copy_styles_stages": False, "require_text_plan_stages": False})
         self.assertTrue(document_lifecycle_requirements(b"    copy_selected_lifecycle();")["require_selected_copy_stages"])
         self.assertTrue(document_lifecycle_requirements(b"    prepared_style_conflicts();")["require_style_rename_stages"])
         self.assertTrue(document_lifecycle_requirements(b"    sort_lifecycle();")["require_sort_stages"])
@@ -26,6 +26,7 @@ class WindowsHeaderProvenance(unittest.TestCase):
         self.assertTrue(document_lifecycle_requirements(b"    unknown_style_lifecycle();")["require_unknown_stages"])
         self.assertTrue(document_lifecycle_requirements(b"    add_style_session_lifecycle();")["require_add_style_stages"])
         self.assertTrue(document_lifecycle_requirements(b"    copy_styles_session_lifecycle();")["require_copy_styles_stages"])
+        self.assertTrue(document_lifecycle_requirements(b"    text_plan_lifecycle();")["require_text_plan_stages"])
         self.assertTrue(document_lifecycle_requirements(b"    metadata_lifecycle();")["require_metadata_stages"])
         self.assertTrue(document_lifecycle_requirements(b"    layout_lifecycle();")["require_layout_stages"])
         self.assertTrue(document_lifecycle_requirements(b'    interpretation_lifecycle();')['require_interpretation_stages'])

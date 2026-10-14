@@ -4626,13 +4626,28 @@ bool CSimpleTextSubtitle::IsEntryUnicode(int i)
 #endif
 }
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+static CStringW ApplyDocumentTextOperation(const XyRust::DocumentTextOperation& operation)
+{
+    ASSERT(operation.has_style);
+    CStringW text = operation.text;
+    if(operation.action == 1) text = MBCSSSAToUnicode(text, operation.charset);
+    else if(operation.action == 2) text = UnicodeSSAToMBCS(text, operation.charset);
+    if(operation.strip_tags) text = RemoveSSATags(text, operation.target_unicode, operation.charset);
+    return text;
+}
+#endif
+
 void CSimpleTextSubtitle::ConvertUnicode(int i, bool fUnicode)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    STSEntry stse = m_document->Entry(i);
+    const auto operation = m_document->TextOperation(i, fUnicode ? 4 : 5);
+    if(operation.action != 3) {
+        const CStringW text = ApplyDocumentTextOperation(operation);
+        m_document->SetText(i, text, operation.target_unicode ? 1 : 0);
+    }
 #else
     STSEntry& stse = m_entries.GetAt(i);
-#endif
 
     if(stse.fUnicode ^ fUnicode)
     {
@@ -4643,19 +4658,16 @@ void CSimpleTextSubtitle::ConvertUnicode(int i, bool fUnicode)
             : UnicodeSSAToMBCS(stse.str, CharSet);
 
         stse.fUnicode = fUnicode;
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-        m_document->SetText(i, stse.str, fUnicode ? 1 : 0);
-#endif
     }
+#endif
 }
 
 CStringW CSimpleTextSubtitle::GetStrW(int i, bool fSSA)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    STSEntry stse = m_document->Entry(i);
+    return ApplyDocumentTextOperation(m_document->TextOperation(i, fSSA ? 0 : 1));
 #else
     STSEntry const& stse = m_entries.GetAt(i);
-#endif
     int CharSet = GetCharSet(i);
 
     CStringW str = stse.str;
@@ -4667,15 +4679,15 @@ CStringW CSimpleTextSubtitle::GetStrW(int i, bool fSSA)
         str = RemoveSSATags(str, true, CharSet);
 
     return str;
+#endif
 }
 
 CStringW CSimpleTextSubtitle::GetStrWA(int i, bool fSSA)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    STSEntry stse = m_document->Entry(i);
+    return ApplyDocumentTextOperation(m_document->TextOperation(i, fSSA ? 2 : 3));
 #else
     STSEntry const& stse = m_entries.GetAt(i);
-#endif
     int CharSet = GetCharSet(i);
 
     CStringW str = stse.str;
@@ -4687,6 +4699,7 @@ CStringW CSimpleTextSubtitle::GetStrWA(int i, bool fSSA)
         str = RemoveSSATags(str, false, CharSet);
 
     return str;
+#endif
 }
 
 void CSimpleTextSubtitle::SetStr(int i, CStringW str, bool fUnicode)

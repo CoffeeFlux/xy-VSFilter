@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "candidate_commit": "23a69442396ed9a5fdf1f173fbab2462ddd747fb",
+  "candidate_commit": "f570dd2bebdd5abf9d12a93783e2a48a54390df3",
   "method": "Lexical source inventory with comments/string/character literals masked and cfg(test) item bodies excluded from production. All platform and feature branches included, not one compiled target. Source hashes identify the measured files; the inventory script may be uncommitted. Block counts and unsafe-function declarations overlap and must not be added as independent operations. Operation categories can overlap and omit raw-pointer dereferences; they are examples, not an exhaustive soundness classification.",
   "limitations": "Not a proof of soundness or a migration completion percentage. Does not measure C/C++/assembly, native libraries, standard-library internals, borrow correctness at native callsites or dynamic path coverage.",
   "crates": {
     "compat": {
-      "file_count": 86,
+      "file_count": 87,
       "totals": {
         "production_block": 0,
         "production_function": 0,
@@ -18,8 +18,8 @@
         "test_trait": 0,
         "test_other": 0
       },
-      "physical_lines_including_tests": 14115,
-      "nonblank_code_lines_excluding_tests": 8421,
+      "physical_lines_including_tests": 14397,
+      "nonblank_code_lines_excluding_tests": 8500,
       "production_extern_functions": 0,
       "operations": {
         "raw_shared_slice_construction": 0,
@@ -364,9 +364,9 @@
         },
         {
           "path": "rust/compat/src/document.rs",
-          "sha256": "a0d821932ee9d1c04e6c4d980de24879d9fa07693adf2cc4842b18058ee37f53",
-          "physical_lines_including_tests": 1875,
-          "nonblank_code_lines_excluding_tests": 785,
+          "sha256": "ca06ae7c6238efc7f700e354481647e7edb1b2835fb0d3b96dc9900059f8372f",
+          "physical_lines_including_tests": 1914,
+          "nonblank_code_lines_excluding_tests": 793,
           "counts": {
             "production_block": 0,
             "production_function": 0,
@@ -517,6 +517,36 @@
           "sha256": "a8c113e7ed5e0111507763b977eebf08f37ade03ae482076925239c0573508c7",
           "physical_lines_including_tests": 311,
           "nonblank_code_lines_excluding_tests": 185,
+          "counts": {
+            "production_block": 0,
+            "production_function": 0,
+            "production_impl": 0,
+            "production_trait": 0,
+            "production_other": 0,
+            "test_block": 0,
+            "test_function": 0,
+            "test_impl": 0,
+            "test_trait": 0,
+            "test_other": 0
+          },
+          "sites": [],
+          "production_extern_functions": 0,
+          "operations": {
+            "raw_shared_slice_construction": 0,
+            "raw_mutable_slice_construction": 0,
+            "box_from_raw": 0,
+            "raw_nonoverlapping_copy": 0,
+            "unchecked_index_calls": 0,
+            "transmute_calls": 0,
+            "inline_assembly": 0,
+            "mutable_statics": 0
+          }
+        },
+        {
+          "path": "rust/compat/src/document_text.rs",
+          "sha256": "63ede1bfe7c5e394034717e3053f44c62306b67d938185af78215a95aa9df06d",
+          "physical_lines_including_tests": 242,
+          "nonblank_code_lines_excluding_tests": 70,
           "counts": {
             "production_block": 0,
             "production_function": 0,
@@ -1084,9 +1114,9 @@
         },
         {
           "path": "rust/compat/src/lib.rs",
-          "sha256": "b09b4272a3e16d1fc144ca167f5e22f858cbf9eda612e310319183c5c6ae1bc0",
-          "physical_lines_including_tests": 132,
-          "nonblank_code_lines_excluding_tests": 88,
+          "sha256": "b7825eb5b59dbb8e14d5f2a0a347aa2006a7957df1a3cc7292b6d2fe7ab91395",
+          "physical_lines_including_tests": 133,
+          "nonblank_code_lines_excluding_tests": 89,
           "counts": {
             "production_block": 0,
             "production_function": 0,
@@ -2617,8 +2647,8 @@
     "ffi": {
       "file_count": 69,
       "totals": {
-        "production_block": 372,
-        "production_function": 310,
+        "production_block": 373,
+        "production_function": 311,
         "production_impl": 2,
         "production_trait": 0,
         "production_other": 0,
@@ -2628,9 +2658,9 @@
         "test_trait": 0,
         "test_other": 0
       },
-      "physical_lines_including_tests": 13373,
-      "nonblank_code_lines_excluding_tests": 5886,
-      "production_extern_functions": 383,
+      "physical_lines_including_tests": 13539,
+      "nonblank_code_lines_excluding_tests": 5954,
+      "production_extern_functions": 384,
       "operations": {
         "raw_shared_slice_construction": 62,
         "raw_mutable_slice_construction": 22,
@@ -3525,12 +3555,12 @@
         },
         {
           "path": "rust/ffi/src/document.rs",
-          "sha256": "5fd4d2696269927e2d6d3a7e139986e574dbbe67a5b9aabb4a4abc7b4ab25637",
-          "physical_lines_including_tests": 4298,
-          "nonblank_code_lines_excluding_tests": 1465,
+          "sha256": "0d5800122d7f1a863c4331f7582da075bc7682be949e776850a6b072d8f9b4a8",
+          "physical_lines_including_tests": 4464,
+          "nonblank_code_lines_excluding_tests": 1533,
           "counts": {
-            "production_block": 46,
-            "production_function": 37,
+            "production_block": 47,
+            "production_function": 38,
             "production_impl": 0,
             "production_trait": 0,
             "production_other": 0,
@@ -3882,137 +3912,147 @@
               "test": false
             },
             {
-              "line": 1436,
+              "line": 1479,
               "kind": "block",
               "test": false
             },
             {
-              "line": 1446,
+              "line": 1488,
               "kind": "function",
               "test": false
             },
             {
-              "line": 1454,
+              "line": 1503,
               "kind": "block",
               "test": false
             },
             {
-              "line": 1465,
+              "line": 1519,
               "kind": "function",
               "test": false
             },
             {
-              "line": 1476,
+              "line": 1527,
               "kind": "block",
               "test": false
             },
             {
-              "line": 1477,
-              "kind": "block",
-              "test": false
-            },
-            {
-              "line": 1506,
+              "line": 1538,
               "kind": "function",
-              "test": false
-            },
-            {
-              "line": 1513,
-              "kind": "block",
-              "test": false
-            },
-            {
-              "line": 1524,
-              "kind": "function",
-              "test": false
-            },
-            {
-              "line": 1531,
-              "kind": "block",
               "test": false
             },
             {
               "line": 1549,
-              "kind": "function",
-              "test": false
-            },
-            {
-              "line": 1565,
               "kind": "block",
               "test": false
             },
             {
-              "line": 1582,
+              "line": 1550,
               "kind": "block",
               "test": false
             },
             {
-              "line": 1625,
+              "line": 1579,
               "kind": "function",
               "test": false
             },
             {
-              "line": 1642,
+              "line": 1586,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1597,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1604,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1622,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1638,
               "kind": "block",
               "test": false
             },
             {
               "line": 1655,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1698,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1715,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1728,
               "kind": "function",
               "test": true
             },
             {
-              "line": 1659,
+              "line": 1732,
               "kind": "block",
               "test": true
             },
             {
-              "line": 1681,
+              "line": 1754,
               "kind": "function",
               "test": true
             },
             {
-              "line": 1684,
+              "line": 1757,
               "kind": "block",
               "test": true
             },
             {
-              "line": 1696,
+              "line": 1769,
               "kind": "function",
               "test": true
             },
             {
-              "line": 1700,
+              "line": 1773,
               "kind": "block",
               "test": true
             },
             {
-              "line": 1705,
+              "line": 1778,
               "kind": "function",
               "test": true
             },
             {
-              "line": 1709,
+              "line": 1782,
               "kind": "block",
               "test": true
             },
             {
-              "line": 1714,
+              "line": 1787,
               "kind": "block",
               "test": true
             },
             {
-              "line": 1738,
+              "line": 1811,
               "kind": "block",
               "test": true
             },
             {
-              "line": 1747,
+              "line": 1820,
               "kind": "block",
               "test": true
             }
           ],
-          "production_extern_functions": 56,
+          "production_extern_functions": 57,
           "operations": {
             "raw_shared_slice_construction": 1,
             "raw_mutable_slice_construction": 0,

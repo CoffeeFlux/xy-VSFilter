@@ -261,6 +261,13 @@ public:
     }
 };
 struct DocumentQuery { int index; bool found; size_t count; };
+struct DocumentTextOperation {
+    uint32_t action;
+    bool target_unicode, strip_tags, has_style;
+    int charset;
+    CStringW text;
+};
+
 class DocumentOwner {
     friend class UnknownStylesPass;
     friend class StyleAddition;
@@ -515,6 +522,26 @@ public:
     void Clear() {DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_clear_storage_v1(id_);}));}
     void RemoveEntries() {DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_remove_entries_v1(id_);}));}
     void Rebuild() {DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_rebuild_segments_v1(id_);}));}
+    DocumentTextOperation TextOperation(int i, uint32_t mode) const {
+        const uint32_t index = DocumentDetail::Index(i);
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_text_plan_v1(
+            id_,index,mode,out.data(),out.size());}));
+        DocumentReply reply(DocumentDetail::Load(out,0,8));
+        const auto bytes = reply.Read();
+        DocumentDetail::Shape(bytes.size() >= 32);
+        const uint32_t action = static_cast<uint32_t>(DocumentDetail::Load(bytes,0,4));
+        const uint64_t target = DocumentDetail::Load(bytes,4,4), strip = DocumentDetail::Load(bytes,8,4);
+        const uint64_t has_style = DocumentDetail::Load(bytes,12,4);
+        const int charset = DocumentDetail::I32(DocumentDetail::Load(bytes,16,4));
+        const uint32_t units = DocumentDetail::Count(DocumentDetail::Size(DocumentDetail::Load(bytes,24,8)));
+        DocumentDetail::Shape(action <= 3 && target <= 1 && strip <= 1 && has_style <= 1 &&
+            DocumentDetail::Load(bytes,20,4) == 0 &&
+            (action != 3 || (units == 0 && strip == 0 && has_style == 0 && charset == 0)) &&
+            bytes.size() == DocumentDetail::AddSize(32,DocumentDetail::MulSize(units,2)));
+        size_t offset = 32;
+        return {action,target != 0,strip != 0,has_style != 0,charset,DocumentDetail::String(bytes,offset,units)};
+    }
     void SetText(int i, const CStringW& text, int flag = -1) {
         const auto bytes = DocumentDetail::Units(text); const uint32_t index = DocumentDetail::Index(i);
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_set_prepared_text_v1(id_,index,flag,bytes.data(),bytes.size());}));

@@ -178,6 +178,14 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_snapshot_drop_v1(uint64_t snapsh
 // Add modes: 0 Add, 1 entry-only, 2 WebVTT; record is already natively prepared.
 // Result: applied:u32, index:i32 (-1 when not applied), total 8 bytes.
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_add_prepared_v1(uint64_t, uint32_t mode, const uint8_t*, size_t, uint8_t*, size_t);
+// Read-only text/encoding plan. Modes0WideSSA/1WideStrip/2PackedSSA/
+// 3PackedStrip/4ConvertWide/5ConvertPacked. Output8 receives snapshot ID.
+// Packet32: action:u32(0Keep/1ToWide/2ToPacked/3NoOp),target_unicode:u32,
+// strip_tags:u32,has_style:u32,charset:i32,reserved-zero:u32,units:u64,
+// then full raw UTF-16LE text. NoOp has no text/style and charset0.
+// Native charset conversion/SSA stripping remains outside admission; conversion
+// commit uses existing prepared text setter. Missing style carries charset-1.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_text_plan_v1(uint64_t owner,uint32_t index,uint32_t mode,uint8_t*,size_t);
 // Prepared text/style are raw UTF-16LE (even byte lengths). No native conversion,
 // normalization, style-map decisions or implicit rebuild. Flag -1 retains stored
 // Unicode mode, 0 stores false, 1 true, after caller's native preparation.

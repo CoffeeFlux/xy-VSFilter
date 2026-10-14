@@ -59,7 +59,7 @@ def verify_document_dialogs(directory, document, candidate):
 
 def document_lifecycle_requirements(verified_probe_source):
     """Archive gates follow invocations in the hash-verified candidate probe."""
-    calls = set(re.findall(rb"(?m)^\s*(named_style_lifecycle|identity_lifecycle|interpretation_lifecycle|layout_lifecycle|metadata_lifecycle|copy_selected_lifecycle|prepared_style_conflicts|sort_lifecycle|base_empty_lifecycle|lcid_lifecycle|resolution_lifecycle|layout_size_lifecycle|conversion_lifecycle|unknown_style_lifecycle|add_style_session_lifecycle|copy_styles_session_lifecycle)\(\);\s*$", verified_probe_source))
+    calls = set(re.findall(rb"(?m)^\s*(named_style_lifecycle|identity_lifecycle|interpretation_lifecycle|layout_lifecycle|metadata_lifecycle|copy_selected_lifecycle|prepared_style_conflicts|sort_lifecycle|base_empty_lifecycle|lcid_lifecycle|resolution_lifecycle|layout_size_lifecycle|conversion_lifecycle|unknown_style_lifecycle|add_style_session_lifecycle|copy_styles_session_lifecycle|text_plan_lifecycle)\(\);\s*$", verified_probe_source))
     return {"require_named_stages": b"named_style_lifecycle" in calls,
             "require_identity_stages": b"identity_lifecycle" in calls,
             "require_interpretation_stages": b"interpretation_lifecycle" in calls,
@@ -75,7 +75,8 @@ def document_lifecycle_requirements(verified_probe_source):
             "require_conversion_stages": b"conversion_lifecycle" in calls,
             "require_unknown_stages": b"unknown_style_lifecycle" in calls,
             "require_add_style_stages": b"add_style_session_lifecycle" in calls,
-            "require_copy_styles_stages": b"copy_styles_session_lifecycle" in calls}
+            "require_copy_styles_stages": b"copy_styles_session_lifecycle" in calls,
+            "require_text_plan_stages": b"text_plan_lifecycle" in calls}
 
 
 def load(path):

@@ -109,13 +109,33 @@ def conversion_rows():
     )]
 
 
+def text_plan_rows():
+    packed=[ord(c) for c in r"{\i1}"]+[0x82,0xa0]+[ord(c) for c in r"{\i}\NZ"]
+    wide=[ord(c) for c in r"{\i1}"]+[0x3042]+[ord(c) for c in r"{\i}\NZ"]
+    plain_packed=[ord(c) for c in "<i>"]+[0x82,0xa0]+[ord(c) for c in "</i>\nZ"]
+    plain_wide=[ord(c) for c in "<i>あ</i>\nZ"]
+    def units(value):return f"{len(value)} "+" ".join(f"{u:04x}" for u in value)
+    rows=[]
+    for stage in ("text-plan-packed-input","text-plan-wide","text-plan-packed-roundtrip"):
+        rows.append(f"text-plan-stage {stage}")
+        for ssa in (1,0):
+            for native_wide in (1,0):
+                value=(wide if native_wide else packed) if ssa else (plain_wide if native_wide else plain_packed)
+                rows.append(f"text-plan-get {stage} wide={native_wide} ssa={ssa} "+units(value))
+        if stage!="text-plan-packed-input":rows.append(f"text-plan-noop wide={int(stage=='text-plan-wide')} callbacks=0")
+    rows += ["text-plan-owned-mutated "+units([82,0,0xd83d,0xde00,81]),
+             "text-plan-owned-reread "+units([82,0,0xd83d,0xde00,90]),
+             "text-plan-stage text-plan-raw-independent"]
+    return [row.encode() for row in rows]
+
+
 def copy_styles_stages():
     return (b"copy-styles-self-before", b"copy-styles-self-after",
             b"copy-styles-grown-source-before", b"copy-styles-grown-result", b"copy-styles-grown-source-after",
             b"copy-styles-mixed-source-before", b"copy-styles-mixed-result", b"copy-styles-mixed-source-after")
 
 
-def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True, require_unknown_stages=True, require_add_style_stages=True, require_copy_styles_stages=True):
+def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True, require_unknown_stages=True, require_add_style_stages=True, require_copy_styles_stages=True, require_text_plan_stages=True):
     lines = data.splitlines()
     if not lines or lines[0] != f"provenance pointer_bits={pointer_bits}".encode():
         raise ValueError("missing or incorrect native architecture provenance")
@@ -124,6 +144,13 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
     for prefix in (b"state ", b"entry ", b"segment ", b"callback ", b"text "):
         if not any(line.startswith(prefix) for line in lines):
             raise ValueError(f"missing native lifecycle trace section {prefix!r}")
+
+    if require_text_plan_stages:
+        if [line for line in lines if line.startswith(b"text-plan-")] != text_plan_rows():
+            raise ValueError("missing or incorrect text-plan getter/conversion/owned-output observations")
+        for stage in (b"text-plan-wide-noop",b"text-plan-packed-noop",b"text-plan-final"):
+            expected=b"style-rename-segments "+stage+b" count=1 animated=1"
+            if lines.count(expected)!=1:raise ValueError("text plan must retain animated segments without rebuild")
 
     if require_copy_styles_stages:
         expected = [b"copy-styles-stage " + name for name in copy_styles_stages()]
@@ -382,11 +409,11 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
 
 
 
-def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True, require_unknown_stages=True, require_add_style_stages=True, require_copy_styles_stages=True):
+def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True, require_unknown_stages=True, require_add_style_stages=True, require_copy_styles_stages=True, require_text_plan_stages=True):
     if len(traces) != 4:
         raise ValueError("two reference and two candidate executions required")
     for trace in traces:
-        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages, require_metadata_stages=require_metadata_stages, require_selected_copy_stages=require_selected_copy_stages, require_style_rename_stages=require_style_rename_stages, require_sort_stages=require_sort_stages, require_base_empty_stages=require_base_empty_stages, require_lcid_stages=require_lcid_stages, require_resolution_stages=require_resolution_stages, require_layout_size_stages=require_layout_size_stages, require_conversion_stages=require_conversion_stages, require_unknown_stages=require_unknown_stages, require_add_style_stages=require_add_style_stages, require_copy_styles_stages=require_copy_styles_stages)
+        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages, require_metadata_stages=require_metadata_stages, require_selected_copy_stages=require_selected_copy_stages, require_style_rename_stages=require_style_rename_stages, require_sort_stages=require_sort_stages, require_base_empty_stages=require_base_empty_stages, require_lcid_stages=require_lcid_stages, require_resolution_stages=require_resolution_stages, require_layout_size_stages=require_layout_size_stages, require_conversion_stages=require_conversion_stages, require_unknown_stages=require_unknown_stages, require_add_style_stages=require_add_style_stages, require_copy_styles_stages=require_copy_styles_stages, require_text_plan_stages=require_text_plan_stages)
     if any(trace != traces[0] for trace in traces[1:]):
         raise ValueError("native lifecycle traces differ or are nondeterministic")
 

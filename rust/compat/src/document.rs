@@ -608,12 +608,22 @@ impl Document {
         text: Vec<u16>,
         unicode: Option<bool>,
     ) -> Result<(), Refusal> {
+        self.replace_prepared_text(index, text, unicode).map(drop)
+    }
+    /// Replaces text first, then optional encoding flag, without rebuild or
+    /// notification. The original allocation leaves admission before dropping.
+    pub fn replace_prepared_text(
+        &mut self,
+        index: usize,
+        text: Vec<u16>,
+        unicode: Option<bool>,
+    ) -> Result<Vec<u16>, Refusal> {
         let entry = self.entries.get_mut(index).ok_or(Refusal::EntryIndex)?;
-        entry.text = text;
+        let retired = core::mem::replace(&mut entry.text, text);
         if let Some(unicode) = unicode {
             entry.unicode = unicode;
         }
-        Ok(())
+        Ok(retired)
     }
 
     /// Stores already-prepared style code units, without normalization or a
@@ -1871,5 +1881,34 @@ mod tests {
         );
         assert!(d.segments().is_empty());
         assert_eq!(d.interpretation(InterpretationField::Mode), Some(1));
+    }
+    #[test]
+    fn text_replacement_retires_original_allocation_without_rebuild() {
+        let mut document = Document::default();
+        document
+            .add_prepared(entry(0, 10, -1), AddMode::Add)
+            .unwrap();
+        document.feedback_animation(0, true).unwrap();
+        let original = document.entries()[0].text.as_ptr();
+        let mut expected = document.clone();
+        let replacement = alloc::vec![0, 0xd800, 10, 13];
+        expected.entries[0].text = replacement.clone();
+        expected.entries[0].unicode = true;
+        let retired = document
+            .replace_prepared_text(0, replacement, Some(true))
+            .unwrap();
+        assert_eq!(retired.as_ptr(), original);
+        assert_eq!(document, expected);
+        let before = document.clone();
+        assert_eq!(
+            document.replace_prepared_text(1, alloc::vec![65], Some(false)),
+            Err(Refusal::EntryIndex)
+        );
+        assert_eq!(document, before);
+        document
+            .replace_prepared_text(0, alloc::vec![], None)
+            .unwrap();
+        assert!(document.entries()[0].unicode);
+        assert!(document.segments()[0].animated);
     }
 }
