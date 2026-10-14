@@ -20,6 +20,22 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns the `DecodeCC` byte-loop state, character tables and command
+  selection. Raw parity bytes are matched exactly; doubled controls consume both
+  pairs and retain the second pair's timestamp index. Ignored controls, trailing
+  bytes, transparent spaces and unusual extended-character dispatch are retained.
+  Native cursor/display actions occur after each input loan ends, preserving
+  source/backing aliases. Logging, display copies/clears, timestamp arithmetic
+  and subtitle insertion remain native.
+  Fatal ASan/UBSan comparisons passed **149,740 sequences / 170,720 `DecodeCC`
+  calls**, plus **117 cursor moves** and **65,536 cell writes**, on arm64 and
+  under x64 execution. They compare **4,209 subtitle records**, **340 injected
+  Add interruptions**, **575 callback mutations** and **12,273 source/backing
+  aliases**. Repeated and split calls cover empty/equal displays and retained
+  caption state. The sink is a fixture; actual Windows ATL strings are used by
+  CI. Native file I/O, unrepresentable arithmetic and caption-ripper integration
+  remain outside these comparisons. Rust 1.85 tests (74 core, 50 FFI), strict
+  Clippy and default syntax checks pass. Windows/Miri validation is pending.
 * Safe Rust normalizes closed-caption cursors and writes initialized cells in
   the original 16-by-33 backing. Columns at or beyond 32 advance only one row;
   rows at or beyond 16 wrap to zero. Negative coordinates clamp first. Each
@@ -82,7 +98,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   separators, custom locale grouping, caller stream flags and exception masks.
   All 100,064 tag-output cases and 30,058 complete parser runs still pass.
   Rust 1.85 tests (69 core, 46 FFI), strict Clippy and default syntax checks pass.
-  Windows/Miri validation is pending. Native stream and map ownership remains.
+  Candidate `482a06ff` passed all four portable platforms, Miri and both Windows
+  DLL jobs, each matching **382 cases / 4,490 frames** and **32 mutations / 224
+  frames**, plus dialogs, visible controls, exports and dependencies. Both logs
+  confirm Rust-enabled `RealTextParser.cpp` compilation.
+  [Timestamp-format evidence](realtext-format-evidence.json) records verified
+  hashes and stable local validation. Native stream and map ownership remains.
 * Safe Rust owns RealText's start/end timing history and interval selection.
   Missing ends, non-increasing next starts, first-line insertion only into an
   empty map, explicit reversed intervals and final flushing retain their native

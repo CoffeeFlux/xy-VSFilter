@@ -991,7 +991,7 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "vobsub_outline_result": vobsub_outline_result.stdout, "vobsub_outline_stderr": vobsub_outline_result.stderr,
         "cc_compile_command": cc_compile,
         "cc_result": cc_result.stdout, "cc_stderr": cc_result.stderr,
-        "cc_scope": "cursor normalization and initialized cell update; complete native DecodeCC with fixture subtitle sink, real Windows ATL strings and portable UTF-16 string model; raw logging/files and native arithmetic overflow outside fixtures",
+        "cc_scope": "owned byte-loop command state, exact raw-byte tables/duplicate consumption, cursor normalization and initialized cell update; native display transitions/timestamp arithmetic retained; complete DecodeCC with fixture subtitle sink, real Windows ATL strings and portable UTF-16 string model; raw logging/files and native arithmetic overflow outside fixtures",
         "cc_source_sha256": hashlib.sha256(cc_source).hexdigest(), "cc_header_sha256": hashlib.sha256(cc_header).hexdigest(),
         "realtext_document_compile_command": realtext_document_compile,
         "realtext_document_result": realtext_document_result.stdout, "realtext_document_stderr": realtext_document_result.stderr,

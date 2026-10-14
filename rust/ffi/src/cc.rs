@@ -1,4 +1,57 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
+use alloc::boxed::Box;
+use xy_vsfilter_compat::cc::Decoder;
+
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_cc_decoder_create(length: i32) -> *mut Decoder {
+    Box::into_raw(Box::new(Decoder::new(length)))
+}
+
+/// # Safety
+/// owner is live and exclusive. Nonempty input is a disjoint initialized byte
+/// span, loaned only for this call and never retained through native operations.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_cc_decoder_next(
+    owner: *mut Decoder,
+    input: *const u8,
+    length: usize,
+) -> u32 {
+    // SAFETY: initialized native input disjoint from the unique live owner.
+    let data = if length == 0 {
+        &[]
+    } else {
+        unsafe { core::slice::from_raw_parts(input, length) }
+    };
+    // SAFETY: native RAII owns this live decoder exclusively.
+    let state = unsafe { &mut *owner };
+    state.next(data)
+}
+
+/// # Safety
+/// owner is live and immutable. Invalid queries return zero.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_cc_decoder_field(owner: *const Decoder, field: u32) -> i32 {
+    // SAFETY: immutable scalar query before the unique release.
+    let state = unsafe { &*owner };
+    match field {
+        0 => state.action_position as i32,
+        1 => i32::from(state.value),
+        2 => state.x,
+        3 => state.y,
+        _ => 0,
+    }
+}
+
+/// # Safety
+/// Release the unique owner exactly once after all other calls.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_cc_decoder_release(owner: *mut Decoder) {
+    if !owner.is_null() {
+        // SAFETY: native RAII returns its uniquely owned allocation once.
+        drop(unsafe { Box::from_raw(owner) });
+    }
+}
+
 /// # Safety
 /// For accepted coordinates, output provides two writable aligned i32 slots.
 /// Declined arithmetic never accesses output, which may then be null.
@@ -31,6 +84,22 @@ pub unsafe extern "C" fn xy_vsfilter_cc_put(buffer: *mut u16, x: i32, y: i32, va
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn decoder_reads_live_bytes_only_between_native_actions() {
+        let owner = xy_vsfilter_cc_decoder_create(2);
+        let mut input = [b'A', b'B'];
+        // SAFETY: unique live owner; initialized input borrowed only during each
+        // call, changed afterward, then a single release.
+        unsafe {
+            assert_eq!(xy_vsfilter_cc_decoder_next(owner, input.as_ptr(), 2), 1);
+            input[1] = b'Z';
+            assert_eq!(xy_vsfilter_cc_decoder_next(owner, input.as_ptr(), 2), 1);
+            assert_eq!(xy_vsfilter_cc_decoder_field(owner, 1), i32::from(b'Z'));
+            assert_eq!(xy_vsfilter_cc_decoder_next(owner, input.as_ptr(), 2), 0);
+            xy_vsfilter_cc_decoder_release(owner);
+        }
+    }
+
     #[test]
     fn writes_are_bounded_and_declines_leave_foreign_storage_alone() {
         let mut cells = [0xaaaau16; 530];
