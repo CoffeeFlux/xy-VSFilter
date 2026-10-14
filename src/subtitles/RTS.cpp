@@ -29,6 +29,7 @@
 #include "xy_rust_drawing_tokens.h"
 #include "xy_rust_text_runs.h"
 #include "xy_rust_wrap.h"
+#include "xy_rust_line_layout.h"
 #endif
 #include "draw_item.h"
 #include "cache_manager.h"
@@ -1588,11 +1589,19 @@ void CSubtitle::MakeLines(CSize size, CRect marginRect)
         l = GetNextLine(pos, size.cx - marginRect.left - marginRect.right);
         if(!l) break;
         if(fFirstLine) {m_topborder = l->m_borderY; fFirstLine = false;}
-        spaceNeeded.cx = max(l->m_width+l->m_borderX, spaceNeeded.cx);
-        spaceNeeded.cy += l->m_ascent + l->m_descent;
+#ifdef XY_VSFILTER_RUST_TEXT
+        if(!XyRust::GrowLineSpace(spaceNeeded, l->m_width, l->m_borderX, l->m_ascent, l->m_descent))
+#endif
+        {
+            spaceNeeded.cx = max(l->m_width+l->m_borderX, spaceNeeded.cx);
+            spaceNeeded.cy += l->m_ascent + l->m_descent;
+        }
         AddTail(l);
     }
     if(l) m_bottomborder = l->m_borderY;
+#ifdef XY_VSFILTER_RUST_TEXT
+    if(XyRust::PlaceLines(m_rect, size, marginRect, spaceNeeded, m_scrAlignment)) return;
+#endif
     m_rect = CRect(
                  CPoint((m_scrAlignment%3) == 1 ? marginRect.left
                         : (m_scrAlignment%3) == 2 ? (marginRect.left + (size.cx - marginRect.right) - spaceNeeded.cx + 1) / 2
