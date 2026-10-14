@@ -4,6 +4,7 @@
 #define NOMINMAX
 #endif
 #include <cstdint>
+#include <cstddef>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -25,7 +26,7 @@ static bool coeffDecline=false,coeffFail=false;
 static size_t coeffRequested=0;
 static uint64_t coeffOwners=0,coeffLoans=0,coeffReleases=0,coeffDeclines=0;
 static CoeffRegion& coeffRegion(const void* p){for(auto& r:coeffRegions)if(r.data==p)return r;coeffRequire(false);return coeffRegions[0];}
-static void coeffGuards(const CoeffRegion& r){if(r.raw){for(size_t i=0;i<32;++i)coeffRequire(r.data[-static_cast<ptrdiff_t>(i)-1]==0xa7&&r.data[r.count+i]==0xa7);}}
+static void coeffGuards(const CoeffRegion& r){if(r.raw){for(size_t i=0;i<32;++i)coeffRequire(r.data[-static_cast<std::ptrdiff_t>(i)-1]==0xa7&&r.data[r.count+i]==0xa7);}}
 static void* xy_malloc(size_t count){
     coeffRequire(count>0&&count<100000);coeffEvents.insert(coeffEvents.end(),{1,count});
     if(coeffFail){coeffEvents.push_back(3);return NULL;}
