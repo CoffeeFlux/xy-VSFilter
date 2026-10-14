@@ -408,6 +408,26 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         vobsub_segment += extract_definition(content.decode("utf-8-sig"), "int CVobSubImage::GrabSegment(") + "\n"
         vobsub_segment += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_vobsub_segment.h").write_text(vobsub_segment, encoding="utf-8")
+    vobsub_split = '#include "vobsub_split_shell.h"\n'
+    for name, content in (("ReferenceVobSplit", vobsub_source), ("CandidateVobSplit", (ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
+        vobsub_split += f"VOBSUB_SPLIT_SHELL({name})\n#define CVobSubImage {name}\n"
+        if name == "CandidateVobSplit":
+            vobsub_split += "#define XY_VSFILTER_RUST_TEXT\n"
+        split_method = extract_definition(content.decode("utf-8-sig"), "void CVobSubImage::SplitOutline(")
+        # MSVC accepts the pinned two-word functional casts; Clang/GCC require
+        # standard cast spelling. Windows compiles the original spelling intact.
+        if os.name != "nt":
+            for expression in ("j - i", "i", "j"):
+                old = f"unsigned int({expression})"
+                assert split_method.count(old) == 1
+                split_method = split_method.replace(old, f"static_cast<unsigned int>({expression})")
+        vobsub_split += split_method + "\n"
+        selection_start = split_method.index("#ifdef XY_VSFILTER_RUST_TEXT") if name == "CandidateVobSplit" else split_method.index("    size_t maxlen =")
+        selection_end = split_method.index("    o1.RemoveAll();", selection_start)
+        vobsub_split += f"static std::vector<size_t> {name}Select(const CAtlArray<UINT>& la,const CAtlArray<UINT>& sa,const CAtlArray<UINT>& ea) {{\nsize_t i,j,k;\n"
+        vobsub_split += split_method[selection_start:selection_end] + "return {j,k};\n}\n"
+        vobsub_split += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_vobsub_split.h").write_text(vobsub_split, encoding="utf-8")
     byte_float = '#include "byte_float_shell.h"\n'
     for name, content in (("ReferenceByteFloat", filter_source), ("CandidateByteFloat", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
         byte_float += f"namespace {name} {{\n"
@@ -755,6 +775,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     vobsub_segment_result = run([str(vobsub_segment_executable)], capture_output=True, text=True)
     print(vobsub_segment_result.stdout, end="", flush=True)
     print(vobsub_segment_result.stderr, end="", file=sys.stderr)
+    vobsub_split_executable = destination / ("vobsub-split-oracle.exe" if os.name == "nt" else "vobsub-split-oracle")
+    vobsub_split_compile = [arg.replace("fill_oracle.cpp", "vobsub_split_oracle.cpp").replace("fill-oracle", "vobsub-split-oracle") for arg in fill_compile]
+    run(vobsub_split_compile)
+    vobsub_split_result = run([str(vobsub_split_executable)], capture_output=True, text=True)
+    print(vobsub_split_result.stdout, end="", flush=True)
+    print(vobsub_split_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -798,6 +824,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "vobsub_scale_result": vobsub_scale_result.stdout, "vobsub_scale_stderr": vobsub_scale_result.stderr,
         "vobsub_outline_compile_command": vobsub_outline_compile,
         "vobsub_outline_result": vobsub_outline_result.stdout, "vobsub_outline_stderr": vobsub_outline_result.stderr,
+        "vobsub_split_compile_command": vobsub_split_compile,
+        "vobsub_split_result": vobsub_split_result.stdout, "vobsub_split_stderr": vobsub_split_result.stderr,
+        "vobsub_split_cast_normalization": "none; original MSVC spelling" if os.name == "nt" else "three unsigned int functional casts per method changed to static_cast<unsigned int>",
         "vobsub_segment_compile_command": vobsub_segment_compile,
         "vobsub_segment_result": vobsub_segment_result.stdout, "vobsub_segment_stderr": vobsub_segment_result.stderr,
         "weighted_filter_compile_command": weighted_compile,

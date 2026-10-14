@@ -1119,28 +1119,37 @@ void CVobSubImage::SplitOutline(const COutline& o, COutline& o1, COutline& o2)
         }
     }
 
-    size_t maxlen = 0, maxidx = -1;
-    size_t maxlen2 = 0, maxidx2 = -1;
+#ifdef XY_VSFILTER_RUST_TEXT
+    size_t split[2];
+    if (xy_vsfilter_vobsub_split(la.GetData(), sa.GetData(), ea.GetData(), la.GetCount(), split)) {
+        j = split[0];
+        k = split[1];
+    } else
+#endif
+    {
+        size_t maxlen = 0, maxidx = -1;
+        size_t maxlen2 = 0, maxidx2 = -1;
 
-    for (i = 0; i < la.GetCount(); i++) {
-        if (maxlen < la[i]) {
-            maxlen = la[i];
-            maxidx = i;
+        for (i = 0; i < la.GetCount(); i++) {
+            if (maxlen < la[i]) {
+                maxlen = la[i];
+                maxidx = i;
+            }
+
+            if (maxlen2 < la[i] && i > 0 && i < la.GetCount() - 1) {
+                maxlen2 = la[i];
+                maxidx2 = i;
+            }
         }
 
-        if (maxlen2 < la[i] && i > 0 && i < la.GetCount() - 1) {
-            maxlen2 = la[i];
-            maxidx2 = i;
+        ASSERT(maxidx != -1 && maxidx2 != -1);
+
+        if (maxlen == maxlen2) {
+            maxidx = maxidx2;    // if equal choose the inner section
         }
+
+        j = (sa[maxidx] + ea[maxidx]) >> 1, k = (sa[maxidx] + ea[maxidx] + 1) >> 1;
     }
-
-    ASSERT(maxidx != -1 && maxidx2 != -1);
-
-    if (maxlen == maxlen2) {
-        maxidx = maxidx2;    // if equal choose the inner section
-    }
-
-    j = (sa[maxidx] + ea[maxidx]) >> 1, k = (sa[maxidx] + ea[maxidx] + 1) >> 1;
 
     o1.RemoveAll();
     o2.RemoveAll();
