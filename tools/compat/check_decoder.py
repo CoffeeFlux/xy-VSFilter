@@ -72,6 +72,7 @@ def capture_inputs():
               ROOT / "src/subtitles/TextFile.h",
               ROOT / "src/subtitles/TextFile.cpp", ROOT / "src/subtitles/STS.cpp",
               ROOT / "src/subtitles/RTS.cpp", ROOT / "tools/compat/reference.json"]
+    inputs += [ROOT / "src/filters/transform/vsfilter/csriapi.cpp"]
     inputs += [ROOT / "src/thirdparty/boost_lib/boost/flyweight.hpp"]
     inputs += sorted((ROOT / "src/thirdparty/boost_lib/boost/flyweight").rglob("*.hpp"))
     inputs += sorted((ROOT / "tools/compat").glob("*oracle.cpp"))
@@ -970,6 +971,17 @@ public:
             packet_method = packet_method.replace(f"pData{field}[nBytes{field}++] = buff[i++];", f"packetPut(pData{field}, nBytes{field}++, buff[i++]);").replace(f"delete [] pData{field}", f"packetDelete(pData{field})")
         cc_packet_code += packet_method + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_cc_packet.h").write_text(cc_packet_code, encoding="utf-8")
+    csri_filename_code = '#include "csri_filename_shell.h"\n'
+    for name, content in (("ReferenceFilename", original("src/filters/transform/vsfilter/csriapi.cpp", reference["commit"])), ("CandidateFilename", (ROOT / "src/filters/transform/vsfilter/csriapi.cpp").read_bytes())):
+        filename_text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        csri_filename_code += f"namespace {name} {{\n"
+        if name == "CandidateFilename":
+            csri_filename_code += "#define XY_VSFILTER_RUST_TEXT\n"
+        for signature in ("CSRIAPI csri_inst *csri_open_file(", "CSRIAPI void csri_close("):
+            filename_method = extract_definition(filename_text, signature).replace("wchar_t", "WCHAR").replace("MultiByteToWideChar(", "filenameConvert(").replace("new WCHAR[namesize]", "filenameNew(namesize)").replace("delete[] namebuf", "filenameDelete(namebuf)")
+            csri_filename_code += filename_method + "\n"
+        csri_filename_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_csri_filename.h").write_text(csri_filename_code, encoding="utf-8")
     filter_source = original("src/subtitles/xy_filter.cpp", reference["commit"])
     gauss_storage_code = '#include "gauss_storage_shell.h"\n'
     for name, content in (("ReferenceGaussStorage", filter_source), ("CandidateGaussStorage", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
@@ -1600,6 +1612,12 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
     legacy_blur_result = run([str(legacy_blur_executable)], capture_output=True, text=True)
     print(legacy_blur_result.stdout, end="", flush=True)
     print(legacy_blur_result.stderr, end="", file=sys.stderr)
+    csri_filename_executable = destination / ("csri-filename-oracle.exe" if os.name == "nt" else "csri-filename-oracle")
+    csri_filename_compile = [arg.replace("find_char_oracle.cpp", "csri_filename_oracle.cpp").replace("find-char-oracle", "csri-filename-oracle") for arg in find_char_compile]
+    run(csri_filename_compile)
+    csri_filename_result = run([str(csri_filename_executable)], capture_output=True, text=True)
+    print(csri_filename_result.stdout, end="", flush=True)
+    print(csri_filename_result.stderr, end="", file=sys.stderr)
     cc_packet_executable = destination / ("cc-packet-oracle.exe" if os.name == "nt" else "cc-packet-oracle")
     cc_packet_compile = [arg.replace("find_char_oracle.cpp", "cc_packet_oracle.cpp").replace("find-char-oracle", "cc-packet-oracle") for arg in find_char_compile]
     run(cc_packet_compile)
@@ -2122,6 +2140,9 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
         "fraction_storage_compile_command": fraction_storage_compile,
         "fraction_storage_result": fraction_storage_result.stdout, "fraction_storage_stderr": fraction_storage_result.stderr,
         "fraction_storage_scope": "Whole pinned xy_be_blur and xy_calculate_filter with observed filter/transpose calls and scratch ownership under strict FP compilation. x86/x64 execute extracted native SSE kernels against Rust kernels; arm64 substitutes extracted scalar callbacks and does not establish SSE parity. Exact stage bytes/order, output/padding, initialized scratch, cache accounting, signed and fractional pass counts, reuse and native allocation fallback. Positive dimensions at least four avoid an unused native before-base cursor; zero/smaller/negative dimensions, overflowing/nonfinite pass counts, invalid backing and actual allocation failure excluded.",
+        "csri_filename_compile_command": csri_filename_compile,
+        "csri_filename_result": csri_filename_result.stdout, "csri_filename_stderr": csri_filename_result.stderr,
+        "csri_filename_scope": "Complete pinned csri_open_file and csri_close with controlled renderer, lock, CString and allocation boundaries. Windows executes actual MultiByteToWideChar; other platforms use controlled UTF-16 output replies. Exact extra-unit capacity, initialized filename bytes and untouched spare unit, first-conversion failure, accepted/rejected open, handle state, release order, repeated calls and ambient error state. Successful conversion inputs include Unicode, malformed UTF-8, embedded NUL and long names. Object/allocation exceptions, second-conversion failure and actual file IO excluded; whole Windows renderer file-open comparisons remain separate.",
         "cc_packet_compile_command": cc_packet_compile,
         "cc_packet_result": cc_packet_result.stdout, "cc_packet_stderr": cc_packet_result.stderr,
         "cc_packet_scope": "Whole pinned ExtractCC with guarded allocation and controlled DecodeCC callback. Native unaligned DWORD loads normalized to checked memcpy for portable execution. Every count byte, odd rounding, first-marker stop, both field orders, 0x800 cursor cutoff, short logical lengths with larger initialized physical backing, output initialization masks, mutable callback bytes, native fallback, repeated calls and ambient error state. Short physical backing is excluded before both implementations, never passes. Actual allocation failures, callback exceptions and caption-ripper integration remain outside scope; byte-loop decoding has separate comparisons.",
