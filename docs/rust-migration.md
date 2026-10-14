@@ -20,6 +20,21 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Rust owns the bilinear filter's aligned temporary column history as well as
+  the output planes. The existing native zero initialization, word-sized view,
+  filter/fallback arithmetic and release points remain; logical cache accounting
+  includes the scratch allocation until release. Fatal ASan/UBSan checks pass on
+  arm64 and under x64 execution: **97,897 exact bilinear comparisons / 801,972,224
+  compared bytes / 92,376 Rust scratch owners, loans and releases**, including
+  final column history, row aliasing, negative/zero pitch, repeated shifts and
+  **256 modeled allocation-failure cases**. The whole shifted-overlay comparison
+  still passes **32,456 calls**, now including **108,040 Rust plane/scratch owners**
+  and **200 modeled filter-scratch failures**. The FFI lifetime test covers
+  independent byte-plane and aligned word-scratch loans through the real Rust
+  filter. Rust 1.85 tests (142 core, 93 FFI), strict Clippy and default syntax
+  pass. The corpus remains **754 cases**; Windows/Miri and actual DLL checks
+  are pending. Native out-of-memory recovery and remaining filter ownership
+  remain outside this increment.
 * Rust also owns the aligned output planes of GetSubpixelVariance, with the
   original shared-reference lifetime and logical cache-byte accounting. Native
   unsigned shift masking, geometry, whole-pitch versus row-width copy selection

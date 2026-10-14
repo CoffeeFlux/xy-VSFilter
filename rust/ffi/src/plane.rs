@@ -29,6 +29,28 @@ pub unsafe extern "C" fn xy_vsfilter_plane_release(owner: *mut Plane) {
 mod tests {
     use super::*;
     #[test]
+    fn aligned_output_loan_supports_independent_word_scratch_in_bilinear_filter() {
+        let pixels = xy_vsfilter_plane_create(4);
+        let columns = xy_vsfilter_plane_create(8);
+        assert!(!pixels.is_null() && !columns.is_null());
+        // SAFETY: disjoint live allocations, initialized byte/word views, no
+        // owner access until both loans' final native/FFI accesses have ended.
+        unsafe {
+            let data = xy_vsfilter_plane_loan(pixels);
+            let scratch = xy_vsfilter_plane_loan(columns).cast::<u16>();
+            core::ptr::copy_nonoverlapping([0, 64, 128, 255].as_ptr(), data, 4);
+            core::ptr::write_bytes(scratch, 0, 4);
+            crate::bilinear::xy_vsfilter_bilinear_row(data, scratch, 4, 4, 4);
+            assert_eq!(core::slice::from_raw_parts(data, 4), &[0, 16, 48, 96]);
+            assert_eq!(
+                core::slice::from_raw_parts(scratch, 4),
+                &[0, 1024, 3072, 6128]
+            );
+            xy_vsfilter_plane_release(columns);
+            xy_vsfilter_plane_release(pixels);
+        }
+    }
+    #[test]
     fn loan_survives_scalar_pixel_calls_until_the_last_native_alias_ends() {
         for count in [1, 15, 16, 17, 129] {
             let owner = xy_vsfilter_plane_create(count);
