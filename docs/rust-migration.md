@@ -20,6 +20,21 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* `csri_open_file` now owns its temporary UTF-16 filename buffer in Rust while
+  preserving both Win32 conversion calls, the extra unused character, renderer
+  construction/open order, failure returns and cleanup. Complete pinned open
+  and close functions match under ordinary and fatal ASan/UBSan local builds
+  on arm64 and x64: **1,024 histories / 128,512 observations / 512 Rust owners,
+  loans and releases / 512 modeled Rust declines**. Across both sides there are
+  **1,024 successful opens / 3,072 rejected opens / 104,448 initialized filename
+  bytes / 4,096 unwritten spare bytes**. Local conversion replies are controlled;
+  Windows uses actual `MultiByteToWideChar` on empty, Unicode, malformed UTF-8,
+  embedded-NUL and long names. Renderer, lock and CString boundaries remain
+  controlled. Object/allocation exceptions, second-conversion failure and
+  actual file I/O are excluded here; whole-renderer file-open cases are separate.
+  Default native syntax and 29 Python checks (three local skips) pass; Rust
+  sources remain at **146 core / 102 FFI tests**. Windows execution is pending.
+
 * `CCDecoder::ExtractCC` now owns both temporary caption-field buffers through
   Rust while retaining the native packet loop, decoder calls and release order.
   The complete pinned extractor matches in ordinary and fatal ASan/UBSan local
@@ -38,7 +53,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   only each field's initialized prefix to the real Rust decoder and releases
   the two owners independently: **146 core / 102 FFI tests** pass, along with
   formatting, Clippy, 29 Python checks (three local skips) and default native
-  syntax. Windows compilation, integration and Miri for this increment are pending.
+  syntax. Miri and the x64 portable comparison now pass (`115919809024` and
+  `115919809311`); Win32 and whole-renderer integration remain pending.
 
 * Gaussian floating-point coefficient tables now use a Rust byte owner with a
   reserved 16-byte physical prefix, preserving native alignment and cursor
@@ -61,6 +77,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   The initial Linux fixture compile (`115915348048`) lacked a qualified
   `std::ptrdiff_t` declaration; the fixture now includes `<cstddef>` explicitly.
   That compile failure remains failed and requires a corrected Linux run.
+  Corrected Windows portable jobs `115917003428` and `115917003595` pass, as
+  does Miri (`115917002472`); complete renderer integration remains pending.
 
 * The initial x64 COM probe matched eight scoped cases; the two autoloader
   apartment cases have an unresolved reference pin-ID outcome, recorded in

@@ -20,6 +20,9 @@
  */
 
 #include "stdafx.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "xy_rust_byte_storage.h"
+#endif
 #include <afxdlgs.h>
 #include <atlpath.h>
 #include "resource.h"
@@ -54,17 +57,31 @@ CSRIAPI csri_inst *csri_open_file(csri_rend *renderer, const char *filename, str
 	if (!namesize)
 		return 0;
 	namesize++;
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::ByteStorage rust_filename;
+    namebuf = rust_filename.Allocate(static_cast<size_t>(namesize) * sizeof(wchar_t))
+        ? reinterpret_cast<wchar_t*>(rust_filename.Data()) : new wchar_t[namesize];
+#else
 	namebuf = new wchar_t[namesize];
+#endif
 	MultiByteToWideChar(CP_UTF8, 0, filename, -1, namebuf, namesize);
 
 	csri_inst *inst = new csri_inst();
 	inst->cs = new CCritSec();
 	inst->rts = new CRenderedTextSubtitle(inst->cs);
 	if (inst->rts->Open(CString(namebuf), DEFAULT_CHARSET)) {
+#ifdef XY_VSFILTER_RUST_TEXT
+        if (rust_filename.Ready()) rust_filename.Reset();
+        else
+#endif
 		delete[] namebuf;
 		inst->readorder = 0;
 		return inst;
 	} else {
+#ifdef XY_VSFILTER_RUST_TEXT
+        if (rust_filename.Ready()) rust_filename.Reset();
+        else
+#endif
 		delete[] namebuf;
 		delete inst->rts;
 		delete inst->cs;
