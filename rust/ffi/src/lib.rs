@@ -139,3 +139,5 @@ mod subrip_cue;
 mod pipe_line;
 
 mod text_writer;
+
+mod layout_rects;

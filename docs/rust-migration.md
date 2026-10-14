@@ -20,6 +20,27 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns the screen-layout allocator's ordered rectangle records, first
+  matching segment/entry lookup, record removal and segment updates. Native
+  rectangle geometry, collision traversal, border adjustment, segment-distance
+  arithmetic and logging order remain intact. Reuse still ignores layer, adjacent
+  segments work in both directions, and this allocator still ignores its
+  `collisions` argument.
+  Fatal ASan/UBSan comparisons passed **43,275 complete histories / 749,175
+  operations** on arm64 and under x64 execution: **456,370 allocations / 201,789
+  advances / 91,016 clears**, **95,440 moved returns / 85,783 reused records**,
+  and **8,104,306 retained record fields**. Rust performed **370,587 additions /
+  225,682 removals / 121,542 segment updates / 456,370 lookups**. Returned rectangles
+  and all ordered retained records match after every operation. Borders,
+  alignments, overlapping layers, empty/inverted rectangles, duplicate active
+  entries and identifier limits are covered with representable arithmetic.
+  Windows uses actual ATL rectangle/list/array behavior; portable geometry and
+  containers are controlled models. Allocation failures remain outside this test.
+  Eight collision scripts, repeated forward/backward sampling and a layer visible
+  control expand renderer validation to **570 cases**. Rust 1.85 tests (107 core,
+  71 FFI), strict Clippy, default syntax and Python harness checks pass. Windows/
+  Miri and full renderer validation are pending; geometry and broader host
+  playback remain native/integration work.
 * Safe Rust owns `CTextFile::WriteString` Unicode output buffers. Every LF gains
   a preceding CR, including CRLF becoming CRCRLF, and UTF-16 writes preserve raw
   code units in the selected byte order. Initial CString NUL termination, native

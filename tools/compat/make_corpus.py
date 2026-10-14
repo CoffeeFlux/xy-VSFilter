@@ -276,6 +276,29 @@ def subrip_cue_variants():
         yield "subrip-cue-" + name + ".srt", ("1\r\n" + timing + body).encode("ascii")
 
 
+def layout_rect_variants():
+    prefix = SEED[:SEED.index(b"Dialogue:")]
+    for name, alignment, second_layer, border, collisions, multiline in (
+        ("bottom", 2, 0, 2, "Normal", False),
+        ("split-layers", 2, 1, 2, "Normal", False),
+        ("top", 8, 0, 2, "Normal", False),
+        ("middle", 5, 0, 2, "Normal", False),
+        ("reverse", 2, 0, 2, "Reverse", False),
+        ("borders", 2, 0, 8, "Normal", False),
+        ("multiline", 2, 0, 2, "Normal", True),
+        ("top-borders", 8, 0, 8, "Normal", True),
+    ):
+        header = prefix.replace(b"[V4+ Styles]", ("Collisions: " + collisions + "\r\n[V4+ Styles]").encode("ascii"))
+        tags = "{\\an" + str(alignment) + "\\bord" + str(border) + "}"
+        text = ""
+        for index, (start, end, layer) in enumerate(((0, 4, 0), (1, 3, second_layer), (2, 5, 0))):
+            body = tags + "Collision " + chr(65 + index)
+            if multiline:
+                body += "\\Nsecond line"
+            text += f"Dialogue: {layer},0:00:0{start}.00,0:00:0{end}.00,Default,,0,0,0,,{body}\r\n"
+        yield "layout-rect-" + name + ".ass", header + text.encode("ascii")
+
+
 def legacy_pipe_variants():
     for kind, header, suffix in (("old-subrip", "{0:0:0}{0:0:4}", ".sub"),
                                  ("vplayer", "0:0:0:", ".txt")):
@@ -487,6 +510,8 @@ def make_cases(files):
                 tick = Decimal("0.0000001")
                 times = [str(Decimal(t) + offset) for t in range(7) for offset in (-tick, Decimal(0), tick)]
                 cases[-1]["times"] = times + list(reversed(times)) + ["1", "3", "1", "5", "3"]
+            if path.stem.startswith("layout-rect-"):
+                cases[-1]["times"] = ["0", "0.9999999", "1", "1.5", "1.9999999", "2", "2.5", "3", "3.5", "4", "4.5", "5", "4", "3", "2", "1", "0", "2", "1", "3"]
             warning_styles = {"field-tab-prefixes": "\tDefault", "field-unicode-style-space": "\u2003Default"}
             if path.stem in warning_styles:
                 cases[-1]["dialog_actions"] = [{"title": "Warning",
@@ -527,7 +552,8 @@ def make_cases(files):
                                                     ("sami-file-title-skips-sync", "sami-file-control"),
                                                     ("subrip-cue-number-in-caption", "subrip-cue-control"),
                                                     ("old-subrip-pipes", "old-subrip-control"),
-                                                    ("vplayer-pipes", "vplayer-control"))
+                                                    ("vplayer-pipes", "vplayer-control"),
+                                                    ("layout-rect-bottom", "layout-rect-split-layers"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -541,6 +567,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in subrip_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in subrip_cue_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in legacy_pipe_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in layout_rect_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in realtext_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_header_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_style_variants()]

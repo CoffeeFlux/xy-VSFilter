@@ -29,6 +29,9 @@
 #include <memory>
 #include "mru_cache.h"
 #include "xy_int_map.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "xy_rust_layout.h"
+#endif
 
 //how hard positioned is the ass cmd 
 enum AssCmdPosLevel
@@ -313,7 +316,11 @@ class CScreenLayoutAllocator
         int segment, entry, layer;
     } SubRect;
 
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::LayoutRects m_subrects;
+#else
     CAtlList<SubRect> m_subrects;
+#endif
 
 public:
     virtual void Empty();
