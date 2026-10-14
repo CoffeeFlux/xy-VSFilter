@@ -384,6 +384,16 @@ def arc_queue_variants():
         yield "arc-queue-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
 
 
+def blur_planes_variants():
+    for name, payload in {
+        "control": br"{\bord0\shad0\be0}Holes and stems",
+        "body": br"{\bord0\shad0\be3}Holes and stems",
+        "border": br"{\bord2\shad0\be3}Holes and stems",
+        "fractional": br"{\bord2\shad0\be1.25}Holes and stems",
+    }.items():
+        yield "blur-planes-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
+
+
 def variance_variants():
     for name, payload in {
         "control": br"{\an7\pos(280,140)\bord2.5\shad0}Shifted outline",
@@ -735,7 +745,8 @@ def make_cases(files):
                                                     ("path-buffer-control", "path-buffer-spaced"),
                                                     ("scan-row-single", "scan-row-hole"),
                                                     ("span-coverage-phase-0", "span-coverage-phase-7"),
-                                                    ("variance-control", "variance-diagonal"))
+                                                    ("variance-control", "variance-diagonal"),
+                                                    ("blur-planes-control", "blur-planes-body"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -758,6 +769,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in path_alignment_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in span_merge_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in arc_queue_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in blur_planes_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in variance_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in span_coverage_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in scan_row_variants()]

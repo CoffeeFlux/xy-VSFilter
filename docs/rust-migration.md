@@ -20,6 +20,27 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Scan-conversion edge ownership has completed all four portable CI targets,
+  Miri and both Windows renderer architectures. The **718-case / 7,530-frame**
+  corpus and **32 mutations / 224 frames** match on each architecture, alongside
+  exports and declared platform requirements. [Archived evidence](edge-storage-evidence.json)
+  distinguishes controlled line/curve emission from production renderer checks.
+* Rust owns the aligned body/border output planes allocated by BeBlur. Native
+  floating-point extent calculations, copy order, filter selection and pass
+  counts remain unchanged, as do shared lifetimes and logical cache accounting.
+  Fatal ASan/UBSan comparisons pass on arm64 and under x64 execution: **19,224
+  whole-method calls / 2,963,312 plane bytes and metadata / 447,756 logical
+  allocation/filter observations / 38,412 Rust owners, loans and releases**,
+  including **19,206 retained shared planes** and **24 false returns** from
+  modeled plane allocation failures. Both input planes are present in this
+  focused campaign; source-plane aliasing, initialized padding, unchanged input
+  and repeated output reuse are checked. Filter kernels are controlled callbacks
+  here and have independent arithmetic comparisons. Source/output object aliasing,
+  absent-plane pointer arithmetic, invalid geometry, actual OOM and native scratch
+  allocation failure are excluded. Default syntax and Python checks pass; Rust
+  remains at the tested 142-core/94-FFI paired-scratch increment. Four body/border
+  and fractional-blur fixtures expand the corpus to **762 cases**. Windows/Miri
+  and actual DLL comparisons are pending.
 * Rust owns both fixed-blur column-history buffers when the validated grouped
   filter path can acquire the complete pair. Both buffers keep native zero
   initialization, word layout and sum-before-pixel release order. Decline resets
