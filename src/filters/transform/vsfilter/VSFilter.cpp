@@ -20,24 +20,12 @@
  */
 
 #include "stdafx.h"
-#include "DirectVobSubFilter.h"
-#include "DirectVobSubPropPage.h"
 #include "VSFilter.h"
-#include "..\..\..\DSUtil\MediaTypes.h"
 
-#include <initguid.h>
-#include "..\..\..\..\include\moreuuids.h"
-#include "xy_sub_filter.h"
-
-
-#if ENABLE_XY_LOG_REG_CONFIG
-#  define TRACE_REG_CONFIG(msg) XY_LOG_TRACE(msg)
-#else
-#  define TRACE_REG_CONFIG(msg)
-#endif
-
-/////////////////////////////////////////////////////////////////////////////
-// CVSFilterApp 
+// The DirectShow base classes' DllEntryPoint walks the factory template list;
+// this DLL only exports the CSRI API, so the list is empty.
+CFactoryTemplate g_Templates[1] = {};
+int g_cTemplates = 0;
 
 BEGIN_MESSAGE_MAP(CVSFilterApp, CWinApp)
 END_MESSAGE_MAP()
@@ -53,11 +41,6 @@ CVSFilterApp::CVSFilterApp()
     xy_logger::doConfigure( dllPath.GetString() );
     delete [] strDLLPath;
 #endif
-
-#if (defined XY_SUB_FILTER_DLL)
-    free((void*)m_pszProfileName);
-    m_pszProfileName = _tcsdup(_T("XySubFilter"));
-#endif
 }
 
 extern "C" BOOL WINAPI DllEntryPoint(HINSTANCE, ULONG, LPVOID);
@@ -67,20 +50,7 @@ BOOL CVSFilterApp::InitInstance()
 	if(!CWinApp::InitInstance())
 		return FALSE;
 
-	SetRegistryKey(_T("Gabest"));
-#if (defined XY_SUB_FILTER_DLL)
-    free((void*)m_pszProfileName);
-    m_pszProfileName = _tcsdup(_T("XySubFilter"));//restore m_pszProfileName overwrite by SetRegistryKey
-#endif
-
 	DllEntryPoint(AfxGetInstanceHandle(), DLL_PROCESS_ATTACH, 0); // "DllMain" of the dshow baseclasses
-
-	STARTUPINFO si;
-	GetStartupInfo(&si);
-	m_AppName = CString(si.lpTitle);
-	m_AppName.Replace('\\', '/');
-	m_AppName = m_AppName.Mid(m_AppName.ReverseFind('/')+1);
-	m_AppName.MakeLower();
 
 	return TRUE;
 }
@@ -90,30 +60,6 @@ int CVSFilterApp::ExitInstance()
 	DllEntryPoint(AfxGetInstanceHandle(), DLL_PROCESS_DETACH, 0); // "DllMain" of the dshow baseclasses
 
 	return CWinApp::ExitInstance();
-}
-
-HINSTANCE CVSFilterApp::LoadAppLangResourceDLL()
-{
-    CString fn;
-    fn.ReleaseBufferSetLength(::GetModuleFileName(m_hInstance, fn.GetBuffer(MAX_PATH), MAX_PATH));
-    fn = fn.Mid(fn.ReverseFind('\\')+1);
-    fn = fn.Left(fn.ReverseFind('.')+1);
-    fn = fn + _T("lang");
-    return ::LoadLibrary(fn);
-}
-
-UINT CVSFilterApp::GetProfileInt( LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault )
-{
-    UINT rv = __super::GetProfileInt(lpszSection, lpszEntry, nDefault);
-    TRACE_REG_CONFIG(lpszSection<<" "<<lpszEntry<<" "<<rv);
-    return rv;
-}
-
-CString CVSFilterApp::GetProfileString( LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszDefault /*= NULL*/ )
-{
-    CString rv = __super::GetProfileString(lpszSection, lpszEntry, lpszDefault);
-    TRACE_REG_CONFIG(lpszSection<<" "<<lpszEntry<<" '"<<rv.GetString()<<"'");
-    return rv;
 }
 
 CVSFilterApp theApp;

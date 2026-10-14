@@ -71,7 +71,6 @@
     <ClCompile Include="main.cpp">
       <AssemblerOutput>AssemblyAndSourceCode</AssemblerOutput>
     </ClCompile>
-    <ClCompile Include="blit_test.cpp" />
     <ClCompile Include="interned_test.cpp" />
     <ClCompile Include="memory_open_test.cpp" />
     <ClCompile Include="overall_test.cpp" />

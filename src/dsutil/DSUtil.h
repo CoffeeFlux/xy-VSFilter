@@ -23,7 +23,6 @@
 
 #include <atlcoll.h>
 //#include "MediaTypes.h"
-#include "blit.h"
 #include "text.h"
 
 // reference time helpers

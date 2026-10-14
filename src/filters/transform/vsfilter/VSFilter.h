@@ -21,27 +21,15 @@
 
 #pragma once
 
-#include "resource.h"
-
 class CVSFilterApp : public CWinApp
 {
 public:
 	CVSFilterApp();
 
-	CString m_AppName;
-
-    virtual UINT GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault);
-    virtual CString GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszDefault = NULL);
-protected:
-	HINSTANCE LoadAppLangResourceDLL();
-
-public:
 	BOOL InitInstance();
-	BOOL ExitInstance();
+	int ExitInstance();
 
 	DECLARE_MESSAGE_MAP()
 };
 
 extern CVSFilterApp theApp;
-
-#define ResStr(id) CString(MAKEINTRESOURCE(id))

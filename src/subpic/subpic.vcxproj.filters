@@ -15,46 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MemSubPic.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PooledSubPic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="color_conv_table.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SubPicImpl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SubPicProviderImpl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SubPicQueueImpl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SubPicProviderExWrapper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SimpleSubPicWrapper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SimpleSubPicProviderImpl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SimpleSubpicImpl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="XySubRenderFrameWrapper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="XySubRenderProviderWrapper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="alpha_blender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -62,52 +29,19 @@
     <ClInclude Include="ISubPic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MemSubPic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PooledSubPic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="color_conv_table.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SubPicImpl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SubPicProviderImpl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SubPicQueueImpl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SubPicProviderExWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="xy_intrinsics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ISimpleSubPic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SimpleSubPicWrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SimpleSubPicProviderImpl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SimpleSubpicImpl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="XySubRenderFrameWrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="XySubRenderProviderWrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="alpha_blender.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

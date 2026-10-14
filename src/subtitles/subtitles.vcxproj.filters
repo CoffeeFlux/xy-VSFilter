@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GFN.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Rasterizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -27,25 +24,13 @@
     <ClCompile Include="RTS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SSF.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="STS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SubtitleInputPin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="USFSubtitles.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VobSubFile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VobSubImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="xy_malloc.cpp">
@@ -55,21 +40,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="subpixel_position_controler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BaseSub.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CompositionObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DVBSub.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="HdmvSub.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderedHdmvSubtitle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="draw_item.cpp">
@@ -93,17 +63,11 @@
     <ClCompile Include="TextFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="hdmv_subtitle_provider.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="StdioFile64.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GFN.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Rasterizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -113,28 +77,16 @@
     <ClInclude Include="RTS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SSF.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="STS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SubtitleInputPin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TextFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="USFSubtitles.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VobSubFile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VobSubImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="flyweight_base_types.h">
@@ -150,21 +102,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="subpixel_position_controler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BaseSub.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CompositionObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DVBSub.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="HdmvSub.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderedHdmvSubtitle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="draw_item.h">
@@ -183,9 +120,6 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="xy_widen_regoin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="hdmv_subtitle_provider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="xy_int_map.h">

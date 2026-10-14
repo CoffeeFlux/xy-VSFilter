@@ -20,37 +20,10 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Copy.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="csriapi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DirectVobSub.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DirectVobSubFilter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DirectVobSubPropPage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="plugins.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="StdAfx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="StyleEditorDialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Systray.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TextInputPin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="vfr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VSFilter.cpp">
@@ -59,48 +32,12 @@
     <ClCompile Include="xy_logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SubRenderOptionsImpl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="XyOptionsImpl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DirectVobSubFilterDll.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="csri.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DirectVobSub.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DirectVobSubFilter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DirectVobSubPropPage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IDirectVobSub.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="StdAfx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="StyleEditorDialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Systray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TextInputPin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vfr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VSFilter.h">
@@ -112,31 +49,11 @@
     <ClInclude Include="xy_logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Timing_Logger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IDirectVobSubXy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="XySubRenderIntf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SubRenderOptionsImpl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="XyOptionsImpl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="VSFilter.def">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="res\Icon_147.ico">
-      <Filter>Resource Files</Filter>
-    </None>
   </ItemGroup>
 </Project>

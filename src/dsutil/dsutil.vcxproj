@@ -57,23 +57,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DSUtil.cpp" />
-    <ClCompile Include="GolombBuffer.cpp" />
     <ClCompile Include="MediaTypes.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="text.cpp" />
-    <ClCompile Include="blit.cpp" />
     <ClCompile Include="xy_utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DSUtil.h" />
-    <ClInclude Include="GolombBuffer.h" />
     <ClInclude Include="MediaTypes.h" />
     <ClInclude Include="SharedInclude.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="text.h" />
-    <ClInclude Include="blit.h" />
     <ClInclude Include="xy_utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

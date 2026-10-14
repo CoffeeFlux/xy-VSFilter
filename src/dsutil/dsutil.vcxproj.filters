@@ -27,12 +27,6 @@
     <ClCompile Include="text.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="blit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GolombBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="xy_utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -50,13 +44,7 @@
     <ClInclude Include="text.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="blit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SharedInclude.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GolombBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="xy_utils.h">

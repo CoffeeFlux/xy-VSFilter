@@ -49,4 +49,3 @@
 #include "flyweight_base_types.h"
 #include "RTS.h"
 #include "cache_manager.h"
-#include "../subpic/PooledSubPic.h"

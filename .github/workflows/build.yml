@@ -2,7 +2,7 @@ name: Build VSFilter
 
 on:
   push:
-    branches: [ci, xy_sub_filter_rc*, vsfilter_rc*, master]
+    branches: [ci, xy_sub_filter_rc*, vsfilter_rc*, master, aegisub*]
   pull_request:
   workflow_dispatch:
 
@@ -25,33 +25,6 @@ jobs:
         shell: 'bash'
 
     steps:
-      - name: Determine configuration
-        id: config
-        run: |
-          # base name of GHA artifact
-          name="VSFilter+SubFilter"
-          # space delimited list of filename stems to delete from artifact
-          delete=""
-
-          # If it runs for one of the main XySubFilter or xy-VSFilter dev branches,
-          # only publish compatible binaries. If it's some other branch, it's probably
-          # a transient testing build, so keep everything.
-          # ref.: https://github.com/Cyberbeing/xy-VSFilter/pull/18#issuecomment-1302638201
-          REF="$GITHUB_REF_NAME"
-          if [ "$REF" = "master" ] || [ "$REF" = "vsfilter_rc" ] ; then
-              name="VSFilter"
-              delete="XySubFilter"
-          # xy-VSFilter specific changes weren't merged back into the
-          # XySubFilter branch, so it normally shouldn't be used to build
-          # xy-VSFilter. But in pinterf/xy-VSFilter there’s only one branch.
-          #elif echo "$REF" | grep -qE '^xy_sub_filter_rc' ; then
-          #    name="SubFilter"
-          #    delete="VSFilter"
-          fi
-
-          echo "name=$name" >> "$GITHUB_OUTPUT"
-          echo "delete=$delete" >> "$GITHUB_OUTPUT"
-
       - name: checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -67,7 +40,7 @@ jobs:
           fi
           echo "VS170COMNTOOLS=$vs_path/Common7/Tools/" >> "$GITHUB_ENV"
 
-      - name: Build xy-VSFilter and/or XySubFilter
+      - name: Build VSFilter (CSRI)
         run: |
           # Version info in version_in.h is maintained by hand, so don't regenerate it
           bash ./build_vsfilter.sh -platform "${{ matrix.vsfplat }}" -compiler VS2022 -voff
@@ -105,19 +78,10 @@ jobs:
           done
           exit $fail
 
-      - name: Prune incompatible files
-        if: steps.config.outputs.delete != ''
-        run: |
-          for dir in bin/lib*/*/Release ; do
-              for bn in ${{ steps.config.outputs.delete }} ; do
-                  rm -f "$dir"/"$bn".*
-              done
-          done
-
       - name: Publish output
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: xy-${{ steps.config.outputs.name }}_nightly_${{ matrix.namesuf }}
+          name: xy-VSFilter-CSRI_nightly_${{ matrix.namesuf }}
           if-no-files-found: error
           path: |
             bin/lib*/*/Release

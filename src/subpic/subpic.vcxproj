@@ -54,44 +54,20 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="alpha_blender.cpp" />
     <ClCompile Include="color_conv_table.cpp">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="MemSubPic.cpp" />
-    <ClCompile Include="PooledSubPic.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="SimpleSubpicImpl.cpp" />
-    <ClCompile Include="SimpleSubPicProviderImpl.cpp" />
-    <ClCompile Include="SimpleSubPicWrapper.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="SubPicImpl.cpp" />
-    <ClCompile Include="SubPicProviderExWrapper.cpp" />
     <ClCompile Include="SubPicProviderImpl.cpp" />
-    <ClCompile Include="SubPicQueueImpl.cpp" />
-    <ClCompile Include="XySubRenderFrameWrapper.cpp" />
-    <ClCompile Include="XySubRenderProviderWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="alpha_blender.h" />
     <ClInclude Include="color_conv_table.h" />
     <ClInclude Include="ISimpleSubPic.h" />
     <ClInclude Include="ISubPic.h" />
-    <ClInclude Include="MemSubPic.h" />
-    <ClInclude Include="PooledSubPic.h" />
-    <ClInclude Include="SimpleSubpicImpl.h" />
-    <ClInclude Include="SimpleSubPicProviderImpl.h" />
-    <ClInclude Include="SimpleSubPicWrapper.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="SubPicImpl.h" />
-    <ClInclude Include="SubPicProviderExWrapper.h" />
     <ClInclude Include="SubPicProviderImpl.h" />
-    <ClInclude Include="SubPicQueueImpl.h" />
-    <ClInclude Include="XySubRenderFrameWrapper.h" />
-    <ClInclude Include="XySubRenderProviderWrapper.h" />
     <ClInclude Include="xy_intrinsics.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
