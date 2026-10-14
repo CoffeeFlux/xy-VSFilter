@@ -26,5 +26,17 @@
     }
   ],
   "observation": "Scroll control/up fixtures produced no changed frames in either renderer at the original start/midpoint/end sampling times. The control therefore correctly failed despite equal reference/candidate case bytes.",
-  "correction": "Retain both scroll and banner distinct-frame controls and add early motion sample times to every clip-fade case. Corrected visibility and full renderer results require new CI; the old failed campaign is not relabeled."
+  "correction": "Retain both scroll and banner distinct-frame controls and add early motion sample times to every clip-fade case. Corrected visibility and full renderer results require new CI; the old failed campaign is not relabeled.",
+  "corrected_x64_followup": {
+    "candidate_commit": "f5c748a9b69eaa4a3f03ab2df177e4b34f8d0e05",
+    "job_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38570707798/job/115874837587",
+    "job_status": "success",
+    "report_sha256": "9a36064f2e13ccb13cefaea8c10df065b802b9696aee4c0e8cf3867753de4220",
+    "complete": true,
+    "passed": true,
+    "controls_passed": true,
+    "cases": 798,
+    "rendered_frames": 8426,
+    "scope": "Corrected early timestamps exercised visible scroll fade; prior failed run remains failed. Win32 and newer increments require their own results."
+  }
 }

@@ -100,5 +100,5 @@ static void bitmapSetWords(void* p,unsigned value,size_t count){
 template<class T>struct BitmapArray {std::vector<T> values;size_t GetCount()const{return values.size();}const T& GetAt(size_t i)const{return values.at(i);}};
 #define BITMAP_FRAME_CLASS class XySubRenderFrame {public: \
     BitmapArray<std::shared_ptr<XyBitmap>> m_bitmaps;BitmapArray<int> m_bitmap_ids;CRect m_output_rect;XyColorSpace m_xy_color_space; \
-    HRESULT GetBitmap(int,ULONGLONG*,POINT*,SIZE*,LPCVOID*,int*);HRESULT GetBitmapExtra(int,LPVOID); \
+    STDMETHODIMP GetBitmap(int,ULONGLONG*,POINT*,SIZE*,LPCVOID*,int*);STDMETHODIMP GetBitmapExtra(int,LPVOID); \
 };

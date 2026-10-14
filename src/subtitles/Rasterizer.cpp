@@ -2259,7 +2259,12 @@ SharedPtrByte Rasterizer::CompositeAlphaMask(const SharedPtrOverlay& overlay, co
     // draw
     // Grab the first colour
     DWORD color = switchpts[0];
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::PlaneAllocation rust_mask(overlay->mOverlayPitch * overlay->mOverlayHeight);
+    byte* s_base = rust_mask.Ready() ? rust_mask.Data() : (byte*)xy_malloc(overlay->mOverlayPitch * overlay->mOverlayHeight);
+#else
     byte* s_base = (byte*)xy_malloc(overlay->mOverlayPitch * overlay->mOverlayHeight);
+#endif
     const byte* alpha_mask_data = alpha_mask != NULL ? alpha_mask->data.get() : NULL;
     const int alpha_mask_pitch = alpha_mask != NULL ? alpha_mask->pitch : 0;
     if(alpha_mask_data!=NULL )
@@ -2291,6 +2296,10 @@ SharedPtrByte Rasterizer::CompositeAlphaMask(const SharedPtrOverlay& overlay, co
             sw += 2;
         }
     }
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (rust_mask.Ready()) rust_mask.Attach(result);
+    else
+#endif
     result.reset( s_base, xy_free );
     return result;
 }
