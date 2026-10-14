@@ -62,8 +62,13 @@ fn main() {
                     2 => AddMode::WebVtt,
                     _ => panic!("mode"),
                 };
-                d.add_prepared(prepared(n(2) as i32, n(3), n(4), n(5) as i32), mode)
-                    .unwrap();
+                let mut entry = prepared(n(2) as i32, n(3), n(4), n(5) as i32);
+                if p.len() == 7 {
+                    entry.layer = n(6) as i32;
+                } else {
+                    assert_eq!(p.len(), 6);
+                }
+                d.add_prepared(entry, mode).unwrap();
             }
             "Q" => {
                 let mode = match n(1) {
@@ -75,6 +80,29 @@ fn main() {
                 let q = d.query_time(mode, n(2)).unwrap();
                 print!("Q {} {} {} ", q.index, q.found as i32, q.count);
             }
+            "E" => {
+                let flag = match n(3) {
+                    -1 => None,
+                    0 => Some(false),
+                    1 => Some(true),
+                    _ => panic!("flag"),
+                };
+                d.set_prepared_text(n(1) as usize, prepared(n(2) as i32, 0, 0, 0).text, flag)
+                    .unwrap();
+            }
+            "O" => {
+                let order = (0..n(1) as usize)
+                    .map(|i| n(i + 2) as usize)
+                    .collect::<Vec<_>>();
+                d.reorder_entries(&order).unwrap();
+            }
+            "T" => {
+                let times = (0..n(1) as usize)
+                    .map(|i| (n(i * 2 + 2), n(i * 2 + 3)))
+                    .collect::<Vec<_>>();
+                d.replace_entry_times(&times).unwrap();
+            }
+            "P" => {}
             "R" => d.rebuild_segments(),
             "D" => d.remove_all_entries(),
             "C" => d.clear_entries_and_segments(),

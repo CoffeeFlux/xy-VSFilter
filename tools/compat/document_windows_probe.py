@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate/run Windows ATL/CRT reference primitive observations (no Rust parity).
+"""Generate/run Windows ATL/CRT primitives and native facade checks (no Rust parity).
 
 Run from an x86 or x64 VS developer prompt with ATL installed. --generate-only
 works on macOS. No unsafe reference histories, network calls or production writes.
@@ -38,6 +38,163 @@ def function(text, signature):
     return text[start:end]
 
 
+def run_facade(out, generate_only):
+    """Actual ATL candidate facade against pinned search bodies/direct storage."""
+    out.mkdir(parents=True, exist_ok=True)
+    report_path = out / "report.json"
+    report = {"schema": 1, "complete": False, "reference_commit": PIN,
+              "kind": "native-backed-facade-isolation", "rust_parity": False}
+    def save():
+        report_path.write_text(json.dumps(report, indent=2) + "\n")
+    save()  # Invalidate stale success before any external command.
+    runner = Path(__file__).resolve()
+    report["runner_sha256"] = sha(runner.read_bytes())
+    report["candidate_commit"] = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=ROOT, timeout=60).decode().strip()
+    candidate_paths = ["src/subtitles/STS.h", "src/subtitles/STS.cpp", "src/subtitles/RTS.cpp"]
+    candidate_bytes = {p: (ROOT / p).read_bytes() for p in candidate_paths}
+    pinned_bytes = {p: source(p) for p in candidate_paths}
+    report["candidate_source_sha256"] = {p: sha(b) for p, b in candidate_bytes.items()}
+    report["reference_source_sha256"] = {p: sha(b) for p, b in pinned_bytes.items()}
+    def decode(b):
+        return b.decode("utf-8-sig").replace("\r\n", "\n")
+    header, current = decode(candidate_bytes[candidate_paths[0]]), decode(candidate_bytes[candidate_paths[1]])
+    pinned = decode(pinned_bytes[candidate_paths[1]])
+    entry = re.search(r"typedef struct\s*\{[^}]+\} STSEntry;", header)
+    if not entry:
+        raise RuntimeError("Current STSEntry extraction failed")
+    segment = function(header, "class STSSegment") + ";"
+    facade_signatures = [
+        "size_t CSimpleTextSubtitle::GetEntryCount(",
+        "STSEntry CSimpleTextSubtitle::GetEntrySnapshot(",
+        "REFERENCE_TIME CSimpleTextSubtitle::GetEntryEnd(",
+        "int CSimpleTextSubtitle::GetEntryLayer(",
+        "int CSimpleTextSubtitle::GetEntryReadOrder(",
+        "CString CSimpleTextSubtitle::GetEntryEffect(",
+        "bool CSimpleTextSubtitle::GetSegmentEntryCount(",
+        "bool CSimpleTextSubtitle::FindNextSegment(",
+        "bool CSimpleTextSubtitle::SearchSubs2Snapshot(",
+        "bool CSimpleTextSubtitle::IsSegmentAnimated(",
+        "void CSimpleTextSubtitle::OrSegmentAnimated("]
+    search_signatures = [
+        "const STSSegment* CSimpleTextSubtitle::SearchSubs(",
+        "STSSegment* CSimpleTextSubtitle::SearchSubs2(",
+        "REFERENCE_TIME CSimpleTextSubtitle::TranslateSegmentStart(",
+        "REFERENCE_TIME CSimpleTextSubtitle::TranslateSegmentEnd("]
+    candidate_functions = [function(current, sig) for sig in facade_signatures + search_signatures]
+    reference_functions = [function(pinned, sig).replace("CSimpleTextSubtitle::", "PinnedReference::") for sig in search_signatures]
+    def shell(name, functions):
+        declarations = [body[:body.index("{")].replace(name + "::", "").strip() + ";" for body in functions]
+        return ("class " + name + " { public:\n"
+                "enum {TIME, FRAME}; int m_mode = TIME;\n"
+                "CAtlArray<STSEntry> m_entries; CAtlArray<STSSegment> m_segments;\n"
+                + "\n".join(declarations) + "\n};\n" + "\n".join(functions))
+    include = ("// Current actual declarations and candidate facade; pinned search comparison.\n"
+               "#define UNITS_FLOAT (10000000.0) // DirectShow adapter constant\n"
+               + entry.group(0) + "\n" + segment + "\n"
+               + shell("CSimpleTextSubtitle", candidate_functions) + "\n"
+               + shell("PinnedReference", reference_functions) + "\n")
+    generated = out / "document_facade_extracted.inc"
+    generated.write_text(include, encoding="utf-8")
+    local = ROOT / "tools/compat/document_facade_probe.cpp"
+    cpp = out / local.name
+    shutil.copyfile(local, cpp)
+    report.update({"probe_sha256": sha(cpp.read_bytes()), "generated_sha256": sha(generated.read_bytes()),
+                   "extracted_candidate_methods": facade_signatures + search_signatures,
+                   "extracted_reference_methods": search_signatures,
+                   "toolchain_status": "unfixed Windows environment; actual headers/compiler/libraries recorded",
+                   "limits": ["TIME mode fixed; native non-Rust search branch only; trace logging disabled",
+                              "minimal class shell, not renderer/host integration or complete class ABI",
+                              "no allocation-failure or reentrant/concurrent mutation equivalence",
+                              "schedule loops modeled from renderer; full GetSubtitle/ParseEffect not executed"]})
+    save()
+    if generate_only:
+        report.update({"generated": True, "generation_only": True})
+        save()
+        return
+    if os.name != "nt":
+        raise SystemExit("Facade execution requires Windows")
+    compiler = shutil.which("cl")
+    if not compiler:
+        raise SystemExit("Facade probe requires VS developer prompt with ATL")
+    exe = out / "document_facade_probe.exe"
+    cmd = [compiler, "/nologo", "/Bv", "/showIncludes", "/std:c++17", "/EHsc", "/O2", "/Oi", "/Ob2", "/MT",
+           "/fp:precise", "/DNDEBUG", "/DUNICODE", "/D_UNICODE", "/D_CRT_SECURE_NO_WARNINGS",
+           str(cpp), f"/Fe:{exe}", f"/Fo:{out / 'document_facade_probe.obj'}", "/link", "/VERBOSE:LIB"]
+    report["build_command"] = cmd
+    report["compiler_sha256"] = sha(Path(compiler).read_bytes())
+    report["environment"] = {k: os.environ.get(k) for k in
+                             ["VCToolsVersion", "VCToolsInstallDir", "WindowsSDKVersion", "WindowsSdkDir",
+                              "VSCMD_ARG_TGT_ARCH", "VSCMD_ARG_HOST_ARCH", "INCLUDE", "LIB"]}
+    save()
+    try:
+        built = subprocess.run(cmd, cwd=out, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=60)
+    except subprocess.TimeoutExpired as error:
+        (out / "build.log").write_bytes(error.stdout or b"")
+        report["unresolved_build"] = "timeout after 60 seconds"
+        save()
+        raise SystemExit("Facade build timeout; unresolved")
+    (out / "build.log").write_bytes(built.stdout)
+    report["build_exit_code"] = built.returncode
+    headers, libraries = {}, {}
+    build_text = built.stdout.decode(errors="replace")
+    for line in build_text.splitlines():
+        match = re.search(r"([A-Za-z]:\\.+?)\s*$", line)
+        if match and Path(match.group(1)).is_file():
+            headers[match.group(1)] = sha(Path(match.group(1)).read_bytes())
+    for match in re.finditer(r"([A-Za-z]:\\[^\r\n]*?\.lib)(?=[:\s(]|$)", build_text, re.I):
+        if Path(match.group(1)).is_file():
+            libraries[match.group(1)] = sha(Path(match.group(1)).read_bytes())
+    report["included_header_sha256"] = headers
+    report["linker_observed_library_sha256"] = libraries
+    report["library_scope"] = "Paths observed in /VERBOSE:LIB, including searched libraries, not proof all contributed code."
+    save()
+    if built.returncode:
+        raise SystemExit("Facade build failed; see facade/build.log")
+    report["binary_sha256"] = sha(exe.read_bytes())
+    save()
+    traces, errors = [], []
+    for run in (1, 2):
+        try:
+            result = subprocess.run([str(exe)], cwd=out, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=60)
+        except subprocess.TimeoutExpired as error:
+            (out / f"trace-{run}.txt").write_bytes(error.stdout or b"")
+            (out / f"stderr-{run}.txt").write_bytes(error.stderr or b"")
+            report["unresolved_execution"] = {"run": run, "reason": "timeout"}
+            save()
+            raise SystemExit("Facade timeout; unresolved")
+        (out / f"trace-{run}.txt").write_bytes(result.stdout)
+        (out / f"stderr-{run}.txt").write_bytes(result.stderr)
+        lines = result.stdout.splitlines()
+        if (result.returncode or result.stderr or not lines
+                or not lines[0].startswith(b"provenance ")
+                or lines[-1] != b"document-facade-v1 complete"
+                or not any(line.startswith(b"checks ") for line in lines)
+                or not any(line == b"isolation complete" for line in lines)):
+            report["unresolved_execution"] = {"run": run, "exit_code": result.returncode,
+                                              "reason": "failed assertions/stderr/incomplete trace"}
+            save()
+            raise SystemExit("Facade observation failed or incomplete; unresolved")
+        traces.append(result.stdout)
+        errors.append(result.stderr)
+    report.update({"trace_sha256": [sha(t) for t in traces], "stderr_sha256": [sha(e) for e in errors],
+                   "repeat_equal": traces[0] == traces[1] and errors[0] == errors[1],
+                   "trace_lines": len(traces[0].splitlines())})
+    stable = (sha(local.read_bytes()) == report["probe_sha256"]
+              and sha(cpp.read_bytes()) == report["probe_sha256"]
+              and sha(generated.read_bytes()) == report["generated_sha256"]
+              and sha(runner.read_bytes()) == report["runner_sha256"]
+              and sha(exe.read_bytes()) == report["binary_sha256"]
+              and all(sha((ROOT / p).read_bytes()) == h for p, h in report["candidate_source_sha256"].items())
+              and subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, timeout=60).decode().strip() == report["candidate_commit"])
+    report["candidate_stable"] = stable
+    if not stable or not report["repeat_equal"]:
+        save()
+        raise SystemExit("Facade source changed or repeated traces differ; unresolved")
+    report["complete"] = True
+    save()
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, required=True)
@@ -47,6 +204,8 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     # Invalidate any previous successful report before git/compiler execution.
     (out / "report.json").write_text(json.dumps({"schema": 1, "complete": False, "reference_commit": PIN}, indent=2) + "\n")
+    (out / "facade").mkdir(parents=True, exist_ok=True)
+    (out / "facade/report.json").write_text(json.dumps({"schema": 1, "complete": False, "reference_commit": PIN}, indent=2) + "\n")
     runner_path = Path(__file__).resolve()
     runner_hash = sha(runner_path.read_bytes())
     candidate_commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, timeout=60).decode().strip()
@@ -199,6 +358,7 @@ def main():
         report["generation_only"] = True
         report["generated"] = True
     (out / "report.json").write_text(json.dumps(report, indent=2) + "\n")
+    run_facade(out / "facade", args.generate_only)
     print(json.dumps({"output": str(out), "generation_only": args.generate_only,
                       "reference_commit": PIN, "rust_parity": False}))
 

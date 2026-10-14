@@ -3684,6 +3684,72 @@ void CSimpleTextSubtitle::TranslateSegmentStartEnd(int i, double fps, /*out*/REF
     }
 }
 
+// Native-backed document access surface. Keep borrowed array views local to
+// these operations; returned snapshots contain independent native values.
+size_t CSimpleTextSubtitle::GetEntryCount() const
+{
+    return m_entries.GetCount();
+}
+
+STSEntry CSimpleTextSubtitle::GetEntrySnapshot(int i) const
+{
+    return m_entries.GetAt(i);
+}
+
+REFERENCE_TIME CSimpleTextSubtitle::GetEntryEnd(int i) const
+{
+    return m_entries.GetAt(i).end;
+}
+
+int CSimpleTextSubtitle::GetEntryLayer(int i) const
+{
+    return m_entries.GetAt(i).layer;
+}
+
+int CSimpleTextSubtitle::GetEntryReadOrder(int i) const
+{
+    return m_entries.GetAt(i).readorder;
+}
+
+CString CSimpleTextSubtitle::GetEntryEffect(int i) const
+{
+    return m_entries.GetAt(i).effect;
+}
+
+bool CSimpleTextSubtitle::GetSegmentEntryCount(int iSegment, size_t& count) const
+{
+    if(iSegment < 0 || iSegment >= (int)m_segments.GetCount()) return false;
+    count = m_segments[iSegment].subs.GetCount();
+    return true;
+}
+
+bool CSimpleTextSubtitle::FindNextSegment(REFERENCE_TIME t, double fps,
+    int* iSegment, int* nSegments)
+{
+    return SearchSubs(t, fps, iSegment, nSegments) != NULL;
+}
+
+bool CSimpleTextSubtitle::SearchSubs2Snapshot(REFERENCE_TIME t, double fps,
+    STSSegment& snapshot, int* iSegment, int* nSegments)
+{
+    const STSSegment* segment = SearchSubs2(t, fps, iSegment, nSegments);
+    if(!segment) return false;
+    snapshot = *segment;
+    return true;
+}
+
+bool CSimpleTextSubtitle::IsSegmentAnimated(unsigned int iSegment) const
+{
+    return iSegment < m_segments.GetCount() ? m_segments[iSegment].animated : false;
+}
+
+void CSimpleTextSubtitle::OrSegmentAnimated(int iSegment, bool animated)
+{
+    // Callers must use the index selected for this render sequence. An invalid
+    // index is a contract failure, never a silently discarded feedback update.
+    m_segments.GetAt(iSegment).animated |= animated;
+}
+
 STSStyle* CSimpleTextSubtitle::GetStyle(int i)
 {
     STSStyle* style = NULL;
