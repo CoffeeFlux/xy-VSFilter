@@ -266,7 +266,11 @@ bool CUSFSubtitles::ConvertToSTS(CSimpleTextSubtitle& sts)
 #else
 	sts.m_name = metadata.language.text;
 #endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+	sts.SetDocumentEncoding(CTextFile::UTF8);
+#else
 	sts.m_encoding = CTextFile::UTF8;
+#endif
 	sts.m_dstScreenSize = CSize(640, 480);
 	sts.m_fScaledBAS = true;
 	sts.m_defaultWrapStyle = 1;

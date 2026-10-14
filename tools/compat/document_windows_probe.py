@@ -292,7 +292,7 @@ def run_owner(out, generate_only):
                          "bool CSimpleTextSubtitle::SearchSubs2Snapshot("]
     bodies = [function(current, sig).replace("CSimpleTextSubtitle::", "ExperimentalFacade::") for sig in facade_signatures]
     declarations = [body[:body.index("{")].replace("ExperimentalFacade::", "").strip() + ";" for body in bodies]
-    reference += ["class ExperimentalFacade { public:enum{TIME,FRAME};int m_mode=TIME;XyRust::DocumentOwner* m_document;explicit ExperimentalFacade(XyRust::DocumentOwner& owner):m_document(&owner){}\n" + "\n".join(declarations) + "\n};\n" + "\n".join(bodies)]
+    reference += ["class ExperimentalFacade { public:enum{TIME,FRAME};int m_mode=TIME;int GetDocumentMode() const{return m_mode;}XyRust::DocumentOwner* m_document;explicit ExperimentalFacade(XyRust::DocumentOwner& owner):m_document(&owner){}\n" + "\n".join(declarations) + "\n};\n" + "\n".join(bodies)]
     generated = out / "document_owner_reference.inc"
     generated.write_bytes(("\n\n".join(reference) + "\n").encode())
     report.update(generated_sha256={p: sha((out / p).read_bytes()) for p in

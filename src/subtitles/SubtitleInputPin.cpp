@@ -540,7 +540,11 @@ STDMETHODIMP_(CSubtitleInputPinHelper*) CSubtitleInputPin::CreateHelper( const C
             pRTS->m_dstScreenSize = CSize(384, 288);
 
             if (m_mt.subtype == MEDIASUBTYPE_WEBVTT) {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                pRTS->SetDocumentType(EXTVTT);
+#else
                 pRTS->m_subtitleType = EXTVTT;
+#endif
             }
 
             if(dwOffset > 0 && mt.cbFormat - dwOffset > 0)

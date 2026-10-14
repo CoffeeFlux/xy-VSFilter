@@ -53,12 +53,14 @@ public:
 
 class TraceDocument : public CSimpleTextSubtitle {
     unsigned id_;
+    int initial_mode_;exttype initial_type_;CTextFile::enc initial_encoding_;
 public:
     explicit TraceDocument(unsigned id) : id_(id) {
+        initial_mode_=Mode();initial_type_=Type();initial_encoding_=Encoding();
         // Assign every observed metadata scalar before the first observation;
         // constructor-indeterminate m_simple/m_lcid are never read.
         m_simple = id != 0;Name(id ? CString(L"destination") : CString(L"source"));
-        m_lcid = 1033+id;m_subtitleType=EXTSRT;m_mode=TIME;m_encoding=CTextFile::UTF8;
+        m_lcid = 1033+id;Type(EXTSRT);Mode(TIME);Encoding(CTextFile::UTF8);
         Path(id ? CString(L"destination-path") : CString(L"source-path"));
         m_dstScreenSize=CSize(640+id,480+id);m_defaultWrapStyle=int(id);m_collisions=int(id);
         m_fScaledBAS=id!=0;m_layout_size=CSize(800+id,600+id);
@@ -72,6 +74,52 @@ public:
         m_dPARCompensation=1.25+id;m_eYCbCrMatrix=YCbCrMatrix_BT709;m_eYCbCrRange=YCbCrRange_PC;
     }
     ~TraceDocument() override {printf("event %u %u destructor-body\n",++sequence,id_);}
+    int Mode() const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        return GetDocumentMode();
+#else
+        return m_mode;
+#endif
+    }
+    void Mode(int value) {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        SetDocumentMode(static_cast<tmode>(value));
+#else
+        m_mode=static_cast<tmode>(value);
+#endif
+    }
+    exttype Type() const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        return GetDocumentType();
+#else
+        return m_subtitleType;
+#endif
+    }
+    void Type(exttype value) {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        SetDocumentType(value);
+#else
+        m_subtitleType=value;
+#endif
+    }
+    CTextFile::enc Encoding() const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        return GetDocumentEncoding();
+#else
+        return m_encoding;
+#endif
+    }
+    void Encoding(CTextFile::enc value) {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        SetDocumentEncoding(value);
+#else
+        m_encoding=value;
+#endif
+    }
+    void ConstructionInterpretation() const {
+        check(initial_mode_==TIME&&initial_type_==EXTSRT&&initial_encoding_==CTextFile::DEFAULT_ENCODING,"native initialized interpretation defaults");
+        printf("interpretation-stage interpretation-constructed mode=%d type=%d encoding=%d\n",initial_mode_,int(initial_type_),int(initial_encoding_));
+    }
     CString Name() const {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
         return GetDocumentName();
@@ -152,7 +200,7 @@ public:
     void Dump(const char* stage) const {
         printf("state %u %u %s %zu %zu\n",++sequence,id_,stage,Entries(),Segments());
         printf("metadata %d",m_simple);units(Name());
-        printf(" %lu %d %d %d",static_cast<unsigned long>(m_lcid),int(m_subtitleType),int(m_mode),int(m_encoding));units(Path());
+        printf(" %lu %d %d %d",static_cast<unsigned long>(m_lcid),int(Type()),Mode(),int(Encoding()));units(Path());
         printf(" %ld %ld %d %d %d %ld %ld %d %d",m_dstScreenSize.cx,m_dstScreenSize.cy,
             m_defaultWrapStyle,m_collisions,m_fScaledBAS,m_layout_size.cx,m_layout_size.cy,
             m_fForcedDefaultStyle,int(m_ePARCompensationType));
@@ -418,12 +466,41 @@ static void identity_lifecycle() {
     check(source.Open(&input,ANSI_CHARSET,CString(L"opened identity")),"ordinary identity Open");
     identity_stage(source,"identity-open-success",CString(L"opened identity"),fixture.name);
 }
+static void interpretation_stage(TraceDocument& doc,const char* stage,int mode,exttype type,CTextFile::enc encoding) {
+    check(doc.Mode()==mode&&doc.Type()==type&&doc.Encoding()==encoding,"interpretation scalar values");
+    printf("interpretation-stage %s mode=%d type=%d encoding=%d\n",stage,doc.Mode(),int(doc.Type()),int(doc.Encoding()));
+    doc.Dump(stage);
+}
+static void interpretation_lifecycle() {
+    TraceDocument source(0),destination(1);source.ConstructionInterpretation();
+    unsigned sourceChanges=change_events[0],destinationChanges=change_events[1];
+    source.Mode(FRAME);source.Type(EXTASS);source.Encoding(CTextFile::LE16);
+    interpretation_stage(source,"interpretation-supplied",FRAME,EXTASS,CTextFile::LE16);
+    destination.Copy(source);
+    interpretation_stage(destination,"interpretation-copy",FRAME,EXTASS,CTextFile::LE16);
+    destination.Mode(TIME);destination.Type(EXTSSA);destination.Encoding(CTextFile::UTF8);
+    interpretation_stage(source,"interpretation-copy-independent",FRAME,EXTASS,CTextFile::LE16);
+    source.Empty();interpretation_stage(source,"interpretation-empty",FRAME,EXTASS,CTextFile::LE16);
+    source.Copy(source);interpretation_stage(source,"interpretation-self-copy",FRAME,EXTASS,CTextFile::LE16);
+    check(change_events[0]==sourceChanges&&change_events[1]==destinationChanges,"interpretation scalar operations add no callbacks");
+    SavedFiles fixture(L"document-lifecycle-interpretation.sub");
+    {
+        const char bytes[]="{0}{25}ordinary MicroDVD\r\n{30}{55}second line\r\n";
+        CFile output;check(output.Open(fixture.name,CFile::modeCreate|CFile::modeWrite|CFile::typeBinary)!=FALSE,"MicroDVD fixture create");
+        output.Write(bytes,sizeof(bytes)-1);
+    }
+    CTextFile input(CTextFile::UTF8);check(input.Open(fixture.name),"MicroDVD fixture input");input.SetFilePath(fixture.name);
+    check(input.GetFilePath()==fixture.name,"deterministic MicroDVD label");
+    check(source.Open(&input,ANSI_CHARSET,CString(L"interpretation MicroDVD")),"ordinary MicroDVD Open");
+    interpretation_stage(source,"interpretation-microdvd-open",FRAME,EXTSSA,input.GetEncoding());
+}
 int main() {
     try {
         if(!AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0))throw std::runtime_error("AfxWinInit failed");
         printf("provenance pointer_bits=%zu\n",sizeof(void*)*8);
         printf("environment ansi=%u oem=%u\n",GetACP(),GetOEMCP());
         default_style_lifecycle();
+        interpretation_lifecycle();
         identity_lifecycle();
         named_style_lifecycle();
         named_style_exports();
@@ -436,10 +513,14 @@ int main() {
             destination.Sort(false);destination.Dump("sort-normal");
             destination.Sort(true);destination.Dump("sort-readorder");
             destination.ConvertToFrameBased(25.0);destination.Animate(0);destination.Dump("converted-to-frame");
+            interpretation_stage(destination,"interpretation-frame",FRAME,EXTSRT,CTextFile::UTF8);
             notifications=change_events[1];destination.ConvertToFrameBased(25.0);destination.Dump("frame-noop");
+            interpretation_stage(destination,"interpretation-frame-noop",FRAME,EXTSRT,CTextFile::UTF8);
             check(change_events[1]==notifications,"frame no-op does not notify");
             destination.ConvertToTimeBased(25.0);destination.Animate(0);destination.Dump("converted-to-time");
+            interpretation_stage(destination,"interpretation-time",TIME,EXTSRT,CTextFile::UTF8);
             notifications=change_events[1];destination.ConvertToTimeBased(25.0);destination.Dump("time-noop");
+            interpretation_stage(destination,"interpretation-time-noop",TIME,EXTSRT,CTextFile::UTF8);
             check(change_events[1]==notifications,"time no-op does not notify");
             destination.RemoveAllEntries();destination.Dump("entries-only-removed");
             check(change_events[1]==notifications,"RemoveAllEntries does not notify");

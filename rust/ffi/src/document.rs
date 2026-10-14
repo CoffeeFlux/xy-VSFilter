@@ -8,7 +8,9 @@
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::ptr;
-use xy_vsfilter_compat::document::{AddMode, Document, IdentityField, Refusal};
+use xy_vsfilter_compat::document::{
+    AddMode, Document, IdentityField, InterpretationField, Refusal,
+};
 use xy_vsfilter_compat::document_style as style_wire;
 use xy_vsfilter_compat::document_wire::{self as wire, Counts, EntryHeader, SegmentHeader};
 use xy_vsfilter_compat::timeline_search::Mode;
@@ -187,6 +189,50 @@ pub extern "C" fn xy_vsfilter_document_copy_default_style_v1(destination: u64, s
         .copy_default_style(destination, source)
         .map_err(registry_error)));
     drop(retired);
+    OK
+}
+fn interpretation_field(field: u32) -> Result<InterpretationField, u32> {
+    match field {
+        0 => Ok(InterpretationField::Mode),
+        1 => Ok(InterpretationField::SubtitleType),
+        2 => Ok(InterpretationField::Encoding),
+        _ => Err(INVALID_INPUT),
+    }
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_set_interpretation_v1(
+    owner: u64,
+    field: u32,
+    value: i32,
+) -> u32 {
+    let field = required!(interpretation_field(field));
+    status(admitted(|registry| {
+        registry
+            .document_mut(owner)
+            .map_err(registry_error)?
+            .replace_interpretation(field, value);
+        Ok(())
+    }))
+}
+/// # Safety
+/// Output follows the byte-buffer contract, capacity >=4; LE signed i32.
+/// Absent constructor state is unresolved and leaves the output untouched.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_get_interpretation_v1(
+    owner: u64,
+    field: u32,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 4));
+    let field = required!(interpretation_field(field));
+    let value = required!(admitted(|registry| registry
+        .document(owner)
+        .map_err(registry_error)?
+        .interpretation(field)
+        .ok_or(UNRESOLVED_REFERENCE)));
+    // SAFETY: output was validated above and the registry loan has ended.
+    unsafe { write_output(output, &value.to_le_bytes()) };
     OK
 }
 /// # Safety
@@ -1027,6 +1073,116 @@ mod tests {
             assert_eq!(xy_vsfilter_document_destroy_v1(target), OK);
             assert_ne!(read_snapshot(snapshot), style);
             assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
+            // Supplied interpretation values are opaque signed scalar bits.
+            let owner = create();
+            let destination = create();
+            let mut output = [0xa5; 4];
+            for field in 0..3 {
+                assert_eq!(
+                    xy_vsfilter_document_get_interpretation_v1(
+                        owner,
+                        field,
+                        output.as_mut_ptr(),
+                        4
+                    ),
+                    UNRESOLVED_REFERENCE
+                );
+                assert_eq!(output, [0xa5; 4]);
+                assert_eq!(
+                    xy_vsfilter_document_set_interpretation_v1(owner, field, i32::MIN),
+                    OK
+                );
+                assert_eq!(
+                    xy_vsfilter_document_set_interpretation_v1(destination, field, i32::MAX),
+                    OK
+                );
+                assert_eq!(
+                    xy_vsfilter_document_get_interpretation_v1(
+                        owner,
+                        field,
+                        output.as_mut_ptr(),
+                        4
+                    ),
+                    OK
+                );
+                assert_eq!(i32::from_le_bytes(output), i32::MIN);
+                output.fill(0xa5);
+            }
+            let before = state(owner);
+            assert_eq!(
+                xy_vsfilter_document_set_interpretation_v1(owner, 3, 0),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_get_interpretation_v1(owner, 3, output.as_mut_ptr(), 4),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_get_interpretation_v1(owner, 0, output.as_mut_ptr(), 3),
+                INVALID_INPUT
+            );
+            assert_eq!(output, [0xa5; 4]);
+            assert_eq!(state(owner), before);
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_set_interpretation_v1(owner, 0, 5))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_get_interpretation_v1(
+                        owner,
+                        0,
+                        output.as_mut_ptr(),
+                        4
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(output, [0xa5; 4]);
+            assert_eq!(state(owner), before);
+            let reply = open_snapshot(owner, 5);
+            assert_eq!(
+                xy_vsfilter_document_set_interpretation_v1(reply, 0, 5),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                xy_vsfilter_document_get_interpretation_v1(reply, 0, output.as_mut_ptr(), 4),
+                BAD_HANDLE
+            );
+            assert_eq!(output, [0xa5; 4]);
+            assert_eq!(xy_vsfilter_document_copy_storage_v1(destination, owner), OK);
+            assert_eq!(xy_vsfilter_document_clear_storage_v1(destination), OK);
+            assert_eq!(xy_vsfilter_document_remove_entries_v1(destination), OK);
+            for field in 0..3 {
+                assert_eq!(
+                    xy_vsfilter_document_get_interpretation_v1(
+                        destination,
+                        field,
+                        output.as_mut_ptr(),
+                        4
+                    ),
+                    OK
+                );
+                assert_eq!(i32::from_le_bytes(output), i32::MAX);
+            }
+            assert_eq!(state(owner).clone(), before);
+            assert_eq!(xy_vsfilter_document_set_interpretation_v1(owner, 0, -1), OK);
+            assert_eq!(
+                xy_vsfilter_document_get_interpretation_v1(destination, 0, output.as_mut_ptr(), 4),
+                OK
+            );
+            assert_eq!(i32::from_le_bytes(output), i32::MAX);
+            assert_eq!(xy_vsfilter_document_destroy_v1(owner), OK);
+            output.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_document_get_interpretation_v1(owner, 0, output.as_mut_ptr(), 4),
+                BAD_HANDLE
+            );
+            assert_eq!(output, [0xa5; 4]);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(reply), OK);
+            assert_eq!(xy_vsfilter_document_destroy_v1(destination), OK);
             // Identity snapshots own exact raw units and survive owner closure.
             let owner = create();
             let destination = create();

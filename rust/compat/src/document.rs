@@ -5,10 +5,10 @@
 //! Callers must perform native text/style preparation and its initial rejection
 //! checks before supplying records (the suffix begins at STSEntry construction);
 //! raw code units are retained, including unpaired surrogates and embedded NULs.
-//! Raw document name/path and supplied initialized default/named styles are owned
-//! here. Native map orchestration, other metadata, Add parsing, full Copy
-//! orchestration, CRT sort and encoding
-//! conversion remain outside this API. Allocation failure/partial native
+//! Raw name/path, supplied interpretation scalars and initialized default/named
+//! styles are owned here. Native map orchestration, other metadata, Add parsing,
+//! full Copy orchestration, CRT sort and encoding conversion remain outside this
+//! API. Allocation failure/partial native
 //! mutation and callbacks are outside this API's comparison domain.
 use alloc::{vec, vec::Vec};
 
@@ -85,10 +85,27 @@ pub enum IdentityField {
     Path,
 }
 
+/// Native interpretation enum values are stored without normalization.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum InterpretationField {
+    Mode,
+    SubtitleType,
+    Encoding,
+}
+impl InterpretationField {
+    fn index(self) -> usize {
+        match self {
+            Self::Mode => 0,
+            Self::SubtitleType => 1,
+            Self::Encoding => 2,
+        }
+    }
+}
 /// Clone creates independent storage; it does not emulate native Copy callbacks
 /// or the selective field assignments in native Copy.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Document {
+    interpretation: [Option<i32>; 3],
     name: Vec<u16>,
     path: Vec<u16>,
     default_style: Option<crate::document_style::StyleValue>,
@@ -97,6 +114,17 @@ pub struct Document {
     segments: Vec<DocumentSegment>,
 }
 impl Document {
+    /// Absent until explicitly supplied by the native constructor/adapter.
+    pub fn interpretation(&self, field: InterpretationField) -> Option<i32> {
+        self.interpretation[field.index()]
+    }
+    pub fn replace_interpretation(
+        &mut self,
+        field: InterpretationField,
+        value: i32,
+    ) -> Option<i32> {
+        self.interpretation[field.index()].replace(value)
+    }
     pub fn identity(&self, field: IdentityField) -> &[u16] {
         match field {
             IdentityField::Name => &self.name,
@@ -898,5 +926,33 @@ mod tests {
             &[65, 0, 0xd800, 0xdcff, 0xffff]
         );
         assert_eq!(source.identity(IdentityField::Path), &[80, 0, 66]);
+    }
+    #[test]
+    fn supplied_interpretation_bits_clone_and_storage_retention() {
+        let mut source = Document::default();
+        let mut destination = Document::default();
+        for field in [
+            InterpretationField::Mode,
+            InterpretationField::SubtitleType,
+            InterpretationField::Encoding,
+        ] {
+            assert_eq!(source.interpretation(field), None);
+            assert_eq!(source.replace_interpretation(field, i32::MIN), None);
+            destination.replace_interpretation(field, i32::MAX);
+        }
+        let cloned = source.clone();
+        source.replace_interpretation(InterpretationField::Mode, -1);
+        destination.copy_storage_from(&source);
+        destination.clear_entries_and_segments();
+        destination.remove_all_entries();
+        for field in [
+            InterpretationField::Mode,
+            InterpretationField::SubtitleType,
+            InterpretationField::Encoding,
+        ] {
+            assert_eq!(cloned.interpretation(field), Some(i32::MIN));
+            assert_eq!(destination.interpretation(field), Some(i32::MAX));
+        }
+        assert_eq!(source.interpretation(InterpretationField::Mode), Some(-1));
     }
 }
