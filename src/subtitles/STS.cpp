@@ -26,6 +26,7 @@
 #include "xy_rust_subrip.h"
 #include "xy_rust_find_char.h"
 #include "xy_rust_microdvd.h"
+#include "xy_rust_microdvd_style.h"
 #include "xy_rust_mpl2.h"
 #include "xy_rust_remove_tags.h"
 #include "xy_rust_case_replace.h"
@@ -1392,6 +1393,12 @@ static STSStyle* GetMicroDVDStyle(CString str, int CharSet)
     STSStyle* ret = DEBUG_NEW STSStyle();
     if(!ret) return(NULL);
 
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::MicroDvdStyle tags(str);
+    while(tags.Next())
+    {
+        CString code = tags.Text<CString>();
+#else
     for(int i = 0, len = str.GetLength(); i < len; i++)
     {
         int j = str.Find('{', i);
@@ -1403,6 +1410,7 @@ static STSStyle* GetMicroDVDStyle(CString str, int CharSet)
         if(k < 0) k = len;
 
         CString code = str.Mid(j, k-j);
+#endif
         if(code.GetLength() > 2) code.SetAt(1, (TCHAR)towlower(code[1]));
 
         if(!_tcsnicmp(code, _T("{c:$"), 4))
@@ -1438,7 +1446,9 @@ static STSStyle* GetMicroDVDStyle(CString str, int CharSet)
             ret->scrAlignment = (p == 0) ? 8 : 2;
         }
 
+#ifndef XY_VSFILTER_RUST_TEXT
         i = k;
+#endif
     }
 
     return(ret);
