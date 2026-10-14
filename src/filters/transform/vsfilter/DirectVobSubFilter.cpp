@@ -2312,7 +2312,11 @@ HRESULT CDirectVobSubFilter::DoGetField(unsigned field, void *value)
             {
                 hr = S_OK;
                 CRenderedTextSubtitle * rts = dynamic_cast<CRenderedTextSubtitle*>(pSubStream);
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                *(int*)value = rts->GetStyleCount();
+#else
                 *(int*)value = rts->m_styles.GetCount();
+#endif
             }
             else
             {
@@ -2342,10 +2346,29 @@ HRESULT CDirectVobSubFilter::GetCurStyles( SubStyle sub_style[], int count )
     if (dynamic_cast<CRenderedTextSubtitle*>(curSubStream)!=NULL)
     {
         CRenderedTextSubtitle * rts = dynamic_cast<CRenderedTextSubtitle*>(curSubStream);
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        if (count != rts->GetStyleCount())
+#else
         if (count != rts->m_styles.GetCount())
+#endif
         {
             return E_INVALIDARG;
         }
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        for(int i = 0; i < count; i++)
+        {
+            CString name;
+            if(!rts->GetStyleNameAt(i, name)) return E_FAIL;
+            if(name.GetLength() >= countof(sub_style[0].name)) return ERROR_BUFFER_OVERFLOW;
+            // Keep per-row partial output: write the name before requesting or
+            // copying this style, and consume no later row in advance.
+            wcscpy_s(sub_style[i].name, name.GetString());
+            if(sub_style[i].style)
+            {
+                if(!rts->GetStyleValueAt(i, *static_cast<STSStyle*>(sub_style[i].style))) return E_FAIL;
+            }
+        }
+#else
         POSITION pos = rts->m_styles.GetStartPosition();
         int i = 0;
         while(pos)
@@ -2366,6 +2389,7 @@ HRESULT CDirectVobSubFilter::GetCurStyles( SubStyle sub_style[], int count )
             }
             i++;
         }
+#endif
     }
     else
     {
@@ -2386,13 +2410,21 @@ HRESULT CDirectVobSubFilter::SetCurStyles( const SubStyle sub_style[], int count
     if (dynamic_cast<CRenderedTextSubtitle*>(curSubStream)!=NULL)
     {
         CRenderedTextSubtitle * rts = dynamic_cast<CRenderedTextSubtitle*>(curSubStream);
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        if (count != rts->GetStyleCount())
+#else
         if (count != rts->m_styles.GetCount())
+#endif
         {
             return E_INVALIDARG;
         }
         for (int i=0;i<count;i++)
         {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            if (!rts->HasNamedStyle(sub_style[i].name))
+#else
             if (!rts->m_styles.Lookup(sub_style[i].name))
+#endif
             {
                 return E_FAIL;
             }
@@ -2400,6 +2432,13 @@ HRESULT CDirectVobSubFilter::SetCurStyles( const SubStyle sub_style[], int count
         bool changed = false;
         for (int i=0;i<count;i++)
         {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            // Every row performs the native second lookup/assert, including
+            // null slots. Pointee values are consumed only after that lookup.
+            const STSStyle* input = static_cast<const STSStyle*>(sub_style[i].style);
+            if(!rts->SetExistingStyleValue(sub_style[i].name, input)) return E_FAIL;
+            if(input) changed = true;
+#else
             STSStyle * style = NULL;
             rts->m_styles.Lookup(sub_style[i].name, style);
             ASSERT(style);
@@ -2408,6 +2447,7 @@ HRESULT CDirectVobSubFilter::SetCurStyles( const SubStyle sub_style[], int count
                 *style = *static_cast<STSStyle*>(sub_style[i].style);
                 changed = true;
             }
+#endif
         }
         if (changed) {
             hr = OnOptionChanged(BIN2_CUR_STYLES);

@@ -28,7 +28,11 @@
 
 CCDecoder::CCDecoder(CString fn, CString rawfn) : m_fn(fn), m_rawfn(rawfn)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    m_sts.ResetDefaultStyle(ANSI_CHARSET);
+#else
     m_sts.CreateDefaultStyle(ANSI_CHARSET);
+#endif
 
     m_time = 0;
     m_fEndOfCaption = false;

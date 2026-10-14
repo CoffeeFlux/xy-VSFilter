@@ -2830,8 +2830,12 @@ bool CRenderedTextSubtitle::ParseSSATag( CSubtitle* sub, const AssTagList& assTa
             }
         case CMD_r:
             {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                if(p.IsEmpty() || !GetNamedStyleCopy(p, style)) style = org;
+#else
                 STSStyle* val;
                 style = (!p.IsEmpty() && m_styles.Lookup(p, val) && val) ? *val : org;
+#endif
                 break;
             }
         case CMD_shad:
@@ -3092,7 +3096,11 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
     if(!sub) return(NULL);
     CStringW str = GetStrW(entry, true);
     STSStyle stss, orgstss;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    GetEntryStyleCopy(entry, stss);
+#else
     GetStyle(entry, &stss);
+#endif
     if (stss.fontScaleX == stss.fontScaleY && m_dPARCompensation != 1.0)
     {
         switch(m_ePARCompensationType)

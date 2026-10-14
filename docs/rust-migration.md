@@ -237,7 +237,7 @@ still requires D4/D5 below and all remaining ownership/fallback accounting.
 | D1 — Capture complete lifecycles | A pinned-reference document harness for create → add → edit/style-change → copy → sort → seek → clear/reopen → destroy | Compare full initialized document/segment state, observable callback/error order and caller snapshots; use real ATL/CRT on Windows. Include failed operations and repeated calls, with failures never counted as parity. Status: in progress; prepared-record sequence harness passes locally, full native lifecycle remains open. |
 | D2 — Implement the Rust owner | Safe Rust entries, styles, metadata and segments; coherent document operations reuse existing helpers | Owner/copy/edit/drop tests, raw UTF-16 preservation, bounded access, no native mutable views; native field/type/alias compatibility reviewed. Status: D2a core in progress; prepared entries/segments and TIME queries implemented, production integration pending. |
 | D3 — Route every caller | Importers, renderer, style interfaces and export paths use document operations or bounded snapshots | Enumerate and eliminate direct authoritative CAtlArray/CAtlMap entry/style/segment accesses in the Rust-enabled build; preserve callback/lock order and public ABI. Retire superseded fine-grained FFI crossings. Status: entries/segments routed in opt-in experimental build; Windows validation pending; styles/metadata remain native. |
-| D4 — Establish parity | Document lifecycle and integrated DLL comparisons on Windows x86/x64 at one exact candidate commit | Exact records, ordering, times, errors, rendering output and style API behavior; existing corpus/mutations, targeted lifecycle/malformed fixtures, Miri and relevant native checks. Resolve mismatches; no undocumented native document fallback. Status: planned. |
+| D4 — Establish parity | Document lifecycle and integrated DLL comparisons on Windows x86/x64 at one exact candidate commit | Exact records, ordering, times, errors, rendering output and style API behavior; existing corpus/mutations, targeted lifecycle/malformed fixtures, Miri and relevant native checks. Resolve mismatches; no undocumented native document fallback. Status: experimental entry/segment owner passes full x64 DLL corpus at `30d087bd`; x86 and full-class lifecycle checks pending; remaining document owners still native. |
 | D5 — Close and hand off | Written ownership/access review and applicable consumer validation | Aegisub load/render/seek/reload/close, relevant player/style-edit lifecycles and architecture results. Record finite corpus scope and bounded retained adapters. Until the real-host check is complete, report core-complete/host-validation-pending, never closed. Status: planned. |
 
 Important compatibility cases already visible in source include self-copy after
@@ -617,8 +617,13 @@ Experimental artifacts use the `renderer-evidence-ARCH-rust-document` name;
 `summarize_evidence.py --document-storage rust-experimental` requires matching
 build metadata and the experimental macro in the compiler log. Native-only
 evidence cannot satisfy that selection. Actual Windows owner compilation now
-passes on both architectures; full renderer results remain pending for this
-integration.
+passes on both architectures. The experimental full renderer also passes on
+x86 and x64 at `30d087bd`, per architecture: 798 corpus cases / 8,426 frames, 32 mutation cases / 224
+frames, the smoke case / ten frames, and ten scoped COM cases, with unchanged
+exports/dependencies. Build metadata, macro, DLL hashes and reports were verified
+using the experimental-storage selector. See
+[rust-document-owner-renderer-evidence.json](rust-document-owner-renderer-evidence.json).
+Both experimental renderer jobs pass; this is not whole-document closure.
 
 The focused Windows probe also compiles the exact adapter against actual ATL
 types and compares its complete records, segment membership and scalar results
@@ -648,7 +653,13 @@ observe rebuilt state after Rust access ends. Complete initialized metadata,
 styles, entries and segments are serialized; two executions per side must match
 exactly. The runner preserves failed/partial observations, hashes libraries,
 headers and executables, and refuses existing output directories. Local evidence
-validation tests pass; actual Windows linking and lifecycle results are pending.
+validation tests pass. At `04673672`, both x64 native-control and experimental
+owner builds pass the linked lifecycle gate with 702 lines per repeated trace,
+then pass the full renderer comparison. Retained executables, source/header
+contents and traces were independently verified. Compiler include paths are
+resolved using Windows case/path semantics before checking Git contents. See
+[rust-document-native-lifecycle-evidence.json](rust-document-native-lifecycle-evidence.json).
+The x86 results remain pending.
 The first Windows attempt at `89fcce47` built both DLLs and passed the smoke
 comparison, then failed compiling the reference probe because its C++17 flag
 removed `auto_ptr`/`unary_function` required by bundled headers. The probe now
@@ -663,6 +674,31 @@ It identifies native-backed value operations for renderer, both filter style
 APIs and CCDecoder before moving styles. Map enumeration history, first-NUL
 comparison versus logical name length, validation-before-update and partial
 output order must survive. This review retires no style or metadata owner.
+
+The experimental build now routes RTS named resets, entry-style copies,
+CCDecoder default reset, and both filter style APIs through native-backed value
+operations. Default/native branches preprocess identically to `04673672`. The
+setter still validates all names before updates, performs its second lookup for
+null rows, and consumes duplicate-name values sequentially. Getters check each
+full logical name length before writing that row, then write its name before
+copying its value. Existing partial output and alias order are preserved. The
+source inventory and independent review cover this change; native style maps,
+default style, internal pointer getters and metadata remain authoritative.
+
+`document_style_api_check.py` adds an experimental-build gate after the normal
+renderer corpus. It builds isolated, test-instrumented copies of both actual
+filter DLLs against each checkout's libraries. The helper creates, copies and
+destroys all CString/FwRect/STSStyle values within that DLL; a small host passes
+only strings/status, isolates settings, and unloads after helper cleanup. Four
+class/mode pairs each require two reference and two candidate executions with
+exact traces and empty stderr. Cases cover wrong counts, shared output slots,
+null slots, late invalid setter names, duplicate updates and partial output at
+a long style name. Production DLL/library hashes must remain unchanged. Wrapper
+projects, commands, compiler environment, sources, fixtures, binaries and traces
+are retained. Local negative controls pass; actual Windows style-API results
+remain pending. This is no claim about graph integration, callback counts,
+allocation failure or complete style ownership.
+
 
 ## Independent audit and unsafe boundary
 

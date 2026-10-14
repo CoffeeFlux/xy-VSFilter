@@ -8,9 +8,11 @@ partially failed run. Miri/job status must be checked separately in GitHub.
 """
 import argparse
 from collections import Counter
+from functools import lru_cache
 import hashlib
 import json
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
+import posixpath
 import subprocess
 import sys
 
@@ -31,6 +33,35 @@ def load(path):
 
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def normalize_windows_source(name):
+    """Resolve compiler include spelling, retaining a repository-relative path."""
+    path = posixpath.normpath(name.replace("\\", "/"))
+    if path == ".." or path.startswith(("../", "/")) or ":" in path:
+        raise ValueError(f"Header path escapes checkout: {name}")
+    return path.casefold()
+
+
+@lru_cache(maxsize=None)
+def source_paths(commit):
+    raw = subprocess.run(["git", "ls-tree", "-rz", "--name-only", commit],
+                         cwd=ROOT, check=True, capture_output=True).stdout
+    paths = {}
+    for name in raw.decode().split("\0"):
+        if name:
+            key = normalize_windows_source(name)
+            assert key not in paths, "Ambiguous Windows source path"
+            paths[key] = name
+    return paths
+
+
+def windows_source_bytes(commit, name):
+    # /showIncludes may retain ../ and spell DSUtil for tracked dsutil. Windows
+    # resolves those names identically; Git's case-sensitive object lookup does not.
+    canonical = source_paths(commit)[normalize_windows_source(name)]
+    return subprocess.run(["git", "show", f"{commit}:{canonical}"], cwd=ROOT,
+                          check=True, capture_output=True).stdout
 
 
 def one(root, pattern):
@@ -184,8 +215,7 @@ def summarize_native(run, platform, candidate, reference, document_storage="nati
                 traces.append((directory / f"{side}-trace-{repeat}.stdout").read_bytes())
                 assert not (directory / f"{side}-trace-{repeat}.stderr").read_bytes()
         for commit, name, digest in sources:
-            raw = subprocess.run(["git", "show", f"{commit}:{name}"], cwd=ROOT,
-                                 check=True, capture_output=True).stdout
+            raw = windows_source_bytes(commit, name)
             lf = raw.replace(b"\r\n", b"\n")
             assert digest in {hashlib.sha256(data).hexdigest() for data in (raw, lf, lf.replace(b"\n", b"\r\n"))}
         compare_traces(traces, 32 if platform == "Win32" else 64)
@@ -195,12 +225,73 @@ def summarize_native(run, platform, candidate, reference, document_storage="nati
             "limits": document["limits"],
             "library_hash_scope": "Build-library hashes are runner-reported; executables, source headers and traces rehashed",
         }
+    has_style_probe = subprocess.run(
+        ["git", "cat-file", "-e", f"{candidate}:tools/compat/document_style_api_check.py"],
+        cwd=ROOT, capture_output=True).returncode == 0
+    if has_style_probe and document_storage == "rust-experimental":
+        entry["checks"]["document-style-api"] = summarize_style_api(
+            base / "document-style-api", candidate, reference, platform, entry["dlls"])
     log = (base / "candidate.log").read_text(errors="replace")
     assert "XY_VSFILTER_RUST_TEXT" in log and "xy_vsfilter_ffi.lib" in log
     if document_storage == "rust-experimental":
         assert "XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL" in log
     entry["candidate_log_sha256"] = sha(base / "candidate.log")
     return entry
+
+
+def summarize_style_api(directory, candidate, reference, platform, production_dlls):
+    from document_style_api_check import validate_trace
+    path = directory / "report.json"
+    report = load(path)
+    assert report["schema"] == "document-style-api-v1" and report["status"] == "complete"
+    assert report["candidate_commit"] == candidate and report["reference_commit"] == reference
+    assert report["platform"] == platform and report["document_storage"] == "rust-experimental"
+    artifacts = report["artifacts"]
+    for key, name in (("helper", "document_style_api_probe.cpp"),
+                      ("host_source", "document_style_api_host.cpp"),
+                      ("runner", "document_style_api_check.py")):
+        raw = windows_source_bytes(candidate, "tools/compat/" + name)
+        lf = raw.replace(b"\r\n", b"\n")
+        assert artifacts[key] in {hashlib.sha256(v).hexdigest() for v in (raw, lf, lf.replace(b"\n", b"\r\n"))}
+    for key, name in (("host", "host.exe"), ("normal.ass", "normal.ass"), ("long-name.ass", "long-name.ass")):
+        assert artifacts[key] == sha(directory / name)
+    assert len(report["builds"]) == 4
+    expected_builds = {(side, name) for side in ("reference", "candidate") for name in ("VSFilter.dll", "XySubFilter.dll")}
+    assert {(b["side"], b["dll"]) for b in report["builds"]} == expected_builds
+    for build in report["builds"]:
+        side, name = build["side"], build["dll"]
+        assert build["wrapper_sha256"] == sha(directory / PureWindowsPath(build["wrapper"]).name)
+        command = build["command"]
+        for flag in ("/p:RustTextDecoder=true", "/p:RustDocumentOwnerExperimental=true"):
+            assert (flag in command) == (side == "candidate")
+        binary = directory / side / name[:-4] / name
+        recorded = [v for k, v in artifacts.items() if PureWindowsPath(k).parts[-3:] == (side, name[:-4], name)]
+        assert recorded == [sha(binary)]
+        source_hashes = {build["project"]: build["project_sha256"], **build["props"]}
+        for source, digest in source_hashes.items():
+            parts = PureWindowsPath(source).parts
+            relative = "/".join(parts[parts.index("src"):])
+            raw = windows_source_bytes(reference if side == "reference" else candidate, relative)
+            lf = raw.replace(b"\r\n", b"\n")
+            assert digest in {hashlib.sha256(v).hexdigest() for v in (raw, lf, lf.replace(b"\n", b"\r\n"))}
+        original = [v for k, v in report["production_artifacts"][side].items() if PureWindowsPath(k).name == name]
+        assert original == [production_dlls[name]["baseline_sha256" if side == "reference" else "candidate_sha256"]]
+    runs = report["runs"]
+    expected = {(side, cls, mode, repeat) for side in ("reference", "candidate")
+                for cls in ("CDirectVobSubFilter", "XySubFilter")
+                for mode in ("normal", "long-name") for repeat in range(2)}
+    assert len(runs) == 16 and {(r["side"], r["class"], r["mode"], r["repeat"]) for r in runs} == expected
+    groups = {}
+    for run in runs:
+        stdout = directory / run["trace"]
+        stderr = stdout.with_suffix(".stderr")
+        assert sha(stdout) == run["stdout_sha256"] and sha(stderr) == run["stderr_sha256"]
+        data = stdout.read_bytes()
+        validate_trace(data, stderr.read_bytes(), run["returncode"], run["mode"], 32 if platform == "Win32" else 64)
+        groups.setdefault((run["class"], run["mode"]), []).append(data)
+    assert all(len(traces) == 4 and all(t == traces[0] for t in traces) for traces in groups.values())
+    return {"report_sha256": sha(path), "equal": True, "class_mode_pairs": 4, "executions": 16,
+            "scope": "Test-instrumented copies of actual DLLs; native style values remain in-module; production DLL hashes unchanged. Build-library hashes are runner-reported. No graph/real-host/callback-count coverage."}
 
 
 def summarize_portable(run, candidate, reference):
