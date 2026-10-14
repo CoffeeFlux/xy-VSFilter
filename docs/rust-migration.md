@@ -20,6 +20,23 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* `Rasterizer::CompositeAlphaMask` now transfers a Rust output allocation into
+  the existing shared result, preserving partial writes and final-alias release.
+  The whole pinned caller and `Overlay::FillAlphaMash`, using extracted native
+  mask kernels, match in ordinary and fatal ASan/UBSan builds on arm64 and x64:
+  **88,368 calls / 4,698,448 state, initialization and allocation fields /
+  876,864 initialized bytes / 1,436,352 unwritten cells tracked without reads /
+  78,492 null results / 25,296 observed fill calls / 9,768 Rust owners, loans and
+  releases / 108 modeled Rust declines**. Clipping, dirty rectangles, subpixel
+  rounding, body/border/mask selection, bounded color switches, repeated colors,
+  empty runs, unchanged inputs, cache accounting and errno/FP/error state match.
+  **1,968 final-row cursor histories are excluded before both calls**, never
+  passes. Unbounded switch arrays, invalid geometry/backing, native allocation
+  failure and shared-control-block exceptions remain outside this comparison.
+  Portable runs exercise the native x64 scalar delegation; actual Win32 SIMD
+  still needs Windows. Rust remains **146 core / 101 FFI tests**; default syntax
+  and Python checks pass. Windows integration for this increment is pending.
+
 * Output `XyBitmap` buffers now use Rust ownership while preserving the native
   address modulo 16, public frame-accessor pointers and logical cache accounting.
   The owner reserves alignment slack without exposing or initializing it; zero
@@ -41,6 +58,11 @@ unresolved reference outcomes requiring investigation, never matching results.
   syntax passes on both local architectures. Windows renderer, platform and
   Miri checks for this increment are pending; the text corpus alone does not
   establish planar consumer-host integration.
+  The first Win32 portable job (`115883283696`) exposed missing `STDMETHODIMP`
+  calling conventions in the modeled frame declarations; the extraction harness
+  now uses the same declaration convention as the real methods. That failed
+  job remains failed. The increment's x64 portable job (`115883283584`) and Miri
+  (`115883283012`) passed; corrected Win32 evidence still requires a new run.
 
 * Fractional `xy_be_blur` now owns its transpose scratch through Rust while
   preserving horizontal filtering, transpose, vertical filtering, transpose-back
@@ -85,6 +107,9 @@ unresolved reference outcomes requiring investigation, never matching results.
   that failure. The control is unchanged; early motion samples are added to all
   fade fixtures so brief visible intervals are exercised. Corrected rendering
   and visibility require a new CI run, not relabeling the prior result.
+  Corrected x64 job `115874837587` at `f5c748a9` now passes all **798 cases /
+  8,426 frames**, with all visibility controls passing; its report hash is
+  recorded in the scope file. Win32 and later increments are separate checks.
 * A staged experiment lets Rust own both VobSub image buffers while retaining the two native capacity
   predicates and active-plane reset. Fatal ASan/UBSan comparisons pass on both
   local architectures: **45,018 Alloc calls / 20,665,260 byte/metadata fields /

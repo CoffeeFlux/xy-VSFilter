@@ -1293,6 +1293,15 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
             masks += extract_definition(content.decode("utf-8-sig"), signature) + "\n"
         masks += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_mask.h").write_text(masks, encoding="utf-8")
+    composite_code = '#include "composite_storage_shell.h"\n'
+    for name, kernels, content in (("ReferenceComposite", "ReferenceMask", raster_source), ("CandidateComposite", "CandidateMask", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+        composite_text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        composite_code += f"namespace {name} {{\nusing namespace {kernels};\nCOMPOSITE_CLASSES\n"
+        if name == "CandidateComposite":
+            composite_code += "#define XY_VSFILTER_RUST_TEXT\n"
+        composite_code += extract_definition(composite_text, "void Overlay::FillAlphaMash(").replace("Overlay::FillAlphaMash(", "Overlay::FillAlphaMashImpl(") + "\n"
+        composite_code += extract_definition(composite_text, "SharedPtrByte Rasterizer::CompositeAlphaMask(").replace("XyRust::PlaneAllocation", "XyRust::ObservedCompositeAllocation") + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_composite_storage.h").write_text(composite_code, encoding="utf-8")
     dvb = '#include "original_hdmv.h"\n#include "dvb_shell.h"\n'
     dvb += '#define UnionRect ObservedUnionRect\n'
     for name, content in (("OriginalDvb", hdmv_source), ("CandidateDvb", candidate_hdmv)):
@@ -1593,6 +1602,12 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
     dvb_storage_result = run([str(dvb_storage_executable)], capture_output=True, text=True)
     print(dvb_storage_result.stdout, end="", flush=True)
     print(dvb_storage_result.stderr, end="", file=sys.stderr)
+    composite_storage_executable = destination / ("composite-storage-oracle.exe" if os.name == "nt" else "composite-storage-oracle")
+    composite_storage_compile = [arg.replace("find_char_oracle.cpp", "composite_storage_oracle.cpp").replace("find-char-oracle", "composite-storage-oracle") for arg in find_char_compile]
+    run(composite_storage_compile)
+    composite_storage_result = run([str(composite_storage_executable)], capture_output=True, text=True)
+    print(composite_storage_result.stdout, end="", flush=True)
+    print(composite_storage_result.stderr, end="", file=sys.stderr)
     bitmap_storage_executable = destination / ("bitmap-storage-oracle.exe" if os.name == "nt" else "bitmap-storage-oracle")
     bitmap_storage_compile = [arg.replace("find_char_oracle.cpp", "bitmap_storage_oracle.cpp").replace("find-char-oracle", "bitmap-storage-oracle") for arg in find_char_compile]
     run(bitmap_storage_compile)
@@ -2055,6 +2070,9 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
         "gauss_planes_compile_command": gauss_planes_compile,
         "gauss_planes_result": gauss_planes_result.stdout, "gauss_planes_stderr": gauss_planes_result.stderr,
         "gauss_planes_scope": "Whole pinned GaussianBlur with controlled coefficient factories and Gaussian kernel. Exact metadata, initialized-byte masks and values, untouched padding, native memset/memcpy footprints, source aliases and ignored extra input border, retained shared lifetimes and cache accounting. Every modeled copy checks extents and source initialization; unwritten bytes are never read. Second-plane failure modeled; first-plane failure, source/output object aliasing, inconsistent geometry and actual OOM excluded.",
+        "composite_storage_compile_command": composite_storage_compile,
+        "composite_storage_result": composite_storage_result.stdout, "composite_storage_stderr": composite_storage_result.stderr,
+        "composite_storage_scope": "Whole pinned CompositeAlphaMask and Overlay::FillAlphaMash with extracted native mask kernels, controlled allocation and initialized source planes. Exact clipping/dirty rectangle, subpixel rounding, body/border/alpha mask selection, single and bounded multicolor switches, written output masks/bytes, native fallback, cache accounting and shared output lifetime. Only initialized output bytes are read; final-row cursor histories that would exceed backing are excluded before both calls and never counted as passes. Malformed unbounded/nonprogressing switch histories, invalid geometry/backing, native allocation failure and shared-control-block allocation exceptions excluded. Non-Windows compares native x64 scalar delegation; actual Win32 SIMD requires Windows.",
         "bitmap_storage_compile_command": bitmap_storage_compile,
         "bitmap_storage_result": bitmap_storage_result.stdout, "bitmap_storage_stderr": bitmap_storage_result.stderr,
         "bitmap_storage_scope": "Whole pinned bitmap constructor/CreateBitmap/ClearBitmap/destructor and GetBitmap/GetBitmapExtra accessors. Allocation and byte/word clears controlled, exact pointer alignment residue, plane offsets, initialized masks and bytes, retained packed padding, logical cache accounting, zero-sized native fallback, optional accessor outputs and shared lifetimes observed. Uninitialized bpp and padding never read. Native object-null allocation modeled; native pixel-allocation failure, invalid/overflowing geometry and actual COM host lifetimes excluded.",
