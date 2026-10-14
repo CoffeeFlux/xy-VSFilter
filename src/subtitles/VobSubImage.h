@@ -45,7 +45,8 @@ class CVobSubImage
 
 private:
     CSize org;
-#ifdef XY_VSFILTER_RUST_TEXT
+// Staged until CVobSubSettings assignment and image alias lifetimes are covered.
+#ifdef XY_VSFILTER_RUST_VOBSUB_STORAGE_EXPERIMENT
     XyRust::ByteStorage m_temp1Storage, m_temp2Storage;
 #endif
     RGBQUAD* lpTemp1;

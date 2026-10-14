@@ -27,7 +27,7 @@ unresolved reference outcomes requiring investigation, never matching results.
   that failure. The control is unchanged; early motion samples are added to all
   fade fixtures so brief visible intervals are exercised. Corrected rendering
   and visibility require a new CI run, not relabeling the prior result.
-* Rust owns both VobSub image buffers while retaining the two native capacity
+* A staged experiment lets Rust own both VobSub image buffers while retaining the two native capacity
   predicates and active-plane reset. Fatal ASan/UBSan comparisons pass on both
   local architectures: **45,018 Alloc calls / 20,665,260 byte/metadata fields /
   2,952,156 initialized bytes / 13,320,372 unwritten cells tracked without reads /
@@ -46,7 +46,15 @@ unresolved reference outcomes requiring investigation, never matching results.
   remain excluded, and native uninitialized nOffset is never observed. Default
   syntax and Python checks pass; Rust remains at 146 core / 98 FFI tests. The
   **798-case text corpus** is unchanged. Windows validation and bitmap host
-  playback remain required.
+  playback remain required. The subsequent Windows build found that
+  `CVobSubFile::Copy` assigns its `CVobSubSettings` base, which implicitly copies
+  the image. Exclusive owners disable that assignment. This increment is now
+  guarded by `XY_VSFILTER_RUST_VOBSUB_STORAGE_EXPERIMENT`, enabled only in the
+  isolated oracle, and is **not enabled by the production Rust switch**. Keep
+  native assignment and allocation until image aliasing/copy/destruction histories
+  have compatibility coverage. Compile-time checks cover the containing settings
+  assignment surface. Failed Windows jobs 115870769331 / 115870769683 are build
+  failures, not renderer passes.
 * Individual CI inspection found a Windows `min` macro collision in the new
   Gaussian failure diagnostic; its qualified call is now parenthesized. This
   blocked Windows portable checks in subsequent increments; those jobs are not
@@ -55,6 +63,9 @@ unresolved reference outcomes requiring investigation, never matching results.
   [The recorded scope](clip-fade-fp-scope.json) keeps ordinary optimized ambient
   flags unresolved. The full fade oracle now requests FP-observable compilation,
   with flags still compared exactly; both local architectures pass that form.
+  GCC still reports the same difference with trapping/rounding flags, so Unix
+  fade extraction now selects Clang's strict FP model explicitly. GCC ambient
+  effects remain unresolved and the failed Linux jobs remain failed.
   New CI results are required. The corrected vector-mask commit's actual Windows
   renderer jobs (`38565161385`) passed on both architectures, separately from
   these portable-harness failures.
