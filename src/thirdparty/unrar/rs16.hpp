@@ -17,6 +17,9 @@ class RSCoder16
     void InvertDecoderMatrix();
 
 #ifdef USE_SSE
+#if defined(USE_SSE) && defined(__GNUC__)
+    __attribute__((target("ssse3")))
+#endif
     bool SSE_UpdateECC(uint DataNum, uint ECCNum, const byte *Data, byte *ECC, size_t BlockSize);
 #endif
 
@@ -35,7 +38,9 @@ class RSCoder16
     ~RSCoder16();
 
     bool Init(uint DataCount, uint RecCount, bool *ValidityFlags);
+#if 0 // We use only UpdateECC now.
     void Process(const uint *Data, uint *Out);
+#endif
     void UpdateECC(uint DataNum, uint ECCNum, const byte *Data, byte *ECC, size_t BlockSize);
 };
 

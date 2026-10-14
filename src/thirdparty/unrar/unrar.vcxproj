@@ -75,7 +75,9 @@
     <ClCompile Include="hash.cpp" />
     <ClCompile Include="headers.cpp" />
     <ClCompile Include="isnt.cpp" />
+    <ClCompile Include="largepage.cpp" />
     <ClCompile Include="match.cpp" />
+    <ClCompile Include="motw.cpp" />
     <ClCompile Include="options.cpp" />
     <ClCompile Include="pathfn.cpp" />
     <ClCompile Include="qopen.cpp" />
@@ -86,7 +88,6 @@
     <ClCompile Include="rarvm.cpp" />
     <ClCompile Include="rawread.cpp" />
     <ClCompile Include="rdwrfn.cpp" />
-    <ClCompile Include="recvol.cpp" />
     <ClCompile Include="rijndael.cpp" />
     <ClCompile Include="rs.cpp" />
     <ClCompile Include="rs16.cpp" />
@@ -107,7 +108,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="archive.hpp" />
-    <ClInclude Include="array.hpp" />
     <ClInclude Include="blake2s.hpp" />
     <ClInclude Include="cmddata.hpp" />
     <ClInclude Include="coder.hpp" />
@@ -131,11 +131,13 @@
     <ClInclude Include="headers.hpp" />
     <ClInclude Include="headers5.hpp" />
     <ClInclude Include="isnt.hpp" />
+    <ClInclude Include="largepage.hpp" />
     <ClInclude Include="list.hpp" />
     <ClInclude Include="loclang.hpp" />
     <ClInclude Include="log.hpp" />
     <ClInclude Include="match.hpp" />
     <ClInclude Include="model.hpp" />
+    <ClInclude Include="motw.hpp" />
     <ClInclude Include="options.hpp" />
     <ClInclude Include="os.hpp" />
     <ClInclude Include="pathfn.hpp" />
@@ -146,6 +148,7 @@
     <ClInclude Include="raros.hpp" />
     <ClInclude Include="rartypes.hpp" />
     <ClInclude Include="rarvm.hpp" />
+    <ClInclude Include="rawint.hpp" />
     <ClInclude Include="rawread.hpp" />
     <ClInclude Include="rdwrfn.hpp" />
     <ClInclude Include="recvol.hpp" />
@@ -153,7 +156,6 @@
     <ClInclude Include="rijndael.hpp" />
     <ClInclude Include="rs.hpp" />
     <ClInclude Include="rs16.hpp" />
-    <ClInclude Include="savepos.hpp" />
     <ClInclude Include="scantree.hpp" />
     <ClInclude Include="secpassword.hpp" />
     <ClInclude Include="sha1.hpp" />
@@ -166,7 +168,6 @@
     <ClInclude Include="threadpool.hpp" />
     <ClInclude Include="timefn.hpp" />
     <ClInclude Include="ui.hpp" />
-    <ClInclude Include="ulinks.hpp" />
     <ClInclude Include="unicode.hpp" />
     <ClInclude Include="unpack.hpp" />
     <ClInclude Include="version.hpp" />

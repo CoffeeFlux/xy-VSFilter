@@ -8,14 +8,16 @@ ScanTree::ScanTree(StringList *FileMasks,RECURSE_MODE Recurse,bool GetLinks,SCAN
   ScanTree::GetDirs=GetDirs;
 
   ScanEntireDisk=false;
+  FolderWildcards=false;
 
+  FindStack.push_back(NULL); // We need a single NULL pointer for initial Depth==0.
+  
   SetAllMaskDepth=0;
-  *CurMask=0;
-  memset(FindStack,0,sizeof(FindStack));
   Depth=0;
   Errors=0;
-  *ErrArcName=0;
   Cmd=NULL;
+  ErrDirList=NULL;
+  ErrDirSpecPathLength=NULL;
 }
 
 
@@ -27,20 +29,30 @@ ScanTree::~ScanTree()
 }
 
 
-SCAN_CODE ScanTree::GetNext(FindData *FindData)
+SCAN_CODE ScanTree::GetNext(FindData *FD)
 {
   if (Depth<0)
     return SCAN_DONE;
 
+#ifndef SILENT
+  uint LoopCount=0;
+#endif
 
   SCAN_CODE FindCode;
   while (1)
   {
-    if (*CurMask==0 && !GetNextMask())
+    if (CurMask.empty() && !GetNextMask())
       return SCAN_DONE;
 
+#ifndef SILENT
+    // Let's return some ticks to system or WinRAR can become irresponsible
+    // while scanning files in command like "winrar a -r arc c:\file.ext".
+    // Also we reset system sleep timer here.
+    if ((++LoopCount & 0x3ff)==0)
+      Wait();
+#endif
 
-    FindCode=FindProc(FindData);
+    FindCode=FindProc(FD);
     if (FindCode==SCAN_ERROR)
     {
       Errors++;
@@ -48,42 +60,200 @@ SCAN_CODE ScanTree::GetNext(FindData *FindData)
     }
     if (FindCode==SCAN_NEXT)
       continue;
-    if (FindCode==SCAN_SUCCESS && FindData->IsDir && GetDirs==SCAN_SKIPDIRS)
+    if (FindCode==SCAN_SUCCESS && FD->IsDir && GetDirs==SCAN_SKIPDIRS)
       continue;
     if (FindCode==SCAN_DONE && GetNextMask())
       continue;
+    if (FilterList.ItemsCount()>0 && FindCode==SCAN_SUCCESS)
+      if (!CommandData::CheckArgs(&FilterList,FD->IsDir,FD->Name,false,MATCH_WILDSUBPATH))
+        continue;
     break;
   }
-  return(FindCode);
+  return FindCode;
+}
+
+
+// For masks like dir1\dir2*\*.ext in non-recursive mode.
+bool ScanTree::ExpandFolderMask()
+{
+  bool WildcardFound=false;
+  uint SlashPos=0;
+  for (uint I=0;I<CurMask.size();I++)
+  {
+    if (CurMask[I]=='?' || CurMask[I]=='*')
+      WildcardFound=true;
+    if (WildcardFound && IsPathDiv(CurMask[I]))
+    {
+      // First path separator position after folder wildcard mask.
+      // In case of dir1\dir2*\dir3\name.ext mask it may point not to file
+      // name, so we cannot use PointToName() here.
+      SlashPos=I; 
+      break;
+    }
+  }
+
+  std::wstring Mask=CurMask.substr(0,SlashPos);
+
+  // Prepare the list of all folders matching the wildcard mask.
+  ExpandedFolderList.Reset();
+  FindFile Find;
+  Find.SetMask(Mask);
+  FindData FD;
+  while (Find.Next(&FD))
+    if (FD.IsDir)
+    {
+      FD.Name+=CurMask.substr(SlashPos);
+
+      // Treat dir*\*, dir*\*.* or dir*\ as dir, so empty 'dir' is also matched
+      // by such mask. Skipping empty dir with dir*\*.* confused some users.
+      std::wstring LastMask=PointToName(FD.Name);
+      if (LastMask==L"*" || LastMask==L"*.*" || LastMask.empty())
+        RemoveNameFromPath(FD.Name);
+
+      ExpandedFolderList.AddString(FD.Name);
+    }
+  if (ExpandedFolderList.ItemsCount()==0)
+    return false;
+  // Return the first matching folder name now.
+  ExpandedFolderList.GetString(CurMask);
+  return true;
+}
+
+
+// For masks like dir1\dir2*\file.ext this function sets 'dir1' recursive mask
+// and '*\dir2*\file.ext' filter. Masks without folder wildcards are
+// returned as is.
+bool ScanTree::GetFilteredMask()
+{
+  // If we have some matching folders left for non-recursive folder wildcard
+  // mask, we return it here.
+  if (ExpandedFolderList.ItemsCount()>0 && ExpandedFolderList.GetString(CurMask))
+    return true;
+
+  FolderWildcards=false;
+  FilterList.Reset();
+  if (!FileMasks->GetString(CurMask))
+    return false;
+
+  // Check if folder wildcards present.
+  bool WildcardFound=false;
+  uint FolderWildcardCount=0;
+  uint SlashPos=0;
+  uint StartPos=0;
+#ifdef _WIN_ALL // Not treat the special NTFS \\?\d: path prefix as a wildcard.
+  if (starts_with(CurMask,L"\\\\?\\"))
+    StartPos=4;
+#endif
+  for (uint I=StartPos;I<CurMask.size();I++)
+  {
+    if (CurMask[I]=='?' || CurMask[I]=='*')
+      WildcardFound=true;
+    if (IsPathDiv(CurMask[I]) || IsDriveDiv(CurMask[I]))
+    {
+      if (WildcardFound)
+      {
+        // Calculate a number of folder wildcards in current mask.
+        FolderWildcardCount++;
+        WildcardFound=false;
+      }
+      if (FolderWildcardCount==0)
+        SlashPos=I; // Slash position before first folder wildcard mask.
+    }
+  }
+  if (FolderWildcardCount==0)
+    return true;
+  FolderWildcards=true; // Global folder wildcards flag.
+
+  // If we have only one folder wildcard component and -r is missing or -r-
+  // is specified, prepare matching folders in non-recursive mode.
+  // We assume -r for masks like dir1*\dir2*\file*, because it is complicated
+  // to fast find them using OS file find API call.
+  if ((Recurse==RECURSE_NONE || Recurse==RECURSE_DISABLE) && FolderWildcardCount==1)
+    return ExpandFolderMask();
+
+  // Convert path\dir*\ to *\dir filter to search for 'dir' in all 'path' subfolders.
+  std::wstring Filter=L"*";
+  AddEndSlash(Filter); // Path separator is OS dependent, so we set it here instead of variable declaration.
+
+  // SlashPos might point or not point to path separator for masks like 'dir*', '\dir*' or 'd:dir*'
+  std::wstring WildName=IsPathDiv(CurMask[SlashPos]) || IsDriveDiv(CurMask[SlashPos]) ? CurMask.substr(SlashPos+1) : CurMask.substr(SlashPos);
+  Filter+=WildName;
+
+  // Treat dir*\* or dir*\*.* as dir\, so empty 'dir' is also matched
+  // by such mask. Skipping empty dir with dir*\*.* confused some users.
+  std::wstring LastMask=PointToName(Filter);
+  if (LastMask==L"*" || LastMask==L"*.*")
+    GetPathWithSep(Filter,Filter);
+
+  FilterList.AddString(Filter);
+
+  bool RelativeDrive=IsDriveDiv(CurMask[SlashPos]);
+  if (RelativeDrive)
+    SlashPos++; // Use "d:" instead of "d" for d:* mask.
+
+  CurMask.erase(SlashPos);
+
+  if (!RelativeDrive) // Keep d: mask as is, not convert to d:\*
+  {
+    // We need to append "\*" both for -ep1 to work correctly and to
+    // convert d:\* masks previously truncated to d: back to original form.
+    AddEndSlash(CurMask);
+    CurMask+=MASKALL;
+  }
+  return true;
 }
 
 
 bool ScanTree::GetNextMask()
 {
-  if (!FileMasks->GetString(CurMask,ASIZE(CurMask)))
+  if (!GetFilteredMask())
     return false;
-  CurMask[ASIZE(CurMask)-1]=0;
 #ifdef _WIN_ALL
-  UnixSlashToDos(CurMask,CurMask,ASIZE(CurMask));
+  UnixSlashToDos(CurMask,CurMask);
 #endif
 
-  // We wish to scan entire disk if mask like c:\ is specified
-  // regardless of recursion mode. Use c:\*.* mask when need to scan only 
-  // the root directory.
-  ScanEntireDisk=IsDiskLetter(CurMask) && IsPathDiv(CurMask[2]) && CurMask[3]==0;
+  // We shall set it before appending the path separator to \\server\share
+  // UNC mask below, so "rar a -ep1 arc \\server\share" includes paths
+  // starting from "share\".
+  SpecPathLength=GetNamePos(CurMask);
 
-  wchar *Name=PointToName(CurMask);
-  if (*Name==0)
-    wcsncatz(CurMask,MASKALL,ASIZE(CurMask));
-  if (Name[0]=='.' && (Name[1]==0 || Name[1]=='.' && Name[2]==0))
+  // We prefer to scan entire disk if mask like \\server\share\ or c:\
+  // is specified even without -r, but not with -r-. Use \\server\share\*.*,
+  // c:\*.* mask or -r- to scan only the root directory. Note that UNC names
+  // are possible both in Win32 and Unix, just with proper path separators.
+  if (Recurse!=RECURSE_DISABLE)
+    if (CurMask.size()>2 && CurMask[0]==CPATHDIVIDER && CurMask[1]==CPATHDIVIDER)
+    {
+      auto Slash=CurMask.find(CPATHDIVIDER,2);
+      if (Slash!=std::wstring::npos)
+      {
+        Slash=CurMask.find(CPATHDIVIDER,Slash+1);
+        // If path separator is mssing or it is the last string character.
+        ScanEntireDisk=Slash==std::wstring::npos || 
+                       Slash!=std::wstring::npos && Slash+1==CurMask.size();
+
+        // Win32 FindFirstFile fails for \\server\share names without
+        // the trailing backslash. So we add it here.
+        if (Slash==std::wstring::npos)
+          CurMask+=CPATHDIVIDER;
+      }
+    }
+    else
+      ScanEntireDisk=IsDriveLetter(CurMask) && IsPathDiv(CurMask[2]) && CurMask[3]==0;
+
+  // Calculate the name position again, because we could modify UNC path above.
+  auto NamePos=GetNamePos(CurMask);
+  std::wstring Name=CurMask.substr(NamePos);
+  if (Name.empty())
+    CurMask+=MASKALL;
+  if (Name==L"." || Name==L"..")
   {
-    AddEndSlash(CurMask,ASIZE(CurMask));
-    wcsncatz(CurMask,MASKALL,ASIZE(CurMask));
+    AddEndSlash(CurMask);
+    CurMask+=MASKALL;
   }
-  SpecPathLength=Name-CurMask;
   Depth=0;
 
-  wcscpy(OrigCurMask,CurMask);
+  OrigCurMask=CurMask;
 
   return true;
 }
@@ -91,7 +261,7 @@ bool ScanTree::GetNextMask()
 
 SCAN_CODE ScanTree::FindProc(FindData *FD)
 {
-  if (*CurMask==0)
+  if (CurMask.empty())
     return SCAN_NEXT;
   bool FastFindFile=false;
   
@@ -111,8 +281,10 @@ SCAN_CODE ScanTree::FindProc(FindData *FD)
     // SearchAll means that we'll use "*" mask for search, so we'll find
     // subdirectories and will be able to recurse into them.
     // We do not use "*" for directories at any level or for files
-    // at top level in recursion mode.
+    // at top level in recursion mode. We always comrpess the entire directory
+    // if folder wildcard is specified.
     bool SearchAll=!IsDir && (Depth>0 || Recurse==RECURSE_ALWAYS ||
+                   FolderWildcards && Recurse!=RECURSE_DISABLE || 
                    Wildcards && Recurse==RECURSE_WILDCARDS || 
                    ScanEntireDisk && Recurse!=RECURSE_DISABLE);
     if (Depth==0)
@@ -122,10 +294,9 @@ SCAN_CODE ScanTree::FindProc(FindData *FD)
       // Create the new FindFile object for wildcard based search.
       FindStack[Depth]=new FindFile;
 
-      wchar SearchMask[NM];
-      wcsncpyz(SearchMask,CurMask,ASIZE(SearchMask));
+      std::wstring SearchMask=CurMask;
       if (SearchAll)
-        SetName(SearchMask,MASKALL,ASIZE(SearchMask));
+        SetName(SearchMask,MASKALL);
       FindStack[Depth]->SetMask(SearchMask);
     }
     else
@@ -150,7 +321,11 @@ SCAN_CODE ScanTree::FindProc(FindData *FD)
           if (Cmd!=NULL && Cmd->ExclCheck(CurMask,false,true,true))
             RetCode=SCAN_NEXT;
           else
+          {
             ErrHandler.OpenErrorMsg(ErrArcName,CurMask);
+            // User asked to return RARX_NOFILES and not RARX_OPEN here.
+            ErrHandler.SetErrorCode(RARX_NOFILES);
+          }
         }
 
         // If we searched only for one file or directory in "fast find" 
@@ -160,7 +335,7 @@ SCAN_CODE ScanTree::FindProc(FindData *FD)
         // It is not necessary for directories, because even in "fast find"
         // mode, directory recursing will quit by (Depth < 0) condition,
         // which returns SCAN_DONE to calling function.
-        *CurMask=0;
+        CurMask.clear();
 
         return RetCode;
       }
@@ -179,9 +354,6 @@ SCAN_CODE ScanTree::FindProc(FindData *FD)
     if (Error)
       ScanError(Error);
 
-    wchar DirName[NM];
-    *DirName=0;
-
     // Going to at least one directory level higher.
     delete FindStack[Depth];
     FindStack[Depth--]=NULL;
@@ -197,26 +369,32 @@ SCAN_CODE ScanTree::FindProc(FindData *FD)
       return SCAN_DONE;
     }
 
-    wchar *Slash=wcsrchr(CurMask,CPATHDIVIDER);
-    if (Slash!=NULL)
+    auto Slash=CurMask.rfind(CPATHDIVIDER);
+    if (Slash!=std::wstring::npos)
     {
-      wchar Mask[NM];
-      wcscpy(Mask,Slash);
+      std::wstring Mask;
+      Mask=CurMask.substr(Slash); // Name mask with leading slash like \*.*
       if (Depth<SetAllMaskDepth)
-        wcscpy(Mask+1,PointToName(OrigCurMask));
-      *Slash=0;
-      wcscpy(DirName,CurMask);
-      wchar *PrevSlash=wcsrchr(CurMask,CPATHDIVIDER);
-      if (PrevSlash==NULL)
-        wcscpy(CurMask,Mask+1);
+        Mask.replace(1, std::wstring::npos, PointToName(OrigCurMask));
+      CurMask.erase(Slash);
+
+      std::wstring DirName=CurMask;
+
+      auto PrevSlash=CurMask.rfind(CPATHDIVIDER);
+      if (PrevSlash==std::wstring::npos)
+        CurMask=Mask.substr(1); // Set to name only without leading slash.
       else
-        wcscpy(PrevSlash,Mask);
-    }
-    if (GetDirs==SCAN_GETDIRSTWICE &&
-        FindFile::FastFind(DirName,FD,GetLinks) && FD->IsDir)
-    {
-      FD->Flags|=FDDF_SECONDDIR;
-      return Error ? SCAN_ERROR:SCAN_SUCCESS;
+      {
+        CurMask.erase(PrevSlash); // Remove one of two sequential slashes.
+        CurMask+=Mask;
+      }
+
+      if (GetDirs==SCAN_GETDIRSTWICE &&
+          FindFile::FastFind(DirName,FD,GetLinks) && FD->IsDir)
+      {
+        FD->Flags|=FDDF_SECONDDIR;
+        return Error ? SCAN_ERROR:SCAN_SUCCESS;
+      }
     }
     return Error ? SCAN_ERROR:SCAN_NEXT;
   }
@@ -246,21 +424,21 @@ SCAN_CODE ScanTree::FindProc(FindData *FD)
       return FastFindFile ? SCAN_DONE:SCAN_NEXT;
     }
     
-    wchar Mask[NM];
+    std::wstring Mask=FastFindFile ? MASKALL:PointToName(CurMask);
+    CurMask=FD->Name;
 
-    wcscpy(Mask,FastFindFile ? MASKALL:PointToName(CurMask));
-    wcscpy(CurMask,FD->Name);
-
-    if (wcslen(CurMask)+wcslen(Mask)+1>=NM || Depth>=MAXSCANDEPTH-1)
+    if (CurMask.size()+Mask.size()+1>=MAXPATHSIZE || Depth>=MAXSCANDEPTH-1)
     {
       uiMsg(UIERROR_PATHTOOLONG,CurMask,SPATHDIVIDER,Mask);
       return SCAN_ERROR;
     }
 
-    AddEndSlash(CurMask,ASIZE(CurMask));
-    wcsncatz(CurMask,Mask,ASIZE(CurMask));
+    AddEndSlash(CurMask);
+    CurMask+=Mask;
 
     Depth++;
+
+    FindStack.resize(Depth+1);
 
     // We need to use OrigCurMask for depths less than SetAllMaskDepth
     // and "*" for depths equal or larger than SetAllMaskDepth.
@@ -302,19 +480,18 @@ void ScanTree::ScanError(bool &Error)
     // We cannot just check FD->FileAttr here, it can be undefined
     // if we process "folder\*" mask or if we process "folder" mask,
     // but "folder" is inaccessible.
-    wchar *Slash=PointToName(CurMask);
-    if (Slash>CurMask)
+    auto Slash=GetNamePos(CurMask);
+    if (Slash>1)
     {
-      *(Slash-1)=0;
-      DWORD Attr=GetFileAttributes(CurMask);
-      *(Slash-1)=CPATHDIVIDER;
+      std::wstring Parent=CurMask.substr(0,Slash-1);
+      DWORD Attr=GetFileAttr(Parent);
       if (Attr!=0xffffffff && (Attr & FILE_ATTRIBUTE_REPARSE_POINT)!=0)
         Error=false;
     }
 
     // Do not display an error if we cannot scan contents of
     // "System Volume Information" folder. Normally it is not accessible.
-    if (wcsstr(CurMask,L"System Volume Information\\")!=NULL)
+    if (CurMask.find(L"System Volume Information\\")!=std::wstring::npos)
       Error=false;
   }
 #endif
@@ -324,9 +501,19 @@ void ScanTree::ScanError(bool &Error)
 
   if (Error)
   {
-    wchar FullName[NM];
+    if (ErrDirList!=NULL)
+      ErrDirList->AddString(CurMask);
+    if (ErrDirSpecPathLength!=NULL)
+      ErrDirSpecPathLength->push_back((uint)SpecPathLength);
+    std::wstring FullName;
     // This conversion works for wildcard masks too.
-    ConvertNameToFull(CurMask,FullName,ASIZE(FullName));
+    ConvertNameToFull(CurMask,FullName);
+
+    // 2025.04.29: remove the trailing mask, so we issue errors like
+    // "Cannot read contents of "c:\dir"" instead of "c:\path\dir\file.ext",
+    // when searching for file.ext in inaccessible c:\path\dir.
+    RemoveNameFromPath(FullName);
+
     uiMsg(UIERROR_DIRSCAN,FullName);
     ErrHandler.SysErrMsg();
   }
