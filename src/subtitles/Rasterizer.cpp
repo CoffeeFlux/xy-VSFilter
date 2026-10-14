@@ -29,6 +29,7 @@
 #include "xy_rust_fill.h"
 #include "xy_rust_mask.h"
 #include "xy_rust_bilinear.h"
+#include "xy_rust_be_blur.h"
 #endif
 #include "SeparableFilter.h"
 #include "xy_logger.h"
@@ -570,6 +571,46 @@ void xy_be_blur(PUINT8 src, int width, int height, int stride, float pass_x, flo
 /**
  * \brief blur with [[1,2,1]. [2,4,2], [1,2,1]] kernel.
  */
+#ifdef XY_VSFILTER_RUST_TEXT
+static void xyRustBeBlur(unsigned char* buf, WORD* columns, WORD* sums,
+    int w, int h, int stride, bool vector)
+{
+    for (int y = 0; y < 2; ++y) {
+        unsigned char* src = buf + y * stride;
+        uint32_t state = src[1] | (uint32_t(src[0] + src[1]) << 16);
+        for (int x = 2; x < w; ++x) {
+            state = xy_vsfilter_be_blur_group(src[x], 1, state, columns + x - 2,
+                sums + x - 2, y, 0).state;
+        }
+    }
+    for (int y = 2; y < h; ++y) {
+        unsigned char* src = buf + y * stride;
+        unsigned char* dst = buf + (y - 1) * stride;
+        int x = 2;
+        if (vector) {
+            uint32_t state = src[1] | (uint32_t(src[0] + src[1]) << 16);
+            for (; x < ((w - 2) & ~7); x += 8) {
+                uint64_t source;
+                memcpy(&source, src + x, 8);
+                const XYRustBlurStep step = xy_vsfilter_be_blur_group(source, 8, state,
+                    columns + x - 2, sums + x - 2, 2, 1);
+                state = step.state;
+                memcpy(dst + x - 1, &step.pixels, 8);
+            }
+        }
+        // The original scalar tail re-reads its seed after SIMD stores. This
+        // matters if destination rows overlap current source bytes.
+        uint32_t state = src[x - 1] | (uint32_t(src[x - 2] + src[x - 1]) << 16);
+        for (; x < w; ++x) {
+            const XYRustBlurStep step = xy_vsfilter_be_blur_group(src[x], 1, state,
+                columns + x - 2, sums + x - 2, 2, 0);
+            state = step.state;
+            dst[x - 1] = static_cast<unsigned char>(step.pixels);
+        }
+    }
+}
+#endif
+
 static void be_blur(unsigned char *buf, unsigned *tmp_base, int w, int h, int stride)
 {   
     WORD *col_pix_buf_base = reinterpret_cast<WORD*>(xy_malloc(w*sizeof(WORD)));
@@ -581,6 +622,14 @@ static void be_blur(unsigned char *buf, unsigned *tmp_base, int w, int h, int st
     }
     memset(col_pix_buf_base, 0, w*sizeof(WORD));
     memset(col_sum_buf_base, 0, w*sizeof(WORD));
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (w >= 2 && w <= INT32_MAX / 2 && h >= 2) {
+        xyRustBeBlur(buf, col_pix_buf_base, col_sum_buf_base, w, h, stride, true);
+        xy_free(col_sum_buf_base);
+        xy_free(col_pix_buf_base);
+        return;
+    }
+#endif
     WORD *col_pix_buf = col_pix_buf_base-2;//for aligment;
     WORD *col_sum_buf = col_sum_buf_base-2;//for aligment;
     {
@@ -689,6 +738,14 @@ static void be_blur_c(unsigned char *buf, unsigned *tmp_base, int w, int h, int 
     }
     memset(col_pix_buf_base, 0, w*sizeof(WORD));
     memset(col_sum_buf_base, 0, w*sizeof(WORD));
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (w >= 2 && w <= INT32_MAX / 2 && h >= 2) {
+        xyRustBeBlur(buf, col_pix_buf_base, col_sum_buf_base, w, h, stride, false);
+        xy_free(col_sum_buf_base);
+        xy_free(col_pix_buf_base);
+        return;
+    }
+#endif
     WORD *col_pix_buf = col_pix_buf_base-2;//for aligment;
     WORD *col_sum_buf = col_sum_buf_base-2;//for aligment;
     {

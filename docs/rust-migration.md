@@ -20,6 +20,21 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust fixed 3x3 blur column-state updates and pixel arithmetic, behind the
+  existing switch for widths/heights of at least two. Native adapters retain
+  one-byte scalar and eight-byte SSE source snapshots, output order, and the
+  scalar tail's re-read of source bytes after SSE writes. This preserves the
+  distinct results possible with overlapping rows. Rust borrows only the current
+  bounded groups of two disjoint column-history buffers; input/output bytes cross
+  by value. Native allocation and uncommon-dimension fallback remain in place.
+  Local fatal ASan/UBSan tests passed **43,860 scalar comparisons** on arm64 and
+  **87,720 comparisons** under x64 execution, including **43,860 actual SSE
+  comparisons, 21,930 visibly changed cases and 360 injected allocation failures**.
+  The oracle also compares allocation events, final column histories, padding,
+  guards and the unused scratch argument across repeated passes and negative/zero
+  stride. A reference-only control confirms scalar/SSE alias results can differ.
+  Rust tests (42 core, 19 FFI), strict Clippy and default native branch syntax
+  checks pass. Windows validation is pending for this increment.
 * Safe Rust bilinear subpixel rows for horizontal/vertical factors zero through
   eight, behind the existing switch. The bridge lends one initialized byte row
   and its disjoint WORD column history at a time. Row borrows end before later
@@ -60,8 +75,13 @@ unresolved reference outcomes requiring investigation, never matching results.
   1,099,759,616 bytes**, including **239,304 visibly changed cases**, with fatal
   ASan/UBSan. It covers byte combinations, signed opacity, buffer/mask aliases,
   strides and defined fallback cases. Rust tests (38 core, 16 FFI), strict
-  Clippy and default native branch syntax checks pass. Windows validation is
-  pending for this increment.
+  Clippy and default native branch syntax checks pass. Candidate `1de3623d`
+  passed all four CI platforms, Miri and both Windows DLL jobs. Each component
+  job passed **268,496 mask comparisons**. Each DLL job matched **322 corpus
+  cases / 4,026 frames** and **32 mutations / 224 frames**, plus dialogs,
+  visible controls, exports and dependencies. Both build logs confirm Rust-enabled
+  `Rasterizer.cpp` compilation. [Scalar-mask evidence](scalar-mask-evidence.json)
+  records verified source/DLL hashes and scope.
 * Safe Rust single-pixel scalar/SSE blending and scaled shape/clip-alpha
   arithmetic are prepared behind the same switch. SSE signed-word weights,
   bitwise weight construction, logical shifts and saturation remain distinct

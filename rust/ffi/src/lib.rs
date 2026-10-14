@@ -6,6 +6,7 @@
 extern crate alloc;
 
 mod ass_tags;
+mod be_blur;
 mod bilinear;
 mod drawing;
 mod drawing_tokens;
