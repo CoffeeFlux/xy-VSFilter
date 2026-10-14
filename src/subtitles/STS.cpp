@@ -2526,13 +2526,23 @@ if(sver <= 4)   style->scrAlignment = (style->scrAlignment&4) ? ((style->scrAlig
         }
         else if(XY_ASS_HEADER(L"layoutresx", 6))
         {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            try {ret.SetDocumentLayoutWidth(GetInt(buff));}
+            catch(...) {ret.SetDocumentLayoutSize(CSize(0, 0)); return(false);}
+#else
             try {ret.m_layout_size.cx = GetInt(buff);}
             catch(...) {ret.m_layout_size = CSize(0, 0); return(false);}
+#endif
         }
         else if(XY_ASS_HEADER(L"layoutresy", 7))
         {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            try {ret.SetDocumentLayoutHeight(GetInt(buff));}
+            catch(...) {ret.SetDocumentLayoutSize(CSize(0, 0)); return(false);}
+#else
             try {ret.m_layout_size.cy = GetInt(buff);}
             catch(...) {ret.m_layout_size = CSize(0, 0); return(false);}
+#endif
         }
         else if(XY_ASS_HEADER(L"wrapstyle", 8))
         {
@@ -3090,6 +3100,7 @@ CSimpleTextSubtitle::CSimpleTextSubtitle()
 #endif
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentLayoutSize(CSize());
     SetDocumentType(EXTSRT);
 #else
     m_subtitleType         = EXTSRT;
@@ -4086,6 +4097,26 @@ CSimpleTextSubtitle::YCbCrRange CSimpleTextSubtitle::GetDocumentColorRange() con
 void CSimpleTextSubtitle::SetDocumentColorRange(YCbCrRange value)
 {
     m_document->SetMetadata(2, static_cast<int32_t>(value));
+}
+
+CSize CSimpleTextSubtitle::GetDocumentLayoutSize() const
+{
+    return m_document->LayoutSize();
+}
+
+void CSimpleTextSubtitle::SetDocumentLayoutSize(const CSize& value)
+{
+    m_document->SetLayoutSize(value);
+}
+
+void CSimpleTextSubtitle::SetDocumentLayoutWidth(int value)
+{
+    m_document->SetScriptField(5, value);
+}
+
+void CSimpleTextSubtitle::SetDocumentLayoutHeight(int value)
+{
+    m_document->SetScriptField(6, value);
 }
 
 CSize CSimpleTextSubtitle::GetDocumentScreenSize() const

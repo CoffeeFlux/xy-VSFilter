@@ -1,0 +1,186 @@
+{
+  "schema": 1,
+  "kind": "selected-windows-csize-constructor-source-evidence",
+  "candidate_commit": "7f3e5c9cede1c6e44bf45d4331d1e806e17c4bdc",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "workflow_run": 38650419987,
+  "workflow_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38650419987",
+  "scope": "Source-only default constructor authority for actual selected Windows CSize; no native object construction or value reads",
+  "conclusion": "The unique active CSize default constructor initializes width and height to zero in both captured native-RustText and experimental subtitles contexts, on x86 and x64. Native CSize construction may supply these initialized values to the safe owner; no Rust default is inferred for other metadata.",
+  "architectures": {
+    "Win32": {
+      "job_id": 116147536069,
+      "report": "artifacts/ci-38650419987/document-atl-contract-Win32/report.json",
+      "report_sha256": "5779cbeaaef0ecf9c5ad6b5b5c0e65651a471409b7c3b7eff679c2361ca3e177",
+      "source_contract_complete": true,
+      "constructor_initialization": {
+        "width": 0,
+        "height": 0
+      },
+      "toolchain_environment": {
+        "VCToolsVersion": "14.44.35207",
+        "WindowsSDKVersion": "10.0.26100.0\\",
+        "VSCMD_ARG_TGT_ARCH": "x86"
+      },
+      "contexts": {
+        "csize-context-native-rust-text": {
+          "private_selection": "artifacts/ci-38650419987/document-atl-contract-Win32/csize-context-native-rust-text.private.json",
+          "private_selection_sha256": "31786fc0245316fd2ef552a21f16dab6c9975eecbf4a1b7d8d6e9a07e22f868a",
+          "active_constructor_excerpt_sha256": "c02749d5bbaa9d2217234a8760c884253eec3a9ca5655daaf3e96cd0c5844a6b",
+          "selected_atltypes_header_sha256": "64dd67b780f097829db7432d53ea41e0408457e64afa6885e5d986cad57f91c3",
+          "repository_headers_verified": 854,
+          "source_input_sha256": "fcc434c7da23a3bf020166eec0e9560f52dcbfa1680d5f19a4e5651dd4fc9a78",
+          "stdout_diagnostics_sha256": "3804246c8d865a3fa9aac80fd76a9be0587692091648b7b5f61906d64d6fa9e0",
+          "stderr_sha256": "bd8570732c6849c058bbfbbf14c8183a065664fdf97cc950423e55ea8f13dc77",
+          "preprocessed_stream_sha256_runner_reported": "ed25fb12a73cd8e38daed3959160eb92a237760d6344f75bfb3e0c883041ffee",
+          "preprocessed_stream_bytes_runner_reported": 10011433,
+          "full_preprocessed_stream_retained": false,
+          "macro_state_after_includes": "undefined",
+          "active_body_matches_selected_source": true,
+          "preprocess_only": true,
+          "first_include": "src/subtitles",
+          "defines": [
+            "NDEBUG",
+            "_CRT_SECURE_NO_WARNINGS",
+            "_SCL_SECURE_NO_WARNINGS",
+            "WINVER=0x0601",
+            "_WIN32_WINNT=0x0601",
+            "PSAPI_VERSION=1",
+            "_WINDOWS",
+            "WINDOWS",
+            "_USE_MATH_DEFINES",
+            "_UNICODE",
+            "UNICODE",
+            "XY_VSFILTER_RUST_TEXT",
+            "WIN32"
+          ]
+        },
+        "csize-context-experimental": {
+          "private_selection": "artifacts/ci-38650419987/document-atl-contract-Win32/csize-context-experimental.private.json",
+          "private_selection_sha256": "addb30c22042c566a390f748f95e3dd36a0f4754a90753c334f356fcb386bf22",
+          "active_constructor_excerpt_sha256": "c02749d5bbaa9d2217234a8760c884253eec3a9ca5655daaf3e96cd0c5844a6b",
+          "selected_atltypes_header_sha256": "64dd67b780f097829db7432d53ea41e0408457e64afa6885e5d986cad57f91c3",
+          "repository_headers_verified": 854,
+          "source_input_sha256": "fcc434c7da23a3bf020166eec0e9560f52dcbfa1680d5f19a4e5651dd4fc9a78",
+          "stdout_diagnostics_sha256": "3804246c8d865a3fa9aac80fd76a9be0587692091648b7b5f61906d64d6fa9e0",
+          "stderr_sha256": "75d7966198e7a7d3c7eb234260f635002754c96e07df3262b06586bd1084f378",
+          "preprocessed_stream_sha256_runner_reported": "06df9c376f8a24b010ac6513645def87646c4a2d3f512ca1fe37fe2fdfece19b",
+          "preprocessed_stream_bytes_runner_reported": 10012452,
+          "full_preprocessed_stream_retained": false,
+          "macro_state_after_includes": "undefined",
+          "active_body_matches_selected_source": true,
+          "preprocess_only": true,
+          "first_include": "src/subtitles",
+          "defines": [
+            "NDEBUG",
+            "_CRT_SECURE_NO_WARNINGS",
+            "_SCL_SECURE_NO_WARNINGS",
+            "WINVER=0x0601",
+            "_WIN32_WINNT=0x0601",
+            "PSAPI_VERSION=1",
+            "_WINDOWS",
+            "WINDOWS",
+            "_USE_MATH_DEFINES",
+            "_UNICODE",
+            "UNICODE",
+            "XY_VSFILTER_RUST_TEXT",
+            "WIN32",
+            "XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL"
+          ]
+        }
+      }
+    },
+    "x64": {
+      "job_id": 116147536638,
+      "report": "artifacts/ci-38650419987/document-atl-contract-x64/report.json",
+      "report_sha256": "21ddbeef7276574e9e27028fc6a01d1b13851eeb5ee6f7ba05154fdd0a1d1327",
+      "source_contract_complete": true,
+      "constructor_initialization": {
+        "width": 0,
+        "height": 0
+      },
+      "toolchain_environment": {
+        "VCToolsVersion": "14.44.35207",
+        "WindowsSDKVersion": "10.0.26100.0\\",
+        "VSCMD_ARG_TGT_ARCH": "x64"
+      },
+      "contexts": {
+        "csize-context-native-rust-text": {
+          "private_selection": "artifacts/ci-38650419987/document-atl-contract-x64/csize-context-native-rust-text.private.json",
+          "private_selection_sha256": "a897db83f87231ea56d78ee62cee499613d08e4d171318a9eccdce8a05241cda",
+          "active_constructor_excerpt_sha256": "c02749d5bbaa9d2217234a8760c884253eec3a9ca5655daaf3e96cd0c5844a6b",
+          "selected_atltypes_header_sha256": "64dd67b780f097829db7432d53ea41e0408457e64afa6885e5d986cad57f91c3",
+          "repository_headers_verified": 854,
+          "source_input_sha256": "fcc434c7da23a3bf020166eec0e9560f52dcbfa1680d5f19a4e5651dd4fc9a78",
+          "stdout_diagnostics_sha256": "3804246c8d865a3fa9aac80fd76a9be0587692091648b7b5f61906d64d6fa9e0",
+          "stderr_sha256": "1051ccf23952dc880b172b2874a8e8afd94794b2e90b6e6c842dc70219c1eb3f",
+          "preprocessed_stream_sha256_runner_reported": "d45784e490d9ce6fe44c24dd1b67f0e09cb8ec239b119a850ae4771c97989a79",
+          "preprocessed_stream_bytes_runner_reported": 9997258,
+          "full_preprocessed_stream_retained": false,
+          "macro_state_after_includes": "undefined",
+          "active_body_matches_selected_source": true,
+          "preprocess_only": true,
+          "first_include": "src/subtitles",
+          "defines": [
+            "NDEBUG",
+            "_CRT_SECURE_NO_WARNINGS",
+            "_SCL_SECURE_NO_WARNINGS",
+            "WINVER=0x0601",
+            "_WIN32_WINNT=0x0601",
+            "PSAPI_VERSION=1",
+            "_WINDOWS",
+            "WINDOWS",
+            "_USE_MATH_DEFINES",
+            "_UNICODE",
+            "UNICODE",
+            "XY_VSFILTER_RUST_TEXT",
+            "_WIN64",
+            "WIN64"
+          ]
+        },
+        "csize-context-experimental": {
+          "private_selection": "artifacts/ci-38650419987/document-atl-contract-x64/csize-context-experimental.private.json",
+          "private_selection_sha256": "8d6cece5d0a0197b6f062c2400daf74c6e544991cc57bdabc9f1133e7a3c7b7c",
+          "active_constructor_excerpt_sha256": "c02749d5bbaa9d2217234a8760c884253eec3a9ca5655daaf3e96cd0c5844a6b",
+          "selected_atltypes_header_sha256": "64dd67b780f097829db7432d53ea41e0408457e64afa6885e5d986cad57f91c3",
+          "repository_headers_verified": 854,
+          "source_input_sha256": "fcc434c7da23a3bf020166eec0e9560f52dcbfa1680d5f19a4e5651dd4fc9a78",
+          "stdout_diagnostics_sha256": "3804246c8d865a3fa9aac80fd76a9be0587692091648b7b5f61906d64d6fa9e0",
+          "stderr_sha256": "8f0f95638e1e27ff4e431b0e9a03b6e03c9a8df7b9b7e7a98a3a04b467b67fac",
+          "preprocessed_stream_sha256_runner_reported": "4536d7eedd9cd5e6b24c89c65b20592c75054d91d8025207e61ca3ea92b6c94c",
+          "preprocessed_stream_bytes_runner_reported": 9998277,
+          "full_preprocessed_stream_retained": false,
+          "macro_state_after_includes": "undefined",
+          "active_body_matches_selected_source": true,
+          "preprocess_only": true,
+          "first_include": "src/subtitles",
+          "defines": [
+            "NDEBUG",
+            "_CRT_SECURE_NO_WARNINGS",
+            "_SCL_SECURE_NO_WARNINGS",
+            "WINVER=0x0601",
+            "_WIN32_WINNT=0x0601",
+            "PSAPI_VERSION=1",
+            "_WINDOWS",
+            "WINDOWS",
+            "_USE_MATH_DEFINES",
+            "_UNICODE",
+            "UNICODE",
+            "XY_VSFILTER_RUST_TEXT",
+            "_WIN64",
+            "WIN64",
+            "XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL"
+          ]
+        }
+      }
+    }
+  },
+  "verification": "Existing native_capture validated retained native artifacts/private source excerpts; active private selections/input/logs and 854 repository headers per context independently rehashed against exact candidate Git with Windows newline normalization. Selected active constructor body tokens matched the captured SDK definition; final macro marker alone was not used as proof.",
+  "limits": [
+    "Full preprocessed SDK streams are intentionally not retained; their capture hashes are runner-reported.",
+    "Installed external compiler/SDK headers and native libraries were not reacquired; external hashes remain runner-reported. Retained selected excerpt hashes and private artifact hashes were independently checked.",
+    "Only the installed selected MFC/ATL constructor and captured contexts are established, not arbitrary other SDK/toolchain definitions.",
+    "This does not initialize or certify constructor-unsupplied m_simple or m_lcid, nor establish renderer/host/whole-document compatibility.",
+    "No production switch authorization."
+  ]
+}

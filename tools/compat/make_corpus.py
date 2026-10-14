@@ -708,6 +708,25 @@ def sami_file_variants():
         yield "sami-file-" + name + ".smi", ("<sami>\r\n" + body + "\r\n").encode("ascii")
 
 
+def document_layout_variants():
+    # Ordinary finite ASS header inputs exercise RenderEx's all-or-nothing
+    # document layout pair selection against the 1280x720 corpus video size.
+    # No distinct-pixel assertion: both sides are measured by the renderer gate.
+    headers = {
+        "control": b"",
+        "positive-pair": b"LayoutResX: 960\r\nLayoutResY: 480\r\n",
+        "width-only": b"LayoutResX: 960\r\n",
+        "height-only": b"LayoutResY: 480\r\n",
+        "zero-width": b"LayoutResX: 0\r\nLayoutResY: 480\r\n",
+        "negative-height": b"LayoutResX: 960\r\nLayoutResY: -1\r\n",
+        "repeated-final-pair": b"LayoutResX: 640\r\nLayoutResY: 360\r\nLayoutResX: 960\r\nLayoutResY: 480\r\n",
+        "repeated-final-fallback": b"LayoutResX: 960\r\nLayoutResY: 480\r\nLayoutResX: 0\r\n",
+    }
+    for name, header in headers.items():
+        data = SEED.replace(b"[V4+ Styles]", header + b"[V4+ Styles]")
+        yield "document-layout-" + name + ".ass", data.replace(b"COMPAT_TEXT", b"Layout pair sample")
+
+
 def timestamps(data):
     matches = re.findall(rb"Dialogue:[^,]*,(\d+):(\d+):(\d+(?:\.\d+)?),(\d+):(\d+):(\d+(?:\.\d+)?)", data)
     if not matches:
@@ -808,6 +827,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in subrip_cue_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in legacy_pipe_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in layout_rect_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in document_layout_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in text_run_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in wrap_width_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in line_layout_variants()]

@@ -393,6 +393,14 @@ public:
         uint64_t bits; std::memcpy(&bits,&value,sizeof bits);
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_set_par_bits_v1(id_,bits);}));
     }
+    CSize LayoutSize() const {
+        const auto bytes = Snapshot(10,0).Read();
+        DocumentDetail::Shape(bytes.size() == 8);
+        return CSize(DocumentDetail::I32(DocumentDetail::Load(bytes,0,4)),DocumentDetail::I32(DocumentDetail::Load(bytes,4,4)));
+    }
+    void SetLayoutSize(const CSize& value) {
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_set_layout_size_v1(id_,value.cx,value.cy);}));
+    }
     CSize ScreenSize() const {
         std::array<uint8_t,8> out{};
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_get_script_size_v1(id_,out.data(),out.size());}));
@@ -402,12 +410,12 @@ public:
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_set_script_size_v1(id_,value.cx,value.cy);}));
     }
     int32_t ScriptField(uint32_t field) const {
-        DocumentDetail::Shape(field <= 4); std::array<uint8_t,4> out{};
+        DocumentDetail::Shape(field <= 6); std::array<uint8_t,4> out{};
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_get_script_field_v1(id_,field,out.data(),out.size());}));
         return DocumentDetail::I32(DocumentDetail::Load(out,0,4));
     }
     void SetScriptField(uint32_t field, int32_t value) {
-        DocumentDetail::Shape(field <= 4);
+        DocumentDetail::Shape(field <= 6);
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_set_script_field_v1(id_,field,value);}));
     }
     int32_t Interpretation(uint32_t field) const {

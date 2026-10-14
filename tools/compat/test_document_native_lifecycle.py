@@ -60,6 +60,12 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
              b"resolution-raw-prefix",b"resolution-lowercase",b"resolution-case-fallback",b"resolution-empty-prefix",
              b"resolution-forced",b"resolution-forced-replaced",b"resolution-output-independent"))
          + b"resolution-mutated-output style 0 raw-font-mutated\n"
+         + b"".join((f"layout-size-callback {stage} width={dx} height={dy}\n".encode() if "parser" in stage else b"") + f"layout-size-stage {stage} source={sx},{sy} destination={dx},{dy}\n".encode() for stage,sx,sy,dx,dy in (
+             ("layout-size-supplied",320,240,800,600),("layout-size-copy-retained",320,240,800,600),
+             ("layout-size-source-independent",352,288,800,600),("layout-size-empty-retained",352,288,800,600),
+             ("layout-size-self-copy-retained",352,288,800,600),("layout-size-parser-x",352,288,640,600),
+             ("layout-size-parser-y",352,288,640,360),("layout-size-parser-repeated",352,288,720,600),
+             ("layout-size-parser-nonpositive",352,288,-2,0)))
          + b"saved-file ssa exists=1 bytes=1 41\nsaved-file ass exists=1 bytes=1 41\n"
          + b"saved-file srt exists=1 bytes=1 41\nsaved-file srt-sidecar exists=1 bytes=1 41\n"
          + b"saved-file ssa-sidecar exists=0\nsaved-file ass-sidecar exists=0\n"
@@ -225,6 +231,14 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
         with self.assertRaises(ValueError): compare_traces([truncated]*4,64)
         changed=TRACE.replace(b"raw-font-mutated",b"raw-font-corrupted")
         with self.assertRaises(ValueError): compare_traces([TRACE,TRACE,changed,changed],64)
+
+    def test_layout_size_retention_callbacks_and_archival_optout(self):
+        legacy=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith(b"layout-size-"))
+        with self.assertRaises(ValueError): compare_traces([legacy]*4,64)
+        compare_traces([legacy]*4,64,require_layout_size_stages=False)
+        for old,new in ((b"destination=640,600",b"destination=640,0"),
+                        (b"layout-size-callback layout-size-parser-y width=640 height=360\n",b"")):
+            with self.assertRaises(ValueError): compare_traces([TRACE.replace(old,new)]*4,64)
 
     def test_rejects_repeat_nondeterminism(self):
         changed = TRACE.replace(b"callback changed", b"callback empty")

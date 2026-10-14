@@ -9,8 +9,8 @@ use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::ptr;
 use xy_vsfilter_compat::document::{
-    AddMode, Document, IdentityField, InterpretationField, MetadataField, Refusal, ResolvedStyle,
-    RetiredEmpty, ScriptField, StyleRenameError, StyleResolutionError,
+    AddMode, Document, IdentityField, InterpretationField, LayoutField, MetadataField, Refusal,
+    ResolvedStyle, RetiredEmpty, ScriptField, StyleRenameError, StyleResolutionError,
 };
 use xy_vsfilter_compat::document_style as style_wire;
 use xy_vsfilter_compat::document_wire::{self as wire, Counts, EntryHeader, SegmentHeader};
@@ -334,13 +334,22 @@ pub extern "C" fn xy_vsfilter_document_set_script_field_v1(
     field: u32,
     value: i32,
 ) -> u32 {
-    if field > 4 || (field == 4 && value != 0 && value != 1) {
+    if field > 6 || (field == 4 && value != 0 && value != 1) {
         return INVALID_INPUT;
     }
     status(admitted(|registry| {
         let document = registry.document_mut(owner).map_err(registry_error)?;
         if field == 4 {
             document.replace_scaled_bas(value != 0);
+        } else if field >= 5 {
+            document.replace_layout_field(
+                if field == 5 {
+                    LayoutField::Width
+                } else {
+                    LayoutField::Height
+                },
+                value,
+            );
         } else {
             document.replace_script_field(script_field(field)?, value);
         }
@@ -357,13 +366,19 @@ pub unsafe extern "C" fn xy_vsfilter_document_get_script_field_v1(
     capacity: usize,
 ) -> u32 {
     required!(output_capacity(output, capacity, 4));
-    if field > 4 {
+    if field > 6 {
         return INVALID_INPUT;
     }
     let value = required!(admitted(|registry| {
         let document = registry.document(owner).map_err(registry_error)?;
         if field == 4 {
             document.scaled_bas().map(i32::from)
+        } else if field >= 5 {
+            document.layout_field(if field == 5 {
+                LayoutField::Width
+            } else {
+                LayoutField::Height
+            })
         } else {
             document.script_field(script_field(field)?)
         }
@@ -775,6 +790,21 @@ pub unsafe extern "C" fn xy_vsfilter_document_query_time_v1(
     OK
 }
 
+/// Supplies both layout axes in a single admission; no normalization.
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_set_layout_size_v1(
+    owner: u64,
+    width: i32,
+    height: i32,
+) -> u32 {
+    status(admitted(|registry| {
+        registry
+            .document_mut(owner)
+            .map_err(registry_error)?
+            .set_layout_size(width, height);
+        Ok(())
+    }))
+}
 /// # Safety
 /// Output follows the byte-buffer contract, capacity >=8.
 #[no_mangle]
@@ -786,7 +816,7 @@ pub unsafe extern "C" fn xy_vsfilter_document_snapshot_open_v1(
     capacity: usize,
 ) -> u32 {
     required!(output_capacity(output, capacity, 8));
-    if kind > 9 {
+    if kind > 10 {
         return INVALID_INPUT;
     }
     let bytes = required!(admitted(|registry| {
@@ -836,6 +866,17 @@ pub unsafe extern "C" fn xy_vsfilter_document_snapshot_open_v1(
                     return Err(OUT_OF_RANGE);
                 }
                 wire::encode_sort_snapshot(document.entries()).map_err(wire_error)
+            }
+            10 => {
+                if index != 0 {
+                    return Err(OUT_OF_RANGE);
+                }
+                let size = document.layout_size().ok_or(UNRESOLVED_REFERENCE)?;
+                let mut bytes = Vec::with_capacity(8);
+                for axis in size {
+                    bytes.extend_from_slice(&axis.to_le_bytes());
+                }
+                Ok(bytes)
             }
             _ => {
                 let resolved =
@@ -1255,6 +1296,133 @@ mod tests {
         // SAFETY: allocated byte ranges below are valid for each supplied size;
         // explicit null/oversized checks are rejected before raw accesses.
         unsafe {
+            // Separate supplied layout axes, atomic pair snapshots and retained ownership.
+            let layout_owner = create();
+            let layout_destination = create();
+            let mut layout_output = [0xa5; 8];
+            assert_eq!(
+                xy_vsfilter_document_snapshot_open_v1(
+                    layout_owner,
+                    10,
+                    0,
+                    layout_output.as_mut_ptr(),
+                    8
+                ),
+                UNRESOLVED_REFERENCE
+            );
+            assert_eq!(
+                xy_vsfilter_document_get_script_field_v1(
+                    layout_owner,
+                    5,
+                    layout_output.as_mut_ptr(),
+                    4
+                ),
+                UNRESOLVED_REFERENCE
+            );
+            assert_eq!(
+                xy_vsfilter_document_set_script_field_v1(layout_owner, 5, i32::MIN),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_snapshot_open_v1(
+                    layout_owner,
+                    10,
+                    0,
+                    layout_output.as_mut_ptr(),
+                    8
+                ),
+                UNRESOLVED_REFERENCE
+            );
+            assert_eq!(layout_output, [0xa5; 8]);
+            assert_eq!(
+                xy_vsfilter_document_set_script_field_v1(layout_owner, 6, i32::MAX),
+                OK
+            );
+            let layout_snapshot = open_snapshot(layout_owner, 10);
+            let layout_bytes = [0, 0, 0, 128, 255, 255, 255, 127];
+            assert_eq!(read_snapshot(layout_snapshot), layout_bytes);
+            assert_eq!(
+                xy_vsfilter_document_get_script_field_v1(
+                    layout_owner,
+                    6,
+                    layout_output.as_mut_ptr(),
+                    4
+                ),
+                OK
+            );
+            assert_eq!(&layout_output[..4], &i32::MAX.to_le_bytes());
+            layout_output.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_document_snapshot_open_v1(
+                    layout_owner,
+                    10,
+                    1,
+                    layout_output.as_mut_ptr(),
+                    8
+                ),
+                OUT_OF_RANGE
+            );
+            assert_eq!(
+                xy_vsfilter_document_snapshot_open_v1(
+                    layout_owner,
+                    10,
+                    0,
+                    layout_output.as_mut_ptr(),
+                    7
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_set_layout_size_v1(layout_snapshot, 0, 0),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_set_layout_size_v1(layout_owner, 0, 0))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_snapshot_open_v1(
+                        layout_owner,
+                        10,
+                        0,
+                        layout_output.as_mut_ptr(),
+                        8
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(layout_output, [0xa5; 8]);
+            assert_eq!(
+                xy_vsfilter_document_set_layout_size_v1(layout_destination, -7, 11),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_copy_selected_state_v1(layout_destination, layout_owner),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_copy_storage_v1(layout_destination, layout_owner),
+                OK
+            );
+            assert_eq!(xy_vsfilter_document_empty_v1(layout_destination), OK);
+            assert_eq!(state(layout_destination).layout_size(), Some([-7, 11]));
+            assert_eq!(
+                xy_vsfilter_document_set_layout_size_v1(layout_owner, 3, -4),
+                OK
+            );
+            assert_eq!(state(layout_owner).layout_size(), Some([3, -4]));
+            assert_eq!(xy_vsfilter_document_destroy_v1(layout_owner), OK);
+            assert_eq!(read_snapshot(layout_snapshot), layout_bytes);
+            assert_eq!(
+                xy_vsfilter_document_set_layout_size_v1(layout_owner, 0, 0),
+                BAD_HANDLE
+            );
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(layout_snapshot), OK);
+            assert_eq!(xy_vsfilter_document_destroy_v1(layout_destination), OK);
+
             // Resolved snapshots own selected values, not live entry/map references.
             let resolved_owner = create();
             let mut resolved_output = [0xa5; 8];
@@ -1386,7 +1554,7 @@ mod tests {
             );
             assert_eq!(output, [0xa5; 8]);
             assert_eq!(
-                xy_vsfilter_document_snapshot_open_v1(source, 10, 0, output.as_mut_ptr(), 8),
+                xy_vsfilter_document_snapshot_open_v1(source, 11, 0, output.as_mut_ptr(), 8),
                 INVALID_INPUT
             );
             assert_eq!(output, [0xa5; 8]);
@@ -2018,6 +2186,23 @@ mod tests {
                 INVALID_INPUT
             );
             assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_get_metadata_v1(
+                        owner,
+                        5,
+                        output.as_mut_ptr(),
+                        4
+                    ))
+                    .unwrap(),
+                INVALID_INPUT
+            );
+            assert_eq!(output, [0xa5; 8]);
+            assert_eq!(
+                xy_vsfilter_document_get_metadata_v1(0, 5, output.as_mut_ptr(), 4),
+                INVALID_INPUT
+            );
+            assert_eq!(output, [0xa5; 8]);
+            assert_eq!(
                 xy_vsfilter_document_get_metadata_v1(owner, 0, output.as_mut_ptr(), 3),
                 INVALID_INPUT
             );
@@ -2129,11 +2314,11 @@ mod tests {
                 assert_eq!(state(owner), before);
             }
             assert_eq!(
-                xy_vsfilter_document_set_script_field_v1(owner, 5, 0),
+                xy_vsfilter_document_set_script_field_v1(owner, 7, 0),
                 INVALID_INPUT
             );
             assert_eq!(
-                xy_vsfilter_document_get_script_field_v1(owner, 5, output.as_mut_ptr(), 4),
+                xy_vsfilter_document_get_script_field_v1(owner, 7, output.as_mut_ptr(), 4),
                 INVALID_INPUT
             );
             assert_eq!(output, [0xa5; 8]);

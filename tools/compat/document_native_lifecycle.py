@@ -36,7 +36,7 @@ def git(root, *args):
     return subprocess.check_output(["git", "-C", str(root), *args], timeout=60).decode().strip()
 
 
-def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True):
+def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True):
     lines = data.splitlines()
     if not lines or lines[0] != f"provenance pointer_bits={pointer_bits}".encode():
         raise ValueError("missing or incorrect native architecture provenance")
@@ -127,6 +127,25 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
             positions.append(lines.index(token))
         if positions != sorted(positions):
             raise ValueError("selected Copy stage order differs")
+
+    if require_layout_size_stages:
+        stages = (("layout-size-supplied",320,240,800,600), ("layout-size-copy-retained",320,240,800,600),
+                  ("layout-size-source-independent",352,288,800,600), ("layout-size-empty-retained",352,288,800,600),
+                  ("layout-size-self-copy-retained",352,288,800,600), ("layout-size-parser-x",352,288,640,600),
+                  ("layout-size-parser-y",352,288,640,360), ("layout-size-parser-repeated",352,288,720,600),
+                  ("layout-size-parser-nonpositive",352,288,-2,0))
+        positions = []
+        for stage,sx,sy,dx,dy in stages:
+            token = f"layout-size-stage {stage} source={sx},{sy} destination={dx},{dy}".encode()
+            if lines.count(token) != 1:
+                raise ValueError(f"missing/invalid layout size stage {stage}")
+            positions.append(lines.index(token))
+            if "parser" in stage:
+                callback = f"layout-size-callback {stage} width={dx} height={dy}".encode()
+                if lines.count(callback) != 1 or lines.index(callback) >= lines.index(token):
+                    raise ValueError(f"missing/invalid layout size callback {stage}")
+        if positions != sorted(positions):
+            raise ValueError("layout size stage order differs")
 
     if require_resolution_stages:
         stages = ("resolution-raw-prefix", "resolution-lowercase", "resolution-case-fallback",
@@ -238,11 +257,11 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
 
 
 
-def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True):
+def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True):
     if len(traces) != 4:
         raise ValueError("two reference and two candidate executions required")
     for trace in traces:
-        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages, require_metadata_stages=require_metadata_stages, require_selected_copy_stages=require_selected_copy_stages, require_style_rename_stages=require_style_rename_stages, require_sort_stages=require_sort_stages, require_base_empty_stages=require_base_empty_stages, require_lcid_stages=require_lcid_stages, require_resolution_stages=require_resolution_stages)
+        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages, require_metadata_stages=require_metadata_stages, require_selected_copy_stages=require_selected_copy_stages, require_style_rename_stages=require_style_rename_stages, require_sort_stages=require_sort_stages, require_base_empty_stages=require_base_empty_stages, require_lcid_stages=require_lcid_stages, require_resolution_stages=require_resolution_stages, require_layout_size_stages=require_layout_size_stages)
     if any(trace != traces[0] for trace in traces[1:]):
         raise ValueError("native lifecycle traces differ or are nondeterministic")
 
