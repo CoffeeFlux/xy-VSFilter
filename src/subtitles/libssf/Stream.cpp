@@ -142,6 +142,18 @@ namespace ssf
 
 	int InputStream::PeekChar()
 	{
+#ifdef XY_VSFILTER_RUST_TEXT
+        XyRust::SsfPeek peek;
+        int last = 0;
+        for (;;) {
+            switch (peek.Next(m_queue, last)) {
+            case XyRust::SsfPeek::Read: last = PushChar(); break;
+            case XyRust::SsfPeek::Pop: last = PopChar(); break;
+            case XyRust::SsfPeek::Done: return peek.Value();
+            case XyRust::SsfPeek::Check: ASSERT(m_queue.GetCount() == 2); break;
+            }
+        }
+#else
 		while(m_queue.GetCount() < 2) PushChar();
 
 		ASSERT(m_queue.GetCount() == 2);
@@ -164,6 +176,7 @@ namespace ssf
 		}
 
 		return m_queue.GetHead();
+#endif
 	}
 
 	int InputStream::GetChar()

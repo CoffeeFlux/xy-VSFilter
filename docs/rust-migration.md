@@ -20,22 +20,25 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
-* SSF input lookahead now uses a safe Rust queue of raw character values. Native
-  comment skipping, whitespace decisions, line/column updates and character
-  provider calls remain in place. Pinned stream base methods and complete
-  push/pop/peek/get/whitespace operations match locally in ordinary and fatal
-  ASan/UBSan runs on arm64 and x64: **15,808 histories / 189,696 operations /
-  3,368,648 fields / 10,271 provider interruptions / 6,405 empty-pop exceptions /
-  93,064 non-EOS results / 15,808 queue owners and releases / 146,431 pushes /
-  120,975 pops**. Repeated EOF, NUL, UTF-16 values, comments and partial queues
-  after provider exceptions retain their state and ordering. Windows uses the
-  actual ATL list as reference; portable builds use a deque. NextChar and the
-  ThrowError boundary are controlled. Encoding, actual file I/O and SSF rendering,
+* SSF input lookahead and comment/peek decisions now run in safe Rust. A
+  transient state machine requests native character reads and pops; each Rust
+  borrow ends before the callback, and exceptions discard only transient state.
+  Whitespace decisions, line/column updates and character provider calls remain
+  native. Pinned stream base methods and complete push/pop/peek/get/whitespace
+  operations match locally in ordinary and fatal ASan/UBSan runs on arm64 and
+  x64: **15,832 histories / 189,984 operations / 3,373,213 fields / 10,285 provider
+  interruptions / 6,406 empty-pop exceptions / 93,084 non-EOS results / 15,832
+  queue owners and releases / 146,553 pushes / 121,057 pops**. Repeated and
+  nonsticky EOF, NUL, UTF-16 values, adjacent comments and partial queues after
+  provider exceptions retain their state and ordering. Windows uses the actual
+  ATL list as reference; portable builds use a deque. NextChar and the ThrowError
+  boundary are controlled. Encoding, actual file I/O and SSF rendering,
   allocation failure, negative non-EOS values, counter overflow and unbounded
-  recursion remain excluded. CSRI opens the RTS parser and cannot establish SSF
-  renderer coverage. **149 core / 104 FFI tests**, formatting, Clippy, 29 Python
-  checks (three local skips), both local sanitizer builds and default native
-  syntax pass. Windows build/integration and Miri are pending for this increment.
+  comment runs remain excluded. CSRI opens the RTS parser and cannot establish
+  SSF renderer coverage. **149 core / 105 FFI tests**, formatting, Clippy,
+  29 Python checks (three local skips), both local sanitizer builds and default
+  native syntax pass. Windows build/integration and Miri are pending for this
+  increment. The preceding queue-only increment is `209402aa`.
 
 * Safe Rust now scans caption packet headers and owns snapshots of both fields
   before native decoding begins. The native path remains when the declared
@@ -105,8 +108,9 @@ unresolved reference outcomes requiring investigation, never matching results.
   only each field's initialized prefix to the real Rust decoder and releases
   the two owners independently: **146 core / 102 FFI tests** pass, along with
   formatting, Clippy, 29 Python checks (three local skips) and default native
-  syntax. Miri and the x64 portable comparison now pass (`115919809024` and
-  `115919809311`); Win32 and whole-renderer integration remain pending.
+  syntax. All four portable jobs, Miri and both Windows renderer jobs now pass;
+  `cc-packet-storage-evidence.json` archives them and exact-commit local checks.
+  This storage-only stage is distinct from the later packet parser.
 
 * Gaussian floating-point coefficient tables now use a Rust byte owner with a
   reserved 16-byte physical prefix, preserving native alignment and cursor
@@ -121,16 +125,16 @@ unresolved reference outcomes requiring investigation, never matching results.
   **706 positive-count null-source copies are excluded before execution**, not
   passes. Copy allocation failure, nonfinite/overflowing widths and actual OOM
   remain excluded. Prefix storage is never read or initialized. Flyweight
-  sharing, handle assignment and final release are exercised; whole Windows
-  renderer integration remains pending. Existing bitmap alignment semantics
+  sharing, handle assignment and final release are exercised. Both Windows
+  renderer jobs now pass at `83803873`. Existing bitmap alignment semantics
   are unchanged and its sanitizer comparisons still pass. Rust remains
   **146 core / 101 FFI tests**, with prefix loans extended through 16/32 bytes;
   formatting, Clippy, Python checks and default native syntax pass locally.
   The initial Linux fixture compile (`115915348048`) lacked a qualified
   `std::ptrdiff_t` declaration; the fixture now includes `<cstddef>` explicitly.
-  That compile failure remains failed and requires a corrected Linux run.
-  Corrected Windows portable jobs `115917003428` and `115917003595` pass, as
-  does Miri (`115917002472`); complete renderer integration remains pending.
+  That compile failure remains failed. All four corrected portable jobs, Miri
+  and both renderer jobs pass; `coeff-storage-evidence.json` archives the
+  verified `83803873` stage.
 
 * The initial x64 COM probe matched eight scoped cases; the two autoloader
   apartment cases have an unresolved reference pin-ID outcome, recorded in

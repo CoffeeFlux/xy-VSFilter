@@ -7,7 +7,9 @@
 #else
 #define XY_SSF_CDECL
 #endif
+struct XYRustSsfPeek {uint32_t phase;int32_t previous,result;};
 extern "C" {
+uint32_t XY_SSF_CDECL xy_vsfilter_ssf_peek_step(XYRustSsfPeek*,size_t,int32_t,int32_t,int32_t);
 void* XY_SSF_CDECL xy_vsfilter_ssf_queue_create();
 void XY_SSF_CDECL xy_vsfilter_ssf_queue_push(void*,int32_t);
 int32_t XY_SSF_CDECL xy_vsfilter_ssf_queue_pop(void*);
@@ -31,4 +33,16 @@ public:
     void AddTail(int value){xy_vsfilter_ssf_queue_push(owner,value);}
     int RemoveHead(){return xy_vsfilter_ssf_queue_pop(owner);}
 };
+class SsfPeek {
+    XYRustSsfPeek state;
+public:
+    enum {Read=0,Pop=1,Done=2,Check=3};
+    SsfPeek(){state.phase=0;state.previous=0;state.result=0;}
+    uint32_t Next(const SsfLookahead& queue,int last){
+        const size_t count=queue.GetCount();
+        return xy_vsfilter_ssf_peek_step(&state,count,count?queue.GetHead():0,count?queue.GetTail():0,last);
+    }
+    int Value()const{return state.result;}
+};
+
 }
