@@ -37,7 +37,7 @@ inventory is incomplete, so there is no defensible overall percentage today.
 | Work package | Implemented/verified pieces | Required closure work | State |
 | --- | --- | --- | --- |
 | Text input, encodings and attachments | Reader/writer buffers, seek targets, charset sequence, embedded-font records | Full input/file/archive/network lifetime inventory; retained CRT/code-page boundaries and public containers | Partial |
-| ASS/SSA documents and timeline | Header/style/dialogue field state, field scanners, timeline lookup/insertion pieces | Own entries/styles/events; sorting, editing and frame/time conversions; complete document lifecycle parity | Partial; shared document owner/timeline is first, ASS frontend next |
+| ASS/SSA documents and timeline | Opt-in canonical entries/segments/styles and 20 retired native owners; safe copy, style-conflict/unknown-style policy, text-operation selection and time-conversion commits | Remaining m_simple contract and native orchestration; exact current x86/x64 lifecycle/render/style parity and real-host validation | Partial; shared document package remains active, ASS frontend next |
 | Other text formats | RealText, SAMI, SubRip, MicroDVD, WebVTT and other parser pieces | Complete per-format path checklist, USF and remaining legacy formats, public document storage and malformed-input recovery | Partial |
 | ASS tags, layout and text preparation | Tag lexer, text runs/escape preparation, collision records, placement and width/dimension decisions | Tag interpretation/interactions, native word traversal, karaoke/transforms and cache state | Partial |
 | Fonts, shaping and glyph paths | Font records, path staging, ellipse/arc helpers, selected Arabic handling | GDI/font fallback/metrics, shaping and kerning; persistent path ownership including all copy/reallocation paths | Partial; Windows APIs retained behind bounded adapters |
@@ -234,10 +234,10 @@ still requires D4/D5 below and all remaining ownership/fallback accounting.
 | Milestone | Deliverable | Required evidence before advancing |
 | --- | --- | --- |
 | D0 — Freeze the contract | Exact operation/callsite inventory, owner/alias graph and retained-adapter list for DOC-01 through DOC-11 | Source review across STS, RTS, format importers and both style APIs; explicitly track unresolved behavior. Status: in progress. |
-| D1 — Capture complete lifecycles | A pinned-reference document harness for create → add → edit/style-change → copy → sort → seek → clear/reopen → destroy | Compare full initialized document/segment state, observable callback/error order and caller snapshots; use real ATL/CRT on Windows. Include failed operations and repeated calls, with failures never counted as parity. Status: bounded full native-class lifecycle passes on x86/x64 at `04673672`; expanded default-style lifecycle also passes at `d6bd058c` with partial workflow evidence; named-style lifecycles and broader host/failure gates remain open. |
+| D1 — Capture complete lifecycles | A pinned-reference document harness for create → add → edit/style-change → copy → sort → seek → clear/reopen → destroy | Compare full initialized document/segment state, observable callback/error order and caller snapshots; use real ATL/CRT on Windows. Include failed operations and repeated calls, with failures never counted as parity. Status: bounded full native-class lifecycle passes on x86/x64 at `04673672`; expanded default-style lifecycle also passes at `d6bd058c` with partial workflow evidence; expanded named-style/layout/conversion/unknown-style lifecycles and actual warning dialogs pass on x64 at `0976ec8a`; newer operations, current x86 and broader host/failure gates remain open. |
 | D2 — Implement the Rust owner | Safe Rust entries, styles, metadata and segments; coherent document operations reuse existing helpers | Owner/copy/edit/drop tests, raw UTF-16 preservation, bounded access, no native mutable views; native field/type/alias compatibility reviewed. Supplied LCID and layout size are owned opt-in; layout constructor provenance is recorded separately. Status: canonical entries/segments, default/named styles, name/path, interpretation, script layout and initialized forced/PAR/color values implemented opt-in. Partial/bounded evidence is recorded separately; current full Windows gates pending; `m_simple` remains native. |
 | D3 — Route every caller | Importers, renderer, style interfaces and export paths use document operations or bounded snapshots | Enumerate and eliminate direct authoritative storage accesses in the Rust-enabled build; preserve callback/lock order and public ABI. Retire superseded fine-grained FFI crossings. Supplied LCID and layout size are owned opt-in; layout constructor provenance is recorded separately. Status: current opt-in owners route through scalar/value facades; unchanged default branches verified by source preprocessing. Full changed-code Windows gates pending; `m_simple` and native orchestration remain. |
-| D4 — Establish parity | Document lifecycle and integrated DLL comparisons on Windows x86/x64 at one exact candidate commit | Exact records, ordering, times, errors, rendering output and style API behavior; existing corpus/mutations, targeted lifecycle/malformed fixtures, Miri and relevant native checks. Resolve mismatches; no undocumented native document fallback. Status: experimental entry/segment owner passes the full DLL corpus and bounded native-class lifecycle on x86/x64 at `04673672`; subsequent canonical named-style changes await full Windows validation; partial default-style results do not close style API/value or workflow gates. No whole-document closure. |
+| D4 — Establish parity | Document lifecycle and integrated DLL comparisons on Windows x86/x64 at one exact candidate commit | Exact records, ordering, times, errors, rendering output and style API behavior; existing corpus/mutations, targeted lifecycle/malformed fixtures, Miri and relevant native checks. Resolve mismatches; no undocumented native document fallback. Status: earlier entry/segment owner passes on x86/x64 at `04673672`. At `0976ec8a`, x64 verifies 3,422-line lifecycle traces, actual warning dialogs, all 16 style API executions and the 814-case renderer corpus. Later AddStyle/CopyStyles/text/preparation changes and matching current x86 results still require their own evidence. No whole-document closure. |
 | D5 — Close and hand off | Written ownership/access review and applicable consumer validation | Aegisub load/render/seek/reload/close, relevant player/style-edit lifecycles and architecture results. Record finite corpus scope and bounded retained adapters. Until the real-host check is complete, report core-complete/host-validation-pending, never closed. Status: planned. |
 
 Important compatibility cases already visible in source include self-copy after
@@ -1398,8 +1398,7 @@ Conversion commits through the existing prepared-text boundary, replacing text
 before setting the requested Unicode flag. That boundary now transfers the old
 allocation out for destruction after admission and validates the entry before
 consuming staged input. Getters never mutate; conversion and setters do not
-rebuild segments or call OnChanged. SetStr's LF preparation remains native while
-its CString source gate is pending.
+rebuild segments or call OnChanged. SetStr's LF preparation remains native in this increment.
 
 Four new full-class stages exercise valid Shift-JIS packed/wide round trips,
 all four getter/SSA combinations, repeated same-flag conversions, retained animated
@@ -1409,6 +1408,44 @@ tests and an exact old-allocation retirement test pass. Local validation passes
 Python tests with four Windows-only skips. Generation and unchanged native-branch
 preprocessing also pass. Windows validation of this change remains pending. One new unsafe output wrapper uses
 the existing write helper; the core retains zero unsafe code and owner count 20.
+
+### Final Add and EntryOnly preparation in the safe owner
+
+The experimental Add/AddSTSEntryOnly paths now send raw fields directly to the
+safe preparation suffix and existing insertion operation. Native FastTrim,
+initial empty/reversed-range rejection, Add's WebVTT transforms and second empty
+check stay in their original order. The transferred suffix removes CR, expands
+LF using the captured CString behavior, and applies each method's exact Default
+and leading-star rules. It does not recheck text/style emptiness afterward.
+
+The gate is grounded in [both-architecture actual helper-source evidence](rust-document-cstring-helper-evidence.json)
+at `f570dd2b` and the prior 620-case repeated native/Windows Rust preparation
+comparisons. All 30 active helper/dispatch selections in each of four contexts
+map to hashed installed source spans. CharNextW advances one raw unit; the
+selected find/length helpers use the captured wide behavior. Actual MFC types,
+per-architecture compiler hashes and 318 Win32/317 x64 shared included-header
+hashes match the runtime captures. Relevant build flags match; the source-capture
+map probe's explicit /fp:precise difference is recorded. This does not certify
+other SDK versions, unassigned allocation tails or full document parity.
+
+The existing private Add export keeps already-prepared modes 0–2 unchanged.
+Modes 3–5 perform the owned suffix before admission, then use the same Add,
+EntryOnly and WebVTT insertion logic. The native wire builder accepts strings
+and scalars directly, avoiding a temporary STSEntry. All unrelated raw fields and
+explicit readorder are retained; negative readorder uses the existing insertion
+rule. No callback or rebuild is added. More than one skipped LF requiring an
+unassigned tail remains an explicit unresolved refusal before owner mutation.
+
+The FFI tests cover all six modes, exact raw code units, emptied style/text,
+Default normalization, overlap staging and unresolved-tail refusal with owner
+and output unchanged. Local Rust validation passes 220 core and 120 FFI tests
+and pinned formatting/Clippy, plus 136 Python tests with four Windows-only skips.
+Four new full-class stages cover mixed CR/LF, the exact bounded skipped-LF/NUL
+result, style-name classes, readorder and zero-duration differences, retaining
+full records and animation. Probe generation and unchanged default/RustText
+preprocessing pass. Changed-source Windows integration remains pending; the
+prerequisite captures do not establish this routing's full-class or renderer parity. No unsafe export, block or helper is
+added by this routing change; the owner count stays 20.
 
 ### Newly verified x64 integration and preparation evidence
 
@@ -1437,6 +1474,18 @@ frame pixel files were not retained, so byte comparison is runner-reported.
 This result predates unknown-style, AddStyle and CopyStyles sessions and grants
 no validation credit to those later changes.
 
+[Unknown-style x64 integration](rust-document-x64-0976-evidence.json) at
+`0976ec8a`, job 116158737947 in run 38653823908, verifies four equal 3,422-line
+lifecycle traces, all four real dialog captures (three responses per execution),
+16 style API runs and the 814-case/8,586-frame corpus. The observer source,
+complete dialog controls/text/responses and retained binaries/traces were checked.
+
+[AddStyle x64 integration](rust-document-x64-23a-evidence.json) at `23a69442`,
+job 116161353969 in run 38654628032, adds the signed-zero/full-font/name-class
+histories in four equal 3,482-line traces; dialog, style API and renderer checks
+also pass. Neither result covers later CopyStyles, text-plan or final-preparation
+routing. Pixel files remain unretained, with byte comparison runner-reported.
+
 At `61e91fa3`, both Win32 and x64 preparation captures completed all 620 native
 observations. [Local comparisons against both captures](rust-document-preparation-both-evidence.json)
 match the safe helper. The Windows Rust jobs stopped before comparison because
@@ -1452,9 +1501,9 @@ literally, and counted C++ form-feed/vertical-tab whitespace as extra source
 lines. The revised selector preserves actual spellings, maps LF-based line
 origins to hashed included headers, and requires dispatch-declaration provenance
 as well as method bodies. Regression tests reject wrong dispatch origins and
-narrow CharNextA. The discarded full preprocessor streams cannot reconstruct
-missing historical evidence: a fresh Windows source capture is required. Native
-string preparation stays in place until that gate passes.
+narrow CharNextA. Discarded full streams cannot reconstruct the old missing proof.
+The fresh `f570dd2b` capture now completes that source gate on both architectures,
+as documented above; the older incomplete capture remains recorded as such.
 
 ### Coarse selected-state Copy boundary
 
@@ -1506,13 +1555,13 @@ Neither count measures the amount of application behavior replaced.
 The reproducible [Rust unsafe inventory](rust-unsafe-inventory.json) uses
 `python3 tools/compat/audit_rust_boundary.py OUTPUT.json`. It masks comments and
 literals, separates cfg(test) items, and includes all platform/feature branches.
-At the current frozen working-tree sources based on `f570dd2b` (exact file
+At the current frozen working-tree sources based on `888e1b22` (exact file
 hashes recorded by the regenerated inventory):
 
 | Layer | Production source inventory | Meaning |
 | --- | --- | --- |
 | `rust/compat` | 0 unsafe blocks/functions/impls; 8,500 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
-| `rust/ffi` | 373 explicit unsafe blocks, 311 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,954 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
+| `rust/ffi` | 373 explicit unsafe blocks, 311 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,971 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
 | Tests | 119 unsafe blocks in FFI tests | Exercise valid and deliberately bounded ownership/alias/initialization contracts; not production code |
 
 Unsafe-function declarations and blocks overlap and must not be added as

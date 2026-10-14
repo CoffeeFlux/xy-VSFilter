@@ -3493,6 +3493,10 @@ void CSimpleTextSubtitle::Add(CStringW str, bool fUnicode, REFERENCE_TIME start,
         if (str.IsEmpty()) return;
     }
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    m_document->AddFinalSuffix(str, fUnicode, start, end, style, actor, effect,
+        marginRect, layer, readorder, GetDocumentType() == EXTVTT ? 5 : 3);
+#else
     str.Remove('\r');
     str.Replace(L"\n", L"\\N");
     if(style.IsEmpty()) style = g_default_style;
@@ -3513,9 +3517,6 @@ void CSimpleTextSubtitle::Add(CStringW str, bool fUnicode, REFERENCE_TIME start,
     sub.end        = end;
     sub.readorder  = readorder < 0 ? (int)GetEntryCount() : readorder;
 
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    m_document->AddPrepared(sub, GetDocumentType() == EXTVTT ? 2 : 0);
-#else
     int n = (int)GetEntryCount();
 
     if (start == end) return;
@@ -3632,6 +3633,10 @@ void CSimpleTextSubtitle::AddSTSEntryOnly( CStringW str, bool fUnicode, REFERENC
     FastTrim(str);
     if (str.IsEmpty() || start > end) return;
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    m_document->AddFinalSuffix(str, fUnicode, start, end, style, actor, effect,
+        marginRect, layer, readorder, 4);
+#else
     str.Remove('\r');
     str.Replace(L"\n", L"\\N");
     if(style.IsEmpty()) style = _T("Default");
@@ -3648,9 +3653,6 @@ void CSimpleTextSubtitle::AddSTSEntryOnly( CStringW str, bool fUnicode, REFERENC
     sub.start      = start;
     sub.end        = end;
     sub.readorder  = readorder < 0 ? GetEntryCount() : readorder;
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    m_document->AddPrepared(sub, 1);
-#else
     m_entries.Add(sub);
 #endif
     return;

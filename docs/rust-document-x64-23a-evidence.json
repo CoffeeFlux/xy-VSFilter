@@ -1,0 +1,310 @@
+{
+  "schema": "rust-document-x64-validated-increment-v1",
+  "candidate_commit": "23a69442396ed9a5fdf1f173fbab2462ddd747fb",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "workflow_run": 38654628032,
+  "job_id": 116161353969,
+  "job_conclusion": "success",
+  "job_completed_at": "2026-10-14T23:46:21Z",
+  "platform": "x64",
+  "document_storage": "rust-experimental",
+  "artifact": "renderer-evidence-x64-rust-document",
+  "build_info_sha256": "a741204fb5e2086b9a4c29ab06ebcb63c30d3f8a5cd25675afea6c08a68dd7c6",
+  "checks": {
+    "smoke": {
+      "report_sha256": "f77d01e2f8313ee24de31ae1d8ff4c0c922e85fa9a7393333369e432297fd063",
+      "case_count": 1,
+      "rendered_frames": 10,
+      "changed_frames": 6,
+      "case_verdicts": {
+        "equal": 1
+      },
+      "candidate_statuses": {
+        "ok": 1
+      },
+      "manifest_sha256": "b3091fe31459e8e5cbde58c9bac57749c0374ed063964c45f600d6693d62c9dd",
+      "retained_frame_hash_observations_verified": 30,
+      "pixel_files_retained": 0,
+      "frame_file_references_checked": 30
+    },
+    "csri": {
+      "report_sha256": "5bc5510a75297bf14339dfc2889de3bb8f7acc2d3fb4b927a116489b8ad21cad",
+      "case_count": 814,
+      "rendered_frames": 8586,
+      "changed_frames": 5720,
+      "case_verdicts": {
+        "equal": 814
+      },
+      "candidate_statuses": {
+        "ok": 796,
+        "open_rejected": 18
+      },
+      "manifest_sha256": "2e197b56427d6b94bb389a8e25e73e8910ea3c71ddf89ebd11658b369b48cd07",
+      "retained_frame_hash_observations_verified": 25758,
+      "pixel_files_retained": 0,
+      "frame_file_references_checked": 25758
+    },
+    "mutation-results": {
+      "report_sha256": "ef4009ca4145fd097ac809b973b1b58f7013314acb91c46e4496e10e9b9599e2",
+      "case_count": 32,
+      "rendered_frames": 224,
+      "changed_frames": 160,
+      "case_verdicts": {
+        "equal": 32
+      },
+      "candidate_statuses": {
+        "ok": 32
+      },
+      "manifest_sha256": "90e89279db719c739c6a1363611c04225b3486f03fee6ad9ceaca20e084ce43c",
+      "retained_frame_hash_observations_verified": 672,
+      "pixel_files_retained": 0,
+      "frame_file_references_checked": 672
+    },
+    "com-contracts": {
+      "report_sha256": "4333508faea1a9672c246ad4e5e78a6994b2663ebf8c26f25382973c4b11a426",
+      "cases": 10,
+      "passed": true,
+      "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+      "headers": {
+        "src/filters/transform/vsfilter/DirectVobSubFilter.h": {
+          "reference_sha256": "d0ad74ce5efb68be080cd77c75f9288489cc2c79499941c83e2c238a9e8ddaf9",
+          "candidate_sha256": "d0ad74ce5efb68be080cd77c75f9288489cc2c79499941c83e2c238a9e8ddaf9"
+        },
+        "src/filters/transform/vsfilter/xy_sub_filter.h": {
+          "reference_sha256": "61b2cb40e906d4147255400be2142ff912c58628feb1da03d1fd68bea29d6a4d",
+          "candidate_sha256": "61b2cb40e906d4147255400be2142ff912c58628feb1da03d1fd68bea29d6a4d"
+        },
+        "src/filters/transform/vsfilter/auto_load_helper.h": {
+          "reference_sha256": "b280254485e02444630a996804e14ef10a97cbcd1f8ee707f919f03e5b59c488",
+          "candidate_sha256": "d37e2ed8ac0142ea7862b1d475a0ae74d1018e0f29ee802c4edf40a76069a102"
+        },
+        "src/filters/transform/vsfilter/xy_sub_filter_consumer.h": {
+          "reference_sha256": "67f5cb83a9c83df388069feea50b7db5f7200971b0b50ae11abd39de1c5294a0",
+          "candidate_sha256": "67f5cb83a9c83df388069feea50b7db5f7200971b0b50ae11abd39de1c5294a0"
+        },
+        "src/filters/transform/vsfilter/IDirectVobSub.h": {
+          "reference_sha256": "c0d693a5c0fc3d91c68f41f539ad8c0f13e6dfe0b19941c99b7ad6d5b15f165f",
+          "candidate_sha256": "c0d693a5c0fc3d91c68f41f539ad8c0f13e6dfe0b19941c99b7ad6d5b15f165f"
+        },
+        "src/filters/transform/vsfilter/XyOptions.h": {
+          "reference_sha256": "9efa9e222e74a84fcdac202be5ddfd13b32ee49b837b9b2649f7bbcc6cf4618c",
+          "candidate_sha256": "9efa9e222e74a84fcdac202be5ddfd13b32ee49b837b9b2649f7bbcc6cf4618c"
+        }
+      },
+      "reference_exclusions": [
+        "XySubFilterAutoLoader QueryId/FindPin; see docs/autoloader-pin-id-scope.json"
+      ],
+      "candidate_only_controls": 2,
+      "settings_environment": "Private volatile HKCU per worker, removed by parent after termination; native constructor writes are isolated."
+    },
+    "document-lifecycle": {
+      "report_sha256": "0579bc577e0b859da347d7206341db0284bcfede27b3a547101eafbc4b22fb86",
+      "equal": true,
+      "trace_lines": 3482,
+      "limits": [
+        "Bounded normal lifecycles and initialized metadata only",
+        "No allocator-failure, concurrent close, or dialog-reentry parity",
+        "Not a real Aegisub/player host test"
+      ],
+      "library_hash_scope": "Build-library hashes are runner-reported; executables, source headers and traces rehashed",
+      "dialogs": {
+        "count": 3,
+        "equal": true,
+        "observer_sha256": "5854127d209d140d19cd9a8578b77dcc8473d0f576de51c3c4f5f76e32eda8a1",
+        "canonical_sha256": [
+          "38f6696cd3a8c61cb8a01618f0465c3a37f7d98dd601fc2113b41adad5f267d4",
+          "38f6696cd3a8c61cb8a01618f0465c3a37f7d98dd601fc2113b41adad5f267d4",
+          "38f6696cd3a8c61cb8a01618f0465c3a37f7d98dd601fc2113b41adad5f267d4",
+          "38f6696cd3a8c61cb8a01618f0465c3a37f7d98dd601fc2113b41adad5f267d4"
+        ],
+        "retained_file_sha256": [
+          "66d762db75102a7e394ce5c5e3e23ebfca82c396795d5e232f9fc3a064ca48a0",
+          "66d762db75102a7e394ce5c5e3e23ebfca82c396795d5e232f9fc3a064ca48a0",
+          "66d762db75102a7e394ce5c5e3e23ebfca82c396795d5e232f9fc3a064ca48a0",
+          "66d762db75102a7e394ce5c5e3e23ebfca82c396795d5e232f9fc3a064ca48a0"
+        ],
+        "scope": "ordered full warning text, controls and scripted responses; no document edits from observer",
+        "ordered_warnings": [
+          {
+            "title": "Warning",
+            "text": [
+              "Unknown style found: \"UnknownA\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+            ],
+            "buttons": [
+              {
+                "id": 1,
+                "text": "OK",
+                "style": 1342373889
+              },
+              {
+                "id": 2,
+                "text": "Cancel",
+                "style": 1342242816
+              }
+            ],
+            "response": "ok"
+          },
+          {
+            "title": "Warning",
+            "text": [
+              "Unknown style found: \"UnknownB\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+            ],
+            "buttons": [
+              {
+                "id": 1,
+                "text": "OK",
+                "style": 1342373889
+              },
+              {
+                "id": 2,
+                "text": "Cancel",
+                "style": 1342242816
+              }
+            ],
+            "response": "cancel"
+          },
+          {
+            "title": "Warning",
+            "text": [
+              "Unknown style found: \"UnknownOpen\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+            ],
+            "buttons": [
+              {
+                "id": 1,
+                "text": "OK",
+                "style": 1342373889
+              },
+              {
+                "id": 2,
+                "text": "Cancel",
+                "style": 1342242816
+              }
+            ],
+            "response": "cancel"
+          }
+        ],
+        "executions": 4,
+        "total_warning_observations": 12
+      },
+      "verified_source_requirements": {
+        "require_named_stages": true,
+        "require_identity_stages": true,
+        "require_interpretation_stages": true,
+        "require_layout_stages": true,
+        "require_metadata_stages": true,
+        "require_selected_copy_stages": true,
+        "require_style_rename_stages": true,
+        "require_sort_stages": true,
+        "require_base_empty_stages": true,
+        "require_lcid_stages": true,
+        "require_resolution_stages": true,
+        "require_layout_size_stages": true,
+        "require_conversion_stages": true,
+        "require_unknown_stages": true,
+        "require_add_style_stages": true,
+        "require_copy_styles_stages": false,
+        "require_text_plan_stages": false
+      },
+      "builds": {
+        "reference": {
+          "sha256": "ebd82efb3e2fc80f2ac7b1c588f0ee7b0a41a1fcd214fbd252fa931c45be6245",
+          "pe_machine": "0x8664",
+          "repository_header_hashes_verified": 850
+        },
+        "candidate": {
+          "sha256": "53fca75fd03bfd54982338ee548dddd0f1b4cc0a660c75922990f0e259a34492",
+          "pe_machine": "0x8664",
+          "repository_header_hashes_verified": 856
+        }
+      },
+      "trace_sha256": [
+        "7d7333b07689eb03d22f42fc11fbf7fb42e2746412f958ca9637773c153c7c17",
+        "7d7333b07689eb03d22f42fc11fbf7fb42e2746412f958ca9637773c153c7c17",
+        "7d7333b07689eb03d22f42fc11fbf7fb42e2746412f958ca9637773c153c7c17",
+        "7d7333b07689eb03d22f42fc11fbf7fb42e2746412f958ca9637773c153c7c17"
+      ]
+    },
+    "document-style-api": {
+      "report_sha256": "2cf937365d273510146e35645a11df420997b366475e6ab3139c2977d146eb24",
+      "equal": true,
+      "class_mode_pairs": 4,
+      "executions": 16,
+      "scope": "Test-instrumented copies of actual DLLs; native style values remain in-module; production DLL hashes unchanged. Build-library hashes are runner-reported. No graph/real-host/callback-count coverage.",
+      "binaries": {
+        "host": {
+          "sha256": "654b3d18ed0f9bd0cf69521bea8fcdf2f45614061b1d39c795989699b00f8c35",
+          "pe_machine": "0x8664"
+        },
+        "reference-VSFilter": {
+          "sha256": "a4f16792819fa86a162503287cc25d9fd481369a5b647539d5464347f388c232",
+          "pe_machine": "0x8664"
+        },
+        "reference-XySubFilter": {
+          "sha256": "e814f85056e63a55da140d0c9618bb8547f8d2d89db7549efde24c05c352d589",
+          "pe_machine": "0x8664"
+        },
+        "candidate-VSFilter": {
+          "sha256": "c8dbf9efa44ca19f0aa68cf367ddb835c14e5160ae365421f85e154f2e0059ad",
+          "pe_machine": "0x8664"
+        },
+        "candidate-XySubFilter": {
+          "sha256": "5dd9736a30d86f940d6edd8df81c34b0d827514708be1281eeca981853fb75d3",
+          "pe_machine": "0x8664"
+        }
+      }
+    },
+    "document-style-value": {
+      "report_sha256": "3aeb425f4f0ef62978567df2cf76d37cddeef5b79337cfbc1ff07e2f5f6cb8c3",
+      "equal": true,
+      "values": 209,
+      "equality_cells": 43681,
+      "scope": "Fixed initialized pinned-native fixtures only; no native arbitrary-input injection or style owner routing",
+      "provenance_scope": "Retained sources, headers, executables, input and traces rehashed; external toolchain and native library hashes runner-reported."
+    }
+  },
+  "production_dlls": {
+    "VSFilter.dll": {
+      "exports_equal": true,
+      "no_added_imports_or_changed_platform_headers": true,
+      "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+      "dependencies_report_sha256": "84a27c3f09cb0d719d9eda44878694f94595dada4c14ceb22a2e4e614f9ec4ff",
+      "baseline_sha256": "0e37e868156867ed741f2c2258b813f1aab57afb18f0819eaa5e9c52ece00a14",
+      "candidate_sha256": "fd2a3e67b566fdf05a98d17b6e77f4b932b0c787c1996e1efd64385195af7f5d",
+      "pe_machine": "0x8664"
+    },
+    "XySubFilter.dll": {
+      "exports_equal": true,
+      "no_added_imports_or_changed_platform_headers": true,
+      "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+      "dependencies_report_sha256": "70a7daaf1cbd89db83662b6014439fe736474ef9fe6ad152a955d625901c74b2",
+      "baseline_sha256": "da6b0d7767dfe0e7050c4b55455a976dc42af8b834f2d1b15621b0d831d89131",
+      "candidate_sha256": "1b8afd2734151d76175e5d8115df5d315da805d81cd76bae93425e1278e801a7",
+      "pe_machine": "0x8664"
+    },
+    "xy_sub_filter_consumer.dll": {
+      "exports_equal": true,
+      "no_added_imports_or_changed_platform_headers": true,
+      "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+      "dependencies_report_sha256": "d0b61ec5540588c5f5e14949472e20c26b17713b3700e75d9fc088d2bcc176b9",
+      "baseline_sha256": "e02bb1d2dd853314e2b0172d69ea485b1e668ac8733cc01d59b94387b7bda27e",
+      "candidate_sha256": "37e0441deee8d46ced5c40d95d4643d605a8720f3ec7c098afec17d18612a640",
+      "pe_machine": "0x8664"
+    }
+  },
+  "candidate_log_sha256": "182b49d3b22ff875b82de949297b3e896db1d7a048e73055dd6627f48ae67e76",
+  "limitations": [
+    "Exact 23a69442 x64 only: unknown-style and AddStyle coarse sessions verified, including signed-zero/full-font duplicate retention and empty-name classification. No later CopyStyles, DOC05 text-plan or final preparation routing credit.",
+    "Renderer result/frame hashes, metadata and guards independently checked; pixel binary files not retained, so exact pixel-byte comparison remains runner-reported.",
+    "Bounded dialogs use exact process filtering/readiness/control identity and scripted responses; no document mutation from observer or dialog-driven document reentry claim.",
+    "Actual style API executes in instrumented DLL copies with isolated registry setup; no real player/Aegisub graph or arbitrary host/callback-count claim.",
+    "Tracked sources, source headers, executables/DLLs, four lifecycle traces and all four dialog JSON artifacts independently rehashed; external SDK/compiler/build libraries remain runner-reported.",
+    "No production-switch authorization, complete document/subsystem closure, or universal malformed-input compatibility claim."
+  ],
+  "archival_verification": {
+    "summarize_native_passed": true,
+    "script": "artifacts/document-x64-23a-verification/verify.py",
+    "script_sha256": "5648e12a301b16df715ff9c1ebc67145750779eb11761fbd33c4b4933c60e554",
+    "summarize_evidence_sha256": "89a7343b29efa1480681a0b89de1f2cc71002d6b69c1c514a98d043e9e4511e6",
+    "document_lifecycle_validator_sha256": "27075e699709b100331343d68378dca03d561be3202fc472fe6c67e981470db3"
+  }
+}

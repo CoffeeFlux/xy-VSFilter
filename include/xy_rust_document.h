@@ -175,7 +175,12 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_snapshot_size_v1(uint64_t snapsh
 // Reads exactly length bytes at offset, or returns OUT_OF_RANGE without output.
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_snapshot_read_v1(uint64_t snapshot, uint64_t offset, uint8_t*, size_t length);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_snapshot_drop_v1(uint64_t snapshot);
-// Add modes: 0 Add, 1 entry-only, 2 WebVTT; record is already natively prepared.
+// Add modes 0 Add, 1 entry-only, 2 WebVTT retain diagnostic prepared records.
+// Modes 3 AddSuffix, 4 EntryOnlySuffix, 5 WebVttSuffix apply owned final CString
+// CR removal, LF replacement and style normalization before persistent Add.
+// Native initial trimming/rejection/WebVTT parsing remains before this suffix.
+// No empty-text recheck after suffix; unresolved allocation-tail input refuses
+// before document mutation. All other raw fields and flags are retained.
 // Result: applied:u32, index:i32 (-1 when not applied), total 8 bytes.
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_add_prepared_v1(uint64_t, uint32_t mode, const uint8_t*, size_t, uint8_t*, size_t);
 // Read-only text/encoding plan. Modes0WideSSA/1WideStrip/2PackedSSA/

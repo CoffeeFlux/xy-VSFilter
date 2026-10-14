@@ -1353,6 +1353,46 @@ static void layout_size_lifecycle() {
     parse("layout-size-parser-repeated","LayoutResY: 480\r\nLayoutResX: 800\r\nLayoutResY: 600\r\nLayoutResX: 720\r\n",CSize(720,600));
     parse("layout-size-parser-nonpositive","LayoutResX: -2\r\nLayoutResY: 0\r\n",CSize(-2,0));
 }
+static void preparation_lifecycle() {
+    TraceDocument doc(0);
+    doc.Add(CStringW(L"baseline"),true,0,10);doc.Animate(0);
+    const unsigned notifications=change_events[0];
+    auto stage=[&](const char* label,size_t entries,size_t segments){
+        check(doc.Entries()==entries&&doc.Segments()==segments&&doc.Segment(0).animated,"preparation counts/retained animation");
+        printf("preparation-stage %s entries=%zu segments=%zu animated=1\n",label,entries,segments);doc.Dump(label);
+    };
+    stage("preparation-initial",1,1);
+    doc.Add(CStringW(L"  A\r\nB  "),true,20,30,CString(L"***Named"),CString(L"actor"),CString(L"effect"),CRect(-1,2,3,4),2,-7);
+    const STSEntry mixed=doc.Entry(1);
+    check(same_identity(mixed.str,CStringW(L"A\\NB"))&&same_identity(mixed.style,CString(L"Named"))&&mixed.readorder==1,"native trim/CR/LF/stars/default readorder");
+    check(mixed.actor==L"actor"&&mixed.effect==L"effect"&&mixed.marginRect==CRect(-1,2,3,4)&&mixed.layer==2&&mixed.fUnicode,"preparation preserves nontext fields");
+    const wchar_t raw[]={L'X',L'\n',L'\n',0,L'\n',L'Y'};
+    const wchar_t expected[]={L'X',L'\\',L'N',L'\\',L'N',0,L'\n',L'Y',0};
+    // Bounded source-derived cursor case: exactly one skipped LF, and all
+    // retained tail units are initialized. No byte conversion/rendering follows.
+    doc.AddSTSEntryOnly(CStringW(raw,6),true,40,50,CString(L"*"));
+    check(same_identity(doc.Entry(2).str,CStringW(expected,9))&&doc.Entry(2).style.GetLength()==0&&doc.Entry(2).readorder==2,"bounded skipped LF and no empty-style renormalization");
+    printf("preparation-value skipped-lf");units(doc.Entry(2).str);units(doc.Entry(2).style);printf("\n");
+    doc.AddSTSEntryOnly(CStringW(L"empty name"),true,60,60,CString(),CString(),CString(),CRect(0,0,0,0),0,73);
+    check(same_identity(doc.Entry(3).style,CString(L"Default"))&&doc.Entry(3).readorder==73,"logical empty style and explicit order");
+    const wchar_t leading[]={0,L'K',0xd800};
+    doc.Add(CStringW(L"leading NUL style"),true,70,80,CString(leading,3),CString(),CString(),CRect(0,0,0,0),0,91);
+    check(same_identity(doc.Entry(4).style,CString(leading,3))&&doc.Entry(4).readorder==91,"nonempty leading NUL style is retained");
+    stage("preparation-fields",5,3);
+    const auto stable=segment_snapshot(doc);
+    auto unchanged=[&]{
+        check(doc.Segments()==stable.size(),"zero-duration preparation retains segment count");
+        for(size_t i=0;i<stable.size();++i){const STSSegment actual=doc.Segment(int(i));const STSSegment& previous=stable[i];
+            check(actual.start==previous.start&&actual.end==previous.end&&actual.animated==previous.animated&&actual.subs.GetCount()==previous.subs.GetCount(),"zero-duration complete segment header");
+            for(size_t j=0;j<previous.subs.GetCount();++j)check(actual.subs[j]==previous.subs[j],"zero-duration segment membership");}
+    };
+    doc.Add(CStringW(L"zero rejected"),true,90,90,CString(L"*"));unchanged();
+    stage("preparation-add-zero-rejected",5,3);
+    doc.AddSTSEntryOnly(CStringW(L"E\r\nF"),true,90,90,CString(L"*"));unchanged();
+    check(same_identity(doc.Entry(5).str,CStringW(L"E\\NF"))&&doc.Entry(5).style.GetLength()==0&&doc.Entry(5).readorder==5,"entry-only zero retained and star-only remains empty");
+    stage("preparation-entry-zero",6,3);
+    check(change_events[0]==notifications,"Add and entry-only preparation do not notify");
+}
 int main() {
     try {
         if(!AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0))throw std::runtime_error("AfxWinInit failed");
@@ -1360,6 +1400,7 @@ int main() {
         printf("environment ansi=%u oem=%u\n",GetACP(),GetOEMCP());
         default_style_lifecycle();
         text_plan_lifecycle();
+        preparation_lifecycle();
         copy_selected_lifecycle();
         metadata_lifecycle();
         layout_lifecycle();

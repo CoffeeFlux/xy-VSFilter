@@ -1,0 +1,350 @@
+{
+  "schema": "rust-document-cstring-helper-evidence-v1",
+  "candidate_commit": "f570dd2bebdd5abf9d12a93783e2a48a54390df3",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "workflow_run": 38655399588,
+  "scope": "Selected actual wide MFC CString helper and dispatch source in native RustText and experimental subtitles contexts on both Windows architectures; source-only ownership prerequisite",
+  "complete": true,
+  "runtime_parity_claim": false,
+  "production_switch": false,
+  "selector_source_sha256": "9baec6e6a83e1ae87527221129c4bfd159be8d82b3e035e7d0db3c5b168c6c65",
+  "architectures": {
+    "Win32": {
+      "report_sha256": "219a532fb1035bfa663c49e87b5b7a6fe3ac03b5970c8d659251bb9f43d41f05",
+      "selected_definitions_sha256": "f65ac7a5267b6409b5dd9c1c8115428e06f902e8a74ac0e4728c692d93ae60f6",
+      "binary_sha256": "08fbf673da8b44501b308fbbc238c3f1aaba8e044c2cde364d663f3ebc4abb26",
+      "contexts": {
+        "csize-context-native-rust-text": {
+          "complete": true,
+          "private_sha256": "c796f51c7531d563edb261ea422d49beca56814c8291b19190dae9b572bd8ca0",
+          "repository_headers_verified": 854,
+          "active_selections_verified": 30,
+          "active_definition_counts": {
+            "ChTraitsCRT::CharNext": 1,
+            "ChTraitsCRT::StringFindString": 1,
+            "ChTraitsCRT::SafeStringLen": 1
+          },
+          "preprocessed_full_stream_sha256_runner_reported": "266ea9c214002eb94fe29890fe209997759096deda568cc4cc59a97995cac248",
+          "method_body_hashes": [
+            {
+              "symbol": "ChTraitsCRT::CharNext",
+              "active_body_sha256": "dd0813dd593e202ede7802ba481630d1115e205d107a46b4aeb15fbb1ccd13fc",
+              "source_matches": [
+                {
+                  "sha256": "2b5e82057a2ed4ce558eb8c1c66f4d25683ce3eebec33beca8faad39ad4bd50f",
+                  "raw_body_sha256": "dd0813dd593e202ede7802ba481630d1115e205d107a46b4aeb15fbb1ccd13fc",
+                  "exact_body_tokens": true
+                }
+              ]
+            },
+            {
+              "symbol": "ChTraitsCRT::StringFindString",
+              "active_body_sha256": "3a34db991c3388f5acb212d75c2f7ace7f60eeb10cf1e6645ed393df59df1305",
+              "source_matches": [
+                {
+                  "sha256": "76288fdfdc89b7750e732552dfb74648c8a85dffe2cba3a9a3eb793c26623d30",
+                  "raw_body_sha256": "3a34db991c3388f5acb212d75c2f7ace7f60eeb10cf1e6645ed393df59df1305",
+                  "exact_body_tokens": true
+                }
+              ]
+            },
+            {
+              "symbol": "ChTraitsCRT::SafeStringLen",
+              "active_body_sha256": "57f8dda64ed6ca1509efc5f9dfcd2c0b9db5cef4442a7ca455edc2ec484187ab",
+              "source_matches": [
+                {
+                  "sha256": "8c9b9551b2e7af1a4a075a6905a8228df878f78bd739327750fa840a2bac3b80",
+                  "raw_body_sha256": "424622590170411c34e3de9dd0d1269ca802f80e96979fa2a206e912c4d0e0f3",
+                  "exact_body_tokens": false
+                }
+              ]
+            },
+            {
+              "symbol": "CSimpleStringT::StringLength",
+              "active_body_sha256": "3b794ebf52d1bd951acebd5337958fb165ee9f16a259af577e66cd798a3a8c9d",
+              "source_matches": [
+                {
+                  "sha256": "add8d8f159111573bb75b8b47cd6dd1334f6f2485278124f5ac4705a5118a84a",
+                  "raw_body_sha256": "ced6e92d353aea5a6240684c8f581d15ac1d00b0681fb726e20ea6200c69e29e",
+                  "exact_body_tokens": false
+                }
+              ]
+            }
+          ]
+        },
+        "csize-context-experimental": {
+          "complete": true,
+          "private_sha256": "412e00c6eb834170ca66842d089989cb4bfca685f59d7e7a48d39044484b1f7d",
+          "repository_headers_verified": 854,
+          "active_selections_verified": 30,
+          "active_definition_counts": {
+            "ChTraitsCRT::CharNext": 1,
+            "ChTraitsCRT::StringFindString": 1,
+            "ChTraitsCRT::SafeStringLen": 1
+          },
+          "preprocessed_full_stream_sha256_runner_reported": "f2b562b19a63a035c400d86df3e943b0d6bcaf4d67e64fe274f3d8f7bd7710d5",
+          "method_body_hashes": [
+            {
+              "symbol": "ChTraitsCRT::CharNext",
+              "active_body_sha256": "dd0813dd593e202ede7802ba481630d1115e205d107a46b4aeb15fbb1ccd13fc",
+              "source_matches": [
+                {
+                  "sha256": "2b5e82057a2ed4ce558eb8c1c66f4d25683ce3eebec33beca8faad39ad4bd50f",
+                  "raw_body_sha256": "dd0813dd593e202ede7802ba481630d1115e205d107a46b4aeb15fbb1ccd13fc",
+                  "exact_body_tokens": true
+                }
+              ]
+            },
+            {
+              "symbol": "ChTraitsCRT::StringFindString",
+              "active_body_sha256": "3a34db991c3388f5acb212d75c2f7ace7f60eeb10cf1e6645ed393df59df1305",
+              "source_matches": [
+                {
+                  "sha256": "76288fdfdc89b7750e732552dfb74648c8a85dffe2cba3a9a3eb793c26623d30",
+                  "raw_body_sha256": "3a34db991c3388f5acb212d75c2f7ace7f60eeb10cf1e6645ed393df59df1305",
+                  "exact_body_tokens": true
+                }
+              ]
+            },
+            {
+              "symbol": "ChTraitsCRT::SafeStringLen",
+              "active_body_sha256": "57f8dda64ed6ca1509efc5f9dfcd2c0b9db5cef4442a7ca455edc2ec484187ab",
+              "source_matches": [
+                {
+                  "sha256": "8c9b9551b2e7af1a4a075a6905a8228df878f78bd739327750fa840a2bac3b80",
+                  "raw_body_sha256": "424622590170411c34e3de9dd0d1269ca802f80e96979fa2a206e912c4d0e0f3",
+                  "exact_body_tokens": false
+                }
+              ]
+            },
+            {
+              "symbol": "CSimpleStringT::StringLength",
+              "active_body_sha256": "3b794ebf52d1bd951acebd5337958fb165ee9f16a259af577e66cd798a3a8c9d",
+              "source_matches": [
+                {
+                  "sha256": "add8d8f159111573bb75b8b47cd6dd1334f6f2485278124f5ac4705a5118a84a",
+                  "raw_body_sha256": "ced6e92d353aea5a6240684c8f581d15ac1d00b0681fb726e20ea6200c69e29e",
+                  "exact_body_tokens": false
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "job_id": 116163841058,
+      "job_conclusion": "success",
+      "artifact": "document-atl-contract-Win32"
+    },
+    "x64": {
+      "report_sha256": "16577a1bf3985978a8b91fca9a1f59694869a4df45ec3f60874503301f8a9911",
+      "selected_definitions_sha256": "f65ac7a5267b6409b5dd9c1c8115428e06f902e8a74ac0e4728c692d93ae60f6",
+      "binary_sha256": "d1aae5d23952d176badc7ab7c5395f0af1df116dd445859a6f6d350eda1098c3",
+      "contexts": {
+        "csize-context-native-rust-text": {
+          "complete": true,
+          "private_sha256": "29c00e157cb23921803a4e3ba4b59aa6227618cd03312b19d135ad088f62e3e2",
+          "repository_headers_verified": 854,
+          "active_selections_verified": 30,
+          "active_definition_counts": {
+            "ChTraitsCRT::CharNext": 1,
+            "ChTraitsCRT::StringFindString": 1,
+            "ChTraitsCRT::SafeStringLen": 1
+          },
+          "preprocessed_full_stream_sha256_runner_reported": "cb1f6ce7063890fb430cac678bf1f181aa9576ed3e1f955e995f5f26967c8879",
+          "method_body_hashes": [
+            {
+              "symbol": "ChTraitsCRT::CharNext",
+              "active_body_sha256": "dd0813dd593e202ede7802ba481630d1115e205d107a46b4aeb15fbb1ccd13fc",
+              "source_matches": [
+                {
+                  "sha256": "2b5e82057a2ed4ce558eb8c1c66f4d25683ce3eebec33beca8faad39ad4bd50f",
+                  "raw_body_sha256": "dd0813dd593e202ede7802ba481630d1115e205d107a46b4aeb15fbb1ccd13fc",
+                  "exact_body_tokens": true
+                }
+              ]
+            },
+            {
+              "symbol": "ChTraitsCRT::StringFindString",
+              "active_body_sha256": "3a34db991c3388f5acb212d75c2f7ace7f60eeb10cf1e6645ed393df59df1305",
+              "source_matches": [
+                {
+                  "sha256": "76288fdfdc89b7750e732552dfb74648c8a85dffe2cba3a9a3eb793c26623d30",
+                  "raw_body_sha256": "3a34db991c3388f5acb212d75c2f7ace7f60eeb10cf1e6645ed393df59df1305",
+                  "exact_body_tokens": true
+                }
+              ]
+            },
+            {
+              "symbol": "ChTraitsCRT::SafeStringLen",
+              "active_body_sha256": "57f8dda64ed6ca1509efc5f9dfcd2c0b9db5cef4442a7ca455edc2ec484187ab",
+              "source_matches": [
+                {
+                  "sha256": "8c9b9551b2e7af1a4a075a6905a8228df878f78bd739327750fa840a2bac3b80",
+                  "raw_body_sha256": "424622590170411c34e3de9dd0d1269ca802f80e96979fa2a206e912c4d0e0f3",
+                  "exact_body_tokens": false
+                }
+              ]
+            },
+            {
+              "symbol": "CSimpleStringT::StringLength",
+              "active_body_sha256": "3b794ebf52d1bd951acebd5337958fb165ee9f16a259af577e66cd798a3a8c9d",
+              "source_matches": [
+                {
+                  "sha256": "add8d8f159111573bb75b8b47cd6dd1334f6f2485278124f5ac4705a5118a84a",
+                  "raw_body_sha256": "ced6e92d353aea5a6240684c8f581d15ac1d00b0681fb726e20ea6200c69e29e",
+                  "exact_body_tokens": false
+                }
+              ]
+            }
+          ]
+        },
+        "csize-context-experimental": {
+          "complete": true,
+          "private_sha256": "c255a0468df637bd73dc9924a907084e4216966aebced19ddfd93fe73f4da7da",
+          "repository_headers_verified": 854,
+          "active_selections_verified": 30,
+          "active_definition_counts": {
+            "ChTraitsCRT::CharNext": 1,
+            "ChTraitsCRT::StringFindString": 1,
+            "ChTraitsCRT::SafeStringLen": 1
+          },
+          "preprocessed_full_stream_sha256_runner_reported": "ce88126b00dca7977cb0d68f2cc4ff05663e0ab33d728075ffc62a120d2d3c8b",
+          "method_body_hashes": [
+            {
+              "symbol": "ChTraitsCRT::CharNext",
+              "active_body_sha256": "dd0813dd593e202ede7802ba481630d1115e205d107a46b4aeb15fbb1ccd13fc",
+              "source_matches": [
+                {
+                  "sha256": "2b5e82057a2ed4ce558eb8c1c66f4d25683ce3eebec33beca8faad39ad4bd50f",
+                  "raw_body_sha256": "dd0813dd593e202ede7802ba481630d1115e205d107a46b4aeb15fbb1ccd13fc",
+                  "exact_body_tokens": true
+                }
+              ]
+            },
+            {
+              "symbol": "ChTraitsCRT::StringFindString",
+              "active_body_sha256": "3a34db991c3388f5acb212d75c2f7ace7f60eeb10cf1e6645ed393df59df1305",
+              "source_matches": [
+                {
+                  "sha256": "76288fdfdc89b7750e732552dfb74648c8a85dffe2cba3a9a3eb793c26623d30",
+                  "raw_body_sha256": "3a34db991c3388f5acb212d75c2f7ace7f60eeb10cf1e6645ed393df59df1305",
+                  "exact_body_tokens": true
+                }
+              ]
+            },
+            {
+              "symbol": "ChTraitsCRT::SafeStringLen",
+              "active_body_sha256": "57f8dda64ed6ca1509efc5f9dfcd2c0b9db5cef4442a7ca455edc2ec484187ab",
+              "source_matches": [
+                {
+                  "sha256": "8c9b9551b2e7af1a4a075a6905a8228df878f78bd739327750fa840a2bac3b80",
+                  "raw_body_sha256": "424622590170411c34e3de9dd0d1269ca802f80e96979fa2a206e912c4d0e0f3",
+                  "exact_body_tokens": false
+                }
+              ]
+            },
+            {
+              "symbol": "CSimpleStringT::StringLength",
+              "active_body_sha256": "3b794ebf52d1bd951acebd5337958fb165ee9f16a259af577e66cd798a3a8c9d",
+              "source_matches": [
+                {
+                  "sha256": "add8d8f159111573bb75b8b47cd6dd1334f6f2485278124f5ac4705a5118a84a",
+                  "raw_body_sha256": "ced6e92d353aea5a6240684c8f581d15ac1d00b0681fb726e20ea6200c69e29e",
+                  "exact_body_tokens": false
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "job_id": 116163841045,
+      "job_conclusion": "success",
+      "artifact": "document-atl-contract-x64"
+    }
+  },
+  "preparation_bridge": {
+    "Win32": {
+      "preparation_commit": "0976ec8a960e9a39ddca3781de4b3d38965bb6be",
+      "preparation_run": 38653823908,
+      "preparation_report_sha256": "1a31181b5679a08d0b55591d27b4528a64a3b1020439e53186690fafb9c36df5",
+      "preparation_observations": 620,
+      "preparation_traces_sha256": [
+        "6ac88a87f8a61d1139d4085090305096a5ddb03fc68200f7ec2dd89180ae2f02",
+        "6ac88a87f8a61d1139d4085090305096a5ddb03fc68200f7ec2dd89180ae2f02"
+      ],
+      "actual_mfc_type_identical": true,
+      "actual_mfc_type": "class ATL::CStringT<wchar_t,class StrTraitMFC<wchar_t,class ATL::ChTraitsCRT<wchar_t> > >",
+      "same_arch_compiler_sha256": "303bfbe5523af2e925871a1bc7fd2ec5f199a69208a3b6716724c3e6d6b6962d",
+      "shared_included_headers_identical": 318,
+      "selected_mfc_atl_headers_sha256": {
+        "afx.h": "2d3e833f618d2d30064eb69df3ebad80300fe6f4908bb1c212a8653269b26c52",
+        "afxstr.h": "f1bef3d417082e6818a6424376481d484d0052955a2a5aa8c7697e8103b4514e",
+        "cstringt.h": "946be7ebc817f7d3214920af5a57d4f71175444f78c5bc408fae3ff5019e127d",
+        "atlsimpstr.h": "73b81faef80dff5bec2e663617da11ddcb942b51dddf5aa8228727bdc1e519db",
+        "afxwin.h": "1345f8610fb9e36a3e832e515f6d14b86c87f9fdff82dd6d339a6d342db0f1ab",
+        "atlstr.h": "0c13f0173d4417e69cde99a1854702bdc494c0dd1a68ba8a3a4ea7d5dfe9af2c"
+      },
+      "shared_explicit_runtime_compile_flags": [
+        "/MT",
+        "/O2",
+        "/EHsc",
+        "/std:c++14",
+        "/DUNICODE",
+        "/D_UNICODE",
+        "/DNDEBUG",
+        "/D_AFX_NO_MFC_CONTROLS_IN_DIALOGS",
+        "/DWINVER=0x0601",
+        "/D_WIN32_WINNT=0x0601"
+      ],
+      "flag_scope": "ATL runtime probe adds explicit /fp:precise; source-only production contexts have additional project flags. This is not an assertion that all commands are identical."
+    },
+    "x64": {
+      "preparation_commit": "0976ec8a960e9a39ddca3781de4b3d38965bb6be",
+      "preparation_run": 38653823908,
+      "preparation_report_sha256": "d6464be017fdf0cea56953d973cbb25072ca82df273efc29037b10fd66618328",
+      "preparation_observations": 620,
+      "preparation_traces_sha256": [
+        "1af9fb5a69ae0963cb4fba7af1db10b8ea0a08ce2fe8500b5bcdc5a2d55da986",
+        "1af9fb5a69ae0963cb4fba7af1db10b8ea0a08ce2fe8500b5bcdc5a2d55da986"
+      ],
+      "actual_mfc_type_identical": true,
+      "actual_mfc_type": "class ATL::CStringT<wchar_t,class StrTraitMFC<wchar_t,class ATL::ChTraitsCRT<wchar_t> > >",
+      "same_arch_compiler_sha256": "fe251ef50a1545b1b0835ee17b1e785459712b38d79e45b5c1d3d28970a36619",
+      "shared_included_headers_identical": 317,
+      "selected_mfc_atl_headers_sha256": {
+        "afx.h": "2d3e833f618d2d30064eb69df3ebad80300fe6f4908bb1c212a8653269b26c52",
+        "afxstr.h": "f1bef3d417082e6818a6424376481d484d0052955a2a5aa8c7697e8103b4514e",
+        "cstringt.h": "946be7ebc817f7d3214920af5a57d4f71175444f78c5bc408fae3ff5019e127d",
+        "atlsimpstr.h": "73b81faef80dff5bec2e663617da11ddcb942b51dddf5aa8228727bdc1e519db",
+        "afxwin.h": "1345f8610fb9e36a3e832e515f6d14b86c87f9fdff82dd6d339a6d342db0f1ab",
+        "atlstr.h": "0c13f0173d4417e69cde99a1854702bdc494c0dd1a68ba8a3a4ea7d5dfe9af2c"
+      },
+      "shared_explicit_runtime_compile_flags": [
+        "/MT",
+        "/O2",
+        "/EHsc",
+        "/std:c++14",
+        "/DUNICODE",
+        "/D_UNICODE",
+        "/DNDEBUG",
+        "/D_AFX_NO_MFC_CONTROLS_IN_DIALOGS",
+        "/DWINVER=0x0601",
+        "/D_WIN32_WINNT=0x0601"
+      ],
+      "flag_scope": "ATL runtime probe adds explicit /fp:precise; source-only production contexts have additional project flags. This is not an assertion that all commands are identical."
+    }
+  },
+  "verified_semantics": [
+    "Actual wide CharNext is expanded as CharNextW and advances one wchar_t unit unconditionally; no surrogate pairing or NUL-sensitive advance is introduced.",
+    "Selected const wide StringFindString delegates to wcsstr. Wide SafeStringLen tests a null pointer and otherwise uses wcslen; CSimpleStringT wide StringLength likewise uses NUL-terminated length.",
+    "Actual wide ChTraitsBase aliases, CStringT and CSimpleStringT dependent aliases, and StrTraitMFC/StrTraitATL template/base declarations are included in the origin proof.",
+    "Active SafeStringLen body expands NULL to zero in these captures. Active and raw body hashes remain distinct; macro-expanded source is authoritative without guessed normalization."
+  ],
+  "limitations": [
+    "This proves only the selected helper signatures/dispatch path in the captured headers, flags and actual contexts, not all CString overloads or arbitrary SDK/toolchain versions.",
+    "Full preprocessed SDK streams were hashed and discarded. Original external SDK/compiler/library files are unavailable locally; full-file hashes and raw stream hashes remain runner-reported. Retained excerpts, origins, contexts, logs, executables, and repository headers are independently verified.",
+    "The preparation bridge revalidates bounded 620-case 0976 observations per architecture with matching actual MFC type/compiler/shared SDK headers and relevant flags. It does not establish whole Add/parser/charset/WebVTT/callback compatibility.",
+    "Replace fixed-original-end behavior and unresolved unassigned tail histories remain scoped by the preparation helper refusal domain. No new native execution or undefined histories were run.",
+    "Earlier 0976 helper source capture was incomplete and receives no complete-helper proof retroactively. Changed-source whole-renderer production gates remain separate."
+  ]
+}
