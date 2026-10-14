@@ -6,8 +6,8 @@
 //! checks before supplying records (the suffix begins at STSEntry construction);
 //! raw code units are retained, including unpaired surrogates and embedded NULs.
 //! Raw name/path, supplied interpretation/script/render metadata and initialized
-//! styles are owned here. Native map orchestration, other metadata, Add parsing,
-//! full Copy orchestration, CRT sort and encoding conversion remain outside this
+//! styles are owned here. Native CRT suffix naming, remaining metadata, Add
+//! frontends, outer Copy orchestration, CRT sort and encoding conversion remain outside this
 //! API. Allocation failure/partial native mutation and callbacks are outside this
 //! API's comparison domain.
 use alloc::{vec, vec::Vec};

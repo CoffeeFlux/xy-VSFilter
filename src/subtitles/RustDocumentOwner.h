@@ -122,19 +122,25 @@ inline CStringW String(const Bytes& bytes, size_t& offset, uint32_t length) {
     for(uint32_t i = 0; i < length; ++i) units.push_back(static_cast<wchar_t>(Load(bytes, offset + size_t(i) * 2, 2)));
     offset += size; return CStringW(units.data(), static_cast<int>(length));
 }
-inline Bytes EntryBytes(const STSEntry& entry) {
+inline Bytes EntryBytes(const CStringW& text, bool unicode, int64_t start, int64_t end,
+    const CString& style, const CString& actor, const CString& effect,
+    const CRect& margin_rect, int layer, int readorder) {
     static_assert(sizeof(TCHAR) == 2, "Experimental document requires the native Unicode configuration");
-    Bytes fields[4] = {Units(entry.str), Units(entry.style), Units(entry.actor), Units(entry.effect)};
+    Bytes fields[4] = {Units(text), Units(style), Units(actor), Units(effect)};
     size_t total = XY_DOCUMENT_V1_ENTRY_HEADER_BYTES;
     for(const auto& field : fields) total = AddSize(total, field.size());
     Bytes bytes(XY_DOCUMENT_V1_ENTRY_HEADER_BYTES, 0); bytes.reserve(total);
-    Put(bytes, 0, static_cast<uint64_t>(entry.start), 8); Put(bytes, 8, static_cast<uint64_t>(entry.end), 8);
-    const LONG margins[4] = {entry.marginRect.left, entry.marginRect.top, entry.marginRect.right, entry.marginRect.bottom};
+    Put(bytes, 0, static_cast<uint64_t>(start), 8); Put(bytes, 8, static_cast<uint64_t>(end), 8);
+    const LONG margins[4] = {margin_rect.left, margin_rect.top, margin_rect.right, margin_rect.bottom};
     for(size_t i = 0; i < 4; ++i) Put(bytes, 16 + 4 * i, static_cast<uint32_t>(margins[i]), 4);
-    Put(bytes, 32, static_cast<uint32_t>(entry.layer), 4); Put(bytes, 36, static_cast<uint32_t>(entry.readorder), 4);
-    Put(bytes, 40, entry.fUnicode ? 1 : 0, 4);
+    Put(bytes, 32, static_cast<uint32_t>(layer), 4); Put(bytes, 36, static_cast<uint32_t>(readorder), 4);
+    Put(bytes, 40, unicode ? 1 : 0, 4);
     for(size_t i = 0; i < 4; ++i) {Put(bytes, 44 + 4 * i, Count(fields[i].size() / 2), 4); bytes.insert(bytes.end(), fields[i].begin(), fields[i].end());}
     return bytes;
+}
+inline Bytes EntryBytes(const STSEntry& entry) {
+    return EntryBytes(entry.str,entry.fUnicode,entry.start,entry.end,entry.style,
+        entry.actor,entry.effect,entry.marginRect,entry.layer,entry.readorder);
 }
 inline STSEntry EntryValue(const Bytes& bytes) {
     Shape(bytes.size() >= XY_DOCUMENT_V1_ENTRY_HEADER_BYTES && Load(bytes, 60, 4) == 0 && Load(bytes, 40, 4) <= 1);
@@ -360,6 +366,17 @@ public:
     int AddPrepared(const STSEntry& entry, uint32_t mode) {
         const auto bytes = DocumentDetail::EntryBytes(entry); std::array<uint8_t,8> out{};
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_add_prepared_v1(id_,mode,bytes.data(),bytes.size(),out.data(),out.size());}));
+        return DocumentDetail::I32(DocumentDetail::Load(out,4,4));
+    }
+    // Native FastTrim/rejections/WebVTT have finished. Rust owns only the final
+    // CR/LF/style suffix followed by the existing prepared-record insertion.
+    int AddFinalSuffix(const CStringW& text, bool unicode, int64_t start, int64_t end,
+        const CString& style, const CString& actor, const CString& effect,
+        const CRect& margin_rect, int layer, int readorder, uint32_t mode) {
+        const auto bytes = DocumentDetail::EntryBytes(text,unicode,start,end,style,actor,effect,margin_rect,layer,readorder);
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_add_prepared_v1(
+            id_,mode,bytes.data(),bytes.size(),out.data(),out.size());}));
         return DocumentDetail::I32(DocumentDetail::Load(out,4,4));
     }
     // Canonical supplied default value lives in Rust. Native defaults/LOGFONT

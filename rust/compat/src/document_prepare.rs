@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 //! Final supplied CString preparation only. Native FastTrim, initial rejection,
 //! WebVTT, charset conversion and append/callback orchestration remain outside.
-//! Candidate model of captured MFC CStringW Remove/Replace/TrimLeft source.
-//! General raw-unit parity still requires captured WCHAR trait dispatch proving
-//! CharNext advances one code unit. Allocation failure/timing is not emulated.
+//! Model of captured MFC CStringW Remove/Replace/TrimLeft source. The installed
+//! WCHAR dispatch and one-code-unit CharNext are source-verified on both Windows
+//! architectures (docs/rust-document-cstring-helper-evidence.json), alongside
+//! bounded native/Rust observations. Allocation failure/timing is not emulated.
 use crate::document::PreparedEntry;
 use alloc::vec::Vec;
 

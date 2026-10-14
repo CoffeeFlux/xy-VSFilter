@@ -84,6 +84,11 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
                     (b"copy-styles-self-after", b"copy-styles-grown-result", b"copy-styles-mixed-result"))
          + b"\n".join(text_plan_rows()) + b"\n"
          + b"".join(b"style-rename-segments "+stage+b" count=1 animated=1\n" for stage in (b"text-plan-wide-noop",b"text-plan-packed-noop",b"text-plan-final"))
+         + b"preparation-stage preparation-initial entries=1 segments=1 animated=1\n"
+         + b"preparation-value skipped-lf 9 0058 005c 004e 005c 004e 0000 000a 0059 0000 0\n"
+         + b"preparation-stage preparation-fields entries=5 segments=3 animated=1\n"
+         + b"preparation-stage preparation-add-zero-rejected entries=5 segments=3 animated=1\n"
+         + b"preparation-stage preparation-entry-zero entries=6 segments=3 animated=1\n"
          + b"saved-file ssa exists=1 bytes=1 41\nsaved-file ass exists=1 bytes=1 41\n"
          + b"saved-file srt exists=1 bytes=1 41\nsaved-file srt-sidecar exists=1 bytes=1 41\n"
          + b"saved-file ssa-sidecar exists=0\nsaved-file ass-sidecar exists=0\n"
@@ -354,6 +359,15 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
         for old,new in ((b"destination=640,600",b"destination=640,0"),
                         (b"layout-size-callback layout-size-parser-y width=640 height=360\n",b"")):
             with self.assertRaises(ValueError): compare_traces([TRACE.replace(old,new)]*4,64)
+
+    def test_native_preparation_stages_raw_cursor_case_and_archive_gate(self):
+        legacy=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith((b"preparation-stage ",b"preparation-value ")))
+        with self.assertRaises(ValueError):compare_traces([legacy]*4,64)
+        compare_traces([legacy]*4,64,require_preparation_stages=False)
+        for old,new in ((b"preparation-stage preparation-entry-zero entries=6",b"preparation-stage preparation-entry-zero entries=5"),
+                        (b"0000 000a 0059 0000 0",b"0000 005c 004e 0059 0"),
+                        (b"preparation-stage preparation-add-zero-rejected entries=5 segments=3 animated=1\n",b"")):
+            with self.assertRaises(ValueError):compare_traces([TRACE.replace(old,new)]*4,64)
 
     def test_rejects_repeat_nondeterminism(self):
         changed = TRACE.replace(b"callback changed", b"callback empty")

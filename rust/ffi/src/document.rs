@@ -1384,15 +1384,32 @@ pub unsafe extern "C" fn xy_vsfilter_document_add_prepared_v1(
     capacity: usize,
 ) -> u32 {
     required!(output_capacity(output, capacity, 8));
-    let mode = match mode {
-        0 => AddMode::Add,
-        1 => AddMode::EntryOnly,
-        2 => AddMode::WebVtt,
+    let (mode, preparation) = match mode {
+        0 => (AddMode::Add, None),
+        1 => (AddMode::EntryOnly, None),
+        2 => (AddMode::WebVtt, None),
+        3 => (AddMode::Add, Some(false)),
+        4 => (AddMode::EntryOnly, Some(true)),
+        5 => (AddMode::WebVtt, Some(false)),
         _ => return INVALID_INPUT,
     };
     // SAFETY: caller lends the bounded readable range; helper snapshots it now.
     let input = required!(unsafe { copy_input(input, length) });
     let entry = required!(wire::decode_entry(&input).map_err(wire_error));
+    let entry = if let Some(entry_only) = preparation {
+        required!(
+            xy_vsfilter_compat::document_prepare::prepare_add_record(entry, entry_only).map_err(
+                |error| match error {
+                    xy_vsfilter_compat::document_prepare::Error::UnresolvedTail =>
+                        UNRESOLVED_REFERENCE,
+                    xy_vsfilter_compat::document_prepare::Error::CountOverflow
+                    | xy_vsfilter_compat::document_prepare::Error::LengthOverflow => COUNT_OVERFLOW,
+                }
+            )
+        )
+    } else {
+        entry
+    };
     let index = required!(admitted(|registry| {
         let document = registry.document_mut(owner).map_err(registry_error)?;
         // The v1 wire admits at most INT_MAX entries, stricter than the core's
@@ -1818,6 +1835,67 @@ mod tests {
         // SAFETY: allocated byte ranges below are valid for each supplied size;
         // explicit null/oversized checks are rejected before raw accesses.
         unsafe {
+            let mut suffix_entry = wire::decode_entry(&entry(0, 10)).unwrap();
+            suffix_entry.text = vec![0xd800, 13, 10, 0, 10];
+            suffix_entry.style = vec![42, 42, 0, 0xdc00, 42];
+            suffix_entry.readorder = 17;
+            for mode in 0..=5 {
+                let owner = create();
+                let bytes = wire::encode_entry(&suffix_entry).unwrap();
+                assert_eq!(add(owner, mode, &bytes).0, OK);
+                let mut expected = suffix_entry.clone();
+                if mode >= 3 {
+                    expected.text = vec![0xd800, 92, 78, 0, 10, 0];
+                    expected.style = vec![0, 0xdc00, 42];
+                }
+                assert_eq!(state(owner).entries(), &[expected]);
+                assert_eq!(xy_vsfilter_document_destroy_v1(owner), OK);
+            }
+            let suffix_owner = create();
+            suffix_entry.text = vec![13];
+            suffix_entry.style = vec![42];
+            assert_eq!(
+                add(suffix_owner, 3, &wire::encode_entry(&suffix_entry).unwrap()).0,
+                OK
+            );
+            assert!(state(suffix_owner).entries()[0].text.is_empty());
+            assert!(state(suffix_owner).entries()[0].style.is_empty());
+            suffix_entry.style = vec![];
+            assert_eq!(
+                add(suffix_owner, 4, &wire::encode_entry(&suffix_entry).unwrap()).0,
+                OK
+            );
+            assert_eq!(
+                state(suffix_owner).entries()[1].style,
+                [68, 101, 102, 97, 117, 108, 116]
+            );
+            suffix_entry.text = vec![10, 10, 0, 10, 10];
+            let before = state(suffix_owner);
+            assert_eq!(
+                add(suffix_owner, 3, &wire::encode_entry(&suffix_entry).unwrap()),
+                (UNRESOLVED_REFERENCE, [0xa5; 8])
+            );
+            assert_eq!(state(suffix_owner), before);
+            assert_eq!(xy_vsfilter_document_destroy_v1(suffix_owner), OK);
+            let suffix_owner = create();
+            suffix_entry.text = vec![10, 0, 10];
+            suffix_entry.style = vec![42, 65];
+            let mut overlap = wire::encode_entry(&suffix_entry).unwrap();
+            assert_eq!(
+                xy_vsfilter_document_add_prepared_v1(
+                    suffix_owner,
+                    3,
+                    overlap.as_ptr(),
+                    overlap.len(),
+                    overlap.as_mut_ptr(),
+                    8
+                ),
+                OK
+            );
+            assert_eq!(state(suffix_owner).entries()[0].text, [92, 78, 0, 10, 0]);
+            assert_eq!(state(suffix_owner).entries()[0].style, [65]);
+            assert_eq!(xy_vsfilter_document_destroy_v1(suffix_owner), OK);
+
             let text_owner = create();
             assert_eq!(add(text_owner, 0, &entry(0, 10)).0, OK);
             let mut output = [0xa5u8; 8];
