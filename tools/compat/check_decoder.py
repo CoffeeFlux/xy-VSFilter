@@ -54,7 +54,7 @@ def capture_inputs():
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h", ROOT / "include/xy_rust_writer.h", ROOT / "include/xy_rust_seek.h",
               ROOT / "include/xy_rust_drawing.h", ROOT / "include/xy_rust_layout.h", ROOT / "include/xy_rust_text_runs.h", ROOT / "include/xy_rust_wrap.h", ROOT / "include/xy_rust_line_layout.h", ROOT / "src/subtitles/RTS.h",
-              ROOT / "include/xy_rust_drawing_tokens.h", ROOT / "include/xy_rust_path_align.h", ROOT / "include/xy_rust_path_buffer.h", ROOT / "include/xy_rust_spans.h", ROOT / "include/xy_rust_edges.h", ROOT / "src/subtitles/Rasterizer.h", ROOT / "include/xy_rust_arc_queue.h", ROOT / "include/xy_rust_ellipse.h",
+              ROOT / "include/xy_rust_drawing_tokens.h", ROOT / "include/xy_rust_path_align.h", ROOT / "include/xy_rust_path_buffer.h", ROOT / "include/xy_rust_spans.h", ROOT / "include/xy_rust_edges.h", ROOT / "include/xy_rust_span_coverage.h", ROOT / "src/subtitles/Rasterizer.h", ROOT / "include/xy_rust_arc_queue.h", ROOT / "include/xy_rust_ellipse.h",
               ROOT / "src/subtitles/xy_widen_region.cpp", ROOT / "src/subtitles/xy_circular_array_queue.h",
               ROOT / "include/xy_rust_pipe_line.h", ROOT / "include/xy_rust_subrip_cue.h", ROOT / "include/xy_rust_sami_file.h", ROOT / "include/xy_rust_microdvd_style.h", ROOT / "include/xy_rust_font_records.h", ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
@@ -816,6 +816,16 @@ public:
             definition = definition.replace("__int64", "int64_t").replace("0x4000000040000000i64", "0x4000000040000000LL")
         edge_code += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n#undef EDGE_OWNER\n#undef EDGE_HEAD\n#undef EDGE_NEXT\n#undef EDGE_POS\n#undef EDGE_CHECK\n"
     (destination / "original_edge_storage.h").write_text(edge_code, encoding="utf-8")
+    coverage_code = '#include "span_coverage_shell.h"\n'
+    for name, content in (("ReferenceCoverage", raster_source), ("CandidateCoverage", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+        text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        coverage_code += f"namespace {name} {{\nCOVERAGE_RASTER_CLASS\n"
+        if name == "CandidateCoverage":
+            coverage_code += "#define XY_VSFILTER_RUST_TEXT\n"
+        definition = extract_definition(text, "bool Rasterizer::Rasterize(")
+        definition = definition.replace("XyRust::AccumulateSpan", "XyRust::ObservedAccumulateSpan")
+        coverage_code += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_span_coverage.h").write_text(coverage_code, encoding="utf-8")
     filter_source = original("src/subtitles/xy_filter.cpp", reference["commit"])
     vobsub_source = original("src/subtitles/VobSubImage.cpp", reference["commit"])
     golomb = '#pragma once\n#include "golomb_shell.h"\n'
@@ -1329,6 +1339,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     edges_result = run([str(edges_executable)], capture_output=True, text=True)
     print(edges_result.stdout, end="", flush=True)
     print(edges_result.stderr, end="", file=sys.stderr)
+    coverage_executable = destination / ("span-coverage-oracle.exe" if os.name == "nt" else "span-coverage-oracle")
+    coverage_compile = [arg.replace("find_char_oracle.cpp", "span_coverage_oracle.cpp").replace("find-char-oracle", "span-coverage-oracle") for arg in find_char_compile]
+    run(coverage_compile)
+    coverage_result = run([str(coverage_executable)], capture_output=True, text=True)
+    print(coverage_result.stdout, end="", flush=True)
+    print(coverage_result.stderr, end="", file=sys.stderr)
     pipe_line_executable = destination / ("pipe-line-oracle.exe" if os.name == "nt" else "pipe-line-oracle")
     pipe_line_compile = [arg.replace("find_char_oracle.cpp", "pipe_line_oracle.cpp").replace("find-char-oracle", "pipe-line-oracle") for arg in find_char_compile]
     run(pipe_line_compile)
@@ -1718,6 +1734,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "path_align_compile_command": path_align_compile,
         "path_align_result": path_align_result.stdout, "path_align_stderr": path_align_result.stderr,
         "path_align_scope": "Complete pinned PathData::AlignLeftTop over initialized point/type buffers; actual Windows POINT/ATL geometry; exact guarded buffers, origin/size, errno/FP/Windows error state; native cleanup modeled, outputs disjoint and representable arithmetic only",
+        "span_coverage_compile_command": coverage_compile,
+        "span_coverage_result": coverage_result.stdout, "span_coverage_stderr": coverage_result.stderr,
+        "span_coverage_scope": "Whole pinned Rasterize, guarded initialized planes, controlled allocator and memset boundaries; exact byte wrapping, endpoint phases, body/border order, metadata and cleanup across reuse/null/empty and modeled first/second allocation failure. Valid linear backing addresses are retained without row clipping. Native dimension overflow, out-of-backing spans, unsupported signed shifts and actual OOM excluded.",
         "edge_storage_compile_command": edges_compile,
         "edge_storage_result": edges_result.stdout, "edge_storage_stderr": edges_result.stderr,
         "edge_storage_scope": "Complete pinned ScanConvert and realloc with controlled line/curve emission; original insertion statements extracted from the integer line evaluator. Exact initialized heads/edges, growth, traversal, Rust sorted nonzero winding and packed output spans/capacity across reuse/empty calls. Includes exhaustive sequences through five signed/duplicate/touching edges and large unfinished windings; native geometry remains controlled. Geometry production and allocator failures modeled/excluded; no uninitialized edge-zero/tail, invalid links/cycles or native constructor state is counted as parity.",

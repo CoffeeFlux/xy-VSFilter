@@ -20,6 +20,27 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Rust accumulates span coverage into the initialized body/border mask planes.
+  It preserves endpoint fractions, wrapping byte additions, span order and valid
+  linear backing addresses, including spans crossing logical row boundaries.
+  Checks complete before any mutation; decline retains the native path. Native
+  dimensions, packed-coordinate decoding, plane allocation and cleanup remain.
+  Fatal ASan/UBSan comparisons pass on arm64 and under x64 execution: **51,668
+  whole-Rasterize calls / 17,891,892 guarded plane bytes and metadata / 604,938
+  allocation-cleanup observations / 771,706 Rust span accumulations / zero
+  fallbacks**. Cases cover endpoint phases, repeated byte wrapping, irrelevant
+  endpoint row bits, body/border order, null/empty/reuse state, modeled failures
+  of each plane allocation, and ambient errno/FP/Windows error state. Dimension
+  overflow, spans outside the backing allocation, unsupported signed shifts and
+  actual allocator failure are excluded. Rust 1.85 tests (141 core, 91 FFI),
+  strict Clippy, default syntax and Python checks pass. Eight drawing scripts
+  cover every subpixel phase and expand the corpus to **746 cases**;
+  Windows/Miri and actual DLL comparisons are pending.
+* Ellipse scratch storage has completed all four portable CI targets, Miri and
+  both Windows renderer architectures. The **706-case / 7,410-frame** corpus and
+  **32 mutations / 224 frames** match on each architecture, with matching exports
+  and declared platform requirements. [Archived evidence](ellipse-scratch-evidence.json)
+  retains the separate ordinary optimized FP-flag limitation.
 * Rust now sorts scanline edges and calculates nonzero winding spans, including
   signed positions, closing-before-opening ties, either winding direction and
   discarded unfinished contours. Packed coordinates and winding updates use

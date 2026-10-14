@@ -111,3 +111,4 @@ pub mod path_buffer;
 
 pub mod edge_storage;
 pub mod scan_row;
+pub mod span_coverage;

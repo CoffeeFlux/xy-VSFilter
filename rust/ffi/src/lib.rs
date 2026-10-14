@@ -163,3 +163,4 @@ mod ellipse_matrix;
 mod path_buffer;
 
 mod edge_storage;
+mod span_coverage;

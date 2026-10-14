@@ -23,6 +23,7 @@
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_path_align.h"
 #include "xy_rust_path_buffer.h"
+#include "xy_rust_span_coverage.h"
 #include "xy_rust_spans.h"
 #endif
 #include <string.h>
@@ -938,6 +939,10 @@ bool Rasterizer::Rasterize(const ScanLineData2& scan_line_data2, int xsub, int y
             int y = (int)(((*it).first >> 32) - 0x40000000 + ysub);
             int x1 = (int)(((*it).first & 0xffffffff) - 0x40000000 + xsub);
             int x2 = (int)(((*it).second & 0xffffffff) - 0x40000000 + xsub);
+#ifdef XY_VSFILTER_RUST_TEXT
+            if(XyRust::AccumulateSpan(plan_selected, pitch, overlay->mOverlayHeight, y, x1, x2))
+                continue;
+#endif
             if(x2 > x1)
             {
                 int first = x1>>3;
