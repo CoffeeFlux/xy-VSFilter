@@ -241,6 +241,14 @@
     [
       "span-coverage-phase-0-memory",
       "span-coverage-phase-7-memory"
+    ],
+    [
+      "variance-control-file",
+      "variance-diagonal-file"
+    ],
+    [
+      "variance-control-memory",
+      "variance-diagonal-memory"
     ]
   ],
   "cases": [
@@ -12822,6 +12830,182 @@
       "id": "arc-queue-animated-memory",
       "script": "test/compat/generated/arc-queue-animated.ass",
       "sha256": "10970619f3b28a254798607b2f6c0f0b8ca8a4d9f3bbaa175dc8561f65d980a7",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "variance-control-file",
+      "script": "test/compat/generated/variance-control.ass",
+      "sha256": "5e9586787919c62de1ed344bba4fce46fbe808f5edb0cc5654968abc2096ec56",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "variance-control-memory",
+      "script": "test/compat/generated/variance-control.ass",
+      "sha256": "5e9586787919c62de1ed344bba4fce46fbe808f5edb0cc5654968abc2096ec56",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "variance-diagonal-file",
+      "script": "test/compat/generated/variance-diagonal.ass",
+      "sha256": "17849035d34be48519c812c7908527a0216027376698ea0d40fe314a3cef2e55",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "variance-diagonal-memory",
+      "script": "test/compat/generated/variance-diagonal.ass",
+      "sha256": "17849035d34be48519c812c7908527a0216027376698ea0d40fe314a3cef2e55",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "variance-reverse-file",
+      "script": "test/compat/generated/variance-reverse.ass",
+      "sha256": "cf884be1fb5929862c1a0c06afd8a56ff2df22e5c6c5812545abee9929242fb6",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "variance-reverse-memory",
+      "script": "test/compat/generated/variance-reverse.ass",
+      "sha256": "cf884be1fb5929862c1a0c06afd8a56ff2df22e5c6c5812545abee9929242fb6",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "variance-drawing-file",
+      "script": "test/compat/generated/variance-drawing.ass",
+      "sha256": "cae74e9e719d60a0d14e3ec505a7dbb00c9231576ee2062e409ad0e2ac9a8d60",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "variance-drawing-memory",
+      "script": "test/compat/generated/variance-drawing.ass",
+      "sha256": "cae74e9e719d60a0d14e3ec505a7dbb00c9231576ee2062e409ad0e2ac9a8d60",
       "open": "memory",
       "width": 1280,
       "height": 720,

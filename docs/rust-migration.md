@@ -20,6 +20,29 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Rust also owns the aligned output planes of GetSubpixelVariance, with the
+  original shared-reference lifetime and logical cache-byte accounting. Native
+  unsigned shift masking, geometry, whole-pitch versus row-width copy selection
+  and the existing bilinear filter order remain. Fatal ASan/UBSan comparisons
+  pass on arm64 and under x64 execution: **32,456 whole-method calls / 3,454,480
+  plane bytes and metadata / 324,320 logical allocation observations / 54,120
+  Rust owners, loans and releases**. Both copy branches are checked (**15,464
+  whole-pitch / 16,992 row-width**), with initialized source padding, aliased
+  sources, retained output references, every subpixel phase and oversized shift
+  values. **200 modeled filter-scratch failures** preserve their return behavior;
+  native object/plane allocation failures, inconsistent source metadata and
+  arithmetic overflow are excluded. The full pinned Bilinear function executes
+  alongside the full pinned/candidate overlay method, including **164,160 Rust
+  filter rows**. Default syntax and Python checks pass; Rust code is unchanged
+  from the tested 142-core/92-FFI plane-ownership increment. Four fractional-motion
+  fixtures expand the renderer corpus to **754 cases**. Windows/Miri and actual
+  DLL comparisons are pending; host cache/filter configuration remains a separate
+  integration boundary.
+* Rust path append has completed all four portable CI targets, Miri and both
+  Windows renderer architectures. The **718-case / 7,530-frame** corpus and
+  **32 mutations / 224 frames** match on each architecture, alongside exports
+  and declared platform requirements. [Archived evidence](path-append-evidence.json)
+  preserves the separate modeled-breakpoint and native-arithmetic limitations.
 * Rust owns the initial aligned body and border planes created by Rasterize.
   The core allocates 16-byte-aligned blocks of output-only `MaybeUninit` bytes;
   native memset initializes the logical plane before consumption. One mutable

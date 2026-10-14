@@ -1986,21 +1986,39 @@ Overlay* Overlay::GetSubpixelVariance(unsigned int xshift, unsigned int yshift)
         return NULL;
     }
 
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::PlaneAllocation rust_body(overlay->mOverlayPitch * overlay->mOverlayHeight);
+    BYTE* body = rust_body.Ready() ? rust_body.Data() : reinterpret_cast<BYTE*>(xy_malloc(overlay->mOverlayPitch * overlay->mOverlayHeight));
+#else
     BYTE* body = reinterpret_cast<BYTE*>(xy_malloc(overlay->mOverlayPitch * overlay->mOverlayHeight));
+#endif
     if( body==NULL )
     {
         return NULL;
     }
+#ifdef XY_VSFILTER_RUST_TEXT
+    if(rust_body.Ready()) rust_body.Attach(overlay->mBody);
+    else
+#endif
     overlay->mBody.reset(body, xy_free);
     memset(body, 0, overlay->mOverlayPitch*overlay->mOverlayHeight);
     BYTE* border = NULL;
     if (!overlay->mfWideOutlineEmpty)
     {
+#ifdef XY_VSFILTER_RUST_TEXT
+        XyRust::PlaneAllocation rust_border(overlay->mOverlayPitch * overlay->mOverlayHeight);
+        border = rust_border.Ready() ? rust_border.Data() : reinterpret_cast<BYTE*>(xy_malloc(overlay->mOverlayPitch * overlay->mOverlayHeight));
+#else
         border = reinterpret_cast<BYTE*>(xy_malloc(overlay->mOverlayPitch * overlay->mOverlayHeight));
+#endif
         if (border==NULL)
         {
             return NULL;
         }
+#ifdef XY_VSFILTER_RUST_TEXT
+        if(rust_border.Ready()) rust_border.Attach(overlay->mBorder);
+        else
+#endif
         overlay->mBorder.reset(border, xy_free);
         memset(border, 0, overlay->mOverlayPitch*overlay->mOverlayHeight);
     }
