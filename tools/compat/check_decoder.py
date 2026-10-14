@@ -72,6 +72,7 @@ def capture_inputs():
               ROOT / "src/subtitles/TextFile.h",
               ROOT / "src/subtitles/TextFile.cpp", ROOT / "src/subtitles/STS.cpp",
               ROOT / "src/subtitles/RTS.cpp", ROOT / "tools/compat/reference.json"]
+    inputs += [ROOT / "src/subtitles/libssf/Arabic.cpp", ROOT / "src/subtitles/libssf/Arabic.h", ROOT / "include/xy_rust_ssf_arabic.h"]
     inputs += [ROOT / "src/filters/transform/vsfilter/csriapi.cpp", ROOT / "src/subtitles/libssf/Stream.cpp", ROOT / "src/subtitles/libssf/Stream.h", ROOT / "include/xy_rust_ssf_stream.h"]
     inputs += [ROOT / "src/thirdparty/boost_lib/boost/flyweight.hpp"]
     inputs += sorted((ROOT / "src/thirdparty/boost_lib/boost/flyweight").rglob("*.hpp"))
@@ -984,6 +985,15 @@ public:
             csri_filename_code += filename_method + "\n"
         csri_filename_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_csri_filename.h").write_text(csri_filename_code, encoding="utf-8")
+    ssf_arabic_code = '#include "ssf_arabic_shell.h"\n'
+    for name, content, declaration in (("ReferenceArabic", original("src/subtitles/libssf/Arabic.cpp", reference["commit"]), original("src/subtitles/libssf/Arabic.h", reference["commit"])), ("CandidateArabic", (ROOT / "src/subtitles/libssf/Arabic.cpp").read_bytes(), (ROOT / "src/subtitles/libssf/Arabic.h").read_bytes())):
+        arabic_text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        arabic_declaration = declaration.decode("utf-8-sig").replace("\r\n", "\n")
+        if name == "CandidateArabic":
+            ssf_arabic_code += "#define XY_VSFILTER_RUST_TEXT\n"
+        arabic_body = arabic_text[arabic_text.index("namespace ssf"):]
+        ssf_arabic_code += arabic_body.replace("namespace ssf\n{", f"namespace {name} {{\n" + extract_definition(arabic_declaration, "class Arabic") + ";\n", 1) + "\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_ssf_arabic.h").write_text(ssf_arabic_code, encoding="utf-8")
     ssf_stream_code = '#include "ssf_stream_shell.h"\n'
     ssf_source = original("src/subtitles/libssf/Stream.cpp", reference["commit"])
     ssf_header = original("src/subtitles/libssf/Stream.h", reference["commit"])
@@ -1642,6 +1652,12 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
     ssf_stream_result = run([str(ssf_stream_executable)], capture_output=True, text=True)
     print(ssf_stream_result.stdout, end="", flush=True)
     print(ssf_stream_result.stderr, end="", file=sys.stderr)
+    ssf_arabic_executable = destination / ("ssf-arabic-oracle.exe" if os.name == "nt" else "ssf-arabic-oracle")
+    ssf_arabic_compile = [arg.replace("find_char_oracle.cpp", "ssf_arabic_oracle.cpp").replace("find-char-oracle", "ssf-arabic-oracle") for arg in find_char_compile]
+    run(ssf_arabic_compile)
+    ssf_arabic_result = run([str(ssf_arabic_executable)], capture_output=True, text=True)
+    print(ssf_arabic_result.stdout, end="", flush=True)
+    print(ssf_arabic_result.stderr, end="", file=sys.stderr)
     ssf_output_executable = destination / ("ssf-output-oracle.exe" if os.name == "nt" else "ssf-output-oracle")
     ssf_output_compile = [arg.replace("find_char_oracle.cpp", "ssf_output_oracle.cpp").replace("find-char-oracle", "ssf-output-oracle") for arg in find_char_compile]
     run(ssf_output_compile)
@@ -2176,6 +2192,9 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
         "fraction_storage_compile_command": fraction_storage_compile,
         "fraction_storage_result": fraction_storage_result.stdout, "fraction_storage_stderr": fraction_storage_result.stderr,
         "fraction_storage_scope": "Whole pinned xy_be_blur and xy_calculate_filter with observed filter/transpose calls and scratch ownership under strict FP compilation. x86/x64 execute extracted native SSE kernels against Rust kernels; arm64 substitutes extracted scalar callbacks and does not establish SSE parity. Exact stage bytes/order, output/padding, initialized scratch, cache accounting, signed and fractional pass counts, reuse and native allocation fallback. Positive dimensions at least four avoid an unused native before-base cursor; zero/smaller/negative dimensions, overflowing/nonfinite pass counts, invalid backing and actual allocation failure excluded.",
+        "ssf_arabic_compile_command": ssf_arabic_compile,
+        "ssf_arabic_result": ssf_arabic_result.stdout, "ssf_arabic_stderr": ssf_arabic_result.stderr,
+        "ssf_arabic_scope": "Complete pinned 256-row ArabicForms table and IsArabic/Replace overloads. All UTF-16 code units and all four presentation forms, every neighbor unit in both positions with representative centers and both membership states, all center units with boundary neighbors, repeated replacements, zero table entries, surrogate/out-of-range passthrough and ambient error state. Pure scalar Rust bridges. Invalid presentation enum values, external shaping/font selection and actual SSF rendering excluded.",
         "ssf_output_compile_command": ssf_output_compile,
         "ssf_output_result": ssf_output_result.stdout, "ssf_output_stderr": ssf_output_result.stderr,
         "ssf_output_scope": "Whole pinned OutputStream construction/destruction and PutChar with controlled virtual NextByte. Every UTF-16 code unit in all six encodings with and without first-character BOM state, repeated calls, byte order and historical left shifts; partial writes after callback exceptions, encoding mutation and bounded reentrant output. Exact callback/state/error traces. PutString formatting, actual IO and SSF rendering excluded. Native BOM recursion retained; safe Rust returns copied scalar output plan, and no Rust borrow spans callbacks.",
