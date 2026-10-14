@@ -2,7 +2,8 @@
 #pragma once
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 // Experimental native value boundary only. Canonical entries/segments live in
-// Rust; styles, metadata, string preparation and CRT numeric/sort choices do not.
+// Rust, including the supplied default style. Named styles, metadata, string
+// preparation and CRT numeric/sort choices remain native.
 #include "STS.h"
 #include "xy_rust_document.h"
 #include <windows.h>
@@ -154,6 +155,73 @@ inline STSSegment SegmentValue(const Bytes& bytes) {
     for(uint32_t i = 0; i < count; ++i) segment.subs.Add(static_cast<int>(Load(bytes,32 + size_t(i)*4,4)));
     return segment;
 }
+// Style wire is independent of STSStyle object layout and FwRect/CString
+// handles. Keep native materialization outside each admitted C ABI call.
+enum { StyleHeaderBytes = 192 };
+template<class Style> inline std::array<const double*,15> StyleFloatFields(const Style& value) {
+    return {{&value.fontSize,&value.outlineWidthX,&value.outlineWidthY,
+        &value.shadowDepthX,&value.shadowDepthY,&value.fontScaleX,&value.fontScaleY,
+        &value.fontSpacing,&value.fBlur,&value.fGaussianBlur,&value.fontAngleZ,
+        &value.fontAngleX,&value.fontAngleY,&value.fontShiftX,&value.fontShiftY}};
+}
+template<class Style> inline std::array<double*,15> StyleFloatFields(Style& value) {
+    return {{&value.fontSize,&value.outlineWidthX,&value.outlineWidthY,
+        &value.shadowDepthX,&value.shadowDepthY,&value.fontScaleX,&value.fontScaleY,
+        &value.fontSpacing,&value.fBlur,&value.fGaussianBlur,&value.fontAngleZ,
+        &value.fontAngleX,&value.fontAngleY,&value.fontShiftX,&value.fontShiftY}};
+}
+template<class Style> inline Bytes StyleBytes(const Style& value) {
+    static_assert(sizeof(double) == 8 && sizeof(int) == 4 && sizeof(COLORREF) == 4,
+        "Windows style transport widths");
+    const Bytes font = Units(value.fontName);
+    Bytes bytes(AddSize(StyleHeaderBytes, font.size()), 0);
+    const int fields[9] = {value.charSet,value.fontWeight,value.scrAlignment,value.borderStyle,value.relativeTo,
+        static_cast<int>(value.marginRect.get().left),static_cast<int>(value.marginRect.get().top),
+        static_cast<int>(value.marginRect.get().right),static_cast<int>(value.marginRect.get().bottom)};
+    for(size_t i = 0; i < 9; ++i) Put(bytes,i * 4,static_cast<uint32_t>(fields[i]),4);
+    for(size_t i = 0; i < 4; ++i) {
+        Put(bytes,36 + i * 4,static_cast<uint32_t>(value.colors[i]),4);
+        bytes[52 + i] = value.alpha[i];
+    }
+    bytes[56] = value.fItalic ? 1 : 0; bytes[57] = value.fUnderline ? 1 : 0;
+    bytes[58] = value.fStrikeOut ? 1 : 0;
+    Put(bytes,64,Count(font.size() / 2),4);
+    const auto floats = StyleFloatFields(value);
+    for(size_t i = 0; i < floats.size(); ++i) {
+        uint64_t bits; std::memcpy(&bits,floats[i],sizeof bits);
+        Put(bytes,72 + i * 8,bits,8);
+    }
+    for(size_t i = 0; i < font.size(); ++i) bytes[StyleHeaderBytes + i] = font[i];
+    return bytes;
+}
+template<class Style = STSStyle> inline Style StyleValue(const Bytes& bytes) {
+    Shape(bytes.size() >= StyleHeaderBytes);
+    for(size_t i = 56; i < 59; ++i) Shape(bytes[i] <= 1);
+    for(size_t i = 59; i < 64; ++i) Shape(bytes[i] == 0);
+    for(size_t i = 68; i < 72; ++i) Shape(bytes[i] == 0);
+    const uint32_t length = Count(static_cast<size_t>(Load(bytes,64,4)));
+    Shape(bytes.size() == AddSize(StyleHeaderBytes,MulSize(length,2)));
+    // Validate the entire record before constructing native strings/flyweights.
+    Style value;
+    value.charSet = I32(Load(bytes,0,4)); value.fontWeight = I32(Load(bytes,4,4));
+    value.scrAlignment = I32(Load(bytes,8,4)); value.borderStyle = I32(Load(bytes,12,4));
+    value.relativeTo = I32(Load(bytes,16,4));
+    value.marginRect = CRect(I32(Load(bytes,20,4)),I32(Load(bytes,24,4)),
+        I32(Load(bytes,28,4)),I32(Load(bytes,32,4)));
+    for(size_t i = 0; i < 4; ++i) {
+        value.colors[i] = static_cast<COLORREF>(Load(bytes,36 + i * 4,4));
+        value.alpha[i] = bytes[52 + i];
+    }
+    value.fItalic = bytes[56] != 0; value.fUnderline = bytes[57] != 0;
+    value.fStrikeOut = bytes[58] != 0;
+    const auto floats = StyleFloatFields(value);
+    for(size_t i = 0; i < floats.size(); ++i) {
+        const uint64_t bits = Load(bytes,72 + i * 8,8);
+        std::memcpy(floats[i],&bits,sizeof bits);
+    }
+    size_t offset = StyleHeaderBytes; value.fontName = String(bytes,offset,length);
+    return value;
+}
 } // namespace DocumentDetail
 
 class DocumentOwner;
@@ -250,6 +318,16 @@ public:
         const auto bytes = DocumentDetail::EntryBytes(entry); std::array<uint8_t,8> out{};
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_add_prepared_v1(id_,mode,bytes.data(),bytes.size(),out.data(),out.size());}));
         return DocumentDetail::I32(DocumentDetail::Load(out,4,4));
+    }
+    // Canonical supplied default value lives in Rust. Native defaults/LOGFONT
+    // preparation are caller operations; no native writable default-style loan.
+    template<class Style> void SetDefaultStyle(const Style& value) {
+        const auto bytes = DocumentDetail::StyleBytes(value);
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_set_default_style_v1(id_,bytes.data(),bytes.size());}));
+    }
+    template<class Style = STSStyle> Style DefaultStyle() const { return DocumentDetail::StyleValue<Style>(Snapshot(2,0).Read()); }
+    void CopyDefaultStyle(const DocumentOwner& source) {
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_copy_default_style_v1(id_,source.id_);}));
     }
     void CopyFrom(const DocumentOwner& source) {DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_copy_storage_v1(id_,source.id_);}));}
     void Clear() {DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_clear_storage_v1(id_);}));}

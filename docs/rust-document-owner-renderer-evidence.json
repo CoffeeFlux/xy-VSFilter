@@ -2037,8 +2037,8 @@
     }
   },
   "remaining": [
-    "Full linked native class lifecycle gate pending",
     "Style/default-style/metadata ownership remains native",
     "Allocator, dialog reentry, host lifetime and real Aegisub/player gates remain unresolved"
-  ]
+  ],
+  "followup": "Full linked native class lifecycle passes x86/x64 at 04673672; see rust-document-native-lifecycle-evidence.json. Later style/default ownership changes require their own evidence."
 }

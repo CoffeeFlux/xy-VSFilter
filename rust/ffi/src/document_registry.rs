@@ -5,6 +5,7 @@
 //! native pointer is a resource handle. Busy is deliberately not mapped to a
 //! public HRESULT. Caller buffers, native wrapper lifetime, allocator/new-handler
 //! reentry and compatible host waiting remain separate integration contracts.
+use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::cell::UnsafeCell;
 use core::sync::atomic::{AtomicBool, Ordering};
@@ -27,7 +28,7 @@ pub(crate) enum Kind {
 }
 
 pub(crate) enum Resource {
-    Document(Document),
+    Document(Box<Document>),
     Snapshot(Vec<u8>),
 }
 impl Resource {
@@ -105,9 +106,34 @@ impl Registry {
         source: Handle,
     ) -> Result<Resource, Error> {
         self.document(destination)?;
-        let copy = self.document(source)?.clone();
-        let retired = core::mem::replace(self.document_mut(destination)?, copy);
+        let mut copy: Box<Document> = Box::default();
+        copy.copy_storage_from(self.document(source)?);
+        let index = self.position(destination)?;
+        let default = self.document_mut(destination)?.replace_default_style(None);
+        let empty = copy.replace_default_style(default);
+        debug_assert!(empty.is_none());
+        // Both handles are validated before default ownership moves. Retire the
+        // original box itself; its payload is destroyed only after admission.
+        let retired = match &mut self.slots[index].1 {
+            Resource::Document(document) => core::mem::replace(document, copy),
+            Resource::Snapshot(_) => unreachable!("validated document kind"),
+        };
         Ok(Resource::Document(retired))
+    }
+
+    /// Explicit default assignment, independent of entry/segment storage copy.
+    pub(crate) fn copy_default_style(
+        &mut self,
+        destination: Handle,
+        source: Handle,
+    ) -> Result<Option<xy_vsfilter_compat::document_style::StyleValue>, Error> {
+        self.document(destination)?;
+        let source_document = self.document(source)?;
+        if destination == source {
+            return Ok(None);
+        }
+        let value = source_document.default_style().cloned();
+        Ok(self.document_mut(destination)?.replace_default_style(value))
     }
 
     /// Removal transfers ownership; callers perform destruction after unlocking.
@@ -203,7 +229,7 @@ mod tests {
     #[test]
     fn typed_access_and_destroy_never_reuse_stale_handles() {
         let boundary = Boundary::new();
-        let owner = insert(&boundary, Resource::Document(Document::default()));
+        let owner = insert(&boundary, Resource::Document(Box::default()));
         let snapshot = insert(&boundary, Resource::Snapshot(alloc::vec![1, 2, 3]));
         boundary
             .try_with(|registry| {
@@ -229,7 +255,7 @@ mod tests {
             boundary.destroy(owner, Kind::Document),
             Err(Error::InvalidHandle)
         );
-        let next = insert(&boundary, Resource::Document(Document::default()));
+        let next = insert(&boundary, Resource::Document(Box::default()));
         assert!(next > snapshot);
         boundary
             .try_with(|registry| {
@@ -256,7 +282,7 @@ mod tests {
     #[test]
     fn destroy_and_lookup_interleave_only_between_acquisitions() {
         let boundary = Arc::new(Boundary::new());
-        let owner = insert(&boundary, Resource::Document(Document::default()));
+        let owner = insert(&boundary, Resource::Document(Box::default()));
         let entered = Arc::new(Barrier::new(2));
         let release = Arc::new(Barrier::new(2));
         let thread_boundary = boundary.clone();
@@ -310,8 +336,8 @@ mod tests {
     #[test]
     fn copies_and_snapshot_replies_are_independent() {
         let boundary = Boundary::new();
-        let source = insert(&boundary, Resource::Document(Document::default()));
-        let destination = insert(&boundary, Resource::Document(Document::default()));
+        let source = insert(&boundary, Resource::Document(Box::default()));
+        let destination = insert(&boundary, Resource::Document(Box::default()));
         let snapshot = insert(&boundary, Resource::Snapshot(alloc::vec![9, 8]));
         let retired = boundary
             .try_with(|registry| {

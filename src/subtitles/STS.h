@@ -196,7 +196,9 @@ public:
     CSTSStyleMap   m_styles;
 
     bool           m_fForcedDefaultStyle;
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     STSStyle       m_defaultStyle;
+#endif
 
     enum EPARCompensationType
     {
@@ -312,7 +314,9 @@ public:
     bool GetStyleValueAt(size_t ordinal, STSStyle& value) const;
 #endif
 
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     STSStyle* GetStyle(int i);
+#endif
     bool      GetStyle(int i, STSStyle* const stss);
     int       GetCharSet(int i);
 

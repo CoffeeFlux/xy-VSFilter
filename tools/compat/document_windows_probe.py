@@ -231,7 +231,9 @@ def run_owner(out, generate_only):
     segment = function(pinned_header, "class STSSegment") + ";"
     if function(decode(inputs["src/subtitles/STS.h"]), "class STSSegment") + ";" != segment:
         raise RuntimeError("Experimental owner probe requires unchanged STSSegment value declaration")
-    (out / "STS.h").write_bytes(("#pragma once\n" + entry + "\n" + segment + "\n").encode())
+    # Style adapter templates are intentionally uninstantiated in this storage
+    # probe. The linked full-class lifecycle gate supplies actual STSStyle/FwRect.
+    (out / "STS.h").write_bytes(("#pragma once\nstruct STSStyle;\n" + entry + "\n" + segment + "\n").encode())
     shutil.copyfile(ROOT / "src/subtitles/RustDocumentOwner.h", out / "RustDocumentOwner.h")
     shutil.copyfile(ROOT / "tools/compat/document_owner_probe.cpp", out / "document_owner_probe.cpp")
     reference = ["""class PinnedOwner { public:
@@ -298,7 +300,7 @@ def run_owner(out, generate_only):
                   complete_reference_methods=complete_signatures,
                   extracted_experimental_facade_methods=facade_signatures,
                   seams=["Add/AddSTSEntryOnly from initialized record/readorder assignment; native preparation bypassed",
-                         "Copy storage tail and Empty arrays tail only; native style/metadata lifecycle excluded",
+                         "Copy storage tail and Empty arrays tail only; style adapter templates uninstantiated, native style/metadata lifecycle excluded",
                          "SetStr prepared assignment and optional ConvertUnicode flag assignment only",
                          "Actual AddStyle entry-rename loop; style map/duplicate naming excluded",
                          "RTS animation OR assignment and MicroDVD correction with precomputed bound",

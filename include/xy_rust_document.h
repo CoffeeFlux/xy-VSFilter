@@ -43,13 +43,28 @@ enum {
 // create/snapshot_open/size return 8-byte LE u64 values.
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_create_v1(uint8_t*, size_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_copy_storage_v1(uint64_t destination, uint64_t source);
+// Storage copy and entry/segment clear retain the destination default style.
+// Default style starts absent; the native constructor supplies initialized bytes.
+// Style wire: 192-byte LE header: five i32 scalars (charset/weight/alignment/
+// border/relative-to)@0, four i32 margins(left/top/right/bottom)@20,
+// u32 colors[4]@36, alpha bytes[4]@52, bool bytes italic/underline/strikeout@56,
+// reserved-zero bytes59..64, font u16-unit count:u32@64, reserved-zero68..72,
+// fifteen f64 bit patterns@72 (size, outlineX/Y, shadowX/Y, scaleX/Y, spacing,
+// blur, gaussianBlur, angleZ/X/Y, shiftX/Y), then raw UTF16LE font units.
+// Count <=INT32_MAX; exact total length required. No native defaults/layout or
+// floating-point normalization. Retired values are destroyed after admission.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_set_default_style_v1(uint64_t owner, const uint8_t*, size_t);
+// Explicit default assignment; source absence clears destination; self-copy no-op.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_copy_default_style_v1(uint64_t destination, uint64_t source);
+
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_destroy_v1(uint64_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_counts_v1(uint64_t, uint8_t*, size_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_entry_header_v1(uint64_t, uint32_t index, uint8_t*, size_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_segment_header_v1(uint64_t, uint32_t index, uint8_t*, size_t);
 // Query modes: 0 entry, 1 next segment, 2 containing segment; integer TIME only.
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_query_time_v1(uint64_t, uint32_t mode, int64_t time, uint8_t*, size_t);
-// Snapshot kinds: 0 full entry wire, 1 full segment wire. Full entry wire is the
+// Snapshot kinds: 0 full entry wire, 1 full segment wire, 2 initialized default
+// style (index must be zero; absent defaults return OUT_OF_RANGE). Full entry wire is the
 // 64-byte header followed by text/style/actor/effect raw UTF-16LE arrays. Full
 // segment wire is the 32-byte header followed by u32LE member indexes.
 // Entry header offsets: start:i64@0, end:i64@8, margins:i32[4]@16
