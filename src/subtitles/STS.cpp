@@ -4715,11 +4715,7 @@ void CSimpleTextSubtitle::Sort(bool fRestoreReadorder)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     CAtlArray<STSEntry> records;
-    for(size_t i = 0, count = GetEntryCount(); i < count; i++) {
-        STSEntry entry = m_document->Entry((int)i);
-        entry.marginRect.left = (int)i; // neither native comparator reads margins
-        records.Add(entry);
-    }
+    m_document->MaterializeSortRecords(records);
     qsort(records.GetData(), records.GetCount(), sizeof(STSEntry), !fRestoreReadorder ? comp1 : comp2);
     std::vector<uint32_t> order;
     order.reserve(records.GetCount());

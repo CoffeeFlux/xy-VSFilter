@@ -307,6 +307,50 @@ pub fn decode_counts(bytes: &[u8]) -> Result<Counts, Error> {
     Ok(counts)
 }
 
+/// Native Sort comparator inputs only; row ordinal supplies original identity.
+/// Native adapters retain actual STSEntry width and CRT comparators. This codec
+/// neither sorts nor widens/emulates native comparator arithmetic.
+pub const SORT_HEADER_BYTES: usize = 8;
+pub const SORT_RECORD_BYTES: usize = 16;
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct SortScalar {
+    pub start: i64,
+    pub layer: i32,
+    pub readorder: i32,
+}
+pub fn encode_sort_snapshot(entries: &[PreparedEntry]) -> Result<Vec<u8>, Error> {
+    let count = count(entries.len())?;
+    let length = total(SORT_HEADER_BYTES, &[count], SORT_RECORD_BYTES)?;
+    let mut bytes = Vec::with_capacity(length);
+    bytes.extend_from_slice(&count.to_le_bytes());
+    bytes.extend_from_slice(&0u32.to_le_bytes());
+    for entry in entries {
+        bytes.extend_from_slice(&entry.start.to_le_bytes());
+        bytes.extend_from_slice(&entry.layer.to_le_bytes());
+        bytes.extend_from_slice(&entry.readorder.to_le_bytes());
+    }
+    Ok(bytes)
+}
+pub fn decode_sort_snapshot(bytes: &[u8]) -> Result<Vec<SortScalar>, Error> {
+    let count = u32_at(bytes, 0)?;
+    if u32_at(bytes, 4)? != 0 {
+        return Err(Error::NonzeroReserved);
+    }
+    exact(
+        bytes,
+        total(SORT_HEADER_BYTES, &[count], SORT_RECORD_BYTES)?,
+    )?;
+    let mut records = Vec::with_capacity(count as usize);
+    for row in bytes[SORT_HEADER_BYTES..].chunks_exact(SORT_RECORD_BYTES) {
+        records.push(SortScalar {
+            start: i64::from_le_bytes(read(row, 0)?),
+            layer: i32::from_le_bytes(read(row, 8)?),
+            readorder: i32::from_le_bytes(read(row, 12)?),
+        });
+    }
+    Ok(records)
+}
+
 /// Conflict relocation packet, not a complete AddStyle request. Names remain
 /// full raw units; map-key truncation and entry-name comparison are core choices.
 /// Header16: old units:u32@0, new units:u32@4, style bytes:u64@8, then both
@@ -635,5 +679,81 @@ mod tests {
         let mut missing = request;
         missing.previous = None;
         assert_eq!(encode_style_rename(&missing), Err(Error::InvalidShape));
+    }
+    #[test]
+    fn sort_snapshot_exact_shape_and_extreme_scalar_bits() {
+        let empty = encode_sort_snapshot(&[]).unwrap();
+        assert_eq!(empty, alloc::vec![0;8]);
+        assert!(decode_sort_snapshot(&empty).unwrap().is_empty());
+        let mut bytes = alloc::vec![];
+        bytes.extend_from_slice(&2u32.to_le_bytes());
+        bytes.extend_from_slice(&0u32.to_le_bytes());
+        for (start, layer, readorder) in [
+            (i64::MIN, i32::MAX, i32::MIN),
+            (i64::MAX, i32::MIN, i32::MAX),
+        ] {
+            bytes.extend_from_slice(&start.to_le_bytes());
+            bytes.extend_from_slice(&layer.to_le_bytes());
+            bytes.extend_from_slice(&readorder.to_le_bytes());
+        }
+        let decoded = decode_sort_snapshot(&bytes).unwrap();
+        assert_eq!(
+            decoded,
+            alloc::vec![
+                SortScalar {
+                    start: i64::MIN,
+                    layer: i32::MAX,
+                    readorder: i32::MIN
+                },
+                SortScalar {
+                    start: i64::MAX,
+                    layer: i32::MIN,
+                    readorder: i32::MAX
+                }
+            ]
+        );
+        let entries: Vec<_> = decoded
+            .iter()
+            .map(|row| PreparedEntry {
+                text: alloc::vec![0xd800, 0, 0xdcff],
+                style: alloc::vec![],
+                actor: alloc::vec![],
+                effect: alloc::vec![],
+                unicode: true,
+                margins: [0; 4],
+                layer: row.layer,
+                start: row.start,
+                end: row.start,
+                readorder: row.readorder,
+            })
+            .collect();
+        assert_eq!(encode_sort_snapshot(&entries).unwrap(), bytes);
+        for prefix in 0..bytes.len() {
+            assert!(
+                decode_sort_snapshot(&bytes[..prefix]).is_err(),
+                "prefix {prefix}"
+            );
+        }
+        let mut extra = bytes.clone();
+        extra.push(0);
+        assert_eq!(decode_sort_snapshot(&extra), Err(Error::InvalidShape));
+        for index in 4..8 {
+            let mut bad = bytes.clone();
+            bad[index] = 1;
+            assert_eq!(decode_sort_snapshot(&bad), Err(Error::NonzeroReserved));
+        }
+        let mut bad = bytes;
+        bad[..4].copy_from_slice(&u32::MAX.to_le_bytes());
+        assert_eq!(decode_sort_snapshot(&bad), Err(Error::CountOverflow));
+        #[cfg(target_pointer_width = "32")]
+        assert_eq!(
+            total(SORT_HEADER_BYTES, &[i32::MAX as u32], SORT_RECORD_BYTES),
+            Err(Error::LengthOverflow)
+        );
+        #[cfg(target_pointer_width = "64")]
+        assert_eq!(
+            total(SORT_HEADER_BYTES, &[i32::MAX as u32], SORT_RECORD_BYTES),
+            Ok(34_359_738_360)
+        );
     }
 }

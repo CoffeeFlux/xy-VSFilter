@@ -1043,6 +1043,34 @@ Failure-only diagnostics now record bounded resource/profile values and registry
 query statuses. They retain the setup assertion and leave successful traces
 unchanged; that runtime gate remains unresolved.
 
+### Scalar Sort snapshot boundary
+
+Experimental Sort now reads one immutable scalar snapshot containing count,
+start, layer and readorder, without copying entry payload strings. The native
+adapter constructs initialized, full-width `STSEntry` scratch records and keeps
+the original CRT comparators and `qsort(sizeof(STSEntry))`. Existing permutation
+application, segment rebuild and notification order remain in place.
+
+Local validation passes 190 core and 117 FFI tests, formatting and Clippy,
+and 94 Python tests with four Windows-only skips. Generation-only extraction
+and eight-file preprocessing checks pass.
+
+The full native probe adds twelve initialized records with exact and mixed ties,
+raw NULs and unpaired code units. Normal and readorder Sort each run twice.
+Compact callbacks check rebuilt segment membership, cleared animation and one
+notification per call; complete post-operation traces and assertions preserve
+all record fields. Strict trace requirements reject missing stages or callback
+identities. Allocation/reentry behavior and changed-source Windows CRT tie-order
+comparisons remain pending; source generation and local tests do not establish
+native runtime parity.
+
+The earlier [dc11 x64 layout lifecycle evidence](rust-document-layout-lifecycle-evidence.json)
+verifies ten layout stages and four resolution callbacks in linked native runs.
+It predates scalar Sort and other later changes; Win32 layout and whole workflow
+approval remain pending. See the scalar Sort source hashes and preprocessing
+record in [the document inventory](rust-document-inventory.json).
+
+
 ### Coarse selected-state Copy boundary
 
 Native Copy still invokes virtual Empty first, then reads the source. The opt-in
@@ -1093,13 +1121,13 @@ Neither count measures the amount of application behavior replaced.
 The reproducible [Rust unsafe inventory](rust-unsafe-inventory.json) uses
 `python3 tools/compat/audit_rust_boundary.py OUTPUT.json`. It masks comments and
 literals, separates cfg(test) items, and includes all platform/feature branches.
-At the current frozen working-tree sources based on `5aa0abb4` (exact file
+At the current frozen working-tree sources based on `2b5efca4` (exact file
 hashes recorded by the regenerated inventory):
 
 | Layer | Production source inventory | Meaning |
 | --- | --- | --- |
-| `rust/compat` | 0 unsafe blocks/functions/impls; 7,577 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
-| `rust/ffi` | 359 explicit unsafe blocks, 302 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,216 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
+| `rust/compat` | 0 unsafe blocks/functions/impls; 7,617 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
+| `rust/ffi` | 359 explicit unsafe blocks, 302 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,222 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
 | Tests | 119 unsafe blocks in FFI tests | Exercise valid and deliberately bounded ownership/alias/initialization contracts; not production code |
 
 Unsafe-function declarations and blocks overlap and must not be added as

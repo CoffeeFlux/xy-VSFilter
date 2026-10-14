@@ -24,7 +24,8 @@ enum {
     XY_DOCUMENT_V1_SEGMENT_HEADER_BYTES = 32,
     XY_DOCUMENT_V1_QUERY_BYTES = 16,
     XY_DOCUMENT_V1_COUNTS_BYTES = 8,
-    XY_DOCUMENT_V1_STYLE_RENAME_HEADER_BYTES = 16
+    XY_DOCUMENT_V1_STYLE_RENAME_HEADER_BYTES = 16,
+    XY_DOCUMENT_V1_SORT_HEADER_BYTES = 8, XY_DOCUMENT_V1_SORT_RECORD_BYTES = 16
 };
 // Buffer contract: nonzero input length/output capacity requires a live readable/
 // writable range for that entire size, at most PTRDIFF_MAX. Bytes need no extra
@@ -127,7 +128,11 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_named_style_lookup_v1(uint64_t o
 // style (index zero; absent defaults return OUT_OF_RANGE), 3 ordinal named key
 // (raw UTF16LE), 4 ordinal named value wire (null => UNRESOLVED_REFERENCE).
 // Kinds5 name/6 path are raw UTF16LE identity snapshots (index0 only).
-// Missing ordinals or nonzero identity indexes return OUT_OF_RANGE. Full entry wire is the
+// Kind7 scalar Sort snapshot(index0): header count:u32@0/reserved-zero:u32@4,
+// then16-byte rows start:i64@0/layer:i32@8/readorder:i32@12; ordinal implicit.
+// No text cloning or Rust sorting; native adapter must retain actual STSEntry
+// width/comparators. Counts and total snapshot sizes use checked native bounds.
+// Missing ordinals or nonzero identity/Sort indexes return OUT_OF_RANGE. Full entry wire is the
 // 64-byte header followed by text/style/actor/effect raw UTF-16LE arrays. Full
 // segment wire is the 32-byte header followed by u32LE member indexes.
 // Entry header offsets: start:i64@0, end:i64@8, margins:i32[4]@16

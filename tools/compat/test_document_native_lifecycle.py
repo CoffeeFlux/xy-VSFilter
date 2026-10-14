@@ -45,6 +45,9 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
          + b"".join(b"style-rename-segments " + stage + b" count=2 animated=1\n" for stage in (
              b"numeric-original", b"numeric-repeat-12", b"numeric-repeat-13", b"named-final",
              b"raw-nul-before", b"raw-nul-to12", b"raw-nul-to2", b"shrink-before", b"shrink-after"))
+         + b"sort-stage sort-input\n"
+         + b"".join(b"sort-callback " + stage + b" entries=12 segments=4 0 1 2 3 4 5 6 7 8 9 10 11\nsort-stage " + stage + b"\n" for stage in (
+             b"sort-time", b"sort-time-repeat", b"sort-readorder", b"sort-readorder-repeat"))
          + b"saved-file ssa exists=1 bytes=1 41\nsaved-file ass exists=1 bytes=1 41\n"
          + b"saved-file srt exists=1 bytes=1 41\nsaved-file srt-sidecar exists=1 bytes=1 41\n"
          + b"saved-file ssa-sidecar exists=0\nsaved-file ass-sidecar exists=0\n"
@@ -168,6 +171,17 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
         for replacement in (b"count=0 animated=1", b"count=2 animated=0", b"count=2 animated=3"):
             with self.assertRaises(ValueError): compare_traces([TRACE.replace(b"count=2 animated=1",replacement)]*4,64)
         changed=TRACE.replace(b"style-rename-stage shrink-after\n",b"style-rename-stage shrink-after\nstyle value changed\n")
+        with self.assertRaises(ValueError): compare_traces([TRACE,TRACE,changed,changed],64)
+
+    def test_sort_gate_callbacks_and_archival_optout(self):
+        legacy=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith((b"sort-stage ",b"sort-callback ")))
+        with self.assertRaises(ValueError): compare_traces([legacy]*4,64)
+        compare_traces([legacy]*4,64,require_sort_stages=False)
+        for old,new in ((b"sort-callback sort-time entries=12",b"missing sort-time entries=12"),
+                        (b"segments=4 0 1",b"segments=4 1 1"),
+                        (b"sort-stage sort-time-repeat\n",b"")):
+            with self.assertRaises(ValueError): compare_traces([TRACE.replace(old,new)]*4,64)
+        changed=TRACE.replace(b"segments=4 0 1",b"segments=4 1 0")
         with self.assertRaises(ValueError): compare_traces([TRACE,TRACE,changed,changed],64)
 
     def test_rejects_repeat_nondeterminism(self):

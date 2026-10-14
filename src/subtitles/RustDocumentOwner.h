@@ -290,6 +290,27 @@ public:
     DocumentReply SnapshotEntry(int index) const { return Snapshot(0,index); }
     DocumentReply SnapshotSegment(int index) const { return Snapshot(1,index); }
     STSEntry Entry(int index) const { return DocumentDetail::EntryValue(SnapshotEntry(index).Read()); }
+    // Scalar-only immutable snapshot. CRT qsort still receives actual native
+    // STSEntry-width records; payload strings remain owned by Rust throughout.
+    void MaterializeSortRecords(CAtlArray<STSEntry>& records) const {
+        const auto bytes = Snapshot(7,0).Read();
+        DocumentDetail::Shape(records.GetCount() == 0 && bytes.size() >= XY_DOCUMENT_V1_SORT_HEADER_BYTES);
+        const uint32_t count = DocumentDetail::Count(static_cast<size_t>(DocumentDetail::Load(bytes,0,4)));
+        DocumentDetail::Shape(DocumentDetail::Load(bytes,4,4) == 0 &&
+            bytes.size() == DocumentDetail::AddSize(XY_DOCUMENT_V1_SORT_HEADER_BYTES,
+                DocumentDetail::MulSize(count,XY_DOCUMENT_V1_SORT_RECORD_BYTES)));
+        for(uint32_t i = 0; i < count; ++i) {
+            const size_t offset = XY_DOCUMENT_V1_SORT_HEADER_BYTES + size_t(i) * XY_DOCUMENT_V1_SORT_RECORD_BYTES;
+            STSEntry entry;
+            entry.fUnicode = false;
+            entry.marginRect.SetRect(static_cast<int>(i),0,0,0);
+            entry.start = DocumentDetail::I64(DocumentDetail::Load(bytes,offset,8));
+            entry.end = 0;
+            entry.layer = DocumentDetail::I32(DocumentDetail::Load(bytes,offset+8,4));
+            entry.readorder = DocumentDetail::I32(DocumentDetail::Load(bytes,offset+12,4));
+            records.Add(entry);
+        }
+    }
     bool Segment(int index, STSSegment& value) const {
         if(index < 0) return false;
         std::array<uint8_t,8> out{};
