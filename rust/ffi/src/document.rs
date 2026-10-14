@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-//! Experimental private v1 document boundary; no production caller is wired.
+//! Private v1 document boundary for the opt-in experimental native caller.
 //! See include/xy_rust_document.h. All canonical access goes through typed IDs
 //! and nonblocking admission. Input bytes are owned before admission, and output
 //! bytes are staged until every registry loan ends. No explicit host callbacks are
 //! made; allocator/new-handler reentry can observe Busy, and its compatible host
 //! handling is unresolved.
+use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::ptr;
 use xy_vsfilter_compat::document::{AddMode, Document, Refusal};
+use xy_vsfilter_compat::document_style as style_wire;
 use xy_vsfilter_compat::document_wire::{self as wire, Counts, EntryHeader, SegmentHeader};
 use xy_vsfilter_compat::timeline_search::Mode;
 
@@ -51,6 +53,12 @@ fn wire_error(error: wire::Error) -> u32 {
         wire::Error::InvalidShape | wire::Error::InvalidBool | wire::Error::NonzeroReserved => {
             INVALID_INPUT
         }
+    }
+}
+fn style_wire_error(error: style_wire::Error) -> u32 {
+    match error {
+        style_wire::Error::CountOverflow | style_wire::Error::LengthOverflow => COUNT_OVERFLOW,
+        _ => INVALID_INPUT,
     }
 }
 fn status(result: Result<(), u32>) -> u32 {
@@ -136,7 +144,7 @@ fn units(bytes: &[u8]) -> Vec<u16> {
 #[no_mangle]
 pub unsafe extern "C" fn xy_vsfilter_document_create_v1(output: *mut u8, capacity: usize) -> u32 {
     required!(output_capacity(output, capacity, 8));
-    let id = required!(insert(Resource::Document(Document::default())));
+    let id = required!(insert(Resource::Document(Box::default())));
     // SAFETY: caller contract and capacity were validated before insertion.
     unsafe { write_output(output, &id.to_le_bytes()) };
     OK
@@ -150,6 +158,35 @@ pub extern "C" fn xy_vsfilter_document_copy_storage_v1(destination: u64, source:
             .map_err(registry_error)
     }));
     drop(retired); // All replaced storage is destroyed after admission.
+    OK
+}
+/// # Safety
+/// Input follows the byte-buffer contract; copied before registry admission.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_set_default_style_v1(
+    owner: u64,
+    input: *const u8,
+    length: usize,
+) -> u32 {
+    // SAFETY: caller supplies the documented live input byte region.
+    let input = required!(unsafe { copy_input(input, length) });
+    let mut value = Some(required!(
+        style_wire::decode(&input).map_err(style_wire_error)
+    ));
+    // Borrow pending ownership so rejected admission/handles also drop outside.
+    let retired = required!(admitted(|registry| {
+        let document = registry.document_mut(owner).map_err(registry_error)?;
+        Ok(document.replace_default_style(value.take()))
+    }));
+    drop(retired);
+    OK
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_copy_default_style_v1(destination: u64, source: u64) -> u32 {
+    let retired = required!(admitted(|registry| registry
+        .copy_default_style(destination, source)
+        .map_err(registry_error)));
+    drop(retired);
     OK
 }
 #[no_mangle]
@@ -278,21 +315,29 @@ pub unsafe extern "C" fn xy_vsfilter_document_snapshot_open_v1(
     capacity: usize,
 ) -> u32 {
     required!(output_capacity(output, capacity, 8));
-    if kind > 1 {
+    if kind > 2 {
         return INVALID_INPUT;
     }
     let bytes = required!(admitted(|registry| {
         let document = registry.document(owner).map_err(registry_error)?;
         match kind {
-            0 => wire::encode_entry(document.entries().get(index as usize).ok_or(OUT_OF_RANGE)?),
-            _ => wire::encode_segment(
+            0 => wire::encode_entry(document.entries().get(index as usize).ok_or(OUT_OF_RANGE)?)
+                .map_err(wire_error),
+            1 => wire::encode_segment(
                 document
                     .segments()
                     .get(index as usize)
                     .ok_or(OUT_OF_RANGE)?,
-            ),
+            )
+            .map_err(wire_error),
+            _ => {
+                if index != 0 {
+                    return Err(OUT_OF_RANGE);
+                }
+                style_wire::encode(document.default_style().ok_or(OUT_OF_RANGE)?)
+                    .map_err(style_wire_error)
+            }
         }
-        .map_err(wire_error)
     }));
     let id = required!(insert(Resource::Snapshot(bytes)));
     // SAFETY: capacity was checked before snapshot insertion, with no loans now.
@@ -684,6 +729,73 @@ mod tests {
         // SAFETY: allocated byte ranges below are valid for each supplied size;
         // explicit null/oversized checks are rejected before raw accesses.
         unsafe {
+            // Default-style transport and ownership are independent of storage.
+            let source = create();
+            let target = create();
+            let mut output = [0xa5; 8];
+            assert_eq!(
+                xy_vsfilter_document_snapshot_open_v1(source, 2, 0, output.as_mut_ptr(), 8),
+                OUT_OF_RANGE
+            );
+            assert_eq!(output, [0xa5; 8]);
+            assert_eq!(
+                xy_vsfilter_document_snapshot_open_v1(source, 3, 0, output.as_mut_ptr(), 8),
+                INVALID_INPUT
+            );
+            assert_eq!(output, [0xa5; 8]);
+            let mut style = vec![0u8; style_wire::HEADER_BYTES + 8];
+            style[64..68].copy_from_slice(&4u32.to_le_bytes());
+            style[72..80].copy_from_slice(&0x7ff0000000000042u64.to_le_bytes());
+            style[192..].copy_from_slice(&[0, 216, 0, 0, 255, 220, 255, 255]);
+            assert_eq!(
+                xy_vsfilter_document_set_default_style_v1(source, style.as_ptr(), style.len()),
+                OK
+            );
+            let snapshot = open_snapshot(source, 2);
+            assert_eq!(read_snapshot(snapshot), style);
+            assert_eq!(
+                xy_vsfilter_document_snapshot_open_v1(source, 2, 1, output.as_mut_ptr(), 8),
+                OUT_OF_RANGE
+            );
+            assert_eq!(
+                xy_vsfilter_document_set_default_style_v1(snapshot, style.as_ptr(), style.len()),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                xy_vsfilter_document_set_default_style_v1(source, ptr::null(), 0),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_copy_default_style_v1(target, snapshot),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                xy_vsfilter_document_copy_default_style_v1(target, source),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_copy_default_style_v1(source, source),
+                OK
+            );
+            assert_eq!(state(source).default_style(), state(target).default_style());
+            let retained = state(target).default_style().cloned();
+            style[72..80].copy_from_slice(&(-0.0f64).to_bits().to_le_bytes());
+            assert_eq!(
+                xy_vsfilter_document_set_default_style_v1(source, style.as_ptr(), style.len()),
+                OK
+            );
+            assert_ne!(state(source).default_style(), retained.as_ref());
+            assert_eq!(xy_vsfilter_document_copy_storage_v1(target, source), OK);
+            assert_eq!(state(target).default_style(), retained.as_ref());
+            assert_eq!(xy_vsfilter_document_clear_storage_v1(target), OK);
+            assert_eq!(xy_vsfilter_document_remove_entries_v1(target), OK);
+            assert_eq!(state(target).default_style(), retained.as_ref());
+            let cloned = state(target).clone();
+            assert_eq!(cloned.default_style(), retained.as_ref());
+            assert_eq!(xy_vsfilter_document_destroy_v1(source), OK);
+            assert_eq!(xy_vsfilter_document_destroy_v1(target), OK);
+            assert_ne!(read_snapshot(snapshot), style);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
             let mut sentinel = [0xa5; 80];
             assert_eq!(
                 xy_vsfilter_document_create_v1(ptr::null_mut(), 0),
@@ -812,7 +924,7 @@ mod tests {
             assert_eq!(read_snapshot(segment_snapshot), segment_bytes);
             assert_eq!(
                 xy_vsfilter_document_snapshot_open_v1(owner, 2, 0, sentinel.as_mut_ptr(), 8),
-                INVALID_INPUT
+                OUT_OF_RANGE
             );
             assert_eq!(
                 xy_vsfilter_document_snapshot_open_v1(owner, 0, 0, sentinel.as_mut_ptr(), 7),

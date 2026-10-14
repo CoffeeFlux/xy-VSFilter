@@ -48,7 +48,12 @@ public:
         m_path = id ? L"destination-path" : L"source-path";
         m_dstScreenSize=CSize(640+id,480+id);m_defaultWrapStyle=int(id);m_collisions=int(id);
         m_fScaledBAS=id!=0;m_layout_size=CSize(800+id,600+id);
-        m_defaultStyle=STSStyle();m_defaultStyle.charSet=ANSI_CHARSET;m_defaultStyle.fontSize=19+id;
+        STSStyle initialDefault;initialDefault.charSet=ANSI_CHARSET;initialDefault.fontSize=19+id;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        m_document->SetDefaultStyle(initialDefault);
+#else
+        m_defaultStyle=initialDefault;
+#endif
         m_fForcedDefaultStyle=false;m_ePARCompensationType=EPCTDownscale;
         m_dPARCompensation=1.25+id;m_eYCbCrMatrix=YCbCrMatrix_BT709;m_eYCbCrRange=YCbCrRange_PC;
     }
@@ -96,7 +101,11 @@ public:
             m_defaultWrapStyle,m_collisions,m_fScaledBAS,m_layout_size.cx,m_layout_size.cy,
             m_fForcedDefaultStyle,int(m_ePARCompensationType));
         real(m_dPARCompensation);printf(" %d %d\n",int(m_eYCbCrMatrix),int(m_eYCbCrRange));
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        style(m_document->DefaultStyle());
+#else
         style(m_defaultStyle);
+#endif
         printf("styles %zu\n",m_styles.GetCount());
         POSITION pos=m_styles.GetStartPosition();
         while(pos){CString name;STSStyle* value=NULL;m_styles.GetNextAssoc(pos,name,value);printf("name");units(name);printf("\n");style(*value);}
@@ -158,11 +167,69 @@ static void text_edits(TraceDocument& doc) {
     check(!doc.IsEntryUnicode(1),"SetStr retains packed storage flag");
     check(change_events[1]==notifications,"text edits have no OnChanged");
 }
+static void check_default(TraceDocument& doc,const STSStyle& expected,const char* stage) {
+    STSStyle actual;check(doc.GetDefaultStyle(actual),"GetDefaultStyle status");
+    // Full initialized values are serialized for direct pinned comparison;
+    // these assertions additionally detect loss of raw CString suffix/zero sign.
+    check(actual.fontName.GetLength()==expected.fontName.GetLength(),"default font logical length");
+    for(int i=0;i<expected.fontName.GetLength();++i)check(actual.fontName[i]==expected.fontName[i],"default raw font unit");
+    uint64_t actualBits,expectedBits;std::memcpy(&actualBits,&actual.fontSize,8);std::memcpy(&expectedBits,&expected.fontSize,8);
+    check(actualBits==expectedBits&&actual.charSet==expected.charSet,"default scalar bits");
+    printf("default-value %s ",stage);style(actual);doc.Dump(stage);
+}
+static void resolved(TraceDocument& doc,int index,const STSStyle& expected,const char* stage) {
+    STSStyle actual;check(doc.GetStyle(index,&actual),"GetStyle copy status");
+    check(actual==expected,"resolved initialized style value");
+    check(doc.GetCharSet(index)==expected.charSet,"resolved charset");
+    printf("resolved-style %s charset=%d ",stage,doc.GetCharSet(index));style(actual);
+}
+static void default_style_lifecycle() {
+    TraceDocument source(0),destination(1);
+    STSStyle supplied;const wchar_t raw[]={L'F',0,0xd800,0xdcff,L'Z'};
+    supplied.fontName=CString(raw,5);supplied.fontSize=-0.0;supplied.charSet=SHIFTJIS_CHARSET;
+    supplied.fontSpacing=-1.25;supplied.fontShiftY=2.5;supplied.marginRect=CRect(-3,4,5,6);
+    unsigned notifications=change_events[0];
+    check(source.SetDefaultStyle(supplied),"SetDefaultStyle status");
+    check(source.SetDefaultStyle(supplied),"SetDefaultStyle identical still true");
+    check_default(source,supplied,"default-supplied");
+    STSStyle isolated;check(source.GetDefaultStyle(isolated),"default owned read");
+    isolated.fontName.SetAt(4,L'Q');isolated.fontSize=11;
+    check_default(source,supplied,"default-read-independent");
+    source.Empty();check_default(source,supplied,"default-retained-empty");
+    check(change_events[0]==notifications,"default set/get/Empty do not notify");
+    destination.Copy(source);check_default(destination,supplied,"default-copied");
+    STSStyle replacement=supplied;replacement.fontName=CString(L"replacement");replacement.fontSize=31;replacement.charSet=ANSI_CHARSET;
+    check(destination.SetDefaultStyle(replacement),"replace copied default");
+    check_default(source,supplied,"default-copy-source-independent");
+    destination.Copy(destination);check_default(destination,replacement,"default-self-copy-retained");
+    // Valid indices only, with no named styles: native default fallback.
+    source.AddSTSEntryOnly(CStringW(L"default resolution"),true,0,10,CString(L"Missing"));
+    resolved(source,0,supplied,"default-fallback");
+    STSStyle* mappedDefault=new STSStyle;mappedDefault->charSet=RUSSIAN_CHARSET;mappedDefault->fontSize=23;
+    STSStyle expectedMapped=*mappedDefault;source.AddStyle(CString(L"Default"),mappedDefault);
+    resolved(source,0,expectedMapped,"mapped-default-fallback");
+    STSStyle* named=new STSStyle;named->charSet=GREEK_CHARSET;named->fontSize=24;
+    STSStyle expectedNamed=*named;source.AddStyle(CString(L"Named"),named);
+    source.AddSTSEntryOnly(CStringW(L"named resolution"),true,10,20,CString(L"Named"));
+    resolved(source,1,expectedNamed,"mapped-named");
+    source.SetForceDefaultStyle(true);resolved(source,0,supplied,"forced-missing");resolved(source,1,supplied,"forced-named");
+    source.SetForceDefaultStyle(false);resolved(source,1,expectedNamed,"unforced-named");
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    source.ResetDefaultStyle(HANGEUL_CHARSET);
+#else
+    source.CreateDefaultStyle(HANGEUL_CHARSET);
+#endif
+    STSStyle reset;reset.charSet=HANGEUL_CHARSET;check_default(source,reset,"default-reset");
+    source.SetForceDefaultStyle(true);resolved(source,1,reset,"forced-reset");
+    check(change_events[0]==notifications,"default resolution/reset do not notify");
+    source.Dump("default-resolution-final");
+}
 int main() {
     try {
         if(!AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0))throw std::runtime_error("AfxWinInit failed");
         printf("provenance pointer_bits=%zu\n",sizeof(void*)*8);
         printf("environment ansi=%u oem=%u\n",GetACP(),GetOEMCP());
+        default_style_lifecycle();
         {
             TraceDocument source(0),destination(1);populate(source);populate(destination);
             unsigned notifications=change_events[1];

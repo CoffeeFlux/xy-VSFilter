@@ -54,6 +54,24 @@ pub struct StyleValue {
     pub font_shift_y: f64,
     pub relative_to: i32,
 }
+// Storage identity is complete raw units and float bits, unlike native equality.
+impl PartialEq for StyleValue {
+    fn eq(&self, other: &Self) -> bool {
+        self.ints() == other.ints()
+            && self.font_name == other.font_name
+            && self.colors == other.colors
+            && self.alpha == other.alpha
+            && self.italic == other.italic
+            && self.underline == other.underline
+            && self.strikeout == other.strikeout
+            && self
+                .floats()
+                .iter()
+                .zip(other.floats())
+                .all(|(a, b)| a.to_bits() == b.to_bits())
+    }
+}
+impl Eq for StyleValue {}
 impl StyleValue {
     fn ints(&self) -> [i32; 9] {
         [

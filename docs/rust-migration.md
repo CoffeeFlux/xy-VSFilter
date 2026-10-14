@@ -653,13 +653,14 @@ observe rebuilt state after Rust access ends. Complete initialized metadata,
 styles, entries and segments are serialized; two executions per side must match
 exactly. The runner preserves failed/partial observations, hashes libraries,
 headers and executables, and refuses existing output directories. Local evidence
-validation tests pass. At `04673672`, both x64 native-control and experimental
+validation tests pass. At `04673672`, both x86/x64 native-control and experimental
 owner builds pass the linked lifecycle gate with 702 lines per repeated trace,
 then pass the full renderer comparison. Retained executables, source/header
 contents and traces were independently verified. Compiler include paths are
 resolved using Windows case/path semantics before checking Git contents. See
 [rust-document-native-lifecycle-evidence.json](rust-document-native-lifecycle-evidence.json).
-The x86 results remain pending.
+All four jobs complete successfully. This predates the style/default ownership
+changes below.
 The first Windows attempt at `89fcce47` built both DLLs and passed the smoke
 comparison, then failed compiling the reference probe because its C++17 flag
 removed `auto_ptr`/`unary_function` required by bundled headers. The probe now
@@ -728,6 +729,42 @@ two executions per side, checked source provenance and retained inputs/binaries.
 The probe never receives arbitrary native input; all native objects stay in its
 own module. Windows results are pending. Default-style ownership and the named
 map's ordering/rename/copy semantics remain the next integration work.
+
+### Experimental default-style ownership
+
+The experimental document now owns its initialized default style in safe Rust.
+Its canonical `m_defaultStyle` member and native pointer-returning default/style
+getters compile out alongside the entry and segment arrays. Native construction
+still supplies the exact STSStyle defaults; the adapter stores explicit values,
+then materializes temporary native CString/FwRect objects only after Rust access
+ends. Named-map style values, the forced-default flag and document metadata
+remain native. The production-default configuration is unchanged.
+
+Set/get/reset, fallback and forced-style resolution, charset lookup and Copy
+use the owned value. Default assignment occurs at its previous point in native
+Copy; the separate entry/segment copy retains the destination default. Empty
+and entry removal retain it too. Self-copy follows native Empty first, retaining
+the default while clearing entries/styles. Full raw font contents and float bits
+survive snapshots and copying. The private C boundary adds set/copy operations
+and immutable snapshot kind 2; IDs retain their type/lifetime checks. Registry
+documents are boxed to keep large style values out of every snapshot slot.
+
+All 174 core and 117 FFI tests pass locally with Rust 1.85; Clippy with warnings
+denied and formatting pass. The core still contains no unsafe Rust. This
+increment adds one documented unsafe input-copy call and its unsafe function
+declaration, reusing the existing bounded byte-buffer helper. The actual full
+class probe now checks default set/get/reset, copy independence, self-copy and
+Empty retention, plus missing/named/map-default/forced resolution and charset
+results. Raw names and signed zero are serialized without rendering them.
+Windows validation of this changed ownership is pending.
+
+The earlier entry/segment-only probe deliberately leaves style adapter templates
+uninstantiated; its generated STS header only forward-declares STSStyle. Actual
+style construction uses the real native types in the full-class and style-value
+gates. Include-stripped preprocessing confirms unchanged native/default and
+Rust-text-only STS code against `b49b367a`; this is source evidence, not native
+compilation. Allocation/failure timing, allocator reentry and real-host lifetime
+remain explicit experimental gates before a default switch.
 
 ## Independent audit and unsafe boundary
 

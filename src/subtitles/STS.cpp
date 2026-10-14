@@ -3068,7 +3068,11 @@ CSimpleTextSubtitle::CSimpleTextSubtitle()
     m_eYCbCrMatrix         = YCbCrMatrix_AUTO;
     m_eYCbCrRange          = YCbCrRange_AUTO;
     m_fForcedDefaultStyle  = false;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    ResetDefaultStyle(DEFAULT_CHARSET);
+#else
     m_defaultStyle.charSet = DEFAULT_CHARSET;
+#endif
 }
 
 CSimpleTextSubtitle::~CSimpleTextSubtitle()
@@ -3088,7 +3092,11 @@ void CSimpleTextSubtitle::Copy(CSimpleTextSubtitle& sts)
     m_collisions                   = sts.m_collisions;
     m_fScaledBAS                   = sts.m_fScaledBAS;
     m_encoding                     = sts.m_encoding;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    m_document->CopyDefaultStyle(*sts.m_document);
+#else
     m_defaultStyle                 = sts.m_defaultStyle;
+#endif
     m_fForcedDefaultStyle          = sts.m_fForcedDefaultStyle;
     CopyStyles     (sts.m_styles  );
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
@@ -3333,12 +3341,14 @@ void CSimpleTextSubtitle::AddSTSEntryOnly( CStringW str, bool fUnicode, REFERENC
     return;
 }
 
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 STSStyle* CSimpleTextSubtitle::CreateDefaultStyle(int CharSet)
 {
     m_defaultStyle = STSStyle();
     m_defaultStyle.charSet = CharSet;
     return &m_defaultStyle;
 }
+#endif
 
 void CSimpleTextSubtitle::ChangeUnknownStylesToDefault()
 {
@@ -3456,13 +3466,21 @@ bool CSimpleTextSubtitle::SetDefaultStyle(STSStyle& s)
 {
     LogStyles(m_styles);
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    m_document->SetDefaultStyle(s);
+#else
     m_defaultStyle = s;
+#endif
     return true;
 }
 
 bool CSimpleTextSubtitle::GetDefaultStyle(STSStyle& s)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    s = m_document->DefaultStyle();
+#else
     s = m_defaultStyle;
+#endif
     return true;
 }
 
@@ -4008,7 +4026,9 @@ bool CSimpleTextSubtitle::SetExistingStyleValue(LPCWSTR name, const STSStyle* va
 
 void CSimpleTextSubtitle::ResetDefaultStyle(int CharSet)
 {
-    CreateDefaultStyle(CharSet);
+    STSStyle value;
+    value.charSet = CharSet;
+    m_document->SetDefaultStyle(value);
 }
 
 bool CSimpleTextSubtitle::GetStyleNameAt(size_t ordinal, CString& name) const
@@ -4038,16 +4058,13 @@ bool CSimpleTextSubtitle::GetStyleValueAt(size_t ordinal, STSStyle& value) const
 }
 #endif
 
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 STSStyle* CSimpleTextSubtitle::GetStyle(int i)
 {
     STSStyle* style = NULL;
     if (!m_fForcedDefaultStyle)
     {
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-        if (!m_styles.Lookup(m_document->Entry(i).style, style) &&
-#else
         if (!m_styles.Lookup(m_entries.GetAt(i).style, style) &&
-#endif
             !m_styles.Lookup(         g_default_style, style))
         {
             style = &m_defaultStyle;
@@ -4062,16 +4079,42 @@ STSStyle* CSimpleTextSubtitle::GetStyle(int i)
     return style;
 }
 
+#endif
+
 bool CSimpleTextSubtitle::GetStyle(int i, STSStyle* const stss)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    STSStyle* style = NULL;
+    if(!m_fForcedDefaultStyle &&
+       (m_styles.Lookup(m_document->Entry(i).style, style) || m_styles.Lookup(g_default_style, style)))
+    {
+        ASSERT(style);
+        *stss = *style;
+    }
+    else
+    {
+        *stss = m_document->DefaultStyle();
+    }
+#else
     *stss = *GetStyle(i);
+#endif
 
     return true;
 }
 
 int CSimpleTextSubtitle::GetCharSet(int i)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    STSStyle* style = NULL;
+    if(m_fForcedDefaultStyle ||
+       (!m_styles.Lookup(m_document->Entry(i).style, style) && !m_styles.Lookup(g_default_style, style)))
+    {
+        return m_document->DefaultStyle().charSet;
+    }
+    ASSERT(style);
+#else
     STSStyle* style = GetStyle(i);
+#endif
     return style!=NULL ? style->charSet : -1;
 }
 

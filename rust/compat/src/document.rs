@@ -5,8 +5,9 @@
 //! Callers must perform native text/style preparation and its initial rejection
 //! checks before supplying records (the suffix begins at STSEntry construction);
 //! raw code units are retained, including unpaired surrogates and embedded NULs.
-//! This is not the Add parser, full Copy, style/metadata owner, CRT sort, encoding
-//! conversion, or a production integration. Allocation failure/partial native
+//! Supplied initialized default-style values are also owned here. Native named
+//! styles, metadata, Add parsing, full Copy orchestration, CRT sort and encoding
+//! conversion remain outside this API. Allocation failure/partial native
 //! mutation and callbacks are outside this API's comparison domain.
 use alloc::{vec, vec::Vec};
 
@@ -77,13 +78,26 @@ pub struct QueryResult {
 }
 
 /// Clone creates independent storage; it does not emulate native Copy callbacks
-/// or copying the document's still-native styles and metadata.
+/// or copying the document's still-native named styles and metadata.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Document {
+    default_style: Option<crate::document_style::StyleValue>,
     entries: Vec<PreparedEntry>,
     segments: Vec<DocumentSegment>,
 }
 impl Document {
+    /// Absent until the native adapter supplies an initialized style.
+    pub fn default_style(&self) -> Option<&crate::document_style::StyleValue> {
+        self.default_style.as_ref()
+    }
+    /// Transfers retired storage to the caller for destruction after admission.
+    pub fn replace_default_style(
+        &mut self,
+        value: Option<crate::document_style::StyleValue>,
+    ) -> Option<crate::document_style::StyleValue> {
+        core::mem::replace(&mut self.default_style, value)
+    }
+
     pub fn entries(&self) -> &[PreparedEntry] {
         &self.entries
     }
@@ -771,5 +785,27 @@ mod tests {
             Err(Refusal::WebVttEndIterator)
         );
         assert_eq!(d, before);
+    }
+    #[test]
+    fn default_style_clone_and_storage_copy_have_distinct_contracts() {
+        use crate::document_style::{decode, HEADER_BYTES};
+        let mut bytes = alloc::vec![0u8;HEADER_BYTES];
+        bytes[72..80].copy_from_slice(&0x7ff0000000000042u64.to_le_bytes());
+        let first = decode(&bytes).unwrap();
+        bytes[72..80].copy_from_slice(&(-0.0f64).to_bits().to_le_bytes());
+        let second = decode(&bytes).unwrap();
+        let mut source = Document::default();
+        assert!(source.default_style().is_none());
+        assert!(source.replace_default_style(Some(first.clone())).is_none());
+        assert_eq!(source.clone().default_style(), Some(&first));
+        let mut destination = Document::default();
+        destination.replace_default_style(Some(second.clone()));
+        destination.copy_storage_from(&source);
+        assert_eq!(destination.default_style(), Some(&second));
+        destination.remove_all_entries();
+        destination.clear_entries_and_segments();
+        assert_eq!(destination.default_style(), Some(&second));
+        assert_eq!(destination.replace_default_style(None), Some(second));
+        assert_eq!(source.default_style(), Some(&first));
     }
 }

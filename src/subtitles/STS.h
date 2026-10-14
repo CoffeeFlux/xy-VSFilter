@@ -196,7 +196,9 @@ public:
     CSTSStyleMap   m_styles;
 
     bool           m_fForcedDefaultStyle;
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     STSStyle       m_defaultStyle;
+#endif
 
     enum EPARCompensationType
     {
@@ -254,7 +256,9 @@ public:
     //remember to call sort when all STSEntrys are ready
     void AddSTSEntryOnly(CStringW str, bool fUnicode, REFERENCE_TIME start, REFERENCE_TIME end, CString style = _T("Default"), const CString& actor = _T(""), const CString& effect = _T(""), const CRect& marginRect = CRect(0,0,0,0), int layer = 0, int readorder = -1);
 
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     STSStyle* CreateDefaultStyle(int CharSet);
+#endif
     void ChangeUnknownStylesToDefault();
     void AddStyle(CString name, STSStyle* style); // style will be stored and freed in Empty() later
 
@@ -320,7 +324,9 @@ public:
     bool GetStyleValueAt(size_t ordinal, STSStyle& value) const;
 #endif
 
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     STSStyle* GetStyle(int i);
+#endif
     bool      GetStyle(int i, STSStyle* const stss);
     int       GetCharSet(int i);
     bool      IsEntryUnicode(int i);
