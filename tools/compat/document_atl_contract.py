@@ -415,7 +415,7 @@ def select_cstring_helpers(source, header):
             specialization = re.search(r'\b' + owner + r'\s*<([^>]*)>', declaration)
             if specialization and not re.search(r'\bwchar_t\b', specialization[1]):
                 continue
-            if owner == 'ChTraitsBase' and not specialization:
+            if owner in ('ChTraitsBase', 'ChTraitsCRT') and not specialization:
                 # Generic/ANSI declarations do not establish the wchar_t aliases.
                 continue
             template_prefix = code[max(0, first - 2000):first]
@@ -446,7 +446,7 @@ def select_cstring_helpers(source, header):
                 # Capture only pointer string overloads, never character overloads.
                 if not re.search(r'\b(?:LPCWSTR|LPWSTR|PCXSTR|PXSTR)\b|\bwchar_t\s*\*', params):
                     continue
-                if match[1] == 'StringFindString' and params.count(',') != 1:
+                if match[1] == 'StringFindString' and (params.count(',') != 1 or re.search(r'\bLPWSTR\b', params.split(',')[0])):
                     continue
                 if match[1] != 'StringFindString' and ',' in params:
                     continue
@@ -464,9 +464,8 @@ def select_cstring_helpers(source, header):
 
 def cstring_helper_contract(records):
     required = ('ChTraitsCRT::CharNext', 'ChTraitsCRT::StringFindString',
-                'ChTraitsCRT::StringLength', 'SafeStringLen')
-    counts = {symbol: sum((r['symbol'] == symbol if symbol != 'SafeStringLen' else
-                           r['symbol'].endswith('::SafeStringLen')) and r['kind'] == 'definition' for r in records)
+                'ChTraitsCRT::SafeStringLen')
+    counts = {symbol: sum(r['symbol'] == symbol and r['kind'] == 'definition' for r in records)
               for symbol in required}
     bases = {owner: sum(r['symbol'] == owner + ' helper class/base' for r in records)
              for owner in ('ChTraitsBase', 'ChTraitsCRT', 'StrTraitATL', 'StrTraitMFC', 'CStringT', 'CSimpleStringT')}
@@ -479,11 +478,14 @@ def cstring_helper_contract(records):
                for owner in ('ChTraitsBase', 'CSimpleStringT', 'CStringT') for name in ('XCHAR', 'PCXSTR')}
     templates = {owner: sum(r['symbol'] == owner + ' helper template' for r in records)
                  for owner in ('StrTraitATL', 'StrTraitMFC', 'CStringT', 'CSimpleStringT')}
-    unique = (all(n == 1 for n in counts.values()) and all(n == 1 for n in bases.values())
+    overrides = [r['symbol'] for r in records if r['owner'] in ('StrTraitATL', 'StrTraitMFC')
+                 and r['kind'] == 'definition']
+    unique = (not overrides and all(n == 1 for n in counts.values()) and all(n == 1 for n in bases.values())
               and all(n >= 1 for n in aliases.values()) and all(n == 1 for n in templates.values()))
     return {'scope': 'Selected wide helper definitions and trait class dispatch declarations; source only, no runtime parity',
             'definition_counts': counts, 'dispatch_declaration_counts': bases,
             'dispatch_alias_counts': aliases, 'dispatch_template_counts': templates,
+            'unsupported_trait_overrides': overrides,
             'source_capture_complete': unique, 'complete': unique and not unknown,
             'active_conditions_resolved': not unknown, 'active_conditions_unresolved': unknown,
             'unresolved': ([] if unique else ['Missing or ambiguous wide helper/dispatch source']) +
@@ -502,8 +504,8 @@ XY_DOCUMENT_CSIZE_ATL_STATIC_LIB_IMPL_UNDEFINED
 
 
 def csize_context_command(compiler, source, platform, experimental):
-    # Native subtitles Release context; /EP stops before compilation/linking.
-    flags = ['/nologo', '/Bv', '/EP', '/showIncludes', '/std:c++14', '/EHsc',
+    # Native subtitles Release context; /E stops before compilation/linking and retains source origins.
+    flags = ['/nologo', '/Bv', '/E', '/showIncludes', '/std:c++14', '/EHsc',
              '/O2', '/Oi', '/Ob2', '/MT', '/fp:precise', '/Y-']
     defines = ['NDEBUG', '_CRT_SECURE_NO_WARNINGS', '_SCL_SECURE_NO_WARNINGS',
                'WINVER=0x0601', '_WIN32_WINNT=0x0601', 'PSAPI_VERSION=1',
@@ -536,7 +538,7 @@ def select_active_csize(stdout, source_name, selected_source_records):
     for line in text.splitlines(keepends=True):
         if 'Note: including file:' in line or line.startswith('XY_DOCUMENT_CSIZE_ATL_STATIC_LIB_IMPL_'):
             diagnostics.append(line)
-        else:
+        elif not re.match(r'^\s*#\s*(?:line\s+)?\d+\s+"', line):
             code.append(line)
     records = select_csize_definitions(''.join(code), 'preprocessed:' + source_name)
     status = csize_source_contract(records)
@@ -555,8 +557,69 @@ def select_active_csize(stdout, source_name, selected_source_records):
             'selected_sdk_default_sha256': original[0]['sha256_utf8'] if len(original) == 1 else None}, ''.join(diagnostics).encode('utf-8')
 
 
-def capture_csize_contexts(out, compiler, platform, source_records, protect, report, save):
+def preprocessed_origins(text):
+    """MSVC /E line markers; unknown/unmapped lines never establish origins."""
+    lines, origins = [], []
+    header, number = None, None
+    for line in text.splitlines(keepends=True):
+        marker = re.match(r'^\s*#\s*(?:line\s+)?(\d+)\s+"([^"\r\n]+)"\s*$', line)
+        if marker:
+            header = marker[2].replace('\\\\', '\\')
+            number = int(marker[1])
+            continue
+        if 'Note: including file:' in line or line.startswith('XY_DOCUMENT_CSIZE_'):
+            continue
+        lines.append(line)
+        origins.append((header, number))
+        if number is not None:
+            number += 1
+    return ''.join(lines), origins
+
+
+def select_active_cstring_helpers(stdout, source_name, source_records, included_headers=None):
+    """Keep authoritative macro-expanded bodies with exact /E source origins."""
+    code, origins = preprocessed_origins(stdout.decode('utf-8', errors='replace'))
+    records = select_cstring_helpers(code, 'preprocessed:' + source_name)
+    status = cstring_helper_contract(records)
+    def path_key(path):
+        return str(path).replace('\\', '/').casefold()
+    headers = {path_key(path): digest for path, digest in (included_headers or {}).items()}
+    matches = []
+    for row in records:
+        if row['kind'] != 'definition':
+            continue
+        mapped = origins[row['first_line'] - 1:row['last_line']]
+        candidates = []
+        for raw in source_records:
+            if raw['kind'] != 'definition' or raw['symbol'] != row['symbol'] or raw['owner'] != row['owner']:
+                continue
+            key = path_key(raw['header'])
+            # All nonblank active method lines must originate within this raw
+            # method, in the same actually included hashed SDK header.
+            substantive = [(origin, line) for origin, line in zip(mapped, code.splitlines()[row['first_line']-1:row['last_line']]) if line.strip()]
+            if (headers.get(key) != raw.get('header_sha256') or key not in headers or not substantive
+                or any(origin[0] is None or path_key(origin[0]) != key or origin[1] is None
+                       or not raw['first_line'] <= origin[1] <= raw['last_line'] for origin, _ in substantive)):
+                continue
+            candidates.append(raw)
+        body = csize_body_tokens(row)
+        matches.append({'symbol': row['symbol'], 'active_sha256': row['sha256_utf8'],
+                        'active_body_sha256': sha((body or '').encode()),
+                        'source_origins': [{'header': h, 'line': n} for h, n in mapped],
+                        'source_matches': [{'sha256': raw['sha256_utf8'],
+                                            'raw_body_sha256': sha((csize_body_tokens(raw) or '').encode()),
+                                            'exact_body_tokens': body == csize_body_tokens(raw)} for raw in candidates]})
+    matched = bool(matches) and all(row['source_matches'] for row in matches)
+    return {'complete': status['complete'] and matched and not any('\ufffd' in r['excerpt'] for r in records),
+            'scope': 'Authoritative active wide helpers mapped to included SDK source spans; macro expansion need not preserve body tokens',
+            'preprocessed_stream_sha256': sha(stdout), 'full_preprocessed_stream_retained': False,
+            'active_selection_status': status, 'active_source_origins_verified': matched,
+            'body_matches': matches, 'selected_definitions': records}
+
+
+def capture_csize_contexts(out, compiler, platform, source_records, protect, report, save, helper_records=()):
     results = {}
+    helper_results = {}
     for experimental in (False, True):
         name = 'csize-context-' + ('experimental' if experimental else 'native-rust-text')
         source = out / (name + '.cpp')
@@ -598,6 +661,16 @@ def capture_csize_contexts(out, compiler, platform, source_records, protect, rep
             path = Path(header.strip()).resolve()
             if path.is_file():
                 headers[str(path)] = protect(path)
+        try:
+            helpers = select_active_cstring_helpers(result.stdout, name, helper_records, headers)
+            helpers['included_header_sha256'] = headers
+            if not headers: helpers['complete'] = False
+            helper_private = out / (name + '-cstring-helpers.private.json')
+            helper_private.write_text(json.dumps({'redistribution':'Private bounded SDK source only', **helpers},indent=2)+'\n')
+            helper_results[name] = {k:v for k,v in helpers.items() if k != 'selected_definitions'}
+            helper_results[name]['private_selection_sha256'] = protect(helper_private)
+        except (ValueError, UnicodeError) as error:
+            helper_results[name] = {'complete':False,'unresolved':str(error)}
         selected['included_header_sha256'] = headers
         if not headers:
             selected['complete'] = False
@@ -609,6 +682,18 @@ def capture_csize_contexts(out, compiler, platform, source_records, protect, rep
         results[name] = {key: value for key, value in selected.items() if key != 'selected_definitions'}
         results[name]['private_selection_sha256'] = selected_hash
         save()
+    report['cstring_helper_active_contexts'] = helper_results
+    if 'cstring_helper_contract' in report:
+        helper_contract = report['cstring_helper_contract']
+        helper_contract['raw_source_selection_status'] = dict(helper_contract)
+        resolved = len(helper_results) == 2 and all(r['complete'] for r in helper_results.values())
+        helper_contract['complete'] = resolved
+        helper_contract['active_conditions_resolved'] = resolved
+        helper_contract['resolution_basis'] = 'Actual /E native-rust-text and experimental contexts; active method origins map to bounded included SDK source spans, macro-expanded bodies authoritative'
+        if resolved:
+            helper_contract['source_capture_complete'] = True
+            helper_contract['active_conditions_unresolved'] = []
+            helper_contract['unresolved'] = []
     report['csize_active_contexts'] = results
     contract = report['csize_source_contract']
     if contract['source_capture_complete'] and len(results) == 2 and all(value['complete'] for value in results.values()):
@@ -795,7 +880,7 @@ def main():
         private=out/'selected-sdk-definitions.private.json';private.write_text(json.dumps({'redistribution':'Private review excerpts only; do not check in SDK source','definitions':excerpts},indent=2)+'\n');report['selected_definitions_sha256']=protect(private)
         report['definition_index']=[{k:v for k,v in r.items() if k!='excerpt'} for r in excerpts]
         report['missing_required_definitions']=[name for name in required if not any(r['symbol']==name and r['kind']=='definition' for r in excerpts)]
-        capture_csize_contexts(out,compiler,args.platform,csize_excerpts,protect,report,save)
+        capture_csize_contexts(out,compiler,args.platform,csize_excerpts,protect,report,save,helper_excerpts)
         traces=[]
         for i in range(2):
             result=run([str(exe)],'trace-'+str(i),30)

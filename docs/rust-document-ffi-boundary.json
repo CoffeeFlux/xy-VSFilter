@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "scope": "Experimental persistent document containers/styles/identity/interpretation/scriptlayout/initializedmetadata; defaultproduction unchanged",
-  "measured_base_commit": "66638ab93376a257261283efdd13a2bdcaaf9376",
+  "measured_base_commit": "61e91fa3ce6ab54cbf7a6222d47bc910e87baa1d",
   "working_tree_source_hashes": true,
   "core_unsafe": {
     "production_block": 0,
@@ -16,8 +16,8 @@
     "test_other": 0
   },
   "ffi_total": {
-    "production_block": 361,
-    "production_function": 303,
+    "production_block": 363,
+    "production_function": 305,
     "production_impl": 2,
     "production_trait": 0,
     "production_other": 0,
@@ -30,12 +30,12 @@
   "new_boundary_files": [
     {
       "path": "rust/ffi/src/document.rs",
-      "sha256": "bb2c3685f234c526dd104ecab648ee7f50c5d77dc8d33e848862f4ec1e42b70f",
-      "physical_lines_including_tests": 3495,
-      "nonblank_code_lines_excluding_tests": 1101,
+      "sha256": "4ef3bb19c453014d332463763854c87cb8291a7838152d12764c90c0acfe71ee",
+      "physical_lines_including_tests": 3661,
+      "nonblank_code_lines_excluding_tests": 1204,
       "counts": {
-        "production_block": 35,
-        "production_function": 30,
+        "production_block": 37,
+        "production_function": 32,
         "production_impl": 0,
         "production_trait": 0,
         "production_other": 0,
@@ -47,42 +47,22 @@
       },
       "sites": [
         {
-          "line": 108,
+          "line": 107,
           "kind": "function",
           "test": false
         },
         {
-          "line": 115,
+          "line": 131,
           "kind": "block",
           "test": false
         },
         {
-          "line": 125,
+          "line": 141,
           "kind": "function",
           "test": false
         },
         {
-          "line": 129,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 151,
-          "kind": "function",
-          "test": false
-        },
-        {
-          "line": 155,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 172,
-          "kind": "function",
-          "test": false
-        },
-        {
-          "line": 178,
+          "line": 185,
           "kind": "block",
           "test": false
         },
@@ -92,97 +72,102 @@
           "test": false
         },
         {
-          "line": 229,
+          "line": 230,
           "kind": "block",
           "test": false
         },
         {
-          "line": 272,
+          "line": 240,
           "kind": "function",
           "test": false
         },
         {
-          "line": 294,
+          "line": 244,
           "kind": "block",
           "test": false
         },
         {
-          "line": 310,
+          "line": 266,
           "kind": "function",
           "test": false
         },
         {
-          "line": 322,
+          "line": 270,
           "kind": "block",
           "test": false
         },
         {
-          "line": 365,
+          "line": 287,
           "kind": "function",
           "test": false
         },
         {
-          "line": 391,
+          "line": 293,
           "kind": "block",
           "test": false
         },
         {
-          "line": 411,
+          "line": 338,
           "kind": "function",
           "test": false
         },
         {
-          "line": 426,
+          "line": 344,
           "kind": "block",
           "test": false
         },
         {
-          "line": 456,
+          "line": 387,
           "kind": "function",
           "test": false
         },
         {
-          "line": 470,
+          "line": 409,
           "kind": "block",
           "test": false
         },
         {
-          "line": 477,
+          "line": 425,
           "kind": "function",
           "test": false
         },
         {
-          "line": 495,
+          "line": 437,
           "kind": "block",
           "test": false
         },
         {
-          "line": 522,
+          "line": 480,
           "kind": "function",
           "test": false
         },
         {
-          "line": 540,
+          "line": 506,
           "kind": "block",
           "test": false
         },
         {
-          "line": 547,
+          "line": 526,
           "kind": "function",
           "test": false
         },
         {
-          "line": 561,
+          "line": 541,
           "kind": "block",
           "test": false
         },
         {
-          "line": 563,
+          "line": 571,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 585,
           "kind": "block",
           "test": false
         },
         {
-          "line": 598,
+          "line": 592,
           "kind": "function",
           "test": false
         },
@@ -192,12 +177,22 @@
           "test": false
         },
         {
-          "line": 634,
+          "line": 637,
           "kind": "function",
           "test": false
         },
         {
-          "line": 650,
+          "line": 655,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 662,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 676,
           "kind": "block",
           "test": false
         },
@@ -207,118 +202,93 @@
           "test": false
         },
         {
-          "line": 693,
+          "line": 713,
           "kind": "function",
           "test": false
         },
         {
-          "line": 708,
+          "line": 725,
           "kind": "block",
           "test": false
         },
         {
-          "line": 715,
+          "line": 749,
           "kind": "function",
           "test": false
         },
         {
-          "line": 733,
+          "line": 765,
           "kind": "block",
           "test": false
         },
         {
-          "line": 740,
+          "line": 793,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 808,
           "kind": "function",
           "test": false
         },
         {
-          "line": 762,
+          "line": 823,
           "kind": "block",
           "test": false
         },
         {
-          "line": 769,
+          "line": 830,
           "kind": "function",
           "test": false
         },
         {
-          "line": 792,
+          "line": 848,
           "kind": "block",
           "test": false
         },
         {
-          "line": 814,
+          "line": 855,
           "kind": "function",
           "test": false
         },
         {
-          "line": 920,
+          "line": 877,
           "kind": "block",
           "test": false
         },
         {
-          "line": 927,
+          "line": 884,
           "kind": "function",
           "test": false
         },
         {
-          "line": 937,
+          "line": 907,
           "kind": "block",
           "test": false
         },
         {
-          "line": 945,
+          "line": 929,
           "kind": "function",
           "test": false
         },
         {
-          "line": 963,
+          "line": 1035,
           "kind": "block",
           "test": false
         },
         {
-          "line": 979,
+          "line": 1042,
           "kind": "function",
           "test": false
         },
         {
-          "line": 995,
+          "line": 1052,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1015,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1022,
+          "line": 1060,
           "kind": "function",
-          "test": false
-        },
-        {
-          "line": 1037,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1047,
-          "kind": "function",
-          "test": false
-        },
-        {
-          "line": 1055,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1066,
-          "kind": "function",
-          "test": false
-        },
-        {
-          "line": 1077,
-          "kind": "block",
           "test": false
         },
         {
@@ -327,107 +297,157 @@
           "test": false
         },
         {
-          "line": 1107,
+          "line": 1094,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1114,
+          "line": 1110,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1125,
+          "line": 1130,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1137,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1132,
+          "line": 1152,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1150,
+          "line": 1162,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1166,
+          "line": 1170,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1183,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1226,
+          "line": 1181,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1243,
+          "line": 1192,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1256,
+          "line": 1193,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1222,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 1229,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1240,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 1247,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1265,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 1281,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1298,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1341,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 1358,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1371,
           "kind": "function",
           "test": true
         },
         {
-          "line": 1260,
+          "line": 1375,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1282,
+          "line": 1397,
           "kind": "function",
           "test": true
         },
         {
-          "line": 1285,
+          "line": 1400,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1297,
+          "line": 1412,
           "kind": "function",
           "test": true
         },
         {
-          "line": 1301,
+          "line": 1416,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1306,
+          "line": 1421,
           "kind": "function",
           "test": true
         },
         {
-          "line": 1310,
+          "line": 1425,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1315,
+          "line": 1430,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1339,
+          "line": 1454,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1348,
+          "line": 1463,
           "kind": "block",
           "test": true
         }
       ],
-      "production_extern_functions": 45,
+      "production_extern_functions": 49,
       "operations": {
         "raw_shared_slice_construction": 1,
         "raw_mutable_slice_construction": 0,
@@ -441,9 +461,9 @@
     },
     {
       "path": "rust/ffi/src/document_registry.rs",
-      "sha256": "dd7f9eeea1bc353364e067c1ce2f4e99f8b0fb3eb5b2336340836ade9b270729",
-      "physical_lines_including_tests": 393,
-      "nonblank_code_lines_excluding_tests": 158,
+      "sha256": "8b8f16bf14c44133bd09814c26c4044ef8630701dd38dd8f3241a2aa73769e12",
+      "physical_lines_including_tests": 473,
+      "nonblank_code_lines_excluding_tests": 208,
       "counts": {
         "production_block": 1,
         "production_function": 0,
@@ -458,12 +478,12 @@
       },
       "sites": [
         {
-          "line": 156,
+          "line": 208,
           "kind": "impl",
           "test": false
         },
         {
-          "line": 200,
+          "line": 252,
           "kind": "block",
           "test": false
         }
@@ -482,11 +502,11 @@
     }
   ],
   "prior_ffi_production_blocks": 325,
-  "added_production_blocks": 36,
+  "added_production_blocks": 38,
   "added_unsafe_impls": 1,
   "retired_native_owners": 18,
   "retired_ffi_crossings": 0,
-  "review": "Frozen coarse time commit and scalar snapshot source measurement; unchanged fine-grained replacement seam retained. Windows exceptional FP/allocation/reentry/full-host parity pending.",
+  "review": "Frozen unknown-style protocol measurement; typed owner/run/reply lifetime and status-atomic preflight reviewed. Allocation/reentry/native invalidating callback histories and full Windows owner parity remain unresolved.",
   "remaining_contracts": [
     "Changed-code Windows x86/x64 full-class named/default lifecycle, style API/value and renderer comparisons",
     "Native wrapper publication/destruction and real host lifetimes",
@@ -1283,29 +1303,66 @@
         "test_trait": 0,
         "test_other": 0
       }
+    },
+    {
+      "status": "superseded coarse conversion source measurement",
+      "measured_base_commit": "66638ab93376a257261283efdd13a2bdcaaf9376",
+      "source_hashes": {
+        "src/subtitles/STS.h": "969cd4ba558665f1c7b64a6dca66ba9d3befe21d4a60d36076750d70af028ee4",
+        "src/subtitles/STS.cpp": "54e8ea10ae95e5bb0c63aeaafd8d9c3671ade2decbafd7b9e7dd0b3d83a775d3",
+        "src/subtitles/RTS.cpp": "17acfde7157426a0a7e3ace4c71b37e3de16ba15300636d39d40de8a4e82f631",
+        "src/subtitles/USFSubtitles.cpp": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
+        "src/subtitles/SubtitleInputPin.cpp": "210276fdf0da5108dd3135b5934dc83015512604d0e8c12fde4d1f9a02ad105d",
+        "src/filters/transform/vsfilter/DirectVobSubFilter.cpp": "d6e056e9357234b9935fe3a8760655df8e1c3c0a5fa6a9954d343ea0234033af",
+        "src/filters/transform/vsfilter/xy_sub_filter.cpp": "680a96edc424c3a4324b514c5f74fded15857d3525b78d114c5394205dac8f9d",
+        "src/filters/transform/vsfilter/plugins.cpp": "38526740c55b4bc51642925d1ded688ebdd0ff26a01b5a5dd7f587add31df3da",
+        "src/subtitles/RustDocumentOwner.h": "24a4913eebe7ab7d04ee6229e6b7561435c4aef5951d4ae14d09675ba971b8ef",
+        "rust/compat/src/document.rs": "c9b0c68936204686c4709d664a79aa02db1212e9c77f78a4eb50d41671efc0d8",
+        "rust/ffi/src/document.rs": "bb2c3685f234c526dd104ecab648ee7f50c5d77dc8d33e848862f4ec1e42b70f",
+        "rust/ffi/src/document_registry.rs": "dd7f9eeea1bc353364e067c1ce2f4e99f8b0fb3eb5b2336340836ade9b270729",
+        "include/xy_rust_document.h": "7700d853859494a135d7ada9ec95bd2a274de318b8cd9a3ff390b23c12436ed0",
+        "tools/compat/document_native_lifecycle.cpp": "381069ab8698b887fb9e7c5acb49208138f77ce4a8f4f46254af9e0184bd4bdb",
+        "tools/compat/document_native_lifecycle.py": "4008e692fc8b60381878dc2ade89dce5334e58f9efa755a20662cef177f63f8d",
+        "tools/compat/summarize_evidence.py": "9b8276a94e631ad4da26e1372ac8c29385e5ec8aa67ee901fc3103a4ed825e72",
+        "tools/compat/audit_document_access.py": "d46b43cba4d0cf4e9b2879e6aff8714469dcc6b6b18f210af10c97617d6697d5",
+        "rust/compat/src/document_wire.rs": "68b38639e50514ae7b95f181d9f330e34d63629555ae2b046a10a447dbe8be27"
+      },
+      "ffi_total": {
+        "production_block": 361,
+        "production_function": 303,
+        "production_impl": 2,
+        "production_trait": 0,
+        "production_other": 0,
+        "test_block": 119,
+        "test_function": 4,
+        "test_impl": 0,
+        "test_trait": 0,
+        "test_other": 0
+      }
     }
   ],
   "retired_native_owners_scope": "Eighteen native fields/containers opt-in only; defaultproduction retirementzero",
   "measurement_method": "Current audit_rust_boundary.inventory over actual Rust source, comments/literals masked and test items separated; counts overlap and do not establish soundness. Historical original snapshot retained.",
   "source_hashes": {
     "src/subtitles/STS.h": "969cd4ba558665f1c7b64a6dca66ba9d3befe21d4a60d36076750d70af028ee4",
-    "src/subtitles/STS.cpp": "54e8ea10ae95e5bb0c63aeaafd8d9c3671ade2decbafd7b9e7dd0b3d83a775d3",
+    "src/subtitles/STS.cpp": "169e03df07f99429bbeb628b121ae08cdd1a9fbed28cdca6e2d175a4474e4ffd",
     "src/subtitles/RTS.cpp": "17acfde7157426a0a7e3ace4c71b37e3de16ba15300636d39d40de8a4e82f631",
     "src/subtitles/USFSubtitles.cpp": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
     "src/subtitles/SubtitleInputPin.cpp": "210276fdf0da5108dd3135b5934dc83015512604d0e8c12fde4d1f9a02ad105d",
     "src/filters/transform/vsfilter/DirectVobSubFilter.cpp": "d6e056e9357234b9935fe3a8760655df8e1c3c0a5fa6a9954d343ea0234033af",
     "src/filters/transform/vsfilter/xy_sub_filter.cpp": "680a96edc424c3a4324b514c5f74fded15857d3525b78d114c5394205dac8f9d",
     "src/filters/transform/vsfilter/plugins.cpp": "38526740c55b4bc51642925d1ded688ebdd0ff26a01b5a5dd7f587add31df3da",
-    "src/subtitles/RustDocumentOwner.h": "24a4913eebe7ab7d04ee6229e6b7561435c4aef5951d4ae14d09675ba971b8ef",
-    "rust/compat/src/document.rs": "c9b0c68936204686c4709d664a79aa02db1212e9c77f78a4eb50d41671efc0d8",
-    "rust/ffi/src/document.rs": "bb2c3685f234c526dd104ecab648ee7f50c5d77dc8d33e848862f4ec1e42b70f",
-    "rust/ffi/src/document_registry.rs": "dd7f9eeea1bc353364e067c1ce2f4e99f8b0fb3eb5b2336340836ade9b270729",
-    "include/xy_rust_document.h": "7700d853859494a135d7ada9ec95bd2a274de318b8cd9a3ff390b23c12436ed0",
-    "tools/compat/document_native_lifecycle.cpp": "381069ab8698b887fb9e7c5acb49208138f77ce4a8f4f46254af9e0184bd4bdb",
-    "tools/compat/document_native_lifecycle.py": "4008e692fc8b60381878dc2ade89dce5334e58f9efa755a20662cef177f63f8d",
-    "tools/compat/summarize_evidence.py": "9b8276a94e631ad4da26e1372ac8c29385e5ec8aa67ee901fc3103a4ed825e72",
-    "tools/compat/audit_document_access.py": "d46b43cba4d0cf4e9b2879e6aff8714469dcc6b6b18f210af10c97617d6697d5",
-    "rust/compat/src/document_wire.rs": "68b38639e50514ae7b95f181d9f330e34d63629555ae2b046a10a447dbe8be27"
+    "src/subtitles/RustDocumentOwner.h": "4e87f09b3f7e9cd9bc4cd103fd28b7237df6ed8999f6e0ce92bb99c176d334db",
+    "rust/compat/src/document.rs": "e9333360e3683a88c4c6f556b83a7e5b9555c26e1295880959d83c2ffe4955d6",
+    "rust/ffi/src/document.rs": "4ef3bb19c453014d332463763854c87cb8291a7838152d12764c90c0acfe71ee",
+    "rust/ffi/src/document_registry.rs": "8b8f16bf14c44133bd09814c26c4044ef8630701dd38dd8f3241a2aa73769e12",
+    "include/xy_rust_document.h": "204d13d8c568929d547c21e482c03ac71718ef293545d1716ab60503d5f3e4ec",
+    "tools/compat/document_native_lifecycle.cpp": "87401bf3805ec9aa3a46a40db4541d4fab95841b2959a6685240d433fb6a16df",
+    "tools/compat/document_native_lifecycle.py": "56408e372b5a0020fdd611acc66b3c257b57eab52c59d43950dcc9ffabdafa97",
+    "tools/compat/summarize_evidence.py": "65d379bbe93f277fdd15fbf953468c74c846a6b2e8c7356439311a674b602483",
+    "tools/compat/audit_document_access.py": "87c06682b25d879bb0fc654e59e54dd0cfc2c24e2ca3621f5dc58ac4c8e86a7b",
+    "rust/compat/src/document_unknown.rs": "e9d0af429f752cc4ee0d9c31077b37304e0124b3fc9fa0974250e84612c84360",
+    "rust/compat/src/lib.rs": "059947ad6c8187ed83b98a6144bd703780d94310bddd6d235fd022684858f000"
   },
   "default_style_extension": {
     "set": "xy_vsfilter_document_set_default_style_v1 copies input and decodes before admission; validates handle before taking pending value; retired Option drops outside admission, including failure/Busy pending input.",
@@ -2725,6 +2782,187 @@
       "production_blocks": 2,
       "unsafe_function_declarations": 1,
       "explanation": "Existing copied-input and output-write helpers used by new unsafe export; no new raw-pointer helper or unsafe impl."
+    }
+  },
+  "unknown_style_pass_extension": {
+    "base_head": "61e91fa3ce6ab54cbf7a6222d47bc910e87baa1d",
+    "source_state": "Frozen working-tree unknown-style step/resume boundary; actual source hashes identify content",
+    "source_hashes": {
+      "src/subtitles/STS.h": "969cd4ba558665f1c7b64a6dca66ba9d3befe21d4a60d36076750d70af028ee4",
+      "src/subtitles/STS.cpp": "169e03df07f99429bbeb628b121ae08cdd1a9fbed28cdca6e2d175a4474e4ffd",
+      "src/subtitles/RTS.cpp": "17acfde7157426a0a7e3ace4c71b37e3de16ba15300636d39d40de8a4e82f631",
+      "src/subtitles/USFSubtitles.cpp": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
+      "src/subtitles/SubtitleInputPin.cpp": "210276fdf0da5108dd3135b5934dc83015512604d0e8c12fde4d1f9a02ad105d",
+      "src/filters/transform/vsfilter/DirectVobSubFilter.cpp": "d6e056e9357234b9935fe3a8760655df8e1c3c0a5fa6a9954d343ea0234033af",
+      "src/filters/transform/vsfilter/xy_sub_filter.cpp": "680a96edc424c3a4324b514c5f74fded15857d3525b78d114c5394205dac8f9d",
+      "src/filters/transform/vsfilter/plugins.cpp": "38526740c55b4bc51642925d1ded688ebdd0ff26a01b5a5dd7f587add31df3da",
+      "src/subtitles/RustDocumentOwner.h": "4e87f09b3f7e9cd9bc4cd103fd28b7237df6ed8999f6e0ce92bb99c176d334db",
+      "rust/compat/src/document.rs": "e9333360e3683a88c4c6f556b83a7e5b9555c26e1295880959d83c2ffe4955d6",
+      "rust/ffi/src/document.rs": "4ef3bb19c453014d332463763854c87cb8291a7838152d12764c90c0acfe71ee",
+      "rust/ffi/src/document_registry.rs": "8b8f16bf14c44133bd09814c26c4044ef8630701dd38dd8f3241a2aa73769e12",
+      "include/xy_rust_document.h": "204d13d8c568929d547c21e482c03ac71718ef293545d1716ab60503d5f3e4ec",
+      "tools/compat/document_native_lifecycle.cpp": "87401bf3805ec9aa3a46a40db4541d4fab95841b2959a6685240d433fb6a16df",
+      "tools/compat/document_native_lifecycle.py": "56408e372b5a0020fdd611acc66b3c257b57eab52c59d43950dcc9ffabdafa97",
+      "tools/compat/summarize_evidence.py": "65d379bbe93f277fdd15fbf953468c74c846a6b2e8c7356439311a674b602483",
+      "tools/compat/audit_document_access.py": "87c06682b25d879bb0fc654e59e54dd0cfc2c24e2ca3621f5dc58ac4c8e86a7b",
+      "rust/compat/src/document_unknown.rs": "e9d0af429f752cc4ee0d9c31077b37304e0124b3fc9fa0974250e84612c84360",
+      "rust/compat/src/lib.rs": "059947ad6c8187ed83b98a6144bd703780d94310bddd6d235fd022684858f000"
+    },
+    "preprocessing_evidence": [
+      {
+        "path": "src/filters/transform/vsfilter/DirectVobSubFilter.cpp",
+        "base_sha256": "d6e056e9357234b9935fe3a8760655df8e1c3c0a5fa6a9954d343ea0234033af",
+        "current_sha256": "d6e056e9357234b9935fe3a8760655df8e1c3c0a5fa6a9954d343ea0234033af",
+        "default_branch_preprocessing": {
+          "native-default": {
+            "same_preprocessed_text": true,
+            "sha256": "d39cf042d69b80020a68f4dc81edd1c9c450cbf37dd90b5c97c8f52aa8c43d2f"
+          },
+          "rust-text-only": {
+            "same_preprocessed_text": true,
+            "sha256": "d39cf042d69b80020a68f4dc81edd1c9c450cbf37dd90b5c97c8f52aa8c43d2f"
+          }
+        },
+        "experimental_preprocessed_sha256": "e4c4a5364c2e23897070965535a9ed9bedf7c73ca6be611a43203556e985e0a0",
+        "active_native_initialized_metadata_tokens_absent": true
+      },
+      {
+        "path": "src/filters/transform/vsfilter/plugins.cpp",
+        "base_sha256": "38526740c55b4bc51642925d1ded688ebdd0ff26a01b5a5dd7f587add31df3da",
+        "current_sha256": "38526740c55b4bc51642925d1ded688ebdd0ff26a01b5a5dd7f587add31df3da",
+        "default_branch_preprocessing": {
+          "native-default": {
+            "same_preprocessed_text": true,
+            "sha256": "6792c4cfecbec9ddeb52d71559c4c39c2e88b2b53fb7b984880a4c13b1d13328"
+          },
+          "rust-text-only": {
+            "same_preprocessed_text": true,
+            "sha256": "6792c4cfecbec9ddeb52d71559c4c39c2e88b2b53fb7b984880a4c13b1d13328"
+          }
+        },
+        "experimental_preprocessed_sha256": "790529faab6373ebd931fd81340a61696835f9f1f64933259429010f3e49f151",
+        "active_native_initialized_metadata_tokens_absent": true
+      },
+      {
+        "path": "src/filters/transform/vsfilter/xy_sub_filter.cpp",
+        "base_sha256": "680a96edc424c3a4324b514c5f74fded15857d3525b78d114c5394205dac8f9d",
+        "current_sha256": "680a96edc424c3a4324b514c5f74fded15857d3525b78d114c5394205dac8f9d",
+        "default_branch_preprocessing": {
+          "native-default": {
+            "same_preprocessed_text": true,
+            "sha256": "b063cc6bf1a77a3ccbcd53b84fba7665efd979398861049c907790fe879891d2"
+          },
+          "rust-text-only": {
+            "same_preprocessed_text": true,
+            "sha256": "b063cc6bf1a77a3ccbcd53b84fba7665efd979398861049c907790fe879891d2"
+          }
+        },
+        "experimental_preprocessed_sha256": "7da18bb6d2ef79d58774c52f2b072a476495fa6424c44f08215f8be74d233271",
+        "active_native_initialized_metadata_tokens_absent": true
+      },
+      {
+        "path": "src/subtitles/RTS.cpp",
+        "base_sha256": "17acfde7157426a0a7e3ace4c71b37e3de16ba15300636d39d40de8a4e82f631",
+        "current_sha256": "17acfde7157426a0a7e3ace4c71b37e3de16ba15300636d39d40de8a4e82f631",
+        "default_branch_preprocessing": {
+          "native-default": {
+            "same_preprocessed_text": true,
+            "sha256": "546b0779eea017e81b1641c84c665c7072df5384e9278e5051f1738075df2c3d"
+          },
+          "rust-text-only": {
+            "same_preprocessed_text": true,
+            "sha256": "bcd96ae9caac7a048689fd3649f21e0a73aa6d4f7750ca58558d14d8e74c7686"
+          }
+        },
+        "experimental_preprocessed_sha256": "ad045b1ad8a3d1937ae35874d81ba63cd26b6a9810a6410391ea92c4fb9500a1",
+        "active_native_initialized_metadata_tokens_absent": true
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "base_sha256": "54e8ea10ae95e5bb0c63aeaafd8d9c3671ade2decbafd7b9e7dd0b3d83a775d3",
+        "current_sha256": "169e03df07f99429bbeb628b121ae08cdd1a9fbed28cdca6e2d175a4474e4ffd",
+        "default_branch_preprocessing": {
+          "native-default": {
+            "same_preprocessed_text": true,
+            "sha256": "ef9c7261e588670a3848b8fa3a45fba10e9fc9e0180a09636db4b257316c6c19"
+          },
+          "rust-text-only": {
+            "same_preprocessed_text": true,
+            "sha256": "d500d49d1f4012017c3d4198cd86b880c536e8b02f18b605331fd178f324729f"
+          }
+        },
+        "experimental_preprocessed_sha256": "4285d6bdaa38fbdfec14385c1011e0b635461282fcc5d941b6daa42471b6feaf",
+        "active_native_initialized_metadata_tokens_absent": true
+      },
+      {
+        "path": "src/subtitles/STS.h",
+        "base_sha256": "969cd4ba558665f1c7b64a6dca66ba9d3befe21d4a60d36076750d70af028ee4",
+        "current_sha256": "969cd4ba558665f1c7b64a6dca66ba9d3befe21d4a60d36076750d70af028ee4",
+        "default_branch_preprocessing": {
+          "native-default": {
+            "same_preprocessed_text": true,
+            "sha256": "5d6cd0064ec5775198407bfdcf517f312e65aee97d57022b836c4c9dc73956ee"
+          },
+          "rust-text-only": {
+            "same_preprocessed_text": true,
+            "sha256": "5d6cd0064ec5775198407bfdcf517f312e65aee97d57022b836c4c9dc73956ee"
+          }
+        },
+        "experimental_preprocessed_sha256": "50aa6cec766c3ba4156178d707ef7fc4e52c690de15e538d322f4ddf89e9681e",
+        "active_native_initialized_metadata_tokens_absent": true
+      },
+      {
+        "path": "src/subtitles/SubtitleInputPin.cpp",
+        "base_sha256": "210276fdf0da5108dd3135b5934dc83015512604d0e8c12fde4d1f9a02ad105d",
+        "current_sha256": "210276fdf0da5108dd3135b5934dc83015512604d0e8c12fde4d1f9a02ad105d",
+        "default_branch_preprocessing": {
+          "native-default": {
+            "same_preprocessed_text": true,
+            "sha256": "8d647f9a88d7240470fe50358889a789471c77987cfdc2759dd42e2320700d6a"
+          },
+          "rust-text-only": {
+            "same_preprocessed_text": true,
+            "sha256": "8d647f9a88d7240470fe50358889a789471c77987cfdc2759dd42e2320700d6a"
+          }
+        },
+        "experimental_preprocessed_sha256": "00202708cbf98ea84bb983af5fd1048f558a737dc0000e87eee9f3e3f660b6b4",
+        "active_native_initialized_metadata_tokens_absent": true
+      },
+      {
+        "path": "src/subtitles/USFSubtitles.cpp",
+        "base_sha256": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
+        "current_sha256": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
+        "default_branch_preprocessing": {
+          "native-default": {
+            "same_preprocessed_text": true,
+            "sha256": "e84591d6becfd3205e1b3276e86d6dcfcb15426364df3149baa7756072f7ac39"
+          },
+          "rust-text-only": {
+            "same_preprocessed_text": true,
+            "sha256": "e84591d6becfd3205e1b3276e86d6dcfcb15426364df3149baa7756072f7ac39"
+          }
+        },
+        "experimental_preprocessed_sha256": "ec1b4cae6a0e0392c67de4041f69734d61e4dea19ce7701f5079ecae2557f16a",
+        "active_native_initialized_metadata_tokens_absent": true
+      }
+    ],
+    "contracts": [
+      "Private Run owns live next index, full pre-dialog last name, last-missing flag, report flag, suppression map and pending/finished protocol. First sentinel equal-name shortcut, consecutive-name shortcut, missing Default warning suppression and Cancel behavior match pinned row order. Present-null map nodes count as known.",
+      "Step handles one live row or returns an owned full raw warning name. Native CString message formatting and actual MessageBox remain outside registry admission, with no Rust reference or native gate retained across dialog. Resume first applies response, then inserts CURRENT live row name into suppression and rewrites that index Default, retaining pre-dialog heuristic state.",
+      "Protocol errors and missing pending row are checked before state mutation. Missing/invalidated native reference histories remain unresolved; no generation or stale-plan rejection policy is invented. In-place editing/reorder tests are pure safe source-derived models, not native reentry evidence.",
+      "Typed registry UnknownRun links only an integer owner ID. Destroyed/type-mismatched owner/run fails lookup before deriving references. Step preflights current-row name bounds, output capacity and reserved immutable snapshot slot/ID before advancing Run; no status-returning work follows core mutation.",
+      "Reply snapshot packet is kindu32 (0 finished/1 advanced/2 warning), reserved-zero u32, unit-count u64, then full raw UTF16LE warning units. Snapshot is independent of run/document lifetime. Run drop and retired original entry/last names and warning value destruction occur outside admission. Generic map key/node allocations/drops and allocation failure/reentry timing remain qualified.",
+      "Native Open still calls CreateSegments/OnChanged before warning pass and screen fallback afterward. The warning pass itself has no repository virtual callback; existing modal observer posts button commands, not document mutations. No new native reentry histories executed.",
+      "Canonical owner count remains20; m_simple remains native and pre-Open initialization/read contract unresolved."
+    ],
+    "validation": {
+      "focused": "Five safe core tests pass, including animated-state retention, raw-name ownership, protocol guards, retirement allocation identity and source-derived current-row/reorder behavior. FFI/local full counts recorded by root.",
+      "windows": "Changed-source actual modal lifecycle/render/host gates pending; no full Windows parity or allocator certification."
+    },
+    "unsafe_delta": {
+      "production_blocks": 2,
+      "unsafe_function_declarations": 2,
+      "explanation": "New open/step unsafe exports use existing validated output-write helper; no raw input buffer or new unsafe impl."
     }
   }
 }

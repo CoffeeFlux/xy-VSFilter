@@ -1167,8 +1167,9 @@ The separate style API test host now creates an empty Software registry
 scaffold. In run 38648351874, x64 job 116140719750, reference setup diagnostics
 verified expected resources and matching loaded modules, but opening
 `Software\Gabest\VSFilter\DefTextPathes` returned error 2. The correction seeds no
-value and retains the assertion; its Windows result remains pending. This test
-setup repair is not a document behavior change or style API passing evidence.
+value and retains the assertion. The corrected x64 job now passes all 16
+style API executions at `7f3e5c9c`; the retained evidence is described below.
+This test setup repair is not a document behavior change.
 
 
 ### Layout-size ownership
@@ -1257,6 +1258,73 @@ zero-FPS same-mode calls and empty documents. Their Windows compile/runtime
 results remain pending. Default/native and Rust-text preprocessing remains
 unchanged across eight native files, and the 814-case rendering corpus is stable.
 
+### Safe unknown-style fallback policy
+
+The experimental ChangeUnknownStylesToDefault now executes its row-by-row
+policy in the safe owner: the initial sentinel shortcut, consecutive-name
+heuristic, named-style presence (including present-null), per-pass suppression,
+Default replacement, and Cancel disabling later warnings. It checks the live
+entry count each step. Native code retains the original warning formatting,
+MessageBox and exact IDOK comparison.
+
+A typed, scoped run handle binds the policy state to its document ID. Each step
+returns an immutable packet with Done, Advanced, or an owned raw warning name.
+No document reference survives the call. After the dialog, resume rereads the
+current row's style for the suppression key and rewrites that row, while keeping
+the pre-dialog heuristic name. There is no generation-based rejection or frozen
+whole-document plan. Array-invalidating dialog histories remain unresolved and
+are not executed. Core tests of defined safe edits/reordering establish the
+state-machine design, not native reentry parity.
+
+Output capacity, typed handles, packet bounds and reply slot reservation are
+checked before step mutation. Replaced entry and remembered names retire after
+admission, as do warning reply buffers. Map key/node allocation and destruction,
+allocation failure timing and allocator reentry remain qualified integration
+limits. The new ABI adds two unsafe output wrappers using the existing write
+helper; resume and drop are safe exports. The core still forbids unsafe code.
+The canonical retired owner count remains 20, with m_simple still native.
+
+New full-class histories exercise the sentinel, repeated unknown names, a known
+separator, missing Default and OK/Cancel responses. They compare complete entries
+and segments and require no callback during the fallback pass. An ordinary ASS
+Open additionally requires OnChanged to observe the unresolved name and rebuilt
+segments before the warning, followed by the final Default name. The existing
+dialog observer now supports a child-process ID and captures complete controls,
+text and responses in all four repeated reference/candidate executions. It does
+not edit the document. Unknown dialogs, missing evidence and timeouts fail;
+Windows execution of these new histories remains pending.
+
+Local validation passes 204 core and 118 FFI tests, pinned formatting and
+all-target Clippy, and 132 Python tests with four Windows-only skips. Eight-file
+preprocessing, generated native probes, lexical inventory and whitespace checks
+pass. The active helper-source capture now uses preprocessor line mappings to
+retain authoritative expanded bodies without guessing macro substitutions.
+
+### Newly verified x64 integration and preparation evidence
+
+[The retained x64 evidence](rust-document-x64-7f-evidence.json) for `7f3e5c9c`,
+run 38650419987/job 116147536646, verifies four equal 2,917-line document lifecycle
+traces, all 16 style API executions across two filter classes and normal/long-name
+modes, disconnected COM comparisons and the bounded style-value corpus. Actual
+DLL/helper/host and repository-source hashes were checked. The job succeeded,
+including the formerly blocked constructor registry setup. This evidence
+predates layout-size ownership, coarse conversion and unknown-style migration;
+it is not validation of those newer changes or a real Aegisub/player session.
+
+The same job reports equal rendering for the 798-case corpus (8,426 frames),
+32 mutations (224 frames) and the smoke case (10 frames). Retained frame hashes,
+guards and result metadata agree across captures. Pixel binaries were not
+retained, so exact byte comparison remains the runner's recorded result.
+External SDK/compiler/library hashes retain their stated runner-reported limits.
+
+At `61e91fa3`, both Win32 and x64 preparation captures completed all 620 native
+observations. [Local comparisons against both captures](rust-document-preparation-both-evidence.json)
+match the safe helper. The Windows Rust jobs stopped before comparison because
+the shallow candidate checkout lacked the pinned reference object. The checker
+now accepts the existing separate reference checkout explicitly. Native string
+preparation remains unchanged until its actual wide-helper source mapping and
+Windows Rust comparison gates pass.
+
 ### Coarse selected-state Copy boundary
 
 Native Copy still invokes virtual Empty first, then reads the source. The opt-in
@@ -1307,13 +1375,13 @@ Neither count measures the amount of application behavior replaced.
 The reproducible [Rust unsafe inventory](rust-unsafe-inventory.json) uses
 `python3 tools/compat/audit_rust_boundary.py OUTPUT.json`. It masks comments and
 literals, separates cfg(test) items, and includes all platform/feature branches.
-At the current frozen working-tree sources based on `66638ab9` (exact file
+At the current frozen working-tree sources based on `61e91fa3` (exact file
 hashes recorded by the regenerated inventory):
 
 | Layer | Production source inventory | Meaning |
 | --- | --- | --- |
-| `rust/compat` | 0 unsafe blocks/functions/impls; 7,886 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
-| `rust/ffi` | 361 explicit unsafe blocks, 303 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,352 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
+| `rust/compat` | 0 unsafe blocks/functions/impls; 8,021 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
+| `rust/ffi` | 363 explicit unsafe blocks, 305 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,505 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
 | Tests | 119 unsafe blocks in FFI tests | Exercise valid and deliberately bounded ownership/alias/initialization contracts; not production code |
 
 Unsafe-function declarations and blocks overlap and must not be added as

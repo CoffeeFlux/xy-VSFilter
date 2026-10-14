@@ -20,7 +20,7 @@ def verify_pe(binary, bits):
     return machine
 
 
-def native_capture(directory):
+def native_capture(directory, reference_root=native.ROOT):
     """Verify retained evidence, without executing a native binary again."""
     directory = Path(directory)
     report_bytes = (directory / 'report.json').read_bytes()
@@ -55,7 +55,7 @@ def native_capture(directory):
         raise ValueError('native observation count mismatch')
     if native.sha(json.dumps(native.fixtures(),separators=(',',':')).encode()) != report['fixture_sha256']:
         raise ValueError('native fixtures changed')
-    raw = subprocess.check_output(['git','show',f'{native.PIN}:src/subtitles/STS.cpp'],cwd=native.ROOT,timeout=30)
+    raw = subprocess.check_output(['git','show',f'{native.PIN}:src/subtitles/STS.cpp'],cwd=reference_root,timeout=30)
     extracted = native.extract(raw.decode('utf-8-sig').replace('\r\n','\n'))
     if native.sha(raw) != report['reference_source_sha256'] or extracted != report['extracted_suffixes']:
         raise ValueError('pinned native suffix provenance mismatch')
@@ -86,6 +86,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--native-capture', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--reference-root', type=Path, default=native.ROOT,
+                        help='Repository containing the pinned reference object; needed with shallow candidate checkouts')
     parser.add_argument('--target', choices=('i686-pc-windows-msvc','x86_64-pc-windows-msvc'))
     parser.add_argument('--allow-working-tree', action='store_true')
     args = parser.parse_args()
@@ -116,7 +118,7 @@ def main():
         return result
     save()
     try:
-        captured, trace, verified = native_capture(args.native_capture)
+        captured, trace, verified = native_capture(args.native_capture,args.reference_root)
         report.update(native_capture=str(args.native_capture.resolve()), native_verified_artifacts=verified,
                       native_capture_commit=captured['candidate_commit'], reference_commit=native.PIN,
                       native_pointer_bits=captured['pointer_bits'], target=args.target,
@@ -153,7 +155,7 @@ def main():
             if result.stderr: raise ValueError('Rust oracle emitted stderr')
             results.append(result.stdout)
         count = compare_values(trace,results,captured['pointer_bits'])
-        if native_capture(args.native_capture)[2] != verified: raise ValueError('native capture changed during comparison')
+        if native_capture(args.native_capture,args.reference_root)[2] != verified: raise ValueError('native capture changed during comparison')
         for path, digest in protected.items():
             if native.sha(Path(path).read_bytes()) != digest: raise ValueError('source/artifact changed during comparison: '+path)
         if git('rev-parse','HEAD') != initial_commit or git('status','--porcelain','--untracked-files=no') != initial_status:

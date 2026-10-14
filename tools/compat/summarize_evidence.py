@@ -28,9 +28,38 @@ BITMAP_SOURCES = ["hdmv_source_sha256", "hdmv_golomb_source_sha256",
                   "hdmv_golomb_header_sha256", "hdmv_raster_source_sha256", "xy_filter_source_sha256", "vobsub_source_sha256", "realtext_source_sha256", "realtext_header_sha256", "cc_source_sha256", "cc_header_sha256"]
 
 
+def verify_document_dialogs(directory, document, candidate):
+    """Verify retained bounded unknown-style dialogs for the exact observer source."""
+    from document_native_lifecycle import validate_dialogs
+    assert document["dialogs_equal"] is True
+    observer = windows_source_bytes(candidate, "tools/compat/dialog_capture.py")
+    lf = observer.replace(b"\r\n", b"\n")
+    assert document["dialog_observer_sha256"] in {
+        hashlib.sha256(data).hexdigest() for data in (observer, lf, lf.replace(b"\n", b"\r\n"))}
+    observations = []
+    retained_hashes = []
+    for side in ("reference", "candidate"):
+        for repeat in (1, 2):
+            path = directory / f"{side}-trace-{repeat}-dialogs" / "dialogs.json"
+            assert path.stat().st_size <= 1024 * 1024, "dialog artifact exceeds bounded fixture domain"
+            events = load(path)
+            validate_dialogs(events)
+            observations.append(events)
+            retained_hashes.append(sha(path))
+    assert all(events == observations[0] for events in observations[1:]), "dialog captures differ"
+    assert document["dialog_count"] == len(observations[0])
+    canonical_hashes = [hashlib.sha256(json.dumps(events, sort_keys=True).encode()).hexdigest()
+                        for events in observations]
+    assert document["dialog_sha256"] == canonical_hashes
+    return {"count": document["dialog_count"], "equal": True,
+            "observer_sha256": document["dialog_observer_sha256"],
+            "canonical_sha256": canonical_hashes, "retained_file_sha256": retained_hashes,
+            "scope": "ordered full warning text, controls and scripted responses; no document edits from observer"}
+
+
 def document_lifecycle_requirements(verified_probe_source):
     """Archive gates follow invocations in the hash-verified candidate probe."""
-    calls = set(re.findall(rb"(?m)^\s*(named_style_lifecycle|identity_lifecycle|interpretation_lifecycle|layout_lifecycle|metadata_lifecycle|copy_selected_lifecycle|prepared_style_conflicts|sort_lifecycle|base_empty_lifecycle|lcid_lifecycle|resolution_lifecycle|layout_size_lifecycle)\(\);\s*$", verified_probe_source))
+    calls = set(re.findall(rb"(?m)^\s*(named_style_lifecycle|identity_lifecycle|interpretation_lifecycle|layout_lifecycle|metadata_lifecycle|copy_selected_lifecycle|prepared_style_conflicts|sort_lifecycle|base_empty_lifecycle|lcid_lifecycle|resolution_lifecycle|layout_size_lifecycle|conversion_lifecycle|unknown_style_lifecycle)\(\);\s*$", verified_probe_source))
     return {"require_named_stages": b"named_style_lifecycle" in calls,
             "require_identity_stages": b"identity_lifecycle" in calls,
             "require_interpretation_stages": b"interpretation_lifecycle" in calls,
@@ -42,7 +71,9 @@ def document_lifecycle_requirements(verified_probe_source):
             "require_base_empty_stages": b"base_empty_lifecycle" in calls,
             "require_lcid_stages": b"lcid_lifecycle" in calls,
             "require_resolution_stages": b"resolution_lifecycle" in calls,
-            "require_layout_size_stages": b"layout_size_lifecycle" in calls}
+            "require_layout_size_stages": b"layout_size_lifecycle" in calls,
+            "require_conversion_stages": b"conversion_lifecycle" in calls,
+            "require_unknown_stages": b"unknown_style_lifecycle" in calls}
 
 
 def load(path):
@@ -245,14 +276,18 @@ def summarize_native(run, platform, candidate, reference, document_storage="nati
             lf = raw.replace(b"\r\n", b"\n")
             assert digest in {hashlib.sha256(data).hexdigest() for data in (raw, lf, lf.replace(b"\n", b"\r\n"))}
         candidate_probe = windows_source_bytes(candidate, "tools/compat/document_native_lifecycle.cpp")
-        compare_traces(traces, 32 if platform == "Win32" else 64,
-                       **document_lifecycle_requirements(candidate_probe))
+        requirements = document_lifecycle_requirements(candidate_probe)
+        compare_traces(traces, 32 if platform == "Win32" else 64, **requirements)
+        dialog_proof = (verify_document_dialogs(directory, document, candidate)
+                        if requirements["require_unknown_stages"] else None)
         assert [hashlib.sha256(trace).hexdigest() for trace in traces] == document["trace_sha256"]
         entry["checks"]["document-lifecycle"] = {
             "report_sha256": sha(path), "equal": True, "trace_lines": document["trace_lines"],
             "limits": document["limits"],
             "library_hash_scope": "Build-library hashes are runner-reported; executables, source headers and traces rehashed",
         }
+        if dialog_proof is not None:
+            entry["checks"]["document-lifecycle"]["dialogs"] = dialog_proof
     has_style_probe = subprocess.run(
         ["git", "cat-file", "-e", f"{candidate}:tools/compat/document_style_api_check.py"],
         cwd=ROOT, capture_output=True).returncode == 0

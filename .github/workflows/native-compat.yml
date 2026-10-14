@@ -116,7 +116,7 @@ jobs:
       - name: Compare safe Rust preparation with captured MFC outputs
         shell: pwsh
         run: |
-          & python tools\compat\document_prepare_rust_check.py --native-capture "artifacts\document-preparation\${{ matrix.platform }}" --target ${{ matrix.target }} --output "artifacts\document-preparation-rust\${{ matrix.platform }}"
+          & python tools\compat\document_prepare_rust_check.py --native-capture "artifacts\document-preparation\${{ matrix.platform }}" --reference-root "$pwd\baseline-preparation" --target ${{ matrix.target }} --output "artifacts\document-preparation-rust\${{ matrix.platform }}"
           if ($LASTEXITCODE -ne 0) { throw "Rust preparation comparison incomplete; inspect report.json" }
       - uses: actions/upload-artifact@v4
         if: always()

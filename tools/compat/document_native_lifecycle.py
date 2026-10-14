@@ -12,6 +12,8 @@ from pathlib import Path
 import re
 import subprocess
 
+from dialog_capture import DialogCapture
+
 ROOT = Path(__file__).resolve().parents[2]
 PIN = json.loads((ROOT / "tools/compat/reference.json").read_text())["commit"]
 SOURCE = ROOT / "tools/compat/document_native_lifecycle.cpp"
@@ -36,6 +38,63 @@ def git(root, *args):
     return subprocess.check_output(["git", "-C", str(root), *args], timeout=60).decode().strip()
 
 
+def unknown_dialog_actions():
+    return [{"title":"Warning", "text_prefix":warning_text(name), "button":button}
+            for name,button in (("UnknownA","ok"),("UnknownB","cancel"),("UnknownOpen","cancel"))]
+
+
+def warning_text(name):
+    return f'Unknown style found: "{name}", changed to "Default"!\n\nPress Cancel to ignore further warnings.'
+
+
+def validate_dialogs(events):
+    actions=unknown_dialog_actions()
+    if len(events)!=len(actions): raise ValueError("missing or extra unknown-style dialogs")
+    for event,action in zip(events,actions):
+        if event.get("title")!=action["title"] or event.get("class")!="#32770" or event.get("response")!=action["button"]:
+            raise ValueError("unknown-style dialog identity/response mismatch")
+        controls=event.get("controls",[])
+        buttons=[c for c in controls if c.get("class")=="Button"]
+        if sorted(c.get("id") for c in buttons)!=[1,2]: raise ValueError("unknown-style OK/Cancel controls missing")
+        if not any(c.get("class")=="Static" and c.get("text")==action["text_prefix"] for c in controls):
+            raise ValueError("unknown-style full warning text mismatch")
+
+
+def run_dialog_process(command,cwd,stem,timeout):
+    """Bounded child observation; all paths kill/reap any still-running child."""
+    destination=Path(str(stem)+"-dialogs");destination.mkdir()
+    process=subprocess.Popen(command,cwd=cwd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    observer=DialogCapture(unknown_dialog_actions(),destination,process_id=process.pid)
+    try:
+        with observer:
+            try: stdout,stderr=process.communicate(timeout=timeout)
+            except subprocess.TimeoutExpired:
+                process.kill();stdout,stderr=process.communicate()
+                Path(str(stem)+".stdout").write_bytes(stdout)
+                Path(str(stem)+".stderr").write_bytes(stderr)
+                raise RuntimeError(f"{stem.name} timed out after {timeout}s; unresolved")
+        Path(str(stem)+".stdout").write_bytes(stdout)
+        Path(str(stem)+".stderr").write_bytes(stderr)
+        (destination/"dialogs.json").write_text(json.dumps(observer.events,indent=2)+"\n",encoding="utf-8")
+        if observer.error: raise RuntimeError(observer.error)
+        if process.returncode: raise RuntimeError(f"{stem.name} exited {process.returncode}; unresolved")
+        validate_dialogs(observer.events)
+        return subprocess.CompletedProcess(command,process.returncode,stdout,stderr),observer.events
+    finally:
+        if process.poll() is None:
+            process.kill();process.communicate()
+
+
+def unknown_rows():
+    names=["!@dkdfjlakfkjjklezdv^5132ae","UnknownA","UnknownA","Known","UnknownA","Default","UnknownB","UnknownC"]
+    rows=[]
+    for stage,values in (("unknown-before",names),("unknown-after",[names[0],"Default","Default","Known","Default","Default","Default","Default"]),("unknown-open-after",["Default"])):
+        rows.append(f"unknown-stage {stage} entries={len(values)}".encode())
+        for i,name in enumerate(values):
+            rows.append((f"unknown-row {stage} {i} {len(name)} "+" ".join(f"{ord(c):04x}" for c in name)).encode())
+    return rows
+
+
 def conversion_rows():
     """Finite native llround outputs and actual/no-op rebuild observations."""
     return [row.encode() for row in (
@@ -50,7 +109,7 @@ def conversion_rows():
     )]
 
 
-def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True):
+def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True, require_unknown_stages=True):
     lines = data.splitlines()
     if not lines or lines[0] != f"provenance pointer_bits={pointer_bits}".encode():
         raise ValueError("missing or incorrect native architecture provenance")
@@ -59,6 +118,13 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
     for prefix in (b"state ", b"entry ", b"segment ", b"callback ", b"text "):
         if not any(line.startswith(prefix) for line in lines):
             raise ValueError(f"missing native lifecycle trace section {prefix!r}")
+
+    if require_unknown_stages:
+        if [line for line in lines if line.startswith((b"unknown-stage ",b"unknown-row "))] != unknown_rows():
+            raise ValueError("missing or incorrect unknown-style row observations")
+        callback=b"unknown-open-callback mode=0 entries=1 segments=1 style 11 0055 006e 006b 006e 006f 0077 006e 004f 0070 0065 006e"
+        if lines.count(callback)!=1 or lines.index(callback)>=lines.index(b"unknown-stage unknown-open-after entries=1"):
+            raise ValueError("missing or misplaced pre-fallback Open callback")
 
     if require_conversion_stages:
         expected = conversion_rows()
@@ -285,11 +351,11 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
 
 
 
-def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True):
+def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True, require_unknown_stages=True):
     if len(traces) != 4:
         raise ValueError("two reference and two candidate executions required")
     for trace in traces:
-        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages, require_metadata_stages=require_metadata_stages, require_selected_copy_stages=require_selected_copy_stages, require_style_rename_stages=require_style_rename_stages, require_sort_stages=require_sort_stages, require_base_empty_stages=require_base_empty_stages, require_lcid_stages=require_lcid_stages, require_resolution_stages=require_resolution_stages, require_layout_size_stages=require_layout_size_stages, require_conversion_stages=require_conversion_stages)
+        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages, require_metadata_stages=require_metadata_stages, require_selected_copy_stages=require_selected_copy_stages, require_style_rename_stages=require_style_rename_stages, require_sort_stages=require_sort_stages, require_base_empty_stages=require_base_empty_stages, require_lcid_stages=require_lcid_stages, require_resolution_stages=require_resolution_stages, require_layout_size_stages=require_layout_size_stages, require_conversion_stages=require_conversion_stages, require_unknown_stages=require_unknown_stages)
     if any(trace != traces[0] for trace in traces[1:]):
         raise ValueError("native lifecycle traces differ or are nondeterministic")
 
@@ -317,7 +383,7 @@ def main():
               "kind": "linked-native-document-lifecycle", "reference_commit": PIN,
               "platform": args.platform, "document_storage": args.document_storage,
               "probe_sha256": sha(SOURCE.read_bytes()),
-              "runner_sha256": sha(Path(__file__).read_bytes()), "builds": {},
+              "runner_sha256": sha(Path(__file__).read_bytes()), "dialog_observer_sha256": sha((ROOT/"tools/compat/dialog_capture.py").read_bytes()), "builds": {},
               "environment": {key: os.environ.get(key) for key in
                               ("VCToolsVersion", "WindowsSDKVersion", "VSCMD_ARG_TGT_ARCH")},
               "limits": ["Bounded normal lifecycles and initialized metadata only",
@@ -356,6 +422,7 @@ def main():
         target = "i686-pc-windows-msvc" if args.platform == "Win32" else "x86_64-pc-windows-msvc"
         bits = 32 if args.platform == "Win32" else 64
         traces = []
+        dialog_observations = []
         for label, root in zip(("reference", "candidate"), roots):
             work = out / label
             work.mkdir()
@@ -401,7 +468,10 @@ def main():
                 if Path(path).is_relative_to(root)
             }
             for repeat in (1, 2):
-                result = run([str(exe)], work, f"{label}-trace-{repeat}", 30)
+                name=f"{label}-trace-{repeat}"
+                (out/f"{name}.command.json").write_text(json.dumps([str(exe)],indent=2)+"\n")
+                result,dialogs=run_dialog_process([str(exe)],work,out/name,20)
+                dialog_observations.append(dialogs)
                 if result.stderr:
                     raise ValueError(f"{label} execution produced unexpected stderr")
                 validate_trace(result.stdout, bits)
@@ -415,13 +485,17 @@ def main():
                 if sha(Path(path).read_bytes()) != expected:
                     raise ValueError("included header changed during execution")
         compare_traces(traces, bits)
+        if any(dialogs!=dialog_observations[0] for dialogs in dialog_observations[1:]):
+            raise ValueError("native dialog observations differ or are not repeatable")
         if [git(root, "rev-parse", "HEAD") for root in roots] != commits:
             raise ValueError("checkout commit changed during observation")
         if any(git(root, "status", "--porcelain", "--untracked-files=no") for root in roots):
             raise ValueError("tracked native source changed during observation")
         if sha(SOURCE.read_bytes()) != report["probe_sha256"] or sha(Path(__file__).read_bytes()) != report["runner_sha256"]:
             raise ValueError("probe source changed during observation")
-        report.update(complete=True, equal=True, repeat_equal=True, stderr_empty=True, inputs_unchanged=True,
+        if sha((ROOT/"tools/compat/dialog_capture.py").read_bytes()) != report["dialog_observer_sha256"]:
+            raise ValueError("dialog observer changed during observation")
+        report.update(dialogs_equal=True, dialog_count=len(dialog_observations[0]), dialog_sha256=[sha(json.dumps(d,sort_keys=True).encode()) for d in dialog_observations], complete=True, equal=True, repeat_equal=True, stderr_empty=True, inputs_unchanged=True,
                       trace_sha256=[sha(trace) for trace in traces], trace_lines=len(traces[0].splitlines()))
     except Exception as error:
         report["unresolved"] = str(error)
