@@ -55,7 +55,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   fallback calls**. Tests compare the entire initialized fixture, including
   scratch state, guards and padding, across repeated and overlapping rows.
   Rust tests (47 core, 26 FFI), strict Clippy and default native branch syntax
-  checks pass. Windows/Miri validation is pending for this increment.
+  checks pass. Candidate `0ac9c3f9` passed all four CI platforms, Miri and both
+  Windows DLL jobs. Each DLL job matched **354 cases / 4,334 frames** and
+  **32 mutations / 224 frames**, plus dialogs, visible controls, exports and
+  dependencies. Both logs confirm Rust-enabled `Rasterizer.cpp` compilation.
+  [Integer-Gaussian evidence](gauss-integer-evidence.json) records verified
+  source/DLL hashes and scope.
 * Safe Rust byte-to-float conversion owns a complete output row and constructs
   the exact binary32 representation of each byte using integer arithmetic.
   It preserves positive-zero extension, source-row overlap and zero/overlapping
