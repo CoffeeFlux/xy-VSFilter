@@ -17,6 +17,7 @@ METHODS = 'Copy CopyStyles Empty IsEmpty Sort RemoveAllEntries CreateSegments Op
 METHODS.extend('GetSegmentCount CopyNamedStylesFrom LookupNamedStyle GetStyleCount HasNamedStyle GetNamedStyleCopy GetEntryStyleCopy SetExistingStyleValue ResetDefaultStyle GetStyleNameAt GetStyleValueAt CopyDefaultStyle DefaultStyle'.split())
 METHODS.extend('GetDocumentName GetDocumentPath SetDocumentName SetDocumentPath'.split())
 METHODS.extend('GetDocumentMode GetDocumentType GetDocumentEncoding SetDocumentMode SetDocumentType SetDocumentEncoding'.split())
+METHODS.extend('GetDocumentScreenSize SetDocumentScreenSize SetDocumentScreenWidth SetDocumentScreenHeight GetDocumentWrapStyle SetDocumentWrapStyle GetDocumentCollisions SetDocumentCollisions GetDocumentScaledBAS SetDocumentScaledBAS'.split())
 PATTERN = re.compile(r'\b(' + '|'.join(FIELDS + METHODS + ['CSimpleTextSubtitle', 'STSEntry', 'STSSegment', 'DocumentOwner', 'DocumentReply']) + r')\b')
 
 def scan(reviewed):

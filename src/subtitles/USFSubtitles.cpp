@@ -271,9 +271,21 @@ bool CUSFSubtitles::ConvertToSTS(CSimpleTextSubtitle& sts)
 #else
 	sts.m_encoding = CTextFile::UTF8;
 #endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+	sts.SetDocumentScreenSize(CSize(640, 480));
+#else
 	sts.m_dstScreenSize = CSize(640, 480);
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+	sts.SetDocumentScaledBAS(true);
+#else
 	sts.m_fScaledBAS = true;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+	sts.SetDocumentWrapStyle(1);
+#else
 	sts.m_defaultWrapStyle = 1;
+#endif
 
 	// TODO: map metadata.language.code to charset num (windows doesn't have such a function...)
 	int charSet = DEFAULT_CHARSET; 
@@ -285,10 +297,17 @@ bool CUSFSubtitles::ConvertToSTS(CSimpleTextSubtitle& sts)
 
 		if(!s->name.CompareNoCase(L"Default") && !s->fontstyle.wrap.IsEmpty())
 		{
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+			sts.SetDocumentWrapStyle(
+				!s->fontstyle.wrap.CompareNoCase(L"no") ? 2 :
+				!s->fontstyle.wrap.CompareNoCase(L"auto") ? 1 :
+				1);
+#else
 			sts.m_defaultWrapStyle = 
 				!s->fontstyle.wrap.CompareNoCase(L"no") ? 2 :
 				!s->fontstyle.wrap.CompareNoCase(L"auto") ? 1 :
 				1;
+#endif
 		}
 
 		STSStyle* stss = new STSStyle;
@@ -296,9 +315,17 @@ bool CUSFSubtitles::ConvertToSTS(CSimpleTextSubtitle& sts)
 
         CRect tmp_rect = stss->marginRect.get();
 		if(!s->pal.horizontal_margin.IsEmpty())
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+			tmp_rect.left = tmp_rect.right = TranslateMargin(s->pal.horizontal_margin, sts.GetDocumentScreenSize().cx);
+#else
 			tmp_rect.left = tmp_rect.right = TranslateMargin(s->pal.horizontal_margin, sts.m_dstScreenSize.cx);
+#endif
 		if(!s->pal.vertical_margin.IsEmpty())
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+			tmp_rect.top = tmp_rect.bottom = TranslateMargin(s->pal.vertical_margin, sts.GetDocumentScreenSize().cy);
+#else
 			tmp_rect.top = tmp_rect.bottom = TranslateMargin(s->pal.vertical_margin, sts.m_dstScreenSize.cy);
+#endif
         stss->marginRect = tmp_rect;
 
 		stss->scrAlignment = TranslateAlignment(s->pal.alignment);
@@ -359,9 +386,17 @@ bool CUSFSubtitles::ConvertToSTS(CSimpleTextSubtitle& sts)
 		marginRect.SetRectEmpty();
 
 		if(!t->pal.horizontal_margin.IsEmpty())
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+			marginRect.left = marginRect.right = TranslateMargin(t->pal.horizontal_margin, sts.GetDocumentScreenSize().cx);
+#else
 			marginRect.left = marginRect.right = TranslateMargin(t->pal.horizontal_margin, sts.m_dstScreenSize.cx);
+#endif
 		if(!t->pal.vertical_margin.IsEmpty())
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+			marginRect.top = marginRect.bottom = TranslateMargin(t->pal.vertical_margin, sts.GetDocumentScreenSize().cy);
+#else
 			marginRect.top = marginRect.bottom = TranslateMargin(t->pal.vertical_margin, sts.m_dstScreenSize.cy);
+#endif
 
 		WCHAR rtags[3][8] = {L"{\\rz%d}", L"{\\rx%d}", L"{\\ry%d}"};
 		for(int i = 0; i < 3; i++)
@@ -387,7 +422,11 @@ bool CUSFSubtitles::ConvertToSTS(CSimpleTextSubtitle& sts)
 						!s->fontstyle.wrap.CompareNoCase(L"auto") ? 1 :
 						1;
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+					if(WrapStyle != sts.GetDocumentWrapStyle())
+#else
 					if(WrapStyle != sts.m_defaultWrapStyle)
+#endif
 					{
 						CStringW str;
                         str.Format(L"{\\q%d}", WrapStyle);

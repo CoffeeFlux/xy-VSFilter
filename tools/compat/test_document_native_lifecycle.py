@@ -18,6 +18,12 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
              b"interpretation-copy-independent", b"interpretation-empty", b"interpretation-self-copy",
              b"interpretation-microdvd-open", b"interpretation-frame", b"interpretation-frame-noop",
              b"interpretation-time", b"interpretation-time-noop"))
+         + b"".join(b"layout-stage " + stage + b" width=0 height=0 wrap=0 collisions=0 scaled=0\n" for stage in (
+             b"layout-constructed", b"layout-supplied", b"layout-copy", b"layout-copy-independent",
+             b"layout-empty", b"layout-self-copy", b"layout-open-fallback", b"layout-open-x1280",
+             b"layout-open-y1024", b"layout-open-repeated"))
+         + b"".join(b"layout-callback " + stage + b" width=0 height=0\n" for stage in (
+             b"layout-open-fallback", b"layout-open-x1280", b"layout-open-y1024", b"layout-open-repeated"))
          + b"saved-file ssa exists=1 bytes=1 41\nsaved-file ass exists=1 bytes=1 41\n"
          + b"saved-file srt exists=1 bytes=1 41\nsaved-file srt-sidecar exists=1 bytes=1 41\n"
          + b"saved-file ssa-sidecar exists=0\nsaved-file ass-sidecar exists=0\n"
@@ -96,6 +102,17 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
         with self.assertRaises(ValueError):compare_traces([TRACE,TRACE,changed,changed],64)
         truncated=TRACE.replace(b"interpretation-stage interpretation-empty",b"missing-stage interpretation-empty")
         with self.assertRaises(ValueError):compare_traces([truncated]*4,64)
+
+    def test_layout_stages_callbacks_and_archival_opt_out(self):
+        legacy=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith((b"layout-stage ",b"layout-callback ")))
+        with self.assertRaises(ValueError):compare_traces([legacy]*4,64)
+        compare_traces([legacy]*4,64,require_layout_stages=False)
+        missing=TRACE.replace(b"layout-callback layout-open-fallback",b"missing-callback layout-open-fallback")
+        with self.assertRaises(ValueError):compare_traces([missing]*4,64)
+        changed=TRACE.replace(b"layout-callback layout-open-fallback width=0",b"layout-callback layout-open-fallback width=384")
+        with self.assertRaises(ValueError):compare_traces([TRACE,TRACE,changed,changed],64)
+        changed=TRACE.replace(b"layout-stage layout-self-copy width=0",b"layout-stage layout-self-copy width=32")
+        with self.assertRaises(ValueError):compare_traces([TRACE,TRACE,changed,changed],64)
 
     def test_rejects_repeat_nondeterminism(self):
         changed = TRACE.replace(b"callback changed", b"callback empty")

@@ -3,7 +3,8 @@
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 // Experimental native value boundary only. Canonical entries/segments live in
 // Rust, including supplied default/named styles and raw name/path identity.
-// Mode/type/encoding scalars are supplied by native construction and parsing.
+// Interpretation and script layout scalars are supplied by native construction
+// and parsing.
 // Other metadata, string preparation and CRT numeric/sort/name-generation
 // choices remain native.
 #include "STS.h"
@@ -330,6 +331,23 @@ public:
     template<class Style = STSStyle> Style DefaultStyle() const { return DocumentDetail::StyleValue<Style>(Snapshot(2,0).Read()); }
     void CopyDefaultStyle(const DocumentOwner& source) {
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_copy_default_style_v1(id_,source.id_);}));
+    }
+    CSize ScreenSize() const {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_get_script_size_v1(id_,out.data(),out.size());}));
+        return CSize(DocumentDetail::I32(DocumentDetail::Load(out,0,4)),DocumentDetail::I32(DocumentDetail::Load(out,4,4)));
+    }
+    void SetScreenSize(const CSize& value) {
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_set_script_size_v1(id_,value.cx,value.cy);}));
+    }
+    int32_t ScriptField(uint32_t field) const {
+        DocumentDetail::Shape(field <= 4); std::array<uint8_t,4> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_get_script_field_v1(id_,field,out.data(),out.size());}));
+        return DocumentDetail::I32(DocumentDetail::Load(out,0,4));
+    }
+    void SetScriptField(uint32_t field, int32_t value) {
+        DocumentDetail::Shape(field <= 4);
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_set_script_field_v1(id_,field,value);}));
     }
     int32_t Interpretation(uint32_t field) const {
         DocumentDetail::Shape(field <= 2); std::array<uint8_t,4> out{};

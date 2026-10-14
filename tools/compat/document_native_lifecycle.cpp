@@ -53,17 +53,19 @@ public:
 
 class TraceDocument : public CSimpleTextSubtitle {
     unsigned id_;
+    CSize initial_screen_,last_callback_screen_;int initial_wrap_,initial_collisions_;bool initial_scaled_;
     int initial_mode_;exttype initial_type_;CTextFile::enc initial_encoding_;
 public:
     explicit TraceDocument(unsigned id) : id_(id) {
+        initial_screen_=Screen();initial_wrap_=Wrap();initial_collisions_=Collisions();initial_scaled_=Scaled();
         initial_mode_=Mode();initial_type_=Type();initial_encoding_=Encoding();
         // Assign every observed metadata scalar before the first observation;
         // constructor-indeterminate m_simple/m_lcid are never read.
         m_simple = id != 0;Name(id ? CString(L"destination") : CString(L"source"));
         m_lcid = 1033+id;Type(EXTSRT);Mode(TIME);Encoding(CTextFile::UTF8);
         Path(id ? CString(L"destination-path") : CString(L"source-path"));
-        m_dstScreenSize=CSize(640+id,480+id);m_defaultWrapStyle=int(id);m_collisions=int(id);
-        m_fScaledBAS=id!=0;m_layout_size=CSize(800+id,600+id);
+        Screen(CSize(640+id,480+id));Wrap(int(id));Collisions(int(id));
+        Scaled(id!=0);m_layout_size=CSize(800+id,600+id);
         STSStyle initialDefault;initialDefault.charSet=ANSI_CHARSET;initialDefault.fontSize=19+id;
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
         m_document->SetDefaultStyle(initialDefault);
@@ -74,6 +76,67 @@ public:
         m_dPARCompensation=1.25+id;m_eYCbCrMatrix=YCbCrMatrix_BT709;m_eYCbCrRange=YCbCrRange_PC;
     }
     ~TraceDocument() override {printf("event %u %u destructor-body\n",++sequence,id_);}
+    CSize Screen() const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        return GetDocumentScreenSize();
+#else
+        return m_dstScreenSize;
+#endif
+    }
+    void Screen(const CSize& value) {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        SetDocumentScreenSize(value);
+#else
+        m_dstScreenSize=value;
+#endif
+    }
+    int Wrap() const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        return GetDocumentWrapStyle();
+#else
+        return m_defaultWrapStyle;
+#endif
+    }
+    void Wrap(int value) {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        SetDocumentWrapStyle(value);
+#else
+        m_defaultWrapStyle=value;
+#endif
+    }
+    int Collisions() const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        return GetDocumentCollisions();
+#else
+        return m_collisions;
+#endif
+    }
+    void Collisions(int value) {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        SetDocumentCollisions(value);
+#else
+        m_collisions=value;
+#endif
+    }
+    bool Scaled() const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        return GetDocumentScaledBAS();
+#else
+        return m_fScaledBAS;
+#endif
+    }
+    void Scaled(bool value) {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        SetDocumentScaledBAS(value);
+#else
+        m_fScaledBAS=value;
+#endif
+    }
+    CSize LastCallbackScreen() const {return last_callback_screen_;}
+    void ConstructionLayout() const {
+        check(initial_screen_==CSize(0,0)&&initial_wrap_==0&&initial_collisions_==0&&!initial_scaled_,"native initialized layout defaults");
+        printf("layout-stage layout-constructed width=%ld height=%ld wrap=%d collisions=%d scaled=%d\n",initial_screen_.cx,initial_screen_.cy,initial_wrap_,initial_collisions_,initial_scaled_);
+    }
     int Mode() const {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
         return GetDocumentMode();
@@ -201,8 +264,8 @@ public:
         printf("state %u %u %s %zu %zu\n",++sequence,id_,stage,Entries(),Segments());
         printf("metadata %d",m_simple);units(Name());
         printf(" %lu %d %d %d",static_cast<unsigned long>(m_lcid),int(Type()),Mode(),int(Encoding()));units(Path());
-        printf(" %ld %ld %d %d %d %ld %ld %d %d",m_dstScreenSize.cx,m_dstScreenSize.cy,
-            m_defaultWrapStyle,m_collisions,m_fScaledBAS,m_layout_size.cx,m_layout_size.cy,
+        printf(" %ld %ld %d %d %d %ld %ld %d %d",Screen().cx,Screen().cy,
+            Wrap(),Collisions(),Scaled(),m_layout_size.cx,m_layout_size.cy,
             m_fForcedDefaultStyle,int(m_ePARCompensationType));
         real(m_dPARCompensation);printf(" %d %d\n",int(m_eYCbCrMatrix),int(m_eYCbCrRange));
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
@@ -236,6 +299,7 @@ public:
     }
 protected:
     void OnChanged() override {
+        last_callback_screen_=Screen();
         ++change_events[id_];printf("event %u %u changed-enter\n",++sequence,id_);Dump("callback-state");
         // Actual native read operations reenter after rebuild's Rust loan ends.
         // They never mutate/reallocate reference storage during the callback.
@@ -385,6 +449,13 @@ static void named_style_lifecycle() {
     named_stage(destination,"named-empty");
     check(change_events[0]==before0&&change_events[1]==before1,"named operations do not notify");
 }
+// CTextFile deliberately inherits CStdioFile64 protected in both checkouts.
+// Expose only the fixture label operation; real Open/parsing remains unchanged.
+class FixtureTextFile : public CTextFile {
+public:
+    explicit FixtureTextFile(CTextFile::enc encoding):CTextFile(encoding){}
+    void SetFixturePath(const CString& value) {SetFilePath(value);}
+};
 struct SavedFiles {
     CString name;
     explicit SavedFiles(const wchar_t* value):name(value){DeleteFile(name);DeleteFile(name+L".style");}
@@ -458,10 +529,10 @@ static void identity_lifecycle() {
         CFile output;check(output.Open(fixture.name,CFile::modeCreate|CFile::modeWrite|CFile::typeBinary)!=FALSE,"identity fixture create");
         output.Write(bytes,sizeof(bytes)-1);
     }
-    CTextFile input(CTextFile::UTF8);check(input.Open(fixture.name),"identity fixture input");
+    FixtureTextFile input(CTextFile::UTF8);check(input.Open(fixture.name),"identity fixture input");
     // CFile's public label setter avoids machine-specific absolute cwd in the
     // paired trace; parsing and actual CSimpleTextSubtitle::Open remain native.
-    input.SetFilePath(fixture.name);
+    input.SetFixturePath(fixture.name);
     check(input.GetFilePath()==fixture.name,"deterministic opened file label");
     check(source.Open(&input,ANSI_CHARSET,CString(L"opened identity")),"ordinary identity Open");
     identity_stage(source,"identity-open-success",CString(L"opened identity"),fixture.name);
@@ -489,10 +560,42 @@ static void interpretation_lifecycle() {
         CFile output;check(output.Open(fixture.name,CFile::modeCreate|CFile::modeWrite|CFile::typeBinary)!=FALSE,"MicroDVD fixture create");
         output.Write(bytes,sizeof(bytes)-1);
     }
-    CTextFile input(CTextFile::UTF8);check(input.Open(fixture.name),"MicroDVD fixture input");input.SetFilePath(fixture.name);
+    FixtureTextFile input(CTextFile::UTF8);check(input.Open(fixture.name),"MicroDVD fixture input");input.SetFixturePath(fixture.name);
     check(input.GetFilePath()==fixture.name,"deterministic MicroDVD label");
     check(source.Open(&input,ANSI_CHARSET,CString(L"interpretation MicroDVD")),"ordinary MicroDVD Open");
     interpretation_stage(source,"interpretation-microdvd-open",FRAME,EXTSSA,input.GetEncoding());
+}
+static void layout_stage(TraceDocument& doc,const char* stage,const CSize& screen,int wrap,int collisions,bool scaled) {
+    check(doc.Screen()==screen&&doc.Wrap()==wrap&&doc.Collisions()==collisions&&doc.Scaled()==scaled,"script layout values");
+    printf("layout-stage %s width=%ld height=%ld wrap=%d collisions=%d scaled=%d\n",stage,doc.Screen().cx,doc.Screen().cy,doc.Wrap(),doc.Collisions(),doc.Scaled());doc.Dump(stage);
+}
+static void layout_open(const char* label,const char* headers,const CSize& expected,int wrap,int collisions,bool scaled,const CSize& callbackSize) {
+    TraceDocument doc(0);SavedFiles fixture(L"document-lifecycle-layout.ass");
+    CStringA text("[Script Info]\r\nScriptType: v4.00+\r\n");text+=headers;
+    text+="[V4+ Styles]\r\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\r\nStyle: Default,Arial,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1\r\n[Events]\r\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\r\nDialogue: 0,0:00:00.00,0:00:01.00,Default,,0,0,0,,ordinary layout\r\n";
+    {CFile output;check(output.Open(fixture.name,CFile::modeCreate|CFile::modeWrite|CFile::typeBinary)!=FALSE,"layout fixture create");output.Write(text.GetString(),text.GetLength());}
+    FixtureTextFile input(CTextFile::UTF8);check(input.Open(fixture.name),"layout fixture input");input.SetFixturePath(fixture.name);
+    check(input.GetFilePath()==fixture.name,"deterministic layout label");unsigned before=change_events[0];
+    check(doc.Open(&input,ANSI_CHARSET,CString(L"layout fixture")),"ordinary ASS layout Open");
+    check(change_events[0]==before+1&&doc.LastCallbackScreen()==callbackSize,"Open callback sees resolution before fallback");
+    printf("layout-callback %s width=%ld height=%ld\n",label,doc.LastCallbackScreen().cx,doc.LastCallbackScreen().cy);
+    layout_stage(doc,label,expected,wrap,collisions,scaled);
+}
+static void layout_lifecycle() {
+    TraceDocument source(0),destination(1);source.ConstructionLayout();
+    const unsigned sourceChanges=change_events[0],destinationChanges=change_events[1];
+    source.Screen(CSize(-4,12));source.Wrap(7);source.Collisions(1);source.Scaled(true);
+    layout_stage(source,"layout-supplied",CSize(-4,12),7,1,true);
+    destination.Copy(source);layout_stage(destination,"layout-copy",CSize(-4,12),7,1,true);
+    destination.Screen(CSize(16,20));destination.Wrap(-2);destination.Collisions(0);destination.Scaled(false);
+    layout_stage(source,"layout-copy-independent",CSize(-4,12),7,1,true);
+    source.Empty();layout_stage(source,"layout-empty",CSize(0,0),7,1,true);
+    source.Screen(CSize(32,24));source.Copy(source);layout_stage(source,"layout-self-copy",CSize(0,0),7,1,true);
+    check(change_events[0]==sourceChanges&&change_events[1]==destinationChanges,"layout scalar lifecycle adds no callbacks");
+    layout_open("layout-open-fallback","",CSize(384,288),0,0,false,CSize(0,0));
+    layout_open("layout-open-x1280","PlayResX: 1280\r\n",CSize(1280,1024),0,0,false,CSize(1280,1024));
+    layout_open("layout-open-y1024","PlayResY: 1024\r\n",CSize(1280,1024),0,0,false,CSize(1280,1024));
+    layout_open("layout-open-repeated","PlayResX: 1280\r\nPlayResY: 600\r\nPlayResX: -8\r\nWrapStyle: -2\r\nWrapStyle: 7\r\nCollisions: prefixREVERSEsuffix\r\nScaledBorderAndShadow: notYESexact\r\n",CSize(-8,600),7,1,true,CSize(-8,600));
 }
 int main() {
     try {
@@ -500,6 +603,7 @@ int main() {
         printf("provenance pointer_bits=%zu\n",sizeof(void*)*8);
         printf("environment ansi=%u oem=%u\n",GetACP(),GetOEMCP());
         default_style_lifecycle();
+        layout_lifecycle();
         interpretation_lifecycle();
         identity_lifecycle();
         named_style_lifecycle();
@@ -530,7 +634,7 @@ int main() {
             check(change_events[1]==notifications,"Empty does not notify");
             destination.Copy(source);destination.Copy(destination);destination.Dump("self-copy");
             check(destination.Entries()==0&&destination.Segments()==0&&destination.NamedCount()==0,"self-copy reads after Empty");
-            check(destination.m_dstScreenSize==CSize(0,0),"self-copy screen size reset");
+            check(destination.Screen()==CSize(0,0),"self-copy screen size reset");
             source.Copy(source);source.Dump("source-self-copy");
             populate(source);source.Dump("nonempty-before-destruction");
             printf("before-destruction empty=%u,%u changed=%u,%u\n",empty_events[0],empty_events[1],change_events[0],change_events[1]);

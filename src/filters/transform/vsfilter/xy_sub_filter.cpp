@@ -1822,7 +1822,11 @@ void XySubFilter::SetSubtitle( ISubStream* pSubStream, bool fApplyDefStyle /*= t
                 break;
             }
             pRTS->Deinit();
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            playres = pRTS->GetDocumentScreenSize();
+#else
             playres = pRTS->m_dstScreenSize;
+#endif
             m_xy_bool_opt[BOOL_IS_BITMAP] = false;
             m_xy_bool_opt[BOOL_IS_MOVABLE] = ((pRTS->IsMovable()) && ((pRTS->IsSimple()) || (m_xy_bool_opt[BOOL_ALLOW_MOVING])));
         }

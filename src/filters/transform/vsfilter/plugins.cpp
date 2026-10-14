@@ -227,7 +227,11 @@ public:
             if(clsid == __uuidof(CRenderedTextSubtitle))
             {
                 CRenderedTextSubtitle* pRTS = dynamic_cast<CRenderedTextSubtitle*>((ISubPicProvider*)m_pSubPicProvider);
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                playres = pRTS->GetDocumentScreenSize();
+#else
                 playres = pRTS->m_dstScreenSize;
+#endif
             }
             m_xy_size_opt[SIZE_ASS_PLAY_RESOLUTION] = playres;
 

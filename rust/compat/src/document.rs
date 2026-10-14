@@ -5,7 +5,7 @@
 //! Callers must perform native text/style preparation and its initial rejection
 //! checks before supplying records (the suffix begins at STSEntry construction);
 //! raw code units are retained, including unpaired surrogates and embedded NULs.
-//! Raw name/path, supplied interpretation scalars and initialized default/named
+//! Raw name/path, supplied interpretation/script scalars and initialized default/named
 //! styles are owned here. Native map orchestration, other metadata, Add parsing,
 //! full Copy orchestration, CRT sort and encoding conversion remain outside this
 //! API. Allocation failure/partial native
@@ -101,10 +101,30 @@ impl InterpretationField {
         }
     }
 }
+/// Supplied script metadata; values are not normalized to rendering ranges.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ScriptField {
+    Width,
+    Height,
+    Wrap,
+    Collisions,
+}
+impl ScriptField {
+    fn index(self) -> usize {
+        match self {
+            Self::Width => 0,
+            Self::Height => 1,
+            Self::Wrap => 2,
+            Self::Collisions => 3,
+        }
+    }
+}
 /// Clone creates independent storage; it does not emulate native Copy callbacks
 /// or the selective field assignments in native Copy.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Document {
+    script: [Option<i32>; 4],
+    scaled_bas: Option<bool>,
     interpretation: [Option<i32>; 3],
     name: Vec<u16>,
     path: Vec<u16>,
@@ -114,6 +134,25 @@ pub struct Document {
     segments: Vec<DocumentSegment>,
 }
 impl Document {
+    pub fn script_field(&self, field: ScriptField) -> Option<i32> {
+        self.script[field.index()]
+    }
+    pub fn replace_script_field(&mut self, field: ScriptField, value: i32) -> Option<i32> {
+        self.script[field.index()].replace(value)
+    }
+    pub fn scaled_bas(&self) -> Option<bool> {
+        self.scaled_bas
+    }
+    pub fn replace_scaled_bas(&mut self, value: bool) -> Option<bool> {
+        self.scaled_bas.replace(value)
+    }
+    pub fn script_size(&self) -> Option<[i32; 2]> {
+        Some([self.script[0]?, self.script[1]?])
+    }
+    pub fn set_script_size(&mut self, width: i32, height: i32) {
+        self.script[0] = Some(width);
+        self.script[1] = Some(height);
+    }
     /// Absent until explicitly supplied by the native constructor/adapter.
     pub fn interpretation(&self, field: InterpretationField) -> Option<i32> {
         self.interpretation[field.index()]
@@ -954,5 +993,38 @@ mod tests {
             assert_eq!(destination.interpretation(field), Some(i32::MAX));
         }
         assert_eq!(source.interpretation(InterpretationField::Mode), Some(-1));
+    }
+    #[test]
+    fn supplied_script_fields_and_size_have_independent_retention() {
+        let mut source = Document::default();
+        let mut destination = Document::default();
+        assert_eq!(source.script_size(), None);
+        assert_eq!(source.scaled_bas(), None);
+        for field in [
+            ScriptField::Width,
+            ScriptField::Height,
+            ScriptField::Wrap,
+            ScriptField::Collisions,
+        ] {
+            assert_eq!(source.script_field(field), None);
+            source.replace_script_field(field, i32::MIN);
+            destination.replace_script_field(field, i32::MAX);
+        }
+        source.replace_scaled_bas(true);
+        destination.replace_scaled_bas(false);
+        let cloned = source.clone();
+        source.set_script_size(-3, 4);
+        assert_eq!(source.script_size(), Some([-3, 4]));
+        assert_eq!(source.script_field(ScriptField::Wrap), Some(i32::MIN));
+        destination.copy_storage_from(&source);
+        destination.clear_entries_and_segments();
+        destination.remove_all_entries();
+        assert_eq!(destination.script_size(), Some([i32::MAX, i32::MAX]));
+        assert_eq!(destination.scaled_bas(), Some(false));
+        assert_eq!(cloned.script_size(), Some([i32::MIN, i32::MIN]));
+        assert_eq!(cloned.scaled_bas(), Some(true));
+        source.set_script_size(0, 0);
+        assert_eq!(source.script_field(ScriptField::Collisions), Some(i32::MIN));
+        assert_eq!(source.scaled_bas(), Some(true));
     }
 }

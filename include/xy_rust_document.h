@@ -63,6 +63,16 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_entry_header_v1(uint64_t, uint32
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_segment_header_v1(uint64_t, uint32_t index, uint8_t*, size_t);
 // Query modes: 0 entry, 1 next segment, 2 containing segment; integer TIME only.
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_query_time_v1(uint64_t, uint32_t mode, int64_t time, uint8_t*, size_t);
+// Script fields:0 width,1 height,2 wrap,3 collisions (raw signed i32),4 scaled
+// borders/shadows (strict0/1). Initially absent until native initialization.
+// Absent get => UNRESOLVED_REFERENCE with unchanged output. Scalar get writes4
+// LE bytes; size get writes8 (width,height) in one admission. Size set changes
+// only width/height in one admission. Storage copy/clear retain all fields;
+// native Empty explicitly resets the size at its original assignment point.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_set_script_field_v1(uint64_t owner, uint32_t field, int32_t value);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_get_script_field_v1(uint64_t owner, uint32_t field, uint8_t*, size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_set_script_size_v1(uint64_t owner, int32_t width, int32_t height);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_get_script_size_v1(uint64_t owner, uint8_t*, size_t);
 // Interpretation fields: 0 mode, 1 subtitle type, 2 encoding. Initially absent;
 // the native constructor supplies its enum constants. Raw signed i32 values are
 // not validated/normalized. Get writes4-byte LE i32; absent => UNRESOLVED_REFERENCE

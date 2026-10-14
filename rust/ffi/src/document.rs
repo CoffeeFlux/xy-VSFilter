@@ -9,7 +9,7 @@ use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::ptr;
 use xy_vsfilter_compat::document::{
-    AddMode, Document, IdentityField, InterpretationField, Refusal,
+    AddMode, Document, IdentityField, InterpretationField, Refusal, ScriptField,
 };
 use xy_vsfilter_compat::document_style as style_wire;
 use xy_vsfilter_compat::document_wire::{self as wire, Counts, EntryHeader, SegmentHeader};
@@ -189,6 +189,95 @@ pub extern "C" fn xy_vsfilter_document_copy_default_style_v1(destination: u64, s
         .copy_default_style(destination, source)
         .map_err(registry_error)));
     drop(retired);
+    OK
+}
+fn script_field(field: u32) -> Result<ScriptField, u32> {
+    match field {
+        0 => Ok(ScriptField::Width),
+        1 => Ok(ScriptField::Height),
+        2 => Ok(ScriptField::Wrap),
+        3 => Ok(ScriptField::Collisions),
+        _ => Err(INVALID_INPUT),
+    }
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_set_script_field_v1(
+    owner: u64,
+    field: u32,
+    value: i32,
+) -> u32 {
+    if field > 4 || (field == 4 && value != 0 && value != 1) {
+        return INVALID_INPUT;
+    }
+    status(admitted(|registry| {
+        let document = registry.document_mut(owner).map_err(registry_error)?;
+        if field == 4 {
+            document.replace_scaled_bas(value != 0);
+        } else {
+            document.replace_script_field(script_field(field)?, value);
+        }
+        Ok(())
+    }))
+}
+/// # Safety
+/// Output follows the byte-buffer contract, capacity >=4; LE signed i32.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_get_script_field_v1(
+    owner: u64,
+    field: u32,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 4));
+    if field > 4 {
+        return INVALID_INPUT;
+    }
+    let value = required!(admitted(|registry| {
+        let document = registry.document(owner).map_err(registry_error)?;
+        if field == 4 {
+            document.scaled_bas().map(i32::from)
+        } else {
+            document.script_field(script_field(field)?)
+        }
+        .ok_or(UNRESOLVED_REFERENCE)
+    }));
+    // SAFETY: output validated before admission; loan has ended.
+    unsafe { write_output(output, &value.to_le_bytes()) };
+    OK
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_set_script_size_v1(
+    owner: u64,
+    width: i32,
+    height: i32,
+) -> u32 {
+    status(admitted(|registry| {
+        registry
+            .document_mut(owner)
+            .map_err(registry_error)?
+            .set_script_size(width, height);
+        Ok(())
+    }))
+}
+/// # Safety
+/// Output follows the byte-buffer contract, capacity >=8; LE i32 width/height.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_get_script_size_v1(
+    owner: u64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let size = required!(admitted(|registry| registry
+        .document(owner)
+        .map_err(registry_error)?
+        .script_size()
+        .ok_or(UNRESOLVED_REFERENCE)));
+    let mut bytes = [0u8; 8];
+    bytes[..4].copy_from_slice(&size[0].to_le_bytes());
+    bytes[4..].copy_from_slice(&size[1].to_le_bytes());
+    // SAFETY: capacity validated above; no registry loan remains.
+    unsafe { write_output(output, &bytes) };
     OK
 }
 fn interpretation_field(field: u32) -> Result<InterpretationField, u32> {
@@ -1073,6 +1162,119 @@ mod tests {
             assert_eq!(xy_vsfilter_document_destroy_v1(target), OK);
             assert_ne!(read_snapshot(snapshot), style);
             assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
+            // Script values preserve raw integers; only the Boolean is shaped.
+            let owner = create();
+            let destination = create();
+            let mut output = [0xa5; 8];
+            assert_eq!(
+                xy_vsfilter_document_get_script_size_v1(owner, output.as_mut_ptr(), 8),
+                UNRESOLVED_REFERENCE
+            );
+            assert_eq!(output, [0xa5; 8]);
+            for field in 0..5 {
+                assert_eq!(
+                    xy_vsfilter_document_get_script_field_v1(owner, field, output.as_mut_ptr(), 4),
+                    UNRESOLVED_REFERENCE
+                );
+                assert_eq!(output, [0xa5; 8]);
+                let value = if field == 4 { 1 } else { i32::MIN };
+                assert_eq!(
+                    xy_vsfilter_document_set_script_field_v1(owner, field, value),
+                    OK
+                );
+                if field == 0 {
+                    assert_eq!(
+                        xy_vsfilter_document_get_script_size_v1(owner, output.as_mut_ptr(), 8),
+                        UNRESOLVED_REFERENCE
+                    );
+                    assert_eq!(output, [0xa5; 8]);
+                }
+
+                assert_eq!(
+                    xy_vsfilter_document_set_script_field_v1(
+                        destination,
+                        field,
+                        if field == 4 { 0 } else { i32::MAX }
+                    ),
+                    OK
+                );
+                assert_eq!(
+                    xy_vsfilter_document_get_script_field_v1(owner, field, output.as_mut_ptr(), 4),
+                    OK
+                );
+                assert_eq!(i32::from_le_bytes(output[..4].try_into().unwrap()), value);
+                output.fill(0xa5);
+            }
+            let before = state(owner);
+            for invalid in [-1, 2, i32::MIN, i32::MAX] {
+                assert_eq!(
+                    xy_vsfilter_document_set_script_field_v1(owner, 4, invalid),
+                    INVALID_INPUT
+                );
+                assert_eq!(state(owner), before);
+            }
+            assert_eq!(
+                xy_vsfilter_document_set_script_field_v1(owner, 5, 0),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_get_script_field_v1(owner, 5, output.as_mut_ptr(), 4),
+                INVALID_INPUT
+            );
+            assert_eq!(output, [0xa5; 8]);
+            assert_eq!(
+                xy_vsfilter_document_get_script_size_v1(owner, output.as_mut_ptr(), 7),
+                INVALID_INPUT
+            );
+            assert_eq!(output, [0xa5; 8]);
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_set_script_size_v1(owner, 5, 6))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_get_script_size_v1(
+                        owner,
+                        output.as_mut_ptr(),
+                        8
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(output, [0xa5; 8]);
+            assert_eq!(state(owner), before);
+            let reply = open_snapshot(owner, 5);
+            assert_eq!(
+                xy_vsfilter_document_set_script_field_v1(reply, 0, 2),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                xy_vsfilter_document_set_script_size_v1(reply, 2, 3),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                xy_vsfilter_document_get_script_size_v1(reply, output.as_mut_ptr(), 8),
+                BAD_HANDLE
+            );
+            assert_eq!(output, [0xa5; 8]);
+            assert_eq!(xy_vsfilter_document_set_script_size_v1(owner, -7, 11), OK);
+            assert_eq!(
+                xy_vsfilter_document_get_script_size_v1(owner, output.as_mut_ptr(), 8),
+                OK
+            );
+            assert_eq!(i32::from_le_bytes(output[..4].try_into().unwrap()), -7);
+            assert_eq!(i32::from_le_bytes(output[4..].try_into().unwrap()), 11);
+            assert_eq!(xy_vsfilter_document_copy_storage_v1(destination, owner), OK);
+            assert_eq!(xy_vsfilter_document_clear_storage_v1(destination), OK);
+            assert_eq!(xy_vsfilter_document_remove_entries_v1(destination), OK);
+            assert_eq!(state(destination).script_size(), Some([i32::MAX, i32::MAX]));
+            assert_eq!(state(destination).scaled_bas(), Some(false));
+            assert_eq!(before.clone().script_size(), Some([i32::MIN, i32::MIN]));
+            assert_eq!(xy_vsfilter_document_destroy_v1(owner), OK);
+            assert_eq!(xy_vsfilter_document_destroy_v1(destination), OK);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(reply), OK);
             // Supplied interpretation values are opaque signed scalar bits.
             let owner = create();
             let destination = create();

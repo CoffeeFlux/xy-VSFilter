@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Compile the actual style API helper against pinned/current Windows headers.
+"""Compile actual style API helper and lifecycle probes against Windows headers.
 
 No link, native execution, rendering or behavioral comparison. Flags reproduce
 VS2022 Release helper compilation captured in run 38640323843, with include paths
-from VSFilter.props and helper wrapper. /showIncludes and /Bv add provenance.
+from VSFilter.props and helper wrapper. Lifecycle flags match its linked runner,
+without the link step. /showIncludes and /Bv add provenance.
 """
 import argparse
 import hashlib
@@ -47,6 +48,31 @@ def command(root, helper, output, platform, kind, experimental, rust_text=False)
             '/Fo' + str(output.with_suffix('.obj')), '/Fd' + str(output.with_suffix('.pdb'))]
 
 
+def lifecycle_command(root, source, output, platform, side):
+    """Actual lifecycle runner's Release compiler flags, stopping at /c."""
+    flags = ['/c', '/nologo', '/Bv', '/O2', '/Oi', '/Ob2', '/fp:precise',
+             '/EHsc', '/std:c++14', '/MT', '/Gy', '/showIncludes', '/Y-']
+    defines = ['UNICODE', '_UNICODE', 'NDEBUG', 'WINVER=0x0601',
+               '_WIN32_WINNT=0x0601', 'PSAPI_VERSION=1', '_USE_MATH_DEFINES',
+               '_CRT_SECURE_NO_WARNINGS', '_SCL_SECURE_NO_WARNINGS',
+               '_AFX_NO_MFC_CONTROLS_IN_DIALOGS', 'WINDOWS', '_WINDOWS',
+               'WIN32' if platform == 'Win32' else 'WIN64']
+    if side == 'reference':
+        defines.append('XY_DOCUMENT_PINNED_REFERENCE')
+    else:
+        defines.append('XY_VSFILTER_RUST_TEXT')
+        if side == 'candidate-experimental':
+            defines.append('XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL')
+    # Source uses <stdafx.h>; the selected actual subtitles context must win.
+    includes = ['src/subtitles', 'src/filters/transform/vsfilter',
+                'src/filters/BaseClasses', 'src/thirdparty/boost_lib',
+                'src/thirdparty/log4cplus/include', 'src/thirdparty/VirtualDub/h',
+                'src/thirdparty', 'include', 'include/unrar']
+    return ['cl', *flags, *('/D' + d for d in defines),
+            *('/I' + str(root / p) for p in includes), str(source),
+            '/Fo' + str(output.with_suffix('.obj'))]
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--reference-root', type=Path, required=True)
@@ -58,7 +84,7 @@ def main():
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
     report = {'schema': 'document-style-api-compile-v1', 'complete': False,
-              'scope': 'Compile-only actual helper and headers; no link, execution or parity claim',
+              'scope': 'Compile-only actual style helper/lifecycle sources and headers; no link, execution or parity claim',
               'platform': args.platform, 'reference_commit': PIN, 'commands': [],
               'source_hashes': {}, 'included_headers': {}, 'objects': {},
               'environment': {k: os.environ.get(k) for k in
@@ -79,7 +105,8 @@ def main():
                          'src/filters/transform/vsfilter/xy_sub_filter.vcxproj']:
                 p = root / name
                 report['source_hashes'][str(p)] = digest(p)
-        for p in [helper, Path(__file__).resolve()]:
+        lifecycle = candidate / 'tools/compat/document_native_lifecycle.cpp'
+        for p in [helper, lifecycle, candidate / 'tools/compat/document_native_lifecycle.py', Path(__file__).resolve()]:
             report['source_hashes'][str(p)] = digest(p)
         for side, root, experimental in [('reference', reference, False),
                                          ('candidate-native', candidate, False),
@@ -88,6 +115,11 @@ def main():
                 label = side + '-' + kind
                 report['commands'].append({'label': label, 'cwd': str(root),
                     'command': command(root, helper, out / label, args.platform, kind, experimental, side != 'reference')})
+        for side, root in [('reference', reference), ('candidate-native', candidate),
+                           ('candidate-experimental', candidate)]:
+            label = side + '-lifecycle'
+            report['commands'].append({'label': label, 'cwd': str(root),
+                'command': lifecycle_command(root, lifecycle, out / label, args.platform, side)})
         save()
         if args.generate_only:
             report['generated'] = True

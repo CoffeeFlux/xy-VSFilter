@@ -197,10 +197,12 @@ public:
     CString        m_path;
 #endif
 
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     CSize          m_dstScreenSize;
     int            m_defaultWrapStyle;
     int            m_collisions;
     bool           m_fScaledBAS;
+#endif
     CSize          m_layout_size;
 
 #ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
@@ -314,6 +316,17 @@ public:
     void OrSegmentAnimated(int iSegment, bool animated);
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    CSize GetDocumentScreenSize() const;
+    void SetDocumentScreenSize(const CSize& value);
+    void SetDocumentScreenWidth(int value);
+    void SetDocumentScreenHeight(int value);
+    int GetDocumentWrapStyle() const;
+    void SetDocumentWrapStyle(int value);
+    int GetDocumentCollisions() const;
+    void SetDocumentCollisions(int value);
+    bool GetDocumentScaledBAS() const;
+    void SetDocumentScaledBAS(bool value);
+
     // Interpretation values are supplied by native construction/parsing.
     tmode GetDocumentMode() const;
     exttype GetDocumentType() const;

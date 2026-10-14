@@ -2809,7 +2809,11 @@ bool CRenderedTextSubtitle::ParseSSATag( CSubtitle* sub, const AssTagList& assTa
                 int n = wcstol(p, NULL, 10);
                 sub->m_wrapStyle = !p.IsEmpty() && (0 <= n && n <= 3)
                                    ? n
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                                   : GetDocumentWrapStyle();
+#else
                                    : m_defaultWrapStyle;
+#endif
                 break;
             }
         case CMD_r:
@@ -3109,11 +3113,23 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
     orgstss = stss;
     sub->m_clip.SetRect(0, 0, m_size.cx>>3, m_size.cy>>3);
     sub->m_scrAlignment = -stss.scrAlignment;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    sub->m_wrapStyle    = GetDocumentWrapStyle();
+#else
     sub->m_wrapStyle    = m_defaultWrapStyle;
+#endif
     sub->m_fAnimated    = false;
     sub->m_relativeTo   = stss.relativeTo;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    sub->m_scalex       = GetDocumentScreenSize().cx > 0 ? 1.0 * m_size.cx / (GetDocumentScreenSize().cx*MAX_SUB_PIXEL) : 1.0;
+#else
     sub->m_scalex       = m_dstScreenSize.cx > 0 ? 1.0 * m_size.cx / (m_dstScreenSize.cx*MAX_SUB_PIXEL) : 1.0;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    sub->m_scaley       = GetDocumentScreenSize().cy > 0 ? 1.0 * m_size.cy / (GetDocumentScreenSize().cy*MAX_SUB_PIXEL) : 1.0;
+#else
     sub->m_scaley       = m_dstScreenSize.cy > 0 ? 1.0 * m_size.cy / (m_dstScreenSize.cy*MAX_SUB_PIXEL) : 1.0;
+#endif
 
     sub->m_target_scale_x = m_target_scale_x;
     sub->m_target_scale_y = m_target_scale_y;
@@ -3158,10 +3174,26 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
         STSStyle tmp       = stss;
         tmp.fontSpacing   *=                 sub->m_scalex * 64;
         tmp.fontSize      *=                 sub->m_scaley * 64;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        tmp.outlineWidthX *= (GetDocumentScaledBAS() ? sub->m_scalex : 1) * MAX_SUB_PIXEL;
+#else
         tmp.outlineWidthX *= (m_fScaledBAS ? sub->m_scalex : 1) * MAX_SUB_PIXEL;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        tmp.outlineWidthY *= (GetDocumentScaledBAS() ? sub->m_scaley : 1) * MAX_SUB_PIXEL;
+#else
         tmp.outlineWidthY *= (m_fScaledBAS ? sub->m_scaley : 1) * MAX_SUB_PIXEL;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        tmp.shadowDepthX  *= (GetDocumentScaledBAS() ? sub->m_scalex : 1) * MAX_SUB_PIXEL;
+#else
         tmp.shadowDepthX  *= (m_fScaledBAS ? sub->m_scalex : 1) * MAX_SUB_PIXEL;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        tmp.shadowDepthY  *= (GetDocumentScaledBAS() ? sub->m_scaley : 1) * MAX_SUB_PIXEL;
+#else
         tmp.shadowDepthY  *= (m_fScaledBAS ? sub->m_scaley : 1) * MAX_SUB_PIXEL;
+#endif
         FwSTSStyle fw_tmp(tmp);
         if(m_nPolygon)
         {
@@ -3454,7 +3486,11 @@ HRESULT CRenderedTextSubtitle::ParseScript(REFERENCE_TIME rt, double fps, CSubti
             }
         }
         if(!fPosOverride && !fOrgOverride && !s->m_fAnimated)
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            r = m_sla.AllocRect(s, segment, entry, stse.layer, GetDocumentCollisions());
+#else
             r = m_sla.AllocRect(s, segment, entry, stse.layer, m_collisions);
+#endif
         CPoint org;
         org.x = (s->m_scrAlignment%3) == 1 ? r.left   : 
                 (s->m_scrAlignment%3) == 2 ? r.CenterPoint().x 

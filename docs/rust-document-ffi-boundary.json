@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "scope": "Experimental persistent document containers/styles/identity/interpretation; defaultproduction unchanged",
-  "measured_base_commit": "95b3fc55824b5e84959ccae7268d4cb3d637df0e",
+  "scope": "Experimental persistent document containers/styles/identity/interpretation/scriptlayout; defaultproduction unchanged",
+  "measured_base_commit": "301aa033827300562796cf599e90a6f609729dbc",
   "working_tree_source_hashes": true,
   "core_unsafe": {
     "production_block": 0,
@@ -16,8 +16,8 @@
     "test_other": 0
   },
   "ffi_total": {
-    "production_block": 354,
-    "production_function": 297,
+    "production_block": 356,
+    "production_function": 299,
     "production_impl": 2,
     "production_trait": 0,
     "production_other": 0,
@@ -30,12 +30,12 @@
   "new_boundary_files": [
     {
       "path": "rust/ffi/src/document.rs",
-      "sha256": "bbe33a1e1d601a897dd00962db2cce91899f42c949adb97b94ce802f26b3cdd1",
-      "physical_lines_including_tests": 1982,
-      "nonblank_code_lines_excluding_tests": 786,
+      "sha256": "c173ff770cc408983c01d1df8cad349a8ec9a8911f48bd62de9fb0bcb1f42b01",
+      "physical_lines_including_tests": 2184,
+      "nonblank_code_lines_excluding_tests": 869,
       "counts": {
-        "production_block": 28,
-        "production_function": 24,
+        "production_block": 30,
+        "production_function": 26,
         "production_impl": 0,
         "production_trait": 0,
         "production_other": 0,
@@ -87,62 +87,57 @@
           "test": false
         },
         {
-          "line": 221,
+          "line": 225,
           "kind": "function",
           "test": false
         },
         {
-          "line": 235,
+          "line": 245,
           "kind": "block",
           "test": false
         },
         {
-          "line": 242,
+          "line": 265,
           "kind": "function",
           "test": false
         },
         {
-          "line": 260,
+          "line": 280,
           "kind": "block",
           "test": false
         },
         {
-          "line": 287,
+          "line": 310,
           "kind": "function",
           "test": false
         },
         {
-          "line": 305,
+          "line": 324,
           "kind": "block",
           "test": false
         },
         {
-          "line": 312,
+          "line": 331,
           "kind": "function",
           "test": false
         },
         {
-          "line": 326,
+          "line": 349,
           "kind": "block",
           "test": false
         },
         {
-          "line": 328,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 363,
+          "line": 376,
           "kind": "function",
           "test": false
         },
         {
-          "line": 375,
+          "line": 394,
           "kind": "block",
           "test": false
         },
         {
-          "line": 399,
+          "line": 401,
           "kind": "function",
           "test": false
         },
@@ -152,217 +147,242 @@
           "test": false
         },
         {
-          "line": 443,
+          "line": 417,
           "kind": "block",
           "test": false
         },
         {
-          "line": 458,
+          "line": 452,
           "kind": "function",
           "test": false
         },
         {
-          "line": 473,
+          "line": 464,
           "kind": "block",
           "test": false
         },
         {
-          "line": 480,
+          "line": 488,
           "kind": "function",
           "test": false
         },
         {
-          "line": 498,
+          "line": 504,
           "kind": "block",
           "test": false
         },
         {
-          "line": 505,
+          "line": 532,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 547,
           "kind": "function",
           "test": false
         },
         {
-          "line": 527,
+          "line": 562,
           "kind": "block",
           "test": false
         },
         {
-          "line": 534,
+          "line": 569,
           "kind": "function",
           "test": false
         },
         {
-          "line": 557,
+          "line": 587,
           "kind": "block",
           "test": false
         },
         {
-          "line": 564,
+          "line": 594,
           "kind": "function",
           "test": false
         },
         {
-          "line": 621,
+          "line": 616,
           "kind": "block",
           "test": false
         },
         {
-          "line": 628,
+          "line": 623,
           "kind": "function",
-          "test": false
-        },
-        {
-          "line": 638,
-          "kind": "block",
           "test": false
         },
         {
           "line": 646,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 653,
           "kind": "function",
           "test": false
         },
         {
-          "line": 664,
+          "line": 710,
           "kind": "block",
           "test": false
         },
         {
-          "line": 680,
+          "line": 717,
           "kind": "function",
           "test": false
         },
         {
-          "line": 696,
+          "line": 727,
           "kind": "block",
           "test": false
         },
         {
-          "line": 716,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 723,
+          "line": 735,
           "kind": "function",
           "test": false
         },
         {
-          "line": 738,
+          "line": 753,
           "kind": "block",
           "test": false
         },
         {
-          "line": 748,
+          "line": 769,
           "kind": "function",
           "test": false
         },
         {
-          "line": 756,
+          "line": 785,
           "kind": "block",
           "test": false
         },
         {
-          "line": 767,
+          "line": 805,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 812,
           "kind": "function",
           "test": false
         },
         {
-          "line": 778,
+          "line": 827,
           "kind": "block",
           "test": false
         },
         {
-          "line": 779,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 808,
+          "line": 837,
           "kind": "function",
           "test": false
         },
         {
-          "line": 815,
+          "line": 845,
           "kind": "block",
           "test": false
         },
         {
-          "line": 826,
+          "line": 856,
           "kind": "function",
           "test": false
         },
         {
-          "line": 833,
+          "line": 867,
           "kind": "block",
           "test": false
         },
         {
-          "line": 886,
-          "kind": "function",
-          "test": false
-        },
-        {
-          "line": 903,
+          "line": 868,
           "kind": "block",
           "test": false
         },
         {
-          "line": 916,
+          "line": 897,
           "kind": "function",
-          "test": true
+          "test": false
         },
         {
-          "line": 920,
+          "line": 904,
           "kind": "block",
-          "test": true
+          "test": false
         },
         {
-          "line": 942,
+          "line": 915,
           "kind": "function",
-          "test": true
+          "test": false
         },
         {
-          "line": 945,
+          "line": 922,
           "kind": "block",
-          "test": true
-        },
-        {
-          "line": 957,
-          "kind": "function",
-          "test": true
-        },
-        {
-          "line": 961,
-          "kind": "block",
-          "test": true
-        },
-        {
-          "line": 966,
-          "kind": "function",
-          "test": true
-        },
-        {
-          "line": 970,
-          "kind": "block",
-          "test": true
+          "test": false
         },
         {
           "line": 975,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 992,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1005,
+          "kind": "function",
+          "test": true
+        },
+        {
+          "line": 1009,
           "kind": "block",
           "test": true
         },
         {
-          "line": 999,
+          "line": 1031,
+          "kind": "function",
+          "test": true
+        },
+        {
+          "line": 1034,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1008,
+          "line": 1046,
+          "kind": "function",
+          "test": true
+        },
+        {
+          "line": 1050,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 1055,
+          "kind": "function",
+          "test": true
+        },
+        {
+          "line": 1059,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 1064,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 1088,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 1097,
           "kind": "block",
           "test": true
         }
       ],
-      "production_extern_functions": 33,
+      "production_extern_functions": 37,
       "operations": {
         "raw_shared_slice_construction": 1,
         "raw_mutable_slice_construction": 0,
@@ -417,11 +437,11 @@
     }
   ],
   "prior_ffi_production_blocks": 325,
-  "added_production_blocks": 29,
+  "added_production_blocks": 31,
   "added_unsafe_impls": 1,
-  "retired_native_owners": 9,
+  "retired_native_owners": 13,
   "retired_ffi_crossings": 0,
-  "review": "Frozen interpretation scalar staging/source review with actual lexical remeasurement; historical independent reviews retained. Local tests and sourcegeneration do not pass current full Windows/native-host gate.",
+  "review": "Frozen script-layout scalar/pair source-staging review and actual lexical remeasurement; historical reviews retained. Local sourcegeneration/tests do not pass current full Windows/native-host gate.",
   "remaining_contracts": [
     "Changed-code Windows x86/x64 full-class named/default lifecycle, style API/value and renderer comparisons",
     "Native wrapper publication/destruction and real host lifetimes",
@@ -869,23 +889,57 @@
         "test_trait": 0,
         "test_other": 0
       }
+    },
+    {
+      "status": "superseded interpretation source measurement",
+      "measured_base_commit": "95b3fc55824b5e84959ccae7268d4cb3d637df0e",
+      "source_hashes": {
+        "src/subtitles/STS.h": "60054dc267c3bffcc2b5177f7b779a51e8a718ff7381c229b5e1b4a096c29a11",
+        "src/subtitles/STS.cpp": "cca868e939d84bb42c38dc2788fc26c8069cb6b027d973759689bd34963d3b2b",
+        "src/subtitles/USFSubtitles.cpp": "25a33a1aaef2112d470ba9f83b4f86cd84ee7331fe20cd98526f6fabd195cb1e",
+        "src/subtitles/SubtitleInputPin.cpp": "eb2d8b2ddc6fb4392a4a9a688758914d2d103cecc9b91056514a165ef8b85d64",
+        "src/subtitles/RustDocumentOwner.h": "796e3adef949573e4d65da21244f4129696d4cc50a9bb94a20f50d3faf0c5601",
+        "rust/compat/src/document.rs": "82ff262b9cc3313cbd9954abd7c03125cb1658095dcfd5b13da03f76e46eae1f",
+        "rust/ffi/src/document.rs": "bbe33a1e1d601a897dd00962db2cce91899f42c949adb97b94ce802f26b3cdd1",
+        "include/xy_rust_document.h": "9f829122e0edb4443e626ceea5008140321857091e9f21ba852d90efdf2c2722",
+        "tools/compat/document_native_lifecycle.cpp": "0d8e9f5464d58831278756b4621e992e0b579949da088ba0cbbbfc3513b2c1fd",
+        "tools/compat/document_native_lifecycle.py": "d25c6fb96bdaeb906d8ca4f2ae32bf88db3a2a9ab720861c6e62ddfa8624eebb",
+        "tools/compat/document_windows_probe.py": "e358f9fb936df274c9be28dad9aa98950ed05a59106611979c66dbf4ecdcc154",
+        "tools/compat/audit_document_access.py": "7f01f83f94841a16341d7e1ee6957e02bdc0472f43476d3bc1cf6448b1ec8ac9"
+      },
+      "ffi_total": {
+        "production_block": 354,
+        "production_function": 297,
+        "production_impl": 2,
+        "production_trait": 0,
+        "production_other": 0,
+        "test_block": 119,
+        "test_function": 4,
+        "test_impl": 0,
+        "test_trait": 0,
+        "test_other": 0
+      }
     }
   ],
-  "retired_native_owners_scope": "Nine persistentnativefields/containers opt-in; defaultproductionretirementzero",
+  "retired_native_owners_scope": "Thirteen native fields/containers opt-in; defaultproduction retirementzero",
   "measurement_method": "Current audit_rust_boundary.inventory over actual Rust source, comments/literals masked and test items separated; counts overlap and do not establish soundness. Historical original snapshot retained.",
   "source_hashes": {
-    "src/subtitles/STS.h": "60054dc267c3bffcc2b5177f7b779a51e8a718ff7381c229b5e1b4a096c29a11",
-    "src/subtitles/STS.cpp": "cca868e939d84bb42c38dc2788fc26c8069cb6b027d973759689bd34963d3b2b",
-    "src/subtitles/USFSubtitles.cpp": "25a33a1aaef2112d470ba9f83b4f86cd84ee7331fe20cd98526f6fabd195cb1e",
-    "src/subtitles/SubtitleInputPin.cpp": "eb2d8b2ddc6fb4392a4a9a688758914d2d103cecc9b91056514a165ef8b85d64",
-    "src/subtitles/RustDocumentOwner.h": "796e3adef949573e4d65da21244f4129696d4cc50a9bb94a20f50d3faf0c5601",
-    "rust/compat/src/document.rs": "82ff262b9cc3313cbd9954abd7c03125cb1658095dcfd5b13da03f76e46eae1f",
-    "rust/ffi/src/document.rs": "bbe33a1e1d601a897dd00962db2cce91899f42c949adb97b94ce802f26b3cdd1",
-    "include/xy_rust_document.h": "9f829122e0edb4443e626ceea5008140321857091e9f21ba852d90efdf2c2722",
-    "tools/compat/document_native_lifecycle.cpp": "0d8e9f5464d58831278756b4621e992e0b579949da088ba0cbbbfc3513b2c1fd",
-    "tools/compat/document_native_lifecycle.py": "d25c6fb96bdaeb906d8ca4f2ae32bf88db3a2a9ab720861c6e62ddfa8624eebb",
-    "tools/compat/document_windows_probe.py": "e358f9fb936df274c9be28dad9aa98950ed05a59106611979c66dbf4ecdcc154",
-    "tools/compat/audit_document_access.py": "7f01f83f94841a16341d7e1ee6957e02bdc0472f43476d3bc1cf6448b1ec8ac9"
+    "src/subtitles/STS.h": "40aafbae585b1aa38b5232a5488ab11533ef24dc1c0a9084d3ccf4006f2b47c1",
+    "src/subtitles/STS.cpp": "52f34af32391197846fafbd499f7b615385ffd1b9dd76605f52eb8e8b7c6729f",
+    "src/subtitles/RTS.cpp": "a23dd1004fa187c45e96d7fb2d2b6bb962821d7d9e203fb37e06d8707a9e18c9",
+    "src/subtitles/USFSubtitles.cpp": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
+    "src/subtitles/SubtitleInputPin.cpp": "7352c0c8410ddab487fdbb437f952502810496b2f3967955b9908bf46152a7e3",
+    "src/filters/transform/vsfilter/DirectVobSubFilter.cpp": "66dd009ca6cafe363bb142d8363ac29137d8ebdd2b0d115a417051b7739967bd",
+    "src/filters/transform/vsfilter/xy_sub_filter.cpp": "d180a7c765827f06ab3cea2c2414105b5b0076424e92c55fe4219aa65fbb4914",
+    "src/filters/transform/vsfilter/plugins.cpp": "3914e83b4f4cec3111a3b57e6f3d4d5b5fefa8816b77710524b95e149f86c95d",
+    "src/subtitles/RustDocumentOwner.h": "18ac4f9497a73c0b65c5d88dd2b46f3ab0f6a0e157b2d29e1dd50a9d80c67017",
+    "rust/compat/src/document.rs": "2cabacdb1e703949fe72c026b1aa8524a15b1aec045c1f61924a840af174eca6",
+    "rust/ffi/src/document.rs": "c173ff770cc408983c01d1df8cad349a8ec9a8911f48bd62de9fb0bcb1f42b01",
+    "include/xy_rust_document.h": "032f912bffc5eae231dd68f2fe0e5105fd81fdc4db6d6da124351c57654e6f4c",
+    "tools/compat/document_native_lifecycle.cpp": "131027ac97db6994cc1c4fbafda671880efdc2ea80b02843dae3dd78484faf3b",
+    "tools/compat/document_native_lifecycle.py": "af5cd7cc44e1c92f01dd2c2bfbc9b8a07f5820bdf16b16e952aa7d260a0f7e33",
+    "tools/compat/summarize_evidence.py": "2f7653a140b8f88b964bd03891e6bb7913c2129b3cecc8f24ee2afe02419a435",
+    "tools/compat/audit_document_access.py": "961e9e2db3e6670a3584b26251db64abbadcb09a844047568bfe7d27e3d46a84"
   },
   "default_style_extension": {
     "set": "xy_vsfilter_document_set_default_style_v1 copies input and decodes before admission; validates handle before taking pending value; retired Option drops outside admission, including failure/Busy pending input.",
@@ -954,5 +1008,17 @@
     "ownership": "Option<i32> suppliednative defaults, absentUNRESOLVED, retained across preparedstoragecopy/clear. Set safeextern; get outputvalidatesbeforeadmission, writeafterloan.",
     "unsafe_change": "One added output-copy invocation and overlappingunsafegetdeclaration; coreunsafezero",
     "gate": "Current fullWindows/nativehost validationpending"
+  },
+  "script_layout_extension": {
+    "operations": [
+      "set_script_field_v1",
+      "get_script_field_v1",
+      "set_script_size_v1",
+      "get_script_size_v1"
+    ],
+    "representation": "Optional supplied i32 width/height/wrap/collisions, boolscaled; absentget unresolved/untouchedoutput; pairupdates coherent underoneadmission",
+    "unsafe_change": "Two added stagedoutputcopies and overlappingunsafegetterdeclarations; no rawinputcopy/coreunsafe",
+    "copy": "Native Copy/Empty orchestrate expectedreset/retention; preparedstorage-onlyswap leaves allmetadata untouched",
+    "gate": "Current Windows fullclass/style/API/render/host pending"
   }
 }
