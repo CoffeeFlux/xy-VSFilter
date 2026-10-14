@@ -5,7 +5,14 @@
 #include <cerrno>
 static unsigned encodingMode=0;
 static uint64_t encodingOwners=0,encodingTakes=0,encodingByteReplies=0,encodingUnitReplies=0;
+static uint64_t ssaEncodingOwners=0,ssaEncodingSteps=0,ssaEncodingAppends=0;
 namespace XyRust {
+class ObservedSsaEncoding : public SsaEncoding {
+public:
+    template<class String> explicit ObservedSsaEncoding(const String& input):SsaEncoding(input){++ssaEncodingOwners;}
+    uint32_t Step(int reply){++ssaEncodingSteps;return SsaEncoding::Step(reply);}
+    template<class String> void Append(const String& input){++ssaEncodingAppends;SsaEncoding::Append(input);}
+};
 class ObservedEncoding : public Encoding {
 public:
     template<class String> explicit ObservedEncoding(const String& input):Encoding(input){++encodingOwners;}

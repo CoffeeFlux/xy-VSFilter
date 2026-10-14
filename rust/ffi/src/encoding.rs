@@ -110,3 +110,101 @@ mod tests {
         }
     }
 }
+
+use xy_vsfilter_compat::encoding::Ssa;
+/// # Safety
+/// Nonempty input spans length initialized aligned u16 values, immutable during
+/// creation. length*2 fits isize. No input borrow escapes this call.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_ssa_encoding_create(
+    input: *const u16,
+    length: u32,
+) -> *mut Ssa {
+    let input = if length == 0 {
+        &[]
+    } else {
+        // SAFETY: caller supplies initialized immutable code units.
+        unsafe { core::slice::from_raw_parts(input, length as usize) }
+    };
+    Box::into_raw(Box::new(Ssa::new(input)))
+}
+/// # Safety
+/// owner is live and uniquely accessible throughout this call.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_ssa_encoding_step(owner: *mut Ssa, reply: i32) -> u32 {
+    // SAFETY: native noncopyable adapter retains exclusive ownership.
+    let state = unsafe { &mut *owner };
+    state.step(reply)
+}
+/// # Safety
+/// owner is live and exclusive; fragment spans length initialized aligned u16
+/// values, immutable, disjoint from owner and with length*2 fitting isize.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_ssa_encoding_append(
+    owner: *mut Ssa,
+    fragment: *const u16,
+    length: u32,
+) {
+    let fragment = if length == 0 {
+        &[]
+    } else {
+        // SAFETY: fresh native append result, borrowed only until this returns.
+        unsafe { core::slice::from_raw_parts(fragment, length as usize) }
+    };
+    // SAFETY: exclusive owner access, disjoint from the fragment loan.
+    let state = unsafe { &mut *owner };
+    state.append(fragment);
+}
+/// # Safety
+/// owner is live and immutable throughout this scalar query.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_ssa_encoding_field(
+    owner: *const Ssa,
+    field: u32,
+    index: u32,
+) -> u32 {
+    // SAFETY: native adapter queries before releasing ownership.
+    let state = unsafe { &*owner };
+    match field {
+        0 => state.input().len() as u32,
+        1 => u32::from(state.input().get(index as usize).copied().unwrap_or(0)),
+        2 => state.output().len() as u32,
+        3 => u32::from(state.output().get(index as usize).copied().unwrap_or(0)),
+        4 => state.count as u32,
+        _ => 0,
+    }
+}
+/// # Safety
+/// Release the unique create result once, after all calls finish.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_ssa_encoding_release(owner: *mut Ssa) {
+    if !owner.is_null() {
+        // SAFETY: native RAII adapter transfers unique ownership once.
+        drop(unsafe { Box::from_raw(owner) });
+    }
+}
+#[cfg(test)]
+mod ssa_tests {
+    use super::*;
+    #[test]
+    fn owned_buffers_survive_native_input_and_fragment_changes() {
+        let mut input = [65u16, 0, 0xd800];
+        // SAFETY: initialized, disjoint loans; unique live owner released once.
+        unsafe {
+            let owner = xy_vsfilter_ssa_encoding_create(input.as_ptr(), 3);
+            input.fill(7);
+            assert_eq!(xy_vsfilter_ssa_encoding_step(owner, 0), 1);
+            assert_eq!(xy_vsfilter_ssa_encoding_step(owner, -1), 6);
+            assert_eq!(xy_vsfilter_ssa_encoding_field(owner, 1, 0), 65);
+            assert_eq!(xy_vsfilter_ssa_encoding_field(owner, 1, 2), 0xd800);
+            xy_vsfilter_ssa_encoding_append(owner, input.as_ptr(), 3);
+            input.fill(9);
+            xy_vsfilter_ssa_encoding_append(owner, core::ptr::null(), 0);
+            assert_eq!(xy_vsfilter_ssa_encoding_step(owner, 0), 0);
+            assert_eq!(xy_vsfilter_ssa_encoding_field(owner, 2, 0), 3);
+            assert_eq!(xy_vsfilter_ssa_encoding_field(owner, 3, 1), 7);
+            assert_eq!(xy_vsfilter_ssa_encoding_field(owner, 3, u32::MAX), 0);
+            xy_vsfilter_ssa_encoding_release(owner);
+        }
+    }
+}
