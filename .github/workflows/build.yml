@@ -84,7 +84,7 @@ jobs:
           "$yasm_dir/yasm.exe" --version
           cygpath -w "$yasm_dir" >> "$GITHUB_PATH"
 
-      - name: Build xy-VSFilter and/or XySubFilter
+      - name: Locate Visual Studio
         run: |
           vs_path="$("/c/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe" -latest -products '*' \
               -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath)"
@@ -92,7 +92,10 @@ jobs:
               echo "Visual Studio with C++ tools not found" >&2
               exit 1
           fi
-          export VS170COMNTOOLS="$vs_path/Common7/Tools/"
+          echo "VS170COMNTOOLS=$vs_path/Common7/Tools/" >> "$GITHUB_ENV"
+
+      - name: Build xy-VSFilter and/or XySubFilter
+        run: |
           # Version info in version_in.h is maintained by hand, so don't regenerate it
           bash ./build_vsfilter.sh -platform "${{ matrix.vsfplat }}" -compiler VS2022 -voff
           cp License.txt bin/
@@ -114,3 +117,9 @@ jobs:
           path: |
             bin/lib*/*/Release
             bin/License.txt
+
+      # Runs after publishing so unit_test.exe stays out of the artifact (it shares
+      # the Release output dir). Only compiled to catch breakage; running it needs
+      # a script argument and test data.
+      - name: Build unit tests
+        run: bash ./build_vsfilter.sh -platform "${{ matrix.vsfplat }}" -compiler VS2022 -voff -proj unit_test
