@@ -157,3 +157,5 @@ mod span_merge;
 mod arc_queue;
 
 mod ellipse_arc;
+
+mod ellipse_matrix;

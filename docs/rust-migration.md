@@ -20,6 +20,21 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Rust owns ellipse intersection-matrix cells and their initialized state. Native
+  floating-point calculations still produce every stored integer in their original
+  order. The unwritten row remains absent; valid lookups copy scalar values and
+  no Rust storage pointer escapes. The existing native lookup-size threshold and
+  formula path remain. Fatal ASan/UBSan checks pass on arm64 and under x64 execution
+  with the documented FP-observable settings: **4,270 ellipse histories / 4,227
+  Rust matrix owners / 17,802,044 initialized cell comparisons / 2,879,952
+  intersection returns**, alongside all persistent-arc queries and rejected-init
+  checks. [Ordinary optimized FP-flag limitations](ellipse-storage-fp-scope.json)
+  remain unresolved and are not passing comparisons. Uninitialized rows, invalid
+  indices and native allocation failures are outside these parity counts.
+  Rust 1.85 tests (133 core, 85 FFI), strict Clippy, default syntax and Python
+  checks pass. The renderer corpus remains **706 cases**. Windows/Miri and actual
+  DLL rendering checks are pending; native float calculations, the temporary
+  cross-coordinate buffer, outer span lists and host integration remain.
 * Rust retains the generated integer ellipse table for the complete native
   ellipse lifetime. Coordinate queries copy scalar values; no Rust storage
   pointer escapes. Native float fields, intersection-table generation and
@@ -101,8 +116,10 @@ unresolved reference outcomes requiring investigation, never matching results.
   oracle, and native cleanup is modeled; Windows uses actual POINT/ATL geometry.
   Rust 1.85 tests (124 core, 80 FFI), strict Clippy, default syntax and Python
   checks pass. Four fractional-coordinate scripts expand the renderer corpus to
-  **662 cases**. Windows/Miri and full renderer checks for this increment are
-  pending; rasterizer buffer allocation and actual-host integration remain.
+  **662 cases**. Windows x86/x64, Linux, macOS and Miri passed; paired Windows
+  DLLs match **662 cases / 6,970 frames**, plus **32 mutations / 224 frames**, on
+  each architecture. See [path-alignment evidence](path-align-evidence.json).
+  Rasterizer buffer allocation and actual-host integration remain.
 * CPolygon now retains its drawing types/points in a Rust owner through native
   scaling, independent polygon copies, cache reuse and rasterizer handoff. The
   temporary parsed path transfers ownership instead of copying into native arrays;
