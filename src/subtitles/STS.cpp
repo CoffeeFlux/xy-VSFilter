@@ -1652,27 +1652,19 @@ static CStringW SMI2SSA(CStringW str, int CharSet)
     {
         while(convert.Step() != 0)
         {
-            CStringW args = convert.Text<CStringW>(1);
-            CStringW arg ;
-
-            args.Remove('\"'); args.Remove('#');    // may include 2 * " + #
+            XyRust::SamiArguments arguments(convert.Text<CStringW>(1));
+            CStringW arg;
             arg.TrimLeft(); arg.TrimRight(L" >");
-
             for (;;)
             {
+                CStringW args = arguments.Text<CStringW>(0);
                 args.TrimLeft();
-                arg = args.SpanExcluding(L" \t>");
-                args = args.Mid(arg.GetLength());
-
-                if(arg.IsEmpty())
-                    break;
-                if (arg.Find(L"color=") == 0 )
+                const unsigned action = arguments.Accept(args);
+                if(action == 0) break;
+                if(action == 2)
                 {
+                    arg = arguments.Text<CStringW>(1);
                     DWORD color;
-
-                    arg = arg.Mid(6);   // delete "color="
-                    if ( arg.IsEmpty())
-                        continue;
 
                     DWORD val;
                     if(g_colors.Lookup(CString(arg), val))

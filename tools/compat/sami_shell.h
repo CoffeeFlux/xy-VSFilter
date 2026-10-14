@@ -41,7 +41,14 @@ public:
 };
 static long samiWcstol(const wchar_t* text,wchar_t** end,int radix){microObserve(8,text);return std::wcstol(text,end,radix);}
 static uint64_t samiHandled=0,samiFallbacks=0,samiSteps=0,samiInsertions=0;
+static uint64_t samiArgumentOwners=0,samiArgumentAccepts=0;
 namespace XyRust {
+class ObservedSamiArguments : public SamiArguments {
+public:
+    template<class String> explicit ObservedSamiArguments(const String& input):SamiArguments(input){++samiArgumentOwners;}
+    template<class String> unsigned Accept(const String& input){++samiArgumentAccepts;return SamiArguments::Accept(input);}
+};
+
 class ObservedSami : public Sami {
 public:
     template<class String> ObservedSami(const String& text,const String& lower):Sami(text,lower){if(Handled())++samiHandled;else ++samiFallbacks;}

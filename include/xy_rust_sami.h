@@ -14,6 +14,10 @@ uint32_t XY_SAMI_CDECL xy_vsfilter_sami_step(void*);
 void XY_SAMI_CDECL xy_vsfilter_sami_insert(void*,const uint16_t*,uint32_t,uint32_t);
 uint32_t XY_SAMI_CDECL xy_vsfilter_sami_field(const void*,uint32_t,uint32_t,uint32_t);
 void XY_SAMI_CDECL xy_vsfilter_sami_release(void*);
+void* XY_SAMI_CDECL xy_vsfilter_sami_arguments_create(const uint16_t*,uint32_t);
+uint32_t XY_SAMI_CDECL xy_vsfilter_sami_arguments_accept(void*,const uint16_t*,uint32_t);
+uint32_t XY_SAMI_CDECL xy_vsfilter_sami_arguments_field(const void*,uint32_t,uint32_t,uint32_t);
+void XY_SAMI_CDECL xy_vsfilter_sami_arguments_release(void*);
 }
 #undef XY_SAMI_CDECL
 namespace XyRust {
@@ -43,4 +47,28 @@ public:
         xy_vsfilter_sami_insert(owner,text.data(),static_cast<uint32_t>(text.size()),static_cast<uint32_t>(advance));
     }
 };
+class SamiArguments {
+    void* owner;
+    SamiArguments(const SamiArguments&);
+    SamiArguments& operator=(const SamiArguments&);
+public:
+    template<class String> explicit SamiArguments(const String& input):owner(NULL){
+        std::vector<uint16_t> text(static_cast<size_t>(input.GetLength()));
+        for(int i=0;i<input.GetLength();++i)text[i]=static_cast<uint16_t>(input[i]);
+        owner=xy_vsfilter_sami_arguments_create(text.data(),static_cast<uint32_t>(text.size()));
+    }
+    ~SamiArguments(){xy_vsfilter_sami_arguments_release(owner);}
+    template<class String> unsigned Accept(const String& input){
+        std::vector<uint16_t> text(static_cast<size_t>(input.GetLength()));
+        for(int i=0;i<input.GetLength();++i)text[i]=static_cast<uint16_t>(input[i]);
+        return xy_vsfilter_sami_arguments_accept(owner,text.data(),static_cast<uint32_t>(text.size()));
+    }
+    template<class String> String Text(unsigned group)const{
+        const uint32_t count=xy_vsfilter_sami_arguments_field(owner,group,0,0);
+        std::vector<wchar_t> text(static_cast<size_t>(count)+1,0);
+        for(uint32_t i=0;i<count;++i)text[i]=static_cast<wchar_t>(xy_vsfilter_sami_arguments_field(owner,group,1,i));
+        return String(text.data(),static_cast<int>(count));
+    }
+};
+
 }

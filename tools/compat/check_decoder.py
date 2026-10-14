@@ -226,6 +226,8 @@ public:
             bridge = "XyRust::Sami convert"
             assert definition.count(bridge) == 1
             definition = definition.replace(bridge, "XyRust::ObservedSami convert")
+            assert definition.count("XyRust::SamiArguments arguments") == 1
+            definition = definition.replace("XyRust::SamiArguments arguments", "XyRust::ObservedSamiArguments arguments")
         sami += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_sami.h").write_text(sami, encoding="utf-8")
     microdvd = '#include "microdvd_shell.h"\n'
@@ -1145,7 +1147,7 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "webvtt_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring model with host iswspace; Windows comparison required",
         "sami_compile_command": sami_compile,
         "sami_result": sami_result.stdout, "sami_stderr": sami_result.stderr,
-        "sami_scope": "Whole SMI2SSA and ReplaceNoCase against pinned method/table data; native ATL CStringW and CAtlMap/CRT on Windows, portable models elsewhere; table name pointers const-qualified without changing entries; native numeric/color callbacks and errno; replacement-bearing NUL outcomes excluded",
+        "sami_scope": "Whole SMI2SSA and ReplaceNoCase against pinned method/table data; native ATL CStringW and CAtlMap/CRT on Windows, portable models elsewhere; table name pointers const-qualified without changing entries; native numeric/color/trim callbacks, post-trim mutations, owned font arguments and errno; replacement-bearing NUL outcomes excluded",
         "case_replace_compile_command": case_replace_compile,
         "case_replace_result": case_replace_result.stdout, "case_replace_stderr": case_replace_result.stderr,
         "case_replace_scope": "Whole ReplaceNoCase with native lowercase checkpoint, mutable caller text, source/from/to aliases and source mutations during lowercase; Windows ATL/CRT in CI; empty-needle nonterminating and replacement-bearing NUL outcomes excluded",
