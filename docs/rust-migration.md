@@ -1134,6 +1134,43 @@ failed reference style API setup. This x64-only evidence predates LCID and later
 Copy/rename/Sort/Empty changes; it does not approve those changes or the workflow.
 
 
+### Resolved style and charset boundary
+
+Experimental GetStyle/GetCharSet now use one shared safe-owner resolver. Forced
+default bypasses entry lookup; otherwise a missing entry-name key advances to
+named Default, and only a missing Default advances to the document default.
+Present-null stops fallback. The style-copy null outcome remains unresolved;
+charset keeps the native assertion and release value -1. No native null or
+unsupplied flag/default histories are executed.
+
+Local checks pass 193 core and 117 FFI tests, 108 Python tests with four
+Windows-only skips, pinned formatting and all-target Clippy. Generation and
+eight-file default/Rust-text preprocessing checks pass.
+
+Seven bounded full-class stages cover Case/case distinction, NUL-prefix aliases,
+a finite stored empty key, forced-default replacement and independent returned
+output mutation. Returned values trace all initialized style fields, raw font
+code units and float bits; the validator rejects identical truncated values.
+The original ordinary resolution fixtures remain. Default/Rust-text branches
+preprocess unchanged across eight files; this is source evidence. Current
+Windows resolver lifecycle, rendering and host gates remain pending. The owner
+count remains 19.
+
+The private fe24 x86/x64 CSize source captures show a zeroing body, but its
+active condition remains unresolved. The new tool separately captures the
+actual preprocessed default-constructor body in native, Rust-text and
+experimental subtitles contexts. It retains bounded private excerpts only,
+executes no objects and leaves the runtime PROBE unchanged. Windows evidence
+for this new capture remains pending.
+
+The separate style API test host now creates an empty Software registry
+scaffold. In run 38648351874, x64 job 116140719750, reference setup diagnostics
+verified expected resources and matching loaded modules, but opening
+`Software\Gabest\VSFilter\DefTextPathes` returned error 2. The correction seeds no
+value and retains the assertion; its Windows result remains pending. This test
+setup repair is not a document behavior change or style API passing evidence.
+
+
 ### Coarse selected-state Copy boundary
 
 Native Copy still invokes virtual Empty first, then reads the source. The opt-in
@@ -1184,13 +1221,13 @@ Neither count measures the amount of application behavior replaced.
 The reproducible [Rust unsafe inventory](rust-unsafe-inventory.json) uses
 `python3 tools/compat/audit_rust_boundary.py OUTPUT.json`. It masks comments and
 literals, separates cfg(test) items, and includes all platform/feature branches.
-At the current frozen working-tree sources based on `fe24c3e7` (exact file
+At the current frozen working-tree sources based on `d4bdbad4` (exact file
 hashes recorded by the regenerated inventory):
 
 | Layer | Production source inventory | Meaning |
 | --- | --- | --- |
-| `rust/compat` | 0 unsafe blocks/functions/impls; 7,641 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
-| `rust/ffi` | 359 explicit unsafe blocks, 302 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,242 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
+| `rust/compat` | 0 unsafe blocks/functions/impls; 7,680 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
+| `rust/ffi` | 359 explicit unsafe blocks, 302 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,268 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
 | Tests | 119 unsafe blocks in FFI tests | Exercise valid and deliberately bounded ownership/alias/initialization contracts; not production code |
 
 Unsafe-function declarations and blocks overlap and must not be added as

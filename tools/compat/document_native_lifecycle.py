@@ -36,7 +36,7 @@ def git(root, *args):
     return subprocess.check_output(["git", "-C", str(root), *args], timeout=60).decode().strip()
 
 
-def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True):
+def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True):
     lines = data.splitlines()
     if not lines or lines[0] != f"provenance pointer_bits={pointer_bits}".encode():
         raise ValueError("missing or incorrect native architecture provenance")
@@ -128,6 +128,41 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
         if positions != sorted(positions):
             raise ValueError("selected Copy stage order differs")
 
+    if require_resolution_stages:
+        stages = ("resolution-raw-prefix", "resolution-lowercase", "resolution-case-fallback",
+                  "resolution-empty-prefix", "resolution-forced", "resolution-forced-replaced",
+                  "resolution-output-independent")
+        positions = []
+        for stage in stages:
+            token = f"resolution-stage {stage}".encode()
+            if lines.count(token) != 1:
+                raise ValueError(f"missing/duplicate resolution stage {stage}")
+            positions.append(lines.index(token))
+            values = [line for line in lines if line.startswith(f"resolved-style {stage} charset=".encode())]
+            if len(values) != 1 or b" style " not in values[0]:
+                raise ValueError(f"missing resolved style value {stage}")
+            fields = values[0].split(b" style ",1)[1].split()
+            try:
+                units = int(fields[1])
+                font = fields[2:2+units]
+                scalars = fields[2+units:]
+                floats = (0,11,12,13,14,23,24,25,26,27,28,29,30,31,32)
+                colors = (15,17,19,21)
+                valid = (units >= 0 and len(font) == units and len(scalars) == 34
+                         and all(re.fullmatch(rb"[0-9a-f]{4}", unit) for unit in font)
+                         and all(re.fullmatch(rb"[0-9a-f]{16}", scalars[index]) for index in floats)
+                         and all(re.fullmatch(rb"[0-9a-f]{8}", scalars[index]) for index in colors)
+                         and re.fullmatch(rb"-?[0-9]+", fields[0])
+                         and all(re.fullmatch(rb"-?[0-9]+", value) for index,value in enumerate(scalars) if index not in floats+colors))
+            except (ValueError, IndexError):
+                valid = False
+            if not valid:
+                raise ValueError(f"truncated/malformed complete style value {stage}")
+        if positions != sorted(positions):
+            raise ValueError("resolution stage order differs")
+        if sum(line.startswith(b"resolution-mutated-output style ") for line in lines) != 1:
+            raise ValueError("missing/duplicate independent style output mutation")
+
     if require_lcid_stages:
         expected = (("lcid-supplied",1031,0), ("lcid-copy-retained",1031,0),
                     ("lcid-source-independent",1033,0), ("lcid-repeated-empty",1033,0),
@@ -203,11 +238,11 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
 
 
 
-def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True):
+def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True):
     if len(traces) != 4:
         raise ValueError("two reference and two candidate executions required")
     for trace in traces:
-        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages, require_metadata_stages=require_metadata_stages, require_selected_copy_stages=require_selected_copy_stages, require_style_rename_stages=require_style_rename_stages, require_sort_stages=require_sort_stages, require_base_empty_stages=require_base_empty_stages, require_lcid_stages=require_lcid_stages)
+        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages, require_metadata_stages=require_metadata_stages, require_selected_copy_stages=require_selected_copy_stages, require_style_rename_stages=require_style_rename_stages, require_sort_stages=require_sort_stages, require_base_empty_stages=require_base_empty_stages, require_lcid_stages=require_lcid_stages, require_resolution_stages=require_resolution_stages)
     if any(trace != traces[0] for trace in traces[1:]):
         raise ValueError("native lifecycle traces differ or are nondeterministic")
 

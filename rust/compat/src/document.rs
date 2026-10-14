@@ -85,6 +85,18 @@ pub enum IdentityField {
     Path,
 }
 
+/// Borrowed native entry-style decision; present null stops fallback.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ResolvedStyle<'a> {
+    Null,
+    Value(&'a crate::document_style::StyleValue),
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum StyleResolutionError {
+    EntryIndex,
+    Uninitialized,
+}
+
 /// Native interpretation enum values are stored without normalization.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum InterpretationField {
@@ -312,6 +324,38 @@ impl Document {
             value,
         )
     }
+    /// Pinned GetStyle/GetCharSet selection, with the native internal Default key.
+    /// Forced selection deliberately bypasses entry bounds and named lookup.
+    pub fn resolve_entry_style(
+        &self,
+        index: u32,
+    ) -> Result<ResolvedStyle<'_>, StyleResolutionError> {
+        if !self
+            .forced_default
+            .ok_or(StyleResolutionError::Uninitialized)?
+        {
+            let entry = self
+                .entries
+                .get(index as usize)
+                .ok_or(StyleResolutionError::EntryIndex)?;
+            const DEFAULT: &[u16] = &[68, 101, 102, 97, 117, 108, 116];
+            if let Some(value) = self
+                .named_styles
+                .get(&entry.style)
+                .or_else(|| self.named_styles.get(DEFAULT))
+            {
+                return Ok(match value {
+                    Some(value) => ResolvedStyle::Value(value),
+                    None => ResolvedStyle::Null,
+                });
+            }
+        }
+        self.default_style
+            .as_ref()
+            .map(ResolvedStyle::Value)
+            .ok_or(StyleResolutionError::Uninitialized)
+    }
+
     /// Absent until the native adapter supplies an initialized style.
     pub fn default_style(&self) -> Option<&crate::document_style::StyleValue> {
         self.default_style.as_ref()
@@ -1096,6 +1140,53 @@ mod tests {
         );
         assert_eq!(d, before);
     }
+    #[test]
+    fn resolved_style_preserves_fallback_null_and_forced_order() {
+        use crate::document_style::{decode, HEADER_BYTES};
+        let mut d = Document::default();
+        let mut value = decode(&alloc::vec![0; HEADER_BYTES]).unwrap();
+        value.char_set = -1;
+        assert_eq!(
+            d.resolve_entry_style(0),
+            Err(StyleResolutionError::Uninitialized)
+        );
+        d.replace_forced_default(true);
+        assert_eq!(
+            d.resolve_entry_style(u32::MAX),
+            Err(StyleResolutionError::Uninitialized)
+        );
+        d.replace_default_style(Some(value.clone()));
+        assert_eq!(
+            d.resolve_entry_style(u32::MAX),
+            Ok(ResolvedStyle::Value(&value))
+        );
+        d.replace_forced_default(false);
+        assert_eq!(
+            d.resolve_entry_style(u32::MAX),
+            Err(StyleResolutionError::EntryIndex)
+        );
+        let mut record = entry(0, 10, 0);
+        record.style = alloc::vec![65, 0, 0xd800];
+        d.add_prepared(record, AddMode::Add).unwrap();
+        assert_eq!(d.resolve_entry_style(0), Ok(ResolvedStyle::Value(&value)));
+        let default_key = alloc::vec![68, 101, 102, 97, 117, 108, 116];
+        d.named_styles_mut().insert(default_key.clone(), None);
+        assert_eq!(d.resolve_entry_style(0), Ok(ResolvedStyle::Null));
+        let mut mapped = value.clone();
+        mapped.char_set = 77;
+        d.named_styles_mut()
+            .insert(default_key, Some(mapped.clone()));
+        assert_eq!(d.resolve_entry_style(0), Ok(ResolvedStyle::Value(&mapped)));
+        d.named_styles_mut()
+            .insert(alloc::vec![65, 0, 0xdc00], None);
+        assert_eq!(d.resolve_entry_style(0), Ok(ResolvedStyle::Null));
+        d.named_styles_mut()
+            .insert(alloc::vec![65], Some(value.clone()));
+        assert_eq!(d.resolve_entry_style(0), Ok(ResolvedStyle::Value(&value)));
+        d.replace_forced_default(true);
+        assert_eq!(d.resolve_entry_style(0), Ok(ResolvedStyle::Value(&value)));
+    }
+
     #[test]
     fn default_style_clone_and_storage_copy_have_distinct_contracts() {
         use crate::document_style::{decode, HEADER_BYTES};

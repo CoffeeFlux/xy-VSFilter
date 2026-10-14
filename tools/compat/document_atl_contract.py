@@ -270,6 +270,136 @@ def csize_source_contract(records):
             'unresolved': (([] if unambiguous else ['Missing or ambiguous selected CSize default constructor/class declaration'])
                            + (['Active CSize conditional directives are not evaluated'] if unknown else []))}
 
+CSIZE_CONTEXT_SOURCE = '''// Source-only preprocessing; no object declarations or execution.
+#include <stdafx.h>
+#include <STS.h>
+#if defined(_ATL_STATIC_LIB_IMPL)
+XY_DOCUMENT_CSIZE_ATL_STATIC_LIB_IMPL_DEFINED
+#else
+XY_DOCUMENT_CSIZE_ATL_STATIC_LIB_IMPL_UNDEFINED
+#endif
+'''
+
+
+def csize_context_command(compiler, source, platform, experimental):
+    # Native subtitles Release context; /EP stops before compilation/linking.
+    flags = ['/nologo', '/Bv', '/EP', '/showIncludes', '/std:c++14', '/EHsc',
+             '/O2', '/Oi', '/Ob2', '/MT', '/fp:precise', '/Y-']
+    defines = ['NDEBUG', '_CRT_SECURE_NO_WARNINGS', '_SCL_SECURE_NO_WARNINGS',
+               'WINVER=0x0601', '_WIN32_WINNT=0x0601', 'PSAPI_VERSION=1',
+               '_WINDOWS', 'WINDOWS', '_USE_MATH_DEFINES', '_UNICODE', 'UNICODE',
+               'XY_VSFILTER_RUST_TEXT']
+    defines += ['_WIN64', 'WIN64'] if platform == 'x64' else ['WIN32']
+    if experimental:
+        defines.append('XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL')
+    includes = ['src/subtitles', 'src/filters/transform/vsfilter',
+                'src/filters/BaseClasses', 'src/thirdparty/boost_lib',
+                'src/thirdparty/log4cplus/include', 'src/thirdparty/VirtualDub/h',
+                'src/thirdparty', 'include', 'include/unrar']
+    return [compiler, *flags, *('/D' + value for value in defines),
+            *('/I' + str(ROOT / value) for value in includes), str(source)]
+
+
+def csize_body_tokens(record):
+    code = masked(record['excerpt'])
+    opening = code.find('{')
+    if opening < 0:
+        return None
+    return re.sub(r'\s+', '', code[opening:closing(code, opening)])
+
+
+def select_active_csize(stdout, source_name, selected_source_records):
+    """Keep bounded active ctor excerpts, never a full preprocessed SDK dump."""
+    text = stdout.decode('utf-8', errors='replace')
+    marker = re.findall(r'^XY_DOCUMENT_CSIZE_ATL_STATIC_LIB_IMPL_(DEFINED|UNDEFINED)\s*$', text, re.M)
+    diagnostics, code = [], []
+    for line in text.splitlines(keepends=True):
+        if 'Note: including file:' in line or line.startswith('XY_DOCUMENT_CSIZE_ATL_STATIC_LIB_IMPL_'):
+            diagnostics.append(line)
+        else:
+            code.append(line)
+    records = select_csize_definitions(''.join(code), 'preprocessed:' + source_name)
+    status = csize_source_contract(records)
+    active = [row for row in records if row['symbol'] == 'CSize::CSize default' and row['kind'] == 'definition']
+    original = [row for row in selected_source_records if row['symbol'] == 'CSize::CSize default' and row['kind'] == 'definition']
+    matched = (len(active) == len(original) == 1 and csize_body_tokens(active[0]) is not None
+               and csize_body_tokens(active[0]) == csize_body_tokens(original[0]))
+    exact = not any('\ufffd' in row['excerpt'] for row in records)
+    complete = status['complete'] and matched and len(marker) == 1 and exact
+    return {'complete': complete, 'scope': 'Actual active preprocessed default constructor; no CSize object constructed or read',
+            'preprocessed_stream_sha256': sha(stdout), 'preprocessed_stream_bytes': len(stdout),
+            'full_preprocessed_stream_retained': False,
+            'macro_state_after_includes': marker[0].lower() if len(marker) == 1 else 'unresolved',
+            'active_default_body_matches_selected_sdk_source': matched,
+            'active_selection_status': status, 'selected_definitions': records,
+            'selected_sdk_default_sha256': original[0]['sha256_utf8'] if len(original) == 1 else None}, ''.join(diagnostics).encode('utf-8')
+
+
+def capture_csize_contexts(out, compiler, platform, source_records, protect, report, save):
+    results = {}
+    for experimental in (False, True):
+        name = 'csize-context-' + ('experimental' if experimental else 'native-rust-text')
+        source = out / (name + '.cpp')
+        source.write_text(CSIZE_CONTEXT_SOURCE)
+        source_hash = protect(source)
+        command = csize_context_command(compiler, source, platform, experimental)
+        row = {'name': name, 'command': command, 'source_sha256': source_hash,
+               'scope': 'Preprocess only; full SDK stdout discarded after hash and narrow selection'}
+        report['executions'].append(row)
+        save()
+        try:
+            result = subprocess.run(command, cwd=out, env=dict(os.environ, VSLANG='1033'),
+                                    capture_output=True, timeout=120)
+        except subprocess.TimeoutExpired as error:
+            # Never persist the potentially full SDK stdout, including partial output.
+            (out / (name + '.stderr')).write_bytes(error.stderr or b'')
+            row['status'] = 'timeout'
+            row['partial_preprocessed_stream_sha256'] = sha(error.stdout or b'')
+            results[name] = {'complete': False, 'unresolved': 'preprocessor timeout'}
+            continue
+        (out / (name + '.stderr')).write_bytes(result.stderr)
+        row.update(returncode=result.returncode, stderr_sha256=protect(out / (name + '.stderr')),
+                   raw_preprocessed_stream_sha256=sha(result.stdout))
+        if result.returncode:
+            results[name] = {'complete': False, 'unresolved': 'preprocessor failed; full SDK stdout discarded'}
+            continue
+        try:
+            selected, diagnostic = select_active_csize(result.stdout, name, source_records)
+        except (ValueError, UnicodeError) as error:
+            results[name] = {'complete': False, 'unresolved': str(error)}
+            continue
+        # /showIncludes may be emitted on either stream. Retain only include
+        # diagnostics and the final macro marker, never the preprocessed program.
+        (out / (name + '.stdout')).write_bytes(diagnostic)
+        row['stdout_sha256'] = protect(out / (name + '.stdout'))
+        headers = {}
+        for header in re.findall(r'Note: including file:\s*([^\r\n]+)',
+                                 (result.stdout + result.stderr).decode('utf-8', errors='replace')):
+            path = Path(header.strip()).resolve()
+            if path.is_file():
+                headers[str(path)] = protect(path)
+        selected['included_header_sha256'] = headers
+        if not headers:
+            selected['complete'] = False
+            selected['unresolved'] = 'Actual include-header provenance missing'
+        private = out / (name + '.private.json')
+        private.write_text(json.dumps({'redistribution': 'Private bounded excerpts only; do not check in SDK source',
+                                       **selected}, indent=2) + '\n')
+        selected_hash = protect(private)
+        results[name] = {key: value for key, value in selected.items() if key != 'selected_definitions'}
+        results[name]['private_selection_sha256'] = selected_hash
+        save()
+    report['csize_active_contexts'] = results
+    contract = report['csize_source_contract']
+    if contract['source_capture_complete'] and len(results) == 2 and all(value['complete'] for value in results.values()):
+        contract['source_conditions_requiring_resolution'] = contract['active_conditions_unresolved']
+        contract.update(complete=True, active_conditions_resolved=True, active_conditions_unresolved=[], unresolved=[],
+                        resolution_basis='Exact default-body tokens in actual native-rust-text and experimental preprocessed subtitles contexts match selected SDK source; final macro marker alone is not the proof')
+    else:
+        contract['complete'] = False
+        contract['unresolved'].append('Actual active preprocessed constructor evidence incomplete')
+    save()
+
 
 PROBE = r'''// Generated bounded native contract observation, no SDK implementation copied.
 #define WIN32_LEAN_AND_MEAN
@@ -415,6 +545,7 @@ def main():
         private=out/'selected-sdk-definitions.private.json';private.write_text(json.dumps({'redistribution':'Private review excerpts only; do not check in SDK source','definitions':excerpts},indent=2)+'\n');report['selected_definitions_sha256']=protect(private)
         report['definition_index']=[{k:v for k,v in r.items() if k!='excerpt'} for r in excerpts]
         report['missing_required_definitions']=[name for name in required if not any(r['symbol']==name and r['kind']=='definition' for r in excerpts)]
+        capture_csize_contexts(out,compiler,args.platform,csize_excerpts,protect,report,save)
         traces=[]
         for i in range(2):
             result=run([str(exe)],'trace-'+str(i),30)

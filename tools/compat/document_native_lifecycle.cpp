@@ -1006,6 +1006,39 @@ static void lcid_lifecycle() {
     destination.Empty();stage("lcid-reused-empty",1033,1031);
     check(change_events[1]==notifications+1,"LCID reuse exactly one rebuild notification");
 }
+static void resolution_lifecycle() {
+    TraceDocument doc(0);
+    STSStyle upper=named_value(1),lower=named_value(2),mapped=named_value(3),empty=named_value(4);
+    upper.charSet=SHIFTJIS_CHARSET;lower.charSet=GREEK_CHARSET;mapped.charSet=RUSSIAN_CHARSET;empty.charSet=HANGEUL_CHARSET;
+    named_add(doc,L"Case",upper);named_add(doc,L"case",lower);named_add(doc,L"Default",mapped);
+    const wchar_t key[]={0,L'K',0xd800},alias[]={0,L'A',0xdcff},prefix[]={L'C',L'a',L's',L'e',0,L'X',0xd800};
+    STSStyle* owned=new STSStyle;*owned=empty;doc.AddStyle(CString(key,3),owned);
+    doc.AddSTSEntryOnly(CStringW(L"raw prefix resolution"),true,0,10,CString(prefix,7));
+    doc.AddSTSEntryOnly(CStringW(L"lowercase resolution"),true,10,20,CString(L"case"));
+    doc.AddSTSEntryOnly(CStringW(L"uppercase fallback"),true,20,30,CString(L"CASE"));
+    doc.AddSTSEntryOnly(CStringW(L"empty prefix resolution"),true,30,40,CString(alias,3));
+    const unsigned notifications=change_events[0];
+    auto stage=[&](const char* name,int index,const STSStyle& expected){
+        printf("resolution-stage %s\n",name);resolved(doc,index,expected,name);
+        STSStyle actual;check(doc.GetStyle(index,&actual)&&same_identity(actual.fontName,expected.fontName),"resolved raw font suffix retained");
+        doc.Dump(name);
+    };
+    stage("resolution-raw-prefix",0,upper);stage("resolution-lowercase",1,lower);
+    stage("resolution-case-fallback",2,mapped);stage("resolution-empty-prefix",3,empty);
+    STSStyle forced=named_value(5);forced.charSet=ANSI_CHARSET;forced.fontSize=-0.0;
+    check(doc.SetDefaultStyle(forced),"resolved forced default set");doc.SetForceDefaultStyle(true);
+    stage("resolution-forced",0,forced);
+    STSStyle replacement=named_value(6);replacement.charSet=HEBREW_CHARSET;replacement.fontSize=-0.0;
+    check(doc.SetDefaultStyle(replacement),"resolved forced default replacement");
+    stage("resolution-forced-replaced",3,replacement);
+    STSStyle output;check(doc.GetStyle(3,&output),"resolved owned output");
+    output.fontName.SetAt(3,L'Q');output.fontName.SetAt(2,L'R');output.fontSize=123.5;output.charSet=THAI_CHARSET;
+    printf("resolution-mutated-output ");style(output);
+    stage("resolution-output-independent",3,replacement);
+    STSStyle reread;check(doc.GetStyle(3,&reread),"resolved independent reread");uint64_t bits;std::memcpy(&bits,&reread.fontSize,8);
+    check(bits==UINT64_C(0x8000000000000000),"resolved default signedzero retained");
+    check(change_events[0]==notifications,"resolution queries/default replacement do not notify");
+}
 int main() {
     try {
         if(!AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0))throw std::runtime_error("AfxWinInit failed");
@@ -1022,6 +1055,7 @@ int main() {
         sort_lifecycle();
         base_empty_lifecycle();
         lcid_lifecycle();
+        resolution_lifecycle();
         named_style_exports();
         {
             TraceDocument source(0),destination(1);populate(source);populate(destination);

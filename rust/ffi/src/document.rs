@@ -9,8 +9,8 @@ use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::ptr;
 use xy_vsfilter_compat::document::{
-    AddMode, Document, IdentityField, InterpretationField, MetadataField, Refusal, RetiredEmpty,
-    ScriptField, StyleRenameError,
+    AddMode, Document, IdentityField, InterpretationField, MetadataField, Refusal, ResolvedStyle,
+    RetiredEmpty, ScriptField, StyleRenameError, StyleResolutionError,
 };
 use xy_vsfilter_compat::document_style as style_wire;
 use xy_vsfilter_compat::document_wire::{self as wire, Counts, EntryHeader, SegmentHeader};
@@ -786,7 +786,7 @@ pub unsafe extern "C" fn xy_vsfilter_document_snapshot_open_v1(
     capacity: usize,
 ) -> u32 {
     required!(output_capacity(output, capacity, 8));
-    if kind > 7 {
+    if kind > 9 {
         return INVALID_INPUT;
     }
     let bytes = required!(admitted(|registry| {
@@ -831,11 +831,37 @@ pub unsafe extern "C" fn xy_vsfilter_document_snapshot_open_v1(
                     IdentityField::Path
                 }))
             }
-            _ => {
+            7 => {
                 if index != 0 {
                     return Err(OUT_OF_RANGE);
                 }
                 wire::encode_sort_snapshot(document.entries()).map_err(wire_error)
+            }
+            _ => {
+                let resolved =
+                    document
+                        .resolve_entry_style(index)
+                        .map_err(|error| match error {
+                            StyleResolutionError::EntryIndex => OUT_OF_RANGE,
+                            StyleResolutionError::Uninitialized => UNRESOLVED_REFERENCE,
+                        })?;
+                if kind == 8 {
+                    match resolved {
+                        ResolvedStyle::Null => Err(UNRESOLVED_REFERENCE),
+                        ResolvedStyle::Value(value) => {
+                            style_wire::encode(value).map_err(style_wire_error)
+                        }
+                    }
+                } else {
+                    let (state, charset): (u32, i32) = match resolved {
+                        ResolvedStyle::Null => (1, -1),
+                        ResolvedStyle::Value(value) => (2, value.char_set),
+                    };
+                    let mut bytes = Vec::with_capacity(8);
+                    bytes.extend_from_slice(&state.to_le_bytes());
+                    bytes.extend_from_slice(&charset.to_le_bytes());
+                    Ok(bytes)
+                }
             }
         }
     }));
@@ -1229,6 +1255,127 @@ mod tests {
         // SAFETY: allocated byte ranges below are valid for each supplied size;
         // explicit null/oversized checks are rejected before raw accesses.
         unsafe {
+            // Resolved snapshots own selected values, not live entry/map references.
+            let resolved_owner = create();
+            let mut resolved_output = [0xa5; 8];
+            assert_eq!(
+                xy_vsfilter_document_snapshot_open_v1(
+                    resolved_owner,
+                    8,
+                    0,
+                    resolved_output.as_mut_ptr(),
+                    8
+                ),
+                UNRESOLVED_REFERENCE
+            );
+            assert_eq!(resolved_output, [0xa5; 8]);
+            let mut selected = style_wire::decode(&[0; style_wire::HEADER_BYTES]).unwrap();
+            selected.char_set = -1;
+            DOCUMENTS
+                .try_with(|registry| {
+                    let d = registry.document_mut(resolved_owner).unwrap();
+                    d.replace_forced_default(true);
+                    d.replace_default_style(Some(selected.clone()));
+                })
+                .unwrap();
+            assert_eq!(
+                xy_vsfilter_document_snapshot_open_v1(
+                    resolved_owner,
+                    8,
+                    u32::MAX,
+                    resolved_output.as_mut_ptr(),
+                    8
+                ),
+                OK
+            );
+            let resolved_value = u64::from_le_bytes(resolved_output);
+            let resolved_charset = open_snapshot(resolved_owner, 9);
+            assert_eq!(
+                read_snapshot(resolved_charset),
+                [2, 0, 0, 0, 255, 255, 255, 255]
+            );
+            resolved_output.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_document_snapshot_open_v1(
+                    resolved_value,
+                    8,
+                    0,
+                    resolved_output.as_mut_ptr(),
+                    8
+                ),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                xy_vsfilter_document_snapshot_open_v1(
+                    resolved_owner,
+                    9,
+                    0,
+                    resolved_output.as_mut_ptr(),
+                    7
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_snapshot_open_v1(
+                        resolved_owner,
+                        9,
+                        0,
+                        resolved_output.as_mut_ptr(),
+                        8
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(resolved_output, [0xa5; 8]);
+            DOCUMENTS
+                .try_with(|registry| {
+                    let d = registry.document_mut(resolved_owner).unwrap();
+                    d.replace_forced_default(false);
+                    let mut record = wire::decode_entry(&entry(0, 10)).unwrap();
+                    record.style = vec![65, 0, 0xd800];
+                    d.add_prepared(record, AddMode::Add).unwrap();
+                    d.named_styles_mut().insert(vec![65], None);
+                })
+                .unwrap();
+            assert_eq!(
+                xy_vsfilter_document_snapshot_open_v1(
+                    resolved_owner,
+                    8,
+                    0,
+                    resolved_output.as_mut_ptr(),
+                    8
+                ),
+                UNRESOLVED_REFERENCE
+            );
+            assert_eq!(
+                xy_vsfilter_document_snapshot_open_v1(
+                    resolved_owner,
+                    9,
+                    u32::MAX,
+                    resolved_output.as_mut_ptr(),
+                    8
+                ),
+                OUT_OF_RANGE
+            );
+            let null_charset = open_snapshot(resolved_owner, 9);
+            assert_eq!(
+                read_snapshot(null_charset),
+                [1, 0, 0, 0, 255, 255, 255, 255]
+            );
+            assert_eq!(xy_vsfilter_document_destroy_v1(resolved_owner), OK);
+            assert_eq!(
+                read_snapshot(resolved_value),
+                style_wire::encode(&selected).unwrap()
+            );
+            assert_eq!(
+                read_snapshot(resolved_charset),
+                [2, 0, 0, 0, 255, 255, 255, 255]
+            );
+            for id in [resolved_value, resolved_charset, null_charset] {
+                assert_eq!(xy_vsfilter_document_snapshot_drop_v1(id), OK);
+            }
+
             // Default-style transport and ownership are independent of storage.
             let source = create();
             let target = create();
@@ -1239,7 +1386,7 @@ mod tests {
             );
             assert_eq!(output, [0xa5; 8]);
             assert_eq!(
-                xy_vsfilter_document_snapshot_open_v1(source, 8, 0, output.as_mut_ptr(), 8),
+                xy_vsfilter_document_snapshot_open_v1(source, 10, 0, output.as_mut_ptr(), 8),
                 INVALID_INPUT
             );
             assert_eq!(output, [0xa5; 8]);

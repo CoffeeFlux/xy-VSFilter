@@ -142,6 +142,13 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_named_style_lookup_v1(uint64_t o
 // then16-byte rows start:i64@0/layer:i32@8/readorder:i32@12; ordinal implicit.
 // No text cloning or Rust sorting; native adapter must retain actual STSEntry
 // width/comparators. Counts and total snapshot sizes use checked native bounds.
+// Kind8 resolved entry style wire (present-null => UNRESOLVED_REFERENCE).
+// Kind9 resolved charset: state:u32@0 (1 null/2 value), charset:i32@4;
+// null carries -1, distinct from a Value whose charset is -1.
+// Both resolve forced default BEFORE index validation; otherwise entry name,
+// then internal Default key only on missing, then owned default only on missing.
+// Missing supplied forced/default state => UNRESOLVED_REFERENCE. Index is rawu32;
+// forced selection bypasses entry bounds. Replies are immutable owned snapshots.
 // Missing ordinals or nonzero identity/Sort indexes return OUT_OF_RANGE. Full entry wire is the
 // 64-byte header followed by text/style/actor/effect raw UTF-16LE arrays. Full
 // segment wire is the 32-byte header followed by u32LE member indexes.
