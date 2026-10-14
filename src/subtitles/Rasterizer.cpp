@@ -30,6 +30,7 @@
 #include "xy_rust_mask.h"
 #include "xy_rust_bilinear.h"
 #include "xy_rust_be_blur.h"
+#include "xy_rust_gauss_integer.h"
 #endif
 #include "SeparableFilter.h"
 #include "xy_logger.h"
@@ -380,6 +381,11 @@ static void ass_gauss_blur(unsigned char *buffer, unsigned *tmp2,
                            const unsigned *g_t_y, int g_r_y, int g_width_y)
 {
 
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (xy_vsfilter_gauss_integer(buffer, tmp2, width, height, stride, g_t_x, g_r_x, g_width_x, g_t_y, g_r_y, g_width_y)) {
+        return;
+    }
+#endif
     int x, y;
 
     unsigned char *s = buffer;

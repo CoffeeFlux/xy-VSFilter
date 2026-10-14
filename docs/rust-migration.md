@@ -20,6 +20,24 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust table-driven integer Gaussian accumulation owns initialized input,
+  scratch and output storage. It preserves the original cumulative edges,
+  asymmetric table traversal, skipped radius-zero first row/column, conditional
+  rounding-state reset, unsigned wrapping and final byte narrowing. The boundary
+  copies back the complete scratch state and active output rows without borrowing
+  uninitialized native scratch or image padding.
+  The Rust path requires nonnegative image stride, odd kernels matching their
+  radii, sufficient dimensions (including the original upper-edge traversal),
+  and mutable buffers disjoint from each other and coefficient tables. Unsupported
+  layouts, arithmetic/table-index states and allocation refusal decline before
+  native writes and retain the original implementation.
+  Local fatal ASan/UBSan tests passed **93,184 comparisons / 6,106,906,624 bytes**
+  on arm64 and under x64 execution, including **67,512 visibly changed images**,
+  **7,168 image/scratch alias cases**, **87,552 Rust-handled calls** and **55,808
+  fallback calls**. Tests compare the entire initialized fixture, including
+  scratch state, guards and padding, across repeated and overlapping rows.
+  Rust tests (47 core, 26 FFI), strict Clippy and default native branch syntax
+  checks pass. Windows/Miri validation is pending for this increment.
 * Safe Rust byte-to-float conversion owns a complete output row and constructs
   the exact binary32 representation of each byte using integer arithmetic.
   It preserves positive-zero extension, source-row overlap and zero/overlapping
@@ -67,8 +85,13 @@ unresolved reference outcomes requiring investigation, never matching results.
   original incremental read/write order. Nonterminating native traversal is
   excluded from parity counts. Rust tests (45 core, 22 FFI), strict Clippy and
   default native branch syntax checks pass; boundary tests use intentionally
-  uninitialized pitch gaps and output. Windows/Miri validation is pending for
-  this increment. Float transposition is a separate increment above.
+  uninitialized pitch gaps and output. Candidate `2d4b8f8a` passed all four CI
+  platforms, Miri and both Windows DLL jobs. Each DLL job matched **322 corpus
+  cases / 4,026 frames** and **32 mutations / 224 frames**, plus dialogs, visible
+  controls, exports and dependencies. Both logs confirm Rust-enabled
+  `xy_filter.cpp` compilation. [Byte-transpose evidence](byte-transpose-evidence.json)
+  records verified source/DLL hashes and scope. Float transposition is a separate
+  increment above.
 * Safe Rust weighted horizontal filtering covers fractional blur arithmetic
   behind the existing switch. Scalar full-width products and narrowing remain
   distinct from SSE word products and saturating additions. The original
@@ -84,7 +107,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   boundaries, padding/guards and repeated overlapping rows are also compared.
   Nonterminating negative-height/negative-stride SSE states are excluded from
   parity counts. Rust tests (44 core, 20 FFI), strict Clippy and default native
-  branch syntax checks pass. Windows validation is pending for this increment.
+  branch syntax checks pass. Candidate `47aecadf` passed all four CI platforms,
+  Miri and both Windows DLL jobs. Each DLL job matched **322 corpus cases /
+  4,026 frames** and **32 mutations / 224 frames**, plus dialogs, visible controls,
+  exports and dependencies. Both logs confirm Rust-enabled `xy_filter.cpp`
+  compilation. [Weighted-filter evidence](weighted-filter-evidence.json) records
+  verified source/DLL hashes and scope.
 * Safe Rust horizontal `[1, 2, 1]` filtering replaces the scalar and SSE
   arithmetic behind the existing switch. Each call lends one initialized row;
   later overlapping rows see earlier writes after the preceding borrow ends.
