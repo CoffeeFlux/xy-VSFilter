@@ -20,6 +20,24 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns the charset-aware `FindChar` loop used by MicroDVD and other
+  text paths: lead-byte skipping, nested style depth, the original search offset,
+  inline `\fe` digit scanning and empty charset reset. Native Windows code-page
+  translation, lead-byte/digit classification, charset arithmetic and the Unicode
+  `CStringW::Find` path remain in order. The native bridge ends each Rust input
+  loan before classification or translation.
+  Fatal ASan/UBSan comparisons passed **487,996 cases**, **5,002,990 native
+  callbacks**, **623,221 translations** and **97 injected interruptions** on
+  arm64 and under x64 execution; **386,883 Rust searches / 5,932,716 steps** were
+  observed. Fixtures include every UTF-16 value, all 256 charset/byte pairs,
+  embedded NULs, nested/empty charset tags and changing classification replies.
+  Windows CI uses actual ATL and Windows charset APIs; local models do not
+  establish those platform semantics. Native arithmetic fixtures are restricted
+  to representable results. Eight MicroDVD scripts and an italic visible-change
+  control expand the rendering corpus to **398 cases**. Rust 1.85 tests (77 core,
+  52 FFI), strict Clippy, default syntax checks and Python harness checks pass.
+  Windows/Miri and complete rendering validation are pending; full converters,
+  native string ownership, allocation failure timing and host integration remain.
 * Safe Rust owns the UTF-16 text produced by caption `SaveDisp`, preserving
   spaces between nonempty fragments, row newlines, and bounded strings spanning
   row boundaries. Native timestamp truncation and subtitle insertion remain in
@@ -65,8 +83,13 @@ unresolved reference outcomes requiring investigation, never matching results.
   model locally, and a fixture subtitle sink. Raw logging/files, native integer
   overflow and actual caption-ripper integration are outside these comparisons.
   Rust 1.85 tests (73 core, 49 FFI), strict Clippy and default syntax checks pass.
-  Windows/Miri validation is pending. Command dispatch, backing ownership and
-  native subtitle/file output remain to be migrated or separately validated.
+  Candidate `9c6c3569` passed all four portable platforms, Miri and both Windows
+  DLL jobs, each matching **382 cases / 4,490 frames** and **32 mutations / 224
+  frames**, plus dialogs, visible controls, exports and dependencies. Both logs
+  confirm Rust-enabled `CCDecoder.cpp` compilation. [Cursor/cell evidence](cc-cursor-evidence.json)
+  records verified hashes and stable local validation. Command dispatch is
+  covered by the later increment above; backing ownership and native subtitle/
+  file integration remain to be migrated or separately validated.
 * Safe Rust owns the outer `ParseRealText` document state machine. It preserves
   comment precedence, separate text/tag paths, start-before-end conversion,
   rendering before line insertion, history advancement afterward, open-before-
