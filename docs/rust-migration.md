@@ -38,6 +38,9 @@ unresolved reference outcomes requiring investigation, never matching results.
   are unchanged and its sanitizer comparisons still pass. Rust remains
   **146 core / 101 FFI tests**, with prefix loans extended through 16/32 bytes;
   formatting, Clippy, Python checks and default native syntax pass locally.
+  The initial Linux fixture compile (`115915348048`) lacked a qualified
+  `std::ptrdiff_t` declaration; the fixture now includes `<cstddef>` explicitly.
+  That compile failure remains failed and requires a corrected Linux run.
 
 * The initial x64 COM probe matched eight scoped cases; the two autoloader
   apartment cases have an unresolved reference pin-ID outcome, recorded in
