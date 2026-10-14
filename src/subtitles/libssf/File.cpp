@@ -20,6 +20,9 @@
  */
 
 #include "stdafx.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "../../../include/xy_rust_ssf_literal.h"
+#endif
 #include "File.h"
 
 #ifndef iswcsym
@@ -151,6 +154,26 @@ namespace ssf
 
 	void File::ParseQuotedString(InputStream& s, Definition* pDef)
 	{
+#ifdef XY_VSFILTER_RUST_TEXT
+        CStringW v;
+        XyRust::SsfLiteral literal(false);
+        int last = 0;
+        for(;;)
+        {
+            switch(literal.Next(last))
+            {
+            case XyRust::SsfLiteral::Skip: last = s.SkipWhiteSpace(); break;
+            case XyRust::SsfLiteral::Get: last = s.GetChar(); break;
+            case XyRust::SsfLiteral::Peek: last = s.PeekChar(); break;
+            case XyRust::SsfLiteral::Append: v += (WCHAR)literal.Value(); break;
+            case XyRust::SsfLiteral::String: pDef->SetAsValue(Definition::string, v); return;
+            case XyRust::SsfLiteral::ExpectedQuote: s.ThrowError(_T("expected qouted string")); break;
+            case XyRust::SsfLiteral::Newline: s.ThrowError(_T("qouted string terminated unexpectedly by a new-line character")); break;
+            case XyRust::SsfLiteral::StringEos: s.ThrowError(_T("qouted string terminated unexpectedly by EOS")); break;
+            case XyRust::SsfLiteral::UnterminatedString: s.ThrowError(_T("unterminated quoted string")); break;
+            }
+        }
+#else
 		CStringW v;
 
 		int quote = s.SkipWhiteSpace();
@@ -168,6 +191,7 @@ namespace ssf
 		}
 
 		s.ThrowError(_T("unterminated quoted string"));
+#endif
 	}
 
 	void File::ParseNumber(InputStream& s, Definition* pDef)
@@ -200,6 +224,25 @@ namespace ssf
 
 	void File::ParseBlock(InputStream& s, Definition* pDef)
 	{
+#ifdef XY_VSFILTER_RUST_TEXT
+        CStringW v;
+        XyRust::SsfLiteral literal(true);
+        int last = 0;
+        for(;;)
+        {
+            switch(literal.Next(last))
+            {
+            case XyRust::SsfLiteral::SkipBlock: last = s.SkipWhiteSpace(L":="); break;
+            case XyRust::SsfLiteral::Get: last = s.GetChar(); break;
+            case XyRust::SsfLiteral::Peek: last = s.PeekChar(); break;
+            case XyRust::SsfLiteral::Append: v += (WCHAR)literal.Value(); break;
+            case XyRust::SsfLiteral::Block: pDef->SetAsValue(Definition::block, v); return;
+            case XyRust::SsfLiteral::ExpectedBrace: s.ThrowError(_T("expected '{'")); break;
+            case XyRust::SsfLiteral::BlockEos: s.ThrowError(_T("block terminated unexpectedly by EOS")); break;
+            case XyRust::SsfLiteral::UnterminatedBlock: s.ThrowError(_T("unterminated block")); break;
+            }
+        }
+#else
 		CStringW v;
 
 		int c = s.SkipWhiteSpace(L":=");
@@ -220,6 +263,7 @@ namespace ssf
 		}
 
 		s.ThrowError(_T("unterminated block"));
+#endif
 	}
 
 	void File::ParseRefs(InputStream& s, Definition* pParentDef, LPCWSTR term)
