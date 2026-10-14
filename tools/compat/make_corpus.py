@@ -274,6 +274,23 @@ def realtext_variants():
         yield "realtext-format-" + name + ".rt", text.encode("ascii")
 
 
+def encoding_variants():
+    # Deliberately omit a Unicode BOM. Preserve raw legacy bytes and select the
+    # Windows charset through the style and inline overrides.
+    for name, charset, payload in (
+        ("western", 0, b"caf\xe9"),
+        ("western-control", 0, b"cafe"),
+        ("japanese", 128, b"\x82\xa0\x82\xa2 legacy"),
+        ("simplified-chinese", 134, b"\xd6\xd0\xce\xc4 legacy"),
+        ("traditional-chinese", 136, b"\xa4\xa4\xa4\xe5 legacy"),
+        ("korean", 129, b"\xb0\xa1\xb3\xaa legacy"),
+        ("johab", 130, b"\x88\x61 legacy"),
+        ("switch-and-trailing", 0, b"caf\xe9{\\fe128}\x82\xa0{\\fe}caf\xe9{\\fe128}\x81"),
+    ):
+        script = SEED.replace(b"10,10,10,1\r\n", f"10,10,10,{charset}\r\n".encode("ascii"))
+        yield "encoding-" + name + ".ass", script.replace(b"COMPAT_TEXT", payload)
+
+
 def microdvd_variants():
     for name, payload in {
         "control": "Formatting sample|second line",
@@ -376,7 +393,8 @@ def make_cases(files):
                                                     ("microdvd-format-italic", "microdvd-format-control"),
                                                     ("mpl2-format-italic", "mpl2-format-control"),
                                                     ("sami-format-italic", "sami-format-control"),
-                                                    ("sami-format-font-black", "sami-format-font-zero"))
+                                                    ("sami-format-font-black", "sami-format-font-zero"),
+                                                    ("encoding-western", "encoding-western-control"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -389,6 +407,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in incremental_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in subrip_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in realtext_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in encoding_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in microdvd_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in mpl2_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in sami_variants()]

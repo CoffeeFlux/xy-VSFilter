@@ -119,3 +119,5 @@ mod remove_tags;
 mod case_replace;
 
 mod sami;
+
+mod encoding;

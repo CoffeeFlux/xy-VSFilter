@@ -20,6 +20,24 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns the raw input/output buffers and iteration for `ToMBCS` and
+  `ToUnicode`. Native charset translation, lead-byte classification and conversion
+  APIs remain in order. Conversion still runs one UTF-16 unit at a time; failed
+  multibyte conversions retain the initialized original unit, and a trailing lead
+  byte survives unchanged. Only bytes reported initialized by the native API are
+  copied. Embedded NULs and surrogate units retain their counted-string behavior.
+  Fatal ASan/UBSan comparisons passed **1,013,664 complete helper/SSA-wrapper
+  comparisons** on arm64 and under x64 execution: **725,800 changed strings**,
+  **4,218,021 output units**, **23,872,243 callback observation values**, **576
+  interruptions**, and **1,183,965 Rust owners**. These include all UTF-16 values,
+  all DBCS byte pairs, all charset/byte pairs, failed conversion replies and errno.
+  Windows CI uses actual ATL and Windows code-page APIs and checks LastError;
+  portable conversion models do not establish Windows conversion behavior.
+  Eight legacy-encoded ASS scripts, with a visible accent control, expand the
+  rendering corpus to **446 cases**. Rust 1.85 tests (89 core, 60 FFI), strict
+  Clippy, default syntax and Python harness checks pass. Windows/Miri and complete
+  rendering validation are pending. SSA wrapper ownership, native conversion,
+  text export and complete host integration remain separate work.
 * Safe Rust owns SAMI font-argument cleanup, the remaining argument buffer and
   the current color value. Quote/hash removal, exact `color=` recognition, token
   consumption before lookup, and ignored/empty attributes retain native order.
@@ -54,9 +72,14 @@ unresolved reference outcomes requiring investigation, never matching results.
   Four added SAMI font fixtures and a named-black/numeric-zero visible control
   expand the rendering corpus to **430 cases**. Rust 1.85 tests (86 core, 58 FFI),
   strict Clippy, default syntax, corpus freshness and Python checks pass.
-  Windows/Miri and complete rendering validation are pending. Native font-argument
-  processing, color/numeric conversion, file parsing, allocation failure timing
-  and full host integration remain separate work.
+  Candidate `1ef84bd6` passed all four portable platforms, Miri and both Windows
+  DLL jobs: each matched **430 cases / 4,778 frames** and **32 mutations / 224
+  frames**, plus dialogs, visible controls, exports and dependencies. Both logs
+  confirm Rust-enabled `STS.cpp` compilation. [SAMI evidence](sami-evidence.json)
+  records verified hashes and stable local validation. Native font-argument
+  processing (migrated in the later increment above), color/numeric conversion,
+  file parsing, allocation failure timing and full host integration remain
+  separate work.
 * Safe Rust owns `ReplaceNoCase` replacement/output construction after the
   original native lowercase call. It preserves source case outside replacements,
   leaves the needle's case untouched and never searches newly inserted text.

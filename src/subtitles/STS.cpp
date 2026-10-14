@@ -30,6 +30,7 @@
 #include "xy_rust_remove_tags.h"
 #include "xy_rust_case_replace.h"
 #include "xy_rust_sami.h"
+#include "xy_rust_encoding.h"
 #include "xy_rust_webvtt.h"
 #include "xy_rust_fields.h"
 #include "xy_rust_segments.h"
@@ -506,6 +507,32 @@ static int FindChar(CStringW str, WCHAR c, int pos, bool fUnicode, int CharSet)
 
 static CStringW ToUnicode(CStringW str, DWORD CharSet)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    DWORD cp = CharSetToCodePage(CharSet);
+    XyRust::Encoding convert(str);
+    for(int unit; (unit = convert.Take()) >= 0; )
+    {
+        WCHAR wc = static_cast<WCHAR>(unit);
+        char c = wc&0xff;
+        if(IsDBCSLeadByteEx(cp, (BYTE)wc))
+        {
+            const int next = convert.Take();
+            if(next >= 0)
+            {
+                char cc[2];
+                cc[0] = c;
+                cc[1] = static_cast<char>(next);
+                MultiByteToWideChar(cp, 0, cc, 2, &wc, 1);
+            }
+        }
+        else
+        {
+            MultiByteToWideChar(cp, 0, &c, 1, &wc, 1);
+        }
+        convert.AppendUnit(static_cast<uint16_t>(wc));
+    }
+    return convert.Text<CStringW>();
+#else
     CStringW ret;
 
     DWORD cp = CharSetToCodePage(CharSet);
@@ -537,6 +564,7 @@ static CStringW ToUnicode(CStringW str, DWORD CharSet)
     }
 
     return(ret);
+#endif
 }
 
 static CStringW MBCSSSAToUnicode(CStringW str, int CharSet)

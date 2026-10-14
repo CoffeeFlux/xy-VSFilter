@@ -97,6 +97,14 @@
     [
       "sami-format-font-black-memory",
       "sami-format-font-zero-memory"
+    ],
+    [
+      "encoding-western-file",
+      "encoding-western-control-file"
+    ],
+    [
+      "encoding-western-memory",
+      "encoding-western-control-memory"
     ]
   ],
   "cases": [
@@ -9180,6 +9188,358 @@
         "3.9999999",
         "4",
         "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "encoding-western-file",
+      "script": "test/compat/generated/encoding-western.ass",
+      "sha256": "a2e0a9d1cd7ad615f4fe35b15b7b06334a753d926240c2eff6041dcdcd3205b3",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "encoding-western-memory",
+      "script": "test/compat/generated/encoding-western.ass",
+      "sha256": "a2e0a9d1cd7ad615f4fe35b15b7b06334a753d926240c2eff6041dcdcd3205b3",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "encoding-western-control-file",
+      "script": "test/compat/generated/encoding-western-control.ass",
+      "sha256": "ac0dc37e8c0a7344a9202d821a351fb5f37bc7c17a6b4871e49efd359c2699cd",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "encoding-western-control-memory",
+      "script": "test/compat/generated/encoding-western-control.ass",
+      "sha256": "ac0dc37e8c0a7344a9202d821a351fb5f37bc7c17a6b4871e49efd359c2699cd",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "encoding-japanese-file",
+      "script": "test/compat/generated/encoding-japanese.ass",
+      "sha256": "fb4bdf279d477372779eb929d1b5e4b4bf81fcd4e1a32cc71e2bc9f05428f9f6",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "encoding-japanese-memory",
+      "script": "test/compat/generated/encoding-japanese.ass",
+      "sha256": "fb4bdf279d477372779eb929d1b5e4b4bf81fcd4e1a32cc71e2bc9f05428f9f6",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "encoding-simplified-chinese-file",
+      "script": "test/compat/generated/encoding-simplified-chinese.ass",
+      "sha256": "d4a5c1f4e7ac2f461b3c059c256cd1c274ee43d5583246ce2a81b0ddeb339b33",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "encoding-simplified-chinese-memory",
+      "script": "test/compat/generated/encoding-simplified-chinese.ass",
+      "sha256": "d4a5c1f4e7ac2f461b3c059c256cd1c274ee43d5583246ce2a81b0ddeb339b33",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "encoding-traditional-chinese-file",
+      "script": "test/compat/generated/encoding-traditional-chinese.ass",
+      "sha256": "477ed55b3efe0ec8764f17f3bd7dbfd5213da81aee2a34631037b0a9fe957244",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "encoding-traditional-chinese-memory",
+      "script": "test/compat/generated/encoding-traditional-chinese.ass",
+      "sha256": "477ed55b3efe0ec8764f17f3bd7dbfd5213da81aee2a34631037b0a9fe957244",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "encoding-korean-file",
+      "script": "test/compat/generated/encoding-korean.ass",
+      "sha256": "95d921bb83d36876fce865f232ef879088c6077ed5ae917d5f8482c6fe458231",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "encoding-korean-memory",
+      "script": "test/compat/generated/encoding-korean.ass",
+      "sha256": "95d921bb83d36876fce865f232ef879088c6077ed5ae917d5f8482c6fe458231",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "encoding-johab-file",
+      "script": "test/compat/generated/encoding-johab.ass",
+      "sha256": "2b6fbab1e8198e3b57bac067eb041eb8c5c076b5059e0ac09e22cc896f854499",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "encoding-johab-memory",
+      "script": "test/compat/generated/encoding-johab.ass",
+      "sha256": "2b6fbab1e8198e3b57bac067eb041eb8c5c076b5059e0ac09e22cc896f854499",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "encoding-switch-and-trailing-file",
+      "script": "test/compat/generated/encoding-switch-and-trailing.ass",
+      "sha256": "0cff59ff8051787a2c638d916b4ee3f91d5768eb716f6e070c904f9cb4666461",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "encoding-switch-and-trailing-memory",
+      "script": "test/compat/generated/encoding-switch-and-trailing.ass",
+      "sha256": "0cff59ff8051787a2c638d916b4ee3f91d5768eb716f6e070c904f9cb4666461",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
       ],
       "stride_padding": 16,
       "fill_seed": 31
