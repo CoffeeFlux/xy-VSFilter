@@ -60,3 +60,5 @@ pub mod find_char;
 pub mod microdvd;
 
 pub mod mpl2;
+
+pub mod remove_tags;

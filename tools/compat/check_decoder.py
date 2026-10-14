@@ -55,7 +55,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
               ROOT / "include/xy_rust_drawing.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
-              ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
+              ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
               ROOT / "include/xy_rust_cc.h", ROOT / "src/subtitles/CCDecoder.cpp", ROOT / "src/subtitles/CCDecoder.h",
               ROOT / "include/xy_rust_segments.h",
@@ -209,7 +209,7 @@ public:
         microdvd += f"namespace {name} {{\n"
         if name == "CandidateMicroDVD":
             microdvd += "#define XY_VSFILTER_RUST_TEXT\n"
-        for signature in ("static DWORD CharSetToCodePage(", "static int FindChar(", "static CStringW MicroDVD2SSA(", "static CStringW MPL22SSA("):
+        for signature in ("static DWORD CharSetToCodePage(", "static int FindChar(", "static CStringW MicroDVD2SSA(", "static CStringW MPL22SSA(", "static CStringW RemoveSSATags("):
             decoded = content.decode("utf-8-sig")
             if signature == "static CStringW MicroDVD2SSA(":
                 # Its unmatched braces inside tag literals defeat brace counting.
@@ -227,6 +227,10 @@ public:
                 bridge = "XyRust::MPL2 convert"
                 assert definition.count(bridge) == 1
                 definition = definition.replace(bridge, "XyRust::ObservedMPL2 convert")
+            if name == "CandidateMicroDVD" and signature == "static CStringW RemoveSSATags(":
+                bridge = "XyRust::RemoveTags convert"
+                assert definition.count(bridge) == 1
+                definition = definition.replace(bridge, "XyRust::ObservedRemoveTags convert")
             microdvd += definition + "\n"
         microdvd += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_microdvd.h").write_text(microdvd, encoding="utf-8")
@@ -800,6 +804,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     mpl2_result = run([str(mpl2_executable)], capture_output=True, text=True)
     print(mpl2_result.stdout, end="", flush=True)
     print(mpl2_result.stderr, end="", file=sys.stderr)
+    remove_tags_executable = destination / ("remove-tags-oracle.exe" if os.name == "nt" else "remove-tags-oracle")
+    remove_tags_compile = [arg.replace("microdvd_oracle.cpp", "remove_tags_oracle.cpp").replace("microdvd-oracle", "remove-tags-oracle") for arg in microdvd_compile]
+    run(remove_tags_compile)
+    remove_tags_result = run([str(remove_tags_executable)], capture_output=True, text=True)
+    print(remove_tags_result.stdout, end="", flush=True)
+    print(remove_tags_result.stderr, end="", file=sys.stderr)
     run(fill_compile)
     fill_result = run([str(fill_executable)], capture_output=True, text=True)
     print(fill_result.stdout, end="", flush=True)
@@ -1093,6 +1103,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "webvtt_compile_command": webvtt_compile,
         "webvtt_result": webvtt_result.stdout, "webvtt_stderr": webvtt_result.stderr,
         "webvtt_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring model with host iswspace; Windows comparison required",
+        "remove_tags_compile_command": remove_tags_compile,
+        "remove_tags_result": remove_tags_result.stdout, "remove_tags_stderr": remove_tags_result.stderr,
+        "remove_tags_scope": "Whole RemoveSSATags composed with both FindChar paths; native replacement-free NUL fallback; replacement-bearing NUL outcomes excluded; native Windows ATL/CRT and charset APIs in CI",
         "mpl2_compile_command": mpl2_compile,
         "mpl2_result": mpl2_result.stdout, "mpl2_stderr": mpl2_result.stderr,
         "mpl2_scope": "Whole MPL22SSA composed with MicroDVD and FindChar; native NUL-without-replacement fallback; tag/replacement-bearing NUL outcomes excluded; Windows ATL/CRT and charset APIs in CI",

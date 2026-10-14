@@ -11,7 +11,7 @@ static void compare(const std::wstring& input,bool unicode,int charset,int failu
     const auto events=searchEvents;searchAttempts=0;searchEvents.clear();
     microSide=1;
     try{b=contents(CandidateMicroDVD::MicroDVD2SSA(source,unicode,charset));}catch(const SearchInterrupted&){ib=true;}
-    if(a!=b || ia!=ib || events!=searchEvents || contents(source)!=before){fprintf(stderr,"MicroDVD mismatch case=%llu length=%zu unicode=%d charset=%d failure=%d output=%zu/%zu callbacks=%zu/%zu\n",(unsigned long long)comparisons,input.size(),unicode,charset,failure,a.size(),b.size(),events.size(),searchEvents.size());std::abort();}
+    if(a!=b || ia!=ib || events!=searchEvents || contents(source)!=before){fprintf(stderr,"MicroDVD mismatch case=%llu length=%zu unicode=%d charset=%d failure=%d output=%zu/%zu callbacks=%zu/%zu\n",(unsigned long long)comparisons,input.size(),unicode,charset,failure,a.size(),b.size(),events.size(),searchEvents.size());fprintf(stderr,"reference units=");for(auto u:a)fprintf(stderr,"%04x,",unsigned(u));fprintf(stderr,"\ncandidate units=");for(auto u:b)fprintf(stderr,"%04x,",unsigned(u));fprintf(stderr,"\n");std::abort();}
     ++comparisons;changed+=!ia && a!=before;units+=a.size();callbacks+=events.size();interruptions+=ia;
 }
 int main(){
