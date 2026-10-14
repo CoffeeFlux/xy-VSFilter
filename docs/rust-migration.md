@@ -778,6 +778,16 @@ Empty retention, plus missing/named/map-default/forced resolution and charset
 results. Raw names and signed zero are serialized without rendering them.
 Windows validation of this changed ownership is pending.
 
+Named-style map contract capture now has a separate short Windows x86/x64 job,
+so it can return evidence while renderer checks run. It records the installed
+ATL implementation's selected definitions and hashes, actual MFC CString type,
+key hashes/conversions, bucket counts and enumeration through bounded insert,
+remove, reinsert, ordered-copy and clear/reuse histories. Generated SDK excerpts
+are review artifacts, not checked-in implementation. This establishes inputs
+for the future safe map port; it does not yet establish Rust map parity.
+The complete style-value comparison also runs independently after the DLL build,
+so an unrelated style-API setup failure cannot suppress that evidence.
+
 The earlier entry/segment-only probe deliberately leaves style adapter templates
 uninstantiated; its generated STS header only forward-declares STSStyle. Actual
 style construction uses the real native types in the full-class and style-value

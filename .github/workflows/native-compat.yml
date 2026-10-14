@@ -46,6 +46,35 @@ permissions:
   contents: read
 
 jobs:
+  atl_contract:
+    runs-on: windows-2022
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: x64
+            arch: x64
+          - platform: Win32
+            arch: amd64_x86
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Capture installed ATL named-style map contract
+        shell: pwsh
+        run: |
+          & python tools\compat\document_atl_contract.py --platform ${{ matrix.platform }} --output "artifacts\document-atl-contract\${{ matrix.platform }}"
+          if ($LASTEXITCODE -ne 0) { throw "ATL contract capture incomplete; inspect report.json" }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: document-atl-contract-${{ matrix.platform }}
+          path: artifacts/document-atl-contract/${{ matrix.platform }}/
   renderer:
     runs-on: windows-2022
     timeout-minutes: 60
@@ -117,6 +146,12 @@ jobs:
           XY_RUST_DOCUMENT_OWNER: ${{ matrix.document_storage == 'rust-experimental' && 'true' || 'false' }}
         run: |
           & candidate\tools\compat\run_native_comparison.ps1 -Platform ${{ matrix.platform }} -Baseline "$pwd\baseline" -MutationCount ([int]$env:XY_MUTATION_COUNT) -MutationSeed ([uint32]$env:XY_MUTATION_SEED) -RustDocumentOwner:($env:XY_RUST_DOCUMENT_OWNER -eq 'true')
+      - name: Compare complete native and Rust style values independently
+        if: ${{ !cancelled() && matrix.document_storage == 'rust-experimental' }}
+        shell: pwsh
+        run: |
+          & python candidate\tools\compat\document_style_value_check.py --reference-root "$pwd\baseline" --candidate-root "$pwd\candidate" --platform ${{ matrix.platform }} --output "$pwd\candidate\artifacts\native\${{ matrix.platform }}\document-style-value"
+          if ($LASTEXITCODE -ne 0) { throw "Style value comparison failed; inspect document-style-value/report.json" }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
