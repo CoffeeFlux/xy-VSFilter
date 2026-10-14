@@ -98,8 +98,11 @@ unresolved reference outcomes requiring investigation, never matching results.
   included. Jobs `115895618184` / `115895618554` remain failed link attempts,
   not comparison results. The linked x64 fixture passes (`115900683970`), but
   Win32 job `115900684289` reports a mismatch in a one-pixel masked fill.
-  Detailed field/event diagnostics are being added; this remains unresolved
-  and is not a passing comparison.
+  The shared fixture used plain malloc alignment, which can be only eight
+  bytes on Win32; native xy_malloc guarantees sixteen and mask dispatch depends
+  on this. The guarded fixture now aligns explicitly and asserts the output
+  alignment. Detailed field/event diagnostics remain enabled. A corrected
+  Win32 comparison is pending; the original failure is not a pass.
 
 * Output `XyBitmap` buffers now use Rust ownership while preserving the native
   address modulo 16, public frame-accessor pointers and logical cache accounting.
