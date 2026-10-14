@@ -384,6 +384,22 @@ def arc_queue_variants():
         yield "arc-queue-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
 
 
+def clip_fade_variants():
+    for name, effect in {
+        "banner-control": b"Banner;3;0;0",
+        "banner-edge": b"Banner;3;0;128",
+        "banner-overlap": b"Banner;3;0;800",
+        "banner-reverse": b"Banner;3;1;128",
+        "scroll-control": b"Scroll up;40;320;4;0",
+        "scroll-up": b"Scroll up;40;320;4;80",
+        "scroll-down": b"Scroll down;40;320;4;80",
+        "scroll-overlap": b"Scroll up;-40;280;4;400",
+    }.items():
+        data = SEED.replace(b",0,0,0,,", b",0,0,0," + effect + b",")
+        data = data.replace(br"{\pos(320,180)\bord2}COMPAT_TEXT", br"{\bord0\shad0}Fade mask comparison WWW 0123456789 WWW")
+        yield "clip-fade-" + name + ".ass", data
+
+
 def clip_mask_variants():
     shape = br"{\an7\pos(260,140)\bord0\shad0\p1}m 0 0 l 100 0 100 60 0 60{\p0}"
     for name, tag in {
@@ -770,7 +786,9 @@ def make_cases(files):
                                                     ("span-coverage-phase-0", "span-coverage-phase-7"),
                                                     ("variance-control", "variance-diagonal"),
                                                     ("blur-planes-control", "blur-planes-body"),
-                                                    ("clip-mask-normal", "clip-mask-inverse"),
+                                                    ("clip-fade-banner-control", "clip-fade-banner-edge"),
+        ("clip-fade-scroll-control", "clip-fade-scroll-up"),
+        ("clip-mask-normal", "clip-mask-inverse"),
         ("gauss-planes-body-light", "gauss-planes-body-wide"))
                                        for mode in ("file", "memory")], "cases": cases}
 
@@ -794,6 +812,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in path_alignment_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in span_merge_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in arc_queue_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in clip_fade_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in clip_mask_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in gauss_planes_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in blur_planes_variants()]

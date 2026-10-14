@@ -20,6 +20,28 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust performs banner and scroll mask fades while native floating-point
+  conversions, integer division and their order remain in the caller. Banner
+  overlap applies both edges sequentially. Scroll passes preserve reversed or
+  offscreen endpoints, signed narrowing and clearing even when no row is faded.
+  Fatal ASan/UBSan and ordinary comparisons pass on both local architectures:
+  **82,656 whole-method calls / 5,411,520 output bytes / 237,408 allocation-paint
+  observations / 66,756 changed outputs / 5,280 null results / 3,264 Rust banner
+  passes / 116,532 Rust scroll passes**. **336 negative-width banner calls** keep
+  native fallback. **10,368 zero-divisor histories are excluded before either
+  implementation**, never parity passes. The initialized base-mask producer is
+  controlled; native overflowing arithmetic/conversions, invalid backing and
+  actual OOM are excluded. A Miri test covers two scroll passes and banner fade
+  through one initialized Rust plane loan. Rust 1.85 tests (146 core, 98 FFI),
+  strict Clippy, default syntax on both architectures and Python checks pass.
+  Eight effect fixtures expand the corpus to **798 cases**, including visible
+  banner/scroll fade controls. Windows/Miri and actual DLL comparisons are pending.
+* The corrected vector-mask commit (`e3dfbf23`) completed its stable full local
+  sanitizer campaign. The report includes Gaussian output and RLE storage
+  comparisons and retains the original UTF-8 header hash, confirming the report
+  variable fix. Ordinary and sanitizer Gaussian tests also pass with the retired
+  initialization-mask regression. Windows portable and renderer jobs are pending;
+  the earlier failed workflows remain failed.
 * Rust owns HDMV's reusable segment buffer. AllocSegment retains its native
   grow-only capacity, resets only position/declared size, and preserves existing
   initialized tails on smaller reuse. Fatal ASan/UBSan and ordinary comparisons

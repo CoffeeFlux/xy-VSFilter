@@ -11,4 +11,6 @@ struct XYRustMaskBytes { uint64_t low, high; };
 extern "C" XYRustMaskBytes XY_MASK_CDECL xy_vsfilter_mask_block(XYRustMaskBytes source, XYRustMaskBytes body, XYRustMaskBytes mask, int32_t color_alpha, uint32_t flags, uint32_t mmx);
 extern "C" uint8_t XY_MASK_CDECL xy_vsfilter_mask_scalar(uint8_t source, uint8_t body, uint8_t mask, int32_t color_alpha, uint32_t flags);
 extern "C" uint32_t XY_MASK_CDECL xy_vsfilter_clip_row(uint8_t* destination, const uint8_t* source, size_t count, uint32_t inverse);
+extern "C" uint32_t XY_MASK_CDECL xy_vsfilter_banner_fade(uint8_t*, int32_t, int32_t, int32_t, int32_t);
+extern "C" uint32_t XY_MASK_CDECL xy_vsfilter_scroll_fade(uint8_t*, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, uint32_t);
 #undef XY_MASK_CDECL

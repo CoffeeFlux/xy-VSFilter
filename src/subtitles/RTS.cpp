@@ -1152,6 +1152,9 @@ GrayImage2* CClipper::PaintBannerClipper()
 
     int da = (64<<8)/width;
     BYTE* am = result->data.get();
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (xy_vsfilter_banner_fade(am, w, h, width, da)) return result;
+#endif
     for(int j = 0; j < h; j++, am += w)
     {
         int a = 0;
@@ -1189,12 +1192,17 @@ GrayImage2* CClipper::PaintScrollClipper()
     if(l > h) {l = h;}
     if(k < h)
     {
-        BYTE* am = &data[k*w];
-        memset(data, 0, am - data);
-        for(int j = k; j < l; j++, a += da)
+#ifdef XY_VSFILTER_RUST_TEXT
+        if (!xy_vsfilter_scroll_fade(data, w, h, k, l, a, da, 1))
+#endif
         {
-            for(int i = 0; i < w; i++, am++)
-                *am = ((*am)*a)>>14;
+            BYTE* am = &data[k*w];
+            memset(data, 0, am - data);
+            for(int j = k; j < l; j++, a += da)
+            {
+                for(int i = 0; i < w; i++, am++)
+                    *am = ((*am)*a)>>14;
+            }
         }
     }
     da = -(64<<8)/height;
@@ -1205,14 +1213,19 @@ GrayImage2* CClipper::PaintScrollClipper()
     if(l > h) {l = h;}
     if(k < h)
     {
-        BYTE* am = &data[k*w];
-        int j = k;
-        for(; j < l; j++, a += da)
+#ifdef XY_VSFILTER_RUST_TEXT
+        if (!xy_vsfilter_scroll_fade(data, w, h, k, l, a, da, 2))
+#endif
         {
-            for(int i = 0; i < w; i++, am++)
-                *am = ((*am)*a)>>14;
+            BYTE* am = &data[k*w];
+            int j = k;
+            for(; j < l; j++, a += da)
+            {
+                for(int i = 0; i < w; i++, am++)
+                    *am = ((*am)*a)>>14;
+            }
+            memset(am, 0, (h-j)*w);
         }
-        memset(am, 0, (h-j)*w);
     }
     return result;
 }

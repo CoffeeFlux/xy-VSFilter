@@ -259,6 +259,22 @@
       "blur-planes-body-memory"
     ],
     [
+      "clip-fade-banner-control-file",
+      "clip-fade-banner-edge-file"
+    ],
+    [
+      "clip-fade-banner-control-memory",
+      "clip-fade-banner-edge-memory"
+    ],
+    [
+      "clip-fade-scroll-control-file",
+      "clip-fade-scroll-up-file"
+    ],
+    [
+      "clip-fade-scroll-control-memory",
+      "clip-fade-scroll-up-memory"
+    ],
+    [
       "clip-mask-normal-file",
       "clip-mask-inverse-file"
     ],
@@ -12854,6 +12870,358 @@
       "id": "arc-queue-animated-memory",
       "script": "test/compat/generated/arc-queue-animated.ass",
       "sha256": "10970619f3b28a254798607b2f6c0f0b8ca8a4d9f3bbaa175dc8561f65d980a7",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-fade-banner-control-file",
+      "script": "test/compat/generated/clip-fade-banner-control.ass",
+      "sha256": "fd385d9fac8a289ce35f8517887f4c5a2b832c59d4120702c5f234eddffe8692",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-fade-banner-control-memory",
+      "script": "test/compat/generated/clip-fade-banner-control.ass",
+      "sha256": "fd385d9fac8a289ce35f8517887f4c5a2b832c59d4120702c5f234eddffe8692",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-fade-banner-edge-file",
+      "script": "test/compat/generated/clip-fade-banner-edge.ass",
+      "sha256": "284f5cded4628214be03d2ff0aba79ad82d1366772f559658518a2180d9455cd",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-fade-banner-edge-memory",
+      "script": "test/compat/generated/clip-fade-banner-edge.ass",
+      "sha256": "284f5cded4628214be03d2ff0aba79ad82d1366772f559658518a2180d9455cd",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-fade-banner-overlap-file",
+      "script": "test/compat/generated/clip-fade-banner-overlap.ass",
+      "sha256": "c21d65e55629c2d9052923841bc2240fc6d30c0a58c4ae49d9f29bc79446d61a",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-fade-banner-overlap-memory",
+      "script": "test/compat/generated/clip-fade-banner-overlap.ass",
+      "sha256": "c21d65e55629c2d9052923841bc2240fc6d30c0a58c4ae49d9f29bc79446d61a",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-fade-banner-reverse-file",
+      "script": "test/compat/generated/clip-fade-banner-reverse.ass",
+      "sha256": "a797a59492f34808d816dd431a4f9c223b1b79bebfa6eddf777b50d30fa273fd",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-fade-banner-reverse-memory",
+      "script": "test/compat/generated/clip-fade-banner-reverse.ass",
+      "sha256": "a797a59492f34808d816dd431a4f9c223b1b79bebfa6eddf777b50d30fa273fd",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-fade-scroll-control-file",
+      "script": "test/compat/generated/clip-fade-scroll-control.ass",
+      "sha256": "6e3f13b943e0806983e1d01b56fccae545ea44bca5254725f0dd5b413eb242fd",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-fade-scroll-control-memory",
+      "script": "test/compat/generated/clip-fade-scroll-control.ass",
+      "sha256": "6e3f13b943e0806983e1d01b56fccae545ea44bca5254725f0dd5b413eb242fd",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-fade-scroll-up-file",
+      "script": "test/compat/generated/clip-fade-scroll-up.ass",
+      "sha256": "b582534420a1544e9e648e2eb704d8d891315b8827b9808bec5fbdaaffe9d527",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-fade-scroll-up-memory",
+      "script": "test/compat/generated/clip-fade-scroll-up.ass",
+      "sha256": "b582534420a1544e9e648e2eb704d8d891315b8827b9808bec5fbdaaffe9d527",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-fade-scroll-down-file",
+      "script": "test/compat/generated/clip-fade-scroll-down.ass",
+      "sha256": "5ec84b19d08ab74c55219f88fb5253e43e0b8d6f1f5fb54ef09df85eb8b6718a",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-fade-scroll-down-memory",
+      "script": "test/compat/generated/clip-fade-scroll-down.ass",
+      "sha256": "5ec84b19d08ab74c55219f88fb5253e43e0b8d6f1f5fb54ef09df85eb8b6718a",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-fade-scroll-overlap-file",
+      "script": "test/compat/generated/clip-fade-scroll-overlap.ass",
+      "sha256": "d5d8c966bc258bb18eed75fbb5f787b0ed719930e37b80ed1c4fc30d3be3c818",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "clip-fade-scroll-overlap-memory",
+      "script": "test/compat/generated/clip-fade-scroll-overlap.ass",
+      "sha256": "d5d8c966bc258bb18eed75fbb5f787b0ed719930e37b80ed1c4fc30d3be3c818",
       "open": "memory",
       "width": 1280,
       "height": 720,
