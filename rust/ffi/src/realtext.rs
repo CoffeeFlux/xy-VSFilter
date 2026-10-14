@@ -3,7 +3,60 @@ use alloc::boxed::Box;
 use xy_vsfilter_compat::realtext::Tags;
 use xy_vsfilter_compat::realtext_attributes::Attributes;
 use xy_vsfilter_compat::realtext_tag::Tag;
+use xy_vsfilter_compat::realtext_text::Text;
 use xy_vsfilter_compat::realtext_timecode::Timecode;
+
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_realtext_text_create() -> *mut Text {
+    Box::into_raw(Box::new(Text::new()))
+}
+
+/// # Safety
+/// owner is live and exclusively borrowed. Input is a disjoint initialized
+/// u16 span; this loan ends before native callbacks or string updates resume.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_text_next(
+    owner: *mut Text,
+    input: *const u16,
+    length: usize,
+    ignore: u32,
+    response: u32,
+) -> u32 {
+    // SAFETY: initialized native input and a disjoint uniquely owned state.
+    unsafe {
+        let state = &mut *owner;
+        state.next(units(input, length), ignore != 0, response != 0)
+    }
+}
+
+/// # Safety
+/// owner is live and immutable. Invalid scalar queries return zero.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_text_field(
+    owner: *const Text,
+    field: u32,
+    index: usize,
+) -> usize {
+    // SAFETY: bounded immutable access before release.
+    let state = unsafe { &*owner };
+    match field {
+        0 => state.position as usize,
+        1 => usize::from(state.character),
+        2 => state.text.len(),
+        3 => usize::from(state.text.get(index).copied().unwrap_or(0)),
+        _ => 0,
+    }
+}
+
+/// # Safety
+/// Release the unique owner exactly once after all operations.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_text_release(owner: *mut Text) {
+    if !owner.is_null() {
+        // SAFETY: noncopyable native RAII returns the uniquely owned allocation.
+        drop(unsafe { Box::from_raw(owner) });
+    }
+}
 
 #[no_mangle]
 pub extern "C" fn xy_vsfilter_realtext_tag_create() -> *mut Tag {
@@ -287,6 +340,31 @@ pub unsafe extern "C" fn xy_vsfilter_realtext_release(owner: *mut Tags) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn text_scanning_does_not_keep_native_input_borrows() {
+        let owner = xy_vsfilter_realtext_text_create();
+        let mut input = [97u16, 0, 0xd800, 60];
+        // SAFETY: initialized input loaned only during each call, uniquely
+        // owned live state, scalar queries, and a single final release.
+        unsafe {
+            assert_eq!(
+                xy_vsfilter_realtext_text_next(owner, input.as_ptr(), 4, 1, 0),
+                2
+            );
+            input[0] = 98;
+            assert_eq!(
+                xy_vsfilter_realtext_text_next(owner, input.as_ptr(), 4, 1, 0),
+                4
+            );
+            input.fill(7);
+            assert_eq!(xy_vsfilter_realtext_text_field(owner, 2, 0), 3);
+            assert_eq!(xy_vsfilter_realtext_text_field(owner, 3, 0), 98);
+            assert_eq!(xy_vsfilter_realtext_text_field(owner, 3, 2), 0xd800);
+            assert_eq!(xy_vsfilter_realtext_text_field(owner, 3, usize::MAX), 0);
+            xy_vsfilter_realtext_text_release(owner);
+        }
+    }
+
     #[test]
     fn tag_name_storage_survives_native_input_changes() {
         let owner = xy_vsfilter_realtext_tag_create();

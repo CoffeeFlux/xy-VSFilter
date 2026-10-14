@@ -295,6 +295,21 @@ bool CRealTextParser::ExtractTextTag(std::wstring& p_rszLine, Tag& p_rTag)
 
 bool CRealTextParser::ExtractString(std::wstring& p_rszLine, std::wstring& p_rszString)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    // Retain native behavior when source and output are the same string.
+    if (&p_rszLine != &p_rszString) {
+        XyRust::RealTextText parser;
+        bool response = false;
+        for (;;) {
+            const uint32_t action = parser.Next(p_rszLine, m_bTryToIgnoreErrors, response);
+            if (action <= 1) return action != 0;
+            if (action == 2) response = ::iswspace(static_cast<wchar_t>(parser.Field(1))) != 0;
+            else if (action == 3) p_rszString = L"";
+            else if (action == 4) p_rszString += parser.Value();
+            else p_rszLine = p_rszLine.substr(parser.Field(0));
+        }
+    }
+#endif
     if (p_rszLine.empty() || p_rszLine.at(0) == '<') {
         if (m_bTryToIgnoreErrors) {
             p_rszString = L"";
