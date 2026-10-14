@@ -28,7 +28,14 @@ static std::vector<int64_t> rleEvents;
 static bool rleDecline=false;
 static size_t rleAllocationLimit=8192;
 static uint64_t rleOwners=0,rleLoans=0,rleReleases=0,rleDeclines=0,rleAssertions=0;
-static void requireRle(bool value){if(!value){fprintf(stderr,"Invalid RLE storage fixture or ownership\n");std::abort();}}
+static void requireRleImpl(bool value,const char* file,int line){if(!value){fprintf(stderr,"Invalid RLE storage fixture or ownership at %s:%d\n",file,line);std::abort();}}
+#define requireRle(value) requireRleImpl(value,__FILE__,__LINE__)
+static RleRegion& rleBaseRegion(const void* data){
+    // A zero-length view at an allocation base can numerically equal the end
+    // of a neighboring live allocation. Owner snapshots require exact identity.
+    for(auto& region:rleRegions)if(region.data==data)return region;
+    requireRle(false);return rleRegions[0];
+}
 static RleRegion& rleRegion(const void* p,size_t count,size_t& offset){
     const uintptr_t address=reinterpret_cast<uintptr_t>(p);
     for(auto& region:rleRegions){const uintptr_t start=reinterpret_cast<uintptr_t>(region.data);

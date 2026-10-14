@@ -731,6 +731,10 @@ def make_cases(files):
                 tick = Decimal("0.0000001")
                 times = [str(Decimal(t) + offset) for t in range(7) for offset in (-tick, Decimal(0), tick)]
                 cases[-1]["times"] = times + list(reversed(times)) + ["1", "3", "1", "5", "3"]
+            if path.stem.startswith("clip-fade-"):
+                # Fast scrolls can enter and leave between start/midpoint samples.
+                # Keep the visible fade control and sample the early motion too.
+                cases[-1]["times"] = ["0", "0.9999999", "1", "1.0000001", "1.125", "1.25", "1.5", "1.75", "2", "2.5", "3.9999999", "4", "4.0000001", "1.25", "2.5", "1"]
             if path.stem.startswith("layout-rect-"):
                 cases[-1]["times"] = ["0", "0.9999999", "1", "1.5", "1.9999999", "2", "2.5", "3", "3.5", "4", "4.5", "5", "4", "3", "2", "1", "0", "2", "1", "3"]
             warning_styles = {"field-tab-prefixes": "\tDefault", "field-unicode-style-space": "\u2003Default"}

@@ -20,6 +20,44 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* The initial fade renderer run (`38566940506`, x64 job `115861902964`) matched
+  every case's bytes across **798 cases / 8,330 frames**, but correctly failed
+  its scroll visibility control: neither renderer drew at the original sparse
+  sample times. [Recorded control scope](clip-fade-control-scope.json) retains
+  that failure. The control is unchanged; early motion samples are added to all
+  fade fixtures so brief visible intervals are exercised. Corrected rendering
+  and visibility require a new CI run, not relabeling the prior result.
+* Rust owns both VobSub image buffers while retaining the two native capacity
+  predicates and active-plane reset. Fatal ASan/UBSan comparisons pass on both
+  local architectures: **45,018 Alloc calls / 20,665,260 byte/metadata fields /
+  2,952,156 initialized bytes / 13,320,372 unwritten cells tracked without reads /
+  131,334 allocation-cleanup observations / 2,058 modeled false returns / 16,824
+  capacity reuses / 22,858 Rust owners, loans and releases**. **13,416 reuse calls
+  with negative dimensions** preserve the native no-allocation branch. **25,979
+  modeled Rust declines** exercise native allocation fallback. Whole pinned
+  constructor/destructor/Alloc/Free retain partial component writes, zero-sized
+  allocations, first/second modeled CMemoryException cleanup and org dimensions
+  after Free. **1,080 negative allocation-count histories are excluded**, never
+  passes. Ordinary runs initially exposed ambiguous zero-length fixture lookup
+  at adjacent allocation boundaries; exact-base owner lookup and a deterministic
+  adjacency regression fix this. Twenty ordinary arm64 and ten ordinary x64
+  reruns then passed. Allocation/exception boundaries are controlled; pixel
+  consumers, overflowing arithmetic, negative array allocations and actual OOM
+  remain excluded, and native uninitialized nOffset is never observed. Default
+  syntax and Python checks pass; Rust remains at 146 core / 98 FFI tests. The
+  **798-case text corpus** is unchanged. Windows validation and bitmap host
+  playback remain required.
+* Individual CI inspection found a Windows `min` macro collision in the new
+  Gaussian failure diagnostic; its qualified call is now parenthesized. This
+  blocked Windows portable checks in subsequent increments; those jobs are not
+  counted as successful. Linux's fade oracle also observed different FP flags
+  on a null-base early return, before either method reaches a Rust fade call.
+  [The recorded scope](clip-fade-fp-scope.json) keeps ordinary optimized ambient
+  flags unresolved. The full fade oracle now requests FP-observable compilation,
+  with flags still compared exactly; both local architectures pass that form.
+  New CI results are required. The corrected vector-mask commit's actual Windows
+  renderer jobs (`38565161385`) passed on both architectures, separately from
+  these portable-harness failures.
 * Rust owns DVB packet-buffer growth and preserves allocation/copy/release order.
   A native handle swap transfers the new owner's existing loan after the old
   initialized prefix is copied and released. Fatal ASan/UBSan and ordinary

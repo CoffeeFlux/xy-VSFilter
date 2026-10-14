@@ -66,6 +66,11 @@ bool CVobSubImage::Alloc(int w, int h)
         Free();
 
         try {
+#ifdef XY_VSFILTER_RUST_TEXT
+            if (m_temp1Storage.Allocate(static_cast<size_t>(w * h) * sizeof(RGBQUAD)))
+                lpTemp1 = reinterpret_cast<RGBQUAD*>(m_temp1Storage.Data());
+            else
+#endif
             lpTemp1 = DEBUG_NEW RGBQUAD[w * h];
         } catch (CMemoryException* e) {
             ASSERT(FALSE);
@@ -74,10 +79,19 @@ bool CVobSubImage::Alloc(int w, int h)
         }
 
         try {
+#ifdef XY_VSFILTER_RUST_TEXT
+            if (m_temp2Storage.Allocate(static_cast<size_t>((w + 2) * (h + 2)) * sizeof(RGBQUAD)))
+                lpTemp2 = reinterpret_cast<RGBQUAD*>(m_temp2Storage.Data());
+            else
+#endif
             lpTemp2 = DEBUG_NEW RGBQUAD[(w + 2) * (h + 2)];
         } catch (CMemoryException* e) {
             ASSERT(FALSE);
             e->Delete();
+#ifdef XY_VSFILTER_RUST_TEXT
+            if (m_temp1Storage.Ready()) m_temp1Storage.Reset();
+            else
+#endif
             delete [] lpTemp1;
             lpTemp1 = nullptr;
             return false;
@@ -94,7 +108,15 @@ bool CVobSubImage::Alloc(int w, int h)
 
 void CVobSubImage::Free()
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (m_temp1Storage.Ready()) { m_temp1Storage.Reset(); lpTemp1 = nullptr; }
+    else
+#endif
     SAFE_DELETE_ARRAY(lpTemp1);
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (m_temp2Storage.Ready()) { m_temp2Storage.Reset(); lpTemp2 = nullptr; }
+    else
+#endif
     SAFE_DELETE_ARRAY(lpTemp2);
 
     lpPixels = nullptr;
