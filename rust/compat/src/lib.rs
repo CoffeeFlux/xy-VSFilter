@@ -21,6 +21,7 @@ pub mod font;
 pub mod golomb;
 pub mod hdmv;
 pub mod mask;
+pub mod realtext;
 pub mod segment_insert;
 pub mod segments;
 pub mod subrip;

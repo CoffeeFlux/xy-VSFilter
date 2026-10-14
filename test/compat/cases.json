@@ -57,6 +57,14 @@
     [
       "subrip-format-underline-memory",
       "subrip-format-control-memory"
+    ],
+    [
+      "realtext-format-italic-file",
+      "realtext-format-control-file"
+    ],
+    [
+      "realtext-format-italic-memory",
+      "realtext-format-control-memory"
     ]
   ],
   "cases": [
@@ -8914,6 +8922,222 @@
       "id": "subrip-format-raw-utf16-memory",
       "script": "test/compat/generated/subrip-format-raw-utf16.srt",
       "sha256": "e430ad9e866f37f0cf404487aeadd73e90081cec5e7572799775710e5cfe4eaf",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "realtext-format-control-file",
+      "script": "test/compat/generated/realtext-format-control.rt",
+      "sha256": "18eab0497b346d7e6a6f5e17dd0fc7e6f86f32f0a741fa05df41cf02bd3a2ce2",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "realtext-format-control-memory",
+      "script": "test/compat/generated/realtext-format-control.rt",
+      "sha256": "18eab0497b346d7e6a6f5e17dd0fc7e6f86f32f0a741fa05df41cf02bd3a2ce2",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "realtext-format-italic-file",
+      "script": "test/compat/generated/realtext-format-italic.rt",
+      "sha256": "6a9d3263cf1e1b05a26a666d82b0e9e5fe43ef5825c298e2bae0e86b13af16a2",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "realtext-format-italic-memory",
+      "script": "test/compat/generated/realtext-format-italic.rt",
+      "sha256": "6a9d3263cf1e1b05a26a666d82b0e9e5fe43ef5825c298e2bae0e86b13af16a2",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "realtext-format-uppercase-file",
+      "script": "test/compat/generated/realtext-format-uppercase.rt",
+      "sha256": "d89e4d4fe256e8015269113ad9d3f37d91653e348cdd330f095602905a13995e",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "realtext-format-uppercase-memory",
+      "script": "test/compat/generated/realtext-format-uppercase.rt",
+      "sha256": "d89e4d4fe256e8015269113ad9d3f37d91653e348cdd330f095602905a13995e",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "realtext-format-font-bounds-file",
+      "script": "test/compat/generated/realtext-format-font-bounds.rt",
+      "sha256": "361225b33cbc8882f2c6160fe5139d39e6ff8402df23163da7518cd7ca213632",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "realtext-format-font-bounds-memory",
+      "script": "test/compat/generated/realtext-format-font-bounds.rt",
+      "sha256": "361225b33cbc8882f2c6160fe5139d39e6ff8402df23163da7518cd7ca213632",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "realtext-format-formatting-only-file",
+      "script": "test/compat/generated/realtext-format-formatting-only.rt",
+      "sha256": "50ea8abdd5a62935e113cbaa525faac38af7a48e7e08bdf3a74e4d006cb13fa2",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "realtext-format-formatting-only-memory",
+      "script": "test/compat/generated/realtext-format-formatting-only.rt",
+      "sha256": "50ea8abdd5a62935e113cbaa525faac38af7a48e7e08bdf3a74e4d006cb13fa2",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "realtext-format-clear-carry-file",
+      "script": "test/compat/generated/realtext-format-clear-carry.rt",
+      "sha256": "62384bd5d70b3ae5bfc71b47a11e346d1eb2831f5c04cf5ad53d3eabe2af9017",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "realtext-format-clear-carry-memory",
+      "script": "test/compat/generated/realtext-format-clear-carry.rt",
+      "sha256": "62384bd5d70b3ae5bfc71b47a11e346d1eb2831f5c04cf5ad53d3eabe2af9017",
       "open": "memory",
       "width": 1280,
       "height": 720,
