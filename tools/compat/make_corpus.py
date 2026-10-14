@@ -274,6 +274,24 @@ def realtext_variants():
         yield "realtext-format-" + name + ".rt", text.encode("ascii")
 
 
+def ass_header_variants():
+    for name, header in (
+        ("scaled-substring", b"ScaledBorderAndShadow: notyes\r\n"),
+        ("scaled-control", b"ScaledBorderAndShadow: no\r\n"),
+        ("collisions-substring", b"Collisions: unreversed\r\n"),
+        ("collisions-control", b"Collisions: normal\r\n"),
+        ("matrix-prefix-retained", b"YCbCr Matrix: pc.709junk\r\nYCbCr Matrix: unknown\r\n"),
+    ):
+        yield "ass-header-" + name + ".ass", SEED.replace(b"[V4+ Styles]", header + b"[V4+ Styles]").replace(b"COMPAT_TEXT", b"Header sample")
+    yield "ass-header-playres-x-only.ass", SEED.replace(b"PlayResX: 640", b"PlayResX: 1280").replace(b"PlayResY: 360\r\n", b"").replace(b"COMPAT_TEXT", b"Header sample")
+    yield "ass-header-playres-y-only.ass", SEED.replace(b"PlayResY: 360", b"PlayResY: 1024").replace(b"PlayResX: 640\r\n", b"").replace(b"COMPAT_TEXT", b"Header sample")
+    legacy = (b"[Script Info]\r\nScriptType: v4.00+\r\nPlayResX: 640\r\nPlayResY: 360\r\n"
+              b"[V4 Styles]\r\nScriptType: unknown\r\n"
+              b"Style: Default,Arial,36,16777215,255,0,0,0,0,1,2,1,2,10,10,10,0,1\r\n"
+              b"[Events]\r\nDialogue: 7,0:00:01.00,0:00:04.00,Default,,0,0,0,,Header sample\r\n")
+    yield "ass-header-unknown-script-preserves-style.ass", legacy
+
+
 def ass_style_variants():
     for name, version, alpha, alignment, border, size in (
         ("v3", 3, 0, 2, 1, "36"),
@@ -447,7 +465,8 @@ def make_cases(files):
                                                     ("sami-format-italic", "sami-format-control"),
                                                     ("sami-format-font-black", "sami-format-font-zero"),
                                                     ("encoding-western", "encoding-western-control"),
-                                                    ("ass-style-v5-box", "ass-style-v5-outline"))
+                                                    ("ass-style-v5-box", "ass-style-v5-outline"),
+                                                    ("ass-header-scaled-substring", "ass-header-scaled-control"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -460,6 +479,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in incremental_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in subrip_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in realtext_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in ass_header_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_style_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_dialogue_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in encoding_variants()]

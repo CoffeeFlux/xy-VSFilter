@@ -111,6 +111,20 @@ public:
         pos=std::max(0,std::min(pos,GetLength()));text.insert(static_cast<size_t>(pos),value);return GetLength();
 #endif
     }
+    MicroString Right(int count)const{
+#ifdef _WIN32
+        auto result=text.Right(count);return MicroString(result.GetString(),result.GetLength());
+#else
+        count=std::max(0,std::min(count,GetLength()));return Mid(GetLength()-count,count);
+#endif
+    }
+    void Truncate(int length){
+#ifdef _WIN32
+        text.Truncate(length);
+#else
+        text.resize(static_cast<size_t>(length));
+#endif
+    }
     MicroString Mid(int start)const{
 #ifdef _WIN32
         auto result=text.Mid(start);return MicroString(result.GetString(),result.GetLength());

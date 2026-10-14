@@ -113,6 +113,14 @@
     [
       "ass-style-v5-box-memory",
       "ass-style-v5-outline-memory"
+    ],
+    [
+      "ass-header-scaled-substring-file",
+      "ass-header-scaled-control-file"
+    ],
+    [
+      "ass-header-scaled-substring-memory",
+      "ass-header-scaled-control-memory"
     ]
   ],
   "cases": [
@@ -9196,6 +9204,358 @@
         "3.9999999",
         "4",
         "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-header-scaled-substring-file",
+      "script": "test/compat/generated/ass-header-scaled-substring.ass",
+      "sha256": "b8ae0423e2459e0497d81f2bbfea29e02e3973be1febd948cf6255ea337a08ea",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-header-scaled-substring-memory",
+      "script": "test/compat/generated/ass-header-scaled-substring.ass",
+      "sha256": "b8ae0423e2459e0497d81f2bbfea29e02e3973be1febd948cf6255ea337a08ea",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-header-scaled-control-file",
+      "script": "test/compat/generated/ass-header-scaled-control.ass",
+      "sha256": "5fd71d096d99b38be897a5e393fb92735e169f182a98323f9d3df91a54f0e067",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-header-scaled-control-memory",
+      "script": "test/compat/generated/ass-header-scaled-control.ass",
+      "sha256": "5fd71d096d99b38be897a5e393fb92735e169f182a98323f9d3df91a54f0e067",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-header-collisions-substring-file",
+      "script": "test/compat/generated/ass-header-collisions-substring.ass",
+      "sha256": "331ccf4578e334c23f51d92ad12b77237fa9c788643acd308f131b09db245dd3",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-header-collisions-substring-memory",
+      "script": "test/compat/generated/ass-header-collisions-substring.ass",
+      "sha256": "331ccf4578e334c23f51d92ad12b77237fa9c788643acd308f131b09db245dd3",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-header-collisions-control-file",
+      "script": "test/compat/generated/ass-header-collisions-control.ass",
+      "sha256": "96d61e9d4e2f43a7b48c530d0f5c5d75e620127277241dd6343a6bdab431125a",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-header-collisions-control-memory",
+      "script": "test/compat/generated/ass-header-collisions-control.ass",
+      "sha256": "96d61e9d4e2f43a7b48c530d0f5c5d75e620127277241dd6343a6bdab431125a",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-header-matrix-prefix-retained-file",
+      "script": "test/compat/generated/ass-header-matrix-prefix-retained.ass",
+      "sha256": "7ac5c20b0d6e737be03807c494500a8beba0da19a42c6cb61c0aa0d0452cf38b",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-header-matrix-prefix-retained-memory",
+      "script": "test/compat/generated/ass-header-matrix-prefix-retained.ass",
+      "sha256": "7ac5c20b0d6e737be03807c494500a8beba0da19a42c6cb61c0aa0d0452cf38b",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-header-playres-x-only-file",
+      "script": "test/compat/generated/ass-header-playres-x-only.ass",
+      "sha256": "08ab7d4ee9962c0b62e3b94f74ed13d1687937d78f6c9f434d6424e83fb7604d",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-header-playres-x-only-memory",
+      "script": "test/compat/generated/ass-header-playres-x-only.ass",
+      "sha256": "08ab7d4ee9962c0b62e3b94f74ed13d1687937d78f6c9f434d6424e83fb7604d",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-header-playres-y-only-file",
+      "script": "test/compat/generated/ass-header-playres-y-only.ass",
+      "sha256": "3cb466602414860e6d7465c4416a724a573e4e2a7297421515e86369d74fb85d",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-header-playres-y-only-memory",
+      "script": "test/compat/generated/ass-header-playres-y-only.ass",
+      "sha256": "3cb466602414860e6d7465c4416a724a573e4e2a7297421515e86369d74fb85d",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-header-unknown-script-preserves-style-file",
+      "script": "test/compat/generated/ass-header-unknown-script-preserves-style.ass",
+      "sha256": "8ce3a31c8c91f183a144e5a9b3ff93d22952db92f044a5ba22dfbaf192ae95f1",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-header-unknown-script-preserves-style-memory",
+      "script": "test/compat/generated/ass-header-unknown-script-preserves-style.ass",
+      "sha256": "8ce3a31c8c91f183a144e5a9b3ff93d22952db92f044a5ba22dfbaf192ae95f1",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
       ],
       "stride_padding": 16,
       "fill_seed": 31

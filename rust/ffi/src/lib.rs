@@ -125,3 +125,5 @@ mod encoding;
 mod ass_dialogue;
 
 mod ass_style;
+
+mod ass_headers;

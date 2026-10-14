@@ -55,7 +55,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
               ROOT / "include/xy_rust_drawing.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
-              ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
+              ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
               ROOT / "include/xy_rust_cc.h", ROOT / "src/subtitles/CCDecoder.cpp", ROOT / "src/subtitles/CCDecoder.h",
               ROOT / "include/xy_rust_segments.h",
@@ -204,6 +204,27 @@ public:
         webvtt += extract_definition(content.decode("utf-8-sig"), "static void WebVTTCueStrip(") + "\n"
         webvtt += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_webvtt.h").write_text(webvtt, encoding="utf-8")
+    document = '#include "ass_document_shell.h"\n'
+    for signature in ("STSStyle::STSStyle(", "void STSStyle::SetDefault("):
+        document += extract_definition(font_source.decode("utf-8-sig"), signature) + "\n"
+    for name, content in (("ReferenceAssDocument", font_source), ("CandidateAssDocument", candidate_font)):
+        decoded = content.decode("utf-8-sig")
+        document += f"namespace {name} {{\n"
+        if name == "CandidateAssDocument":
+            document += "#define XY_VSFILTER_RUST_TEXT\n"
+        for signature in ("static inline CStringW GetStr(", "static inline int GetInt(", "static inline double GetFloat(", "static inline CStringW::PCXSTR TryNextStr(", "static inline int NextInt(", "static bool LoadUUEFont("):
+            document += extract_definition(decoded, signature) + "\n"
+        start = decoded.index("static bool OpenSubStationAlpha(")
+        end = decoded.index("static bool OpenXombieSub(", start)
+        definition = decoded[start:end].rstrip()
+        assert definition.endswith("}")
+        definition = re.sub(r"(\d+)i64\b", r"\1LL", definition)
+        if name == "CandidateAssDocument":
+            for before, after in (("XyRust::AssHeaders headers", "XyRust::ObservedAssHeaders headers"), ("XyRust::AssStyle fields", "XyRust::ObservedAssStyle fields"), ("XyRust::AssDialogue dialogue", "XyRust::ObservedAssDialogue dialogue")):
+                assert definition.count(before) == 1
+                definition = definition.replace(before, after)
+        document += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_ass_document.h").write_text(document, encoding="utf-8")
     style = '#include "ass_style_shell.h"\n'
     for signature in ("STSStyle::STSStyle(", "void STSStyle::SetDefault("):
         style += extract_definition(font_source.decode("utf-8-sig"), signature) + "\n"
@@ -885,6 +906,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     find_char_result = run([str(find_char_executable)], capture_output=True, text=True)
     print(find_char_result.stdout, end="", flush=True)
     print(find_char_result.stderr, end="", file=sys.stderr)
+    document_executable = destination / ("ass-document-oracle.exe" if os.name == "nt" else "ass-document-oracle")
+    document_compile = [arg.replace("find_char_oracle.cpp", "ass_document_oracle.cpp").replace("find-char-oracle", "ass-document-oracle") for arg in find_char_compile]
+    run(document_compile)
+    document_result = run([str(document_executable)], capture_output=True, text=True)
+    print(document_result.stdout, end="", flush=True)
+    print(document_result.stderr, end="", file=sys.stderr)
     style_executable = destination / ("ass-style-oracle.exe" if os.name == "nt" else "ass-style-oracle")
     style_compile = [arg.replace("find_char_oracle.cpp", "ass_style_oracle.cpp").replace("find-char-oracle", "ass-style-oracle") for arg in find_char_compile]
     run(style_compile)
@@ -1226,6 +1253,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "webvtt_compile_command": webvtt_compile,
         "webvtt_result": webvtt_result.stdout, "webvtt_stderr": webvtt_result.stderr,
         "webvtt_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring model with host iswspace; Windows comparison required",
+        "ass_document_compile_command": document_compile,
+        "ass_document_result": document_result.stdout, "ass_document_stderr": document_result.stderr,
+        "ass_document_scope": "Complete pinned OpenSubStationAlpha and LoadUUEFont, including migrated dialogue/style branches; native ATL/CRT in Windows CI, portable strings elsewhere; controlled line I/O, FastTrim utility, style-map and font-registration boundaries; complete retained settings, entry arguments, input position, callback order/interruption and partial failures; representable numeric arithmetic only",
         "ass_style_compile_command": style_compile,
         "ass_style_result": style_result.stdout, "ass_style_stderr": style_result.stderr,
         "ass_style_scope": "Complete pinned style branch and native defaults; actual ATL/CRT in Windows CI, portable string model elsewhere; remaining input, all style fields/float bits, errno/floating flags, retained numeric callbacks and interruptions; GetStr private TrimLeft call identity already replaced by prior StringField migration; overflowing scanf conversions and full file/style-map integration excluded",

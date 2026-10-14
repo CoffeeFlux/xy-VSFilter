@@ -20,6 +20,30 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns ASS header classification, acceptance/version state, collision
+  and scaled-border substring decisions, and YCbCr matrix/range prefix selection.
+  Native trimming, lowercase, suffix comparisons, numeric conversion, resolution
+  arithmetic and public subtitle fields remain in order. Style section versions
+  stay independent of dialogue versions; an unrecognized ScriptType changes
+  neither. NUL-terminated header comparisons and permissive suffix/substring
+  matches are preserved, including `notyes` enabling scaled borders.
+  A new complete-parser oracle extracts pinned `OpenSubStationAlpha` and
+  `LoadUUEFont`, integrating the migrated dialogue/style branches. Fatal
+  ASan/UBSan comparisons passed **146,811 documents** on arm64 and under x64
+  execution: **71,624 accepted / 75,150 rejected / 37 escaping exceptions**,
+  **8,019 style calls / 7,938 dialogue calls**, **16,752,683 callback observation
+  values**, **117 interruptions**, **7,014 read-time setting mutations**, and
+  **351,532 Rust classifications / 88,730 value selections / 10,916 version
+  replies**. Retained settings, entry arguments, file position, errors, errno and
+  floating status match. Final-line EOF, repeated headers, every UTF-16 value,
+  embedded NULs, partial failures and consumed font-section headers are covered.
+  Line I/O, FastTrim, style-map storage and OS font registration are modeled
+  boundaries; their full integration is not established by this extracted test.
+  Eight header scripts and a scaled-border visible control expand renderer
+  validation to **494 cases**. Rust 1.85 tests (96 core, 64 FFI), strict Clippy,
+  default syntax and Python harness checks pass. Windows/Miri and full renderer
+  validation are pending. Native numeric/floating behavior, line/file ownership,
+  font registration and complete host integration remain separate work.
 * Safe Rust owns ASS style remainder buffers, version-dependent field order and
   integer normalization. Legacy outline-color remapping, alpha clamping, negative
   charset fallback, border-style mapping and alignment bit precedence preserve
@@ -76,9 +100,13 @@ unresolved reference outcomes requiring investigation, never matching results.
   **158,384 SSA owners / 1,882,917 steps / 721,707 appended fragments**. Every
   UTF-16 value is now also exercised inside SSA charset transitions. Rust 1.85
   tests (90 core, 61 FFI), strict Clippy, default syntax and corpus freshness pass.
-  Windows/Miri and complete renderer validation are pending. Native code-page
-  conversion, numeric parsing, text export and host integration remain separate
-  work; the portable conversion models do not establish Windows API behavior.
+  Candidate `b002fd59` passed all four portable platforms, Miri and both Windows
+  DLL jobs, each matching **446 cases / 4,938 frames** and **32 mutations / 224
+  frames**, plus dialogs, visible controls, exports and dependencies. Both logs
+  confirm Rust-enabled `STS.cpp` compilation. [SSA conversion evidence](ssa-encoding-evidence.json)
+  records verified hashes and stable local validation. Native code-page conversion,
+  numeric parsing, text export and host integration remain separate work; portable
+  conversion models do not establish Windows API behavior.
 * Safe Rust owns the raw input/output buffers and iteration for `ToMBCS` and
   `ToUnicode`. Native charset translation, lead-byte classification and conversion
   APIs remain in order. Conversion still runs one UTF-16 unit at a time; failed
@@ -94,9 +122,14 @@ unresolved reference outcomes requiring investigation, never matching results.
   portable conversion models do not establish Windows conversion behavior.
   Eight legacy-encoded ASS scripts, with a visible accent control, expand the
   rendering corpus to **446 cases**. Rust 1.85 tests (89 core, 60 FFI), strict
-  Clippy, default syntax and Python harness checks pass. Windows/Miri and complete
-  rendering validation are pending. SSA wrapper ownership, native conversion,
-  text export and complete host integration remain separate work.
+  Clippy, default syntax and Python harness checks pass. Candidate `83d17f8c`
+  passed all four portable platforms, Miri and both Windows DLL jobs: each matched
+  **446 cases / 4,938 frames** and **32 mutations / 224 frames**, plus dialogs,
+  visible controls, exports and dependencies. Both logs confirm Rust-enabled
+  `STS.cpp` compilation. [Encoding evidence](encoding-evidence.json) records
+  verified hashes and stable local validation. SSA wrapper ownership follows in
+  the later increment above; native conversion, text export and complete host
+  integration remain separate work.
 * Safe Rust owns SAMI font-argument cleanup, the remaining argument buffer and
   the current color value. Quote/hash removal, exact `color=` recognition, token
   consumption before lookup, and ignored/empty attributes retain native order.
