@@ -1,7 +1,7 @@
 import tempfile
 import unittest
 from unittest.mock import patch
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 import document_style_api_check as check
 
 
@@ -17,6 +17,12 @@ class StyleRunnerTests(unittest.TestCase):
 
     def test_complete_long_trace(self):
         check.validate_trace(self.trace(), b'', 0, 'long-name', 64)
+
+    def test_video_filter_requires_checked_media_setup(self):
+        trace = self.trace().replace(b'load hr=0', b'setup.video_check hr=0\nsetup.video hr=0\nload hr=0')
+        check.validate_trace(trace, b'', 0, 'long-name', 64, video_setup=True)
+        with self.assertRaises(ValueError):
+            check.validate_trace(self.trace(), b'', 0, 'long-name', 64, video_setup=True)
 
     def test_normal_complete_rows_and_late_status_required(self):
         lines = ['provenance pointer_bits=64', 'factory hr=0', 'create hr=0',
@@ -51,19 +57,28 @@ class StyleRunnerTests(unittest.TestCase):
                     check.validate_trace(data, stderr, code, 'long-name', 64)
 
     def test_wrapper_has_isolated_helper_and_paths(self):
+        for path_type in (PurePosixPath, PureWindowsPath):
+            with self.subTest(path_type=path_type):
+                self.check_wrapper_paths(path_type)
+
+    def check_wrapper_paths(self, path_type):
         import xml.etree.ElementTree as ET
-        text = check.wrapper_xml(Path('/repo/src/filters/VSFilter.vcxproj'), Path('/helper/a&b.cpp'), Path('/repo'), Path('/out'), Path('/int'), Path('/libs'))
+        project = path_type('/repo/src/filters/VSFilter.vcxproj')
+        source = path_type('/helper/a&b.cpp')
+        repo = path_type('/repo')
+        libs = path_type('/libs')
+        text = check.wrapper_xml(project, source, repo, path_type('/out'), path_type('/int'), libs)
         root = ET.fromstring(text)
         ns = {'m': 'http://schemas.microsoft.com/developer/msbuild/2003'}
         self.assertEqual(root.find('m:Import', ns).attrib['Project'], 'VSFilter.vcxproj')
         helper = root.find('m:ItemGroup/m:ClCompile', ns)
-        self.assertEqual(helper.attrib['Include'], '/helper/a&b.cpp')
+        self.assertEqual(helper.attrib['Include'], str(source))
         self.assertEqual(helper.find('m:PrecompiledHeader', ns).text, 'NotUsing')
         self.assertIn('/Y-', helper.find('m:AdditionalOptions', ns).text)
         self.assertIn('XY_DOCUMENT_STYLE_TEST_HELPER', helper.find('m:PreprocessorDefinitions', ns).text)
         self.assertEqual(helper.find('m:AdditionalIncludeDirectories', ns).text,
-                         '/repo/src;/repo/src/filters;%(AdditionalIncludeDirectories)')
-        self.assertIn('/libs;', text)
+                         f'{repo / "src"};{project.parent};%(AdditionalIncludeDirectories)')
+        self.assertIn(str(libs) + ';', text)
         self.assertNotIn('RustTextDecoder', text)
         self.assertNotIn('ModuleDefinitionFile', text)
 

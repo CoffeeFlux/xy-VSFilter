@@ -708,6 +708,18 @@ under that run's `document-style-api` evidence; it reached no style-API runtime
 comparison and does not establish a behavioral mismatch. Windows validation
 of the corrected harness remains pending.
 
+At `d6bd058c` the reference test DLL builds, but filename setup returns ordinary
+`E_FAIL` before style comparisons. The host's isolated registry root is now
+nonvolatile so MFC can create its ordinary profile subkeys; the runner still
+deletes the UUID subtree. The helper requires the constructor's `.` search path
+to have persisted, and checks that the fixture exists. For DirectVobSubFilter it
+also checks and assigns an initialized RGB32 input media type through the actual
+input pin, enabling the normal subpicture provider and active subtitle selection.
+This is bounded in-module setup, not graph/player validation. The Windows Python
+wrapper test also now exercises both Windows and POSIX path syntax explicitly.
+These corrections await Windows validation; the prior `E_FAIL` is retained as a
+setup failure, not a passing style comparison.
+
 
 ### D2b supplied style values
 

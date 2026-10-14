@@ -28,7 +28,10 @@ int wmain(int argc,wchar_t** argv){
     for(size_t i=prefix.size();i<path.size();++i)
         if(!((path[i]>=L'0'&&path[i]<=L'9')||(path[i]>=L'a'&&path[i]<=L'f')||path[i]==L'-'))return 2;
     HKEY settings=nullptr;
-    if(RegCreateKeyExW(HKEY_CURRENT_USER,key,0,nullptr,REG_OPTION_VOLATILE,KEY_ALL_ACCESS,nullptr,&settings,nullptr)!=ERROR_SUCCESS||
+    // MFC creates ordinary profile subkeys. A volatile parent rejects those
+    // writes (ERROR_CHILD_MUST_BE_VOLATILE), leaving subtitle search paths empty.
+    // The UUID subtree is still isolated and deleted by the runner on exit.
+    if(RegCreateKeyExW(HKEY_CURRENT_USER,key,0,nullptr,REG_OPTION_NON_VOLATILE,KEY_ALL_ACCESS,nullptr,&settings,nullptr)!=ERROR_SUCCESS||
        RegOverridePredefKey(HKEY_CURRENT_USER,settings)!=ERROR_SUCCESS)return 5;
     // Override and handle survive DLL detach. Runner deletes the private key
     // after this process exits, as with com_contract_probe.cpp.

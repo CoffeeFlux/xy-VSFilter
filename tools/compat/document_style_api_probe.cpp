@@ -8,6 +8,10 @@
 #include "subtitles/stdafx.h"
 #include "subtitles/STS.h"
 #include "filters/transform/vsfilter/IDirectVobSubXy.h"
+#include "filters/transform/vsfilter/VSFilter.h"
+#ifndef XY_SUB_FILTER_DLL
+#include "filters/transform/vsfilter/DirectVobSubFilter.h"
+#endif
 #include <iostream>
 #include <iomanip>
 #include <sstream>
@@ -53,6 +57,7 @@ STDAPI DllGetClassObject(REFCLSID, REFIID, LPVOID*);
 #endif
 extern "C" __declspec(dllexport) uint32_t __cdecl xy_document_style_test_v1(
     const wchar_t* clsid_text,const wchar_t* fixture,const wchar_t* mode) {
+    AFX_MANAGE_STATE(AfxGetStaticModuleState());
     std::cout<<std::unitbuf;
     try {
         require(clsid_text&&fixture&&mode,"null helper argument");
@@ -66,6 +71,37 @@ extern "C" __declspec(dllexport) uint32_t __cdecl xy_document_style_test_v1(
             CComPtr<IXyOptions> api;
             h=factory->CreateInstance(nullptr,__uuidof(IXyOptions),reinterpret_cast<void**>(&api));
             status("create",h);require(h==S_OK&&api,"IXyOptions creation failed");
+            // Fail explicitly if isolated profile writes were unavailable.
+            CString path_key;path_key.Format(ResStr(IDS_RP_PATH),0);
+            require(theApp.GetProfileString(ResStr(IDS_R_DEFTEXTPATHES),path_key)==_T("."),
+                    "constructor subtitle search path was not persisted");
+            require(GetFileAttributesW(fixture)!=INVALID_FILE_ATTRIBUTES,"fixture file missing");
+#ifndef XY_SUB_FILTER_DLL
+            // The video filter selects an active subtitle only once its input
+            // media type has initialized the normal subpicture provider. All
+            // objects and calls stay inside this actual filter module.
+            auto filter=dynamic_cast<CDirectVobSubFilter*>(api.p);
+            require(filter!=nullptr,"unexpected video filter class");
+            auto input=dynamic_cast<CTransformInputPin*>(filter->GetPin(0));
+            require(input!=nullptr,"missing video input pin");
+            VIDEOINFOHEADER video={};
+            video.AvgTimePerFrame=400000;
+            video.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
+            video.bmiHeader.biWidth=640;video.bmiHeader.biHeight=480;
+            video.bmiHeader.biPlanes=1;video.bmiHeader.biBitCount=32;
+            video.bmiHeader.biCompression=BI_RGB;
+            video.bmiHeader.biSizeImage=640*480*4;
+            CMediaType media;
+            media.SetType(&MEDIATYPE_Video);media.SetSubtype(&MEDIASUBTYPE_RGB32);
+            media.SetFormatType(&FORMAT_VideoInfo);media.SetTemporalCompression(FALSE);
+            media.SetSampleSize(video.bmiHeader.biSizeImage);
+            require(media.SetFormat(reinterpret_cast<BYTE*>(&video),sizeof(video))!=FALSE,
+                    "video format allocation failed");
+            h=input->CheckMediaType(&media);status("setup.video_check",h);
+            require(h==S_OK,"video input media type rejected");
+            h=input->SetMediaType(&media);status("setup.video",h);
+            require(h==S_OK,"video input media type setup failed");
+#endif
             const size_t length=wcslen(fixture);
             require(length<=INT_MAX,"fixture path too long");
             h=api->XySetString(STRING_FILE_NAME,const_cast<wchar_t*>(fixture),static_cast<int>(length));
