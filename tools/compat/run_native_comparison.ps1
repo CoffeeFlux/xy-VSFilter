@@ -85,6 +85,11 @@ try {
         --cases "$evidence\smoke-cases.json" --output "$evidence\smoke" --timeout 30 `
         --environment-label "GitHub windows-2022; VS2022 Release $Platform; initial DLL smoke check"
     if ($LASTEXITCODE -ne 0) { throw "DLL smoke comparison failed; inspect $evidence\smoke\report.json" }
+    $documentStorage = if ($RustDocumentOwner) { "rust-experimental" } else { "native" }
+    & python "$PSScriptRoot\document_native_lifecycle.py" --reference-root $baselineRoot `
+        --candidate-root $candidateRoot --platform $Platform --document-storage $documentStorage `
+        --output "$evidence\document-lifecycle"
+    if ($LASTEXITCODE -ne 0) { throw "Native document lifecycle comparison failed; inspect $evidence\document-lifecycle\report.json" }
     & python "$PSScriptRoot\csri_compare.py" --reference $original --candidate $candidate `
         --output "$evidence\csri" --timeout 15 `
         --environment-label "GitHub windows-2022; VS2022 Release $Platform; stock runner fonts; pinned baseline"

@@ -160,6 +160,41 @@ def summarize_native(run, platform, candidate, reference, document_storage="nati
                                                 "passed": True, "scope": com["scope"], "headers": com["headers"],
                                                 "reference_exclusions": com["reference_exclusions"], "candidate_only_controls": 2,
                                                 "settings_environment": com["settings_environment"]}
+    has_document_probe = subprocess.run(
+        ["git", "cat-file", "-e", f"{candidate}:tools/compat/document_native_lifecycle.cpp"],
+        cwd=ROOT, capture_output=True).returncode == 0
+    if has_document_probe:
+        from document_native_lifecycle import compare_traces
+        directory = base / "document-lifecycle"
+        path = directory / "report.json"
+        document = load(path)
+        for flag in ("complete", "equal", "repeat_equal", "stderr_empty", "inputs_unchanged"):
+            assert document[flag] is True
+        assert document["candidate_commit"] == candidate and document["reference_commit"] == reference
+        assert document["platform"] == platform and document["document_storage"] == document_storage
+        sources = [(candidate, "tools/compat/document_native_lifecycle.cpp", document["probe_sha256"]),
+                   (candidate, "tools/compat/document_native_lifecycle.py", document["runner_sha256"])]
+        traces = []
+        for side, commit in (("reference", reference), ("candidate", candidate)):
+            details = document["builds"][side]
+            assert details["binary_sha256"] == sha(directory / side / "document-native-lifecycle.exe")
+            assert details["source_header_sha256"], "Native source headers were not captured"
+            sources.extend((commit, name, digest) for name, digest in details["source_header_sha256"].items())
+            for repeat in (1, 2):
+                traces.append((directory / f"{side}-trace-{repeat}.stdout").read_bytes())
+                assert not (directory / f"{side}-trace-{repeat}.stderr").read_bytes()
+        for commit, name, digest in sources:
+            raw = subprocess.run(["git", "show", f"{commit}:{name}"], cwd=ROOT,
+                                 check=True, capture_output=True).stdout
+            lf = raw.replace(b"\r\n", b"\n")
+            assert digest in {hashlib.sha256(data).hexdigest() for data in (raw, lf, lf.replace(b"\n", b"\r\n"))}
+        compare_traces(traces, 32 if platform == "Win32" else 64)
+        assert [hashlib.sha256(trace).hexdigest() for trace in traces] == document["trace_sha256"]
+        entry["checks"]["document-lifecycle"] = {
+            "report_sha256": sha(path), "equal": True, "trace_lines": document["trace_lines"],
+            "limits": document["limits"],
+            "library_hash_scope": "Build-library hashes are runner-reported; executables, source headers and traces rehashed",
+        }
     log = (base / "candidate.log").read_text(errors="replace")
     assert "XY_VSFILTER_RUST_TEXT" in log and "xy_vsfilter_ffi.lib" in log
     if document_storage == "rust-experimental":

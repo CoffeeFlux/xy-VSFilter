@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "candidate_commit": "30d087bd28241519dfddd908cb7bdc14725f4b66",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38623532342",
+  "scope": "Actual experimental native adapter with ATL records against extracted pinned storage methods; not full CSimpleTextSubtitle lifecycle or renderer parity.",
+  "workflow_conclusion": "failure",
+  "workflow_failure": "Broad check_decoder extraction still searched for m_entries.GetCount after facade spelling changed; focused document steps passed.",
+  "architectures": {
+    "i686-pc-windows-msvc": {
+      "job_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38623532342/job/116056817176",
+      "focused_step_conclusion": "success",
+      "artifact_report": "artifacts/ci-38623532342/document-evidence-i686-pc-windows-msvc/document-primitives/i686-pc-windows-msvc/owner/report.json",
+      "report_sha256": "25b5346f9384cb76921264c9444cbc8baa690e93a31911a2e9f569af68e24866",
+      "checks": 3745,
+      "states": 32,
+      "trace_lines": 2361,
+      "trace_sha256": [
+        "caa3c2c2cab4c176d4b06bb55e5c03b2d263bfcb9ac17a6953d78a54d0df061e",
+        "caa3c2c2cab4c176d4b06bb55e5c03b2d263bfcb9ac17a6953d78a54d0df061e"
+      ],
+      "binary_sha256": "4af9ddd20c47434c52e084c9fa19f86111f69ccd183c781112bf1986ffd1e20d",
+      "static_library_sha256_recorded": "790baf63c70b2dc85aadfb02ec791146d5298c6ae1d6858e89afb423ad7b10b8",
+      "generated_sha256": {
+        "STS.h": "7e8e944c839c3daa5131b2bf383a4613dc151df9e28394f8ff37878ee90ff91a",
+        "RustDocumentOwner.h": "cd7779e6506a067e49d6d52926d110d53ca5c9e7f1a1c0f24bc7dcc902b90271",
+        "document_owner_probe.cpp": "b8145adc2aa28b1fe5422f0e07b501b622e69ec15a7b3aeca72a01467c1d60c7",
+        "document_owner_reference.inc": "66e32a31e653c49068d764c5f6f8d15523384ded3ff6a9bf5b190fb82bf1f8c7"
+      },
+      "msvc_tools_version": "14.44.35207",
+      "windows_sdk_version": "10.0.26100.0\\",
+      "source_provenance": "All recorded candidate/reference source hashes verified against Git, allowing checkout line endings; generated inputs, executable, and repeated traces rehashed. Static library is not in retained owner artifact; its hash remains runner-reported.",
+      "seams": [
+        "Add/AddSTSEntryOnly from initialized record/readorder assignment; native preparation bypassed",
+        "Copy storage tail and Empty arrays tail only; native style/metadata lifecycle excluded",
+        "SetStr prepared assignment and optional ConvertUnicode flag assignment only",
+        "Actual AddStyle entry-rename loop; style map/duplicate naming excluded",
+        "RTS animation OR assignment and MicroDVD correction with precomputed bound",
+        "Native conversion assignment loop with caller-precomputed times, then rebuild",
+        "Full native Sort selects a permutation; owner applies indexes and rebuilds"
+      ],
+      "limits": [
+        "Actual wrapper and ATL values, minimal pinned-owner/current-facade shells; not whole class ABI or renderer integration",
+        "TIME queries and bounded FRAME translation remain native CRT on both sides; no numeric port claim",
+        "No callback/reentry/concurrency/allocation-failure parity; destructor failure remains experimental unresolved contract",
+        "Known unresolved WebVTT end and stale-index Add histories are not executed"
+      ]
+    },
+    "x86_64-pc-windows-msvc": {
+      "job_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38623532342/job/116056816963",
+      "focused_step_conclusion": "success",
+      "artifact_report": "artifacts/ci-38623532342/document-evidence-x86_64-pc-windows-msvc/document-primitives/x86_64-pc-windows-msvc/owner/report.json",
+      "report_sha256": "7b5ac0055fa715a8561e05a312f1008a1183e1086775c30e75a13b1dd5a68216",
+      "checks": 3745,
+      "states": 32,
+      "trace_lines": 2361,
+      "trace_sha256": [
+        "2b3a68b6ae7d64bd5476e6dce49ea9bb4a1a4eac72c1ec1cc854b75130804e8c",
+        "2b3a68b6ae7d64bd5476e6dce49ea9bb4a1a4eac72c1ec1cc854b75130804e8c"
+      ],
+      "binary_sha256": "6c398ec10c8b00c9416ab7ea9c06d934dbad9fdebb69eeedf59a4390a4836a62",
+      "static_library_sha256_recorded": "334f4ab772d09f6cd7c2e9a2706ae361cf728931eb95eb2a9ea7164b10af67df",
+      "generated_sha256": {
+        "STS.h": "7e8e944c839c3daa5131b2bf383a4613dc151df9e28394f8ff37878ee90ff91a",
+        "RustDocumentOwner.h": "cd7779e6506a067e49d6d52926d110d53ca5c9e7f1a1c0f24bc7dcc902b90271",
+        "document_owner_probe.cpp": "b8145adc2aa28b1fe5422f0e07b501b622e69ec15a7b3aeca72a01467c1d60c7",
+        "document_owner_reference.inc": "66e32a31e653c49068d764c5f6f8d15523384ded3ff6a9bf5b190fb82bf1f8c7"
+      },
+      "msvc_tools_version": "14.44.35207",
+      "windows_sdk_version": "10.0.26100.0\\",
+      "source_provenance": "All recorded candidate/reference source hashes verified against Git, allowing checkout line endings; generated inputs, executable, and repeated traces rehashed. Static library is not in retained owner artifact; its hash remains runner-reported.",
+      "seams": [
+        "Add/AddSTSEntryOnly from initialized record/readorder assignment; native preparation bypassed",
+        "Copy storage tail and Empty arrays tail only; native style/metadata lifecycle excluded",
+        "SetStr prepared assignment and optional ConvertUnicode flag assignment only",
+        "Actual AddStyle entry-rename loop; style map/duplicate naming excluded",
+        "RTS animation OR assignment and MicroDVD correction with precomputed bound",
+        "Native conversion assignment loop with caller-precomputed times, then rebuild",
+        "Full native Sort selects a permutation; owner applies indexes and rebuilds"
+      ],
+      "limits": [
+        "Actual wrapper and ATL values, minimal pinned-owner/current-facade shells; not whole class ABI or renderer integration",
+        "TIME queries and bounded FRAME translation remain native CRT on both sides; no numeric port claim",
+        "No callback/reentry/concurrency/allocation-failure parity; destructor failure remains experimental unresolved contract",
+        "Known unresolved WebVTT end and stale-index Add histories are not executed"
+      ]
+    }
+  },
+  "miri": {
+    "conclusion": "success",
+    "job_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38623532342/job/116056816972"
+  }
+}

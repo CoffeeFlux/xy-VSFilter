@@ -555,16 +555,19 @@ public:
             fields += extract_method(content.decode("utf-8-sig"), signature) + "\n"
         fields += "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_fields.h").write_text(fields, encoding="utf-8")
+    document_count_bindings = "#define GetEntryCount() m_entries.GetCount()\n#define GetSegmentCount() m_segments.GetCount()\n"
+    document_count_unbind = "#undef GetEntryCount\n#undef GetSegmentCount\n"
     segment_header = original("src/subtitles/STS.h", reference["commit"])
     segment_class = extract_method(segment_header.decode("utf-8-sig"), "class STSSegment")
     segments = font_source.decode("utf-8-sig").split("#include", 1)[0]
     segments += '#include "segments_shell.h"\n' + segment_class + ";\n"
     for name, content in (("OriginalSegments", font_source), ("CandidateSegments", candidate_font)):
         segments += f"SEGMENTS_SHELL({name})\n#define CSimpleTextSubtitle {name}\n"
+        body = extract_method(content.decode("utf-8-sig"), "void CSimpleTextSubtitle::CreateSegments()")
         if name == "CandidateSegments":
-            segments += "#define XY_VSFILTER_RUST_TEXT\n"
-        segments += extract_method(content.decode("utf-8-sig"), "void CSimpleTextSubtitle::CreateSegments()")
-        segments += "\n#undef CSimpleTextSubtitle\n#undef XY_VSFILTER_RUST_TEXT\n"
+            segments += "#define XY_VSFILTER_RUST_TEXT\n" + document_count_bindings
+        segments += body
+        segments += "\n#undef CSimpleTextSubtitle\n#undef XY_VSFILTER_RUST_TEXT\n" + document_count_unbind
     (destination / "original_segments.h").write_text(segments, encoding="utf-8")
     insertion = '#include "original_segments.h"\n#include "segment_insert_shell.h"\n'
     insertion += segment_class.replace("STSSegment", "InsertionSegment").replace("CAtlArray<int>", "ObservedArray<int>") + ";\n"
@@ -573,29 +576,36 @@ public:
         method = extract_method(content.decode("utf-8-sig"), "void CSimpleTextSubtitle::Add(")
         insertion += f"INSERTION_SHELL({name})\n#define STSSegment InsertionSegment\n"
         if name == "CandidateInsertion":
-            insertion += "#define XY_VSFILTER_RUST_TEXT\n"
+            insertion += "#define XY_VSFILTER_RUST_TEXT\n" + document_count_bindings
         # The unchanged string/style/WebVTT preprocessing remains native. Feed
         # its prepared entry to the exact original/candidate timeline tail.
         insertion += f"void {name}::AddPrepared(REFERENCE_TIME start, REFERENCE_TIME end, int readorder) {{\n"
         insertion += "if (start > end) return;\nPreparedEntry sub = {start,end,0};\n"
         a = method.index("    sub.readorder  =")
-        insertion += method[a:method.index(";", a)+1] + "\n"
-        insertion += method[method.index("    int n = (int)m_entries.GetCount();"):]
-        insertion += "\n#undef STSSegment\n#undef XY_VSFILTER_RUST_TEXT\n"
+        prepared = method.index(";", a) + 1
+        insertion += method[a:prepared] + "\n"
+        # Keep the entire suffix after the initialized-record boundary, including
+        # any enclosing experimental ifdef/else/endif. Selecting the inner native
+        # int-n line would omit its opener and leave unbalanced preprocessing.
+        # This runner leaves the experimental owner undefined; its separate
+        # document/Windows harnesses validate that configuration.
+        insertion += method[prepared:]
+        insertion += "\n#undef STSSegment\n#undef XY_VSFILTER_RUST_TEXT\n" + document_count_unbind
     (destination / "original_segment_insert.h").write_text(insertion, encoding="utf-8")
     searches = '#include "original_segments.h"\n#include "timeline_search_shell.h"\n'
     for name, content in (("OriginalTimelineSearch", font_source), ("CandidateTimelineSearch", candidate_font)):
         searches += f"TIMELINE_SEARCH_SHELL({name})\n#define CSimpleTextSubtitle {name}\n"
         if name == "CandidateTimelineSearch":
-            searches += "#define XY_VSFILTER_RUST_TEXT\n"
+            searches += "#define XY_VSFILTER_RUST_TEXT\n" + document_count_bindings
         for signature in ("int CSimpleTextSubtitle::SearchSub(",
                           "const STSSegment* CSimpleTextSubtitle::SearchSubs(",
                           "STSSegment* CSimpleTextSubtitle::SearchSubs2("):
-            searches += extract_method(content.decode("utf-8-sig"), signature) + "\n"
+            block = extract_method(content.decode("utf-8-sig"), signature)
+            searches += block + "\n"
         for method in ("TranslateStart", "TranslateSegmentStart", "TranslateSegmentEnd"):
             block = extract_method(content.decode("utf-8-sig"), "REFERENCE_TIME CSimpleTextSubtitle::" + method + "(")
             searches += block.replace("::" + method + "(", "::" + method + "Impl(", 1) + "\n"
-        searches += "\n#undef CSimpleTextSubtitle\n#undef XY_VSFILTER_RUST_TEXT\n"
+        searches += "\n#undef CSimpleTextSubtitle\n#undef XY_VSFILTER_RUST_TEXT\n" + document_count_unbind
     (destination / "original_timeline_search.h").write_text(searches, encoding="utf-8")
     lexer_source = original("src/subtitles/RTS.cpp", reference["commit"])
     candidate_lexer = (ROOT / "src/subtitles/RTS.cpp").read_bytes()
