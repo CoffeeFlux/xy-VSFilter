@@ -20,6 +20,22 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns ordered outline-span merge results before native export. Native
+  reserve/swap, offset construction and destination growth stay in order; ties,
+  touching/reversed spans, unsigned coordinate wrap and vector capacity match.
+  Fatal ASan/UBSan comparisons passed **80,202 terminating calls** on arm64 and
+  under x64 execution: **224,479 emitted spans / 63,205 changed outputs / 16,000
+  repeated widening histories / 80,202 Rust merges / zero fallbacks**.
+  The oracle guards and excludes **31,806 leftover-A cases**, including **72
+  nonempty aliases**, before entering unresolved reference control flow; direct
+  Rust decline is checked separately. These are not passing comparisons. See
+  [scope of unresolved span behavior](span-merge-unresolved.json). Native offset
+  construction remains; comparisons use nonnegative `dy`, successful allocation
+  and spare vector capacity. No universal/debug-iterator compatibility is claimed.
+  Rust 1.85 tests (126 core, 81 FFI), strict Clippy, default syntax and Python
+  checks pass. Six horizontal-outline scripts and a visible border control expand
+  the renderer corpus to **674 cases**. Windows/Miri and renderer checks for this
+  increment are pending; outline container ownership and host work remain.
 * Safe Rust aligns initialized rasterizer path points and computes origin/size.
   Negative-coordinate shifts, eight-unit origin alignment, the extra size unit,
   point-write order and final native output assignments are preserved. Empty paths

@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "status": "unresolved-reference-control-flow",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "source": "src/subtitles/Rasterizer.cpp",
+  "source_sha256": "29b113f2c927793005afd25d8d0c861a430b55462f6e8e057e1bbaceccf08334",
+  "function": "OverlapRegion",
+  "observation": "The leftover-A while loop contains only push_back; ++itA is outside that loop. The terminal increment is not subsequently read.",
+  "decision": "The extracted oracle guards the leftover-A branch before entering it and excludes those inputs from passing comparisons. The Rust planner declines those cases, preserving the production native fallback. No native completion or universal equivalence is claimed for excluded branches.",
+  "limits": [
+    "Negative dy remains native and is excluded from the sanitized offset domain.",
+    "The oracle supplies spare vector capacity and tests completed release behavior, not debug iterator diagnostics.",
+    "Native allocation failures remain unverified."
+  ]
+}

@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_path_align.h"
+#include "xy_rust_spans.h"
 #endif
 #include <string.h>
 #include <cmath>
@@ -1260,6 +1261,15 @@ void OverlapRegion(tSpanBuffer& dst, const tSpanBuffer& src, int dx, int dy)
     // Don't worry -- even if dy<0 this will still work! // G: hehe, the evil twin :)
     unsigned __int64 offset1 = (((__int64)dy)<<32) - dx;
     unsigned __int64 offset2 = (((__int64)dy)<<32) + dx;
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::SpanMerge merged(temp, src, offset1, offset2);
+    if(merged.Ready())
+    {
+        for(size_t i = 0; i < merged.Count(); ++i)
+            dst.push_back(tSpan(merged.Start(i), merged.End(i)));
+        return;
+    }
+#endif
     while(itA != itAE && itB != itBE)
     {
         if((*itB).first + offset1 < (*itA).first)

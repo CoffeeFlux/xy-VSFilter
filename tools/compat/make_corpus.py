@@ -357,6 +357,19 @@ def path_alignment_variants():
         yield "path-align-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", br"{\p1}" + path + br"{\p0}after")
 
 
+
+def span_merge_variants():
+    for name, payload in {
+        "control": br"{\xbord0\ybord0}W I O  gap",
+        "horizontal-border": br"{\xbord8\ybord0}W I O  gap",
+        "small-border": br"{\xbord1.5\ybord0}W I O  gap",
+        "drawing-holes": br"{\xbord6\ybord0\p1}m 0 0 l 80 0 80 60 0 60 m 20 20 l 20 40 60 40 60 20{\p0}",
+        "italic-karaoke": br"{\xbord7\ybord0\i1\k30}wide {\k40}words",
+        "scaled": br"{\xbord9\ybord0\fscx75\fscy150}Horizontal outline",
+    }.items():
+        yield "span-merge-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
+
+
 def layout_rect_variants():
     prefix = SEED[:SEED.index(b"Dialogue:")]
     for name, alignment, second_layer, border, collisions, multiline in (
@@ -638,7 +651,8 @@ def make_cases(files):
                                                     ("text-runs-soft-wrap-zero", "text-runs-soft-wrap-two"),
                                                     ("wrap-width-style-0", "wrap-width-style-2"),
                                                     ("line-layout-align-1", "line-layout-align-9"),
-                                                    ("drawing-storage-control", "drawing-storage-fractional-scale"))
+                                                    ("drawing-storage-control", "drawing-storage-fractional-scale"),
+                                                    ("span-merge-control", "span-merge-horizontal-border"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -659,6 +673,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in drawing_preparation_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in drawing_storage_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in path_alignment_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in span_merge_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in realtext_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_header_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_style_variants()]

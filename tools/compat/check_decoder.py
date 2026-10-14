@@ -54,7 +54,7 @@ def capture_inputs():
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h", ROOT / "include/xy_rust_writer.h", ROOT / "include/xy_rust_seek.h",
               ROOT / "include/xy_rust_drawing.h", ROOT / "include/xy_rust_layout.h", ROOT / "include/xy_rust_text_runs.h", ROOT / "include/xy_rust_wrap.h", ROOT / "include/xy_rust_line_layout.h", ROOT / "src/subtitles/RTS.h",
-              ROOT / "include/xy_rust_drawing_tokens.h", ROOT / "include/xy_rust_path_align.h",
+              ROOT / "include/xy_rust_drawing_tokens.h", ROOT / "include/xy_rust_path_align.h", ROOT / "include/xy_rust_spans.h",
               ROOT / "include/xy_rust_pipe_line.h", ROOT / "include/xy_rust_subrip_cue.h", ROOT / "include/xy_rust_sami_file.h", ROOT / "include/xy_rust_microdvd_style.h", ROOT / "include/xy_rust_font_records.h", ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
               ROOT / "include/xy_rust_cc.h", ROOT / "src/subtitles/CCDecoder.cpp", ROOT / "src/subtitles/CCDecoder.h",
@@ -698,6 +698,24 @@ public:
             definition = definition.replace("XyRust::AlignPath", "XyRust::ObservedAlignPath")
         path_align += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_path_align.h").write_text(path_align, encoding="utf-8")
+    span_merge = '#include "span_merge_shell.h"\n'
+    for name, content in (("ReferenceSpans", raster_source), ("CandidateSpans", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+        span_merge += f"namespace {name} {{\n"
+        if name == "CandidateSpans":
+            span_merge += "#define XY_VSFILTER_RUST_TEXT\n"
+        definition = extract_definition(content.decode("utf-8-sig").replace("\r\n", "\n"), "void OverlapRegion(")
+        # Static reference control flow: ++itA is outside the unbraced while.
+        # Guard that unresolved branch before entry; it is never counted as a pass.
+        tail = "while(itA != itAE)\n        dst.push_back(*itA);\n        ++itA;"
+        assert tail in definition
+        definition = definition.replace(tail, "if(itA != itAE) throw UnresolvedSpanTail();\n    " + tail)
+        if name == "CandidateSpans":
+            assert definition.count("XyRust::SpanMerge merged") == 1
+            definition = definition.replace("XyRust::SpanMerge merged", "XyRust::ObservedSpanMerge merged")
+        if os.name != "nt":
+            definition = definition.replace("unsigned __int64", "uint64_t").replace("__int64", "int64_t")
+        span_merge += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_span_merge.h").write_text(span_merge, encoding="utf-8")
     filter_source = original("src/subtitles/xy_filter.cpp", reference["commit"])
     vobsub_source = original("src/subtitles/VobSubImage.cpp", reference["commit"])
     golomb = '#pragma once\n#include "golomb_shell.h"\n'
@@ -1158,6 +1176,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     path_align_result = run([str(path_align_executable)], capture_output=True, text=True)
     print(path_align_result.stdout, end="", flush=True)
     print(path_align_result.stderr, end="", file=sys.stderr)
+    span_executable = destination / ("span-merge-oracle.exe" if os.name == "nt" else "span-merge-oracle")
+    span_compile = [arg.replace("find_char_oracle.cpp", "span_merge_oracle.cpp").replace("find-char-oracle", "span-merge-oracle") for arg in find_char_compile]
+    run(span_compile)
+    span_result = run([str(span_executable)], capture_output=True, text=True)
+    print(span_result.stdout, end="", flush=True)
+    print(span_result.stderr, end="", file=sys.stderr)
     writer_executable = destination / ("text-writer-oracle.exe" if os.name == "nt" else "text-writer-oracle")
     writer_compile = [arg.replace("find_char_oracle.cpp", "text_writer_oracle.cpp").replace("find-char-oracle", "text-writer-oracle") for arg in find_char_compile]
     run(writer_compile)
@@ -1553,6 +1577,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "path_align_compile_command": path_align_compile,
         "path_align_result": path_align_result.stdout, "path_align_stderr": path_align_result.stderr,
         "path_align_scope": "Complete pinned PathData::AlignLeftTop over initialized point/type buffers; actual Windows POINT/ATL geometry; exact guarded buffers, origin/size, errno/FP/Windows error state; native cleanup modeled, outputs disjoint and representable arithmetic only",
+        "span_merge_compile_command": span_compile,
+        "span_merge_result": span_result.stdout, "span_merge_stderr": span_result.stderr,
+        "span_merge_scope": "Pinned OverlapRegion with leftover-A loop guarded before entry and excluded, never treated as a passing comparison; direct Rust decline checked for excluded cases. Exact terminating span outputs/order, source preservation, vector capacity, errno/FP flags, repeated production widening; native offsets retained, dy>=0 and successful allocation only",
         "text_writer_compile_command": writer_compile,
         "text_writer_result": writer_result.stdout, "text_writer_stderr": writer_result.stderr,
         "text_writer_scope": "Complete pinned CTextFile::WriteString; native ATL strings/UTF-8 conversion on Windows, modeled UTF-8 and 16-bit Windows write layout on portable hosts; controlled native write boundaries, exact bytes/default-string arguments, errno/LastError and callback interruptions/source mutation; allocation failures and OS file persistence excluded",
