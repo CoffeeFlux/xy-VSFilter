@@ -217,6 +217,14 @@
     [
       "arc-queue-control-memory",
       "arc-queue-round-memory"
+    ],
+    [
+      "path-buffer-control-file",
+      "path-buffer-spaced-file"
+    ],
+    [
+      "path-buffer-control-memory",
+      "path-buffer-spaced-memory"
     ]
   ],
   "cases": [
@@ -13150,6 +13158,270 @@
       "id": "ellipse-storage-wide-short-memory",
       "script": "test/compat/generated/ellipse-storage-wide-short.ass",
       "sha256": "f1e95d1ec598acd20adfa4b3c62adf61db0e54f4c4c30de64301b440153fda5e",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "path-buffer-control-file",
+      "script": "test/compat/generated/path-buffer-control.ass",
+      "sha256": "54b0d89599636c083e31fa72af10e48529ec2d1f0ae08888c7a9b7e57da3ec98",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "path-buffer-control-memory",
+      "script": "test/compat/generated/path-buffer-control.ass",
+      "sha256": "54b0d89599636c083e31fa72af10e48529ec2d1f0ae08888c7a9b7e57da3ec98",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "path-buffer-spaced-file",
+      "script": "test/compat/generated/path-buffer-spaced.ass",
+      "sha256": "c12964563b3ba2933fe918fd70971a714950c77a3429db599d46a165d65a9f71",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "path-buffer-spaced-memory",
+      "script": "test/compat/generated/path-buffer-spaced.ass",
+      "sha256": "c12964563b3ba2933fe918fd70971a714950c77a3429db599d46a165d65a9f71",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "path-buffer-negative-file",
+      "script": "test/compat/generated/path-buffer-negative.ass",
+      "sha256": "c458fd293059ee7743af68b969ce111c648798ae72ff8ca4d458619c17f44985",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "path-buffer-negative-memory",
+      "script": "test/compat/generated/path-buffer-negative.ass",
+      "sha256": "c458fd293059ee7743af68b969ce111c648798ae72ff8ca4d458619c17f44985",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "path-buffer-fractional-file",
+      "script": "test/compat/generated/path-buffer-fractional.ass",
+      "sha256": "bf666e1aa3bdcd038ed21ad0a4c9ca2052f0b7370a7c79ad81734d0632c6d96f",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "path-buffer-fractional-memory",
+      "script": "test/compat/generated/path-buffer-fractional.ass",
+      "sha256": "bf666e1aa3bdcd038ed21ad0a4c9ca2052f0b7370a7c79ad81734d0632c6d96f",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "path-buffer-combining-file",
+      "script": "test/compat/generated/path-buffer-combining.ass",
+      "sha256": "cac3b3b117b30131779da63d3845d2314a0dd19e88c4badf76547ea5d4f1fd68",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "path-buffer-combining-memory",
+      "script": "test/compat/generated/path-buffer-combining.ass",
+      "sha256": "cac3b3b117b30131779da63d3845d2314a0dd19e88c4badf76547ea5d4f1fd68",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "path-buffer-surrogate-pair-file",
+      "script": "test/compat/generated/path-buffer-surrogate-pair.ass",
+      "sha256": "403e805281b3155e767b5f879ee951adc796e621b3416c78b3a38a29cb6984e5",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "path-buffer-surrogate-pair-memory",
+      "script": "test/compat/generated/path-buffer-surrogate-pair.ass",
+      "sha256": "403e805281b3155e767b5f879ee951adc796e621b3416c78b3a38a29cb6984e5",
       "open": "memory",
       "width": 1280,
       "height": 720,

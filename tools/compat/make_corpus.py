@@ -404,6 +404,19 @@ def ellipse_storage_variants():
         yield "ellipse-storage-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
 
 
+def path_buffer_variants():
+    for name, payload in {
+        "control": br"{\fsp0}AV fi O W",
+        "spaced": br"{\fsp3}AV fi O W",
+        "negative": br"{\fsp-2}AV fi O W",
+        "fractional": br"{\fsp0.125}AV fi O W",
+    }.items():
+        yield "path-buffer-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
+    for name, text in (("combining", "A\u0301 fi O W"), ("surrogate-pair", "A\U0001d11eV fi O W")):
+        payload = br"{\fsp1.5}" + text.encode("utf-8")
+        yield "path-buffer-" + name + ".ass", b"\xef\xbb\xbf" + SEED.replace(b"COMPAT_TEXT", payload)
+
+
 def layout_rect_variants():
     prefix = SEED[:SEED.index(b"Dialogue:")]
     for name, alignment, second_layer, border, collisions, multiline in (
@@ -687,7 +700,8 @@ def make_cases(files):
                                                     ("line-layout-align-1", "line-layout-align-9"),
                                                     ("drawing-storage-control", "drawing-storage-fractional-scale"),
                                                     ("span-merge-control", "span-merge-horizontal-border"),
-                                                    ("arc-queue-control", "arc-queue-round"))
+                                                    ("arc-queue-control", "arc-queue-round"),
+                                                    ("path-buffer-control", "path-buffer-spaced"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -712,6 +726,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in arc_queue_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ellipse_arc_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ellipse_storage_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in path_buffer_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in realtext_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_header_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_style_variants()]

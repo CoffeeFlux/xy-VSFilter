@@ -54,7 +54,7 @@ def capture_inputs():
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h", ROOT / "include/xy_rust_writer.h", ROOT / "include/xy_rust_seek.h",
               ROOT / "include/xy_rust_drawing.h", ROOT / "include/xy_rust_layout.h", ROOT / "include/xy_rust_text_runs.h", ROOT / "include/xy_rust_wrap.h", ROOT / "include/xy_rust_line_layout.h", ROOT / "src/subtitles/RTS.h",
-              ROOT / "include/xy_rust_drawing_tokens.h", ROOT / "include/xy_rust_path_align.h", ROOT / "include/xy_rust_spans.h", ROOT / "include/xy_rust_arc_queue.h", ROOT / "include/xy_rust_ellipse.h",
+              ROOT / "include/xy_rust_drawing_tokens.h", ROOT / "include/xy_rust_path_align.h", ROOT / "include/xy_rust_path_buffer.h", ROOT / "include/xy_rust_spans.h", ROOT / "include/xy_rust_arc_queue.h", ROOT / "include/xy_rust_ellipse.h",
               ROOT / "src/subtitles/xy_widen_region.cpp", ROOT / "src/subtitles/xy_circular_array_queue.h",
               ROOT / "include/xy_rust_pipe_line.h", ROOT / "include/xy_rust_subrip_cue.h", ROOT / "include/xy_rust_sami_file.h", ROOT / "include/xy_rust_microdvd_style.h", ROOT / "include/xy_rust_font_records.h", ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
@@ -699,6 +699,26 @@ public:
             definition = definition.replace("XyRust::AlignPath", "XyRust::ObservedAlignPath")
         path_align += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_path_align.h").write_text(path_align, encoding="utf-8")
+    path_buffer = '#include "path_buffer_shell.h"\n'
+    for name, content in (("ReferencePathBuffer", raster_source), ("CandidatePathBuffer", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+        path_buffer += f"namespace {name} {{\n"
+        path_buffer += "class PathData : public PathBufferState { public: explicit PathData(int n):PathBufferState(n){} bool PartialEndPath(HDC,PathOffset,PathOffset); };\n"
+        if name == "CandidatePathBuffer":
+            path_buffer += "#define XY_VSFILTER_RUST_TEXT\n"
+        definition = extract_definition(content.decode("utf-8-sig").replace("\r\n", "\n"), "bool PathData::PartialEndPath(")
+        definition = definition.replace("long dx, long dy", "PathOffset dx, PathOffset dy")
+        for before, after in (("::CloseFigure(", "::PathCloseFigure("), ("::EndPath(", "::PathEndPath("), ("::AbortPath(", "::PathAbortPath("), ("GetPath(", "PathGetPath("), ("DebugBreak()", "PathDebugBreak()"), ("realloc(", "pathRealloc(")):
+            definition = definition.replace(before, after)
+        if name == "CandidatePathBuffer":
+            assert definition.count("XyRust::PathBuffer temporary") == 1
+            definition = definition.replace("XyRust::PathBuffer temporary", "XyRust::ObservedPathBuffer temporary")
+        else:
+            assert definition.count("POINT* pPoints = DEBUG_NEW POINT[nPoints];") == 1
+            definition = definition.replace("POINT* pPoints = DEBUG_NEW POINT[nPoints];", "POINT* pPoints = DEBUG_NEW POINT[nPoints];\n        PathTemporaryCreated();")
+            assert definition.count("delete[] pPoints;") == 2
+            definition = definition.replace("delete[] pPoints;", "delete[] pPoints; PathTemporaryReleased();")
+        path_buffer += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_path_buffer.h").write_text(path_buffer, encoding="utf-8")
     span_merge = '#include "span_merge_shell.h"\n'
     for name, content in (("ReferenceSpans", raster_source), ("CandidateSpans", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         span_merge += f"namespace {name} {{\n"
@@ -1227,6 +1247,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     path_align_result = run([str(path_align_executable)], capture_output=True, text=True)
     print(path_align_result.stdout, end="", flush=True)
     print(path_align_result.stderr, end="", file=sys.stderr)
+    path_buffer_executable = destination / ("path-buffer-oracle.exe" if os.name == "nt" else "path-buffer-oracle")
+    path_buffer_compile = [arg.replace("find_char_oracle.cpp", "path_buffer_oracle.cpp").replace("find-char-oracle", "path-buffer-oracle") for arg in find_char_compile]
+    run(path_buffer_compile)
+    path_buffer_result = run([str(path_buffer_executable)], capture_output=True, text=True)
+    print(path_buffer_result.stdout, end="", flush=True)
+    print(path_buffer_result.stderr, end="", file=sys.stderr)
     span_executable = destination / ("span-merge-oracle.exe" if os.name == "nt" else "span-merge-oracle")
     span_compile = [arg.replace("find_char_oracle.cpp", "span_merge_oracle.cpp").replace("find-char-oracle", "span-merge-oracle") for arg in find_char_compile]
     run(span_compile)
@@ -1666,6 +1692,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "arc_queue_compile_command": arc_compile,
         "arc_queue_result": arc_result.stdout, "arc_queue_stderr": arc_result.stderr,
         "arc_queue_scope": "Pinned circular queue and complete add_left/add_right/cross_left methods with controlled native ellipse callbacks; initialized positive capacities and nonnegative representable indices/counts, successful allocation; every physical slot including removed slots, callback order, errno/FP/Windows error state. Ellipse math and outer span/list algorithm remain native and require renderer comparisons.",
+        "path_buffer_compile_command": path_buffer_compile,
+        "path_buffer_result": path_buffer_result.stdout, "path_buffer_stderr": path_buffer_result.stderr,
+        "path_buffer_scope": "Pinned PartialEndPath with modeled output-only GDI and guarded realloc boundaries; successful complete output, zero points, EndPath failure, callback order, buffer bytes/capacity and cleanup timing. DebugBreak continuations are modeled separately and never counted as native compatibility passes. Rust buffers lend both disjoint outputs in one FFI call; no Rust call using the owner until native consumption ends. Native OOM, negative counts and unrepresentable geometry excluded.",
         "span_merge_compile_command": span_compile,
         "span_merge_result": span_result.stdout, "span_merge_stderr": span_result.stderr,
         "span_merge_scope": "Pinned OverlapRegion with leftover-A loop guarded before entry and excluded, never treated as a passing comparison; direct Rust decline checked for excluded cases. Exact terminating span outputs/order, source preservation, vector capacity, errno/FP flags, repeated production widening; native offsets retained, dy>=0 and successful allocation only",
