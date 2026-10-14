@@ -25,6 +25,103 @@ impl Lookahead {
         self.values.back().copied()
     }
 }
+/// Transient state for one PeekChar call. A native exception discards this
+/// state while retaining the queue changes already made by PushChar/PopChar.
+#[repr(C)]
+#[derive(Default)]
+pub struct Peek {
+    phase: u32,
+    previous: i32,
+    result: i32,
+}
+#[repr(u32)]
+pub enum PeekAction {
+    Read = 0,
+    Pop = 1,
+    Done = 2,
+    Check = 3,
+}
+impl Peek {
+    pub fn step(&mut self, count: usize, head: i32, tail: i32, last: i32) -> PeekAction {
+        loop {
+            match self.phase {
+                0 => {
+                    // Fill the two-character lookahead, then native ASSERT.
+                    if count < 2 {
+                        return PeekAction::Read;
+                    }
+                    self.phase = 1;
+                    return PeekAction::Check;
+                }
+                1 => {
+                    self.phase = if head == 47 && tail == 47 {
+                        2
+                    } else if head == 47 && tail == 42 {
+                        6
+                    } else {
+                        self.result = head;
+                        12
+                    };
+                }
+                2 => {
+                    // Line comment: discard the queued opener completely.
+                    if count != 0 {
+                        return PeekAction::Pop;
+                    }
+                    self.phase = 3;
+                }
+                3 => {
+                    self.phase = 4;
+                    return PeekAction::Read;
+                }
+                4 => {
+                    self.phase = 5;
+                    return PeekAction::Pop;
+                }
+                5 => {
+                    self.phase = if last == 10 || last == -1 { 0 } else { 3 };
+                }
+                6 => {
+                    // Block comment: discard opener, then seed one character.
+                    if count != 0 {
+                        return PeekAction::Pop;
+                    }
+                    self.phase = 7;
+                }
+                7 => {
+                    self.phase = 8;
+                    return PeekAction::Read;
+                }
+                8 => {
+                    self.phase = 9;
+                    return PeekAction::Read;
+                }
+                9 => {
+                    self.previous = last;
+                    self.phase = 10;
+                    return PeekAction::Pop;
+                }
+                10 => {
+                    self.phase = if (last == 42 && self.previous == 47) || last == -1 {
+                        11
+                    } else {
+                        8
+                    };
+                }
+                11 => {
+                    self.phase = 0;
+                    return PeekAction::Pop;
+                }
+                12 => return PeekAction::Done,
+                _ => self.phase = 0,
+            }
+        }
+    }
+    pub fn value(&self) -> i32 {
+        self.result
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
