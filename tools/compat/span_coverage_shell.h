@@ -28,7 +28,7 @@ struct ScanLineData2 {
 size_t g_xy_malloc_used_size=0;
 static std::vector<int64_t> coverageEvents;
 static int allocationAttempt=0,allocationFailure=-1;
-struct CoverageAllocation {BYTE* base;size_t count;bool rust=false;void* owner=NULL;BYTE* data()const{return rust?base:base+32;}};
+struct CoverageAllocation {BYTE* base;size_t count;bool rust=false;void* owner=NULL;BYTE* raw=NULL;BYTE* data()const{return rust?base:base+32;}};
 static std::vector<CoverageAllocation> coverageAllocations;
 static void checkCoverageGuards(const CoverageAllocation& a){
     if(a.rust)return;
@@ -37,15 +37,18 @@ static void checkCoverageGuards(const CoverageAllocation& a){
 static void* xy_malloc(size_t count){
     coverageEvents.insert(coverageEvents.end(),{1,static_cast<int64_t>(count)});
     if(allocationAttempt++==allocationFailure)return NULL;
-    BYTE* base=static_cast<BYTE*>(std::malloc(count+64));if(!base)std::abort();
-    std::memset(base,0xcc,count+64);CoverageAllocation a;a.base=base;a.count=count;coverageAllocations.push_back(a);g_xy_malloc_used_size+=count;return base+32;
+    // xy_malloc guarantees 16-byte alignment even on Win32, where malloc
+    // itself may only provide eight. The mask dispatch depends on this.
+    BYTE* raw=static_cast<BYTE*>(std::malloc(count+79));if(!raw)std::abort();
+    BYTE* base=reinterpret_cast<BYTE*>((reinterpret_cast<uintptr_t>(raw)+15)&~uintptr_t(15));
+    std::memset(base,0xcc,count+64);CoverageAllocation a;a.base=base;a.raw=raw;a.count=count;coverageAllocations.push_back(a);g_xy_malloc_used_size+=count;return base+32;
 }
 static void xy_free(void* value){
     if(!value)return;
     for(size_t i=0;i<coverageAllocations.size();++i)if(coverageAllocations[i].data()==value){
         const CoverageAllocation a=coverageAllocations[i];checkCoverageGuards(a);
         coverageEvents.insert(coverageEvents.end(),{2,static_cast<int64_t>(a.count)});
-        if(a.rust)std::abort();g_xy_malloc_used_size-=a.count;std::free(a.base);coverageAllocations.erase(coverageAllocations.begin()+i);return;
+        if(a.rust)std::abort();g_xy_malloc_used_size-=a.count;std::free(a.raw);coverageAllocations.erase(coverageAllocations.begin()+i);return;
     }
     std::abort();
 }

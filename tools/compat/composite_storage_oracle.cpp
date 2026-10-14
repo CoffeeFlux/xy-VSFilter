@@ -16,6 +16,7 @@ out.insert(out.end(),{static_cast<uint64_t>(error),static_cast<uint64_t>(flags),
 static SharedPtrByte input(size_t count,unsigned salt){auto* p=static_cast<BYTE*>(xy_malloc(count));for(size_t i=0;i<count;++i)p[i]=static_cast<BYTE>(i*37+salt);return SharedPtrByte(p,xy_free);}
 static void outputSnapshot(const SharedPtrByte& data,std::vector<uint64_t>& out,bool count){
     out.push_back(data?1:0);out.push_back(g_xy_malloc_used_size);if(!data)return;
+    compositeRequire(reinterpret_cast<uintptr_t>(data.get())%16==0);
     compositeRequire(data.get()==compositeDestination);
     for(size_t i=0;i<compositeCount;++i){out.push_back(compositeWritten[i]);if(compositeWritten[i]){out.push_back(data.get()[i]);initialized+=count;}else unwritten+=count;}
 }
