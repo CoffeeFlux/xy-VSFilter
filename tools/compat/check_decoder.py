@@ -55,7 +55,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
               ROOT / "include/xy_rust_drawing.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
-              ROOT / "include/xy_rust_sami_file.h", ROOT / "include/xy_rust_microdvd_style.h", ROOT / "include/xy_rust_font_records.h", ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
+              ROOT / "include/xy_rust_subrip_cue.h", ROOT / "include/xy_rust_sami_file.h", ROOT / "include/xy_rust_microdvd_style.h", ROOT / "include/xy_rust_font_records.h", ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
               ROOT / "include/xy_rust_cc.h", ROOT / "src/subtitles/CCDecoder.cpp", ROOT / "src/subtitles/CCDecoder.h",
               ROOT / "include/xy_rust_segments.h",
@@ -396,6 +396,20 @@ public:
             find_char += definition + "\n"
         find_char += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_find_char.h").write_text(find_char, encoding="utf-8")
+    subrip_cue = '#include "subrip_cue_shell.h"\n'
+    for name, content in (("ReferenceSubRipCue", font_source), ("CandidateSubRipCue", candidate_font)):
+        subrip_cue += f"namespace {name} {{\n"
+        if name == "CandidateSubRipCue":
+            subrip_cue += "#define XY_VSFILTER_RUST_TEXT\n"
+        for signature in ("static CStringW SubRipper2SSA(", "static bool OpenSubRipper("):
+            definition = extract_definition(content.decode("utf-8-sig"), signature)
+            definition = re.sub(r"(\d+)i64\b", r"\1LL", definition)
+            if name == "CandidateSubRipCue" and signature == "static bool OpenSubRipper(":
+                assert definition.count("XyRust::SubRipCue cue") == 1
+                definition = definition.replace("XyRust::SubRipCue cue", "XyRust::ObservedSubRipCue cue")
+            subrip_cue += definition + "\n"
+        subrip_cue += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_subrip_cue.h").write_text(subrip_cue, encoding="utf-8")
     subrip = '#include "subrip_shell.h"\n'
     for name, content in (("ReferenceSubRip", font_source), ("CandidateSubRip", candidate_font)):
         subrip += f"namespace {name} {{\n"
@@ -938,6 +952,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     find_char_result = run([str(find_char_executable)], capture_output=True, text=True)
     print(find_char_result.stdout, end="", flush=True)
     print(find_char_result.stderr, end="", file=sys.stderr)
+    subrip_cue_executable = destination / ("subrip-cue-oracle.exe" if os.name == "nt" else "subrip-cue-oracle")
+    subrip_cue_compile = [arg.replace("find_char_oracle.cpp", "subrip_cue_oracle.cpp").replace("find-char-oracle", "subrip-cue-oracle") for arg in find_char_compile]
+    run(subrip_cue_compile)
+    subrip_cue_result = run([str(subrip_cue_executable)], capture_output=True, text=True)
+    print(subrip_cue_result.stdout, end="", flush=True)
+    print(subrip_cue_result.stderr, end="", file=sys.stderr)
     sami_file_executable = destination / ("sami-file-oracle.exe" if os.name == "nt" else "sami-file-oracle")
     sami_file_compile = [arg.replace("find_char_oracle.cpp", "sami_file_oracle.cpp").replace("find-char-oracle", "sami-file-oracle") for arg in find_char_compile]
     run(sami_file_compile)
@@ -1297,6 +1317,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "webvtt_compile_command": webvtt_compile,
         "webvtt_result": webvtt_result.stdout, "webvtt_stderr": webvtt_result.stderr,
         "webvtt_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring model with host iswspace; Windows comparison required",
+        "subrip_cue_compile_command": subrip_cue_compile,
+        "subrip_cue_result": subrip_cue_result.stdout, "subrip_cue_stderr": subrip_cue_result.stderr,
+        "subrip_cue_scope": "Complete pinned OpenSubRipper and SubRipper2SSA; native ATL/secure CRT on Windows, portable wide-character scan spellings elsewhere; controlled line I/O, FastTrim and Add sink; exact emitted records, input positions, errno and native callback order/interruption; successful representable numeric conversions and replacement-free NUL fixtures",
         "sami_file_compile_command": sami_file_compile,
         "sami_file_result": sami_file_result.stdout, "sami_file_stderr": sami_file_result.stderr,
         "sami_file_scope": "Complete pinned OpenSami and SMI2SSA; native ATL/case/CRT on Windows, portable strings elsewhere; controlled line I/O, FastTrim and Add sink; probe read-ahead, seek, caption/comment state, timestamp callback ordering, exact emitted records, errno and interruptions; representable timestamp arithmetic and replacement-free NUL fixtures",

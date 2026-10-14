@@ -32,6 +32,7 @@
 #include "xy_rust_case_replace.h"
 #include "xy_rust_sami.h"
 #include "xy_rust_sami_file.h"
+#include "xy_rust_subrip_cue.h"
 #include "xy_rust_encoding.h"
 #include "xy_rust_ass_dialogue.h"
 #include "xy_rust_ass_style.h"
@@ -1223,6 +1224,27 @@ static bool OpenSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
                 ms2 = 0;
             }
 
+#ifdef XY_VSFILTER_RUST_TEXT
+            CStringW tmp;
+            XyRust::SubRipCue cue;
+            while(true) {
+                bool fEOF = !file->ReadString(tmp);
+                if (fEOF && tmp.IsEmpty()) break;
+                FastTrim(tmp);
+                if (tmp.IsEmpty()) cue.EmptyLine();
+                int num2;
+                WCHAR wc;
+                if (cue.Boundary(swscanf_s(tmp, L"%d%c", &num2, &wc, 1) == 1)) {
+                    num = num2;
+                    break;
+                }
+                CStringW fragment;
+                fragment += tmp + '\n';
+                cue.Append(fragment);
+                if (fEOF) break;
+            }
+            CStringW str = cue.Text<CStringW>();
+#else
             CStringW str, tmp;
 
             bool fFoundEmpty = false;
@@ -1247,6 +1269,8 @@ static bool OpenSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 
                 if(fEOF) break;
             }
+
+#endif
 
             ret.Add(
                 SubRipper2SSA(str, CharSet),

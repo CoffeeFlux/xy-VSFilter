@@ -80,3 +80,5 @@ pub mod font_records;
 pub mod microdvd_style;
 
 pub mod sami_file;
+
+pub mod subrip_cue;

@@ -8,7 +8,7 @@ typedef uint64_t ULONGLONG;
 #endif
 struct CFile { enum {begin=0}; };
 #define MS2RT(value) (static_cast<int64_t>(value)*10000)
-#define LONGLONG_MAX (std::numeric_limits<int64_t>::max())
+#define LONGLONG_MAX ((std::numeric_limits<int64_t>::max)())
 static uint64_t fileOwners=0,fileBegins=0,fileAppends=0,fileFlushes=0,fileEnds=0;
 namespace XyRust {
 class ObservedSamiFile : public SamiFile {
@@ -45,6 +45,7 @@ struct SamiEntry {
 };
 struct CSimpleTextSubtitle {
     std::vector<SamiEntry> entries;
+    bool IsEmpty()const{microObserve(50,L"");return entries.empty();}
     void Add(const MicroString& text,bool unicode,int64_t start,int64_t end){
         microObserve(49,text.GetString());fileText(text);searchEvents.push_back(unicode?1:0);
         searchEvents.push_back(static_cast<uint64_t>(start));searchEvents.push_back(static_cast<uint64_t>(end));

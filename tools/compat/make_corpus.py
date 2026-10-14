@@ -261,6 +261,21 @@ def subrip_variants():
         yield "subrip-format-" + name + ".srt", data
 
 
+def subrip_cue_variants():
+    timing = "00:00:00,000 --> 00:00:04,000\r\n"
+    for name, body in {
+        "control": "Caption sample\r\nsecond line\r\n",
+        "number-in-caption": "Caption sample\r\n2\r\nsecond line\r\n",
+        "blank-number": "Caption sample\r\n\r\n2\r\n00:00:01,000 --> 00:00:03,000\r\nNext caption\r\n",
+        "sticky-blank": "Caption sample\r\n\r\nintervening line\r\n2\r\n00:00:01,000 --> 00:00:03,000\r\nNext caption\r\n",
+        "number-with-tail": "Caption sample\r\n\r\n2suffix\r\nsecond line\r\n",
+        "number-trailing-space": "Caption sample\r\n\r\n2  \r\n00:00:01,000 --> 00:00:03,000\r\nNext caption\r\n",
+        "empty-lines": "Caption sample\r\n\r\n\r\nsecond line\r\n",
+        "final-no-newline": "Caption sample",
+    }.items():
+        yield "subrip-cue-" + name + ".srt", ("1\r\n" + timing + body).encode("ascii")
+
+
 def realtext_variants():
     for name, payload in {
         "control": "Formatting sample<br/>second line",
@@ -495,7 +510,8 @@ def make_cases(files):
                                                     ("ass-style-v5-box", "ass-style-v5-outline"),
                                                     ("ass-header-scaled-substring", "ass-header-scaled-control"),
                                                     ("microdvd-style-italic", "microdvd-style-control"),
-                                                    ("sami-file-title-skips-sync", "sami-file-control"))
+                                                    ("sami-file-title-skips-sync", "sami-file-control"),
+                                                    ("subrip-cue-number-in-caption", "subrip-cue-control"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -507,6 +523,7 @@ def main():
     generated = [(DEST / "generated" / (name + ".ass"), data) for name, data in variants()]
     generated += [(DEST / "generated" / name, data) for name, data in incremental_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in subrip_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in subrip_cue_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in realtext_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_header_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_style_variants()]

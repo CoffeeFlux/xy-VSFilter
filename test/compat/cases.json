@@ -137,6 +137,14 @@
     [
       "sami-file-title-skips-sync-memory",
       "sami-file-control-memory"
+    ],
+    [
+      "subrip-cue-number-in-caption-file",
+      "subrip-cue-control-file"
+    ],
+    [
+      "subrip-cue-number-in-caption-memory",
+      "subrip-cue-control-memory"
     ]
   ],
   "cases": [
@@ -8994,6 +9002,294 @@
       "id": "subrip-format-raw-utf16-memory",
       "script": "test/compat/generated/subrip-format-raw-utf16.srt",
       "sha256": "e430ad9e866f37f0cf404487aeadd73e90081cec5e7572799775710e5cfe4eaf",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-cue-control-file",
+      "script": "test/compat/generated/subrip-cue-control.srt",
+      "sha256": "1af4d03d1c0399921f850507f1bf1bc1e337317e5b5e89e1575c2b685da6c895",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-cue-control-memory",
+      "script": "test/compat/generated/subrip-cue-control.srt",
+      "sha256": "1af4d03d1c0399921f850507f1bf1bc1e337317e5b5e89e1575c2b685da6c895",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-cue-number-in-caption-file",
+      "script": "test/compat/generated/subrip-cue-number-in-caption.srt",
+      "sha256": "21db9b4e34524b4136ce3a70908939f253cef17b17987998b15e220980c7802b",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-cue-number-in-caption-memory",
+      "script": "test/compat/generated/subrip-cue-number-in-caption.srt",
+      "sha256": "21db9b4e34524b4136ce3a70908939f253cef17b17987998b15e220980c7802b",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-cue-blank-number-file",
+      "script": "test/compat/generated/subrip-cue-blank-number.srt",
+      "sha256": "5b737741ea1a9fb28accf71edd901e087a13db8214d8a9f295353792547a4066",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-cue-blank-number-memory",
+      "script": "test/compat/generated/subrip-cue-blank-number.srt",
+      "sha256": "5b737741ea1a9fb28accf71edd901e087a13db8214d8a9f295353792547a4066",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-cue-sticky-blank-file",
+      "script": "test/compat/generated/subrip-cue-sticky-blank.srt",
+      "sha256": "ade256b70a928b8be7e9adefdf599d728718141140da4923afa36e3a4a23e71b",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-cue-sticky-blank-memory",
+      "script": "test/compat/generated/subrip-cue-sticky-blank.srt",
+      "sha256": "ade256b70a928b8be7e9adefdf599d728718141140da4923afa36e3a4a23e71b",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-cue-number-with-tail-file",
+      "script": "test/compat/generated/subrip-cue-number-with-tail.srt",
+      "sha256": "00cb01e9e7c95a5f0e86c191d75567c45a95c062d02cf716f1c8024e92f2f1f1",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-cue-number-with-tail-memory",
+      "script": "test/compat/generated/subrip-cue-number-with-tail.srt",
+      "sha256": "00cb01e9e7c95a5f0e86c191d75567c45a95c062d02cf716f1c8024e92f2f1f1",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-cue-number-trailing-space-file",
+      "script": "test/compat/generated/subrip-cue-number-trailing-space.srt",
+      "sha256": "bd81b8089a2d026d01d10151d0f2a42e80ef399b4b8f73c0776e51725c153b33",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-cue-number-trailing-space-memory",
+      "script": "test/compat/generated/subrip-cue-number-trailing-space.srt",
+      "sha256": "bd81b8089a2d026d01d10151d0f2a42e80ef399b4b8f73c0776e51725c153b33",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-cue-empty-lines-file",
+      "script": "test/compat/generated/subrip-cue-empty-lines.srt",
+      "sha256": "4c792d7b189db4b88524535de924b3bc947a7cf9e7672352eb3547eb90dab1a9",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-cue-empty-lines-memory",
+      "script": "test/compat/generated/subrip-cue-empty-lines.srt",
+      "sha256": "4c792d7b189db4b88524535de924b3bc947a7cf9e7672352eb3547eb90dab1a9",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-cue-final-no-newline-file",
+      "script": "test/compat/generated/subrip-cue-final-no-newline.srt",
+      "sha256": "cf7a09f54ca07c80e90449d48819595854b9b8ee1fd57c51fd0d7c83fac449dd",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-cue-final-no-newline-memory",
+      "script": "test/compat/generated/subrip-cue-final-no-newline.srt",
+      "sha256": "cf7a09f54ca07c80e90449d48819595854b9b8ee1fd57c51fd0d7c83fac449dd",
       "open": "memory",
       "width": 1280,
       "height": 720,
