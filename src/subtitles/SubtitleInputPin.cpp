@@ -486,7 +486,11 @@ STDMETHODIMP_(CSubtitleInputPinHelper*) CSubtitleInputPin::CreateHelper( const C
 #else
         pRTS->m_name = CString(GetPinName(pReceivePin)) + _T(" (embeded)");
 #endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        pRTS->SetDocumentScreenSize(CSize(384, 288));
+#else
         pRTS->m_dstScreenSize = CSize(384, 288);
+#endif
         ret = DEBUG_NEW CTextSubtitleInputPinHepler(pRTS, m_mt);
     }
     else if(mt.majortype == MEDIATYPE_Subtitle)
@@ -537,7 +541,11 @@ STDMETHODIMP_(CSubtitleInputPinHelper*) CSubtitleInputPin::CreateHelper( const C
             pRTS->m_name = name;
 #endif
             pRTS->m_lcid = lcid;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            pRTS->SetDocumentScreenSize(CSize(384, 288));
+#else
             pRTS->m_dstScreenSize = CSize(384, 288);
+#endif
 
             if (m_mt.subtype == MEDIASUBTYPE_WEBVTT) {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL

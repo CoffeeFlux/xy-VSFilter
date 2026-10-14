@@ -1731,8 +1731,16 @@ void CDirectVobSubFilter::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyl
             if(m_xy_bool_opt[BOOL_OVERRIDE_PLACEMENT])
             {
                 s.scrAlignment = 2;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                int w = pRTS->GetDocumentScreenSize().cx;
+#else
                 int w = pRTS->m_dstScreenSize.cx;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                int h = pRTS->GetDocumentScreenSize().cy;
+#else
                 int h = pRTS->m_dstScreenSize.cy;
+#endif
                 CRect tmp_rect = s.marginRect.get();
                 int mw = w - tmp_rect.left - tmp_rect.right;
                 tmp_rect.bottom = h - MulDiv(h, m_xy_size_opt[SIZE_PLACEMENT_PERC].cy, 100);
@@ -1787,7 +1795,11 @@ void CDirectVobSubFilter::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyl
                 break;
             }
             pRTS->Deinit();
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            playres = pRTS->GetDocumentScreenSize();
+#else
             playres = pRTS->m_dstScreenSize;
+#endif
         }
         else if(clsid == __uuidof(CRenderedHdmvSubtitle))
         {

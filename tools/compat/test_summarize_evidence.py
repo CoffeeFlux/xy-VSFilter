@@ -9,10 +9,11 @@ from summarize_evidence import normalize_windows_source, windows_source_bytes, p
 class WindowsHeaderProvenance(unittest.TestCase):
     def test_lifecycle_archive_requirements_follow_verified_invocations(self):
         self.assertEqual(document_lifecycle_requirements(b"old probe"),
-                         {"require_named_stages": False, "require_identity_stages": False, "require_interpretation_stages": False})
+                         {"require_named_stages": False, "require_identity_stages": False, "require_interpretation_stages": False, "require_layout_stages": False})
         source=b"int main() {\n    named_style_lifecycle();\n    identity_lifecycle();\n}"
         self.assertEqual(document_lifecycle_requirements(source),
-                         {"require_named_stages": True, "require_identity_stages": True, "require_interpretation_stages": False})
+                         {"require_named_stages": True, "require_identity_stages": True, "require_interpretation_stages": False, "require_layout_stages": False})
+        self.assertTrue(document_lifecycle_requirements(b"    layout_lifecycle();")["require_layout_stages"])
         self.assertTrue(document_lifecycle_requirements(b'    interpretation_lifecycle();')['require_interpretation_stages'])
         self.assertFalse(document_lifecycle_requirements(b'// identity_lifecycle();\n"identity_lifecycle();"')['require_identity_stages'])
 

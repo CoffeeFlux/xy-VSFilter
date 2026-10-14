@@ -2636,26 +2636,62 @@ if(sver <= 4)   style->scrAlignment = (style->scrAlignment&4) ? ((style->scrAlig
         }
         else if(XY_ASS_HEADER(L"playresx", 4))
         {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            try {ret.SetDocumentScreenWidth(GetInt(buff));}
+#else
             try {ret.m_dstScreenSize.cx = GetInt(buff);}
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            catch(...) {ret.SetDocumentScreenSize(CSize(0, 0)); return(false);}
+#else
             catch(...) {ret.m_dstScreenSize = CSize(0, 0); return(false);}
+#endif
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            if(ret.GetDocumentScreenSize().cy <= 0)
+#else
             if(ret.m_dstScreenSize.cy <= 0)
+#endif
             {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                ret.SetDocumentScreenHeight((ret.GetDocumentScreenSize().cx == 1280)
+                    ? 1024
+                    : ret.GetDocumentScreenSize().cx * 3 / 4);
+#else
                 ret.m_dstScreenSize.cy = (ret.m_dstScreenSize.cx == 1280)
                     ? 1024
                     : ret.m_dstScreenSize.cx * 3 / 4;
+#endif
             }
         }
         else if(XY_ASS_HEADER(L"playresy", 5))
         {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            try {ret.SetDocumentScreenHeight(GetInt(buff));}
+#else
             try {ret.m_dstScreenSize.cy = GetInt(buff);}
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            catch(...) {ret.SetDocumentScreenSize(CSize(0, 0)); return(false);}
+#else
             catch(...) {ret.m_dstScreenSize = CSize(0, 0); return(false);}
+#endif
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            if(ret.GetDocumentScreenSize().cx <= 0)
+#else
             if(ret.m_dstScreenSize.cx <= 0)
+#endif
             {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                ret.SetDocumentScreenWidth((ret.GetDocumentScreenSize().cy == 1024)
+                    ? 1280
+                    : ret.GetDocumentScreenSize().cy * 4 / 3);
+#else
                 ret.m_dstScreenSize.cx = (ret.m_dstScreenSize.cy == 1024)
                     ? 1280
                     : ret.m_dstScreenSize.cy * 4 / 3;
+#endif
             }
         }
         else if(XY_ASS_HEADER(L"layoutresx", 6))
@@ -2670,8 +2706,16 @@ if(sver <= 4)   style->scrAlignment = (style->scrAlignment&4) ? ((style->scrAlig
         }
         else if(XY_ASS_HEADER(L"wrapstyle", 8))
         {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            try {ret.SetDocumentWrapStyle(GetInt(buff));}
+#else
             try {ret.m_defaultWrapStyle = GetInt(buff);}
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            catch(...) {ret.SetDocumentWrapStyle(1); return(false);}
+#else
             catch(...) {ret.m_defaultWrapStyle = 1; return(false);}
+#endif
         }
         else if(XY_ASS_HEADER(L"scripttype", 9))
         {
@@ -2694,9 +2738,17 @@ if(sver <= 4)   style->scrAlignment = (style->scrAlignment&4) ? ((style->scrAlig
             buff = GetStr(buff);
             buff.MakeLower();
 #ifdef XY_VSFILTER_RUST_TEXT
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            ret.SetDocumentCollisions(static_cast<int>(headers.Value(buff, 0)));
+#else
             ret.m_collisions = static_cast<int>(headers.Value(buff, 0));
+#endif
+#else
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            ret.SetDocumentCollisions(buff.Find(L"reverse") >= 0 ? 1 : 0);
 #else
             ret.m_collisions = buff.Find(L"reverse") >= 0 ? 1 : 0;
+#endif
 #endif
         }
         else if(XY_ASS_HEADER(L"scaledborderandshadow", 11))
@@ -2704,9 +2756,17 @@ if(sver <= 4)   style->scrAlignment = (style->scrAlignment&4) ? ((style->scrAlig
             buff = GetStr(buff);
             buff.MakeLower();
 #ifdef XY_VSFILTER_RUST_TEXT
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            ret.SetDocumentScaledBAS(headers.Value(buff, 1) != 0);
+#else
             ret.m_fScaledBAS = headers.Value(buff, 1) != 0;
+#endif
+#else
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            ret.SetDocumentScaledBAS(buff.Find(L"yes") >= 0);
 #else
             ret.m_fScaledBAS = buff.Find(L"yes") >= 0;
+#endif
 #endif
         }
         else if(XY_ASS_HEADER(L"[v4 styles]", 12))
@@ -2817,26 +2877,62 @@ static bool OpenXombieSub(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
         }
         else if(entry == L"screenhorizontal")
         {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            try {ret.SetDocumentScreenWidth(GetInt(buff));}
+#else
             try {ret.m_dstScreenSize.cx = GetInt(buff);}
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            catch(...) {ret.SetDocumentScreenSize(CSize(0, 0)); return(false);}
+#else
             catch(...) {ret.m_dstScreenSize = CSize(0, 0); return(false);}
+#endif
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            if(ret.GetDocumentScreenSize().cy <= 0)
+#else
             if(ret.m_dstScreenSize.cy <= 0)
+#endif
             {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                ret.SetDocumentScreenHeight((ret.GetDocumentScreenSize().cx == 1280)
+                    ? 1024
+                    : ret.GetDocumentScreenSize().cx * 3 / 4);
+#else
                 ret.m_dstScreenSize.cy = (ret.m_dstScreenSize.cx == 1280)
                     ? 1024
                     : ret.m_dstScreenSize.cx * 3 / 4;
+#endif
             }
         }
         else if(entry == L"screenvertical")
         {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            try {ret.SetDocumentScreenHeight(GetInt(buff));}
+#else
             try {ret.m_dstScreenSize.cy = GetInt(buff);}
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            catch(...) {ret.SetDocumentScreenSize(CSize(0, 0)); return(false);}
+#else
             catch(...) {ret.m_dstScreenSize = CSize(0, 0); return(false);}
+#endif
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            if(ret.GetDocumentScreenSize().cx <= 0)
+#else
             if(ret.m_dstScreenSize.cx <= 0)
+#endif
             {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                ret.SetDocumentScreenWidth((ret.GetDocumentScreenSize().cy == 1024)
+                    ? 1280
+                    : ret.GetDocumentScreenSize().cy * 4 / 3);
+#else
                 ret.m_dstScreenSize.cx = (ret.m_dstScreenSize.cy == 1024)
                     ? 1280
                     : ret.m_dstScreenSize.cy * 4 / 3;
+#endif
             }
         }
         else if(entry == L"style")
@@ -3087,10 +3183,26 @@ CSimpleTextSubtitle::CSimpleTextSubtitle()
 #else
     m_mode                 = TIME;
 #endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentScreenSize(CSize(0, 0));
+#else
     m_dstScreenSize        = CSize(0, 0);
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentWrapStyle(0);
+#else
     m_defaultWrapStyle     = 0;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentCollisions(0);
+#else
     m_collisions           = 0;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentScaledBAS(false);
+#else
     m_fScaledBAS           = false;
+#endif
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     SetDocumentEncoding(CTextFile::DEFAULT_ENCODING);
 #else
@@ -3132,10 +3244,26 @@ void CSimpleTextSubtitle::Copy(CSimpleTextSubtitle& sts)
 #else
     m_subtitleType                 = sts.m_subtitleType;
 #endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentScreenSize(sts.GetDocumentScreenSize());
+#else
     m_dstScreenSize                = sts.m_dstScreenSize;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentWrapStyle(sts.GetDocumentWrapStyle());
+#else
     m_defaultWrapStyle             = sts.m_defaultWrapStyle;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentCollisions(sts.GetDocumentCollisions());
+#else
     m_collisions                   = sts.m_collisions;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentScaledBAS(sts.GetDocumentScaledBAS());
+#else
     m_fScaledBAS                   = sts.m_fScaledBAS;
+#endif
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     SetDocumentEncoding(sts.GetDocumentEncoding());
 #else
@@ -3224,7 +3352,11 @@ bool CSimpleTextSubtitle::CopyStyles(const CSTSStyleMap& styles, bool fAppend)
 
 void CSimpleTextSubtitle::Empty()
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentScreenSize(CSize(0, 0));
+#else
     m_dstScreenSize = CSize(0, 0);
+#endif
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     m_document->ClearNamedStyles();
     m_document->Clear();
@@ -4118,6 +4250,56 @@ void CSimpleTextSubtitle::OrSegmentAnimated(int iSegment, bool animated)
 }
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+CSize CSimpleTextSubtitle::GetDocumentScreenSize() const
+{
+    return m_document->ScreenSize();
+}
+
+void CSimpleTextSubtitle::SetDocumentScreenSize(const CSize& value)
+{
+    m_document->SetScreenSize(value);
+}
+
+void CSimpleTextSubtitle::SetDocumentScreenWidth(int value)
+{
+    m_document->SetScriptField(0, value);
+}
+
+void CSimpleTextSubtitle::SetDocumentScreenHeight(int value)
+{
+    m_document->SetScriptField(1, value);
+}
+
+int CSimpleTextSubtitle::GetDocumentWrapStyle() const
+{
+    return m_document->ScriptField(2);
+}
+
+void CSimpleTextSubtitle::SetDocumentWrapStyle(int value)
+{
+    m_document->SetScriptField(2, value);
+}
+
+int CSimpleTextSubtitle::GetDocumentCollisions() const
+{
+    return m_document->ScriptField(3);
+}
+
+void CSimpleTextSubtitle::SetDocumentCollisions(int value)
+{
+    m_document->SetScriptField(3, value);
+}
+
+bool CSimpleTextSubtitle::GetDocumentScaledBAS() const
+{
+    return m_document->ScriptField(4) != 0;
+}
+
+void CSimpleTextSubtitle::SetDocumentScaledBAS(bool value)
+{
+    m_document->SetScriptField(4, value ? 1 : 0);
+}
+
 tmode CSimpleTextSubtitle::GetDocumentMode() const
 {
     return static_cast<tmode>(m_document->Interpretation(0));
@@ -4626,7 +4808,11 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
 
         ChangeUnknownStylesToDefault();
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        if(GetDocumentScreenSize() == CSize(0, 0)) SetDocumentScreenSize(CSize(384, 288));
+#else
         if(m_dstScreenSize == CSize(0, 0)) m_dstScreenSize = CSize(384, 288);
+#endif
 
         return(true);
     }
@@ -4710,8 +4896,16 @@ bool CSimpleTextSubtitle::SaveAs(CString fn, exttype et, double fps, CTextFile::
         str += _T("; Note: This file was saved by Subresync.\n");
         str += _T("; \n");
         str += (et == EXTSSA) ? _T("ScriptType: v4.00\n") : _T("ScriptType: v4.00+\n");
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        str += (GetDocumentCollisions() == 0) ? _T("Collisions: Normal\n") : _T("Collisions: Reverse\n");
+#else
         str += (m_collisions == 0) ? _T("Collisions: Normal\n") : _T("Collisions: Reverse\n");
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        if(et == EXTASS && GetDocumentScaledBAS()) str += _T("ScaledBorderAndShadow: Yes\n");
+#else
         if(et == EXTASS && m_fScaledBAS) str += _T("ScaledBorderAndShadow: Yes\n");
+#endif
         str += _T("PlayResX: %d\n");
         str += _T("PlayResY: %d\n");
         str += _T("Timer: 100.0000\n");
@@ -4721,7 +4915,11 @@ bool CSimpleTextSubtitle::SaveAs(CString fn, exttype et, double fps, CTextFile::
             : _T("[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n");
 
         CString str2;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        str2.Format(str, GetDocumentScreenSize().cx, GetDocumentScreenSize().cy);
+#else
         str2.Format(str, m_dstScreenSize.cx, m_dstScreenSize.cy);
+#endif
         f.WriteString(str2);
 
         str  = (et == EXTSSA)
@@ -4908,7 +5106,11 @@ bool CSimpleTextSubtitle::SaveAs(CString fn, exttype et, double fps, CTextFile::
         str += _T("PlayResY: %d\n");
         str += _T("\n");
         str += _T("[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n");
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        str2.Format(str, GetDocumentScreenSize().cx, GetDocumentScreenSize().cy);
+#else
         str2.Format(str, m_dstScreenSize.cx, m_dstScreenSize.cy);
+#endif
         f.WriteString(str2);
 
         str  = _T("Style: Default,%s,%d,&H%08x,&H%08x,&H%08x,&H%08x,%d,%d,%d,%d,%d,%d,%d,%.2f,%d,%d,%d,%d,%d,%d,%d,%d\n");

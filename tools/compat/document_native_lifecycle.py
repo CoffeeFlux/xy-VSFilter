@@ -36,7 +36,7 @@ def git(root, *args):
     return subprocess.check_output(["git", "-C", str(root), *args], timeout=60).decode().strip()
 
 
-def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True):
+def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True):
     lines = data.splitlines()
     if not lines or lines[0] != f"provenance pointer_bits={pointer_bits}".encode():
         raise ValueError("missing or incorrect native architecture provenance")
@@ -75,6 +75,24 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
         if positions != sorted(positions):
             raise ValueError("interpretation lifecycle stage order differs")
 
+    if require_layout_stages:
+        stages = ("layout-constructed", "layout-supplied", "layout-copy", "layout-copy-independent",
+                  "layout-empty", "layout-self-copy", "layout-open-fallback", "layout-open-x1280",
+                  "layout-open-y1024", "layout-open-repeated")
+        positions = []
+        for stage in stages:
+            matches = [(index, line) for index, line in enumerate(lines)
+                       if line.startswith(f"layout-stage {stage} width=".encode())]
+            if len(matches) != 1 or any(token not in matches[0][1] for token in (b" height=", b" wrap=", b" collisions=", b" scaled=")):
+                raise ValueError(f"missing/duplicate script layout stage {stage}")
+            positions.append(matches[0][0])
+        if positions != sorted(positions):
+            raise ValueError("script layout stage order differs")
+        for stage in stages[-4:]:
+            matches = [line for line in lines if line.startswith(f"layout-callback {stage} width=".encode())]
+            if len(matches) != 1 or b" height=" not in matches[0]:
+                raise ValueError(f"missing/duplicate layout callback observation {stage}")
+
     if require_named_stages:
         for stage in ("named-initial", "named-equal-duplicate", "named-conflict-collision",
                       "named-numeric-collision", "named-copy-replace", "named-copy-independent",
@@ -90,11 +108,11 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
 
 
 
-def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True):
+def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True):
     if len(traces) != 4:
         raise ValueError("two reference and two candidate executions required")
     for trace in traces:
-        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages)
+        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages)
     if any(trace != traces[0] for trace in traces[1:]):
         raise ValueError("native lifecycle traces differ or are nondeterministic")
 
