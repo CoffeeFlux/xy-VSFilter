@@ -20,6 +20,22 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust also owns the remaining source, output and conversion sequence in
+  `UnicodeSSAToMBCS` and `MBCSSSAToUnicode`. The wrappers still convert an empty
+  prefix before an opening brace, parse only the first qualifying `\fe`, use
+  the original charset for tag text, reset empty charset overrides, and retain
+  unterminated tails. Native searches, numeric conversion and CString fragment
+  concatenation remain at their original checkpoints; counted fragments are then
+  copied into Rust. Embedded NULs retain native concatenation behavior.
+  Expanded fatal ASan/UBSan comparisons passed **1,144,736 complete conversions**
+  on arm64 and under x64 execution: **856,420 changed strings**, **7,018,405
+  output units**, **46,486,003 callback observation values**, **576 interruptions**,
+  **158,384 SSA owners / 1,882,917 steps / 721,707 appended fragments**. Every
+  UTF-16 value is now also exercised inside SSA charset transitions. Rust 1.85
+  tests (90 core, 61 FFI), strict Clippy, default syntax and corpus freshness pass.
+  Windows/Miri and complete renderer validation are pending. Native code-page
+  conversion, numeric parsing, text export and host integration remain separate
+  work; the portable conversion models do not establish Windows API behavior.
 * Safe Rust owns the raw input/output buffers and iteration for `ToMBCS` and
   `ToUnicode`. Native charset translation, lead-byte classification and conversion
   APIs remain in order. Conversion still runs one UTF-16 unit at a time; failed

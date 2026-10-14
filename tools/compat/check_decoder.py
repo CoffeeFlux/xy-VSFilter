@@ -219,6 +219,8 @@ public:
         if name == "CandidateEncoding":
             assert definition.count("XyRust::Encoding convert") == 2
             definition = definition.replace("XyRust::Encoding convert", "XyRust::ObservedEncoding convert")
+            assert definition.count("XyRust::SsaEncoding convert") == 2
+            definition = definition.replace("XyRust::SsaEncoding convert", "XyRust::ObservedSsaEncoding convert")
         encoding += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_encoding.h").write_text(encoding, encoding="utf-8")
     sami = '#include "sami_shell.h"\n'
@@ -1170,7 +1172,7 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "webvtt_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring model with host iswspace; Windows comparison required",
         "encoding_compile_command": encoding_compile,
         "encoding_result": encoding_result.stdout, "encoding_stderr": encoding_result.stderr,
-        "encoding_scope": "Complete ToMBCS, ToUnicode and both SSA wrappers against pinned methods; native ATL and Windows conversion APIs in Windows CI, portable conversion models elsewhere; raw UTF-16/NULs, initialized returned bytes only, failed conversions, trailing lead bytes, callback order/interruption and errno/LastError",
+        "encoding_scope": "Owned ToMBCS, ToUnicode and both SSA wrappers against pinned methods; native fragment concatenation, ATL and Windows conversion APIs in Windows CI, portable conversion models elsewhere; raw UTF-16/NULs, initialized returned bytes only, failed conversions, trailing lead bytes, callback order/interruption and errno/LastError",
         "sami_compile_command": sami_compile,
         "sami_result": sami_result.stdout, "sami_stderr": sami_result.stderr,
         "sami_scope": "Whole SMI2SSA and ReplaceNoCase against pinned method/table data; native ATL CStringW and CAtlMap/CRT on Windows, portable models elsewhere; table name pointers const-qualified without changing entries; native numeric/color/trim callbacks, post-trim mutations, owned font arguments and errno; replacement-bearing NUL outcomes excluded",

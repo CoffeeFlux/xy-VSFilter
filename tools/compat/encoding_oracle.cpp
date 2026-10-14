@@ -62,6 +62,8 @@ int main(){
         for(unsigned function=0;function<2;++function)for(int mode=0;mode<3;++mode)compare(single,function,128,mode);
         std::wstring mixed=L"a";mixed+=single;mixed.push_back(0);mixed+=L"z";
         compare(mixed,0,0);compare(mixed,1,128);
+        std::wstring tagged=L"a{\\fe128}";tagged+=single;tagged.push_back(0);tagged+=L"tail{\\fe}z";
+        compare(tagged,2,0);compare(tagged,3,128);
         std::wstring pair;pair.push_back(static_cast<wchar_t>(unit>>8));pair.push_back(static_cast<wchar_t>(unit&255));
         for(int charset:{128,129,130,134,136})compare(pair,1,charset);
     }
@@ -79,6 +81,6 @@ int main(){
     const std::wstring interrupted=L"text{\\fe128}\x81\x40{\\fe}tail";
     for(unsigned function=0;function<4;++function)for(int mode=0;mode<3;++mode)for(int failure=0;failure<90;++failure)
         compare(interrupted,function,128,mode,0,failure);
-    if(!changed || !interruptions || !encodingOwners || !encodingByteReplies || !encodingUnitReplies || !failedConversions || !trailingLeads)return 1;
-    printf("%llu exact encoding comparisons passed (%llu changed strings, %llu output UTF-16 units, %llu callback observation values, %llu injected interruptions, %llu failed-conversion fixtures, %llu trailing-lead controls; %llu Rust owners / %llu input reads / %llu byte replies / %llu unit replies; complete ToMBCS, ToUnicode and SSA wrappers, all UTF-16 values, all DBCS byte pairs, all charset/byte pairs, embedded NULs, ordered native APIs and errno/Windows LastError; portable conversion models are not Windows code-page evidence)\n",(unsigned long long)comparisons,(unsigned long long)changed,(unsigned long long)units,(unsigned long long)callbacks,(unsigned long long)interruptions,(unsigned long long)failedConversions,(unsigned long long)trailingLeads,(unsigned long long)encodingOwners,(unsigned long long)encodingTakes,(unsigned long long)encodingByteReplies,(unsigned long long)encodingUnitReplies);
+    if(!changed || !interruptions || !encodingOwners || !encodingByteReplies || !encodingUnitReplies || !failedConversions || !trailingLeads || !ssaEncodingOwners || !ssaEncodingSteps || !ssaEncodingAppends)return 1;
+    printf("%llu exact encoding comparisons passed (%llu changed strings, %llu output UTF-16 units, %llu callback observation values, %llu injected interruptions, %llu failed-conversion fixtures, %llu trailing-lead controls; %llu Rust owners / %llu input reads / %llu byte replies / %llu unit replies; %llu SSA owners / %llu steps / %llu appended fragments; complete ToMBCS, ToUnicode and SSA wrappers, all UTF-16 values, all DBCS byte pairs, all charset/byte pairs, embedded NULs, ordered native APIs and errno/Windows LastError; portable conversion models are not Windows code-page evidence)\n",(unsigned long long)comparisons,(unsigned long long)changed,(unsigned long long)units,(unsigned long long)callbacks,(unsigned long long)interruptions,(unsigned long long)failedConversions,(unsigned long long)trailingLeads,(unsigned long long)encodingOwners,(unsigned long long)encodingTakes,(unsigned long long)encodingByteReplies,(unsigned long long)encodingUnitReplies,(unsigned long long)ssaEncodingOwners,(unsigned long long)ssaEncodingSteps,(unsigned long long)ssaEncodingAppends);
 }

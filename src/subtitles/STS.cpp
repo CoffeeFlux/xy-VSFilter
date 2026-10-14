@@ -569,6 +569,44 @@ static CStringW ToUnicode(CStringW str, DWORD CharSet)
 
 static CStringW MBCSSSAToUnicode(CStringW str, int CharSet)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    const int OrgCharSet = CharSet;
+    XyRust::SsaEncoding convert(str);
+    int reply = 0;
+    for(;;)
+    {
+        const unsigned action = convert.Step(reply);
+        if(action == 0) return convert.Text<CStringW>(true);
+        str = convert.Text<CStringW>();
+        switch(action)
+        {
+        case 1: reply = FindChar(str, '{', 0, false, CharSet); break;
+        case 2: reply = FindChar(str, '}', 0, false, CharSet); break;
+        case 3:
+            {
+                const int k = str.Find(L"\\fe");
+                if(k >= 0 && k < convert.Count()-1)
+                {
+                    CharSet = 0;
+                    int l = k+3;
+                    for(; _istdigit(str[l]); l++) CharSet = CharSet*10 + (str[l] - '0');
+                    if(l == k+3) CharSet = OrgCharSet;
+                }
+            }
+            break;
+        case 4:
+        case 5:
+        case 6:
+            {
+                CStringW fragment;
+                if(action == 6) fragment += ToUnicode(str, CharSet);
+                else fragment += ToUnicode(str.Left(convert.Count()), action == 5 ? OrgCharSet : CharSet);
+                convert.Append(fragment);
+            }
+            break;
+        }
+    }
+#else
     CStringW ret;
 
     int OrgCharSet = CharSet;
@@ -615,6 +653,7 @@ static CStringW MBCSSSAToUnicode(CStringW str, int CharSet)
     }
 
     return(ret);
+#endif
 }
 
 static CStringW RemoveSSATags(CStringW str, bool fUnicode, int CharSet)
