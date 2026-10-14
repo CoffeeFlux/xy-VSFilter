@@ -20,6 +20,28 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Scanline sorting/winding has completed all four portable CI targets, Miri and
+  both Windows renderer architectures. The **730-case / 7,650-frame** corpus and
+  **32 mutations / 224 frames** match on each architecture, with matching exports
+  and declared platform requirements. [Archived evidence](scan-row-evidence.json)
+  keeps controlled geometry emission distinct from production renderer checks.
+* Rust owns legacy OldFixedPointBlur output planes only after a full-pitch copy
+  preflight confirms both source planes, logical copy extents and final row
+  cursors fit the backing. Unsupported layouts retain the native path. Fatal
+  ASan/UBSan comparisons pass on arm64 and under x64 execution: **46,058 calls /
+  13,447,184 plane bytes and metadata / 1,502,796 logical allocation, factory and
+  filter observations / 92,076 Rust owners, loans and releases**. The native
+  floating-point geometry, threshold/pass decisions, full-pitch padding copies,
+  source aliases, output reuse, shared lifetimes and cache accounting match.
+  **1,848 preflight layout exclusions are not parity passes**. The initial
+  unchecked-footprint campaign failed; its status and the corrected boundary are
+  recorded in [layout scope](legacy-blur-layout-scope.json). Corrected calls also
+  use an independent checked-copy interceptor before memory access. Coefficient
+  factories and kernels are controlled; absent-plane pointer arithmetic, object
+  aliasing, invalid geometry, actual OOM and scratch failures remain excluded.
+  Rust 1.85 tests (143 core, 94 FFI), strict Clippy, default syntax and Python
+  checks pass. The corpus remains **762 cases**; production renderer entry into
+  this legacy method is not asserted. Windows/Miri and DLL checks are pending.
 * Scan-conversion edge ownership has completed all four portable CI targets,
   Miri and both Windows renderer architectures. The **718-case / 7,530-frame**
   corpus and **32 mutations / 224 frames** match on each architecture, alongside
