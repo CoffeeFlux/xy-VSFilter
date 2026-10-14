@@ -329,8 +329,8 @@ public:
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_set_default_style_v1(id_,bytes.data(),bytes.size());}));
     }
     template<class Style = STSStyle> Style DefaultStyle() const { return DocumentDetail::StyleValue<Style>(Snapshot(2,0).Read()); }
-    void CopyDefaultStyle(const DocumentOwner& source) {
-        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_copy_default_style_v1(id_,source.id_);}));
+    void CopySelectedState(const DocumentOwner& source) {
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_copy_selected_state_v1(id_,source.id_);}));
     }
     int32_t Metadata(uint32_t field) const {
         DocumentDetail::Shape(field <= 3); std::array<uint8_t,4> out{};

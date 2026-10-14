@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "scope": "Experimental persistent document containers/styles/identity/interpretation/scriptlayout/initializedmetadata; defaultproduction unchanged",
-  "measured_base_commit": "dc11cd69045f708f43f096ccb2dddafd4dfe9b73",
+  "measured_base_commit": "4f1264a4baea1ac2e6ea43f7d36654a6ce6214f1",
   "working_tree_source_hashes": true,
   "core_unsafe": {
     "production_block": 0,
@@ -30,9 +30,9 @@
   "new_boundary_files": [
     {
       "path": "rust/ffi/src/document.rs",
-      "sha256": "c6eed22b222dd863cc7be480aa827191609516fef83586589c50ece8595024d7",
-      "physical_lines_including_tests": 2394,
-      "nonblank_code_lines_excluding_tests": 940,
+      "sha256": "2db5eda976e7c32075500e3b5697c70df9b8c05793105c18ca600c74e797e649",
+      "physical_lines_including_tests": 2518,
+      "nonblank_code_lines_excluding_tests": 943,
       "counts": {
         "production_block": 32,
         "production_function": 28,
@@ -87,317 +87,317 @@
           "test": false
         },
         {
-          "line": 220,
+          "line": 223,
           "kind": "function",
           "test": false
         },
         {
-          "line": 240,
+          "line": 243,
           "kind": "block",
           "test": false
         },
         {
-          "line": 256,
+          "line": 259,
           "kind": "function",
           "test": false
         },
         {
-          "line": 268,
+          "line": 271,
           "kind": "block",
           "test": false
         },
         {
-          "line": 302,
+          "line": 305,
           "kind": "function",
           "test": false
         },
         {
-          "line": 322,
+          "line": 325,
           "kind": "block",
           "test": false
         },
         {
-          "line": 342,
+          "line": 345,
           "kind": "function",
           "test": false
         },
         {
-          "line": 357,
+          "line": 360,
           "kind": "block",
           "test": false
         },
         {
-          "line": 387,
+          "line": 390,
           "kind": "function",
           "test": false
         },
         {
-          "line": 401,
+          "line": 404,
           "kind": "block",
           "test": false
         },
         {
-          "line": 408,
+          "line": 411,
           "kind": "function",
           "test": false
         },
         {
-          "line": 426,
+          "line": 429,
           "kind": "block",
           "test": false
         },
         {
-          "line": 453,
+          "line": 456,
           "kind": "function",
           "test": false
         },
         {
-          "line": 471,
+          "line": 474,
           "kind": "block",
           "test": false
         },
         {
-          "line": 478,
+          "line": 481,
           "kind": "function",
           "test": false
         },
         {
-          "line": 492,
+          "line": 495,
           "kind": "block",
           "test": false
         },
         {
-          "line": 494,
+          "line": 497,
           "kind": "block",
           "test": false
         },
         {
-          "line": 529,
+          "line": 532,
           "kind": "function",
           "test": false
         },
         {
-          "line": 541,
+          "line": 544,
           "kind": "block",
           "test": false
         },
         {
-          "line": 565,
+          "line": 568,
           "kind": "function",
           "test": false
         },
         {
-          "line": 581,
+          "line": 584,
           "kind": "block",
           "test": false
         },
         {
-          "line": 609,
+          "line": 612,
           "kind": "block",
           "test": false
         },
         {
-          "line": 624,
+          "line": 627,
           "kind": "function",
           "test": false
         },
         {
-          "line": 639,
+          "line": 642,
           "kind": "block",
           "test": false
         },
         {
-          "line": 646,
+          "line": 649,
           "kind": "function",
           "test": false
         },
         {
-          "line": 664,
+          "line": 667,
           "kind": "block",
           "test": false
         },
         {
-          "line": 671,
+          "line": 674,
           "kind": "function",
           "test": false
         },
         {
-          "line": 693,
+          "line": 696,
           "kind": "block",
           "test": false
         },
         {
-          "line": 700,
+          "line": 703,
           "kind": "function",
           "test": false
         },
         {
-          "line": 723,
+          "line": 726,
           "kind": "block",
           "test": false
         },
         {
-          "line": 730,
+          "line": 733,
           "kind": "function",
           "test": false
         },
         {
-          "line": 787,
+          "line": 790,
           "kind": "block",
           "test": false
         },
         {
-          "line": 794,
+          "line": 797,
           "kind": "function",
           "test": false
         },
         {
-          "line": 804,
+          "line": 807,
           "kind": "block",
           "test": false
         },
         {
-          "line": 812,
+          "line": 815,
           "kind": "function",
           "test": false
         },
         {
-          "line": 830,
+          "line": 833,
           "kind": "block",
           "test": false
         },
         {
-          "line": 846,
+          "line": 849,
           "kind": "function",
           "test": false
         },
         {
-          "line": 862,
+          "line": 865,
           "kind": "block",
           "test": false
         },
         {
-          "line": 882,
+          "line": 885,
           "kind": "block",
           "test": false
         },
         {
-          "line": 889,
+          "line": 892,
           "kind": "function",
           "test": false
         },
         {
-          "line": 904,
+          "line": 907,
           "kind": "block",
           "test": false
         },
         {
-          "line": 914,
+          "line": 917,
           "kind": "function",
           "test": false
         },
         {
-          "line": 922,
+          "line": 925,
           "kind": "block",
           "test": false
         },
         {
-          "line": 933,
+          "line": 936,
           "kind": "function",
           "test": false
         },
         {
-          "line": 944,
+          "line": 947,
           "kind": "block",
           "test": false
         },
         {
-          "line": 945,
+          "line": 948,
           "kind": "block",
           "test": false
         },
         {
-          "line": 974,
+          "line": 977,
           "kind": "function",
           "test": false
         },
         {
-          "line": 981,
+          "line": 984,
           "kind": "block",
           "test": false
         },
         {
-          "line": 992,
+          "line": 995,
           "kind": "function",
           "test": false
         },
         {
-          "line": 999,
+          "line": 1002,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1052,
+          "line": 1055,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1069,
+          "line": 1072,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1082,
+          "line": 1085,
           "kind": "function",
           "test": true
         },
         {
-          "line": 1086,
+          "line": 1089,
           "kind": "block",
-          "test": true
-        },
-        {
-          "line": 1108,
-          "kind": "function",
           "test": true
         },
         {
           "line": 1111,
-          "kind": "block",
-          "test": true
-        },
-        {
-          "line": 1123,
           "kind": "function",
           "test": true
         },
         {
-          "line": 1127,
+          "line": 1114,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1132,
+          "line": 1126,
           "kind": "function",
           "test": true
         },
         {
-          "line": 1136,
+          "line": 1130,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1141,
+          "line": 1135,
+          "kind": "function",
+          "test": true
+        },
+        {
+          "line": 1139,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1165,
+          "line": 1144,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1174,
+          "line": 1168,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 1177,
           "kind": "block",
           "test": true
         }
@@ -416,9 +416,9 @@
     },
     {
       "path": "rust/ffi/src/document_registry.rs",
-      "sha256": "5236ff1cb388c233cb63c4c1d0850047bed3f5f4234d19bccd5c5a48b5a9f5cb",
-      "physical_lines_including_tests": 388,
-      "nonblank_code_lines_excluding_tests": 155,
+      "sha256": "dd7f9eeea1bc353364e067c1ce2f4e99f8b0fb3eb5b2336340836ade9b270729",
+      "physical_lines_including_tests": 393,
+      "nonblank_code_lines_excluding_tests": 158,
       "counts": {
         "production_block": 1,
         "production_function": 0,
@@ -433,12 +433,12 @@
       },
       "sites": [
         {
-          "line": 151,
+          "line": 156,
           "kind": "impl",
           "test": false
         },
         {
-          "line": 195,
+          "line": 200,
           "kind": "block",
           "test": false
         }
@@ -461,7 +461,7 @@
   "added_unsafe_impls": 1,
   "retired_native_owners": 18,
   "retired_ffi_crossings": 0,
-  "review": "Frozen initializedmetadata scalar/rawbits staging review and actual lexical measurement; original reviews retainedhistorically. Localtests/generation do not pass full Windows/nativehost gates.",
+  "review": "Frozen selected-state Copy staging and source measurement; previous default-copy snapshots historical. No additional unsafe code or runtimecall-count/parity claim.",
   "remaining_contracts": [
     "Changed-code Windows x86/x64 full-class named/default lifecycle, style API/value and renderer comparisons",
     "Native wrapper publication/destruction and real host lifetimes",
@@ -973,27 +973,62 @@
         "test_trait": 0,
         "test_other": 0
       }
+    },
+    {
+      "status": "superseded initializedmetadata source measurement",
+      "measured_base_commit": "dc11cd69045f708f43f096ccb2dddafd4dfe9b73",
+      "source_hashes": {
+        "src/subtitles/STS.h": "ed723ecdf765261961960355f8f5b9a1a4f8bd788fa23e0ffaf75a63e2531d99",
+        "src/subtitles/STS.cpp": "190a5172ba5b6d497bd1ccd128569889901346fa13c83fcf34d5371b7bc3759e",
+        "src/subtitles/RTS.cpp": "a75521771024bcf73b5ce3aeca32b371bf0d2481d67ab026c71827163a2c9e88",
+        "src/subtitles/USFSubtitles.cpp": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
+        "src/subtitles/SubtitleInputPin.cpp": "7352c0c8410ddab487fdbb437f952502810496b2f3967955b9908bf46152a7e3",
+        "src/filters/transform/vsfilter/DirectVobSubFilter.cpp": "d6e056e9357234b9935fe3a8760655df8e1c3c0a5fa6a9954d343ea0234033af",
+        "src/filters/transform/vsfilter/xy_sub_filter.cpp": "680a96edc424c3a4324b514c5f74fded15857d3525b78d114c5394205dac8f9d",
+        "src/filters/transform/vsfilter/plugins.cpp": "38526740c55b4bc51642925d1ded688ebdd0ff26a01b5a5dd7f587add31df3da",
+        "src/subtitles/RustDocumentOwner.h": "f6a0aef21cab5e2567aed8006abb2667753d34ee2d69cca04b57413b9b4fb25b",
+        "rust/compat/src/document.rs": "e5257fd3c0ccd521f4878b5ac33253e6c082830945f1999a71001c49f010263d",
+        "rust/ffi/src/document.rs": "c6eed22b222dd863cc7be480aa827191609516fef83586589c50ece8595024d7",
+        "include/xy_rust_document.h": "6aeca6afea101146534f1e4a82941cecb90608917bdfe01ccd0ae12a49533a7c",
+        "tools/compat/document_native_lifecycle.cpp": "23c3292bcc2e6079076ef7202b7f61bc0aece2dd741e4b89f27a7d5240c2ee6c",
+        "tools/compat/document_native_lifecycle.py": "df9cec71c69503351bdd0faed6b2babf943090cebbe7e906813c6a0c5120c778",
+        "tools/compat/summarize_evidence.py": "0e97795107f7953f830306ec588b78ad8934d772282ccefdec6966e2089aab31",
+        "tools/compat/audit_document_access.py": "fed188f365baaa9620b87d21b2c1c18687f5c0bd74a5b9ab2403d8aa5c2fa990"
+      },
+      "ffi_total": {
+        "production_block": 358,
+        "production_function": 301,
+        "production_impl": 2,
+        "production_trait": 0,
+        "production_other": 0,
+        "test_block": 119,
+        "test_function": 4,
+        "test_impl": 0,
+        "test_trait": 0,
+        "test_other": 0
+      }
     }
   ],
   "retired_native_owners_scope": "Eighteen native fields/containers opt-in only; defaultproduction retirementzero",
   "measurement_method": "Current audit_rust_boundary.inventory over actual Rust source, comments/literals masked and test items separated; counts overlap and do not establish soundness. Historical original snapshot retained.",
   "source_hashes": {
     "src/subtitles/STS.h": "ed723ecdf765261961960355f8f5b9a1a4f8bd788fa23e0ffaf75a63e2531d99",
-    "src/subtitles/STS.cpp": "190a5172ba5b6d497bd1ccd128569889901346fa13c83fcf34d5371b7bc3759e",
+    "src/subtitles/STS.cpp": "bf365cd1c71eb15ec5b5dd5b9acda25c71badb7441e258119263fc38ac0e4ca9",
     "src/subtitles/RTS.cpp": "a75521771024bcf73b5ce3aeca32b371bf0d2481d67ab026c71827163a2c9e88",
     "src/subtitles/USFSubtitles.cpp": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
     "src/subtitles/SubtitleInputPin.cpp": "7352c0c8410ddab487fdbb437f952502810496b2f3967955b9908bf46152a7e3",
     "src/filters/transform/vsfilter/DirectVobSubFilter.cpp": "d6e056e9357234b9935fe3a8760655df8e1c3c0a5fa6a9954d343ea0234033af",
     "src/filters/transform/vsfilter/xy_sub_filter.cpp": "680a96edc424c3a4324b514c5f74fded15857d3525b78d114c5394205dac8f9d",
     "src/filters/transform/vsfilter/plugins.cpp": "38526740c55b4bc51642925d1ded688ebdd0ff26a01b5a5dd7f587add31df3da",
-    "src/subtitles/RustDocumentOwner.h": "f6a0aef21cab5e2567aed8006abb2667753d34ee2d69cca04b57413b9b4fb25b",
-    "rust/compat/src/document.rs": "e5257fd3c0ccd521f4878b5ac33253e6c082830945f1999a71001c49f010263d",
-    "rust/ffi/src/document.rs": "c6eed22b222dd863cc7be480aa827191609516fef83586589c50ece8595024d7",
-    "include/xy_rust_document.h": "6aeca6afea101146534f1e4a82941cecb90608917bdfe01ccd0ae12a49533a7c",
-    "tools/compat/document_native_lifecycle.cpp": "23c3292bcc2e6079076ef7202b7f61bc0aece2dd741e4b89f27a7d5240c2ee6c",
-    "tools/compat/document_native_lifecycle.py": "df9cec71c69503351bdd0faed6b2babf943090cebbe7e906813c6a0c5120c778",
-    "tools/compat/summarize_evidence.py": "0e97795107f7953f830306ec588b78ad8934d772282ccefdec6966e2089aab31",
-    "tools/compat/audit_document_access.py": "fed188f365baaa9620b87d21b2c1c18687f5c0bd74a5b9ab2403d8aa5c2fa990"
+    "src/subtitles/RustDocumentOwner.h": "b4ecb8b9325a75a418388cd4551c5e875482095d9e08d92b43364bfc1be075bb",
+    "rust/compat/src/document.rs": "2407f189235f3108baa1ed26d361d8f82765ff832136dc9876208a7e915f515e",
+    "rust/ffi/src/document.rs": "2db5eda976e7c32075500e3b5697c70df9b8c05793105c18ca600c74e797e649",
+    "rust/ffi/src/document_registry.rs": "dd7f9eeea1bc353364e067c1ce2f4e99f8b0fb3eb5b2336340836ade9b270729",
+    "include/xy_rust_document.h": "2d5ee51f7f38320d61eb3ac59afd182ebb990fda2e84f50fd4cc080e4e4cb23d",
+    "tools/compat/document_native_lifecycle.cpp": "9160a920c66706311ac0a85754508ebe5b0827987dbd312d99800296b272c180",
+    "tools/compat/document_native_lifecycle.py": "4a9b397e5b4dbb7957a5a954143113f71ebffdf6bbb40be69ab28f0e331dc39b",
+    "tools/compat/summarize_evidence.py": "63fa30c04dd0d7ec81b3be68b2ce0afe7fa09ec7c3e00106d459e3775f5f0531",
+    "tools/compat/audit_document_access.py": "3230132a3e3fb2d9135fb465540d3c5aa1dbc9464ae17cca81b609cb7d1dbf5a"
   },
   "default_style_extension": {
     "set": "xy_vsfilter_document_set_default_style_v1 copies input and decodes before admission; validates handle before taking pending value; retired Option drops outside admission, including failure/Busy pending input.",
@@ -1026,7 +1061,8 @@
       "test_trait": 0,
       "test_other": 0
     },
-    "baseline_note": "Measured actual b49 Rust FFI source with the same lexical audit; original initial registry counts are retained separately in historical_measurements."
+    "baseline_note": "Measured actual b49 Rust FFI source with the same lexical audit; original initial registry counts are retained separately in historical_measurements.",
+    "status": "Historical initial default-owner extension; copy-default helper/export retired by selected-state consolidation"
   },
   "named_style_extension": {
     "operations": [
@@ -1086,5 +1122,13 @@
     "unsafe_change": "Two added stagedoutputcopies and overlappingunsafegetterdeclarations; no rawinputcopy/coreunsafe",
     "copy": "NativeCopyforcedonly, retainsdestPAR/color; Empty/preparedstorage-onlyswap retainmetadata",
     "gate": "Current exact-code Windows/nativehost gate pending"
+  },
+  "selected_state_copy_extension": {
+    "operation": "xy_vsfilter_document_copy_selected_state_v1",
+    "retired_operation": "xy_vsfilter_document_copy_default_style_v1",
+    "input": "Typed integer source/destination handles only; no rawpointerbuffer",
+    "ownership": "Validate bothowners beforeselectedmetadata cloning; selfnoop. Retired name/default ownedvalues drop outsideadmission. Nativecallback beforeadmission, map/storageoutside selectedstage.",
+    "unsafe_growth": 0,
+    "gate": "Current Windows fullclass/host and allocation/reentry/partialfailure pending"
   }
 }

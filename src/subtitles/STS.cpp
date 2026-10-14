@@ -3166,53 +3166,17 @@ void CSimpleTextSubtitle::Copy(CSimpleTextSubtitle& sts)
     Empty();
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    SetDocumentName(sts.GetDocumentName());
+    m_document->CopySelectedState(*sts.m_document);
 #else
     m_name                         = sts.m_name;
-#endif
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    SetDocumentMode(sts.GetDocumentMode());
-#else
     m_mode                         = sts.m_mode;
-#endif
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    SetDocumentType(sts.GetDocumentType());
-#else
     m_subtitleType                 = sts.m_subtitleType;
-#endif
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    SetDocumentScreenSize(sts.GetDocumentScreenSize());
-#else
     m_dstScreenSize                = sts.m_dstScreenSize;
-#endif
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    SetDocumentWrapStyle(sts.GetDocumentWrapStyle());
-#else
     m_defaultWrapStyle             = sts.m_defaultWrapStyle;
-#endif
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    SetDocumentCollisions(sts.GetDocumentCollisions());
-#else
     m_collisions                   = sts.m_collisions;
-#endif
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    SetDocumentScaledBAS(sts.GetDocumentScaledBAS());
-#else
     m_fScaledBAS                   = sts.m_fScaledBAS;
-#endif
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    SetDocumentEncoding(sts.GetDocumentEncoding());
-#else
     m_encoding                     = sts.m_encoding;
-#endif
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    m_document->CopyDefaultStyle(*sts.m_document);
-#else
     m_defaultStyle                 = sts.m_defaultStyle;
-#endif
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    SetDocumentForcedDefaultStyle(sts.GetDocumentForcedDefaultStyle());
-#else
     m_fForcedDefaultStyle          = sts.m_fForcedDefaultStyle;
 #endif
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL

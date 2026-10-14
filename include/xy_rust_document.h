@@ -54,8 +54,13 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_copy_storage_v1(uint64_t destina
 // Count <=INT32_MAX; exact total length required. No native defaults/layout or
 // floating-point normalization. Retired values are destroyed after admission.
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_set_default_style_v1(uint64_t owner, const uint8_t*, size_t);
-// Explicit default assignment; source absence clears destination; self-copy no-op.
-uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_copy_default_style_v1(uint64_t destination, uint64_t source);
+// Selected Copy state AFTER caller's virtual Empty: name, mode/type/encoding,
+// script size/wrap/collisions/scaled, default style, forced-default. Source optional
+// absence is copied explicitly (native constructor normally initializes it).
+// Destination path/PAR/colors/named map/records remain untouched. No callbacks;
+// retired name/default payloads are dropped after admission. Typed self-copy no-op.
+// Caller still performs native CopyNamedStylesFrom(false), then prepared copy.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_copy_selected_state_v1(uint64_t destination, uint64_t source);
 
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_destroy_v1(uint64_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_counts_v1(uint64_t, uint8_t*, size_t);

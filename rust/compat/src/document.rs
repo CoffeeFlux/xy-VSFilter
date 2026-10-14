@@ -135,6 +135,23 @@ impl MetadataField {
         }
     }
 }
+/// The initialized/native-supplied Copy header, captured after virtual Empty.
+/// Optional absence is copied explicitly, never replaced with invented defaults.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SelectedState {
+    name: Vec<u16>,
+    interpretation: [Option<i32>; 3],
+    script: [Option<i32>; 4],
+    scaled_bas: Option<bool>,
+    default_style: Option<crate::document_style::StyleValue>,
+    forced_default: Option<bool>,
+}
+/// Retired owned header payloads must be destroyed after boundary admission.
+#[derive(Debug)]
+pub struct RetiredSelectedState {
+    pub name: Vec<u16>,
+    pub default_style: Option<crate::document_style::StyleValue>,
+}
 /// Clone creates independent storage; it does not emulate native Copy callbacks
 /// or the selective field assignments in native Copy.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -153,6 +170,34 @@ pub struct Document {
     segments: Vec<DocumentSegment>,
 }
 impl Document {
+    /// Captures source state at the caller-selected point after native Empty.
+    /// Native constructors supply every selected scalar/default before use.
+    pub fn selected_state(&self) -> SelectedState {
+        SelectedState {
+            name: self.name.clone(),
+            interpretation: self.interpretation,
+            script: self.script,
+            scaled_bas: self.scaled_bas,
+            default_style: self.default_style.clone(),
+            forced_default: self.forced_default,
+        }
+    }
+    /// Successful-allocation header assignment only: no callbacks, named-map
+    /// clearing, prepared copy, or native partial-allocation-failure emulation.
+    pub fn replace_selected_state(&mut self, state: SelectedState) -> RetiredSelectedState {
+        let name = core::mem::replace(&mut self.name, state.name);
+        self.interpretation[0] = state.interpretation[0];
+        self.interpretation[1] = state.interpretation[1];
+        self.script = state.script;
+        self.scaled_bas = state.scaled_bas;
+        self.interpretation[2] = state.interpretation[2];
+        let default_style = core::mem::replace(&mut self.default_style, state.default_style);
+        self.forced_default = state.forced_default;
+        RetiredSelectedState {
+            name,
+            default_style,
+        }
+    }
     pub fn metadata(&self, field: MetadataField) -> Option<i32> {
         self.metadata[field.index()]
     }
@@ -1112,5 +1157,87 @@ mod tests {
                 assert_eq!(cloned.metadata(field), Some(i32::MIN));
             }
         }
+    }
+    #[test]
+    fn selected_state_copies_only_header_and_retires_owned_payloads() {
+        let mut source = Document::default();
+        let mut destination = Document::default();
+        let raw = alloc::vec![65, 0, 0xd800, 0xdcff];
+        source.replace_identity(IdentityField::Name, raw.clone());
+        source.replace_identity(IdentityField::Path, alloc::vec![83]);
+        destination.replace_identity(IdentityField::Name, alloc::vec![68]);
+        destination.replace_identity(IdentityField::Path, alloc::vec![80, 0, 0xd800]);
+        for field in [
+            InterpretationField::Mode,
+            InterpretationField::SubtitleType,
+            InterpretationField::Encoding,
+        ] {
+            source.replace_interpretation(field, i32::MIN);
+            destination.replace_interpretation(field, i32::MAX);
+        }
+        for field in [
+            ScriptField::Width,
+            ScriptField::Height,
+            ScriptField::Wrap,
+            ScriptField::Collisions,
+        ] {
+            source.replace_script_field(field, -5);
+            destination.replace_script_field(field, 7);
+        }
+        source.replace_scaled_bas(true);
+        source.replace_forced_default(true);
+        destination.replace_scaled_bas(false);
+        destination.replace_forced_default(false);
+        let mut wire = alloc::vec![0u8;crate::document_style::HEADER_BYTES];
+        wire[72..80].copy_from_slice(&0x7ff0000000000042u64.to_le_bytes());
+        let first = crate::document_style::decode(&wire).unwrap();
+        wire[72..80].copy_from_slice(&(-0.0f64).to_bits().to_le_bytes());
+        let old_default = crate::document_style::decode(&wire).unwrap();
+        source.replace_default_style(Some(first.clone()));
+        destination.replace_default_style(Some(old_default.clone()));
+        destination.replace_par_bits(0x3ff0000000000000);
+        source.replace_par_bits(0);
+        for field in [
+            MetadataField::PARType,
+            MetadataField::ColorMatrix,
+            MetadataField::ColorRange,
+        ] {
+            destination.replace_metadata(field, 9);
+            source.replace_metadata(field, 3);
+        }
+        for key in 0..65 {
+            destination
+                .named_styles_mut()
+                .insert(alloc::vec![key], None);
+        }
+        destination
+            .add_prepared(entry(0, 10, -1), AddMode::Add)
+            .unwrap();
+        destination.feedback_animation(0, true).unwrap();
+        destination.remove_all_entries();
+        let before = destination.clone();
+        let selected = source.selected_state();
+        let retired = destination.replace_selected_state(selected.clone());
+        assert_eq!(retired.name, alloc::vec![68]);
+        assert_eq!(retired.default_style, Some(old_default));
+        assert_eq!(destination.selected_state(), selected);
+        assert_eq!(destination.default_style(), Some(&first));
+        assert_eq!(
+            destination.identity(IdentityField::Path),
+            before.identity(IdentityField::Path)
+        );
+        assert_eq!(destination.par_bits(), before.par_bits());
+        assert_eq!(destination.metadata, before.metadata);
+        assert_eq!(destination.named_styles(), before.named_styles());
+        assert_eq!(destination.entries(), before.entries());
+        assert_eq!(destination.segments(), before.segments());
+        source.replace_identity(IdentityField::Name, alloc::vec![90]);
+        source.replace_default_style(None);
+        assert_eq!(destination.identity(IdentityField::Name), raw);
+        assert_eq!(destination.default_style(), Some(&first));
+        let absent = Document::default().selected_state();
+        destination.replace_selected_state(absent.clone());
+        assert_eq!(destination.selected_state(), absent);
+        assert_eq!(destination.named_styles(), before.named_styles());
     }
 }
