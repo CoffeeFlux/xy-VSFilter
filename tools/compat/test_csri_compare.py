@@ -6,6 +6,9 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import Mock
+
+from dialog_capture import DialogCapture
 
 import csri_compare as harness
 
@@ -84,10 +87,20 @@ class NativeHarnessTests(unittest.TestCase):
         right, rd = self.run_variant("DIALOG", "right")
         self.assertEqual(left["status"], "ok", left)
         self.assertEqual(left["dialogs"][0]["response"], "cancel")
+        self.assertEqual((ld / left["frames"][0]["file"]).read_bytes()[1], 2)  # IDCANCEL returned natively
         self.assertEqual(harness.compare_captures(left,right,ld,rd), {"kind": "equal"})
         other, od = self.run_variant("DIALOG_DIFFERENT", "other")
         self.assertEqual(other["status"], "ok", other)
         self.assertIn("dialogs", harness.compare_captures(left,other,ld,od)["changed_fields"])
+
+    @unittest.skipUnless(os.name == "nt", "native Windows modal dialogs")
+    def test_scripted_ok_returns_native_idok(self):
+        self.case["dialog_actions"] = [{"title": "Warning", "text_prefix": "Harness ", "button": "ok"}]
+        harness.write_json(self.case_path, self.case)
+        result, directory = self.run_variant("DIALOG", "ok-response")
+        self.assertEqual(result["status"], "ok", result)
+        self.assertEqual(result["dialogs"][0]["response"], "ok")
+        self.assertEqual((directory / result["frames"][0]["file"]).read_bytes()[1], 1)  # IDOK
 
     @unittest.skipUnless(os.name == "nt", "native Windows modal dialogs")
     def test_unscripted_dialog_times_out_and_missing_dialog_fails(self):
@@ -191,6 +204,92 @@ class NativeHarnessTests(unittest.TestCase):
             self.assertEqual(result.returncode, code, result.stderr)
             report = harness.read_json(output / "report.json")
             self.assertEqual(report["controls_passed"], code == 0)
+
+
+class ScriptedDialogDeliveryTests(unittest.TestCase):
+    def setUp(self):
+        self.capture = DialogCapture([], Path("unused-dialog-capture"))
+        self.capture.api = Mock()
+        self.capture.api.GetDlgItem.return_value = 222
+        self.capture.api.GetParent.return_value = 111
+        self.capture.api.GetDlgCtrlID.return_value = 2
+        self.capture.api.IsWindowVisible.return_value = True
+        self.capture.api.IsWindowEnabled.return_value = True
+        self.capture.api.PostMessageW.return_value = True
+        self.capture.class_name = Mock(return_value="Button")
+        self.action = {"button": "cancel"}
+
+    def test_ready_button_dispatches_one_command_to_dialog_with_control_identity(self):
+        button = self.capture.scripted_button(111, self.action)
+        self.assertEqual(button, 222)
+        self.capture.post_response(111, button, self.action)
+        self.capture.api.PostMessageW.assert_called_once_with(111, 0x0111, 2, 222)
+
+    def test_unready_or_wrong_control_never_receives_a_command(self):
+        for name, value in [("GetDlgItem", None), ("GetParent", 999),
+                            ("GetDlgCtrlID", 1), ("IsWindowVisible", False),
+                            ("IsWindowEnabled", False)]:
+            function = getattr(self.capture.api, name)
+            previous = function.return_value
+            function.return_value = value
+            with self.subTest(name=name):
+                self.assertIsNone(self.capture.scripted_button(111, self.action))
+                self.capture.api.PostMessageW.assert_not_called()
+            function.return_value = previous
+        self.capture.class_name.return_value = "Static"
+        self.assertIsNone(self.capture.scripted_button(111, self.action))
+        self.capture.api.PostMessageW.assert_not_called()
+
+    def test_failed_queue_operation_does_not_report_delivery(self):
+        self.capture.api.PostMessageW.return_value = False
+        with self.assertRaisesRegex(RuntimeError, "could not queue"):
+            self.capture.post_response(111, 222, self.action)
+        self.assertEqual(self.capture.consumed, 0)
+        self.assertEqual(self.capture.events, [])
+
+    def configure_watch(self, destination, polls=1):
+        self.capture.destination = destination
+        self.capture.actions = [{"title": "Warning", "text_prefix": "Harness ", "button": "cancel"}]
+        self.capture.windows = lambda parent=None: [111] if parent is None else [222, 333]
+        self.capture.class_name = lambda window: {111: "#32770", 222: "Button", 333: "Static"}[window]
+        self.capture.text = lambda window: {111: "Warning", 222: "Cancel", 333: "Harness warning"}[window]
+        self.capture.api.GetDlgCtrlID.side_effect = lambda window: {222: 2, 333: 65535}[window]
+        self.capture.api.GetWindowLongW.return_value = 0
+        self.capture.stop = Mock()
+        self.capture.stop.is_set.side_effect = [False] * polls + [True]
+
+    def test_readiness_poll_keeps_one_warning_and_dispatches_only_once(self):
+        with tempfile.TemporaryDirectory() as directory:
+            self.configure_watch(Path(directory), polls=3)
+            self.capture.api.IsWindowEnabled.side_effect = [False, True]
+            self.capture.watch()
+            self.assertIsNone(self.capture.error)
+            self.assertEqual(self.capture.consumed, 1)
+            self.assertEqual(len(self.capture.events), 1)
+            self.assertEqual(self.capture.events[0]["response"], "cancel")
+            self.capture.api.PostMessageW.assert_called_once_with(111, 0x0111, 2, 222)
+
+    def test_failed_dispatch_preserves_warning_without_claiming_response(self):
+        with tempfile.TemporaryDirectory() as directory:
+            self.configure_watch(Path(directory))
+            self.capture.api.PostMessageW.return_value = False
+            self.capture.watch()
+            self.assertIn("could not queue", self.capture.error)
+            self.assertEqual(self.capture.consumed, 0)
+            events = json.loads((Path(directory) / "dialogs.json").read_text())
+            self.assertEqual(len(events), 1)
+            self.assertIsNone(events[0]["response"])
+
+    def test_disabled_button_keeps_warning_and_action_unconsumed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            self.configure_watch(Path(directory))
+            self.capture.api.IsWindowEnabled.return_value = False
+            self.capture.watch()
+            self.assertEqual(self.capture.consumed, 0)
+            self.capture.api.PostMessageW.assert_not_called()
+            events = json.loads((Path(directory) / "dialogs.json").read_text())
+            self.assertEqual(len(events), 1)
+            self.assertIsNone(events[0]["response"])
 
 
 if __name__ == "__main__":

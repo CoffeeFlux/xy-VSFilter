@@ -45,6 +45,8 @@ class DialogCapture:
             ("GetDlgCtrlID", [C.c_void_p], C.c_int),
             ("GetWindowLongW", [C.c_void_p, C.c_int], C.c_int32),
             ("IsWindowVisible", [C.c_void_p], C.c_int),
+            ("IsWindowEnabled", [C.c_void_p], C.c_int),
+            ("GetParent", [C.c_void_p], C.c_void_p),
             ("GetDlgItem", [C.c_void_p, C.c_int], C.c_void_p),
             ("PostMessageW", [C.c_void_p, C.c_uint, C.c_size_t, C.c_ssize_t], C.c_int),
         ):
@@ -89,12 +91,38 @@ class DialogCapture:
             self.api.EnumChildWindows(parent, collect, 0)
         return windows
 
+    def scripted_button(self, window, action):
+        identifier = 1 if action["button"] == "ok" else 2
+        button = self.api.GetDlgItem(window, identifier)
+        # A visible dialog may still be creating/enabling its controls. Poll
+        # readiness, never send another response to a previously observed one.
+        if (not button or self.class_name(button) != "Button"
+                or self.api.GetParent(button) != window
+                or self.api.GetDlgCtrlID(button) != identifier
+                or not self.api.IsWindowVisible(button)
+                or not self.api.IsWindowEnabled(button)):
+            return None
+        return button
+
+    def post_response(self, window, button, action):
+        identifier = 1 if action["button"] == "ok" else 2
+        # BM_CLICK can fail on inactive dialogs, and SetActiveWindow belongs to
+        # the UI thread's message queue, not this observer. Queue the documented
+        # button notification instead: WM_COMMAND, BN_CLICKED (high word zero),
+        # exact control ID and its validated HWND. No activation or input hooks.
+        # https://learn.microsoft.com/en-us/windows/win32/controls/bm-click
+        # https://learn.microsoft.com/en-us/windows/win32/controls/bn-clicked
+        if not self.api.PostMessageW(window, 0x0111, identifier, button):
+            raise RuntimeError("could not queue scripted dialog button response")
+
     def watch(self):
         seen = set()
+        pending = {}
         try:
             while not self.stop.is_set():
                 current = set(self.windows())
                 seen.intersection_update(current)
+                pending = {window: event for window, event in pending.items() if window in current}
                 for window in sorted(current - seen):
                     if self.class_name(window) != "#32770" or not self.api.IsWindowVisible(window):
                         continue
@@ -117,16 +145,28 @@ class DialogCapture:
                     matches = (action is not None and title == action["title"] and
                                any(c["class"] == "Static" and isinstance(c["text"], str) and c["text"].startswith(action["text_prefix"])
                                    for c in controls))
-                    event = {"title": title, "class": "#32770", "controls": controls,
-                             "response": action["button"] if matches else None}
-                    self.events.append(event)
-                    seen.add(window)
-                    # Preserve the warning even when the worker later times out.
+                    event = pending.get(window)
+                    if event is None:
+                        event = {"title": title, "class": "#32770", "controls": controls,
+                                 "response": None}
+                        self.events.append(event)
+                        pending[window] = event
+                    else:
+                        event.update(title=title, controls=controls)
+                    # Preserve the warning even if readiness or dismissal never
+                    # arrives. A pending dialog occupies one event until ready.
                     (self.destination / "dialogs.json").write_text(json.dumps(self.events, indent=2) + "\n", encoding="utf-8")
+                    button = self.scripted_button(window, action) if matches else None
+                    if matches and button is None:
+                        continue
+                    seen.add(window)
                     if matches:
-                        button = self.api.GetDlgItem(window, 1 if action["button"] == "ok" else 2)
-                        if not button or not self.api.PostMessageW(button, 0x00F5, 0, 0):  # BM_CLICK
-                            raise RuntimeError("could not click scripted dialog button")
+                        self.post_response(window, button, action)
+                        # Response records the accepted queued command. Only a
+                        # completed worker establishes dismissal; timeouts remain
+                        # unresolved even when this chosen response is recorded.
+                        event["response"] = action["button"]
+                        (self.destination / "dialogs.json").write_text(json.dumps(self.events, indent=2) + "\n", encoding="utf-8")
                         self.consumed += 1
                     else:
                         self.error = "unexpected native dialog"
