@@ -642,12 +642,26 @@ public:
         else:
             a = text.index("    // Drawing token input boundary.")
             b = text.index("        // Drawing command state.", a)
-            block = text[a:b]
+            block = "XyRust::DrawingTokens tokens(str);\n" + text[a:b]
             token_code += "#define XY_VSFILTER_RUST_TEXT\n"
         token_code += f"namespace {name} {{\nDrawingTokenList Scan(const CStringW& input) {{\nDrawingTokenList result;\n"
         token_code += "CStringW str = input;\n" + block
         token_code += "result.emplace_back(c, s);\n}\nreturn result;\n}\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_drawing_tokens.h").write_text(token_code, encoding="utf-8")
+    preparation_code = '#include "drawing_tokens_shell.h"\n'
+    for name, content in (("OriginalDrawingPreparation", lexer_source), ("CandidateDrawingPreparation", candidate_lexer)):
+        text = content.decode("utf-8-sig")
+        a = text.index("    CStringW str = m_str.Get();", text.index("bool CPolygon::ParseStr()"))
+        b = text.index("        switch(c)", a) if name == "OriginalDrawingPreparation" else text.index("        // Drawing command state.", a)
+        block = text[a:b].replace("m_str.Get()", "input", 1)
+        if name == "CandidateDrawingPreparation":
+            assert block.count("XyRust::DrawingTokens tokens") == 1
+            block = block.replace("XyRust::DrawingTokens tokens", "XyRust::ObservedDrawingTokens tokens")
+            preparation_code += "#define XY_VSFILTER_RUST_TEXT\n"
+        preparation_code += f"namespace {name} {{\nDrawingTokenList Scan(const CStringW& input) {{\nDrawingTokenList result;\n"
+        preparation_code += block + "result.emplace_back(c,s);\n}\nreturn result;\n}\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_drawing_preparation.h").write_text(preparation_code, encoding="utf-8")
+
     hdmv_source = original("src/subtitles/CompositionObject.cpp", reference["commit"])
     candidate_hdmv = (ROOT / "src/subtitles/CompositionObject.cpp").read_bytes()
     golomb_source = original("src/dsutil/GolombBuffer.cpp", reference["commit"])

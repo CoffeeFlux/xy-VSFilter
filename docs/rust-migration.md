@@ -20,6 +20,20 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust prepares drawing command separators before the existing raw-token
+  traversal. Each lowercase command gets the same preceding `*`, including
+  command letters inside arbitrary text. Existing separators and raw UTF-16 are
+  preserved; embedded-NUL input retains native replacement and is reimported.
+  Fatal ASan/UBSan comparisons passed **233,817 complete preprocessing/tokenization
+  calls** on arm64 and under x64 execution: **2,284,300 emitted tokens / 233,814
+  Rust preparations / 3 native fallbacks / 3 reimports**. The existing **1,342,183
+  raw token comparisons** also pass on both architectures, and **343,183 drawing
+  state comparisons** pass locally. The lexical oracle uses actual ATL on Windows;
+  replacement-bearing NUL outcomes and allocation failures remain excluded.
+  Rust 1.85 tests (122 core, 78 FFI), strict Clippy, default syntax and Python
+  checks pass. Eight drawing scripts expand the renderer corpus to **642 cases**.
+  Windows/Miri and renderer validation for this increment are pending. Native
+  numeric conversion, scaling, final path storage and NUL preparation remain.
 * Safe Rust computes `CTextFile::Seek` targets while native position/length/seek
   calls and successful-seek buffer invalidation retain their order. Unsigned
   wrapping, reinterpretation before the zero clamp, unknown origins, BOM offsets,
@@ -94,8 +108,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   Eight whitespace/karaoke scripts and a soft-break visible control expand
   renderer validation to **586 cases**. Rust 1.85 tests (112 core, 74 FFI), strict
   Clippy, default syntax and Python harness checks pass. Windows/Miri and full
-  renderer checks for this increment are pending; NUL escape replacement, font
-  metrics, word objects and full host integration remain native/separate work.
+  renderer checks for escape preparation are pending. The preceding run-storage
+  increment passed all four platforms, Miri and both Windows renderers with
+  **586 cases / 6,210 frames**, plus **32 mutation cases / 224 frames**, matching
+  dialogs, controls, exports and dependencies; see [verified run-storage evidence](text-runs-evidence.json).
+  NUL escape replacement, font metrics, word objects and full host integration
+  remain native/separate work.
 * Corrected SAMI, SubRip and legacy SubRip/VPlayer Windows x86/x64 renderer checks
   passed **554 cases / 5,730 frames** per architecture, plus **32 mutation cases /
   224 frames**, with matching dialogs, visible controls, exports and declared

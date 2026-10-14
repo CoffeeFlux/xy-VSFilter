@@ -32,6 +32,14 @@ public:
         }
         cursor=-1; return DrawingString();
     }
+    DrawingString SpanIncluding(const wchar_t* characters)const {
+        size_t n=0;while(n<value.size() && value[n] && std::wcschr(characters,value[n]))++n;
+        return DrawingString(value.data(),static_cast<int>(n));
+    }
+    int Replace(const wchar_t* from,const wchar_t* to){
+        size_t position=0,fromLength=std::wcslen(from),toLength=std::wcslen(to);int count=0;
+        while((position=value.find(from,position))!=std::wstring::npos){value.replace(position,fromLength,to);position+=toLength;++count;}return count;
+    }
     void TrimLeft(const wchar_t* characters) {
         size_t n=0;
         while (n<value.size() && value[n] && std::wcschr(characters,value[n])) ++n;
@@ -49,3 +57,13 @@ struct LexedDrawingToken {
 };
 typedef std::vector<LexedDrawingToken> DrawingTokenList;
 #define CStringW DrawingString
+
+static uint64_t drawingPreparations=0,drawingFallbacks=0,drawingResets=0;
+namespace XyRust {
+class ObservedDrawingTokens : public DrawingTokens {
+public:
+    template<class String> explicit ObservedDrawingTokens(const String& s):DrawingTokens(s){}
+    bool Prepare(){bool ok=DrawingTokens::Prepare();if(ok)++drawingPreparations;else ++drawingFallbacks;return ok;}
+    template<class String> void Reset(const String& s){++drawingResets;DrawingTokens::Reset(s);}
+};
+}

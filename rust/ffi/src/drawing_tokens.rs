@@ -22,6 +22,33 @@ pub unsafe extern "C" fn xy_vsfilter_drawing_tokens_create(
 }
 
 /// # Safety
+/// owner is live and exclusively accessible until this call returns.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_drawing_tokens_prepare(owner: *mut Tokens) -> u32 {
+    // SAFETY: the bridge holds no input borrow or callback across this mutation.
+    u32::from(unsafe { &mut *owner }.prepare())
+}
+
+/// # Safety
+/// owner is live and exclusive; nonempty input is aligned and initialized for
+/// length u16 values, immutable and disjoint from owner; length*2 fits isize.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_drawing_tokens_reset(
+    owner: *mut Tokens,
+    input: *const u16,
+    length: u32,
+) {
+    let input = if length == 0 {
+        &[]
+    } else {
+        // SAFETY: a fresh native-prepared copy, borrowed only until return.
+        unsafe { core::slice::from_raw_parts(input, length as usize) }
+    };
+    // SAFETY: exclusive owner and disjoint input copy.
+    unsafe { *owner = Tokens::scan(input) };
+}
+
+/// # Safety
 /// owner is live and not concurrently mutated or released. Fields: 0=count,
 /// 1=command, 2=parameter length, 3=parameter unit. Invalid queries return zero.
 #[no_mangle]
@@ -77,6 +104,24 @@ mod tests {
             assert_eq!(xy_vsfilter_drawing_tokens_field(owner, 1, 0, 0), 109);
             assert_eq!(xy_vsfilter_drawing_tokens_field(owner, 3, 0, 0), 0xd800);
             assert_eq!(xy_vsfilter_drawing_tokens_field(owner, 3, 0, usize::MAX), 0);
+            xy_vsfilter_drawing_tokens_release(owner);
+        }
+    }
+
+    #[test]
+    fn fallback_reimports_a_native_copy_and_preparation_replaces_tokens() {
+        let input = [109u16, 0, 49];
+        let mut prepared = [42u16, 109, 32, 49, 42, 108, 32, 50];
+        // SAFETY: initialized disjoint inputs, live unique owner, one release.
+        unsafe {
+            let owner = xy_vsfilter_drawing_tokens_create(input.as_ptr(), 3);
+            assert_eq!(xy_vsfilter_drawing_tokens_prepare(owner), 0);
+            xy_vsfilter_drawing_tokens_reset(owner, prepared.as_ptr(), 8);
+            prepared.fill(0);
+            assert_eq!(xy_vsfilter_drawing_tokens_field(owner, 0, 0, 0), 2);
+            assert_eq!(xy_vsfilter_drawing_tokens_field(owner, 3, 1, 0), 50);
+            assert_eq!(xy_vsfilter_drawing_tokens_prepare(owner), 1);
+            assert_eq!(xy_vsfilter_drawing_tokens_field(owner, 0, 0, 0), 2);
             xy_vsfilter_drawing_tokens_release(owner);
         }
     }
