@@ -19,10 +19,10 @@ class EvidenceTests(unittest.TestCase):
             lines.append(f"dump {index} units {count}")
             (self.root / f"dump-{index}.units").write_bytes(bytes(4 * count))
             lines.append(f"frame {index} found 1 subtitles 1")
-            lines.append(f"pixels {index} changed {0 if index == 0 else 12} bounds 0 0 20 20")
-            changed = 0 if index == 0 else 12
+            lines.append(f"pixels {index} changed {0} bounds 0 0 20 20")
+            changed = 0
             (self.root / f"frame-{index}.bgra").write_bytes(b"\x01\x00\x00\xff" * changed + b"\x00\x00\x00\xff" * (320 * 180 - changed))
-        lines.extend(["rendered 1 glyphs 0041", "ssf-native-v1 complete"])
+        lines.extend(["text units 0041", "rendered 1 glyphs", "ssf-native-v1 complete"])
         (self.root / "stdout.txt").write_text("\n".join(lines) + "\n")
         (self.root / "stderr.txt").write_bytes(b"")
 
@@ -47,16 +47,16 @@ class EvidenceTests(unittest.TestCase):
         frame.unlink()
         self.assertEqual(MODULE.inspect(self.root, 0)["status"], "incomplete")
 
-    def test_claimed_visibility_must_match_actual_pixels(self):
-        (self.root / "frame-2.bgra").write_bytes(b"\x00\x00\x00\xff" * (320 * 180))
+    def test_blank_characterization_must_match_actual_pixels(self):
+        (self.root / "frame-2.bgra").write_bytes(b"\x01\x00\x00\xff" * (320 * 180))
         self.assertEqual(MODULE.inspect(self.root, 0)["status"], "control_failed")
 
-    def test_missing_completion_and_empty_visibility_fail(self):
+    def test_missing_completion_and_empty_text_fail(self):
         path = self.root / "stdout.txt"
         original = path.read_text()
         path.write_text(original.replace("ssf-native-v1 complete\n", ""))
         self.assertEqual(MODULE.inspect(self.root, 0)["status"], "incomplete")
-        path.write_text(original.replace("pixels 2 changed 12", "pixels 2 changed 0"))
+        path.write_text(original.replace("text units 0041", "text units"))
         self.assertEqual(MODULE.inspect(self.root, 0)["status"], "control_failed")
 
 

@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "first_candidate_commit": "9bc7ccdd17e106e47352feb62a283089a6fd64c2",
+  "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38592814959",
+  "status": "Initial visible-output control failed; not a rendering parity pass.",
+  "observations": [
+    {
+      "platform": "Win32",
+      "capture": {
+        "returncode": 0,
+        "stdout_sha256": "42e708c8dd7c7378860f1f9a8ba87df128fe6ee37b4e1059f57c842632a182e9",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "files": {},
+        "status": "control_failed"
+      },
+      "trace": "ssf-native-v1 parsed segments 1\ndump 0 units 0\ndump 1 units 0\ndump 2 units 297\ndump 3 units 590\ndump 4 units 590\ndump 5 units 294\nframe 0 found 0 subtitles 0\npixels 0 changed 0 bounds 0 0 0 0\nframe 1 found 1 subtitles 1\nrendered 1 glyphs\npixels 1 changed 0 bounds 0 0 0 0\nframe 2 found 1 subtitles 1\nrendered 1 glyphs\npixels 2 changed 0 bounds 0 0 0 0\nframe 3 found 1 subtitles 1\nrendered 1 glyphs\npixels 3 changed 0 bounds 0 0 0 0\nframe 4 found 0 subtitles 0\npixels 4 changed 0 bounds 0 0 0 0\nframe 5 found 1 subtitles 1\nrendered 1 glyphs\npixels 5 changed 0 bounds 0 0 0 0\nssf-native-v1 complete\n",
+      "report_sha256": "729649af61e29c652687931c4b0e8a5afafc235530e8a4eeea73ad7e3415a565"
+    },
+    {
+      "platform": "x64",
+      "capture": {
+        "returncode": 0,
+        "stdout_sha256": "42e708c8dd7c7378860f1f9a8ba87df128fe6ee37b4e1059f57c842632a182e9",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "files": {},
+        "status": "control_failed"
+      },
+      "trace": "ssf-native-v1 parsed segments 1\ndump 0 units 0\ndump 1 units 0\ndump 2 units 297\ndump 3 units 590\ndump 4 units 590\ndump 5 units 294\nframe 0 found 0 subtitles 0\npixels 0 changed 0 bounds 0 0 0 0\nframe 1 found 1 subtitles 1\nrendered 1 glyphs\npixels 1 changed 0 bounds 0 0 0 0\nframe 2 found 1 subtitles 1\nrendered 1 glyphs\npixels 2 changed 0 bounds 0 0 0 0\nframe 3 found 1 subtitles 1\nrendered 1 glyphs\npixels 3 changed 0 bounds 0 0 0 0\nframe 4 found 0 subtitles 0\npixels 4 changed 0 bounds 0 0 0 0\nframe 5 found 1 subtitles 1\nrendered 1 glyphs\npixels 5 changed 0 bounds 0 0 0 0\nssf-native-v1 complete\n",
+      "report_sha256": "2fbd5580fedb211680105c0fb92f56ff650b9b76b9735cb6737f5f8991a3e04f"
+    }
+  ],
+  "source_explanation": "Pinned src/subtitles/libssf/Renderer.cpp FontCache::Create calls CreateFontIndirect and returns NULL when the handle is nonzero. Renderer::Lookup skips text after both requested and Arial font creation return NULL. Preserve this native behavior; do not invert the test during the compatibility rewrite.",
+  "scope_decision": "Validate full SSF parsing, text and dump independently. Record unchanged blank frames and empty glyph traces as characterization with zero visible-rendering parity frames. Font-dependent visible SSF rendering remains unproven."
+}

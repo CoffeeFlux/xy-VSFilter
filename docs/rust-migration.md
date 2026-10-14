@@ -20,18 +20,21 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
-* A separate Windows SSF integration workflow now builds the pinned and Rust
-  `libssf` libraries and links identical probes against each. Six bounded valid
-  documents exercise comments, Arabic replacement and multiline text through
-  the real parser, node dump in all six encodings, GDI/font renderer and raw
-  320x180 RGBA frames at six timestamps including a repeated seek. Each side
-  runs twice in fresh processes; incomplete output, nonzero exit, timeouts,
-  missing pixels, mismatched traces and invisible controls cannot pass. Raw
-  dumps, frames, executables, library hashes and build logs are retained.
-  Local evidence-driver tests pass (**34 Python checks, three local skips**).
-  Native compilation/execution is pending; this does not yet establish SSF
-  renderer parity. Byte-stream decoding, malformed-document behavior and
-  DirectShow/real-host integration remain separate work.
+* A separate Windows SSF workflow builds the pinned and Rust `libssf`
+  libraries and links identical probes against each. Initial native builds
+  succeeded, but both visible-output controls failed (`38592814959`): the
+  reference parsed a subtitle and returned blank frames with no glyphs. The
+  pinned FontCache returns NULL after successful font creation. This behavior
+  is preserved and recorded in `ssf-native-rendering-scope.json`; the failed
+  controls are not rendering parity passes. The probe now validates real parser
+  text and node dumps in six encodings independently, with repeated fresh
+  processes and comment/distinct-document controls. Renderer traces and blank
+  RGBA frames are separately characterized with **zero visible-rendering parity
+  frames**. Six bounded valid documents cover comments, Arabic units and
+  multiline text at six timestamps. Local evidence-driver tests pass
+  (**34 Python checks, three local skips**); corrected Windows execution is
+  pending. Byte decoding, malformed-document behavior, visible SSF rendering
+  and DirectShow/real-host integration remain separate work.
 
 * SSF Arabic range classification and both character-replacement overloads now
   run in safe Rust with the exact pinned 256-row table. Zero mappings and
