@@ -4027,6 +4027,17 @@ void CSimpleTextSubtitle::OrSegmentAnimated(int iSegment, bool animated)
 }
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+LCID CSimpleTextSubtitle::GetDocumentLCID() const
+{
+    return static_cast<LCID>(m_document->LCIDValue());
+}
+
+void CSimpleTextSubtitle::SetDocumentLCID(LCID value)
+{
+    static_assert(sizeof(LCID) == sizeof(uint32_t), "Native LCID transport width");
+    m_document->SetLCID(static_cast<uint32_t>(value));
+}
+
 bool CSimpleTextSubtitle::GetDocumentForcedDefaultStyle() const
 {
     return m_document->Metadata(3) != 0;

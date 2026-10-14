@@ -197,6 +197,7 @@ pub struct RetiredEmpty {
 /// or the selective field assignments in native Copy.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Document {
+    lcid: Option<u32>,
     metadata: [Option<i32>; 3],
     forced_default: Option<bool>,
     par_bits: Option<u64>,
@@ -238,6 +239,13 @@ impl Document {
             name,
             default_style,
         }
+    }
+    /// Supplied only; the native constructor deliberately supplies no LCID.
+    pub fn lcid(&self) -> Option<u32> {
+        self.lcid
+    }
+    pub fn replace_lcid(&mut self, value: u32) -> Option<u32> {
+        self.lcid.replace(value)
     }
     pub fn metadata(&self, field: MetadataField) -> Option<i32> {
         self.metadata[field.index()]
@@ -606,7 +614,6 @@ impl Document {
     pub fn remove_all_entries(&mut self) {
         self.entries.clear();
     }
-    /// Only this subset's storage; not native Empty's metadata/style reset.
     /// Base Empty only: caller retains native virtual dispatch/Deinit. No
     /// callback, default reset, or unrelated metadata reset occurs here.
     pub fn empty(&mut self) -> RetiredEmpty {
@@ -620,6 +627,7 @@ impl Document {
             entries,
         }
     }
+    /// Only this subset's storage; not native Empty's metadata/style reset.
     pub fn clear_entries_and_segments(&mut self) {
         self.entries.clear();
         self.segments.clear();
@@ -1516,5 +1524,25 @@ mod tests {
         let retired = d.empty();
         assert_eq!(retired.entries, alloc::vec![raw]);
         assert_eq!(d, expected);
+    }
+    #[test]
+    fn supplied_lcid_clone_and_document_operations_retain_destination() {
+        let mut source = Document::default();
+        let mut destination = Document::default();
+        assert_eq!(source.lcid(), None);
+        for bits in [0u32, 1, 0x7fffffff, 0x80000000, u32::MAX] {
+            source.replace_lcid(bits);
+            let cloned = source.clone();
+            source.replace_lcid(!bits);
+            assert_eq!(cloned.lcid(), Some(bits));
+            destination.replace_lcid(bits);
+            destination.replace_selected_state(source.selected_state());
+            destination.copy_storage_from(&source);
+            destination.remove_all_entries();
+            destination.clear_entries_and_segments();
+            drop(destination.empty());
+            assert_eq!(destination.lcid(), Some(bits));
+            assert_eq!(source.lcid(), Some(!bits));
+        }
     }
 }

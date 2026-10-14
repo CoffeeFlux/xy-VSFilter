@@ -71,7 +71,7 @@ public:
         // Assign every observed metadata scalar before the first observation;
         // constructor-indeterminate m_simple/m_lcid are never read.
         m_simple = id != 0;Name(id ? CString(L"destination") : CString(L"source"));
-        m_lcid = 1033+id;Type(EXTSRT);Mode(TIME);Encoding(CTextFile::UTF8);
+        LCIDValue(1033+id);Type(EXTSRT);Mode(TIME);Encoding(CTextFile::UTF8);
         Path(id ? CString(L"destination-path") : CString(L"source-path"));
         Screen(CSize(640+id,480+id));Wrap(int(id));Collisions(int(id));
         Scaled(id!=0);m_layout_size=CSize(800+id,600+id);
@@ -84,6 +84,20 @@ public:
         Forced(false);PARType(EPCTDownscale);PAR(1.25+id);Matrix(YCbCrMatrix_BT709);Range(YCbCrRange_PC);
     }
     ~TraceDocument() override {printf("event %u %u destructor-body\n",++sequence,id_);}
+    LCID LCIDValue() const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        return GetDocumentLCID();
+#else
+        return m_lcid;
+#endif
+    }
+    void LCIDValue(LCID value) {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        SetDocumentLCID(value);
+#else
+        m_lcid=value;
+#endif
+    }
     bool Forced() const {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
         return GetDocumentForcedDefaultStyle();
@@ -356,7 +370,7 @@ public:
     void Dump(const char* stage) const {
         printf("state %u %u %s %zu %zu\n",++sequence,id_,stage,Entries(),Segments());
         printf("metadata %d",m_simple);units(Name());
-        printf(" %lu %d %d %d",static_cast<unsigned long>(m_lcid),int(Type()),Mode(),int(Encoding()));units(Path());
+        printf(" %lu %d %d %d",static_cast<unsigned long>(LCIDValue()),int(Type()),Mode(),int(Encoding()));units(Path());
         printf(" %ld %ld %d %d %d %ld %ld %d %d",Screen().cx,Screen().cy,
             Wrap(),Collisions(),Scaled(),m_layout_size.cx,m_layout_size.cy,
             Forced(),int(PARType()));
@@ -945,7 +959,7 @@ static void base_empty_lifecycle() {
     const CString name=doc.Name(),path=doc.Path();const MetadataValue metadata=doc.Metadata();
     const int mode=doc.Mode(),wrap=doc.Wrap(),collisions=doc.Collisions();const exttype type=doc.Type();
     const CTextFile::enc encoding=doc.Encoding();const bool scaled=doc.Scaled(),simple=doc.m_simple;
-    const LCID lcid=doc.m_lcid;const CSize layout=doc.m_layout_size;
+    const LCID lcid=doc.LCIDValue();const CSize layout=doc.m_layout_size;
     named_add(doc,L"EmptyA",named_value(1));named_add(doc,L"EmptyB",named_value(2));
     for(int i=0;i<3;++i){const wchar_t payload[]={wchar_t(L'A'+i),0,wchar_t(0xd800+i),L'Z'};
         doc.AddSTSEntryOnly(CStringW(payload,4),true,i*10,i*10+20,CString(i%2?L"EmptyB":L"EmptyA"));}
@@ -958,7 +972,7 @@ static void base_empty_lifecycle() {
         check(doc.Entries()==0&&doc.Segments()==0&&doc.NamedCount()==0&&doc.Screen()==CSize(0,0),"Empty clears only owned collections/screen");
         check(same_identity(doc.Name(),name)&&same_identity(doc.Path(),path)&&same_metadata(doc.Metadata(),metadata)
             &&doc.Mode()==mode&&doc.Type()==type&&doc.Encoding()==encoding&&doc.Wrap()==wrap&&doc.Collisions()==collisions&&doc.Scaled()==scaled
-            &&doc.m_simple==simple&&doc.m_lcid==lcid&&doc.m_layout_size==layout,"Empty retains initialized identity/metadata");
+            &&doc.m_simple==simple&&doc.LCIDValue()==lcid&&doc.m_layout_size==layout,"Empty retains initialized identity/metadata");
         STSStyle actual;check(doc.GetDefaultStyle(actual)&&actual==defaultValue&&same_identity(actual.fontName,defaultValue.fontName),"Empty retains complete default");
         uint64_t bits;std::memcpy(&bits,&actual.fontSize,8);check(bits==UINT64_C(0x8000000000000000),"Empty preserves default signedzero");
         printf("empty-stage %s\n",stage);doc.Dump(stage);
@@ -972,6 +986,25 @@ static void base_empty_lifecycle() {
     printf("empty-stage empty-reused\n");doc.Dump("empty-reused");
     doc.Empty();cleared("empty-final");
     check(empty_events[0]==empties+3&&change_events[0]==notifications+1,"Final Empty no notification");
+}
+static void lcid_lifecycle() {
+    TraceDocument source(0),destination(1);
+    source.LCIDValue(1031);destination.LCIDValue(0);
+    source.AddSTSEntryOnly(CStringW(L"LCID source"),true,0,10);
+    auto stage=[&](const char* name,LCID sourceExpected,LCID destinationExpected){
+        check(source.LCIDValue()==sourceExpected&&destination.LCIDValue()==destinationExpected,"supplied LCID retention/independence");
+        printf("lcid-stage %s source=%lu destination=%lu\n",name,static_cast<unsigned long>(source.LCIDValue()),static_cast<unsigned long>(destination.LCIDValue()));
+        source.Dump(name);destination.Dump(name);
+    };
+    stage("lcid-supplied",1031,0);
+    destination.Copy(source);stage("lcid-copy-retained",1031,0);
+    source.LCIDValue(1033);stage("lcid-source-independent",1033,0);
+    const unsigned notifications=change_events[1];
+    destination.Empty();destination.Empty();stage("lcid-repeated-empty",1033,0);
+    check(change_events[1]==notifications,"LCID Empty has no notification");
+    destination.LCIDValue(1031);destination.AddSTSEntryOnly(CStringW(L"LCID reuse"),true,0,20);destination.CreateSegments();
+    destination.Empty();stage("lcid-reused-empty",1033,1031);
+    check(change_events[1]==notifications+1,"LCID reuse exactly one rebuild notification");
 }
 int main() {
     try {
@@ -988,6 +1021,7 @@ int main() {
         prepared_style_conflicts();
         sort_lifecycle();
         base_empty_lifecycle();
+        lcid_lifecycle();
         named_style_exports();
         {
             TraceDocument source(0),destination(1);populate(source);populate(destination);

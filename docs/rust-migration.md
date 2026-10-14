@@ -235,8 +235,8 @@ still requires D4/D5 below and all remaining ownership/fallback accounting.
 | --- | --- | --- |
 | D0 — Freeze the contract | Exact operation/callsite inventory, owner/alias graph and retained-adapter list for DOC-01 through DOC-11 | Source review across STS, RTS, format importers and both style APIs; explicitly track unresolved behavior. Status: in progress. |
 | D1 — Capture complete lifecycles | A pinned-reference document harness for create → add → edit/style-change → copy → sort → seek → clear/reopen → destroy | Compare full initialized document/segment state, observable callback/error order and caller snapshots; use real ATL/CRT on Windows. Include failed operations and repeated calls, with failures never counted as parity. Status: bounded full native-class lifecycle passes on x86/x64 at `04673672`; expanded default-style lifecycle also passes at `d6bd058c` with partial workflow evidence; named-style lifecycles and broader host/failure gates remain open. |
-| D2 — Implement the Rust owner | Safe Rust entries, styles, metadata and segments; coherent document operations reuse existing helpers | Owner/copy/edit/drop tests, raw UTF-16 preservation, bounded access, no native mutable views; native field/type/alias compatibility reviewed. Status: canonical entries/segments, default/named styles, name/path, interpretation, script layout and initialized forced/PAR/color values implemented opt-in. Partial/bounded evidence is recorded separately; current full Windows gates pending; simple/lcid/layout_size remain native. |
-| D3 — Route every caller | Importers, renderer, style interfaces and export paths use document operations or bounded snapshots | Enumerate and eliminate direct authoritative storage accesses in the Rust-enabled build; preserve callback/lock order and public ABI. Retire superseded fine-grained FFI crossings. Status: current opt-in owners route through scalar/value facades; unchanged default branches verified by source preprocessing. Full changed-code Windows gates pending; simple/lcid/layout_size and native orchestration remain. |
+| D2 — Implement the Rust owner | Safe Rust entries, styles, metadata and segments; coherent document operations reuse existing helpers | Owner/copy/edit/drop tests, raw UTF-16 preservation, bounded access, no native mutable views; native field/type/alias compatibility reviewed. Supplied LCID is now owned opt-in without a constructor default. Status: canonical entries/segments, default/named styles, name/path, interpretation, script layout and initialized forced/PAR/color values implemented opt-in. Partial/bounded evidence is recorded separately; current full Windows gates pending; simple/layout_size remain native. |
+| D3 — Route every caller | Importers, renderer, style interfaces and export paths use document operations or bounded snapshots | Enumerate and eliminate direct authoritative storage accesses in the Rust-enabled build; preserve callback/lock order and public ABI. Retire superseded fine-grained FFI crossings. Supplied LCID is now owned opt-in without a constructor default. Status: current opt-in owners route through scalar/value facades; unchanged default branches verified by source preprocessing. Full changed-code Windows gates pending; simple/layout_size and native orchestration remain. |
 | D4 — Establish parity | Document lifecycle and integrated DLL comparisons on Windows x86/x64 at one exact candidate commit | Exact records, ordering, times, errors, rendering output and style API behavior; existing corpus/mutations, targeted lifecycle/malformed fixtures, Miri and relevant native checks. Resolve mismatches; no undocumented native document fallback. Status: experimental entry/segment owner passes the full DLL corpus and bounded native-class lifecycle on x86/x64 at `04673672`; subsequent canonical named-style changes await full Windows validation; partial default-style results do not close style API/value or workflow gates. No whole-document closure. |
 | D5 — Close and hand off | Written ownership/access review and applicable consumer validation | Aegisub load/render/seek/reload/close, relevant player/style-edit lifecycles and architecture results. Record finite corpus scope and bounded retained adapters. Until the real-host check is complete, report core-complete/host-validation-pending, never closed. Status: planned. |
 
@@ -1001,7 +1001,8 @@ The [prior compile evidence](rust-document-probe-compile-evidence.json) at
 architectures. It is compile-only, predates this metadata slice and establishes
 no linked runtime or current owner approval.
 
-The remaining native metadata fields are `m_simple`, `m_lcid` and `m_layout_size`.
+At this earlier stage, native metadata included `m_simple`, `m_lcid` and
+`m_layout_size`; supplied LCID ownership is described below.
 Their existing initialization contracts are unchanged; the probe deliberately
 initializes them and does not turn indeterminate reference state into passing
 constructor-default evidence. Native parsing, CRT, callbacks, dialogs, file I/O
@@ -1101,6 +1102,38 @@ selects the complete native suffix. A separate tool captures a narrow private
 SDK CSize constructor excerpt and provenance only. Its runtime probe is
 unchanged, and no CSize Windows behavior or constructor default is inferred.
 
+### Supplied LCID ownership
+
+The experimental document now owns LCID as an optional raw u32. Native explicit
+assignments use `SetDocumentLCID`; reads use `GetDocumentLCID`. Constructor,
+Copy and Empty still supply no LCID value, so Copy retains the destination's
+prior LCID. Unsupplied safe-owner reads remain unresolved. GetStreamInfo keeps
+its literal zero output. The opt-in retired field/container count is now 19;
+`m_simple` and `m_layout_size` remain native.
+
+Local checks pass 192 core and 117 FFI tests, pinned formatting and all-target
+Clippy, and 105 Python tests with four Windows-only skips. Generated-probe and
+eight-file default/Rust-text preprocessing checks pass. Exact-code Windows LCID
+lifecycle, rendering and host gates remain pending.
+
+The native probe explicitly initializes every observed LCID and adds ordinary
+1031, 0 and 1033 histories for Copy retention, source independence, repeated
+Empty and reuse. It does not probe constructor-indeterminate storage. Headerless
+text setup can reach CreateHelper, AddSubStream, XySubFilter UpdateSubtitle and
+SetSubtitle, then IsSimple before Open assigns m_simple. That source-only
+initialization/read contract remains unresolved; no default or native outcome
+is inferred or executed.
+
+The [verified 4f x64 metadata evidence](rust-document-metadata-evidence.json)
+checks four identical 2,058-line native lifecycle traces, including 19 metadata
+stages and 11 callbacks, plus source/header/EXE hashes. Smoke, 798 corpus cases
+and 32 mutation cases report equal rendering. Retained capture metadata and
+frame hashes match, but pixel binaries were not retained, so exact byte equality
+is runner-reported rather than independently rechecked. The workflow later
+failed reference style API setup. This x64-only evidence predates LCID and later
+Copy/rename/Sort/Empty changes; it does not approve those changes or the workflow.
+
+
 ### Coarse selected-state Copy boundary
 
 Native Copy still invokes virtual Empty first, then reads the source. The opt-in
@@ -1151,13 +1184,13 @@ Neither count measures the amount of application behavior replaced.
 The reproducible [Rust unsafe inventory](rust-unsafe-inventory.json) uses
 `python3 tools/compat/audit_rust_boundary.py OUTPUT.json`. It masks comments and
 literals, separates cfg(test) items, and includes all platform/feature branches.
-At the current frozen working-tree sources based on `611d7ff9` (exact file
+At the current frozen working-tree sources based on `fe24c3e7` (exact file
 hashes recorded by the regenerated inventory):
 
 | Layer | Production source inventory | Meaning |
 | --- | --- | --- |
-| `rust/compat` | 0 unsafe blocks/functions/impls; 7,634 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
-| `rust/ffi` | 359 explicit unsafe blocks, 302 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,238 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
+| `rust/compat` | 0 unsafe blocks/functions/impls; 7,641 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
+| `rust/ffi` | 359 explicit unsafe blocks, 302 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,242 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
 | Tests | 119 unsafe blocks in FFI tests | Exercise valid and deliberately bounded ownership/alias/initialization contracts; not production code |
 
 Unsafe-function declarations and blocks overlap and must not be added as

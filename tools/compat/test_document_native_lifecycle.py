@@ -50,6 +50,9 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
              b"sort-time", b"sort-time-repeat", b"sort-readorder", b"sort-readorder-repeat"))
          + b"".join(b"empty-stage " + stage + b"\n" for stage in (
              b"empty-populated", b"empty-cleared", b"empty-repeated", b"empty-reused", b"empty-final"))
+         + b"".join(f"lcid-stage {stage} source={source} destination={destination}\n".encode() for stage,source,destination in (
+             ("lcid-supplied",1031,0),("lcid-copy-retained",1031,0),("lcid-source-independent",1033,0),
+             ("lcid-repeated-empty",1033,0),("lcid-reused-empty",1033,1031)))
          + b"saved-file ssa exists=1 bytes=1 41\nsaved-file ass exists=1 bytes=1 41\n"
          + b"saved-file srt exists=1 bytes=1 41\nsaved-file srt-sidecar exists=1 bytes=1 41\n"
          + b"saved-file ssa-sidecar exists=0\nsaved-file ass-sidecar exists=0\n"
@@ -196,6 +199,14 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
         with self.assertRaises(ValueError): compare_traces([reordered]*4,64)
         changed=TRACE.replace(b"empty-stage empty-final\n",b"empty-stage empty-final\nretained metadata changed\n")
         with self.assertRaises(ValueError): compare_traces([TRACE,TRACE,changed,changed],64)
+
+    def test_lcid_retention_and_archival_optout(self):
+        legacy=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith(b"lcid-stage "))
+        with self.assertRaises(ValueError): compare_traces([legacy]*4,64)
+        compare_traces([legacy]*4,64,require_lcid_stages=False)
+        for old,new in ((b"lcid-stage lcid-copy-retained source=1031 destination=0",b"lcid-stage lcid-copy-retained source=1031 destination=1031"),
+                        (b"lcid-stage lcid-repeated-empty source=1033 destination=0\n",b"")):
+            with self.assertRaises(ValueError): compare_traces([TRACE.replace(old,new)]*4,64)
 
     def test_rejects_repeat_nondeterminism(self):
         changed = TRACE.replace(b"callback changed", b"callback empty")

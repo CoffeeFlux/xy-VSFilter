@@ -248,12 +248,14 @@ fn metadata_field(field: u32) -> Result<MetadataField, u32> {
 }
 #[no_mangle]
 pub extern "C" fn xy_vsfilter_document_set_metadata_v1(owner: u64, field: u32, value: i32) -> u32 {
-    if field > 3 || (field == 3 && value != 0 && value != 1) {
+    if field > 4 || (field == 3 && value != 0 && value != 1) {
         return INVALID_INPUT;
     }
     status(admitted(|registry| {
         let document = registry.document_mut(owner).map_err(registry_error)?;
-        if field == 3 {
+        if field == 4 {
+            document.replace_lcid(value as u32);
+        } else if field == 3 {
             document.replace_forced_default(value != 0);
         } else {
             document.replace_metadata(metadata_field(field)?, value);
@@ -262,7 +264,7 @@ pub extern "C" fn xy_vsfilter_document_set_metadata_v1(owner: u64, field: u32, v
     }))
 }
 /// # Safety
-/// Output follows the byte-buffer contract, capacity >=4; LE signed i32.
+/// Output follows the byte-buffer contract, capacity >=4; LE i32 or raw LCID u32.
 #[no_mangle]
 pub unsafe extern "C" fn xy_vsfilter_document_get_metadata_v1(
     owner: u64,
@@ -271,12 +273,14 @@ pub unsafe extern "C" fn xy_vsfilter_document_get_metadata_v1(
     capacity: usize,
 ) -> u32 {
     required!(output_capacity(output, capacity, 4));
-    if field > 3 {
+    if field > 4 {
         return INVALID_INPUT;
     }
     let value = required!(admitted(|registry| {
         let document = registry.document(owner).map_err(registry_error)?;
-        if field == 3 {
+        if field == 4 {
+            document.lcid().map(|bits| bits as i32)
+        } else if field == 3 {
             document.forced_default().map(i32::from)
         } else {
             document.metadata(metadata_field(field)?)
@@ -1292,6 +1296,88 @@ mod tests {
             assert_eq!(xy_vsfilter_document_destroy_v1(target), OK);
             assert_ne!(read_snapshot(snapshot), style);
             assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
+            // Supplied LCID uses all raw u32 bits; no constructor default.
+            let source = create();
+            let destination = create();
+            let mut output = [0xa5; 4];
+            assert_eq!(
+                xy_vsfilter_document_get_metadata_v1(source, 4, output.as_mut_ptr(), 4),
+                UNRESOLVED_REFERENCE
+            );
+            assert_eq!(output, [0xa5; 4]);
+            assert_eq!(
+                xy_vsfilter_document_set_metadata_v1(destination, 4, 123),
+                OK
+            );
+            for bits in [0u32, 1, 0x7fffffff, 0x80000000, u32::MAX] {
+                assert_eq!(
+                    xy_vsfilter_document_set_metadata_v1(source, 4, bits as i32),
+                    OK
+                );
+                assert_eq!(
+                    xy_vsfilter_document_get_metadata_v1(source, 4, output.as_mut_ptr(), 4),
+                    OK
+                );
+                assert_eq!(u32::from_le_bytes(output), bits);
+                assert_eq!(state(source).clone().lcid(), Some(bits));
+            }
+            let before = state(source);
+            output.fill(0xa5);
+            let reply = open_snapshot(source, 5);
+            assert_eq!(
+                xy_vsfilter_document_get_metadata_v1(source, 4, output.as_mut_ptr(), 3),
+                INVALID_INPUT
+            );
+            assert_eq!(output, [0xa5; 4]);
+            assert_eq!(
+                xy_vsfilter_document_set_metadata_v1(reply, 4, 0),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                xy_vsfilter_document_get_metadata_v1(reply, 4, output.as_mut_ptr(), 4),
+                BAD_HANDLE
+            );
+            assert_eq!(output, [0xa5; 4]);
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_set_metadata_v1(source, 4, 0))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_get_metadata_v1(
+                        source,
+                        4,
+                        output.as_mut_ptr(),
+                        4
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(output, [0xa5; 4]);
+            assert_eq!(state(source), before);
+            assert_eq!(
+                xy_vsfilter_document_copy_selected_state_v1(destination, source),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_copy_storage_v1(destination, source),
+                OK
+            );
+            assert_eq!(xy_vsfilter_document_clear_storage_v1(destination), OK);
+            assert_eq!(xy_vsfilter_document_remove_entries_v1(destination), OK);
+            assert_eq!(xy_vsfilter_document_empty_v1(destination), OK);
+            assert_eq!(state(destination).lcid(), Some(123));
+            assert_eq!(state(source).lcid(), Some(u32::MAX));
+            assert_eq!(xy_vsfilter_document_destroy_v1(source), OK);
+            assert_eq!(
+                xy_vsfilter_document_get_metadata_v1(source, 4, output.as_mut_ptr(), 4),
+                BAD_HANDLE
+            );
+            assert_eq!(output, [0xa5; 4]);
+            assert_eq!(xy_vsfilter_document_destroy_v1(destination), OK);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(reply), OK);
             // Base Empty preserves unrelated state and immutable old replies.
             let owner = create();
             let raw = [65u8, 0, 0, 0, 0, 216];
@@ -1777,11 +1863,11 @@ mod tests {
                 assert_eq!(state(owner), before);
             }
             assert_eq!(
-                xy_vsfilter_document_set_metadata_v1(owner, 4, 0),
+                xy_vsfilter_document_set_metadata_v1(owner, 5, 0),
                 INVALID_INPUT
             );
             assert_eq!(
-                xy_vsfilter_document_get_metadata_v1(owner, 4, output.as_mut_ptr(), 4),
+                xy_vsfilter_document_get_metadata_v1(owner, 5, output.as_mut_ptr(), 4),
                 INVALID_INPUT
             );
             assert_eq!(

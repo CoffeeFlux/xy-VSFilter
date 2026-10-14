@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "candidate_commit": "611d7ff9a36a0e0c97696a7fba15737ecb27f396",
+  "candidate_commit": "fe24c3e7d23beb0d4979d0fe67d5a1c2ee6e67e9",
   "method": "Lexical source inventory with comments/string/character literals masked and cfg(test) item bodies excluded from production. All platform and feature branches included, not one compiled target. Source hashes identify the measured files; the inventory script may be uncommitted. Block counts and unsafe-function declarations overlap and must not be added as independent operations. Operation categories can overlap and omit raw-pointer dereferences; they are examples, not an exhaustive soundness classification.",
   "limitations": "Not a proof of soundness or a migration completion percentage. Does not measure C/C++/assembly, native libraries, standard-library internals, borrow correctness at native callsites or dynamic path coverage.",
   "crates": {
@@ -18,8 +18,8 @@
         "test_trait": 0,
         "test_other": 0
       },
-      "physical_lines_including_tests": 12310,
-      "nonblank_code_lines_excluding_tests": 7634,
+      "physical_lines_including_tests": 12338,
+      "nonblank_code_lines_excluding_tests": 7641,
       "production_extern_functions": 0,
       "operations": {
         "raw_shared_slice_construction": 0,
@@ -364,9 +364,9 @@
         },
         {
           "path": "rust/compat/src/document.rs",
-          "sha256": "94fda971fe47de5822b1ea6bbc817f2ca6ce9db0e527ab5d78b68aad12f6983f",
-          "physical_lines_including_tests": 1520,
-          "nonblank_code_lines_excluding_tests": 605,
+          "sha256": "85ba90f936e599fec3c3dbde87ac50fb7a8451472d3dbe97d0584d6e4db21567",
+          "physical_lines_including_tests": 1548,
+          "nonblank_code_lines_excluding_tests": 612,
           "counts": {
             "production_block": 0,
             "production_function": 0,
@@ -2508,8 +2508,8 @@
         "test_trait": 0,
         "test_other": 0
       },
-      "physical_lines_including_tests": 11661,
-      "nonblank_code_lines_excluding_tests": 5238,
+      "physical_lines_including_tests": 11747,
+      "nonblank_code_lines_excluding_tests": 5242,
       "production_extern_functions": 370,
       "operations": {
         "raw_shared_slice_construction": 62,
@@ -3405,9 +3405,9 @@
         },
         {
           "path": "rust/ffi/src/document.rs",
-          "sha256": "1a3cf8f33a0debcb81d044fb36f91737084807baf66d339fe54c863cc8ceebb8",
-          "physical_lines_including_tests": 2866,
-          "nonblank_code_lines_excluding_tests": 987,
+          "sha256": "fbaeeee1042cbbe6907daa9c801ea7fc5fc90fbc6c7476ac893db31dbe633b36",
+          "physical_lines_including_tests": 2952,
+          "nonblank_code_lines_excluding_tests": 991,
           "counts": {
             "production_block": 33,
             "production_function": 29,
@@ -3472,317 +3472,317 @@
               "test": false
             },
             {
-              "line": 267,
+              "line": 269,
               "kind": "function",
               "test": false
             },
             {
-              "line": 287,
+              "line": 291,
               "kind": "block",
               "test": false
             },
             {
-              "line": 303,
+              "line": 307,
               "kind": "function",
               "test": false
             },
             {
-              "line": 315,
+              "line": 319,
               "kind": "block",
               "test": false
             },
             {
-              "line": 349,
+              "line": 353,
               "kind": "function",
               "test": false
             },
             {
-              "line": 369,
+              "line": 373,
               "kind": "block",
               "test": false
             },
             {
-              "line": 389,
+              "line": 393,
               "kind": "function",
               "test": false
             },
             {
-              "line": 404,
+              "line": 408,
               "kind": "block",
               "test": false
             },
             {
-              "line": 434,
+              "line": 438,
               "kind": "function",
               "test": false
             },
             {
-              "line": 448,
+              "line": 452,
               "kind": "block",
               "test": false
             },
             {
-              "line": 455,
+              "line": 459,
               "kind": "function",
               "test": false
             },
             {
-              "line": 473,
+              "line": 477,
               "kind": "block",
               "test": false
             },
             {
-              "line": 500,
+              "line": 504,
               "kind": "function",
               "test": false
             },
             {
-              "line": 518,
+              "line": 522,
               "kind": "block",
               "test": false
             },
             {
-              "line": 525,
+              "line": 529,
               "kind": "function",
               "test": false
             },
             {
-              "line": 539,
+              "line": 543,
               "kind": "block",
               "test": false
             },
             {
-              "line": 541,
+              "line": 545,
               "kind": "block",
               "test": false
             },
             {
-              "line": 576,
+              "line": 580,
               "kind": "function",
               "test": false
             },
             {
-              "line": 588,
+              "line": 592,
               "kind": "block",
               "test": false
             },
             {
-              "line": 612,
+              "line": 616,
               "kind": "function",
               "test": false
             },
             {
-              "line": 628,
+              "line": 632,
               "kind": "block",
               "test": false
             },
             {
-              "line": 656,
+              "line": 660,
               "kind": "block",
               "test": false
             },
             {
-              "line": 671,
+              "line": 675,
               "kind": "function",
               "test": false
             },
             {
-              "line": 686,
+              "line": 690,
               "kind": "block",
               "test": false
             },
             {
-              "line": 693,
+              "line": 697,
               "kind": "function",
               "test": false
             },
             {
-              "line": 711,
+              "line": 715,
               "kind": "block",
               "test": false
             },
             {
-              "line": 718,
+              "line": 722,
               "kind": "function",
               "test": false
             },
             {
-              "line": 740,
+              "line": 744,
               "kind": "block",
               "test": false
             },
             {
-              "line": 747,
+              "line": 751,
               "kind": "function",
               "test": false
             },
             {
-              "line": 770,
+              "line": 774,
               "kind": "block",
               "test": false
             },
             {
-              "line": 777,
+              "line": 781,
               "kind": "function",
               "test": false
             },
             {
-              "line": 840,
+              "line": 844,
               "kind": "block",
               "test": false
             },
             {
-              "line": 847,
+              "line": 851,
               "kind": "function",
               "test": false
             },
             {
-              "line": 857,
+              "line": 861,
               "kind": "block",
               "test": false
             },
             {
-              "line": 865,
+              "line": 869,
               "kind": "function",
               "test": false
             },
             {
-              "line": 883,
+              "line": 887,
               "kind": "block",
               "test": false
             },
             {
-              "line": 899,
+              "line": 903,
               "kind": "function",
               "test": false
             },
             {
-              "line": 915,
+              "line": 919,
               "kind": "block",
               "test": false
             },
             {
-              "line": 935,
+              "line": 939,
               "kind": "block",
               "test": false
             },
             {
-              "line": 942,
+              "line": 946,
               "kind": "function",
               "test": false
             },
             {
-              "line": 957,
+              "line": 961,
               "kind": "block",
               "test": false
             },
             {
-              "line": 967,
+              "line": 971,
               "kind": "function",
               "test": false
             },
             {
-              "line": 975,
+              "line": 979,
               "kind": "block",
               "test": false
             },
             {
-              "line": 986,
+              "line": 990,
               "kind": "function",
               "test": false
             },
             {
-              "line": 997,
+              "line": 1001,
               "kind": "block",
               "test": false
             },
             {
-              "line": 998,
+              "line": 1002,
               "kind": "block",
               "test": false
             },
             {
-              "line": 1027,
+              "line": 1031,
               "kind": "function",
               "test": false
             },
             {
-              "line": 1034,
+              "line": 1038,
               "kind": "block",
               "test": false
             },
             {
-              "line": 1045,
+              "line": 1049,
               "kind": "function",
               "test": false
             },
             {
-              "line": 1052,
+              "line": 1056,
               "kind": "block",
               "test": false
             },
             {
-              "line": 1105,
+              "line": 1109,
               "kind": "function",
               "test": false
             },
             {
-              "line": 1122,
+              "line": 1126,
               "kind": "block",
               "test": false
-            },
-            {
-              "line": 1135,
-              "kind": "function",
-              "test": true
             },
             {
               "line": 1139,
-              "kind": "block",
-              "test": true
-            },
-            {
-              "line": 1161,
               "kind": "function",
               "test": true
             },
             {
-              "line": 1164,
+              "line": 1143,
               "kind": "block",
               "test": true
             },
             {
-              "line": 1176,
+              "line": 1165,
               "kind": "function",
+              "test": true
+            },
+            {
+              "line": 1168,
+              "kind": "block",
               "test": true
             },
             {
               "line": 1180,
-              "kind": "block",
-              "test": true
-            },
-            {
-              "line": 1185,
               "kind": "function",
               "test": true
             },
             {
+              "line": 1184,
+              "kind": "block",
+              "test": true
+            },
+            {
               "line": 1189,
+              "kind": "function",
+              "test": true
+            },
+            {
+              "line": 1193,
               "kind": "block",
               "test": true
             },
             {
-              "line": 1194,
+              "line": 1198,
               "kind": "block",
               "test": true
             },
             {
-              "line": 1218,
+              "line": 1222,
               "kind": "block",
               "test": true
             },
             {
-              "line": 1227,
+              "line": 1231,
               "kind": "block",
               "test": true
             }

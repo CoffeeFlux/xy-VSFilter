@@ -1,0 +1,152 @@
+{
+  "schema": 1,
+  "kind": "partial-experimental-initialized-metadata-lifecycle-and-renderer-evidence",
+  "candidate_commit": "4f1264a4baea1ac2e6ea43f7d36654a6ce6214f1",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "workflow_run": 38645850290,
+  "job_id": 116132378129,
+  "workflow_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38645850290",
+  "platform": "x64",
+  "build_info_sha256": "dfd01bae2bcf27a4ef39ef92da862c54ccf180de769bca7e6588c07a94bcb69f",
+  "renderer": {
+    "smoke": {
+      "report_sha256": "e3fa705c933db0df45f2249d7674d3e48db5913b46658aec38256168d5c239c0",
+      "case_count": 1,
+      "rendered_frames": 10,
+      "changed_frames": 6,
+      "case_verdicts": {
+        "equal": 1
+      },
+      "candidate_statuses": {
+        "ok": 1
+      },
+      "manifest_sha256": "b3091fe31459e8e5cbde58c9bac57749c0374ed063964c45f600d6693d62c9dd",
+      "frame_hash_metadata_observations_verified": 30,
+      "pixel_byte_comparison_scope": "Runtime runner-reported exact bytes; frame binary files not retained, cannot independently rehash/recompare pixels",
+      "distinct_frame_control_count": 0,
+      "timeline_observation_count": 0,
+      "dialog_observation_case_count": 0,
+      "report": "artifacts/ci-38645850290/renderer-evidence-x64-rust-document/candidate/artifacts/native/x64/smoke/report.json",
+      "capture_result_count": 3,
+      "ordered_path_and_result_sha256_manifest_sha256": "8735f8e3fb1574cd5ea6d0cca9b41a9c8445c4e8eb6715274f0407d64ead5c79",
+      "runtime_stderr_empty": true
+    },
+    "csri": {
+      "report_sha256": "5a6426c654eacbae30ee749aebb373d9f433cb4f3b2a7cb6ccc935d865aa3e5e",
+      "case_count": 798,
+      "rendered_frames": 8426,
+      "changed_frames": 5624,
+      "case_verdicts": {
+        "equal": 798
+      },
+      "candidate_statuses": {
+        "ok": 780,
+        "open_rejected": 18
+      },
+      "manifest_sha256": "9a83e1dddc8b734cad7a6a76a7abc00dfba9cc6d8f4190a57cf41a2ee916a0eb",
+      "frame_hash_metadata_observations_verified": 25278,
+      "pixel_byte_comparison_scope": "Runtime runner-reported exact bytes; frame binary files not retained, cannot independently rehash/recompare pixels",
+      "distinct_frame_control_count": 72,
+      "timeline_observation_count": 32,
+      "dialog_observation_case_count": 4,
+      "report": "artifacts/ci-38645850290/renderer-evidence-x64-rust-document/candidate/artifacts/native/x64/csri/report.json",
+      "capture_result_count": 2394,
+      "ordered_path_and_result_sha256_manifest_sha256": "fba7fe3fd553194cb1d97b9133f93633510f4f24f49814dd4a27ae009b4ab673",
+      "runtime_stderr_empty": true
+    },
+    "mutation-results": {
+      "report_sha256": "055a8a6d319f1b71798cd0ce10d75910f053679e3c57b9e0ed47e3281ca9460c",
+      "case_count": 32,
+      "rendered_frames": 224,
+      "changed_frames": 160,
+      "case_verdicts": {
+        "equal": 32
+      },
+      "candidate_statuses": {
+        "ok": 32
+      },
+      "manifest_sha256": "90e89279db719c739c6a1363611c04225b3486f03fee6ad9ceaca20e084ce43c",
+      "frame_hash_metadata_observations_verified": 672,
+      "pixel_byte_comparison_scope": "Runtime runner-reported exact bytes; frame binary files not retained, cannot independently rehash/recompare pixels",
+      "distinct_frame_control_count": 0,
+      "timeline_observation_count": 0,
+      "dialog_observation_case_count": 0,
+      "report": "artifacts/ci-38645850290/renderer-evidence-x64-rust-document/candidate/artifacts/native/x64/mutation-results/report.json",
+      "capture_result_count": 96,
+      "ordered_path_and_result_sha256_manifest_sha256": "6b2b40e2ecbcb649604d282410785285768ed6dd08faebd5cc13daf163c9136a",
+      "runtime_stderr_empty": true
+    }
+  },
+  "lifecycle": {
+    "report": "artifacts/ci-38645850290/renderer-evidence-x64-rust-document/candidate/artifacts/native/x64/document-lifecycle/report.json",
+    "report_sha256": "e67c49ae8f76f5a17be27835bb066b9d6cb261ee68c92cac8cde44041db9cc59",
+    "probe_sha256": "d62a5c5f30db4d211c87097dd367ed799255f3785a89c17523ddbdf6a7d7c70c",
+    "runner_sha256": "ff05e042e540d0adba84f5faa41147bf5df3a69d9a03583f710a0d7ba1927a42",
+    "requirements_from_verified_probe": {
+      "require_named_stages": true,
+      "require_identity_stages": true,
+      "require_interpretation_stages": true,
+      "require_layout_stages": true,
+      "require_metadata_stages": true,
+      "require_selected_copy_stages": false,
+      "require_style_rename_stages": false,
+      "require_sort_stages": false,
+      "require_base_empty_stages": false
+    },
+    "four_traces_identical": true,
+    "trace_lines": 2058,
+    "trace_sha256": [
+      "d894c3663c9e3f881869c78602681cdac5c6bb74682e45bdd88919041d769958",
+      "d894c3663c9e3f881869c78602681cdac5c6bb74682e45bdd88919041d769958",
+      "d894c3663c9e3f881869c78602681cdac5c6bb74682e45bdd88919041d769958",
+      "d894c3663c9e3f881869c78602681cdac5c6bb74682e45bdd88919041d769958"
+    ],
+    "stderr_empty": true,
+    "builds": {
+      "reference": {
+        "binary_sha256": "6bb3553fcd9cba5002bd6271c001fe12f5dd8a0b089cadd324069d75df83f7f8",
+        "pe_machine": "0x8664",
+        "source_header_count_verified": 850,
+        "library_hash_scope": "runner-reported; build libraries not retained here"
+      },
+      "candidate": {
+        "binary_sha256": "99128b3a38e090f9d191d874f0e692a7dc47f9ebf14c245cbce0291bdd9ab8a3",
+        "pe_machine": "0x8664",
+        "source_header_count_verified": 856,
+        "library_hash_scope": "runner-reported; build libraries not retained here"
+      }
+    },
+    "metadata_stages": 19,
+    "metadata_callbacks": 11
+  },
+  "production_dll_sha256": {
+    "VSFilter.dll": {
+      "reference": "691d3d7cbcc99a345882484bfa13ef01a4ce215b7943d4694bcaf2e0998eca07",
+      "candidate": "734aaf81a92aabebf0f49814180fa993d66d73e2ec3b43b709c790e26c28acc6"
+    },
+    "XySubFilter.dll": {
+      "reference": "3d7f2c2cc331ef23858e0ec9d332389713cbfcd8d1d10624e03567eeb9eff715",
+      "candidate": "7748046ff28125ae1d58c213d225024b4ea23308369a96a8c5615966528889a1"
+    },
+    "xy_sub_filter_consumer.dll": {
+      "reference": "9c74fe5f9470db1afa72323ee6c888b9914015ff7a59ecd961e4f884e8a7fa32",
+      "candidate": "29eff5e9b603740ee245ba0a14890093e52984b0503ff71a3cbd36f1ce41e6e7"
+    }
+  },
+  "limits": [
+    "Failed overall workflow: reference style API setup failed after these comparisons; no workflow/styleAPI/fullhost approval.",
+    "x64 only and exact4f initializedmetadata sources; predates selectedCopy/preparedrename/scalarSort/coarseEmpty.",
+    "Renderer evidence is bounded fixed corpus+32 mutations. Per-frame hash/guard/result metadata independently compared across two reference and one candidate captures; actual frame binaries absent, runtime exact pixel-byte comparison only runner-reported. Not complete formats/options/interfaces coverage.",
+    "Lifecycle repository header/source and executable hashes independently checked; externalSDK/compiler/libraries remain runner-reported."
+  ],
+  "candidate_source_hashes": {
+    "src/subtitles/STS.h": "ed723ecdf765261961960355f8f5b9a1a4f8bd788fa23e0ffaf75a63e2531d99",
+    "src/subtitles/STS.cpp": "190a5172ba5b6d497bd1ccd128569889901346fa13c83fcf34d5371b7bc3759e",
+    "src/subtitles/RustDocumentOwner.h": "f6a0aef21cab5e2567aed8006abb2667753d34ee2d69cca04b57413b9b4fb25b",
+    "rust/compat/src/document.rs": "e5257fd3c0ccd521f4878b5ac33253e6c082830945f1999a71001c49f010263d",
+    "rust/ffi/src/document.rs": "c6eed22b222dd863cc7be480aa827191609516fef83586589c50ece8595024d7",
+    "tools/compat/csri_compare.py": "e6afea2e8a04b0a78eb71eb59ba8e57355dc11ea48ad789152cb786caeba6bd3"
+  },
+  "artifact_root": "artifacts/ci-38645850290/renderer-evidence-x64-rust-document",
+  "verification": "Existing summarize_comparison and lifecycle compare_traces helpers, source invocation archival requirements, plus complete capture-result equality/PE/trace/header/hash checks. Pixel binaries absent; runtime exact bytes not independently revalidated."
+}

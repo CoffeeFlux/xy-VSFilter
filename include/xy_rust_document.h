@@ -88,7 +88,10 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_empty_v1(uint64_t owner);
 // values/entry names drop after admission; map keys/allocations still occur inside.
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_commit_style_rename_v1(uint64_t owner, const uint8_t* packet, size_t packet_bytes);
 // Render metadata fields:0 PAR type,1 color matrix,2 color range (raw i32),
-// 3 forced default style(strict0/1). Initially absent until native initialization.
+// 3 forced default style(strict0/1),4 supplied-only LCID(raw u32 bits carried
+// through the i32 setter argument). No constructor LCID default. Clone copies
+// LCID; selected Copy/Empty/storage operations retain destination LCID.
+// Other fields are initially absent until native initialization.
 // Get writes4 LE bytes; absence => UNRESOLVED_REFERENCE, output unchanged.
 // PAR compensation is separately supplied/stored as opaque u64 double bits;
 // get writes8 LE bytes. No floating-point evaluation/normalization occurs here.
