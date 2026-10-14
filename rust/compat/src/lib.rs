@@ -15,6 +15,7 @@ pub mod bilinear;
 pub mod document;
 pub mod document_style;
 pub mod document_style_add;
+pub mod document_style_copy;
 pub mod document_style_map;
 pub mod document_unknown;
 pub mod document_wire;

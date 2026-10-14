@@ -1,0 +1,161 @@
+{
+  "schema": "rust-document-preparation-windows-rust-evidence-v1",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "candidate_commit": "0976ec8a960e9a39ddca3781de4b3d38965bb6be",
+  "run_id": 38653823908,
+  "scope": "Retained bounded actual-MFC final Add/EntryOnly suffix and SetStr LF-only versus safe Rust, no native reruns",
+  "whole_document_or_renderer_gate": false,
+  "production_preparation_routing_gate": false,
+  "architectures": {
+    "Win32": {
+      "job_id": 116158738010,
+      "observations": 620,
+      "equal": true,
+      "repeat_equal": true,
+      "stderr_empty": true,
+      "native_report_sha256": "1a31181b5679a08d0b55591d27b4528a64a3b1020439e53186690fafb9c36df5",
+      "rust_report_sha256": "64b4dacb9b28073b058aef30bf6c45e6940c7f62d7d8b547adb83bbac9000452",
+      "actual_type": "class ATL::CStringT<wchar_t,class StrTraitMFC<wchar_t,class ATL::ChTraitsCRT<wchar_t> > >",
+      "native_exe_sha256": "5521c2549fdb24d2cdab80e4c44725251911b6937f1ee0683be10ea6b92a20b1",
+      "rust_exe_sha256": "6bf4c8946e5ae92010ce941d3a7fdc5ba0ac3c72ce9295a4d182519e78923f7c",
+      "native_trace_sha256": [
+        "6ac88a87f8a61d1139d4085090305096a5ddb03fc68200f7ec2dd89180ae2f02",
+        "6ac88a87f8a61d1139d4085090305096a5ddb03fc68200f7ec2dd89180ae2f02"
+      ],
+      "rust_trace_sha256": [
+        "bc483162d75d4dcfb226ad40c79416aaa8bcbf47acd01f3fdb7e0af6c68dcf3c",
+        "bc483162d75d4dcfb226ad40c79416aaa8bcbf47acd01f3fdb7e0af6c68dcf3c"
+      ],
+      "input_sha256": "5180d5659e3f95e59f52e9e1ef63ecc2bfa9e51cdc19378cafb9ba231a6be093",
+      "build_log_sha256": "1b089ac7060fedc8aa2ba8d19409f3cf611831159ec2df6854f0d019c74e48af",
+      "compiler_sha256": "303bfbe5523af2e925871a1bc7fd2ec5f199a69208a3b6716724c3e6d6b6962d",
+      "verified_inputs": {
+        "retained_files": 12,
+        "git_sources": 91,
+        "external_reported_only": 0
+      },
+      "rust_toolchain": "rustc 1.85.0 (4d91de4e4 2025-02-17)\nbinary: rustc\ncommit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688\ncommit-date: 2025-02-17\nhost: x86_64-pc-windows-msvc\nrelease: 1.85.0\nLLVM version: 19.1.7"
+    },
+    "x64": {
+      "job_id": 116158737956,
+      "observations": 620,
+      "equal": true,
+      "repeat_equal": true,
+      "stderr_empty": true,
+      "native_report_sha256": "d6464be017fdf0cea56953d973cbb25072ca82df273efc29037b10fd66618328",
+      "rust_report_sha256": "53ec032b24fbe372bfb1cff692ffba27f7f49afbc333852462edd659eb70c7a5",
+      "actual_type": "class ATL::CStringT<wchar_t,class StrTraitMFC<wchar_t,class ATL::ChTraitsCRT<wchar_t> > >",
+      "native_exe_sha256": "33a4cac427fac98f228444106e52f0049bc6f5fe701d63194fa768a46b41f9d5",
+      "rust_exe_sha256": "b9f29ad2fe61989734d71af2ede07546b83aa379edd46e4c819f3e148a447113",
+      "native_trace_sha256": [
+        "1af9fb5a69ae0963cb4fba7af1db10b8ea0a08ce2fe8500b5bcdc5a2d55da986",
+        "1af9fb5a69ae0963cb4fba7af1db10b8ea0a08ce2fe8500b5bcdc5a2d55da986"
+      ],
+      "rust_trace_sha256": [
+        "bc483162d75d4dcfb226ad40c79416aaa8bcbf47acd01f3fdb7e0af6c68dcf3c",
+        "bc483162d75d4dcfb226ad40c79416aaa8bcbf47acd01f3fdb7e0af6c68dcf3c"
+      ],
+      "input_sha256": "5180d5659e3f95e59f52e9e1ef63ecc2bfa9e51cdc19378cafb9ba231a6be093",
+      "build_log_sha256": "b013a18dba42a31f533388193fd796229f6f6633f0d6be7cf79e7c5a88aa5f28",
+      "compiler_sha256": "fe251ef50a1545b1b0835ee17b1e785459712b38d79e45b5c1d3d28970a36619",
+      "verified_inputs": {
+        "retained_files": 12,
+        "git_sources": 91,
+        "external_reported_only": 0
+      },
+      "rust_toolchain": "rustc 1.85.0 (4d91de4e4 2025-02-17)\nbinary: rustc\ncommit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688\ncommit-date: 2025-02-17\nhost: x86_64-pc-windows-msvc\nrelease: 1.85.0\nLLVM version: 19.1.7"
+    }
+  },
+  "limits": [
+    "620 finite initialized observations per architecture; no trimming/locale/WebVTT/codepage/append/callback parity",
+    "Unassigned CString allocation-tail histories excluded; safe helper explicitly refuses more than one skipped LF",
+    "Compiler/SDK/library hashes are runner-reported when external files were not retained",
+    "Active CString helper source proof incomplete; successful jobs do not discharge that gate"
+  ],
+  "cstring_helper_gate": {
+    "complete": false,
+    "reason": [
+      "Both active contexts on both architectures select zero CharNext definitions",
+      "Selected StringFindString/SafeStringLen active bodies have no accepted hashed raw-source span match",
+      "Retained active selections do not prove complete WCHAR dispatch; production preparation routing remains blocked"
+    ],
+    "report_sha256": {
+      "Win32": "4fc3d7aadee5f9909db79df464ed269b3619c8b340b30c672268b8343a4398de",
+      "x64": "0106dac33e7605a5e5047cfac9826f5b434e1a3823e2ebfa407cb6adab22a467"
+    },
+    "active_contexts": {
+      "Win32": {
+        "csize-context-native-rust-text": {
+          "complete": false,
+          "active_source_origins_verified": false,
+          "definition_counts": {
+            "ChTraitsCRT::CharNext": 0,
+            "ChTraitsCRT::StringFindString": 1,
+            "ChTraitsCRT::SafeStringLen": 1
+          },
+          "private_selection_sha256": "589d706ccbb805e3afe5588452835846932f4951d5e39772275bff7cfede383e",
+          "preprocessed_stream_sha256": "266ea9c214002eb94fe29890fe209997759096deda568cc4cc59a97995cac248",
+          "full_preprocessed_stream_retained": false,
+          "unmatched_source_methods": [
+            "ChTraitsCRT::StringFindString",
+            "ChTraitsCRT::SafeStringLen",
+            "CSimpleStringT::StringLength"
+          ]
+        },
+        "csize-context-experimental": {
+          "complete": false,
+          "active_source_origins_verified": false,
+          "definition_counts": {
+            "ChTraitsCRT::CharNext": 0,
+            "ChTraitsCRT::StringFindString": 1,
+            "ChTraitsCRT::SafeStringLen": 1
+          },
+          "private_selection_sha256": "ad86fc82cac4ed5361a0dee061b2516a0191aaef4d76ae9b45957c69a0a9aa7c",
+          "preprocessed_stream_sha256": "f2b562b19a63a035c400d86df3e943b0d6bcaf4d67e64fe274f3d8f7bd7710d5",
+          "full_preprocessed_stream_retained": false,
+          "unmatched_source_methods": [
+            "ChTraitsCRT::StringFindString",
+            "ChTraitsCRT::SafeStringLen",
+            "CSimpleStringT::StringLength"
+          ]
+        }
+      },
+      "x64": {
+        "csize-context-native-rust-text": {
+          "complete": false,
+          "active_source_origins_verified": false,
+          "definition_counts": {
+            "ChTraitsCRT::CharNext": 0,
+            "ChTraitsCRT::StringFindString": 1,
+            "ChTraitsCRT::SafeStringLen": 1
+          },
+          "private_selection_sha256": "199ee0eff0ef50aedf49c3cfbab2f3883ea6b6783ec57c45351b98f42a1dd605",
+          "preprocessed_stream_sha256": "cb1f6ce7063890fb430cac678bf1f181aa9576ed3e1f955e995f5f26967c8879",
+          "full_preprocessed_stream_retained": false,
+          "unmatched_source_methods": [
+            "ChTraitsCRT::StringFindString",
+            "ChTraitsCRT::SafeStringLen",
+            "CSimpleStringT::StringLength"
+          ]
+        },
+        "csize-context-experimental": {
+          "complete": false,
+          "active_source_origins_verified": false,
+          "definition_counts": {
+            "ChTraitsCRT::CharNext": 0,
+            "ChTraitsCRT::StringFindString": 1,
+            "ChTraitsCRT::SafeStringLen": 1
+          },
+          "private_selection_sha256": "65deec82d317d17fc5cf5b6a822337b96aa6bff2394dbdc98a75bebf4e2da768",
+          "preprocessed_stream_sha256": "ce88126b00dca7977cb0d68f2cc4ff05663e0ab33d728075ffc62a120d2d3c8b",
+          "full_preprocessed_stream_retained": false,
+          "unmatched_source_methods": [
+            "ChTraitsCRT::StringFindString",
+            "ChTraitsCRT::SafeStringLen",
+            "CSimpleStringT::StringLength"
+          ]
+        }
+      }
+    }
+  }
+}

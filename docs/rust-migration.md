@@ -839,9 +839,9 @@ insertion remains permitted. Duplicate AddStyle calls involving a null old/new
 style have an unresolved reference outcome: the experiment returns an explicit
 unresolved status instead of executing an unsafe history or claiming parity.
 
-Copying takes another document, clears the destination before source enumeration
-and invokes AddStyle separately for each copied row, including native self-copy
-semantics. The separate registry storage-copy operation replaces only prepared
+Copying takes another document and now runs through the safe CopyStyles session
+described below. It clears the destination before source enumeration and invokes
+the shared AddStyle policy separately for each copied row. The separate registry storage-copy operation replaces only prepared
 entry/segment vectors and retains default style, named-map shape/history and
 other document state in place. Public style loops retain their name-length,
 partial-output, duplicate/null-slot and notification choreography. Immutable
@@ -1340,6 +1340,45 @@ Generated probes, unchanged default/RustText preprocessing and inventories pass.
 Windows validation of this new session remains pending. The canonical retired
 owner count remains 20; consolidating operations does not retire another field.
 
+### Safe style-copy orchestration
+
+The experimental CopyNamedStylesFrom now keeps source enumeration, copied style
+values and AddStyle decisions in safe Rust. The native loop consumes Done,
+Advanced or NeedSuffix packets and supplies CRT-generated candidate names only.
+It no longer allocates a native STSStyle or serializes a style value for each
+copied row. Direct AddStyle and copying share the unchanged suffix expressions.
+
+Opening a typed copy run binds source and destination IDs without touching maps.
+The first step performs initialization only: replacement clears destination
+before reading any source row. Self replacement therefore enumerates the now-empty
+map. Subsequent steps read one current row, advance the cursor before AddStyle,
+and preserve successful prior mutations. Copying into a grown map retains its
+bucket history. It does not replace the destination with a source-map clone.
+Ordinary finite self append compares equal values and leaves the map unchanged.
+Mutating source-enumeration histories, null dereferences and native shared-pointer
+histories remain outside the bounded native comparisons.
+
+Registry access uses safe slice splits for three distinct resources and a
+separate self-source case. No overlapping document references are constructed.
+Output capacity, current-row packet capacity and reply slot/ID are reserved before
+mutation. Old styles, entry names, copied keys, unused normalized names and
+completed conflict sessions are returned for destruction after admission, also
+on errors. Allocator reentry and allocation/partial-failure timing remain
+qualified. The three unsafe wrappers add four explicit unsafe blocks using
+existing copy/write helpers, with no new raw mechanism or unsafe implementation.
+
+Three new full-class histories add eight required stages: ordinary self append
+with signed zeros and raw font suffixes, replacement into a map grown to 128
+styles, and append combining equal/conflicting/missing rows with an occupied
+suffix. They retain complete source/destination traces and verify animated
+segments and callback counts. The native grown-map fixture compares resulting
+order and state; bin counts themselves are asserted only in the safe core test. Existing self-replacement and empty-stored-key copy
+histories remain required. Source-verified archival gates distinguish older probes.
+Six focused core tests and registry permutation/FFI tests pass. The full local
+suite passes 215 core and 120 FFI tests, pinned formatting and all-target Clippy,
+and 134 Python tests with four Windows-only skips. Changed-source Windows
+lifecycle, API and rendering comparisons remain pending; owner count stays 20.
+
 ### Newly verified x64 integration and preparation evidence
 
 [The retained x64 evidence](rust-document-x64-7f-evidence.json) for `7f3e5c9c`,
@@ -1357,13 +1396,34 @@ guards and result metadata agree across captures. Pixel binaries were not
 retained, so exact byte comparison remains the runner's recorded result.
 External SDK/compiler/library hashes retain their stated runner-reported limits.
 
+[The subsequent x64 integration evidence](rust-document-x64-61-evidence.json)
+for `61e91fa3`, run 38652657123/job 116154922265, adds verified layout-size and
+coarse time-conversion histories: four equal 3,291-line lifecycle traces and all
+16 style API executions. The expanded CSRI corpus reports 814 cases and 8,586
+frames, alongside 32 mutations/224 frames and smoke coverage. Retained binaries,
+repository inputs, full traces, frame hashes and guards were rechecked. As before,
+frame pixel files were not retained, so byte comparison is runner-reported.
+This result predates unknown-style, AddStyle and CopyStyles sessions and grants
+no validation credit to those later changes.
+
 At `61e91fa3`, both Win32 and x64 preparation captures completed all 620 native
 observations. [Local comparisons against both captures](rust-document-preparation-both-evidence.json)
 match the safe helper. The Windows Rust jobs stopped before comparison because
 the shallow candidate checkout lacked the pinned reference object. The checker
-now accepts the existing separate reference checkout explicitly. Native string
-preparation remains unchanged until its actual wide-helper source mapping and
-Windows Rust comparison gates pass.
+now accepts the existing separate reference checkout explicitly. At `0976ec8a`,
+[retained Windows Rust comparisons](rust-document-preparation-windows-rust-evidence.json)
+pass all 620 observations twice on both architectures. Input/source/binary hashes,
+PE architecture and actual Rust 1.85 provenance were independently checked.
+
+The actual wide-helper source gate still fails in those artifacts. The capture
+missed macro-expanded CharNextW, compared repeated Windows path separators
+literally, and counted C++ form-feed/vertical-tab whitespace as extra source
+lines. The revised selector preserves actual spellings, maps LF-based line
+origins to hashed included headers, and requires dispatch-declaration provenance
+as well as method bodies. Regression tests reject wrong dispatch origins and
+narrow CharNextA. The discarded full preprocessor streams cannot reconstruct
+missing historical evidence: a fresh Windows source capture is required. Native
+string preparation stays in place until that gate passes.
 
 ### Coarse selected-state Copy boundary
 
@@ -1415,13 +1475,13 @@ Neither count measures the amount of application behavior replaced.
 The reproducible [Rust unsafe inventory](rust-unsafe-inventory.json) uses
 `python3 tools/compat/audit_rust_boundary.py OUTPUT.json`. It masks comments and
 literals, separates cfg(test) items, and includes all platform/feature branches.
-At the current frozen working-tree sources based on `0976ec8a` (exact file
+At the current frozen working-tree sources based on `23a69442` (exact file
 hashes recorded by the regenerated inventory):
 
 | Layer | Production source inventory | Meaning |
 | --- | --- | --- |
-| `rust/compat` | 0 unsafe blocks/functions/impls; 8,225 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
-| `rust/ffi` | 368 explicit unsafe blocks, 307 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,659 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
+| `rust/compat` | 0 unsafe blocks/functions/impls; 8,421 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
+| `rust/ffi` | 372 explicit unsafe blocks, 310 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,886 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
 | Tests | 119 unsafe blocks in FFI tests | Exercise valid and deliberately bounded ownership/alias/initialization contracts; not production code |
 
 Unsafe-function declarations and blocks overlap and must not be added as

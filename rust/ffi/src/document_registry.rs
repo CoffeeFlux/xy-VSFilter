@@ -27,6 +27,7 @@ pub(crate) enum Kind {
     Snapshot,
     UnknownRun,
     StyleAddRun,
+    StyleCopyRun,
 }
 
 // Inline sessions avoid a new fallible box allocation after core ownership transfer.
@@ -44,6 +45,11 @@ pub(crate) enum Resource {
         owner: Handle,
         run: xy_vsfilter_compat::document_style_add::Session,
     },
+    StyleCopyRun {
+        destination: Handle,
+        source: Handle,
+        run: xy_vsfilter_compat::document_style_copy::Run,
+    },
 }
 impl Resource {
     fn kind(&self) -> Kind {
@@ -52,6 +58,7 @@ impl Resource {
             Self::Snapshot(_) => Kind::Snapshot,
             Self::UnknownRun { .. } => Kind::UnknownRun,
             Self::StyleAddRun { .. } => Kind::StyleAddRun,
+            Self::StyleCopyRun { .. } => Kind::StyleCopyRun,
         }
     }
 }
@@ -202,6 +209,73 @@ impl Registry {
         }
     }
 
+    pub(crate) fn style_copy_pair(
+        &mut self,
+        id: Handle,
+    ) -> Result<
+        (
+            &mut Document,
+            Option<&Document>,
+            &mut xy_vsfilter_compat::document_style_copy::Run,
+        ),
+        Error,
+    > {
+        let run_index = self.position(id)?;
+        let (destination, source) = match &self.slots[run_index].1 {
+            Resource::StyleCopyRun {
+                destination,
+                source,
+                ..
+            } => (*destination, *source),
+            _ => return Err(Error::TypeMismatch),
+        };
+        let destination_index = self.position(destination)?;
+        let source_index = self.position(source)?;
+        if destination_index == run_index || source_index == run_index {
+            return Err(Error::TypeMismatch);
+        }
+        if destination_index == source_index {
+            let (document_resource, run_resource) = if destination_index < run_index {
+                let (before, after) = self.slots.split_at_mut(run_index);
+                (&mut before[destination_index].1, &mut after[0].1)
+            } else {
+                let (before, after) = self.slots.split_at_mut(destination_index);
+                (&mut after[0].1, &mut before[run_index].1)
+            };
+            return match (document_resource, run_resource) {
+                (Resource::Document(document), Resource::StyleCopyRun { run, .. }) => {
+                    Ok((document, None, run))
+                }
+                _ => Err(Error::TypeMismatch),
+            };
+        }
+        let mut positions = [
+            (destination_index, 0usize),
+            (source_index, 1),
+            (run_index, 2),
+        ];
+        positions.sort_unstable_by_key(|row| row.0);
+        let (before_last, last) = self.slots.split_at_mut(positions[2].0);
+        let (before_middle, middle) = before_last.split_at_mut(positions[1].0);
+        let mut resources = [
+            Some(&mut before_middle[positions[0].0].1),
+            Some(&mut middle[0].1),
+            Some(&mut last[0].1),
+        ];
+        let rank = |tag| positions.iter().position(|row| row.1 == tag).unwrap();
+        let destination = resources[rank(0)].take().unwrap();
+        let source = resources[rank(1)].take().unwrap();
+        let run = resources[rank(2)].take().unwrap();
+        match (destination, source, run) {
+            (
+                Resource::Document(destination),
+                Resource::Document(source),
+                Resource::StyleCopyRun { run, .. },
+            ) => Ok((destination, Some(source), run)),
+            _ => Err(Error::TypeMismatch),
+        }
+    }
+
     /// Deep storage copy within this acquisition. This is not native Copy's
     /// metadata, virtual Empty, self-copy orchestration or partial-failure model.
     /// Returns retired destination storage to be dropped after admission ends.
@@ -328,6 +402,63 @@ mod tests {
             .try_with(|registry| registry.insert(resource).map_err(|(error, _)| error))
             .unwrap()
             .unwrap()
+    }
+
+    #[test]
+    fn copy_run_safe_borrows_cover_all_slot_orders_and_self() {
+        for order in [
+            [1, 2, 3],
+            [1, 3, 2],
+            [2, 1, 3],
+            [2, 3, 1],
+            [3, 1, 2],
+            [3, 2, 1],
+        ] {
+            let mut registry = Registry::new();
+            let destination = registry
+                .insert(Resource::Document(Box::default()))
+                .ok()
+                .unwrap();
+            let source = registry
+                .insert(Resource::Document(Box::default()))
+                .ok()
+                .unwrap();
+            let id = registry
+                .insert(Resource::StyleCopyRun {
+                    destination,
+                    source,
+                    run: xy_vsfilter_compat::document_style_copy::Run::new(false),
+                })
+                .ok()
+                .unwrap();
+            registry
+                .slots
+                .sort_by_key(|slot| order.iter().position(|handle| *handle == slot.0).unwrap());
+            let (destination, source, run) = registry.style_copy_pair(id).unwrap();
+            destination.set_script_size(1, 2);
+            assert_ne!(destination.script_size(), source.unwrap().script_size());
+            assert!(!run.initialized());
+            registry.next = None;
+            assert_eq!(registry.reserve_insert(), Err(Error::Exhausted));
+            assert!(!registry.style_copy_pair(id).unwrap().2.initialized());
+        }
+        let mut registry = Registry::new();
+        let owner = registry
+            .insert(Resource::Document(Box::default()))
+            .ok()
+            .unwrap();
+        let id = registry
+            .insert(Resource::StyleCopyRun {
+                destination: owner,
+                source: owner,
+                run: xy_vsfilter_compat::document_style_copy::Run::new(false),
+            })
+            .ok()
+            .unwrap();
+        for _ in 0..2 {
+            assert!(registry.style_copy_pair(id).unwrap().1.is_none());
+            registry.slots.swap(0, 1);
+        }
     }
 
     #[test]

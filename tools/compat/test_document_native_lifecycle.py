@@ -5,7 +5,7 @@ from pathlib import Path
 import subprocess
 import document_native_lifecycle as lifecycle
 
-from document_native_lifecycle import compare_traces, conversion_rows, unknown_rows
+from document_native_lifecycle import compare_traces, conversion_rows, unknown_rows, copy_styles_stages
 
 
 STYLE_SCALARS = b" ".join(b"0000000000000000" if i in (0,11,12,13,14,23,24,25,26,27,28,29,30,31,32) else b"00000000" if i in (15,17,19,21) else b"0" for i in range(34))
@@ -79,6 +79,9 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
          + b"add-style-retained ZeroPos bits=0000000000000000 font 4 004e 0000 d802 005a\n"
          + b"add-style-stage add-style-equal-after\nadd-style-stage add-style-name-classes\n"
          + b"add-style-name-classes count=2 default=1 empty=1 default-size=21 empty-size=22 entry 2 0000 004b\n"
+         + b"".join(b"copy-styles-stage " + stage + b"\n" for stage in copy_styles_stages())
+         + b"".join(b"style-rename-segments " + stage + b" count=3 animated=1\n" for stage in
+                    (b"copy-styles-self-after", b"copy-styles-grown-result", b"copy-styles-mixed-result"))
          + b"saved-file ssa exists=1 bytes=1 41\nsaved-file ass exists=1 bytes=1 41\n"
          + b"saved-file srt exists=1 bytes=1 41\nsaved-file srt-sidecar exists=1 bytes=1 41\n"
          + b"saved-file ssa-sidecar exists=0\nsaved-file ass-sidecar exists=0\n"
@@ -87,6 +90,16 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
 
 
 class NativeLifecycleEvidenceTests(unittest.TestCase):
+    def test_copy_styles_requires_complete_order_and_segment_observations(self):
+        compare_traces([TRACE] * 4, 64)
+        for stage in copy_styles_stages():
+            missing = TRACE.replace(b"copy-styles-stage " + stage + b"\n", b"")
+            with self.assertRaises(ValueError): compare_traces([missing] * 4, 64)
+        missing = TRACE.replace(b"style-rename-segments copy-styles-grown-result count=3 animated=1\n", b"")
+        with self.assertRaises(ValueError): compare_traces([missing] * 4, 64)
+        old = TRACE.replace(b"copy-styles-stage copy-styles-self-before\n", b"")
+        compare_traces([old] * 4, 64, require_copy_styles_stages=False)
+
     def test_add_style_retains_signedzero_fullfont_and_name_classes(self):
         for old,new in ((b"bits=8000000000000000",b"bits=0000000000000000"),
                         (b"font 4 004e 0000 d801 005a",b"font 4 004e 0000 dcff 005a"),
@@ -269,7 +282,7 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
         with self.assertRaises(ValueError):compare_traces([TRACE,TRACE,changed,changed],64)
 
     def test_style_rename_stages_and_segment_invariants(self):
-        legacy = b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith(b"style-rename-"))
+        legacy = b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith(b"style-rename-") or line.startswith(b"style-rename-segments copy-styles-"))
         with self.assertRaises(ValueError): compare_traces([legacy]*4,64)
         compare_traces([legacy]*4,64,require_style_rename_stages=False)
         for token in (b"style-rename-stage shrink-after\n", b"style-rename-segments raw-nul-to2 count=2 animated=1\n"):

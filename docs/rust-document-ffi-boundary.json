@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "scope": "Experimental persistent document containers/styles/identity/interpretation/scriptlayout/initializedmetadata; defaultproduction unchanged",
-  "measured_base_commit": "0976ec8a960e9a39ddca3781de4b3d38965bb6be",
+  "measured_base_commit": "23a69442396ed9a5fdf1f173fbab2462ddd747fb",
   "working_tree_source_hashes": true,
   "core_unsafe": {
     "production_block": 0,
@@ -16,8 +16,8 @@
     "test_other": 0
   },
   "ffi_total": {
-    "production_block": 368,
-    "production_function": 307,
+    "production_block": 372,
+    "production_function": 310,
     "production_impl": 2,
     "production_trait": 0,
     "production_other": 0,
@@ -30,12 +30,12 @@
   "new_boundary_files": [
     {
       "path": "rust/ffi/src/document.rs",
-      "sha256": "c825ea9e3013935e8b17d7afa17932385a8346038fd3aadb5ed9d00de573ee2c",
-      "physical_lines_including_tests": 3917,
-      "nonblank_code_lines_excluding_tests": 1311,
+      "sha256": "5fd4d2696269927e2d6d3a7e139986e574dbbe67a5b9aabb4a4abc7b4ab25637",
+      "physical_lines_including_tests": 4298,
+      "nonblank_code_lines_excluding_tests": 1465,
       "counts": {
-        "production_block": 42,
-        "production_function": 34,
+        "production_block": 46,
+        "production_function": 37,
         "production_impl": 0,
         "production_trait": 0,
         "production_other": 0,
@@ -47,122 +47,117 @@
       },
       "sites": [
         {
-          "line": 108,
+          "line": 110,
           "kind": "function",
           "test": false
         },
         {
-          "line": 120,
+          "line": 144,
           "kind": "block",
           "test": false
         },
         {
-          "line": 121,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 172,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 180,
+          "line": 153,
           "kind": "function",
           "test": false
         },
         {
-          "line": 190,
+          "line": 214,
           "kind": "block",
           "test": false
         },
         {
-          "line": 199,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 224,
+          "line": 222,
           "kind": "function",
           "test": false
         },
         {
-          "line": 248,
+          "line": 232,
           "kind": "block",
           "test": false
         },
         {
-          "line": 258,
-          "kind": "function",
-          "test": false
-        },
-        {
-          "line": 302,
+          "line": 249,
           "kind": "block",
           "test": false
         },
         {
-          "line": 340,
+          "line": 275,
           "kind": "function",
+          "test": false
+        },
+        {
+          "line": 287,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 288,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 339,
+          "kind": "block",
           "test": false
         },
         {
           "line": 347,
-          "kind": "block",
+          "kind": "function",
           "test": false
         },
         {
           "line": 357,
-          "kind": "function",
-          "test": false
-        },
-        {
-          "line": 361,
           "kind": "block",
           "test": false
         },
         {
-          "line": 383,
-          "kind": "function",
-          "test": false
-        },
-        {
-          "line": 387,
+          "line": 366,
           "kind": "block",
           "test": false
         },
         {
-          "line": 404,
+          "line": 391,
           "kind": "function",
           "test": false
         },
         {
-          "line": 410,
+          "line": 415,
           "kind": "block",
           "test": false
         },
         {
-          "line": 455,
+          "line": 425,
           "kind": "function",
           "test": false
         },
         {
-          "line": 461,
+          "line": 469,
           "kind": "block",
           "test": false
         },
         {
-          "line": 504,
+          "line": 507,
           "kind": "function",
           "test": false
         },
         {
-          "line": 526,
+          "line": 514,
           "kind": "block",
           "test": false
         },
         {
-          "line": 542,
+          "line": 524,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 528,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 550,
           "kind": "function",
           "test": false
         },
@@ -172,32 +167,32 @@
           "test": false
         },
         {
-          "line": 597,
+          "line": 571,
           "kind": "function",
           "test": false
         },
         {
-          "line": 623,
+          "line": 577,
           "kind": "block",
           "test": false
         },
         {
-          "line": 643,
+          "line": 622,
           "kind": "function",
           "test": false
         },
         {
-          "line": 658,
+          "line": 628,
           "kind": "block",
           "test": false
         },
         {
-          "line": 688,
+          "line": 671,
           "kind": "function",
           "test": false
         },
         {
-          "line": 702,
+          "line": 693,
           "kind": "block",
           "test": false
         },
@@ -207,282 +202,322 @@
           "test": false
         },
         {
-          "line": 727,
+          "line": 721,
           "kind": "block",
           "test": false
         },
         {
-          "line": 754,
+          "line": 764,
           "kind": "function",
           "test": false
         },
         {
-          "line": 772,
+          "line": 790,
           "kind": "block",
           "test": false
         },
         {
-          "line": 779,
+          "line": 810,
           "kind": "function",
           "test": false
         },
         {
-          "line": 793,
+          "line": 825,
           "kind": "block",
           "test": false
         },
         {
-          "line": 795,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 830,
+          "line": 855,
           "kind": "function",
           "test": false
         },
         {
-          "line": 842,
+          "line": 869,
           "kind": "block",
           "test": false
         },
         {
-          "line": 866,
+          "line": 876,
           "kind": "function",
           "test": false
         },
         {
-          "line": 882,
+          "line": 894,
           "kind": "block",
           "test": false
         },
         {
-          "line": 910,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 925,
+          "line": 921,
           "kind": "function",
           "test": false
         },
         {
-          "line": 940,
+          "line": 939,
           "kind": "block",
           "test": false
         },
         {
-          "line": 947,
+          "line": 946,
           "kind": "function",
           "test": false
         },
         {
-          "line": 965,
+          "line": 960,
           "kind": "block",
           "test": false
         },
         {
-          "line": 972,
+          "line": 962,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 997,
           "kind": "function",
           "test": false
         },
         {
-          "line": 994,
+          "line": 1009,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1001,
+          "line": 1033,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1024,
+          "line": 1049,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1046,
+          "line": 1077,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1092,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1152,
+          "line": 1107,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1159,
+          "line": 1114,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1169,
+          "line": 1132,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1177,
+          "line": 1139,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1195,
+          "line": 1161,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1211,
+          "line": 1168,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1227,
+          "line": 1191,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1247,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1254,
+          "line": 1213,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1269,
+          "line": 1319,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1279,
+          "line": 1326,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1287,
+          "line": 1336,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1298,
+          "line": 1344,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1309,
+          "line": 1362,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1310,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1339,
+          "line": 1378,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1346,
+          "line": 1394,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1357,
+          "line": 1414,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1421,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1364,
+          "line": 1436,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1382,
+          "line": 1446,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1398,
+          "line": 1454,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1415,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1458,
+          "line": 1465,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1475,
+          "line": 1476,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1488,
+          "line": 1477,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1506,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 1513,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1524,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 1531,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1549,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 1565,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1582,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1625,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 1642,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1655,
           "kind": "function",
           "test": true
         },
         {
-          "line": 1492,
+          "line": 1659,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1514,
+          "line": 1681,
           "kind": "function",
           "test": true
         },
         {
-          "line": 1517,
+          "line": 1684,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1529,
+          "line": 1696,
           "kind": "function",
           "test": true
         },
         {
-          "line": 1533,
+          "line": 1700,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1538,
+          "line": 1705,
           "kind": "function",
           "test": true
         },
         {
-          "line": 1542,
+          "line": 1709,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1547,
+          "line": 1714,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1571,
+          "line": 1738,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1580,
+          "line": 1747,
           "kind": "block",
           "test": true
         }
       ],
-      "production_extern_functions": 52,
+      "production_extern_functions": 56,
       "operations": {
         "raw_shared_slice_construction": 1,
         "raw_mutable_slice_construction": 0,
@@ -496,9 +531,9 @@
     },
     {
       "path": "rust/ffi/src/document_registry.rs",
-      "sha256": "46458dc604894d83e23c262c0f532275b35ea2b569b22729522b3fbe775427fb",
-      "physical_lines_including_tests": 542,
-      "nonblank_code_lines_excluding_tests": 255,
+      "sha256": "b0c91d1f8e7411ead43ff5ea64572002ab32f7fc327ba4bebfa8c6abed1d70ba",
+      "physical_lines_including_tests": 673,
+      "nonblank_code_lines_excluding_tests": 328,
       "counts": {
         "production_block": 1,
         "production_function": 0,
@@ -513,12 +548,12 @@
       },
       "sites": [
         {
-          "line": 261,
+          "line": 335,
           "kind": "impl",
           "test": false
         },
         {
-          "line": 305,
+          "line": 379,
           "kind": "block",
           "test": false
         }
@@ -537,7 +572,7 @@
     }
   ],
   "prior_ffi_production_blocks": 325,
-  "added_production_blocks": 43,
+  "added_production_blocks": 47,
   "added_unsafe_impls": 1,
   "retired_native_owners": 18,
   "retired_ffi_crossings": 0,
@@ -1887,31 +1922,581 @@
         }
       ],
       "review": "Frozen unknown-style protocol measurement; typed owner/run/reply lifetime and status-atomic preflight reviewed. Allocation/reentry/native invalidating callback histories and full Windows owner parity remain unresolved."
+    },
+    {
+      "status": "Superseded AddStyle session source measurement; original counts and hashes preserved",
+      "measured_base_commit": "0976ec8a960e9a39ddca3781de4b3d38965bb6be",
+      "working_tree_source_hashes": true,
+      "source_hashes": {
+        "src/subtitles/STS.h": "969cd4ba558665f1c7b64a6dca66ba9d3befe21d4a60d36076750d70af028ee4",
+        "src/subtitles/STS.cpp": "9ba5de13a892e4586a160c1943ff84998cf21244f5ece96ee4634c53aa251555",
+        "src/subtitles/RTS.cpp": "17acfde7157426a0a7e3ace4c71b37e3de16ba15300636d39d40de8a4e82f631",
+        "src/subtitles/USFSubtitles.cpp": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
+        "src/subtitles/SubtitleInputPin.cpp": "210276fdf0da5108dd3135b5934dc83015512604d0e8c12fde4d1f9a02ad105d",
+        "src/filters/transform/vsfilter/DirectVobSubFilter.cpp": "d6e056e9357234b9935fe3a8760655df8e1c3c0a5fa6a9954d343ea0234033af",
+        "src/filters/transform/vsfilter/xy_sub_filter.cpp": "680a96edc424c3a4324b514c5f74fded15857d3525b78d114c5394205dac8f9d",
+        "src/filters/transform/vsfilter/plugins.cpp": "38526740c55b4bc51642925d1ded688ebdd0ff26a01b5a5dd7f587add31df3da",
+        "src/subtitles/RustDocumentOwner.h": "ea815122c75da96513ad6b285ac36e34b334be8778e24b8c6d38cec9e1f648b7",
+        "rust/compat/src/document.rs": "a0d821932ee9d1c04e6c4d980de24879d9fa07693adf2cc4842b18058ee37f53",
+        "rust/ffi/src/document.rs": "5fd4d2696269927e2d6d3a7e139986e574dbbe67a5b9aabb4a4abc7b4ab25637",
+        "rust/ffi/src/document_registry.rs": "b0c91d1f8e7411ead43ff5ea64572002ab32f7fc327ba4bebfa8c6abed1d70ba",
+        "include/xy_rust_document.h": "7029b58265f371b5399c9184d2aa078670708b3fa01aba5a6ff0573ff3604fc1",
+        "tools/compat/document_native_lifecycle.cpp": "0928d60f13264af7b967ba6878c438ca507d8c05484c45248acf2fe9dd4cb9fa",
+        "tools/compat/document_native_lifecycle.py": "c872d2fc2bd32e94f2de4edc36b20e54c2fb3ed166fae96f27ef45cc9773e357",
+        "tools/compat/summarize_evidence.py": "35af4e3af51eb66b339230075c60c0d0a75e58d6eb3333e8db46c0a35d07198d",
+        "tools/compat/audit_document_access.py": "ac7f7090a85023208bae24f563b964801700a04481a6f05e2002edbdfb716589",
+        "rust/compat/src/document_unknown.rs": "e9d0af429f752cc4ee0d9c31077b37304e0124b3fc9fa0974250e84612c84360",
+        "rust/compat/src/lib.rs": "b09b4272a3e16d1fc144ca167f5e22f858cbf9eda612e310319183c5c6ae1bc0",
+        "rust/compat/src/document_style_add.rs": "1a9948d942dd3cd56a3d3d8c0c897762101859944def56a4b81ce6ae122e27a6",
+        "rust/compat/src/document_style_copy.rs": "6040a9114f2a875d84d0948b3ee938a7aa2a6b28af7314cbe3bb2040a01e9094"
+      },
+      "ffi_total": {
+        "production_block": 368,
+        "production_function": 307,
+        "production_impl": 2,
+        "production_trait": 0,
+        "production_other": 0,
+        "test_block": 119,
+        "test_function": 4,
+        "test_impl": 0,
+        "test_trait": 0,
+        "test_other": 0
+      },
+      "new_boundary_files": [
+        {
+          "path": "rust/ffi/src/document.rs",
+          "sha256": "c825ea9e3013935e8b17d7afa17932385a8346038fd3aadb5ed9d00de573ee2c",
+          "physical_lines_including_tests": 3917,
+          "nonblank_code_lines_excluding_tests": 1311,
+          "counts": {
+            "production_block": 42,
+            "production_function": 34,
+            "production_impl": 0,
+            "production_trait": 0,
+            "production_other": 0,
+            "test_block": 7,
+            "test_function": 4,
+            "test_impl": 0,
+            "test_trait": 0,
+            "test_other": 0
+          },
+          "sites": [
+            {
+              "line": 108,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 120,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 121,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 172,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 180,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 190,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 199,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 224,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 248,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 258,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 302,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 340,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 347,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 357,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 361,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 383,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 387,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 404,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 410,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 455,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 461,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 504,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 526,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 542,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 554,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 597,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 623,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 643,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 658,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 688,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 702,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 709,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 727,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 754,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 772,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 779,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 793,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 795,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 830,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 842,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 866,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 882,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 910,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 925,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 940,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 947,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 965,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 972,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 994,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1001,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1024,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1046,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1152,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1159,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1169,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1177,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1195,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1211,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1227,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1247,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1254,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1269,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1279,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1287,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1298,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1309,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1310,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1339,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1346,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1357,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1364,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1382,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1398,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1415,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1458,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1475,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1488,
+              "kind": "function",
+              "test": true
+            },
+            {
+              "line": 1492,
+              "kind": "block",
+              "test": true
+            },
+            {
+              "line": 1514,
+              "kind": "function",
+              "test": true
+            },
+            {
+              "line": 1517,
+              "kind": "block",
+              "test": true
+            },
+            {
+              "line": 1529,
+              "kind": "function",
+              "test": true
+            },
+            {
+              "line": 1533,
+              "kind": "block",
+              "test": true
+            },
+            {
+              "line": 1538,
+              "kind": "function",
+              "test": true
+            },
+            {
+              "line": 1542,
+              "kind": "block",
+              "test": true
+            },
+            {
+              "line": 1547,
+              "kind": "block",
+              "test": true
+            },
+            {
+              "line": 1571,
+              "kind": "block",
+              "test": true
+            },
+            {
+              "line": 1580,
+              "kind": "block",
+              "test": true
+            }
+          ],
+          "production_extern_functions": 52,
+          "operations": {
+            "raw_shared_slice_construction": 1,
+            "raw_mutable_slice_construction": 0,
+            "box_from_raw": 0,
+            "raw_nonoverlapping_copy": 1,
+            "unchecked_index_calls": 0,
+            "transmute_calls": 0,
+            "inline_assembly": 0,
+            "mutable_statics": 0
+          }
+        },
+        {
+          "path": "rust/ffi/src/document_registry.rs",
+          "sha256": "46458dc604894d83e23c262c0f532275b35ea2b569b22729522b3fbe775427fb",
+          "physical_lines_including_tests": 542,
+          "nonblank_code_lines_excluding_tests": 255,
+          "counts": {
+            "production_block": 1,
+            "production_function": 0,
+            "production_impl": 1,
+            "production_trait": 0,
+            "production_other": 0,
+            "test_block": 0,
+            "test_function": 0,
+            "test_impl": 0,
+            "test_trait": 0,
+            "test_other": 0
+          },
+          "sites": [
+            {
+              "line": 261,
+              "kind": "impl",
+              "test": false
+            },
+            {
+              "line": 305,
+              "kind": "block",
+              "test": false
+            }
+          ],
+          "production_extern_functions": 0,
+          "operations": {
+            "raw_shared_slice_construction": 0,
+            "raw_mutable_slice_construction": 0,
+            "box_from_raw": 0,
+            "raw_nonoverlapping_copy": 0,
+            "unchecked_index_calls": 0,
+            "transmute_calls": 0,
+            "inline_assembly": 0,
+            "mutable_statics": 0
+          }
+        }
+      ]
     }
   ],
   "retired_native_owners_scope": "Eighteen native fields/containers opt-in only; defaultproduction retirementzero",
   "measurement_method": "Current audit_rust_boundary.inventory over actual Rust source, comments/literals masked and test items separated; counts overlap and do not establish soundness. Historical original snapshot retained.",
   "source_hashes": {
     "src/subtitles/STS.h": "969cd4ba558665f1c7b64a6dca66ba9d3befe21d4a60d36076750d70af028ee4",
-    "src/subtitles/STS.cpp": "0306f0848ad7fe43f16e1794fec2c566c23b25f22677f809ad3e714fc5430145",
+    "src/subtitles/STS.cpp": "9ba5de13a892e4586a160c1943ff84998cf21244f5ece96ee4634c53aa251555",
     "src/subtitles/RTS.cpp": "17acfde7157426a0a7e3ace4c71b37e3de16ba15300636d39d40de8a4e82f631",
     "src/subtitles/USFSubtitles.cpp": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
     "src/subtitles/SubtitleInputPin.cpp": "210276fdf0da5108dd3135b5934dc83015512604d0e8c12fde4d1f9a02ad105d",
     "src/filters/transform/vsfilter/DirectVobSubFilter.cpp": "d6e056e9357234b9935fe3a8760655df8e1c3c0a5fa6a9954d343ea0234033af",
     "src/filters/transform/vsfilter/xy_sub_filter.cpp": "680a96edc424c3a4324b514c5f74fded15857d3525b78d114c5394205dac8f9d",
     "src/filters/transform/vsfilter/plugins.cpp": "38526740c55b4bc51642925d1ded688ebdd0ff26a01b5a5dd7f587add31df3da",
-    "src/subtitles/RustDocumentOwner.h": "15e04a3bdc4061a1a84eba9ffa02b22dafaad71ca0403b5782c6ce354f4952ff",
+    "src/subtitles/RustDocumentOwner.h": "ea815122c75da96513ad6b285ac36e34b334be8778e24b8c6d38cec9e1f648b7",
     "rust/compat/src/document.rs": "a0d821932ee9d1c04e6c4d980de24879d9fa07693adf2cc4842b18058ee37f53",
-    "rust/ffi/src/document.rs": "c825ea9e3013935e8b17d7afa17932385a8346038fd3aadb5ed9d00de573ee2c",
-    "rust/ffi/src/document_registry.rs": "46458dc604894d83e23c262c0f532275b35ea2b569b22729522b3fbe775427fb",
-    "include/xy_rust_document.h": "d646b3b8d552cc626f56e54fbb8e7b730486e40964a9bc37e9351c51116684e4",
-    "tools/compat/document_native_lifecycle.cpp": "28163b86d6c302bbf709308550244a551b170af2b39e3693af9aaf5b85b2bf0b",
-    "tools/compat/document_native_lifecycle.py": "e14babfe567ad44492ad7c907a2f22ceb86133cb626d45174eebf9bf43145142",
-    "tools/compat/summarize_evidence.py": "9ca6127b06109b14737af8bf4fa18561c980932571363d2b8c74926af1b3f6a2",
-    "tools/compat/audit_document_access.py": "e89014e73a2d72c966f0c5506e3cf0822e24c0b4c8338a6461abf2585076262f",
+    "rust/ffi/src/document.rs": "5fd4d2696269927e2d6d3a7e139986e574dbbe67a5b9aabb4a4abc7b4ab25637",
+    "rust/ffi/src/document_registry.rs": "b0c91d1f8e7411ead43ff5ea64572002ab32f7fc327ba4bebfa8c6abed1d70ba",
+    "include/xy_rust_document.h": "7029b58265f371b5399c9184d2aa078670708b3fa01aba5a6ff0573ff3604fc1",
+    "tools/compat/document_native_lifecycle.cpp": "0928d60f13264af7b967ba6878c438ca507d8c05484c45248acf2fe9dd4cb9fa",
+    "tools/compat/document_native_lifecycle.py": "c872d2fc2bd32e94f2de4edc36b20e54c2fb3ed166fae96f27ef45cc9773e357",
+    "tools/compat/summarize_evidence.py": "35af4e3af51eb66b339230075c60c0d0a75e58d6eb3333e8db46c0a35d07198d",
+    "tools/compat/audit_document_access.py": "ac7f7090a85023208bae24f563b964801700a04481a6f05e2002edbdfb716589",
     "rust/compat/src/document_unknown.rs": "e9d0af429f752cc4ee0d9c31077b37304e0124b3fc9fa0974250e84612c84360",
-    "rust/compat/src/lib.rs": "c95c33bc159f6e7e5b5d56055a115e35e592252e6b83a77c8f3776373269b69e",
-    "rust/compat/src/document_style_add.rs": "1a9948d942dd3cd56a3d3d8c0c897762101859944def56a4b81ce6ae122e27a6"
+    "rust/compat/src/lib.rs": "b09b4272a3e16d1fc144ca167f5e22f858cbf9eda612e310319183c5c6ae1bc0",
+    "rust/compat/src/document_style_add.rs": "1a9948d942dd3cd56a3d3d8c0c897762101859944def56a4b81ce6ae122e27a6",
+    "rust/compat/src/document_style_copy.rs": "6040a9114f2a875d84d0948b3ee938a7aa2a6b28af7314cbe3bb2040a01e9094"
   },
   "default_style_extension": {
     "set": "xy_vsfilter_document_set_default_style_v1 copies input and decodes before admission; validates handle before taking pending value; retired Option drops outside admission, including failure/Busy pending input.",
@@ -3539,6 +4124,35 @@
       "new_raw_helpers": 0,
       "new_unsafe_impls": 0,
       "explanation": "Begin/submit use existing copy-input/output helpers; drop has no unsafe body. No new raw pointer mechanism."
+    }
+  },
+  "copy_styles_session_extension": {
+    "scope": "Experimental CopyNamedStylesFrom delegates row enumeration, copied values and AddStyle orchestration to safe Rust; native CRT candidate generator shared with direct AddStyle",
+    "capture_scope": "Working-tree hashes over measured_base_commit; Windows parity of this changed source pending",
+    "exports": [
+      "xy_vsfilter_document_copy_styles_open_v1",
+      "xy_vsfilter_document_copy_styles_step_v1",
+      "xy_vsfilter_document_copy_styles_submit_v1",
+      "xy_vsfilter_document_copy_styles_drop_v1"
+    ],
+    "contracts": [
+      "Open validates source/destination and creates a typed run without reading maps or mutating documents. First step performs only initialization and, for replacement, clears destination before source enumeration. Self replacement therefore sees an empty source.",
+      "Subsequent steps copy one current source row, advance its ordinal before AddStyle classification, and return Advanced, Done or NeedSuffix. Source and destination remain distinct references or one explicit self-source path. No whole-map presnapshot or clone replaces destination bucket history.",
+      "The source map order is valid for a distinct unchanged source or ordinary finite self append with unchanged map. Mutating self append, null source dereference, shared native pointers and allocator-driven source mutation remain excluded from native parity.",
+      "Step preflights output, current row name capacity and one snapshot ID/slot before mutation. Initial clear uses a fixed packet and no source row read. Snapshot16 is action:u32(0 Done/1 Advanced/2 NeedSuffix), reserved zero:u32, name units:u64 followed by full normalized UTF16LE units. Native caller already owns the run and releases replies through RAII.",
+      "Submit copies the CRT-generated candidate before admission and delegates occupied-name testing and complete conflict commit. Successful earlier rows remain committed. Original values, entry names, copied row keys, unused normalized names and completed sessions retire outside admission, including rejected cloned values on errors.",
+      "Registry supports source/destination/run in all slot orders using safe split_at_mut. Destroyed source or destination fails lookup; typed run remains droppable. No per-row native STSStyle allocation, value wire round trip, canonical mirror or borrowed reference survives a call.",
+      "Native CRT formatting and original expression/increment order are shared by both adapters. Allocation/failure timing, allocator reentry and native pointer lifetime histories remain qualified; canonical retired owner count stays 20."
+    ],
+    "validation": {
+      "local": "Six core CopyStyles tests, 120 FFI tests and pinned Rust 1.85 all-target Clippy pass. Registry tests exercise all six distinct slot orders and self alias handling. Three native fixture histories generate successfully, with eight strict stages and source-gated archival requirements.",
+      "windows": "Changed-source full-class/style API/renderer gates pending."
+    },
+    "unsafe_delta": {
+      "production_blocks": 4,
+      "unsafe_function_declarations": 3,
+      "new_raw_helpers": 0,
+      "new_unsafe_impls": 0
     }
   }
 }

@@ -205,6 +205,16 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_remove_entries_v1(uint64_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_animation_or_v1(uint64_t, uint32_t segment, uint32_t animated);
 // No rebuild. Result: applied:u32, reserved-zero:u32, end:i64 (zero if absent).
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_correct_last_end_v1(uint64_t, int64_t bound, uint8_t*, size_t);
+// CopyStyles typed run binds destination and source. Open performs no mutation;
+// first step initializes/clears and returns Advanced before reading source rows.
+// Step output8 is snapshot ID; packet16: action:u32(0Done/1Advanced/2NeedSuffix),
+// reserved-zero:u32,units:u64, then normalized full raw UTF-16LE name.
+// Submit receives native CRT candidate and returns applied:u64LE. No style wire
+// or native style temporary crosses the boundary per copied row.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_copy_styles_open_v1(uint64_t destination,uint64_t source,uint32_t append,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_copy_styles_step_v1(uint64_t run,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_copy_styles_submit_v1(uint64_t run,const uint8_t*,size_t,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_copy_styles_drop_v1(uint64_t run);
 // Coarse AddStyle: nullable wire is zero bytes. Begin output16 holds
 // snapshotID:u64,runID:u64(0Done), before caller constructs native values.
 // Begin snapshot packet24:

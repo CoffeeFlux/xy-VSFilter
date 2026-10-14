@@ -3218,27 +3218,40 @@ void CSTSStyleMap::Free()
 }
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+template<class Submission>
+static void SubmitStyleSuffix(const CString& name_str, Submission& submission)
+{
+    int i;
+    int len = name_str.GetLength();
+    for(i = len; i > 0 && _istdigit(name_str[i-1]); i--);
+    int idx = 1;
+    CString name2 = name_str;
+    if(i < len && _stscanf_s(name_str.Right(len-i), _T("%d"), &idx) == 1)
+    {
+        name2 = name_str.Left(i);
+    }
+    idx++;
+    CString name3;
+    CString name3_str;
+    do
+    {
+        name3_str.Format(_T("%s%d"), name2, idx);
+        name3 = name3_str;
+        idx++;
+    }
+    while(!submission.Submit(name3));
+}
+
 bool CSimpleTextSubtitle::CopyNamedStylesFrom(const CSimpleTextSubtitle& source, bool fAppend)
 {
-    // Empty the destination before reading source state: self replacement must
-    // enumerate the now-empty map, not a previously captured snapshot.
-    if(!fAppend) m_document->ClearNamedStyles();
-    for(size_t ordinal = 0; ; ordinal++)
+    XyRust::NamedStyleCopy copy(*m_document, *source.m_document, fAppend);
+    CString name;
+    for(;;)
     {
-        CString key;
-        if(!source.GetStyleNameAt(ordinal, key)) break;
-        STSStyle* value = DEBUG_NEW STSStyle;
-        if(!value) return false;
-        try
-        {
-            if(!source.GetStyleValueAt(ordinal, *value)) { delete value; return false; }
-        }
-        catch(...) { delete value; throw; }
-        // Ownership passes at the same per-row native AddStyle point. Do not
-        // prefetch later rows or retain a second authoritative style table.
-        AddStyle(key, value);
+        const uint32_t action = copy.Next(name);
+        if(action == 0) return true;
+        if(action == 2) SubmitStyleSuffix(name, copy);
     }
-    return true;
 }
 #else
 bool CSimpleTextSubtitle::CopyStyles(const CSTSStyleMap& styles, bool fAppend)
@@ -3529,35 +3542,7 @@ void CSimpleTextSubtitle::AddStyle(CString name, STSStyle* style)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     XyRust::StyleAddition addition(*m_document, name, style);
-    if(addition.NeedsSuffix()) {
-        int i;
-        const CString& name_str = addition.Name();
-
-        int len = name_str.GetLength();
-
-        for(i = len; i > 0 && _istdigit(name_str[i-1]); i--);
-
-        int idx = 1;
-
-        CString name2 = name_str;
-
-        if(i < len && _stscanf_s(name_str.Right(len-i), _T("%d"), &idx) == 1)
-        {
-            name2 = name_str.Left(i);
-        }
-
-        idx++;
-
-        CString name3;
-        CString name3_str;
-        do
-        {
-            name3_str.Format(_T("%s%d"), name2, idx);
-            name3 = name3_str;
-            idx++;
-        }
-        while(!addition.Submit(name3));
-    }
+    if(addition.NeedsSuffix()) SubmitStyleSuffix(addition.Name(), addition);
     delete style;
 #else
     int i, j;
