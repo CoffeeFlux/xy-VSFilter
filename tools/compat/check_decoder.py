@@ -57,6 +57,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_drawing_tokens.h",
               ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
+              ROOT / "include/xy_rust_cc.h", ROOT / "src/subtitles/CCDecoder.cpp", ROOT / "src/subtitles/CCDecoder.h",
               ROOT / "include/xy_rust_segments.h",
               ROOT / "include/xy_rust_segment_insert.h",
               ROOT / "include/xy_rust_hdmv.h",
@@ -144,6 +145,20 @@ public:
         font += text[start:end] + '\n decoded.assign((BYTE*)pData, (BYTE*)pData + datalen);\n return true;\n}\n}\n'
         font += "#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_font.h").write_text(font, encoding="utf-8")
+    cc_source = original("src/subtitles/CCDecoder.cpp", reference["commit"])
+    cc_header = original("src/subtitles/CCDecoder.h", reference["commit"])
+    cc_class = extract_method(cc_header.decode("utf-8-sig"), "class CCDecoder").replace("{", "{\npublic:", 1)
+    cc = '#include "cc_shell.h"\n'
+    for name, content in (("ReferenceCC", cc_source), ("CandidateCC", (ROOT / "src/subtitles/CCDecoder.cpp").read_bytes())):
+        cc += f"namespace {name} {{\n" + cc_class + ";\n"
+        if name == "CandidateCC":
+            cc += "#define XY_VSFILTER_RUST_TEXT\n"
+        for signature in ("CCDecoder::CCDecoder(", "CCDecoder::~CCDecoder(", "void CCDecoder::MoveCursor(",
+                          "void CCDecoder::OffsetCursor(", "void CCDecoder::PutChar(", "void CCDecoder::SaveDisp(",
+                          "void CCDecoder::DecodeCC("):
+            cc += extract_definition(content.decode("utf-8-sig"), signature) + "\n"
+        cc += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_cc.h").write_text(cc, encoding="utf-8")
     realtext_source = original("src/subtitles/RealTextParser.cpp", reference["commit"])
     realtext_header = original("src/subtitles/RealTextParser.h", reference["commit"])
     realtext_class = extract_method(realtext_header.decode("utf-8-sig"), "class CRealTextParser")
@@ -923,6 +938,14 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     realtext_document_result = run([str(realtext_document_executable)], capture_output=True, text=True)
     print(realtext_document_result.stdout, end="", flush=True)
     print(realtext_document_result.stderr, end="", file=sys.stderr)
+    cc_executable = destination / ("cc-oracle.exe" if os.name == "nt" else "cc-oracle")
+    cc_compile = [arg.replace("fill_oracle.cpp", "cc_oracle.cpp").replace("fill-oracle", "cc-oracle") for arg in fill_compile]
+    if os.name == "nt":
+        cc_compile += ["/D_UNICODE", "/DUNICODE"]
+    run(cc_compile)
+    cc_result = run([str(cc_executable)], capture_output=True, text=True)
+    print(cc_result.stdout, end="", flush=True)
+    print(cc_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -966,6 +989,10 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "vobsub_scale_result": vobsub_scale_result.stdout, "vobsub_scale_stderr": vobsub_scale_result.stderr,
         "vobsub_outline_compile_command": vobsub_outline_compile,
         "vobsub_outline_result": vobsub_outline_result.stdout, "vobsub_outline_stderr": vobsub_outline_result.stderr,
+        "cc_compile_command": cc_compile,
+        "cc_result": cc_result.stdout, "cc_stderr": cc_result.stderr,
+        "cc_scope": "cursor normalization and initialized cell update; complete native DecodeCC with fixture subtitle sink, real Windows ATL strings and portable UTF-16 string model; raw logging/files and native arithmetic overflow outside fixtures",
+        "cc_source_sha256": hashlib.sha256(cc_source).hexdigest(), "cc_header_sha256": hashlib.sha256(cc_header).hexdigest(),
         "realtext_document_compile_command": realtext_document_compile,
         "realtext_document_result": realtext_document_result.stdout, "realtext_document_stderr": realtext_document_result.stderr,
         "realtext_document_scope": "owned document control flow; native extraction/conversion/render/public-state actions retain order; callbacks observe partial public state and injected interruptions across repeated parses; representable numeric fixtures only",

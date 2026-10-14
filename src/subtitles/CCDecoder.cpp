@@ -21,6 +21,9 @@
 
 #include "StdAfx.h"
 #include "ccdecoder.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "xy_rust_cc.h"
+#endif
 
 CCDecoder::CCDecoder(CString fn, CString rawfn) : m_fn(fn), m_rawfn(rawfn)
 {
@@ -50,6 +53,13 @@ CCDecoder::~CCDecoder()
 
 void CCDecoder::MoveCursor(int x, int y)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    int32_t position[2];
+    if (xy_vsfilter_cc_move(x, y, position)) {
+        m_cursor = CPoint(position[0], position[1]);
+        return;
+    }
+#endif
     m_cursor = CPoint(x, y);
     if (m_cursor.x < 0) m_cursor.x = 0;
     if (m_cursor.y < 0) m_cursor.y = 0;
@@ -64,6 +74,13 @@ void CCDecoder::OffsetCursor(int x, int y)
 
 void CCDecoder::PutChar(WCHAR c)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    static_assert(sizeof(WCHAR) == sizeof(uint16_t), "caption cells must contain UTF-16 units");
+    if (xy_vsfilter_cc_put(reinterpret_cast<uint16_t*>(m_buff), m_cursor.x, m_cursor.y, c)) {
+        OffsetCursor(1, 0);
+        return;
+    }
+#endif
     m_buff[m_cursor.y][m_cursor.x] = c;
     OffsetCursor(1, 0);
 }

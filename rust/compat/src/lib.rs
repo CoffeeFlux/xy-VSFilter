@@ -42,6 +42,7 @@ pub mod webvtt;
 pub mod transpose;
 
 pub mod byte_float;
+pub mod cc;
 
 pub mod gauss_integer;
 
