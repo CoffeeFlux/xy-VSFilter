@@ -96,3 +96,4 @@ mod byte_float;
 mod gauss_integer;
 
 mod vobsub_packet;
+mod vobsub_pixels;

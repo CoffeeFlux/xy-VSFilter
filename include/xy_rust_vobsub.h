@@ -17,4 +17,6 @@ struct XyVobSubPacketPatch {
     uint32_t palette,transparency,animated;
 };
 extern "C" uint32_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_packet(const uint8_t* packet, size_t length, size_t data_size, int32_t time, XyVobSubPacketPatch* output);
+extern "C" uint64_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_clip(int32_t left, int32_t top, int32_t right, int32_t bottom, int32_t x, int32_t y, int32_t length);
+extern "C" uint32_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_fill(uint8_t* destination, size_t pixels, uint32_t color);
 #undef XY_VOBSUB_CDECL
