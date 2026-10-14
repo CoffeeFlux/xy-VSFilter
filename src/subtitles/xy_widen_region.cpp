@@ -113,6 +113,7 @@ public:
     int cross_right(XY_POINT c1, XY_POINT base) const;
 
     int init_cross_point();
+    void set_cross_point(int dy, int dx, int value);
 
     int m_rx, m_ry;
     float m_f_rx, m_f_ry;
@@ -120,6 +121,7 @@ public:
 
 #ifdef XY_VSFILTER_RUST_TEXT
     XyRust::EllipseArc m_arc;
+    XyRust::EllipseMatrix m_matrix;
 #endif
     int *m_left_arc;
     int *m_left_arc_base;
@@ -672,13 +674,17 @@ int XyEllipse::init_cross_point()
     {
         return 0;
     }
-    m_cross_matrix_base = DEBUG_NEW int[ (2*m_ry+1)*(2*m_rx+1) ];
-    if (!m_cross_matrix_base)
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (!m_matrix.Initialize(m_rx, m_ry))
+#endif
     {
-        return -1;
+        m_cross_matrix_base = DEBUG_NEW int[ (2*m_ry+1)*(2*m_rx+1) ];
+        if (!m_cross_matrix_base)
+        {
+            return -1;
+        }
+        m_cross_matrix = m_cross_matrix_base + (2*m_ry)*(2*m_rx+1) + m_rx;
     }
-
-    m_cross_matrix = m_cross_matrix_base + (2*m_ry)*(2*m_rx+1) + m_rx;
 
 
     ASSERT(m_f_ry>0);
@@ -707,30 +713,41 @@ int XyEllipse::init_cross_point()
             cross_x[y] = min(cross_x[y-1], max(min(cross_x[y],m_rx),-m_rx));
         }
 
-        int *cross_matrix = m_cross_matrix + dy*(2*m_rx+1);
 
         y--;
         //[ -m_rx, cross_x[y] )
         for (int j=-m_rx;j<cross_x[y];j++)
         {
-            cross_matrix[j] = MAX_CROSS_LINE;
+            set_cross_point(dy, j, MAX_CROSS_LINE);
         }
         for ( ;y>-m_ry;y-- )
         {
             //[ cross_x[y], cross_x[y-1] )
             for (int j=cross_x[y];j<cross_x[y-1];j++)
             {
-                cross_matrix[j] = y;
+                set_cross_point(dy, j, y);
             }
         }
-        cross_matrix[cross_x[y]] = y;
+        set_cross_point(dy, cross_x[y], y);
         //[ cross_x[y], m_rx ]
         for (int j=cross_x[y];j<=m_rx;j++)
         {
-            cross_matrix[j] = MIN_CROSS_LINE;
+            set_cross_point(dy, j, MIN_CROSS_LINE);
         }
     }
     return 0;
+}
+
+void XyEllipse::set_cross_point(int dy, int dx, int value)
+{
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (m_matrix.Ready())
+    {
+        m_matrix.Set(dy, dx, value);
+        return;
+    }
+#endif
+    m_cross_matrix[dy*(2*m_rx+1) + dx] = value;
 }
 
 int XyEllipse::cross_left( XY_POINT c1, XY_POINT base ) const
@@ -758,6 +775,12 @@ int XyEllipse::cross_left( int dx, int dy ) const
     {
         return MIN_CROSS_LINE;
     }
+#ifdef XY_VSFILTER_RUST_TEXT
+    else if (m_matrix.Ready())
+    {
+        return m_matrix.Get(dy, dx);
+    }
+#endif
     else if (m_cross_matrix)// [-m_rx, m_rx], use lookup table
     {
         ASSERT( abs( *(m_cross_matrix + dy*(2*m_rx+1) + dx) )<=m_ry || 

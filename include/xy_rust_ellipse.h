@@ -13,9 +13,33 @@ void* XY_ELLIPSE_CDECL xy_vsfilter_ellipse_create(int32_t,int32_t);
 void* XY_ELLIPSE_CDECL xy_vsfilter_ellipse_owned_create(int32_t,int32_t);
 int64_t XY_ELLIPSE_CDECL xy_vsfilter_ellipse_cell(const void*,size_t);
 void XY_ELLIPSE_CDECL xy_vsfilter_ellipse_release(void*);
+void* XY_ELLIPSE_CDECL xy_vsfilter_ellipse_matrix_create(int32_t,int32_t);
+uint32_t XY_ELLIPSE_CDECL xy_vsfilter_ellipse_matrix_set(void*,int32_t,int32_t,int32_t);
+int64_t XY_ELLIPSE_CDECL xy_vsfilter_ellipse_matrix_get(const void*,int32_t,int32_t);
+void XY_ELLIPSE_CDECL xy_vsfilter_ellipse_matrix_release(void*);
 }
 #undef XY_ELLIPSE_CDECL
 namespace XyRust {
+class EllipseMatrix {
+    void* owner;
+    EllipseMatrix(const EllipseMatrix&);EllipseMatrix& operator=(const EllipseMatrix&);
+public:
+    EllipseMatrix():owner(NULL){}
+    ~EllipseMatrix(){xy_vsfilter_ellipse_matrix_release(owner);}
+    bool Initialize(int rx,int ry){
+        void* next=xy_vsfilter_ellipse_matrix_create(rx,ry);
+        xy_vsfilter_ellipse_matrix_release(owner);owner=next;return owner!=NULL;
+    }
+    bool Ready()const{return owner!=NULL;}
+    void Set(int dy,int dx,int value){
+        if(!xy_vsfilter_ellipse_matrix_set(owner,dy,dx,value))throw std::out_of_range("ellipse matrix coordinate");
+    }
+    int Get(int dy,int dx)const{
+        int64_t value=xy_vsfilter_ellipse_matrix_get(owner,dy,dx);
+        if(value==INT64_MIN)throw std::out_of_range("ellipse matrix coordinate");
+        return static_cast<int>(value);
+    }
+};
 class EllipseArc {
     void* owner;
     uint64_t origin;
