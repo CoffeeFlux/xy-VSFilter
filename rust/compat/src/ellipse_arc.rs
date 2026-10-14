@@ -9,6 +9,9 @@ impl Arc {
     pub fn len(&self) -> usize {
         self.cells.len()
     }
+    pub fn is_complete(&self) -> bool {
+        self.cells.iter().all(Option::is_some)
+    }
     pub fn is_empty(&self) -> bool {
         self.cells.is_empty()
     }

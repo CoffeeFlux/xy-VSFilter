@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "reference_source_sha256": "af0034118448829065a6bdd6748bb8943aac4a62fbf852a59cd869d63486dd7c",
+  "status": "unresolved ordinary optimized x64 ambient FP effects; not passing compatibility evidence",
+  "environment": "Apple Clang 21.0.0 (clang-2100.3.34.2), macOS arm64 running x86_64 executable, -O2 -fsanitize=address,undefined -fno-sanitize-recover=all",
+  "candidate_reference_observation": {
+    "rx": 14,
+    "ry": 45,
+    "return": [
+      0,
+      0
+    ],
+    "errno": [
+      33,
+      33
+    ],
+    "fp_flags": [
+      38,
+      36
+    ]
+  },
+  "reference_reference_observation": {
+    "rx": 14,
+    "ry": 33,
+    "return": [
+      0,
+      0
+    ],
+    "errno": [
+      33,
+      33
+    ],
+    "fp_flags": [
+      38,
+      36
+    ],
+    "setup": "Two calls to the same pinned native initializer. Before the second, allocate/release an integer-only Rust ellipse owner; the diagnostic verifies that this perturbation itself preserves the seeded errno and FP flags."
+  },
+  "diagnostic_source": "tools/compat/ellipse_fp_stability_oracle.cpp",
+  "diagnostic_exit_code": 2,
+  "disassembly_observation": "Clang emits cvtsi2ss/movsldup followed by packed subps/maxps/sqrtps; packed upper lanes are not consumed by the scalar result. cvtsi2ss retains upper register lanes after vector allocation helper calls. This supports an unused-lane explanation for the ambient denormal flag difference.",
+  "decision": "Keep native floating-point source unchanged. Run the persistent-table oracle with FP-observable compiler settings (MSVC /fp:strict; Clang -ffp-model=strict; GCC rounding/trapping math with tree vectorization disabled). Record those commands. Do not relabel ordinary optimized initialization flags as matching. Paired Windows renderer comparisons use the actual production settings and remain required.",
+  "limits": "Strict-FP extracted comparisons do not establish ambient FP flag equivalence of ordinary optimized builds or arbitrary host environments. Uninitialized matrix rows and out-of-range queries are excluded."
+}

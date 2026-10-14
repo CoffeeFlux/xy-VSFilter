@@ -749,6 +749,20 @@ public:
             definition = definition.replace("__int64", "int64_t")
         ellipse_code += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_ellipse_arc.h").write_text(ellipse_code, encoding="utf-8")
+    storage_code = '#include "ellipse_storage_shell.h"\n'
+    for name, content in (("ReferenceEllipseStorage", widen_source), ("CandidateEllipseStorage", (ROOT / "src/subtitles/xy_widen_region.cpp").read_bytes())):
+        text = content.decode("utf-8-sig")
+        storage_code += f"namespace {name} {{\n"
+        if name == "CandidateEllipseStorage":
+            storage_code += "#define XY_VSFILTER_RUST_TEXT\n"
+        start = text.index("struct XyEllipse")
+        end = text.index("class WidenRegionCreaterImpl", start)
+        definition = text[start:end] + extract_definition(text, "int gen_left_arc(") + "\n"
+        definition += text[text.index("XyEllipse::XyEllipse()"):]
+        if os.name != "nt":
+            definition = definition.replace("__int64", "int64_t")
+        storage_code += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_ellipse_storage.h").write_text(storage_code, encoding="utf-8")
     filter_source = original("src/subtitles/xy_filter.cpp", reference["commit"])
     vobsub_source = original("src/subtitles/VobSubImage.cpp", reference["commit"])
     golomb = '#pragma once\n#include "golomb_shell.h"\n'
@@ -1233,6 +1247,23 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     ellipse_result = run([str(ellipse_executable)], capture_output=True, text=True)
     print(ellipse_result.stdout, end="", flush=True)
     print(ellipse_result.stderr, end="", file=sys.stderr)
+    ellipse_storage_executable = destination / ("ellipse-storage-oracle.exe" if os.name == "nt" else "ellipse-storage-oracle")
+    ellipse_storage_compile = [arg.replace("find_char_oracle.cpp", "ellipse_storage_oracle.cpp").replace("find-char-oracle", "ellipse-storage-oracle") for arg in find_char_compile]
+    # This oracle observes the FP environment. Clang's ordinary optimized
+    # packed math can evaluate unused lanes and raise ambient denormal flags
+    # even between two reference executions with different allocation history.
+    # Keep the native source, but require FP-observable compilation here.
+    # Actual production flags are exercised separately by paired Windows DLLs.
+    if os.name == "nt":
+        ellipse_storage_compile += ["/fp:strict"]
+    elif sys.platform == "darwin":
+        ellipse_storage_compile += ["-ffp-model=strict"]
+    else:
+        ellipse_storage_compile += ["-frounding-math", "-ftrapping-math", "-fno-tree-vectorize", "-fno-tree-slp-vectorize"]
+    run(ellipse_storage_compile)
+    ellipse_storage_result = run([str(ellipse_storage_executable)], capture_output=True, text=True)
+    print(ellipse_storage_result.stdout, end="", flush=True)
+    print(ellipse_storage_result.stderr, end="", file=sys.stderr)
     pipe_line_executable = destination / ("pipe-line-oracle.exe" if os.name == "nt" else "pipe-line-oracle")
     pipe_line_compile = [arg.replace("find_char_oracle.cpp", "pipe_line_oracle.cpp").replace("find-char-oracle", "pipe-line-oracle") for arg in find_char_compile]
     run(pipe_line_compile)
@@ -1622,6 +1653,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "path_align_compile_command": path_align_compile,
         "path_align_result": path_align_result.stdout, "path_align_stderr": path_align_result.stderr,
         "path_align_scope": "Complete pinned PathData::AlignLeftTop over initialized point/type buffers; actual Windows POINT/ATL geometry; exact guarded buffers, origin/size, errno/FP/Windows error state; native cleanup modeled, outputs disjoint and representable arithmetic only",
+        "ellipse_storage_compile_command": ellipse_storage_compile,
+        "ellipse_storage_result": ellipse_storage_result.stdout, "ellipse_storage_stderr": ellipse_storage_result.stderr,
+        "ellipse_storage_scope": "Complete pinned XyEllipse initialization/query/destruction including native floating-point intersection tables, compiled with FP-observable settings recorded in the command; ordinary optimized x64 ambient flag mismatch is unresolved and is not counted as a pass. Compare valid centered arc indices, initialized negative matrix rows, float/double fields, returned intersections and errno/FP/Windows error state; center-coordinate native overloads tested for nonnegative relative offsets, candidate negative offsets separately checked against direct native indexed values. No uninitialized row, out-of-range query, OOM or unsupported arithmetic is counted as parity.",
         "ellipse_arc_compile_command": ellipse_compile,
         "ellipse_arc_result": ellipse_result.stdout, "ellipse_arc_stderr": ellipse_result.stderr,
         "ellipse_arc_scope": "Complete pinned integer gen_left_arc with initialized guarded buffers; degenerate axes, exhaustive bounded radii, large aspect ratios and repeated generation, untouched padding, native return/errno/FP/Windows error state. Nonnegative radii and representable native arithmetic; original fallback retained on decline. Native floating-point intersection tables unchanged.",
