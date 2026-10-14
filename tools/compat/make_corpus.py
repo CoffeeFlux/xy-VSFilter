@@ -274,6 +274,42 @@ def realtext_variants():
         yield "realtext-format-" + name + ".rt", text.encode("ascii")
 
 
+def ass_style_variants():
+    for name, version, alpha, alignment, border, size in (
+        ("v3", 3, 0, 2, 1, "36"),
+        ("v4-alpha-low", 4, -1, 2, 1, "36"),
+        ("v4-alpha-high", 4, 512, 2, 1, "36"),
+        ("v4-alignment", 4, 0, 15, 1, "36"),
+        ("v5-outline", 5, 0, 2, 1, "36"),
+        ("v5-box", 5, 0, 2, 3, "36"),
+        ("v6-bottom", 6, 0, 2, 1, "36"),
+        ("invalid-float", 5, 0, 2, 1, "junk"),
+    ):
+        fields = ["Default", "Arial", size, "&H00ffffff", "&H000000ff", "0", "&H80000000", "0", "0"]
+        if version >= 5:
+            fields += ["0", "0", "100", "100", "0", "0"]
+        if version >= 4:
+            fields += [str(border)]
+        fields += ["2", "1", str(alignment), "10", "10", "10"]
+        if version >= 6:
+            fields += ["30"]
+        if version <= 4:
+            fields += [str(alpha)]
+        fields += ["1"]
+        if version >= 6:
+            fields += ["2"]
+        header = "[Script Info]\r\nPlayResX: 640\r\nPlayResY: 360\r\n"
+        if version >= 4:
+            header += "ScriptType: v4.00" + "+" * (version - 4) + "\r\n"
+            header += "[V4" + "+" * (version - 4) + " Styles]\r\n"
+        dialogue = ("Marked=0" if version <= 4 else "0") + ",0:00:01.00,0:00:04.00,Default,,0,0,0,"
+        if version >= 6:
+            dialogue += "30,"
+        dialogue += ",Style sample"
+        script = header + "Style: " + ",".join(fields) + "\r\n[Events]\r\nDialogue: " + dialogue + "\r\n"
+        yield "ass-style-" + name + ".ass", script.encode("ascii")
+
+
 def ass_dialogue_variants():
     header = SEED.split(b"Dialogue:", 1)[0]
     normal = b"0,0:00:01.00,0:00:04.00,Default,,0,0,0,,visible"
@@ -410,7 +446,8 @@ def make_cases(files):
                                                     ("mpl2-format-italic", "mpl2-format-control"),
                                                     ("sami-format-italic", "sami-format-control"),
                                                     ("sami-format-font-black", "sami-format-font-zero"),
-                                                    ("encoding-western", "encoding-western-control"))
+                                                    ("encoding-western", "encoding-western-control"),
+                                                    ("ass-style-v5-box", "ass-style-v5-outline"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -423,6 +460,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in incremental_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in subrip_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in realtext_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in ass_style_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_dialogue_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in encoding_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in microdvd_variants()]

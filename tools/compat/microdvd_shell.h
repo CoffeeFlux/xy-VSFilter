@@ -31,7 +31,11 @@ static void microDiagnostics(){
 }
 static uint64_t microSearches=0,microSteps=0,microTagCallbacks=0;
 static void (*microHook)(unsigned)=NULL;
+// GetStr's earlier Rust migration replaces TrimLeft internally. Its callers
+// compare field results and retained numeric callbacks, not that private call.
+static bool microObserveFieldTrims=true;
 static void microObserve(unsigned kind,const wchar_t* text){
+    if(!microObserveFieldTrims && (kind==9 || kind==10))return;
     ++microTagCallbacks;searchObserve(kind,0);
     while(*text)searchEvents.push_back(static_cast<uint16_t>(*text++));
     searchEvents.push_back(0x10000);

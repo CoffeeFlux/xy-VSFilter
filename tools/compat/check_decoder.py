@@ -55,7 +55,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
               ROOT / "include/xy_rust_drawing.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
-              ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
+              ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
               ROOT / "include/xy_rust_cc.h", ROOT / "src/subtitles/CCDecoder.cpp", ROOT / "src/subtitles/CCDecoder.h",
               ROOT / "include/xy_rust_segments.h",
@@ -204,6 +204,28 @@ public:
         webvtt += extract_definition(content.decode("utf-8-sig"), "static void WebVTTCueStrip(") + "\n"
         webvtt += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_webvtt.h").write_text(webvtt, encoding="utf-8")
+    style = '#include "ass_style_shell.h"\n'
+    for signature in ("STSStyle::STSStyle(", "void STSStyle::SetDefault("):
+        style += extract_definition(font_source.decode("utf-8-sig"), signature) + "\n"
+    for name, content in (("ReferenceAssStyle", font_source), ("CandidateAssStyle", candidate_font)):
+        decoded = content.decode("utf-8-sig")
+        style += f"namespace {name} {{\n"
+        if name == "CandidateAssStyle":
+            style += "#define XY_VSFILTER_RUST_TEXT\n"
+        for signature in ("static inline CStringW GetStr(", "static inline int GetInt(", "static inline double GetFloat("):
+            style += extract_definition(decoded, signature) + "\n"
+        parser = decoded.index("static bool OpenSubStationAlpha(")
+        start = decoded.index('        else if(entry == L"style")', parser)
+        end = decoded.index('        else if(entry == L"[script info]")', start)
+        branch = decoded[start:end]
+        assert branch.count('else if(entry == L"style")') == 1
+        branch = branch.replace('else if(entry == L"style")', 'if(true)')
+        if name == "CandidateAssStyle":
+            assert branch.count("XyRust::AssStyle fields") == 1
+            branch = branch.replace("XyRust::AssStyle fields", "XyRust::ObservedAssStyle fields")
+        style += "static bool ParseStyle(CSimpleTextSubtitle& ret, CStringW& buff, int sver) {\n"
+        style += branch + "return true;\n}\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_ass_style.h").write_text(style, encoding="utf-8")
     dialogue = '#include "ass_dialogue_shell.h"\n'
     for name, content in (("ReferenceAssDialogue", font_source), ("CandidateAssDialogue", candidate_font)):
         decoded = content.decode("utf-8-sig")
@@ -863,6 +885,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     find_char_result = run([str(find_char_executable)], capture_output=True, text=True)
     print(find_char_result.stdout, end="", flush=True)
     print(find_char_result.stderr, end="", file=sys.stderr)
+    style_executable = destination / ("ass-style-oracle.exe" if os.name == "nt" else "ass-style-oracle")
+    style_compile = [arg.replace("find_char_oracle.cpp", "ass_style_oracle.cpp").replace("find-char-oracle", "ass-style-oracle") for arg in find_char_compile]
+    run(style_compile)
+    style_result = run([str(style_executable)], capture_output=True, text=True)
+    print(style_result.stdout, end="", flush=True)
+    print(style_result.stderr, end="", file=sys.stderr)
     dialogue_executable = destination / ("ass-dialogue-oracle.exe" if os.name == "nt" else "ass-dialogue-oracle")
     dialogue_compile = [arg.replace("find_char_oracle.cpp", "ass_dialogue_oracle.cpp").replace("find-char-oracle", "ass-dialogue-oracle") for arg in find_char_compile]
     run(dialogue_compile)
@@ -1198,6 +1226,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "webvtt_compile_command": webvtt_compile,
         "webvtt_result": webvtt_result.stdout, "webvtt_stderr": webvtt_result.stderr,
         "webvtt_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring model with host iswspace; Windows comparison required",
+        "ass_style_compile_command": style_compile,
+        "ass_style_result": style_result.stdout, "ass_style_stderr": style_result.stderr,
+        "ass_style_scope": "Complete pinned style branch and native defaults; actual ATL/CRT in Windows CI, portable string model elsewhere; remaining input, all style fields/float bits, errno/floating flags, retained numeric callbacks and interruptions; GetStr private TrimLeft call identity already replaced by prior StringField migration; overflowing scanf conversions and full file/style-map integration excluded",
         "ass_dialogue_compile_command": dialogue_compile,
         "ass_dialogue_result": dialogue_result.stdout, "ass_dialogue_stderr": dialogue_result.stderr,
         "ass_dialogue_scope": "Complete OpenSubStationAlpha dialogue branch and NextInt/TryNextStr against pinned source; i64 literal suffix spelling normalized only; native ATL/CRT on Windows, portable string models elsewhere; raw UTF-16/NULs, failed fields, callback order, entry arguments and errno; full file/style parsing and unrepresentable timestamp arithmetic excluded",

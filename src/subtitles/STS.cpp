@@ -32,6 +32,7 @@
 #include "xy_rust_sami.h"
 #include "xy_rust_encoding.h"
 #include "xy_rust_ass_dialogue.h"
+#include "xy_rust_ass_style.h"
 #include "xy_rust_webvtt.h"
 #include "xy_rust_fields.h"
 #include "xy_rust_segments.h"
@@ -2172,6 +2173,42 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
                 int encoding;
                 CRect tmp_rect;
 
+#ifdef XY_VSFILTER_RUST_TEXT
+                XyRust::AssStyle fields(buff, sver);
+                for(unsigned field; (field = fields.Next()) != 0; )
+                {
+                    if(field == 27) {style->marginRect = tmp_rect; continue;}
+                    buff = fields.Text<CStringW>();
+                    switch(field)
+                    {
+                    case 1: StyleName = GetStr(buff); break;
+                    case 2: style->fontName = GetStr(buff); break;
+                    case 3: style->fontSize = GetFloat(buff); break;
+                    case 4: case 5: case 6: case 7: style->colors[field-4] = (COLORREF)GetInt(buff); break;
+                    case 8: style->fontWeight = !!GetInt(buff) ? FW_BOLD : FW_NORMAL; break;
+                    case 9: style->fItalic = !!GetInt(buff); break;
+                    case 10: style->fUnderline = !!GetInt(buff); break;
+                    case 11: style->fStrikeOut = !!GetInt(buff); break;
+                    case 12: style->fontScaleX = GetFloat(buff); break;
+                    case 13: style->fontScaleY = GetFloat(buff); break;
+                    case 14: style->fontSpacing = GetFloat(buff); break;
+                    case 15: style->fontAngleZ = GetFloat(buff); break;
+                    case 16: style->borderStyle = GetInt(buff); break;
+                    case 17: style->outlineWidthX = style->outlineWidthY = GetFloat(buff); break;
+                    case 18: style->shadowDepthX = style->shadowDepthY = GetFloat(buff); break;
+                    case 19: style->scrAlignment = GetInt(buff); break;
+                    case 20: tmp_rect.left = GetInt(buff); break;
+                    case 21: tmp_rect.right = GetInt(buff); break;
+                    case 22: tmp_rect.top = tmp_rect.bottom = GetInt(buff); break;
+                    case 23: tmp_rect.bottom = GetInt(buff); break;
+                    case 24: alpha = GetInt(buff); break;
+                    case 25: encoding = GetInt(buff); break;
+                    case 26: style->relativeTo = GetInt(buff); break;
+                    }
+                    fields.Accept(buff);
+                }
+
+#else
                 StyleName = GetStr(buff);
                 style->fontName = GetStr(buff);
                 style->fontSize = GetFloat(buff);
@@ -2197,24 +2234,41 @@ if(sver <= 4)   alpha = GetInt(buff);
                 encoding = GetInt(buff);
 if(sver >= 6)   style->relativeTo = GetInt(buff);
 
+#endif
+#ifdef XY_VSFILTER_RUST_TEXT
+                uint32_t colors[4];
+                for(size_t i = 0; i < 4; i++) colors[i] = style->colors[i];
+                fields.Normalize(colors, sver <= 4 ? alpha : 0, encoding, style->borderStyle, style->scrAlignment);
+                style->charSet = static_cast<int>(fields.Number(8));
+                for(size_t i = 0; i < 4; i++) {style->colors[i] = fields.Number(i); style->alpha[i] = static_cast<BYTE>(fields.Number(i+4));}
+#else
                 // Map unsupported extension to the most permissive charSet
                 style->charSet = encoding < 0 ? DEFAULT_CHARSET : encoding;
 if(sver <= 4)   style->colors[2] = style->colors[3]; // style->colors[2] is used for drawing the outline
 if(sver <= 4)   alpha = max(min(alpha, 0xff), 0);
 if(sver <= 4)   {for(size_t i = 0; i < 3; i++) style->alpha[i] = alpha; style->alpha[3] = 0x80;}
 if(sver >= 5)   for(size_t i = 0; i < 4; i++) {style->alpha[i] = (BYTE)(style->colors[i]>>24); style->colors[i] &= 0xffffff;}
+#endif
 if(sver >= 5)   style->fontScaleX = max(style->fontScaleX, 0);
 if(sver >= 5)   style->fontScaleY = max(style->fontScaleY, 0);
 if(sver >= 5)   style->fontSpacing = max(style->fontSpacing, 0);
                 style->fontAngleX = style->fontAngleY = 0;
+#ifdef XY_VSFILTER_RUST_TEXT
+                style->borderStyle = static_cast<int>(fields.Number(9));
+#else
                 style->borderStyle = style->borderStyle == 1 ? 0 : style->borderStyle == 3 ? 1 : 0;
+#endif
                 style->outlineWidthX = max(style->outlineWidthX, 0);
                 style->outlineWidthY = max(style->outlineWidthY, 0);
                 style->shadowDepthX = max(style->shadowDepthX, 0);
                 style->shadowDepthY = max(style->shadowDepthY, 0);
+#ifdef XY_VSFILTER_RUST_TEXT
+                style->scrAlignment = static_cast<int>(fields.Number(10));
+#else
 if(sver <= 4)   style->scrAlignment = (style->scrAlignment&4) ? ((style->scrAlignment&3)+6) // top
                                         : (style->scrAlignment&8) ? ((style->scrAlignment&3)+3) // mid
                                         : (style->scrAlignment&3); // bottom
+#endif
 
                 StyleName.TrimLeft(_T('*'));
 
