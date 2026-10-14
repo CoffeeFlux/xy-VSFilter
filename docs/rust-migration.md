@@ -20,6 +20,23 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns the reverse field extraction used by RealText `GetTimecode`.
+  Empty components, embedded NULs, original unit order and the cached initial
+  length are preserved; later numeric callbacks can still change unread input.
+  A shortened input reaches the original native checked-string exception.
+  Separator detection, fractional zero-padding, `_wtoi` and integer folding
+  remain native. The original colon-only interpretation is retained: `1:2`
+  produces 1,200 milliseconds.
+  Fatal ASan/UBSan comparisons passed **364,136 cases** on arm64 and under x64
+  execution, including **239,174 nonzero results**, **927,373 conversions**,
+  **99 injected conversion interruptions**, **64 matching checked-string
+  exceptions** and **280 callback-mutated inputs**. **1,425 fixtures outside
+  representable native arithmetic** are excluded, not passing comparisons.
+  The tag-output oracle and 58 complete native parses also pass with all three
+  RealText replacements active. Rust 1.85 tests (64 core, 41 FFI), strict Clippy,
+  corpus freshness and both default-branch syntax checks pass. Windows/Miri
+  validation is pending. Native numeric arithmetic and allocation/OOM behavior
+  remain outside this replacement.
 * Safe Rust now owns the RealText attribute parser's names, values and cursor
   state. It retains missing-equals recovery, whitespace skipping even inside
   quotes, either quote ending a quoted value, raw NULs and duplicate map keys.

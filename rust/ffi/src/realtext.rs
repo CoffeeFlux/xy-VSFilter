@@ -2,6 +2,58 @@
 use alloc::boxed::Box;
 use xy_vsfilter_compat::realtext::Tags;
 use xy_vsfilter_compat::realtext_attributes::Attributes;
+use xy_vsfilter_compat::realtext_timecode::Timecode;
+
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_realtext_timecode_create(length: usize) -> *mut Timecode {
+    Box::into_raw(Box::new(Timecode::new(length)))
+}
+
+/// # Safety
+/// owner is live and uniquely borrowed; input is a disjoint initialized u16
+/// span. No input borrow survives this call or reaches native CRT conversion.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_timecode_next(
+    owner: *mut Timecode,
+    input: *const u16,
+    length: usize,
+) -> u32 {
+    // SAFETY: exclusive live owner and disjoint initialized native input.
+    unsafe {
+        let state = &mut *owner;
+        state.next(units(input, length))
+    }
+}
+
+/// # Safety
+/// owner is live and immutable. Fields: final-field flag, missing index, part
+/// length and bounded part units. Invalid queries return zero.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_timecode_field(
+    owner: *const Timecode,
+    field: u32,
+    index: usize,
+) -> usize {
+    // SAFETY: immutable scalar query before the unique release.
+    let state = unsafe { &*owner };
+    match field {
+        0 => usize::from(state.last),
+        1 => state.missing,
+        2 => state.part.len(),
+        3 => usize::from(state.part.get(index).copied().unwrap_or(0)),
+        _ => 0,
+    }
+}
+
+/// # Safety
+/// Release the unique owner once, after all other operations.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_timecode_release(owner: *mut Timecode) {
+    if !owner.is_null() {
+        // SAFETY: native RAII returns the uniquely owned allocation once.
+        drop(unsafe { Box::from_raw(owner) });
+    }
+}
 
 #[no_mangle]
 pub extern "C" fn xy_vsfilter_realtext_attributes_create(position: u32) -> *mut Attributes {
@@ -237,6 +289,29 @@ mod tests {
                 0
             );
             xy_vsfilter_realtext_attributes_release(owner);
+        }
+    }
+
+    #[test]
+    fn timecode_fields_outlive_their_native_input_loans() {
+        let owner = xy_vsfilter_realtext_timecode_create(5);
+        let mut input = [49u16, 58, 0xd800, 0, 50];
+        // SAFETY: initialized input during each short loan; only scalar queries
+        // occur afterward, followed by a unique release.
+        unsafe {
+            assert_eq!(
+                xy_vsfilter_realtext_timecode_next(owner, input.as_ptr(), 5),
+                1
+            );
+            input.fill(7);
+            assert_eq!(xy_vsfilter_realtext_timecode_field(owner, 2, 0), 3);
+            assert_eq!(xy_vsfilter_realtext_timecode_field(owner, 3, 0), 0xd800);
+            assert_eq!(xy_vsfilter_realtext_timecode_field(owner, 3, usize::MAX), 0);
+            assert_eq!(
+                xy_vsfilter_realtext_timecode_next(owner, core::ptr::null(), 0),
+                2
+            );
+            xy_vsfilter_realtext_timecode_release(owner);
         }
     }
 }
