@@ -4,19 +4,9 @@
 #include <cstdint>
 #include <cstring>
 #include <vector>
-#include "xy_rust_vobsub.h"
+#include "vobsub_trim_shell.h"
 using std::min;
 typedef uint8_t BYTE;
-typedef uint32_t DWORD;
-struct CPoint { int32_t x,y; CPoint(int32_t a=0,int32_t b=0):x(a),y(b){} };
-struct CRect {
-    int32_t left,top,right,bottom;
-    CRect(int32_t l=0,int32_t t=0,int32_t r=0,int32_t b=0):left(l),top(t),right(r),bottom(b){}
-    int32_t Width() const {return right-left;}
-    int32_t Height() const {return bottom-top;}
-    CPoint TopLeft() const {return CPoint(left,top);}
-};
-struct RGBQUAD { BYTE rgbBlue,rgbGreen,rgbRed,rgbReserved; };
 struct RleInterrupted {};
 static std::vector<uint64_t> rleEvents;
 static int rleFailure=-1,rleObservations=0;
@@ -32,11 +22,12 @@ template<class Image> static void observeRle(const Image& image,unsigned action,
 #define VOBSUB_RLE_SHELL(Name) \
 class Name { public: \
     CRect rect;bool fCustomPal,fAligned,allocate;int tridx;size_t nOffset[2],nPlane; \
-    RGBQUAD *orgpal,*cuspal,*lpPixels,*lpTemp1,*backing;size_t backingCount; \
+    RGBQUAD *orgpal,*cuspal,*lpPixels,*lpTemp1,*lpTemp2,*backing;size_t backingCount; \
     struct SubPal {BYTE pal:4,tr:4;};SubPal pal[4]; \
     void GetPacketInfo(const BYTE*,size_t,size_t,int){observeRle(*this,1);} \
     bool Alloc(int w,int h){observeRle(*this,2,w,h);return allocate;} \
-    void TrimSubImage(){observeRle(*this,7);} \
+    void TrimSubImageImpl(); \
+    void TrimSubImage(){observeRle(*this,7);TrimSubImageImpl();observeRle(*this,8);} \
     BYTE GetNibbleImpl(const BYTE*); \
     BYTE GetNibble(const BYTE* data){observeRle(*this,3);const BYTE value=GetNibbleImpl(data);observeRle(*this,4,0,0,0,value);return value;} \
     void DrawPixelsImpl(CPoint,int,size_t); \

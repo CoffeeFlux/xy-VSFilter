@@ -20,6 +20,26 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust DVD trimming scans only alpha bytes and builds bordered crops in
+  owned storage. RGB bytes retain the native copy semantics without requiring
+  initialization; the new border is zero-filled. Native rectangle inflation,
+  intersection, final positioning and pointer selection remain in the adapter.
+  Unsupported layouts, allocation refusal, source/output overlap and writes
+  into the native object retain the original copy before any Rust output write.
+  Local fatal ASan/UBSan comparisons passed **80,285 cases** on arm64 and under
+  x64 execution, including every 4x4 alpha occupancy mask, repeated trimming,
+  empty/reversed dimensions, **809 source/output alias cases** and **100
+  protected-object cases**. There were **159,629 Rust bounds scans**, **16 native
+  bounds fallbacks**, **144,856 Rust crop copies** and **243 native copy
+  fallbacks**. Fixtures with overlapping individual native `memcpy` ranges are
+  excluded from parity (91 cases); admitted whole-buffer aliases still test
+  observable border-zeroing and row-copy order.
+  The decode-loop oracle now uses the actual trimming implementation as well:
+  **85,168 comparisons / 3,500,216 full state/pixel boundary observations** pass
+  on both local architectures. Windows component tests use actual ATL rectangle
+  operations for both oracles. Rust tests (53 core, 30 FFI), strict Clippy and
+  default native branch syntax checks pass. Windows/Miri validation is pending.
+  Native image allocation, retained-buffer ownership and host playback remain.
 * Safe Rust DVD nibble extraction and variable-length run-code decoding preserve
   each of the four stopping thresholds and the separate fill-to-end case. Values
   cross the C ABI one nibble at a time, retaining native read/draw interleaving
@@ -47,8 +67,13 @@ unresolved reference outcomes requiring investigation, never matching results.
   initialized fixture, with **473,623 visibly changed cases**, **607,744 palette
   alias cases**, **1,827,275 Rust-handled clipping calls**, **24 fallback calls**
   and **948,488 Rust-filled spans**. Rust tests (51 core, 29 FFI), strict Clippy
-  and both default native branch syntax checks pass. Windows/Miri validation is
-  pending for this increment. DVD RLE, trimming and buffer ownership remain native.
+  and both default native branch syntax checks pass. Candidate `5aa90d84` passed
+  all four CI platforms, Miri and both Windows DLL jobs. Each DLL job matched
+  **354 cases / 4,334 frames** and **32 mutations / 224 frames**, plus dialogs,
+  visible controls, exports and dependencies. Both logs confirm Rust-enabled
+  `VobSubImage.cpp` compilation. [DVD pixel evidence](vobsub-pixels-evidence.json)
+  records verified source/DLL hashes and scope. DVD RLE and trimming are separate
+  increments above; native buffer ownership and bitmap-host playback remain.
 * Safe Rust DVD/VobSub control-packet parsing returns patches for only the fields
   assigned by the original. It preserves inclusive rectangle coordinates,
   palette/transparency nibble order, 16-bit command-counter wrapping, forced

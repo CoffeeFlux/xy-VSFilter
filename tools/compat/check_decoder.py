@@ -363,12 +363,21 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         vobsub_rle += f"VOBSUB_RLE_SHELL({name})\n#define CVobSubImage {name}\n"
         if name == "CandidateVobRle":
             vobsub_rle += "#define XY_VSFILTER_RUST_TEXT\n"
-        for signature in ("bool CVobSubImage::Decode(", "BYTE CVobSubImage::GetNibble(", "void CVobSubImage::DrawPixels("):
+        for signature in ("bool CVobSubImage::Decode(", "BYTE CVobSubImage::GetNibble(", "void CVobSubImage::DrawPixels(", "void CVobSubImage::TrimSubImage("):
             definition = extract_definition(content.decode("utf-8-sig"), signature)
             definition = definition.replace("CVobSubImage::GetNibble(", "CVobSubImage::GetNibbleImpl(", 1).replace("CVobSubImage::DrawPixels(", "CVobSubImage::DrawPixelsImpl(", 1)
+            definition = definition.replace("CVobSubImage::TrimSubImage(", "CVobSubImage::TrimSubImageImpl(", 1)
             vobsub_rle += definition + "\n"
         vobsub_rle += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_vobsub_rle.h").write_text(vobsub_rle, encoding="utf-8")
+    vobsub_trim = '#include "vobsub_trim_shell.h"\n'
+    for name, content in (("ReferenceVobTrim", vobsub_source), ("CandidateVobTrim", (ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
+        vobsub_trim += f"VOBSUB_TRIM_SHELL({name})\n#define CVobSubImage {name}\n"
+        if name == "CandidateVobTrim":
+            vobsub_trim += "#define XY_VSFILTER_RUST_TEXT\n"
+        vobsub_trim += extract_definition(content.decode("utf-8-sig"), "void CVobSubImage::TrimSubImage(") + "\n"
+        vobsub_trim += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_vobsub_trim.h").write_text(vobsub_trim, encoding="utf-8")
     byte_float = '#include "byte_float_shell.h"\n'
     for name, content in (("ReferenceByteFloat", filter_source), ("CandidateByteFloat", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
         byte_float += f"namespace {name} {{\n"
@@ -684,10 +693,20 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     print(vobsub_pixels_result.stderr, end="", file=sys.stderr)
     vobsub_rle_executable = destination / ("vobsub-rle-oracle.exe" if os.name == "nt" else "vobsub-rle-oracle")
     vobsub_rle_compile = [arg.replace("fill_oracle.cpp", "vobsub_rle_oracle.cpp").replace("fill-oracle", "vobsub-rle-oracle") for arg in fill_compile]
+    if os.name == "nt":
+        vobsub_rle_compile += ["user32.lib"]  # Actual ATL rectangle operations in trimming.
     run(vobsub_rle_compile)
     vobsub_rle_result = run([str(vobsub_rle_executable)], capture_output=True, text=True)
     print(vobsub_rle_result.stdout, end="", flush=True)
     print(vobsub_rle_result.stderr, end="", file=sys.stderr)
+    vobsub_trim_executable = destination / ("vobsub-trim-oracle.exe" if os.name == "nt" else "vobsub-trim-oracle")
+    vobsub_trim_compile = [arg.replace("fill_oracle.cpp", "vobsub_trim_oracle.cpp").replace("fill-oracle", "vobsub-trim-oracle") for arg in fill_compile]
+    if os.name == "nt":
+        vobsub_trim_compile += ["user32.lib"]  # Use actual ATL rectangle operations.
+    run(vobsub_trim_compile)
+    vobsub_trim_result = run([str(vobsub_trim_executable)], capture_output=True, text=True)
+    print(vobsub_trim_result.stdout, end="", flush=True)
+    print(vobsub_trim_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -725,6 +744,8 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "vobsub_pixels_result": vobsub_pixels_result.stdout, "vobsub_pixels_stderr": vobsub_pixels_result.stderr,
         "vobsub_rle_compile_command": vobsub_rle_compile,
         "vobsub_rle_result": vobsub_rle_result.stdout, "vobsub_rle_stderr": vobsub_rle_result.stderr,
+        "vobsub_trim_compile_command": vobsub_trim_compile,
+        "vobsub_trim_result": vobsub_trim_result.stdout, "vobsub_trim_stderr": vobsub_trim_result.stderr,
         "weighted_filter_compile_command": weighted_compile,
         "weighted_filter_result": weighted_result.stdout, "weighted_filter_stderr": weighted_result.stderr,
         "gauss_integer_compile_command": integer_gauss_compile,

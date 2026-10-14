@@ -397,22 +397,30 @@ void CVobSubImage::TrimSubImage()
     r.right = 0;
     r.bottom = 0;
 
-    RGBQUAD* ptr = lpTemp1;
+#ifdef XY_VSFILTER_RUST_TEXT
+    int32_t bounds[4];
+    if (xy_vsfilter_vobsub_bounds(reinterpret_cast<const uint8_t*>(lpTemp1), rect.Width(), rect.Height(), bounds)) {
+        r = CRect(bounds[0], bounds[1], bounds[2], bounds[3]);
+    } else
+#endif
+    {
+        RGBQUAD* ptr = lpTemp1;
 
-    for (int j = 0, y = rect.Height(); j < y; j++) {
-        for (int i = 0, x = rect.Width(); i < x; i++, ptr++) {
-            if (ptr->rgbReserved) {
-                if (r.top > j) {
-                    r.top = j;
-                }
-                if (r.bottom < j) {
-                    r.bottom = j;
-                }
-                if (r.left > i) {
-                    r.left = i;
-                }
-                if (r.right < i) {
-                    r.right = i;
+        for (int j = 0, y = rect.Height(); j < y; j++) {
+            for (int i = 0, x = rect.Width(); i < x; i++, ptr++) {
+                if (ptr->rgbReserved) {
+                    if (r.top > j) {
+                        r.top = j;
+                    }
+                    if (r.bottom < j) {
+                        r.bottom = j;
+                    }
+                    if (r.left > i) {
+                        r.left = i;
+                    }
+                    if (r.right < i) {
+                        r.right = i;
+                    }
                 }
             }
         }
@@ -434,6 +442,15 @@ void CVobSubImage::TrimSubImage()
 
     DWORD* src = (DWORD*)&lpTemp1[offset];
     DWORD* dst = (DWORD*)&lpTemp2[1 + w + 1];
+
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (xy_vsfilter_vobsub_crop(reinterpret_cast<const uint8_t*>(src), rect.Width(), w, h,
+            reinterpret_cast<uint8_t*>(lpTemp2), reinterpret_cast<const uint8_t*>(this), sizeof(*this))) {
+        lpPixels = lpTemp2;
+        rect = r + rect.TopLeft();
+        return;
+    }
+#endif
 
     ZeroMemory(lpTemp2, (1 + w + 1)*sizeof(RGBQUAD));
 

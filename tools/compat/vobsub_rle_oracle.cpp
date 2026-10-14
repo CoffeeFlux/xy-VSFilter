@@ -6,9 +6,10 @@
 typedef std::array<RGBQUAD,160> Storage;
 struct Outcome {
     Storage pixels;
+    std::array<RGBQUAD,256> trimmed;
     std::vector<uint64_t> events,state;
     bool operator==(const Outcome& other)const {
-        return !std::memcmp(pixels.data(),other.pixels.data(),sizeof(pixels)) && events==other.events && state==other.state;
+        return !std::memcmp(pixels.data(),other.pixels.data(),sizeof(pixels)) && !std::memcmp(trimmed.data(),other.trimmed.data(),sizeof(trimmed)) && events==other.events && state==other.state;
     }
 };
 static uint64_t comparisons=0,observations=0,interruptions=0,aliases=0,changed=0;
@@ -19,9 +20,11 @@ static Storage initial() {
 }
 template<class Image> static Outcome execute(const std::vector<BYTE>& bytes,size_t first,size_t second,size_t dataSize,int width,int height,bool custom,bool trim,bool allocate,int alias,int failure) {
     Outcome result;result.pixels=initial();Image image;
+    for(size_t i=0;i<result.trimmed.size();++i)result.trimmed[i]=result.pixels[i%result.pixels.size()];
     image.rect=CRect(-3,7,width-3,height+7);image.nOffset[0]=first;image.nOffset[1]=second;
     image.nPlane=1;image.fAligned=false;image.fCustomPal=!custom;image.tridx=-77;image.allocate=allocate;
     image.backing=result.pixels.data();image.backingCount=result.pixels.size();image.lpTemp1=image.backing+32;image.lpPixels=image.backing+31;
+    image.lpTemp2=result.trimmed.data()+8;
     image.orgpal=image.backing+4;image.cuspal=image.backing+24;
     for(unsigned i=0;i<4;++i){image.pal[i].pal=(i*3+1)&15;image.pal[i].tr=(i*5+3)&15;}
     auto input=bytes;BYTE* data=input.data();
@@ -31,7 +34,7 @@ template<class Image> static Outcome execute(const std::vector<BYTE>& bytes,size
     try{returned=image.Decode(data,bytes.size(),dataSize,123,custom,9,image.backing+4,image.backing+24,trim);}
     catch(const RleInterrupted&){interrupted=true;}
     result.events=rleEvents;
-    result.state={uint64_t(returned),uint64_t(interrupted),image.nOffset[0],image.nOffset[1],image.nPlane,uint64_t(image.fAligned),uint64_t(image.fCustomPal),uint64_t(static_cast<uint32_t>(image.tridx)),uint64_t(static_cast<uint32_t>(image.rect.left)),uint64_t(static_cast<uint32_t>(image.rect.top)),uint64_t(static_cast<uint32_t>(image.rect.right)),uint64_t(static_cast<uint32_t>(image.rect.bottom)),uint64_t(image.lpPixels-image.backing),uint64_t(image.orgpal-image.backing),uint64_t(image.cuspal-image.backing)};
+    result.state={uint64_t(returned),uint64_t(interrupted),image.nOffset[0],image.nOffset[1],image.nPlane,uint64_t(image.fAligned),uint64_t(image.fCustomPal),uint64_t(static_cast<uint32_t>(image.tridx)),uint64_t(static_cast<uint32_t>(image.rect.left)),uint64_t(static_cast<uint32_t>(image.rect.top)),uint64_t(static_cast<uint32_t>(image.rect.right)),uint64_t(static_cast<uint32_t>(image.rect.bottom)),image.lpPixels==image.lpTemp2 ? uint64_t(-1) : uint64_t(image.lpPixels-image.backing),uint64_t(image.orgpal-image.backing),uint64_t(image.cuspal-image.backing)};
     return result;
 }
 static void compare(const std::vector<BYTE>& bytes,size_t first,size_t second,size_t size,int width,int height,bool custom=false,bool trim=false,bool allocate=true,int alias=0,int failure=-1) {
@@ -72,7 +75,7 @@ int main() {
     for(size_t i=0;i<control.events.size();i+=170)if(control.events[i]==4)separateNibbles.push_back(control.events[i+4]);
     for(size_t i=0;i<shared.events.size();i+=170)if(shared.events[i]==4)sharedNibbles.push_back(shared.events[i+4]);
     const auto before=initial();
-    if(separateNibbles==sharedNibbles || !nibbleCalls || !codeCalls || !interruptions || !aliases || !std::memcmp(control.pixels.data(),before.data(),sizeof(Storage))){fprintf(stderr,"DVD RLE route/visibility control failed\n");return 1;}
-    printf("%llu exact DVD RLE comparisons passed (%llu full state/pixel boundary observations, %llu injected native interruptions, %llu input/output alias cases, %llu changed backing stores, %llu Rust nibble calls, %llu Rust code steps; every four-nibble prefix, alternating planes, byte alignment, short-circuit consumption and native draw order)\n",
+    if(separateNibbles==sharedNibbles || !nibbleCalls || !codeCalls || !cropsHandled || !interruptions || !aliases || !std::memcmp(control.pixels.data(),before.data(),sizeof(Storage))){fprintf(stderr,"DVD RLE route/visibility control failed\n");return 1;}
+    printf("%llu exact DVD RLE comparisons passed (%llu full state/pixel boundary observations, %llu injected native interruptions, %llu input/output alias cases, %llu changed backing stores, %llu Rust nibble calls, %llu Rust code steps; every four-nibble prefix, alternating planes, byte alignment, short-circuit consumption, native draw order and actual image trimming)\n",
         static_cast<unsigned long long>(comparisons),static_cast<unsigned long long>(observations),static_cast<unsigned long long>(interruptions),static_cast<unsigned long long>(aliases),static_cast<unsigned long long>(changed),static_cast<unsigned long long>(nibbleCalls),static_cast<unsigned long long>(codeCalls));
 }
