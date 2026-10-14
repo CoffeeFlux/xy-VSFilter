@@ -74,6 +74,10 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_add_prepared_v1(uint64_t, uint32
 // Unicode mode, 0 stores false, 1 true, after caller's native preparation.
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_set_prepared_text_v1(uint64_t, uint32_t index, int32_t flag, const uint8_t*, size_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_set_prepared_style_v1(uint64_t, uint32_t index, const uint8_t*, size_t);
+// Entry-style rename only: case-sensitive native CString equality terminates at
+// the first NUL code unit on each side; assignment preserves the entire new raw
+// UTF-16LE value, including its NUL suffix. Neither style-map mutation nor rebuild.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_rename_style_cstring_v1(uint64_t, const uint8_t* old_units, size_t old_bytes, const uint8_t* new_units, size_t new_bytes);
 // Endpoint: 0=end, 1=start. Caller supplies native-evaluated time; no rebuild.
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_set_entry_time_v1(uint64_t, uint32_t index, uint32_t start, int64_t value);
 // Native-selected original indexes (u32LE bijection) or native-evaluated start/end

@@ -437,6 +437,32 @@ pub unsafe extern "C" fn xy_vsfilter_document_set_prepared_style_v1(
         document.set_prepared_style(index as usize, style)
     })
 }
+/// # Safety
+/// Both inputs follow the byte-buffer contract and have even raw-UTF16LE byte
+/// lengths. Overlap is allowed; both values are owned before admission. CString
+/// comparison terminates at first NUL, while replacement preserves all units.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_rename_style_cstring_v1(
+    owner: u64,
+    old: *const u8,
+    old_length: usize,
+    new: *const u8,
+    new_length: usize,
+) -> u32 {
+    required!(element_shape(old_length, 2));
+    required!(element_shape(new_length, 2));
+    // SAFETY: caller provides both readable ranges; neither can change during
+    // these copies, and no caller pointer enters the registry closure.
+    let old = required!(unsafe { copy_input(old, old_length) });
+    let new = required!(unsafe { copy_input(new, new_length) });
+    let old = units(&old);
+    let new = units(&new);
+    mutate(owner, |document| {
+        document.rename_style_cstring(&old, &new);
+        Ok(())
+    })
+}
+
 #[no_mangle]
 pub extern "C" fn xy_vsfilter_document_set_entry_time_v1(
     owner: u64,
@@ -936,6 +962,81 @@ mod tests {
             );
             assert_eq!(state(owner), animated);
             assert_eq!(sentinel, [0xa5; 80]);
+
+            // Full replacement survives CString's NUL-terminated comparison.
+            let old_style = [65, 0, 0, 0, 66, 0];
+            let equivalent_old = [65, 0, 0, 0, 67, 0];
+            let replacement = [90, 0, 0, 0, 0, 0xd8, 0xff, 0xff];
+            assert_eq!(
+                xy_vsfilter_document_set_prepared_style_v1(
+                    owner,
+                    0,
+                    old_style.as_ptr(),
+                    old_style.len()
+                ),
+                OK
+            );
+            let before_rename = state(owner);
+            assert_eq!(
+                xy_vsfilter_document_rename_style_cstring_v1(
+                    owner,
+                    equivalent_old.as_ptr(),
+                    equivalent_old.len(),
+                    replacement.as_ptr(),
+                    replacement.len()
+                ),
+                OK
+            );
+            assert_eq!(state(owner).entries()[0].style, [90, 0, 0xd800, 0xffff]);
+            assert_eq!(state(owner).segments(), before_rename.segments());
+            let renamed = state(owner);
+            assert_eq!(
+                xy_vsfilter_document_rename_style_cstring_v1(
+                    owner,
+                    ptr::null(),
+                    1,
+                    replacement.as_ptr(),
+                    replacement.len()
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_rename_style_cstring_v1(
+                    owner,
+                    replacement.as_ptr(),
+                    replacement.len(),
+                    ptr::null(),
+                    2
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(state(owner), renamed);
+            assert_eq!(
+                xy_vsfilter_document_rename_style_cstring_v1(
+                    owner,
+                    replacement.as_ptr(),
+                    replacement.len(),
+                    replacement.as_ptr(),
+                    replacement.len()
+                ),
+                OK
+            );
+            assert_eq!(state(owner), renamed); // overlapped inputs, same full value
+            assert_eq!(
+                xy_vsfilter_document_set_prepared_style_v1(owner, 0, ptr::null(), 0),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_rename_style_cstring_v1(
+                    owner,
+                    ptr::null(),
+                    0,
+                    replacement.as_ptr(),
+                    replacement.len()
+                ),
+                OK
+            );
+            assert_eq!(state(owner).entries()[0].style, [90, 0, 0xd800, 0xffff]);
 
             assert_eq!(
                 xy_vsfilter_document_set_prepared_text_v1(owner, 0, 1, ptr::null(), 0),

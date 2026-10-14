@@ -59,6 +59,59 @@ static void maps() {
     STSStyle first={1}, second={2};
     ProbeMap map; map[a]=&first; map[b]=&second; dump_map("nul",map);
 }
+static void cstring_check(bool condition, const char* operation) {
+    if(!condition) { fprintf(stderr,"CString matrix unresolved: %s\n",operation); std::exit(2); }
+}
+static CString raw_cstring(const std::vector<uint16_t>& units) {
+    static_assert(sizeof(wchar_t)==2,"Windows code-unit contract");
+    if(units.empty()) return CString();
+    std::vector<wchar_t> wide;
+    for(uint16_t unit:units) wide.push_back(static_cast<wchar_t>(unit));
+    return CString(wide.data(),static_cast<int>(wide.size()));
+}
+static void print_cstring_units(const CString& value) {
+    printf(" %d:",value.GetLength());
+    for(int i=0;i<value.GetLength();++i) printf("%04x",static_cast<unsigned>(static_cast<uint16_t>(value[i])));
+}
+static void cstring_matrix() {
+    // Actual Unicode CString equality/assignment, including logical lengths
+    // that extend past the first NUL. No style-map/naming behavior is modeled.
+    const std::vector<std::vector<uint16_t>> cases = {
+        {},{0},{0,0xd800},{65},{65,0},{65,0,66},{65,0,67},{97},
+        {65,66},{0xd800},{0xd800,0,0xdc00},{0xdc00},{0xd801},
+        {0xd800,1},{0xffff},{0xffff,0}
+    };
+    size_t comparisons=0,assignments=0;
+    for(size_t i=0;i<cases.size();++i) {
+        CString original=raw_cstring(cases[i]);
+        CString assigned(L"previous destination contents");
+        assigned=original;
+        cstring_check(assigned.GetLength()==static_cast<int>(cases[i].size()),"assignment length");
+        for(size_t unit=0;unit<cases[i].size();++unit)
+            cstring_check(static_cast<uint16_t>(assigned[static_cast<int>(unit)])==cases[i][unit],"assignment code units");
+        printf("cstring-assignment %zu",i);print_cstring_units(original);print_cstring_units(assigned);puts("");++assignments;
+        for(size_t j=0;j<cases.size();++j) {
+            CString other=raw_cstring(cases[j]);
+            const bool equal=original==other;
+            const int comparison=original.Compare(other);
+            const auto left_end=std::find(cases[i].begin(),cases[i].end(),uint16_t(0));
+            const auto right_end=std::find(cases[j].begin(),cases[j].end(),uint16_t(0));
+            const bool prefix_equal=std::vector<uint16_t>(cases[i].begin(),left_end)==std::vector<uint16_t>(cases[j].begin(),right_end);
+            cstring_check(equal==prefix_equal && (comparison==0)==equal,"first-NUL equality");
+            // Exercise pinned AddStyle's predicate/assignment shape using actual CString.
+            CString renamed=original;
+            const std::vector<uint16_t> replacement_units={0xdcff,0,0xd800,78};
+            const CString replacement=raw_cstring(replacement_units);
+            if(renamed==other) renamed=replacement;
+            const auto& expected=equal?replacement_units:cases[i];
+            cstring_check(renamed.GetLength()==static_cast<int>(expected.size()),"rename length");
+            for(size_t unit=0;unit<expected.size();++unit)
+                cstring_check(static_cast<uint16_t>(renamed[static_cast<int>(unit)])==expected[unit],"rename code units");
+            printf("cstring-matrix %zu %zu %d %d",i,j,equal,comparison);print_cstring_units(renamed);puts("");++comparisons;
+        }
+    }
+    printf("cstring-matrix-summary %zu %zu\n",comparisons,assignments);
+}
 static void sorts() {
     for(int count=0;count<=7;++count) {
         std::vector<int> ids; for(int i=0;i<count;++i) ids.push_back(i);
@@ -127,7 +180,7 @@ int main() {
     printf("offsets str=%zu unicode=%zu style=%zu actor=%zu effect=%zu margins=%zu layer=%zu start=%zu end=%zu readorder=%zu\n",
         offsetof(STSEntry,str),offsetof(STSEntry,fUnicode),offsetof(STSEntry,style),offsetof(STSEntry,actor),offsetof(STSEntry,effect),
         offsetof(STSEntry,marginRect),offsetof(STSEntry,layer),offsetof(STSEntry,start),offsetof(STSEntry,end),offsetof(STSEntry,readorder));
-    maps(); sorts(); numeric();
+    maps(); cstring_matrix(); sorts(); numeric();
     puts("unresolved comparator-overflow OOM invalid-fps out-of-range-llround production-integration");
     puts("document-primitives-v1 complete");
 }

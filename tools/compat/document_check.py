@@ -115,7 +115,7 @@ public:
             'extracted_header_sha256':hashlib.sha256(generated.encode()).hexdigest(),
             'seams':['Add suffix from readorder assignment (initialized prepared record)', 'AddSTSEntryOnly suffix from readorder assignment',
                      'CreateSegments and RemoveAllEntries complete bodies','Empty entries/segments tail only',
-                     'MicroDVD end correction with precomputed MS2RT bound','AddStyle entry rename loop only','RTS renderer animation OR assignment','SearchSub/SearchSubs/SearchSubs2 and native translation bodies, query wrapper temporarily fixes TIME even after native conversion metadata becomes FRAME'],
+                     'MicroDVD end correction with precomputed MS2RT bound','AddStyle entry rename loop only, with actual CStringW equality adapter on Windows and complete replacement units','RTS renderer animation OR assignment','SearchSub/SearchSubs/SearchSubs2 and native translation bodies, query wrapper temporarily fixes TIME even after native conversion metadata becomes FRAME'],
             'storage_shell':'portable std::vector arrays plus immutable trivially-copyable raw-unit handles, including on Windows; not CString/ATL layout or allocation parity',
             'native_retained_controls':'full extracted platform qsort Sort and llround conversion methods choose permutations/time pairs; Rust replays bounded handoffs, not CRT algorithms',
             'adapter_constants':{'UNITS':10000000,'UNITS_FLOAT':10000000.0},
@@ -169,6 +169,28 @@ def corpus():
         ['C']+[f'A 1 {i+1} {i%4} {100+i%5} {i%3} {i%2}' for i in range(32)]+
             ['R','F 0 1','K','S 0','F 0 1','S 1','E 17 74 0',
              'A 0 41 2 80 1 0','S 0','B','S 1','C'],
+    ]
+    # Raw style values: equality ends at first NUL, replacement retains every
+    # unit. Windows binds the extracted loop to actual ATL CStringW equality.
+    def raw(values):return str(len(values))+''.join(f' {value}' for value in values)
+    def style(index,values):return f'Y {index} '+raw(values)
+    def rename(old,new):return 'J '+raw(old)+' '+raw(new)
+    initial=[[65,0,66],[65],[65,0,67],[97,0,66],[65,66],[0,0xd800],[],[0xd800,0,0xdc00]]
+    sequences += [
+        ['C']+[f'A 1 {i+1} 0 10 0 0' for i in range(len(initial))]+
+        [style(i,value) for i,value in enumerate(initial)]+[
+            'R','F 0 1','K',rename([65,0,88],[90,0,0xdfff,0xffff]),
+            rename([],[0,0xffff,0xd800]),rename([0xd800,0,0xdfff],[0xdc00,0,0xd800]),
+            rename([97],[97,0,0xdc00]),rename([97,0,0],[]),rename([0],[65,0,111]),
+            'B',rename([0xdc00],[0xd800]),'R','C'],
+        ['C']+[f'A 1 {i+1} 0 10 0 0' for i in range(5)]+[
+            style(0,[0xd800,0xdc00]),style(1,[0xd800]),style(2,[0xd800,0xdc00,0,0xffff]),
+            style(3,[0xdc00]),style(4,[0xd801,0xdc00]),'R','F 0 1','K',
+            rename([0xd800,0xdc00,0,77],[0xffff,0,0,0xd800]),
+            rename([0xd800],[0xd800,0,0xdc00]),rename([0xdc00],[0,0xdc00,0xd800]),
+            rename([] ,[]),'B','C'],
+        ['C',rename([],[0,0xd800]),'A 0 1 0 10 -1',style(0,[65,0,66]),'F 0 1',
+            'D',rename([65],[66,0,0xdc00]),'R','C'],
     ]
     # Observe seeks against each persistent mutation, including stale segments.
     expanded=[]
@@ -243,6 +265,47 @@ def build_ffi_trace(destination, target_dir, target):
                        'static_library_sha256':hashlib.sha256((library_dir/('xy_vsfilter_ffi.lib' if os.name=='nt' else 'libxy_vsfilter_ffi.a')).read_bytes()).hexdigest(),
                        'scope':'Experimental stable-handle C ABI lifecycle; no production native owner switch. Native fixture sanitizer does not instrument Rust library.'}
 
+def check_admission_trace(stdout,stderr):
+    backend='Windows-CRITICAL_SECTION' if os.name=='nt' else 'portable-recursive-mutex'
+    marker=f'document-admission-v1 complete gate={backend} checks=3 normal_busy=0'
+    if os.name!='nt':marker+=' Windows-validation=pending'
+    if stderr or stdout!=marker+'\n':raise RuntimeError('incomplete or invalid candidate admission trace')
+    return backend
+
+def admission_probe(destination,ffi_binary,ffi_report):
+    # Reuse exactly the already-selected Rust static library/dependencies and
+    # native architecture/runtime/sanitizer options, changing fixture files only.
+    source=ROOT/'tools/compat/document_admission.cpp'
+    header=ROOT/'tools/compat/document_admission.h'
+    executable=destination/('document-admission.exe' if os.name=='nt' else 'document-admission')
+    command=[]
+    for arg in ffi_report['compile_command']:
+        if arg==str(ROOT/'tools/compat/document_ffi_trace.cpp'):arg=str(source)
+        elif arg==str(ffi_binary):arg=str(executable)
+        elif arg.startswith('/Fo'):arg='/Fo'+str(destination/'document-admission.obj')
+        elif arg.startswith('/Fe'):arg='/Fe'+str(executable)
+        command.append(arg)
+    if os.name!='nt':command.append('-pthread')
+    run(command)
+    first=run([str(executable)],timeout=20)
+    second=run([str(executable)],timeout=20)
+    backend=check_admission_trace(first.stdout,first.stderr)
+    check_admission_trace(second.stdout,second.stderr)
+    if first.stdout!=second.stdout:raise RuntimeError('candidate admission trace changed between runs')
+    # Verify the completion gate rejects truncation, unexpected output and stderr.
+    for stdout,stderr in [('', ''),(first.stdout+'extra\n',''),(first.stdout,'unexpected')]:
+        try:check_admission_trace(stdout,stderr)
+        except RuntimeError:pass
+        else:raise RuntimeError('candidate admission completion negative control passed')
+    return first.stdout,{'complete':True,'repeat_equal':True,'stderr_empty':True,'backend':backend,
+                        'completion_negative_controls':True,'process_timeout_seconds':20,
+                        'source_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),
+                        'header_sha256':hashlib.sha256(header.read_bytes()).hexdigest(),
+                        'binary_sha256':hashlib.sha256(executable.read_bytes()).hexdigest(),
+                        'trace_sha256':hashlib.sha256(first.stdout.encode()).hexdigest(),
+                        'compile_command':command,
+                        'scope':'Candidate coordination mechanism checks only; no native-reference concurrency parity or production caller-lock compatibility.'}
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',type=Path,required=True)
@@ -253,7 +316,7 @@ def main():
     (args.output/'report.json').write_text(json.dumps({'complete':False,'reference_commit':REFERENCE})+'\n')
     tracked=['Cargo.toml','Cargo.lock','rust/compat/Cargo.toml','tools/compat/document_check.py','tools/compat/test_document_check.py','tools/compat/document_shell.h','tools/compat/document_oracle.cpp','rust/compat/examples/document_trace.rs']
     tracked += [str(p.relative_to(ROOT)) for p in (ROOT/'rust/compat/src').rglob('*.rs')]
-    tracked += ['rust/ffi/Cargo.toml','include/xy_rust_document.h','tools/compat/document_ffi_trace.cpp']
+    tracked += ['rust/ffi/Cargo.toml','include/xy_rust_document.h','tools/compat/document_ffi_trace.cpp','tools/compat/document_admission.cpp','tools/compat/document_admission.h']
     tracked += [str(p.relative_to(ROOT)) for p in (ROOT/'rust/ffi/src').rglob('*.rs')]
     hashes=lambda:{p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in tracked}
     before=hashes()
@@ -265,7 +328,7 @@ def main():
         (args.output/'original_document.h').write_bytes((tmp/'original_document.h').read_bytes())
         native_binary=tmp/('document-oracle'+suffix)
         if os.name=='nt':
-            command=['cl','/Bv','/MT','/O2','/EHsc','/std:c++17','/I'+str(tmp),'/I'+str(ROOT/'tools/compat'),str(ROOT/'tools/compat/document_oracle.cpp'),'/Fo'+str(tmp/'document-oracle.obj'),'/Fe'+str(native_binary)]
+            command=['cl','/Bv','/showIncludes','/MT','/O2','/EHsc','/std:c++17','/I'+str(tmp),'/I'+str(ROOT/'tools/compat'),str(ROOT/'tools/compat/document_oracle.cpp'),'/Fo'+str(tmp/'document-oracle.obj'),'/Fe'+str(native_binary)]
             sanitizers=[]
         else:
             command=['c++','-std=c++17','-O1','-g','-fsanitize=address,undefined','-fno-sanitize-recover=all','-I'+str(tmp),'-I'+str(ROOT/'tools/compat'),str(ROOT/'tools/compat/document_oracle.cpp'),'-o',str(native_binary)]
@@ -274,11 +337,19 @@ def main():
                 architecture={'x86_64':'x86_64','aarch64':'arm64'}[args.target.split('-')[0]]
                 command.extend(['-arch',architecture])
         compile_result=run(command)
+        included_headers={}
+        if os.name=='nt':
+            for line in (compile_result.stdout+compile_result.stderr).splitlines():
+                match=re.search(r'([A-Za-z]:\\.*\.(?:h|hpp|inl|inc))\s*$',line)
+                if match:
+                    header_path=Path(match.group(1))
+                    if header_path.is_file():included_headers[str(header_path)]=hashlib.sha256(header_path.read_bytes()).hexdigest()
         compiler_version=(compile_result.stdout+compile_result.stderr) if os.name=='nt' else run(['c++','--version']).stdout
         cargo_command=['rustup','run','1.85.0','cargo','build','--locked','--offline','--manifest-path','Cargo.toml','-p','xy-vsfilter-compat','--example','document_trace','--target-dir',str(target_dir)]
         if args.target:cargo_command.extend(['--target',args.target])
         run(cargo_command)
         ffi_binary,ffi_report=build_ffi_trace(tmp,target_dir,args.target)
+        admission_trace,admission_report=admission_probe(tmp,ffi_binary,ffi_report)
         seq=corpus();ops=[op for s in seq for op in s];data='\n'.join(ops)+'\n'
         (args.output/'operations.txt').write_text(data,newline='')
         replay_path=args.output/'replay-operations.txt'
@@ -313,11 +384,12 @@ def main():
         (args.output/'reference.txt').write_text(reference.stdout,newline='')
         (args.output/'candidate.txt').write_text(candidate.stdout,newline='')
         (args.output/'ffi-candidate.txt').write_text(ffi_candidate.stdout,newline='')
+        (args.output/'admission-trace.txt').write_text(admission_trace,newline='')
         report.update(complete=True,sequences=len(seq),operations=len(ops),queries=sum(op.startswith('Q ') for op in ops),
                       mutations_and_control_ops=sum(not op.startswith('Q ') for op in ops),negative_mismatch_control=negative,
                       native_binary_sha256=hashlib.sha256(native_binary.read_bytes()).hexdigest(),
                       candidate_binary_sha256=hashlib.sha256(candidate_binary.read_bytes()).hexdigest(),
-                      ffi=ffi_report,
+                      ffi=ffi_report,admission=admission_report,
                       native_replay_equal=True,native_control_replay_repeat_equal=True,
                       replay_operations_sha256=hashlib.sha256(replay_path.read_bytes()).hexdigest(),
                       native_control_operations=sum(op.startswith(('S ','V ')) for op in ops),
@@ -327,7 +399,8 @@ def main():
                       cargo_build_command=cargo_command,rust_target=args.target or 'toolchain host',
                       native_sanitizers=sanitizers,negative_controls=negative_controls,
                       platform=platform.platform(),machine=platform.machine(),subprocess_timeout_seconds=60,
-                      compiler_version=compiler_version,
+                      compiler_version=compiler_version,included_header_sha256=included_headers,
+                      style_comparison_adapter='actual ATL CStringW' if os.name=='nt' else 'portable first-NUL raw-unit approximation',
                       rustc_version=run(['rustup','run','1.85.0','rustc','--version','--verbose']).stdout,
                       cargo_version=run(['rustup','run','1.85.0','cargo','--version']).stdout,
                       candidate_head=run(['git','rev-parse','HEAD']).stdout.strip(),source_stability_verified=True,
@@ -340,7 +413,7 @@ def main():
                         'incremental Add to stale segments containing out-of-range entry members'],
                       limits=['prepared records only: native acceptance and text/style/WebVTT preprocessing bypassed',
                               'clear/copy covers entries and segments only; styles/metadata lifecycle excluded',
-                              'rename loop only on NUL-free style names: native style-map ordering/duplicate naming and embedded-NUL comparison excluded',
+                              'rename entry loop only: actual ATL CStringW equality on Windows; POSIX first-NUL raw-unit comparison is an approximation; native style-map ordering and duplicate naming excluded',
                               'callback counts observed only; reentry, callbacks copying full host state excluded',
                               'queries use integer TIME mode only, no frame/FPS conversion claim',
                               'replay transport is bounded to 4096 records per control operation',

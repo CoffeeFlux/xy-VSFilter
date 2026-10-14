@@ -326,9 +326,13 @@ def main():
                 (out / "report.json").write_text(json.dumps(report, indent=2) + "\n")
                 raise SystemExit(f"Reference probe unresolved: exit {result.returncode}; no parity claim")
             lines = result.stdout.splitlines()
-            required = (b"map ", b"cstring ", b"sort ", b"lsort ", b"numeric ", b"round ")
+            required = (b"map ", b"cstring ", b"cstring-assignment ", b"cstring-matrix ",
+                        b"sort ", b"lsort ", b"numeric ", b"round ")
             if (not lines or not lines[0].startswith(b"provenance ")
                     or lines[-1] != b"document-primitives-v1 complete"
+                    or lines.count(b"cstring-matrix-summary 256 16") != 1
+                    or sum(line.startswith(b"cstring-matrix ") for line in lines) != 256
+                    or sum(line.startswith(b"cstring-assignment ") for line in lines) != 16
                     or any(not any(line.startswith(prefix) for line in lines) for prefix in required)):
                 report["unresolved_execution"] = {"run": run, "reason": "missing required trace section or completion marker"}
                 (out / "report.json").write_text(json.dumps(report, indent=2) + "\n")

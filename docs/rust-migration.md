@@ -382,6 +382,15 @@ and x64; Miri also passes. This confirms the controlled-dialog OK/Cancel fix in
 both architectures. The longer campaigns remain running at this evidence capture,
 so this is not a full-matrix pass.
 
+The separate full Windows renderer run `38614673381` subsequently completes
+successfully at the same `eca923eb` commit on x86 and x64.
+[Verified DLL evidence](rust-dialog-renderer-evidence.json) records, per
+architecture, 798 corpus cases / 8,426 frames, 32 mutation cases / 224 frames,
+one smoke case / 10 frames, and ten COM contract comparisons. Paired binaries,
+exports/dependencies, dialogs, timeline controls and retained COM traces were
+checked. This validates that earlier commit; it predates the document facade
+and new persistent-owner C interface and does not validate those changes.
+
 [Verified primitive observations](rust-document-primitives-evidence.json) retain
 both architectures' exact source, generated-header, binary and repeated-trace
 hashes, toolchain/header/library provenance and focused CI status. Each trace has
@@ -498,6 +507,15 @@ Clippy and formatting; the Python suite passes 49 tests with four Windows skips.
 Windows C ABI compilation and Miri for this new boundary are pending. Windows
 fixture builds explicitly match production `/MT` with Rust `+crt-static`.
 
+At published commit `d2b75237`, the focused Windows C ABI comparisons and Miri
+now pass in run `38619305483`.
+[Verified Windows C ABI evidence](rust-document-ffi-windows-evidence.json)
+checks exact-commit source hashes and all retained traces: native reference,
+direct safe Rust and C++ C ABI callers match all 97,461 snapshots on both
+architectures. Both focused ATL probes also pass. The longer portable and full
+renderer campaigns remain separate; this is not a whole-matrix or production
+ownership claim.
+
 [The boundary inventory](rust-document-ffi-boundary.json) makes the unsafe cost
 explicit: the core remains at zero; the new FFI adds 18 production unsafe blocks,
 16 unsafe function declarations and one unsafe Sync implementation. These counts
@@ -507,6 +525,41 @@ slice construction and one copy primitive; no raw Document pointer is a handle.
 Compile-time Send assertions constrain future resource changes. Total FFI blocks
 rise from 325 to 343 until superseded native crossings can be retired. This is
 review surface, not a soundness percentage or a memory-safe dependency claim.
+
+### CString rename and native admission preparation
+
+The owner now has a separate CString-compatible prepared rename operation:
+compare case-sensitive raw UTF-16 prefixes through the first NUL, then store the
+entire replacement, including its suffix after NUL. It does not normalize
+surrogates, change the style map, rebuild segments or issue callbacks. Native
+duplicate-style naming remains outside this operation. The earlier exact-unit
+helper retains its separate, narrower contract.
+
+[Local sequence evidence](rust-document-cstring-local-evidence.json) expands the
+comparison to 145 histories / 100,352 snapshots, including empty/leading-NUL
+names, differing suffixes after NUL, case differences, unpaired surrogates,
+copy/restore and animation preservation. Both safe Rust and C ABI paths match
+the extracted native operations; the POSIX CString comparator is explicitly an
+approximation. Windows now binds that comparison to actual ATL CStringW and
+also observes a 256-pair primitive matrix plus sixteen assignment cases. Local
+generation passes; those expanded Windows checks are pending.
+
+The [native admission proposal and isolated probe](rust-document-admission.md)
+exercise a recursive native gate around individual C ABI calls. The candidate
+probe checks normal parallel calls, observed gate contention before destruction,
+stale-handle rejection, surviving snapshots and reentry after release. Two local
+ASan/UBSan runs agree, with bounded waits and completion negative controls.
+This is a candidate coordination check, not native-reference concurrency parity.
+Windows uses CRITICAL_SECTION; its execution remains pending. No production
+gate or public mapping for private Busy is introduced.
+
+The workspace passes 167 core and 117 FFI tests, Clippy and formatting; the Python
+suite passes 49 tests with four Windows skips. The rename export adds two unsafe
+input-copy call sites and one unsafe function declaration, taking FFI production
+blocks from 343 to 345. It adds no raw-memory primitive; the core remains entirely
+safe. Canonical production entry/segment arrays are still native, with no owner
+retired in this increment. Connecting the native wrapper, preparation/lifecycle
+operations and all remaining callers remains the next integration milestone.
 
 ## Independent audit and unsafe boundary
 

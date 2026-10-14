@@ -9,6 +9,12 @@ static STSEntry prepared(int id,int64_t start,int64_t end,int order) {
  for(int i=0;i<4;++i)e.marginRect[i]=id*(i+1)-7;
  e.layer=id-3;e.start=start;e.end=end;e.readorder=order;return e;
 }
+static std::vector<uint16_t> read_units(std::istream& input) {
+ size_t count=0;if(!(input>>count)||count>4096)throw std::runtime_error("unit count");
+ std::vector<uint16_t> result;result.reserve(count);
+ for(size_t i=0;i<count;++i){uint32_t unit=0;if(!(input>>unit)||unit>0xffff)throw std::runtime_error("unit value");result.push_back(static_cast<uint16_t>(unit));}
+ return result;
+}
 static void units(const std::vector<uint16_t>& v) {std::cout<<' '<<v.size();for(auto x:v)std::cout<<' '<<x;}
 static void snapshot(const OriginalDocument& d) {
  std::cout<<d.m_entries.GetCount();
@@ -61,6 +67,8 @@ int main(int argc,char** argv){OriginalDocument d,saved;char op;
  else if(op=='C')d.ClearPrepared();
  else if(op=='F'){size_t i;int value;input>>i>>value;d.Feedback(i,value!=0);}
  else if(op=='L'){int64_t bound;input>>bound;if(!d.m_entries.IsEmpty())d.CorrectLast(bound);}
+ else if(op=='Y'){size_t index=0;if(!(input>>index))return 2;d.m_entries.GetAt(index).style=read_units(input);}
+ else if(op=='J'){auto old=read_units(input);auto replacement=read_units(input);d.RenamePrepared(old,replacement);}
  else if(op=='N'){int old,new_;input>>old>>new_;d.RenamePrepared({static_cast<uint16_t>(old)},{static_cast<uint16_t>(new_)});}
  else if(op=='K'){saved.m_entries.Copy(d.m_entries);saved.m_segments.Copy(d.m_segments);}
  else if(op=='B'){d.m_entries.Copy(saved.m_entries);d.m_segments.Copy(saved.m_segments);}
