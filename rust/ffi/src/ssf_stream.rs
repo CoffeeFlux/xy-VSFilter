@@ -157,6 +157,19 @@ pub unsafe extern "C" fn xy_vsfilter_ssf_wide_release(
     }
 }
 
+/// Transient state and provider result are copied scalars; native callbacks
+/// never run while a Rust borrow is active.
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_ssf_bom_step(state: u32, byte: i32) -> u64 {
+    xy_vsfilter_compat::ssf_stream::bom_step(state, byte)
+}
+
+/// Copied provider results only; the native read has already completed.
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_ssf_utf16(first: i32, second: i32) -> i32 {
+    xy_vsfilter_compat::ssf_stream::utf16(first, second)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

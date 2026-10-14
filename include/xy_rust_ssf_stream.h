@@ -9,6 +9,8 @@
 #endif
 struct XYRustSsfPeek {uint32_t phase;int32_t previous,result;};
 extern "C" {
+int32_t XY_SSF_CDECL xy_vsfilter_ssf_utf16(int32_t,int32_t);
+uint64_t XY_SSF_CDECL xy_vsfilter_ssf_bom_step(uint32_t,int32_t);
 void* XY_SSF_CDECL xy_vsfilter_ssf_wide_create(const uint16_t*,int32_t);
 int32_t XY_SSF_CDECL xy_vsfilter_ssf_wide_read(const void*,int32_t);
 void XY_SSF_CDECL xy_vsfilter_ssf_wide_release(void*);
@@ -42,6 +44,12 @@ public:
     ~SsfWide(){xy_vsfilter_ssf_wide_release(owner);}
     int GetLength()const{return length;}
     WCHAR operator[](int position)const{return owner?static_cast<WCHAR>(xy_vsfilter_ssf_wide_read(owner,position)):fallback[position];}
+};
+class SsfBom {
+    uint32_t state;
+public:
+    SsfBom():state(0){}
+    uint32_t Next(int byte){const uint64_t result=xy_vsfilter_ssf_bom_step(state,byte);state=static_cast<uint32_t>(result>>32);return static_cast<uint32_t>(result);}
 };
 class SsfMemory {
     void* owner;

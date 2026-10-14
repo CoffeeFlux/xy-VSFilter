@@ -169,6 +169,34 @@ impl<T: Copy + Into<i32>> Memory<T> {
     }
 }
 
+/// One BOM-recognition transition. Low word: 0 done, 1 read, 2/3/4 encoding.
+/// High word: next transient state. Native code sets unknown before the first
+/// read and applies a recognized encoding only after the matching final byte.
+pub fn bom_step(state: u32, byte: i32) -> u64 {
+    let (next, action): (u32, u32) = match (state, byte) {
+        (0, _) => (1, 1),
+        (1, 0xef) => (2, 1),
+        (1, 0xff) => (4, 1),
+        (1, 0xfe) => (5, 1),
+        (2, 0xbb) => (3, 1),
+        (3, 0xbf) => (6, 2),
+        (4, 0xfe) => (6, 3),
+        (5, 0xff) => (6, 4),
+        _ => (6, 0),
+    };
+    (u64::from(next) << 32) | u64::from(action)
+}
+
+/// Both native UTF-16 branches assemble in this order, including the branch
+/// labeled big endian. A first EOS remains set even when followed by data.
+pub fn utf16(first: i32, second: i32) -> i32 {
+    if second == -1 {
+        -1
+    } else {
+        first | second.wrapping_shl(8)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

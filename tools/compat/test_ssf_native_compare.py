@@ -23,7 +23,7 @@ class EvidenceTests(unittest.TestCase):
             changed = 0
             (self.root / f"frame-{index}.bgra").write_bytes(b"\x01\x00\x00\xff" * changed + b"\x00\x00\x00\xff" * (320 * 180 - changed))
         lines.extend(["text units 0041", "rendered 1 glyphs", "ssf-native-v1 complete"])
-        (self.root / "stdout.txt").write_text("\n".join(lines) + "\n")
+        (self.root / "stdout.txt").write_text("\n".join(lines) + "\n", newline="\n")
         (self.root / "stderr.txt").write_bytes(b"")
 
     def test_requires_four_complete_equal_captures(self):
@@ -54,9 +54,9 @@ class EvidenceTests(unittest.TestCase):
     def test_missing_completion_and_empty_text_fail(self):
         path = self.root / "stdout.txt"
         original = path.read_text()
-        path.write_text(original.replace("ssf-native-v1 complete\n", ""))
+        path.write_text(original.replace("ssf-native-v1 complete\n", ""), newline="\n")
         self.assertEqual(MODULE.inspect(self.root, 0)["status"], "incomplete")
-        path.write_text(original.replace("text units 0041", "text units"))
+        path.write_text(original.replace("text units 0041", "text units"), newline="\n")
         self.assertEqual(MODULE.inspect(self.root, 0)["status"], "control_failed")
 
 

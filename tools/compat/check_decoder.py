@@ -1041,6 +1041,22 @@ public:
             ssf_wide_code += extract_definition(wide_text, signature) + "\n"
         ssf_wide_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_ssf_wide.h").write_text(ssf_wide_code, encoding="utf-8")
+    ssf_bom_code = '#include "ssf_bom_shell.h"\n'
+    for name, content, declaration in (("ReferenceSsf", ssf_source, ssf_header), ("CandidateSsf", (ROOT / "src/subtitles/libssf/Stream.cpp").read_bytes(), (ROOT / "src/subtitles/libssf/Stream.h").read_bytes())):
+        bom_text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        bom_declaration = declaration.decode("utf-8-sig").replace("\r\n", "\n")
+        ssf_bom_code += f"namespace {name} {{\n"
+        if name == "CandidateSsf":
+            ssf_bom_code += "#define XY_VSFILTER_RUST_TEXT\n"
+        ssf_bom_code += extract_definition(bom_declaration, "class Stream").replace("protected:", "public:") + ";\n"
+        for signature in ("Stream::Stream()", "Stream::~Stream()", "bool Stream::IsWhiteSpace("):
+            ssf_bom_code += extract_definition(bom_text, signature) + "\n"
+        ssf_bom_code += "void Stream::ThrowError(LPCTSTR message,...){ssfThrow(m_line,m_col,message);}\n"
+        ssf_bom_code += extract_definition(bom_declaration, "class InputStream :").replace("{", "{\npublic:", 1).replace("protected:", "public:").replace("virtual int NextByte() = 0;", "virtual int NextByte(){return ssfNextChar();}") + ";\n"
+        for signature in ("InputStream::InputStream()", "InputStream::~InputStream()", "int InputStream::NextChar()"):
+            ssf_bom_code += extract_definition(bom_text, signature).replace("XyRust::SsfBom", "XyRust::ObservedSsfBom").replace("xy_vsfilter_ssf_utf16(", "ssfObservedUtf16(") + "\n"
+        ssf_bom_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_ssf_bom.h").write_text(ssf_bom_code, encoding="utf-8")
     filter_source = original("src/subtitles/xy_filter.cpp", reference["commit"])
     gauss_storage_code = '#include "gauss_storage_shell.h"\n'
     for name, content in (("ReferenceGaussStorage", filter_source), ("CandidateGaussStorage", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
@@ -1677,6 +1693,12 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
     ssf_stream_result = run([str(ssf_stream_executable)], capture_output=True, text=True)
     print(ssf_stream_result.stdout, end="", flush=True)
     print(ssf_stream_result.stderr, end="", file=sys.stderr)
+    ssf_bom_executable = destination / ("ssf-bom-oracle.exe" if os.name == "nt" else "ssf-bom-oracle")
+    ssf_bom_compile = [arg.replace("find_char_oracle.cpp", "ssf_bom_oracle.cpp").replace("find-char-oracle", "ssf-bom-oracle") for arg in find_char_compile]
+    run(ssf_bom_compile)
+    ssf_bom_result = run([str(ssf_bom_executable)], capture_output=True, text=True)
+    print(ssf_bom_result.stdout, end="", flush=True)
+    print(ssf_bom_result.stderr, end="", file=sys.stderr)
     ssf_wide_executable = destination / ("ssf-wide-oracle.exe" if os.name == "nt" else "ssf-wide-oracle")
     ssf_wide_compile = [arg.replace("find_char_oracle.cpp", "ssf_wide_oracle.cpp").replace("find-char-oracle", "ssf-wide-oracle") for arg in find_char_compile]
     run(ssf_wide_compile)
@@ -2229,6 +2251,9 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
         "fraction_storage_compile_command": fraction_storage_compile,
         "fraction_storage_result": fraction_storage_result.stdout, "fraction_storage_stderr": fraction_storage_result.stderr,
         "fraction_storage_scope": "Whole pinned xy_be_blur and xy_calculate_filter with observed filter/transpose calls and scratch ownership under strict FP compilation. x86/x64 execute extracted native SSE kernels against Rust kernels; arm64 substitutes extracted scalar callbacks and does not establish SSE parity. Exact stage bytes/order, output/padding, initialized scratch, cache accounting, signed and fractional pass counts, reuse and native allocation fallback. Positive dimensions at least four avoid an unused native before-base cursor; zero/smaller/negative dimensions, overflowing/nonfinite pass counts, invalid backing and actual allocation failure excluded.",
+        "ssf_bom_compile_command": ssf_bom_compile,
+        "ssf_bom_result": ssf_bom_result.stdout, "ssf_bom_stderr": ssf_bom_result.stderr,
+        "ssf_bom_scope": "Complete pinned NextChar with controlled NextByte and literal exception boundary. Exact BOM short-circuit consumption, encoding state on interruptions, unknown retries and ambient errors; exhaustive byte tails after EF and all UTF-16-valued first/second provider results. Only defined native decoding paths used (ASCII UTF-8 and bounded UTF-16); known UTF-8 EOF excluded before both calls, not a pass. Arbitrary UTF-8 decode prefixes/overflow, provider reentry/mutation, IO and visible SSF rendering excluded. UTF-8 decoding remains native; safe Rust owns transient BOM decisions and UTF-16 assembly, preserving the original big-endian-labeled branch order.",
         "ssf_wide_compile_command": ssf_wide_compile,
         "ssf_wide_result": ssf_wide_result.stdout, "ssf_wide_stderr": ssf_wide_result.stderr,
         "ssf_wide_scope": "Whole pinned WCharInputStream constructor and NextByte plus extracted production adapter. Every UTF-16 unit including embedded NUL and unpaired surrogates, complete long input, source mutation, retained caller-pointer lifetime, empty strings and repeated EOF. Actual Windows CStringW versus portable COW string model. Native CString reference retained as lifetime anchor and fallback; Rust supplies immutable snapshot and bounded reads. Modeled Rust decline; allocation failure, invalid indices/string state and actual SSF rendering excluded.",
