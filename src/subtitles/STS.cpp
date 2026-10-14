@@ -33,6 +33,7 @@
 #include "xy_rust_sami.h"
 #include "xy_rust_sami_file.h"
 #include "xy_rust_subrip_cue.h"
+#include "xy_rust_pipe_line.h"
 #include "xy_rust_encoding.h"
 #include "xy_rust_ass_dialogue.h"
 #include "xy_rust_ass_style.h"
@@ -1167,11 +1168,21 @@ static bool OpenOldSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int Char
         FastTrim(buff);
         if(buff.IsEmpty()) continue;
 
+#ifdef XY_VSFILTER_RUST_TEXT
+        XyRust::PipeLine line(buff);
+        for(int i = line.Position(); i >= 0; i = line.Position())
+        {
+            CStringW source = line.Text<CStringW>();
+            line.Found(FindChar(source, '|', i, file->IsUnicode(), CharSet));
+        }
+        buff = line.Text<CStringW>();
+#else
         for(int i = 0; i < buff.GetLength(); i++)
         {
             if((i = FindChar(buff, '|', i, file->IsUnicode(), CharSet)) < 0) break;
             buff.SetAt(i, '\n');
         }
+#endif
 
         int hh1, mm1, ss1, hh2, mm2, ss2;
         int c = swscanf_s(buff, L"{%d:%d:%d}{%d:%d:%d}", &hh1, &mm1, &ss1, &hh2, &mm2, &ss2);
@@ -1952,11 +1963,21 @@ static bool OpenVPlayer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
         FastTrim(buff);
         if(buff.IsEmpty()) continue;
 
+#ifdef XY_VSFILTER_RUST_TEXT
+        XyRust::PipeLine line(buff);
+        for(int i = line.Position(); i >= 0; i = line.Position())
+        {
+            CStringW source = line.Text<CStringW>();
+            line.Found(FindChar(source, '|', i, file->IsUnicode(), CharSet));
+        }
+        buff = line.Text<CStringW>();
+#else
         for(int i = 0; i < buff.GetLength(); i++)
         {
             if((i = FindChar(buff, '|', i, file->IsUnicode(), CharSet)) < 0) break;
             buff.SetAt(i, '\n');
         }
+#endif
 
         int hh, mm, ss;
         int c = swscanf_s(buff, L"%d:%d:%d:", &hh, &mm, &ss);

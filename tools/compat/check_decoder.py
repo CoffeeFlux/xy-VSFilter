@@ -55,7 +55,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
               ROOT / "include/xy_rust_drawing.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
-              ROOT / "include/xy_rust_subrip_cue.h", ROOT / "include/xy_rust_sami_file.h", ROOT / "include/xy_rust_microdvd_style.h", ROOT / "include/xy_rust_font_records.h", ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
+              ROOT / "include/xy_rust_pipe_line.h", ROOT / "include/xy_rust_subrip_cue.h", ROOT / "include/xy_rust_sami_file.h", ROOT / "include/xy_rust_microdvd_style.h", ROOT / "include/xy_rust_font_records.h", ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
               ROOT / "include/xy_rust_cc.h", ROOT / "src/subtitles/CCDecoder.cpp", ROOT / "src/subtitles/CCDecoder.h",
               ROOT / "include/xy_rust_segments.h",
@@ -396,6 +396,31 @@ public:
             find_char += definition + "\n"
         find_char += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_find_char.h").write_text(find_char, encoding="utf-8")
+    pipe_line = '#include "pipe_line_shell.h"\n'
+    for name, content in (("ReferencePipeLine", font_source), ("CandidatePipeLine", candidate_font)):
+        pipe_line += f"namespace {name} {{\n"
+        if name == "CandidatePipeLine":
+            pipe_line += "#define XY_VSFILTER_RUST_TEXT\n"
+        for signature in ("static DWORD CharSetToCodePage(", "static int FindChar(", "static bool OpenOldSubRipper(", "static bool OpenVPlayer("):
+            decoded = content.decode("utf-8-sig")
+            if signature == "static bool OpenOldSubRipper(":
+                start = decoded.index(signature)
+                end = decoded.index("static bool OpenSubViewer(", start)
+                definition = decoded[start:end].rstrip()
+                assert definition.endswith("}")
+            else:
+                definition = extract_definition(decoded, signature)
+            definition = re.sub(r"(\d+)i64\b", r"\1LL", definition)
+            if name == "CandidatePipeLine":
+                if signature == "static int FindChar(":
+                    definition = definition.replace("XyRust::FindChar search", "XyRust::ObservedSearch search")
+                    definition = definition.replace("XyRust::FindUnicode(", "XyRust::ObservedUnicode(")
+                if signature.startswith("static bool Open"):
+                    assert definition.count("XyRust::PipeLine line") == 1
+                    definition = definition.replace("XyRust::PipeLine line", "XyRust::ObservedPipeLine line")
+            pipe_line += definition + "\n"
+        pipe_line += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_pipe_line.h").write_text(pipe_line, encoding="utf-8")
     subrip_cue = '#include "subrip_cue_shell.h"\n'
     for name, content in (("ReferenceSubRipCue", font_source), ("CandidateSubRipCue", candidate_font)):
         subrip_cue += f"namespace {name} {{\n"
@@ -952,6 +977,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     find_char_result = run([str(find_char_executable)], capture_output=True, text=True)
     print(find_char_result.stdout, end="", flush=True)
     print(find_char_result.stderr, end="", file=sys.stderr)
+    pipe_line_executable = destination / ("pipe-line-oracle.exe" if os.name == "nt" else "pipe-line-oracle")
+    pipe_line_compile = [arg.replace("find_char_oracle.cpp", "pipe_line_oracle.cpp").replace("find-char-oracle", "pipe-line-oracle") for arg in find_char_compile]
+    run(pipe_line_compile)
+    pipe_line_result = run([str(pipe_line_executable)], capture_output=True, text=True)
+    print(pipe_line_result.stdout, end="", flush=True)
+    print(pipe_line_result.stderr, end="", file=sys.stderr)
     subrip_cue_executable = destination / ("subrip-cue-oracle.exe" if os.name == "nt" else "subrip-cue-oracle")
     subrip_cue_compile = [arg.replace("find_char_oracle.cpp", "subrip_cue_oracle.cpp").replace("find-char-oracle", "subrip-cue-oracle") for arg in find_char_compile]
     run(subrip_cue_compile)
@@ -1317,6 +1348,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "webvtt_compile_command": webvtt_compile,
         "webvtt_result": webvtt_result.stdout, "webvtt_stderr": webvtt_result.stderr,
         "webvtt_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring model with host iswspace; Windows comparison required",
+        "pipe_line_compile_command": pipe_line_compile,
+        "pipe_line_result": pipe_line_result.stdout, "pipe_line_stderr": pipe_line_result.stderr,
+        "pipe_line_scope": "Complete pinned OpenOldSubRipper/OpenVPlayer and FindChar; native ATL/CRT/codepage APIs on Windows, portable strings and codepage models elsewhere; controlled file/trim/Add boundaries; exact output records, input positions, errno and ordered callbacks/interruption; representable numeric arithmetic",
         "subrip_cue_compile_command": subrip_cue_compile,
         "subrip_cue_result": subrip_cue_result.stdout, "subrip_cue_stderr": subrip_cue_result.stderr,
         "subrip_cue_scope": "Complete pinned OpenSubRipper and SubRipper2SSA; native ATL/secure CRT on Windows, portable wide-character scan spellings elsewhere; controlled line I/O, FastTrim and Add sink; exact emitted records, input positions, errno and native callback order/interruption; successful representable numeric conversions and replacement-free NUL fixtures",
