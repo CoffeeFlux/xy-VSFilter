@@ -40,6 +40,7 @@ typedef struct {int start, stop; CStringW effect, style, str; posattriblist_t pa
 
 class CUSFSubtitles
 {
+	bool Load(const VARIANT& source);
 	bool ParseUSFSubtitles(CComPtr<IXMLDOMNode> pNode);
 	 void ParseMetadata(CComPtr<IXMLDOMNode> pNode, metadata_t& m);
 	 void ParseStyle(CComPtr<IXMLDOMNode> pNode, style_t* s);
@@ -56,6 +57,7 @@ public:
 	virtual ~CUSFSubtitles();
 
 	bool Read(LPCTSTR fn);
+	bool Read(const BYTE* data, size_t len);
 //	bool Write(LPCTSTR fn); // TODO
 
 	metadata_t metadata;

@@ -47,14 +47,32 @@ private:
 
 	enum charerror {CHARERR_NEED_MORE=-1, CHARERR_REOPEN=-2};
 
+	// Set by OpenMemory(): read from this buffer instead of the file.
+	bool m_inMemory;
+	const BYTE* m_memData;
+	size_t m_memLen;
+	size_t m_memPos;
+
 	int NextChar();
 	bool ReadLine();
+	bool DetectEncoding();
+
+	UINT RawRead(void* lpBuf, UINT nCount);
+	ULONGLONG RawGetPosition() const;
+	ULONGLONG RawGetLength() const;
+	ULONGLONG RawSeek(ULONGLONG pos);
 
 public:
 	CTextFile(enc e = DEFAULT_ENCODING);
 
 	virtual bool Open(LPCTSTR lpszFileName);
 	virtual bool Save(LPCTSTR lpszFileName, enc e /*= DEFAULT_ENCODING*/);
+
+	// Reads from a caller-owned buffer, which must outlive this object.
+	// GetFilePath() returns an empty string for in-memory data.
+	bool OpenMemory(const void* pData, size_t len);
+	// Returns the buffer passed to OpenMemory(), or NULL when reading a file.
+	const BYTE* GetMemoryData(size_t& len) const;
 
 	void SetEncoding(enc e);
 	enc GetEncoding();
@@ -76,12 +94,12 @@ public:
 class CWebTextFile : public CTextFile
 {
 	LONGLONG m_llMaxSize;
-	CString m_tempfn;
+	std::vector<BYTE> m_data;
 
 public:
     CWebTextFile(CTextFile::enc e = DEFAULT_ENCODING, LONGLONG llMaxSize = 1024 * 1024);
 
+	// http:// URLs are downloaded into memory; anything else is opened as a file.
 	bool Open(LPCTSTR lpszFileName);
 	bool Save(LPCTSTR lpszFileName, enc e /*= DEFAULT_ENCODING*/);
-	void Close();
 };

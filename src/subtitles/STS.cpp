@@ -1826,45 +1826,9 @@ static bool LoadFont(CString& font)
         pData[datalen++] = ((pData[(len&~3)+1]&15)<<4)|((pData[(len&~3)+2]>>2)&15);
     }
 
-    HANDLE hFont = INVALID_HANDLE_VALUE;
-
-    if(HMODULE hModule = LoadLibrary(_T("GDI32.DLL")))
-    {
-        typedef HANDLE (WINAPI *PAddFontMemResourceEx)( IN PVOID, IN DWORD, IN PVOID , IN DWORD*);
-        if(PAddFontMemResourceEx f = (PAddFontMemResourceEx)GetProcAddress(hModule, "AddFontMemResourceEx"))
-        {
-            DWORD cFonts;
-            hFont = f(pData, datalen, NULL, &cFonts);
-        }
-
-        FreeLibrary(hModule);
-    }
-
-    if(hFont == INVALID_HANDLE_VALUE)
-    {
-        TCHAR path[MAX_PATH];
-        GetTempPath(MAX_PATH, path);
-
-        DWORD chksum = 0;
-        for(int i = 0, j = datalen>>2; i < j; i++)
-            chksum += ((DWORD*)(BYTE*)pData)[i];
-
-        CString fn;
-        fn.Format(_T("%sfont%08lx.ttf"), path, chksum);
-
-        CFileStatus fs;
-        if(!CFileGetStatus(fn, fs))
-        {
-            CFile f;
-            if(f.Open(fn, CFile::modeCreate|CFile::modeWrite|CFile::typeBinary|CFile::shareDenyWrite))
-            {
-                f.Write(pData, datalen);
-                f.Close();
-            }
-        }
-
-        AddFontResource(fn);
-    }
+    // The font is private to this process and freed when it exits.
+    DWORD cFonts;
+    AddFontMemResourceEx(pData, datalen, NULL, &cFonts);
 
     return(true);
 }
@@ -2327,7 +2291,9 @@ static bool OpenUSF(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
         if(str.Find(_T("USFSubtitles")) >= 0)
         {
             CUSFSubtitles usf;
-            if(usf.Read(file->GetFilePath()) && usf.ConvertToSTS(ret))
+            size_t len;
+            const BYTE* data = file->GetMemoryData(len);
+            if((data ? usf.Read(data, len) : usf.Read(file->GetFilePath())) && usf.ConvertToSTS(ret))
                 return(true);
 
             break;
@@ -3288,9 +3254,12 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
         m_path = f->GetFilePath();
         m_simple = i > 0;
 
-        CWebTextFile f2(CTextFile::UTF8);
-        if(f2.Open(f->GetFilePath() + _T(".style")))
-            OpenSubStationAlpha(&f2, *this, CharSet);
+        if(!m_path.IsEmpty())
+        {
+            CWebTextFile f2(CTextFile::UTF8);
+            if(f2.Open(m_path + _T(".style")))
+                OpenSubStationAlpha(&f2, *this, CharSet);
+        }
 
         //      Sort();
         CreateSegments();
@@ -3307,26 +3276,12 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
 
 bool CSimpleTextSubtitle::Open(BYTE* data, int len, int CharSet, CString name)
 {
-    TCHAR path[MAX_PATH];
-    if(!GetTempPath(MAX_PATH, path)) return(false);
+    Empty();
 
-    TCHAR fn[MAX_PATH];
-    if(!GetTempFileName(path, _T("vs"), 0, fn)) return(false);
+    CTextFile f(CTextFile::UTF8);
+    if(len < 0 || !f.OpenMemory(data, len)) return(false);
 
-    FILE* tmp = _tfopen(fn, _T("wb"));
-    if(!tmp) return(false);
-
-    int i = 0;
-    for(; i <= (len-1024); i += 1024) fwrite(&data[i], 1024, 1, tmp);
-    if(len > i) fwrite(&data[i], len - i, 1, tmp);
-
-    fclose(tmp);
-
-    bool fRet = Open(fn, CharSet, name);
-
-    _tremove(fn);
-
-    return(fRet);
+    return(Open(&f, CharSet, name));
 }
 
 bool CSimpleTextSubtitle::SaveAs(CString fn, exttype et, double fps, CTextFile::enc e)

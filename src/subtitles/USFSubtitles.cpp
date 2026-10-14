@@ -22,6 +22,7 @@
 #include "StdAfx.h"
 #include "usfsubtitles.h"
 #include <msxml.h>
+#include <atlsafe.h>
 
 #define DeclareNameAndValue(pNode, name, val) \
     CComBSTR name; \
@@ -182,11 +183,29 @@ CUSFSubtitles::~CUSFSubtitles()
 
 bool CUSFSubtitles::Read(LPCTSTR fn)
 {
+	return Load(CComVariant(fn));
+}
+
+bool CUSFSubtitles::Read(const BYTE* data, size_t len)
+{
+	// MSXML loads a VT_ARRAY|VT_UI1 source as a document in memory,
+	// detecting its encoding the same way as for a file.
+	CComSafeArray<BYTE> bytes;
+	if(len > ULONG_MAX || FAILED(bytes.Create((ULONG)len)))
+		return(false);
+	if(len)
+		memcpy(bytes.m_psa->pvData, data, len);
+
+	return Load(CComVariant(bytes.m_psa));
+}
+
+bool CUSFSubtitles::Load(const VARIANT& source)
+{
 	VARIANT_BOOL vb;
 	CComPtr<IXMLDOMDocument> pDoc;
 	if(FAILED(pDoc.CoCreateInstance(CLSID_DOMDocument))
 	|| FAILED(pDoc->put_async(VARIANT_FALSE))
-	|| FAILED(pDoc->load(CComVariant(fn), &vb)) || vb != VARIANT_TRUE)
+	|| FAILED(pDoc->load(source, &vb)) || vb != VARIANT_TRUE)
 		return(false);
 
 	styles.RemoveAll();

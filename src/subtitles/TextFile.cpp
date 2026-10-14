@@ -33,24 +33,56 @@ CTextFile::CTextFile(enc e)
 , m_offset(0)
 , m_bufferPos(0)
 , m_bufferCount(0)
+, m_inMemory(false)
+, m_memData(NULL)
+, m_memLen(0)
+, m_memPos(0)
 {
 }
 
 bool CTextFile::Open(LPCTSTR lpszFileName)
 {
+	m_inMemory = false;
+
 	if (!__super::Open(lpszFileName, modeRead | typeBinary | shareDenyNone)) {
 		return false;
 	}
 
+	if (!DetectEncoding()) {
+		return Close(), false;
+	}
+
+	return true;
+}
+
+bool CTextFile::OpenMemory(const void* pData, size_t len)
+{
+	m_inMemory = true;
+	m_memData = static_cast<const BYTE*>(pData);
+	m_memLen = pData ? len : 0;
+	m_memPos = 0;
+	m_strFileName.Empty();
+
+	return DetectEncoding();
+}
+
+const BYTE* CTextFile::GetMemoryData(size_t& len) const
+{
+	len = m_inMemory ? m_memLen : 0;
+	return m_inMemory ? m_memData : NULL;
+}
+
+bool CTextFile::DetectEncoding()
+{
 	m_encoding = m_defaultencoding;
 	m_offset = 0;
 	m_bufferCount = false;
 
-	if(__super::GetLength() >= 2)
+	if(RawGetLength() >= 2)
 	{
 		WORD w;
-		if(sizeof(w) != Read(&w, sizeof(w)))
-			return Close(), false;
+		if(sizeof(w) != RawRead(&w, sizeof(w)))
+			return false;
 
 		if(w == 0xfeff)
 		{
@@ -62,11 +94,11 @@ bool CTextFile::Open(LPCTSTR lpszFileName)
 			m_encoding = BE16;
 			m_offset = 2;
 		}
-		else if(w == 0xbbef && __super::GetLength() >= 3)
+		else if(w == 0xbbef && RawGetLength() >= 3)
 		{
 			BYTE b;
-			if(sizeof(b) != Read(&b, sizeof(b)))
-				return Close(), false;
+			if(sizeof(b) != RawRead(&b, sizeof(b)))
+				return false;
 
 			if(b == 0xbf)
 			{
@@ -85,6 +117,8 @@ bool CTextFile::Open(LPCTSTR lpszFileName)
 
 bool CTextFile::Save(LPCTSTR lpszFileName, enc e)
 {
+	m_inMemory = false;
+
 	if(!__super::Open(lpszFileName, modeCreate|modeWrite|shareDenyWrite|(e==DEFAULT_ENCODING?typeText:typeBinary)))
 		return(false);
 
@@ -124,6 +158,45 @@ bool CTextFile::IsUnicode()
 	return m_encoding != DEFAULT_ENCODING;
 }
 
+// Raw access to the underlying file or memory buffer
+
+UINT CTextFile::RawRead(void* lpBuf, UINT nCount)
+{
+	if (!m_inMemory) {
+		return Read(lpBuf, nCount);
+	}
+
+	size_t left = m_memLen - m_memPos;
+	if (nCount > left) {
+		nCount = (UINT)left;
+	}
+	if (nCount) {
+		memcpy(lpBuf, m_memData + m_memPos, nCount);
+		m_memPos += nCount;
+	}
+	return nCount;
+}
+
+ULONGLONG CTextFile::RawGetPosition() const
+{
+	return m_inMemory ? m_memPos : __super::GetPosition();
+}
+
+ULONGLONG CTextFile::RawGetLength() const
+{
+	return m_inMemory ? m_memLen : __super::GetLength();
+}
+
+ULONGLONG CTextFile::RawSeek(ULONGLONG pos)
+{
+	if (!m_inMemory) {
+		return __super::Seek(pos, begin);
+	}
+
+	m_memPos = (size_t)min(pos, (ULONGLONG)m_memLen);
+	return m_memPos;
+}
+
 // CFile
 
 CString CTextFile::GetFilePath() const
@@ -136,12 +209,12 @@ CString CTextFile::GetFilePath() const
 
 ULONGLONG CTextFile::GetPosition() const
 {
-	return (__super::GetPosition() - m_offset - (m_bufferCount ? m_bufferCount - m_bufferPos : 0));
+	return (RawGetPosition() - m_offset - (m_bufferCount ? m_bufferCount - m_bufferPos : 0));
 }
 
 ULONGLONG CTextFile::GetLength() const
 {
-	return (__super::GetLength() - m_offset);
+	return (RawGetLength() - m_offset);
 }
 
 ULONGLONG CTextFile::Seek(LONGLONG lOff, UINT nFrom)
@@ -159,7 +232,7 @@ ULONGLONG CTextFile::Seek(LONGLONG lOff, UINT nFrom)
 
 	lOff = max((LONGLONG)min((ULONGLONG)lOff, len), 0ll) + m_offset;
 
-	pos = __super::Seek(lOff, begin) - m_offset;
+	pos = RawSeek(lOff) - m_offset;
 	m_bufferCount = 0;
 
 	return pos;
@@ -200,7 +273,7 @@ bool CTextFile::ReadLine() {
 
 	while (true) {
 		if (m_bufferPos >= m_bufferCount) {
-			m_bufferCount = Read(m_readbuffer, sizeof(m_readbuffer));
+			m_bufferCount = RawRead(m_readbuffer, sizeof(m_readbuffer));
 			if (!m_bufferCount) return true;
 			m_bufferPos = 0;
 		}
@@ -222,7 +295,7 @@ bool CTextFile::ReadLine() {
 		if (c == CHARERR_NEED_MORE) {
 			size_t count = m_bufferCount - m_bufferPos;
 			memmove(m_readbuffer, m_readbuffer + m_bufferPos, count);
-			m_bufferCount = count + Read(m_readbuffer + count, sizeof(m_readbuffer) - count);
+			m_bufferCount = count + RawRead(m_readbuffer + count, (UINT)(sizeof(m_readbuffer) - count));
 			m_bufferPos = 0;
 			if (m_bufferCount == count) return true;
 			continue;
@@ -319,6 +392,8 @@ bool CWebTextFile::Open(LPCTSTR lpszFileName)
 	if(fn.Find(_T("http://")) != 0)
 		return __super::Open(lpszFileName);
 
+	std::vector<BYTE> data;
+
 	try
 	{
 		CInternetSession is;
@@ -326,26 +401,17 @@ bool CWebTextFile::Open(LPCTSTR lpszFileName)
 		CAutoPtr<CStdioFile> f(is.OpenURL(fn, 1, INTERNET_FLAG_TRANSFER_BINARY|INTERNET_FLAG_EXISTING_CONNECT));
 		if(!f) return(false);
 
-		TCHAR path[MAX_PATH];
-		GetTempPath(MAX_PATH, path);
-
-		fn = path + fn.Mid(fn.ReverseFind('/')+1);
-		int i = fn.Find(_T("?"));
-		if(i > 0) fn = fn.Left(i);
-		CFile temp;
-		if(!temp.Open(fn, modeCreate|modeWrite|typeBinary|shareDenyWrite))
-		{
-			f->Close();
-			return(false);
-		}
-
 		BYTE buff[1024];
-		int len, total = 0;
-		while((len = f->Read(buff, 1024)) == 1024 && (m_llMaxSize < 0 || (total+=1024) < m_llMaxSize))
-			temp.Write(buff, len);
-		if(len > 0) temp.Write(buff, len);
-
-		m_tempfn = fn;
+		UINT len;
+		while((len = f->Read(buff, sizeof(buff))) > 0)
+		{
+			data.insert(data.end(), buff, buff + len);
+			if(m_llMaxSize >= 0 && (LONGLONG)data.size() >= m_llMaxSize)
+			{
+				data.resize((size_t)m_llMaxSize);
+				break;
+			}
+		}
 
 		f->Close(); // must close it because the desctructor doesn't seem to do it and we will get an exception when "is" is destroying
 	}
@@ -355,7 +421,8 @@ bool CWebTextFile::Open(LPCTSTR lpszFileName)
 		return(false);
 	}
 
-	return __super::Open(m_tempfn);
+	m_data.swap(data);
+	return OpenMemory(m_data.empty() ? NULL : &m_data[0], m_data.size());
 }
 
 bool CWebTextFile::Save(LPCTSTR lpszFileName, enc e)
@@ -363,15 +430,4 @@ bool CWebTextFile::Save(LPCTSTR lpszFileName, enc e)
 	// CWebTextFile is read-only...
 	ASSERT(0);
 	return(false);
-}
-
-void CWebTextFile::Close()
-{
-	__super::Close();
-
-	if(!m_tempfn.IsEmpty())
-	{
-		_tremove(m_tempfn);
-		m_tempfn.Empty();
-	}
 }
