@@ -20,6 +20,34 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* SSF BOM recognition and UTF-16 value assembly now use safe Rust. Native code
+  still sets unknown encoding before the first read, performs the virtual byte
+  callbacks and applies a recognized encoding after the final matching byte.
+  UTF-8 decoding remains unchanged. UTF-16 assembly preserves the original
+  order even in the branch labeled big endian. Complete pinned NextChar
+  comparisons pass locally in ordinary and
+  fatal ASan/UBSan builds on arm64 and x64: **1,245,835 histories / 83,453,567
+  observed fields / 721,665 provider interruptions / 1,245,314 unknown-encoding
+  exceptions / 131,209 decoded results / 852,353 retained-unknown retries /
+  2,951,460 Rust BOM transitions / 131,080 Rust UTF-16 results**. The fixture
+  covers every byte tail after EF,
+  every UTF-16-valued first/second provider result, all UTF-16 outputs in both
+  native byte-order branches, ASCII after a UTF-8 BOM, partial prefixes and
+  exact short-circuit reads. One known UTF-8 EOF history is excluded before
+  either implementation and is not a pass; other UTF-8 decode/overflow domains,
+  provider reentry/mutation and actual I/O remain outside this fixture.
+  **149 core / 107 FFI tests**, formatting, Clippy, 34 Python checks (three
+  local skips) and default native syntax pass. Windows/Miri are pending.
+
+* `ssf-integration-evidence.json` now archives the complete passing stage at
+  `75467486`: queue ownership, comment/peek decisions, output encoding and
+  Arabic replacement. All four portable jobs, Miri, both full Windows renderer
+  jobs and the exact-commit local sanitizer campaign passed. Actual libssf
+  compilation with the Rust flag is verified. Each renderer matched 798 cases /
+  8,426 frames and 32 mutation cases / 224 frames, plus scoped COM/export checks.
+  The later native SSF parser workflow and byte/UTF-16 input owners have their
+  own evidence; CSRI does not establish SSF rendering coverage.
+
 * SSF `WCharInputStream` now reads from an immutable Rust snapshot of raw UTF-16
   units. Its original CString reference is deliberately retained alongside the
   snapshot: callers can hold pointers into that string while later source
@@ -36,7 +64,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   behavior. Allocation failure and invalid strings/indices remain excluded.
   **149 core / 107 FFI tests**, formatting, Clippy, 34 Python checks (three
   local skips), default native syntax and the prior byte-input sanitizer
-  comparisons pass. Windows/Miri validation for this increment is pending.
+  comparisons pass. Native SSF input-mode checks pass on both Windows
+  architectures at `2ae4e89a` (`115962446566`, `115962446863`), and Miri passes
+  (`115962447200`). Windows portable jobs `115962448122` / `115962448169` stopped
+  at Python evidence tests: test fixtures emitted CRLF while inspect expects
+  capture-normalized LF. The tests now request LF explicitly. Those failures
+  remain failed; actual Windows CStringW leaf execution awaits the corrected run.
 
 * Complete caption packet parsing and CSRI filename evidence is now archived
   at `5f586dac` in `cc-packet-parser-evidence.json`: four portable jobs, Miri,
@@ -122,7 +155,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   mutation during BOM emission are compared. PutString formatting, actual I/O
   and SSF rendering remain outside these controlled callback checks.
   **149 core / 105 FFI tests**, formatting, Clippy, 29 Python checks (three
-  local skips) and default native syntax pass. Windows and Miri are pending.
+  local skips) and default native syntax pass. Windows and Miri pass in the
+  integrated `75467486` stage (`ssf-integration-evidence.json`).
 
 * SSF input lookahead and comment/peek decisions now run in safe Rust. A
   transient state machine requests native character reads and pops; each Rust
@@ -142,7 +176,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   SSF renderer coverage. **149 core / 105 FFI tests**, formatting, Clippy,
   29 Python checks (three local skips), both local sanitizer builds and default
   native syntax pass. Miri and both Windows portable jobs pass at `154a1120` (`115943572360`,
-  `115943572000`, `115943572386`); full native build/integration remains pending. Both Windows portable jobs passed for the preceding
+  `115943572000`, `115943572386`); full native jobs also passed. Integrated
+  evidence through `75467486` is archived in `ssf-integration-evidence.json`. Both Windows portable jobs passed for the preceding
   queue-only increment `209402aa` (`115936712952`, `115936713551`).
 
 * Safe Rust now scans caption packet headers and owns snapshots of both fields

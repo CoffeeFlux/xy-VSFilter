@@ -71,6 +71,17 @@ namespace ssf
 		{
 			m_encoding = unknown;
 
+#ifdef XY_VSFILTER_RUST_TEXT
+            XyRust::SsfBom bom;
+            int last = 0;
+            for(;;)
+            {
+                const uint32_t action = bom.Next(last);
+                if(action == 1) {last = NextByte(); continue;}
+                if(action >= 2) m_encoding = static_cast<encoding_t>(action);
+                break;
+            }
+#else
 			switch(NextByte())
 			{
 			case 0xef: 
@@ -83,6 +94,7 @@ namespace ssf
 				if(NextByte() == 0xff) m_encoding = utf16be;
 				break;
 			}
+#endif
 		}
 
 		if(m_encoding == unknown)
@@ -103,13 +115,21 @@ namespace ssf
 			break;
 		case utf16le: 
 			c = NextByte();
+#ifdef XY_VSFILTER_RUST_TEXT
+            cur = xy_vsfilter_ssf_utf16(cur, c);
+#else
 			if(c == EOS) {cur = EOS; break;}
 			cur = (c << 8) | cur;
+#endif
 			break;
 		case utf16be: 
 			c = NextByte();
+#ifdef XY_VSFILTER_RUST_TEXT
+            cur = xy_vsfilter_ssf_utf16(cur, c);
+#else
 			if(c == EOS) {cur = EOS; break;}
 			cur = cur | (c << 8);
+#endif
 			break;
 		case wchar:
 			break;
