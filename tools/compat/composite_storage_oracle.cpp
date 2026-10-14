@@ -53,7 +53,13 @@ static void compare(int w,int h,int sub,int flags,bool border,int maskMode,int c
     if(colorMode>=2){const DWORD middle=colorMode==2?0xffabcdefU:0x07123456U;colors={0x07123456U,0,middle,static_cast<DWORD>(xo+std::max<int>(0,cw)/2),0x00123456U,static_cast<DWORD>(xo+std::max<int>(0,cw)),0xff000000U,0xffffffffU};}
     const auto a=execute<ReferenceComposite::Overlay,ReferenceComposite::Rasterizer>(w,h,sub,flags,border,maskMode,clip,colors,decline,true);
     const auto b=execute<CandidateComposite::Overlay,CandidateComposite::Rasterizer>(w,h,sub,flags,border,maskMode,clip,colors,decline,false);
-    if(!(a==b)){fprintf(stderr,"Composite mask mismatch size=%d,%d sub=%d flags=%d border=%d mask=%d clip=%d colors=%d decline=%d\n",w,h,sub,flags,border,maskMode,clipMode,colorMode,decline);std::abort();}
+    if(!(a==b)){
+        fprintf(stderr,"Composite mask mismatch size=%d,%d sub=%d flags=%d border=%d mask=%d clip=%d colors=%d decline=%d\n",w,h,sub,flags,border,maskMode,clipMode,colorMode,decline);
+        fprintf(stderr,"Fields reference=%llu candidate=%llu; events reference=%llu candidate=%llu\n",(unsigned long long)a.fields.size(),(unsigned long long)b.fields.size(),(unsigned long long)a.events.size(),(unsigned long long)b.events.size());
+        for(size_t i=0;i<std::min(a.fields.size(),b.fields.size());++i)if(a.fields[i]!=b.fields[i])fprintf(stderr,"field[%llu] reference=%llu candidate=%llu\n",(unsigned long long)i,(unsigned long long)a.fields[i],(unsigned long long)b.fields[i]);
+        for(size_t i=0;i<std::min(a.events.size(),b.events.size());++i)if(a.events[i]!=b.events[i])fprintf(stderr,"event[%llu] reference=%lld candidate=%lld\n",(unsigned long long)i,(long long)a.events[i],(long long)b.events[i]);
+        std::abort();
+    }
     calls+=2;fields+=a.fields.size()+a.events.size();
 }
 int main(){

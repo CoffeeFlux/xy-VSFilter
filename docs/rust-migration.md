@@ -32,9 +32,17 @@ unresolved reference outcomes requiring investigation, never matching results.
   it after exit. This isolates default writes performed by native constructors.
   Nine driver tests cover repeated traces, failures, partial output, timeouts,
   candidate-only ID checks and private-key cleanup (**29 Python tests total**).
-  Corrected Windows execution is pending. The first failed COM jobs remain
-  failed; redundant native run `38576708233` was cancelled to avoid repeating
-  the known unresolved operation, while its portability jobs continue.
+  Corrected x64 execution passed in job `115900682982`: all ten scoped pairs
+  and both candidate-only ID controls completed. Win32 is pending. The first
+  failed COM jobs remain failed; superseded workflows were cancelled after
+  their build failures were retained.
+
+* Fractional blur scratch and VobSub scaler temporary storage now have full
+  evidence at `9b31fb49` in `fraction-storage-evidence.json`: all four portable
+  jobs, Miri, both Windows renderer jobs, and the exact-commit local sanitizer
+  campaign passed. Each Windows architecture matched **798 cases / 8,426
+  frames** and **32 mutation cases / 224 frames**, including visibility controls.
+  This does not include later bitmap, composite-mask or COM changes.
 
 * The repaired ownership integration stage at `f5c748a9` is now fully archived
   in `ownership-integration-evidence.json`: all four portable jobs, Miri, and
@@ -60,7 +68,7 @@ unresolved reference outcomes requiring investigation, never matching results.
   traces and mismatches fail the gate. The evidence summarizer requires this
   report for candidates containing the probe. Nine harness checks pass locally
   (**29 Python tests total, three platform skips**); native compilation and
-  execution await Windows CI. This adds interface characterization, not a Rust
+  execution now pass on x64; Win32 remains pending. This adds interface characterization, not a Rust
   COM implementation. Custom interface methods, media negotiation, graph
   playback, UI and real-player integration remain outstanding.
 
@@ -88,7 +96,10 @@ unresolved reference outcomes requiring investigation, never matching results.
   The next Windows jobs reached the link step and required `user32.lib` for
   ATL's actual SetRect/IntersectRect calls; that explicit dependency is now
   included. Jobs `115895618184` / `115895618554` remain failed link attempts,
-  not comparison results.
+  not comparison results. The linked x64 fixture passes (`115900683970`), but
+  Win32 job `115900684289` reports a mismatch in a one-pixel masked fill.
+  Detailed field/event diagnostics are being added; this remains unresolved
+  and is not a passing comparison.
 
 * Output `XyBitmap` buffers now use Rust ownership while preserving the native
   address modulo 16, public frame-accessor pointers and logical cache accounting.
