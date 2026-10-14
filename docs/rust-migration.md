@@ -20,6 +20,18 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust horizontal `[1, 2, 1]` filtering replaces the scalar and SSE
+  arithmetic behind the existing switch. Each call lends one initialized row;
+  later overlapping rows see earlier writes after the preceding borrow ends.
+  All four original rounding expressions, zero-padded endpoints and repeated
+  passes are preserved, including the nonstandard named half-to-even policy.
+  The extracted oracle passed **67,221,760 comparisons** on arm64 and
+  **134,443,520 comparisons** under x64 execution with fatal ASan/UBSan,
+  including **67,221,760 actual SSE comparisons**. It exhausts all byte triples
+  under every policy in a full eight-pixel SIMD group plus scalar tail, and
+  covers padding, guards, width/alignment boundaries and negative/zero strides.
+  Rust tests (43 core, 20 FFI), strict Clippy and both default native branch
+  syntax checks pass. Windows validation is pending for this increment.
 * Safe Rust fixed 3x3 blur column-state updates and pixel arithmetic, behind the
   existing switch for widths/heights of at least two. Native adapters retain
   one-byte scalar and eight-byte SSE source snapshots, output order, and the
@@ -60,9 +72,13 @@ unresolved reference outcomes requiring investigation, never matching results.
   passed **34,088,424 comparisons**, including **33,554,432 explicit group-size
   byte-triple comparisons**. That supplementary run uses Clang MS extensions
   for the original pointer narrowing and disables alignment instrumentation for
-  x86 unaligned loads; it is not a Win32 ABI result. Actual Windows x86
-  component and DLL validation is still pending. Rust tests (39 core, 17 FFI)
-  and strict Clippy pass.
+  x86 unaligned loads; it is not a Win32 ABI result. Candidate `9febb4eb`
+  subsequently passed all four CI platforms, Miri and both Windows DLL jobs.
+  Each DLL job matched **322 corpus cases / 4,026 frames** and **32 mutations /
+  224 frames**, plus dialogs, visible controls, exports and dependencies.
+  Both build logs confirm Rust-enabled `Rasterizer.cpp` compilation.
+  [SIMD-mask evidence](simd-mask-evidence.json) records verified source/DLL
+  hashes and scope. Rust tests (39 core, 17 FFI) and strict Clippy pass.
 * Safe Rust scalar body/border alpha-mask arithmetic, with and without clip
   masks, is prepared behind the same switch. Signed rounding and final byte
   wrapping are preserved. Native code retains row traversal and buffer access;

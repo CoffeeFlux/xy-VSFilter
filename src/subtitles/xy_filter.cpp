@@ -1,4 +1,7 @@
 #include "stdafx.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "xy_rust_be_filter.h"
+#endif
 
 typedef const UINT8 CUINT8, *PCUINT8;
 typedef const UINT CUINT, *PCUINT;
@@ -1043,6 +1046,11 @@ void xy_be_filter_c(PUINT8 dst, int width, int height, int stride)
     {
         return;
     }
+#ifdef XY_VSFILTER_RUST_TEXT
+    for (int y = 0; y < height; ++y) {
+        xy_vsfilter_be_filter_row(dst + y * stride, width, ROUNDING_POLICY);
+    }
+#else
     PUINT8 dst2 = NULL;
     XyRounding<ROUNDING_POLICY, 2> xy_rounding;
     for (int y=0;y<height;y++)
@@ -1061,6 +1069,7 @@ void xy_be_filter_c(PUINT8 dst, int width, int height, int stride)
         tmp = old_sum + dst2[x];
         dst2[x] = (xy_rounding.round(tmp)>>2);
     }
+#endif
 }
 
 /****
@@ -1120,6 +1129,11 @@ void xy_be_filter_sse(PUINT8 dst, int width, int height, int stride)
     {
         return;
     }
+#ifdef XY_VSFILTER_RUST_TEXT
+    for (int y = 0; y < height; ++y) {
+        xy_vsfilter_be_filter_row(dst + y * stride, width, ROUNDING_POLICY);
+    }
+#else
     int width_mod8 = ((width-1)&~7);
     XyRounding<ROUNDING_POLICY, 2> xy_rounding;
     xy_rounding.init_sse();
@@ -1162,6 +1176,7 @@ void xy_be_filter_sse(PUINT8 dst, int width, int height, int stride)
         tmp = old_sum + dst2[x];
         dst2[x] = (xy_rounding.round(tmp)>>2);
     }
+#endif
 }
 
 /****

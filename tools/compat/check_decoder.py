@@ -60,7 +60,8 @@ def capture_inputs():
               ROOT / "include/xy_rust_segment_insert.h",
               ROOT / "include/xy_rust_hdmv.h",
               ROOT / "include/xy_rust_dvb.h", ROOT / "include/xy_rust_golomb.h", ROOT / "include/xy_rust_fill.h",
-              ROOT / "src/subtitles/Rasterizer.cpp", ROOT / "include/xy_rust_mask.h", ROOT / "include/xy_rust_bilinear.h", ROOT / "include/xy_rust_be_blur.h",
+              ROOT / "src/subtitles/Rasterizer.cpp", ROOT / "include/xy_rust_mask.h", ROOT / "include/xy_rust_bilinear.h", ROOT / "include/xy_rust_be_blur.h", ROOT / "include/xy_rust_be_filter.h",
+              ROOT / "src/subtitles/xy_filter.cpp",
               ROOT / "src/dsutil/GolombBuffer.cpp", ROOT / "src/dsutil/GolombBuffer.h",
               ROOT / "src/subtitles/CompositionObject.cpp",
               ROOT / "include/xy_rust_timeline_search.h",
@@ -260,6 +261,7 @@ public:
     golomb_source = original("src/dsutil/GolombBuffer.cpp", reference["commit"])
     golomb_header = original("src/dsutil/GolombBuffer.h", reference["commit"])
     raster_source = original("src/subtitles/Rasterizer.cpp", reference["commit"])
+    filter_source = original("src/subtitles/xy_filter.cpp", reference["commit"])
     golomb = '#pragma once\n#include "golomb_shell.h"\n'
     candidate_golomb = (ROOT / "src/dsutil/GolombBuffer.cpp").read_bytes()
     candidate_golomb_header = (ROOT / "src/dsutil/GolombBuffer.h").read_bytes()
@@ -339,6 +341,26 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         hdmv += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     hdmv += "#endif\n"
     (destination / "original_hdmv.h").write_text(hdmv, encoding="utf-8")
+    filters = '#include "be_filter_shell.h"\n'
+    for name, content in (("ReferenceFilter", filter_source), ("CandidateFilter", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
+        filters += f"namespace {name} {{\n"
+        text_source = content.decode("utf-8-sig")
+        rounding = text_source[text_source.index("enum RoundingPolicy"):text_source.index("template<int ROUNDING_POLICY>\r\nvoid xy_be_filter_c(") if "template<int ROUNDING_POLICY>\r\nvoid xy_be_filter_c(" in text_source else text_source.index("template<int ROUNDING_POLICY>\nvoid xy_be_filter_c(")]
+        filters += "#if FILTER_NATIVE_SSE\n" + rounding + "\n#else\n"
+        # arm64 compares the verbatim scalar rounding methods; no surrogate SSE.
+        filters += extract_definition(text_source, "enum RoundingPolicy") + ";\n"
+        filters += "template<int POLICY, int precision> struct XyRounding;\n"
+        for policy in ("ROUND_DOWN", "ROUND_HALF_DOWN", "ROUND_HALF_UP", "ROUND_HALF_TO_EVEN"):
+            definition = extract_definition(text_source, f"struct XyRounding<{policy}, precision>")
+            filters += f"template<int precision> struct XyRounding<{policy}, precision> {{\n"
+            filters += extract_definition(definition, "__forceinline int round(unsigned in)") + "\n};\n"
+        filters += "#endif\n"
+        if name == "CandidateFilter":
+            filters += "#define XY_VSFILTER_RUST_TEXT\n"
+        filters += "template<int ROUNDING_POLICY>\n" + extract_definition(text_source, "void xy_be_filter_c(") + "\n"
+        filters += "#if FILTER_NATIVE_SSE\ntemplate<int ROUNDING_POLICY>\n" + extract_definition(text_source, "void xy_be_filter_sse(") + "\n#endif\n"
+        filters += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_be_filter.h").write_text(filters, encoding="utf-8")
     blur = '#include "be_blur_shell.h"\n'
     for name, content in (("ReferenceBlur", raster_source), ("CandidateBlur", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         blur += f"namespace {name} {{\n"
@@ -547,6 +569,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     blur_result = run([str(blur_executable)], capture_output=True, text=True)
     print(blur_result.stdout, end="", flush=True)
     print(blur_result.stderr, end="", file=sys.stderr)
+    filter_executable = destination / ("be-filter-oracle.exe" if os.name == "nt" else "be-filter-oracle")
+    filter_compile = [arg.replace("fill_oracle.cpp", "be_filter_oracle.cpp").replace("fill-oracle", "be-filter-oracle") for arg in fill_compile]
+    run(filter_compile)
+    filter_result = run([str(filter_executable)], capture_output=True, text=True)
+    print(filter_result.stdout, end="", flush=True)
+    print(filter_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -576,6 +604,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "hdmv_golomb_source_sha256": hashlib.sha256(golomb_source).hexdigest(),
         "hdmv_golomb_header_sha256": hashlib.sha256(golomb_header).hexdigest(),
         "hdmv_raster_source_sha256": hashlib.sha256(raster_source).hexdigest(),
+        "xy_filter_source_sha256": hashlib.sha256(filter_source).hexdigest(),
+        "be_filter_compile_command": filter_compile,
+        "be_filter_result": filter_result.stdout, "be_filter_stderr": filter_result.stderr,
         "be_blur_compile_command": blur_compile,
         "be_blur_result": blur_result.stdout, "be_blur_stderr": blur_result.stderr,
         "bilinear_compile_command": bilinear_compile,
