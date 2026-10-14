@@ -20,6 +20,21 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust implements the DVD `Scale2x` edge-filter arithmetic and traversal.
+  The original method keeps the image dimensions unchanged. The Rust path
+  preserves its five-neighbor equality tests, center-pixel substitution at
+  edges, and packed-channel bias: blue/green receive rounding while red/alpha
+  truncate. Native temporary allocation, allocation-exception timing, copy-back
+  and deletion remain in their original order. Rust fills uninitialized output
+  through an exclusive loan while borrowing disjoint initialized source words.
+  Fatal ASan/UBSan tests passed **74,951 comparisons / 153,499,648 bytes** on
+  arm64 and under x64 execution, including **68,256 visibly changed cases**,
+  **143,749 observed allocations**, **18 injected allocation interruptions**
+  and **143,731 Rust-filled images**. Tests compare two complete image/guard
+  checkpoints, every equality assignment among five neighbors, channel pairs,
+  rectangle/pointer state and allocation order. Rust tests (54 core, 32 FFI),
+  strict Clippy and both default native branch syntax checks pass. Windows/Miri
+  validation is pending for this increment.
 * Safe Rust DVD trimming scans only alpha bytes and builds bordered crops in
   owned storage. RGB bytes retain the native copy semantics without requiring
   initialization; the new border is zero-filled. Native rectangle inflation,
@@ -54,7 +69,13 @@ unresolved reference outcomes requiring investigation, never matching results.
   consumed nibbles. Packet metadata, allocation and trim calls are observed
   substitutes in this loop oracle, not evidence for those implementations.
   Rust tests (52 core, 29 FFI), strict Clippy and both default native branch syntax
-  checks pass. Windows/Miri validation is pending for this increment.
+  checks pass. Candidate `d8df717e` passed all four CI platforms, Miri and both
+  Windows DLL jobs. Each DLL job matched **354 cases / 4,334 frames** and
+  **32 mutations / 224 frames**, plus dialogs, visible controls, exports and
+  dependencies. Both logs confirm Rust-enabled `VobSubImage.cpp` compilation.
+  [DVD run-code evidence](vobsub-rle-evidence.json) records verified source/DLL
+  hashes and scope. The trimming increment above extends the loop oracle with
+  actual trimming; packet metadata and allocation remain observed substitutes.
 * Safe Rust DVD pixel-run clipping and filling preserve the original left-edge
   length retention, including runs ending exactly at the left edge, right-edge
   truncation, initial rejection order and pixel indexing. Palette reads remain
