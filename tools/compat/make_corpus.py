@@ -274,6 +274,20 @@ def realtext_variants():
         yield "realtext-format-" + name + ".rt", text.encode("ascii")
 
 
+def microdvd_variants():
+    for name, payload in {
+        "control": "Formatting sample|second line",
+        "italic": "{y:i}Formatting sample|second line",
+        "global-italic": "{Y:i}Formatting sample|second line",
+        "charset": r"{h:128}Formatting sample|{h:0}second line",
+        "embedded-charset": r"{\fe128}Formatting sample|{\fe}second line",
+        "nested": r"{{\fe134}Formatting} sample|{unknown}second line",
+        "empty-lines": "|Formatting||sample|",
+        "mixed": "{c:$123456}{f:Arial}{s:24}{y:bius}Formatting|sample",
+    }.items():
+        yield "microdvd-format-" + name + ".sub", ("{0}{100}" + payload + "\r\n").encode("ascii")
+
+
 def timestamps(data):
     matches = re.findall(rb"Dialogue:[^,]*,(\d+):(\d+):(\d+(?:\.\d+)?),(\d+):(\d+):(\d+(?:\.\d+)?)", data)
     if not matches:
@@ -325,7 +339,8 @@ def make_cases(files):
                                                     ("raster-gaussian-medium", "raster-control"),
                                                     ("subrip-format-italic", "subrip-format-control"),
                                                     ("subrip-format-underline", "subrip-format-control"),
-                                                    ("realtext-format-italic", "realtext-format-control"))
+                                                    ("realtext-format-italic", "realtext-format-control"),
+                                                    ("microdvd-format-italic", "microdvd-format-control"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -338,6 +353,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in incremental_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in subrip_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in realtext_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in microdvd_variants()]
     manifest = json.dumps(make_cases(files + generated), indent=2) + "\n"
     expected = generated + [(DEST / "cases.json", manifest.encode("utf-8"))]
     for path, data in expected:

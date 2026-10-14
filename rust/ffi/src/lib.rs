@@ -107,3 +107,5 @@ mod vobsub_rle;
 mod vobsub_scale;
 mod vobsub_segment;
 mod vobsub_trim;
+
+mod find_char;

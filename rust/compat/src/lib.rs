@@ -54,3 +54,5 @@ pub mod vobsub_rle;
 pub mod vobsub_scale;
 pub mod vobsub_segment;
 pub mod vobsub_trim;
+
+pub mod find_char;

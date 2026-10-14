@@ -24,6 +24,7 @@
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_text.h"
 #include "xy_rust_subrip.h"
+#include "xy_rust_find_char.h"
 #include "xy_rust_webvtt.h"
 #include "xy_rust_fields.h"
 #include "xy_rust_segments.h"
@@ -435,6 +436,29 @@ static int FindChar(CStringW str, WCHAR c, int pos, bool fUnicode, int CharSet)
 {
     if(fUnicode) return(str.Find(c, pos));
 
+#ifdef XY_VSFILTER_RUST_TEXT
+    DWORD cp = CharSetToCodePage(CharSet);
+    const int originalCharSet = CharSet;
+    XyRust::FindChar search(static_cast<uint16_t>(c), pos, str.GetLength());
+    bool reply = false;
+    for(;;)
+    {
+        const unsigned action = search.Step(str, reply);
+        const int value = search.Value();
+        switch(action)
+        {
+        case 0: return value;
+        case 1: reply = IsDBCSLeadByteEx(cp, static_cast<BYTE>(value)) != 0; break;
+        case 2: CharSet = 0; break;
+        case 3: reply = _istdigit(static_cast<WCHAR>(value)) != 0; break;
+        case 4: CharSet = CharSet*10 + (value - '0'); break;
+        case 5:
+            if(value) CharSet = originalCharSet;
+            cp = CharSetToCodePage(CharSet);
+            break;
+        }
+    }
+#else
     int fStyleMod = 0;
 
     DWORD cp = CharSetToCodePage(CharSet);
@@ -466,6 +490,7 @@ static int FindChar(CStringW str, WCHAR c, int pos, bool fUnicode, int CharSet)
     }
 
     return(-1);
+#endif
 }
 
 static CStringW ToUnicode(CStringW str, DWORD CharSet)

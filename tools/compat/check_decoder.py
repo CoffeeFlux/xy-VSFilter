@@ -55,7 +55,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
               ROOT / "include/xy_rust_drawing.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
-              ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
+              ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
               ROOT / "include/xy_rust_cc.h", ROOT / "src/subtitles/CCDecoder.cpp", ROOT / "src/subtitles/CCDecoder.h",
               ROOT / "include/xy_rust_segments.h",
@@ -204,6 +204,20 @@ public:
         webvtt += extract_definition(content.decode("utf-8-sig"), "static void WebVTTCueStrip(") + "\n"
         webvtt += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_webvtt.h").write_text(webvtt, encoding="utf-8")
+    find_char = '#include "find_char_shell.h"\n'
+    for name, content in (("ReferenceFindChar", font_source), ("CandidateFindChar", candidate_font)):
+        find_char += f"namespace {name} {{\n"
+        if name == "CandidateFindChar":
+            find_char += "#define XY_VSFILTER_RUST_TEXT\n"
+        for signature in ("static DWORD CharSetToCodePage(", "static int FindChar("):
+            definition = extract_definition(content.decode("utf-8-sig"), signature)
+            if name == "CandidateFindChar" and signature == "static int FindChar(":
+                bridge = "XyRust::FindChar search"
+                assert definition.count(bridge) == 1
+                definition = definition.replace(bridge, "XyRust::ObservedSearch search")
+            find_char += definition + "\n"
+        find_char += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_find_char.h").write_text(find_char, encoding="utf-8")
     subrip = '#include "subrip_shell.h"\n'
     for name, content in (("ReferenceSubRip", font_source), ("CandidateSubRip", candidate_font)):
         subrip += f"namespace {name} {{\n"
@@ -864,6 +878,14 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     vobsub_path_result = run([str(vobsub_path_executable)], capture_output=True, text=True)
     print(vobsub_path_result.stdout, end="", flush=True)
     print(vobsub_path_result.stderr, end="", file=sys.stderr)
+    find_char_executable = destination / ("find-char-oracle.exe" if os.name == "nt" else "find-char-oracle")
+    find_char_compile = [arg.replace("fill_oracle.cpp", "find_char_oracle.cpp").replace("fill-oracle", "find-char-oracle") for arg in fill_compile]
+    if os.name == "nt":
+        find_char_compile += ["/D_UNICODE", "/DUNICODE", "gdi32.lib"]
+    run(find_char_compile)
+    find_char_result = run([str(find_char_executable)], capture_output=True, text=True)
+    print(find_char_result.stdout, end="", flush=True)
+    print(find_char_result.stderr, end="", file=sys.stderr)
     subrip_executable = destination / ("subrip-oracle.exe" if os.name == "nt" else "subrip-oracle")
     subrip_compile = [arg.replace("fill_oracle.cpp", "subrip_oracle.cpp").replace("fill-oracle", "subrip-oracle") for arg in fill_compile]
     run(subrip_compile)
@@ -1030,6 +1052,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "webvtt_compile_command": webvtt_compile,
         "webvtt_result": webvtt_result.stdout, "webvtt_stderr": webvtt_result.stderr,
         "webvtt_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring model with host iswspace; Windows comparison required",
+        "find_char_compile_command": find_char_compile,
+        "find_char_result": find_char_result.stdout, "find_char_stderr": find_char_result.stderr,
+        "find_char_scope": "Native charset-aware FindChar and Unicode CString path; actual Windows ATL, charset and lead-byte APIs in Windows CI, portable model elsewhere; classification order and injected interruptions; representable charset arithmetic only",
         "subrip_compile_command": subrip_compile,
         "subrip_result": subrip_result.stdout, "subrip_stderr": subrip_result.stderr,
         "subrip_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring replacement model; Windows comparison required",
