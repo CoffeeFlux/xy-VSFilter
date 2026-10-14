@@ -41,6 +41,22 @@
     [
       "raster-gaussian-medium-memory",
       "raster-control-memory"
+    ],
+    [
+      "subrip-format-italic-file",
+      "subrip-format-control-file"
+    ],
+    [
+      "subrip-format-italic-memory",
+      "subrip-format-control-memory"
+    ],
+    [
+      "subrip-format-underline-file",
+      "subrip-format-control-file"
+    ],
+    [
+      "subrip-format-underline-memory",
+      "subrip-format-control-memory"
     ]
   ],
   "cases": [
@@ -8620,6 +8636,294 @@
         "1",
         "5",
         "3"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-format-control-file",
+      "script": "test/compat/generated/subrip-format-control.srt",
+      "sha256": "4a38f4156c98238163db0f8e4c2265d1dd302a4a9cc0db50429b635c2e8c3761",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-format-control-memory",
+      "script": "test/compat/generated/subrip-format-control.srt",
+      "sha256": "4a38f4156c98238163db0f8e4c2265d1dd302a4a9cc0db50429b635c2e8c3761",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-format-italic-file",
+      "script": "test/compat/generated/subrip-format-italic.srt",
+      "sha256": "6a790f7a215d4f530edaa5708ca1ce31a47f4bd423444e8626a2a347061756cf",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-format-italic-memory",
+      "script": "test/compat/generated/subrip-format-italic.srt",
+      "sha256": "6a790f7a215d4f530edaa5708ca1ce31a47f4bd423444e8626a2a347061756cf",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-format-bold-file",
+      "script": "test/compat/generated/subrip-format-bold.srt",
+      "sha256": "2c5a6775c194f4b883ba7a402ca412e495d59dea801b619eb21d4af9873fc61c",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-format-bold-memory",
+      "script": "test/compat/generated/subrip-format-bold.srt",
+      "sha256": "2c5a6775c194f4b883ba7a402ca412e495d59dea801b619eb21d4af9873fc61c",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-format-underline-file",
+      "script": "test/compat/generated/subrip-format-underline.srt",
+      "sha256": "3ba150e4e5838cccfbebbfc76ce7d3fda693ba45ac07c02a7948d590637731bd",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-format-underline-memory",
+      "script": "test/compat/generated/subrip-format-underline.srt",
+      "sha256": "3ba150e4e5838cccfbebbfc76ce7d3fda693ba45ac07c02a7948d590637731bd",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-format-uppercase-file",
+      "script": "test/compat/generated/subrip-format-uppercase.srt",
+      "sha256": "e2ea9e57b6cfd3850f429760c63ef4f2a40315d7152be75b8292496b32aa13fa",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-format-uppercase-memory",
+      "script": "test/compat/generated/subrip-format-uppercase.srt",
+      "sha256": "e2ea9e57b6cfd3850f429760c63ef4f2a40315d7152be75b8292496b32aa13fa",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-format-mixed-file",
+      "script": "test/compat/generated/subrip-format-mixed.srt",
+      "sha256": "41e9cf99b5f1dc8f64dc53fc60e6c82cc2a8c95bbb039dbc812e3ece37ff98d6",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-format-mixed-memory",
+      "script": "test/compat/generated/subrip-format-mixed.srt",
+      "sha256": "41e9cf99b5f1dc8f64dc53fc60e6c82cc2a8c95bbb039dbc812e3ece37ff98d6",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-format-malformed-file",
+      "script": "test/compat/generated/subrip-format-malformed.srt",
+      "sha256": "412a7c033214f63960aebdc64b9aaef2bb9504e21c48354c51497199362c8ae8",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-format-malformed-memory",
+      "script": "test/compat/generated/subrip-format-malformed.srt",
+      "sha256": "412a7c033214f63960aebdc64b9aaef2bb9504e21c48354c51497199362c8ae8",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-format-raw-utf16-file",
+      "script": "test/compat/generated/subrip-format-raw-utf16.srt",
+      "sha256": "e430ad9e866f37f0cf404487aeadd73e90081cec5e7572799775710e5cfe4eaf",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "subrip-format-raw-utf16-memory",
+      "script": "test/compat/generated/subrip-format-raw-utf16.srt",
+      "sha256": "e430ad9e866f37f0cf404487aeadd73e90081cec5e7572799775710e5cfe4eaf",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
       ],
       "stride_padding": 16,
       "fill_seed": 31

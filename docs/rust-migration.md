@@ -20,6 +20,23 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns the UTF-16 text produced by `SubRipper2SSA`, applying the six
+  original case-sensitive italic/bold/underline replacements in their original
+  order. The native public string interface remains unchanged; the source is
+  not mutated, the charset argument remains ignored, and no Unicode decoding
+  or case normalization is introduced. A noncopyable C++ owner queries bounded
+  code units and releases the Rust result even if native string construction
+  throws. Embedded-NUL inputs retain native replacement because the existing
+  CString replacement evidence does not establish deterministic parity there.
+  Fatal ASan/UBSan comparisons passed **121,163 cases / 2,703,506 UTF-16 units**
+  on arm64 and under x64 execution, including **117,224 changed strings**,
+  every nonzero code unit, malformed/nested fragments and a long repeated-tag
+  case. Only stable tag-free NUL cases enter reference comparison; tag-bearing
+  NUL cases are excluded. Windows uses installed ATL strings for the oracle.
+  Rust tests (60 core, 37 FFI), strict Clippy and default-branch syntax checks
+  pass. The renderer corpus now has **370 cases / 4,430 scheduled frames**, with
+  eight new SRT files and visible italic/underline control pairs in file and
+  memory modes. Windows/Miri and actual renderer validation are pending.
 * Safe Rust selects DVD polygon-to-ASS commands and formats their signed decimal
   coordinates into a bounded UTF-16 buffer. Native public `CStringW` output,
   position/header formatting, prefix appends, final suffix and exception

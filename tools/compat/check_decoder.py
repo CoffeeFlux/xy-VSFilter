@@ -55,7 +55,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
               ROOT / "include/xy_rust_drawing.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
-              ROOT / "include/xy_rust_fields.h",
+              ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h",
               ROOT / "include/xy_rust_segments.h",
               ROOT / "include/xy_rust_segment_insert.h",
               ROOT / "include/xy_rust_hdmv.h",
@@ -143,6 +143,14 @@ public:
         font += text[start:end] + '\n decoded.assign((BYTE*)pData, (BYTE*)pData + datalen);\n return true;\n}\n}\n'
         font += "#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_font.h").write_text(font, encoding="utf-8")
+    subrip = '#include "subrip_shell.h"\n'
+    for name, content in (("ReferenceSubRip", font_source), ("CandidateSubRip", candidate_font)):
+        subrip += f"namespace {name} {{\n"
+        if name == "CandidateSubRip":
+            subrip += "#define XY_VSFILTER_RUST_TEXT\n"
+        subrip += extract_definition(content.decode("utf-8-sig"), "static CStringW SubRipper2SSA(") + "\n"
+        subrip += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_subrip.h").write_text(subrip, encoding="utf-8")
     fields = font_source.decode("utf-8-sig").split("#include", 1)[0]
     fields += '#include "fields_shell.h"\n'
     for name, content in (("OriginalFields", font_source), ("CandidateFields", candidate_font)):
@@ -795,6 +803,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     vobsub_path_result = run([str(vobsub_path_executable)], capture_output=True, text=True)
     print(vobsub_path_result.stdout, end="", flush=True)
     print(vobsub_path_result.stderr, end="", file=sys.stderr)
+    subrip_executable = destination / ("subrip-oracle.exe" if os.name == "nt" else "subrip-oracle")
+    subrip_compile = [arg.replace("fill_oracle.cpp", "subrip_oracle.cpp").replace("fill-oracle", "subrip-oracle") for arg in fill_compile]
+    run(subrip_compile)
+    subrip_result = run([str(subrip_executable)], capture_output=True, text=True)
+    print(subrip_result.stdout, end="", flush=True)
+    print(subrip_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -838,6 +852,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "vobsub_scale_result": vobsub_scale_result.stdout, "vobsub_scale_stderr": vobsub_scale_result.stderr,
         "vobsub_outline_compile_command": vobsub_outline_compile,
         "vobsub_outline_result": vobsub_outline_result.stdout, "vobsub_outline_stderr": vobsub_outline_result.stderr,
+        "subrip_compile_command": subrip_compile,
+        "subrip_result": subrip_result.stdout, "subrip_stderr": subrip_result.stderr,
+        "subrip_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring replacement model; Windows comparison required",
         "vobsub_path_compile_command": vobsub_path_compile,
         "vobsub_path_result": vobsub_path_result.stdout, "vobsub_path_stderr": vobsub_path_result.stderr,
         "vobsub_path_string_backend": "installed ATL CStringW" if os.name == "nt" else "swprintf/wstring with LONG-range coordinates",

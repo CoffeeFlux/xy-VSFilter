@@ -244,6 +244,23 @@ def incremental_variants():
         yield "incremental-" + name + ".srt", data
 
 
+def subrip_variants():
+    for name, payload in {
+        "control": "Formatting sample\r\nsecond line",
+        "italic": "<i>Formatting sample</i>\r\nsecond line",
+        "bold": "<b>Formatting sample</b>\r\nsecond line",
+        "underline": "<u>Formatting sample</u>\r\nsecond line",
+        "uppercase": "<I>Formatting sample</I>\r\nsecond line",
+        "mixed": "<i><b>Formatting</b> <u>sample</u></i>\r\nsecond line",
+        "malformed": "<b<i>>Formatting</b> <u>sample</i>\r\nsecond line",
+        "raw-utf16": "<i>Formatting \ud800sample\udfff</i>\r\nsecond line",
+    }.items():
+        text = "1\r\n00:00:00,000 --> 00:00:04,000\r\n" + payload + "\r\n\r\n"
+        data = (b"\xff\xfe" + text.encode("utf-16le", "surrogatepass")
+                if name == "raw-utf16" else text.encode("ascii"))
+        yield "subrip-format-" + name + ".srt", data
+
+
 def timestamps(data):
     matches = re.findall(rb"Dialogue:[^,]*,(\d+):(\d+):(\d+(?:\.\d+)?),(\d+):(\d+):(\d+(?:\.\d+)?)", data)
     if not matches:
@@ -292,7 +309,9 @@ def make_cases(files):
                                                     ("drawing-state-spline-close-twice", "drawing-state-control"),
                                                     ("raster-be-one", "raster-control"),
                                                     ("raster-be-fraction-high", "raster-control"),
-                                                    ("raster-gaussian-medium", "raster-control"))
+                                                    ("raster-gaussian-medium", "raster-control"),
+                                                    ("subrip-format-italic", "subrip-format-control"),
+                                                    ("subrip-format-underline", "subrip-format-control"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -303,6 +322,7 @@ def main():
     files = [(path, path.read_bytes()) for path in sorted((ROOT / "test").glob("*.ass"))]
     generated = [(DEST / "generated" / (name + ".ass"), data) for name, data in variants()]
     generated += [(DEST / "generated" / name, data) for name, data in incremental_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in subrip_variants()]
     manifest = json.dumps(make_cases(files + generated), indent=2) + "\n"
     expected = generated + [(DEST / "cases.json", manifest.encode("utf-8"))]
     for path, data in expected:
