@@ -10,6 +10,10 @@
 #define XY_REALTEXT_CDECL
 #endif
 extern "C" {
+void* XY_REALTEXT_CDECL xy_vsfilter_realtext_tag_create();
+uint32_t XY_REALTEXT_CDECL xy_vsfilter_realtext_tag_next(void*, const uint16_t*, size_t, uint32_t, uint32_t, uint32_t);
+size_t XY_REALTEXT_CDECL xy_vsfilter_realtext_tag_field(const void*, uint32_t, size_t);
+void XY_REALTEXT_CDECL xy_vsfilter_realtext_tag_release(void*);
 void* XY_REALTEXT_CDECL xy_vsfilter_realtext_create(uint32_t, int32_t, int32_t);
 uint32_t XY_REALTEXT_CDECL xy_vsfilter_realtext_begin(void*, const uint16_t*, size_t, uint32_t);
 uint32_t XY_REALTEXT_CDECL xy_vsfilter_realtext_attribute_kind(const void*, const uint16_t*, size_t);
@@ -28,6 +32,29 @@ void XY_REALTEXT_CDECL xy_vsfilter_realtext_timecode_release(void*);
 }
 #undef XY_REALTEXT_CDECL
 namespace XyRust {
+class RealTextTag {
+    void* owner;
+    RealTextTag(const RealTextTag&);
+    RealTextTag& operator=(const RealTextTag&);
+public:
+    RealTextTag():owner(xy_vsfilter_realtext_tag_create()){}
+    ~RealTextTag(){xy_vsfilter_realtext_tag_release(owner);}
+    uint32_t Next(const std::wstring& input,bool ignore,bool response,uint32_t position){
+#ifdef _WIN32
+        static_assert(sizeof(wchar_t)==sizeof(uint16_t),"native strings must contain UTF-16 units");
+        return xy_vsfilter_realtext_tag_next(owner,reinterpret_cast<const uint16_t*>(input.data()),input.size(),ignore?1:0,response?1:0,position);
+#else
+        const std::vector<uint16_t> units(input.begin(),input.end());
+        return xy_vsfilter_realtext_tag_next(owner,units.data(),units.size(),ignore?1:0,response?1:0,position);
+#endif
+    }
+    size_t Field(uint32_t field)const{return xy_vsfilter_realtext_tag_field(owner,field,0);}
+    std::wstring Text()const{
+        const size_t length=Field(4);std::wstring result(length,L'\0');
+        for(size_t i=0;i<length;++i)result[i]=static_cast<wchar_t>(xy_vsfilter_realtext_tag_field(owner,5,i));
+        return result;
+    }
+};
 class RealTextTimecode {
     void* owner;
     RealTextTimecode(const RealTextTimecode&);

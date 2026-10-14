@@ -20,6 +20,21 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns the `ExtractTag` state machine, including comments, prefix
+  recovery, partial name/flag changes and source consumption. Comment names keep
+  the leading `!`; a comment delimiter at EOF still returns false without
+  consuming input. Existing tag names are appended to before native lowercasing,
+  existing attributes survive, and the text flag is untouched. Native whitespace
+  and lowercase callbacks see the same partial state. Their input changes and
+  exceptions are preserved through short input loans and a noncopyable owner.
+  Fatal ASan/UBSan comparisons passed **374,404 cases** on arm64 and under x64
+  execution, including **231,469 successful returns**, **257,246 changed inputs**,
+  **1,549,227 native operations**, **1,036 injected interruptions**, **1,216
+  matching checked-string exceptions** and **3,018 callback mutations**. The
+  100,064 tag-output comparisons and 58 complete parser cases still pass with
+  all four RealText replacements. Rust 1.85 tests (65 core, 42 FFI), strict
+  Clippy, corpus freshness and default-branch syntax checks pass. Windows/Miri
+  validation is pending. Native allocation failure timing remains unverified.
 * Safe Rust owns the reverse field extraction used by RealText `GetTimecode`.
   Empty components, embedded NULs, original unit order and the cached initial
   length are preserved; later numeric callbacks can still change unread input.
@@ -50,7 +65,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   The tag-output oracle and **58 complete parser cases** also pass with both
   RealText replacements active. Rust 1.85 tests (63 core, 40 FFI), strict Clippy
   on both the pinned and current toolchains, and default-branch syntax checks
-  pass. Windows/Miri validation is pending. Input/output allocation failures
+  pass. Candidate `e71d0945` passed all four CI platforms, Miri and both
+  Windows DLL jobs, each matching **382 cases / 4,490 rendered frames** and
+  **32 mutations / 224 frames**, plus dialogs, visible controls, exports and
+  dependencies. Both logs confirm Rust-enabled `RealTextParser.cpp` compilation.
+  [Tag-output and attribute evidence](realtext-tags-attributes-evidence.json)
+  records verified hashes and stable local validation. Input/output allocation failures
   still need separate validation; native classification and map storage remain.
   This increment also corrects a Clippy 1.85 `needless_borrow` failure in the
   initial tag-output bridge: local checks had used a newer Clippy. Run
@@ -72,7 +92,9 @@ unresolved reference outcomes requiring investigation, never matching results.
   Windows uses its actual CRT. Rust tests (62 core, 39 FFI), strict Clippy and
   both default-branch syntax checks pass. The renderer corpus now has **382
   cases / 4,582 scheduled frames**, including six RealText files and visible
-  italic controls in file/memory modes. Windows/Miri validation is pending.
+  italic controls in file/memory modes. The corrected bridge and its composition
+  with attribute parsing are validated on Windows x86/x64 and all portable CI
+  platforms at `e71d0945`; see the shared evidence above.
   Parsing control flow, numeric conversion and native allocation/OOM behavior
   remain outside this replacement.
 * Safe Rust recognizes the leading settings line removed by `WebVTTCueStrip`.

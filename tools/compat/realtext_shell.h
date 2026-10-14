@@ -22,8 +22,10 @@ static std::map<std::wstring,std::wstring>* realTextAttributes=nullptr;
 static std::vector<int64_t> realTextAttributeEvents;
 static int realTextFailure=-1,realTextAttempts=0,realTextMutation=0;
 static bool realTextMutated=false;
+static void (*realTextTagHook)(int,const std::wstring&)=nullptr;
 static void realTextStringEvent(const std::wstring& text){realTextAttributeEvents.push_back(text.size());for(wchar_t c:text)realTextAttributeEvents.push_back(c);}
 static void realTextAttributeHook(int action,const std::wstring& name){
+    if(realTextTagHook)realTextTagHook(action,name);
     if(!realTextInput)return;
     realTextAttributeEvents.insert(realTextAttributeEvents.end(),{action,*realTextPosition});realTextStringEvent(name);realTextStringEvent(*realTextInput);
     realTextAttributeEvents.push_back(realTextAttributes->size());for(const auto& item:*realTextAttributes){realTextStringEvent(item.first);realTextStringEvent(item.second);}
