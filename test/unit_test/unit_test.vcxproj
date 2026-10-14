@@ -71,6 +71,7 @@
     <ClCompile Include="main.cpp">
       <AssemblerOutput>AssemblyAndSourceCode</AssemblerOutput>
     </ClCompile>
+    <ClCompile Include="memory_open_test.cpp" />
     <ClCompile Include="overall_test.cpp" />
   </ItemGroup>
   <ItemGroup>

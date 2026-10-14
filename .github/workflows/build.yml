@@ -155,3 +155,13 @@ jobs:
       # a script argument and test data.
       - name: Build unit tests
         run: bash ./build_vsfilter.sh -platform "${{ matrix.vsfplat }}" -compiler VS2022 -voff -proj unit_test
+
+      # OverallTest needs a script argument and is skipped; MemoryOpen compares
+      # every test/*.ass rendered from a file against the same script from memory.
+      - name: Run unit tests
+        timeout-minutes: 15
+        env:
+          XY_TEST_DATA: test
+        run: |
+          exe=(bin/lib*/"${{ matrix.vsfplat }}"/Release/unit_test.exe)
+          "${exe[0]}"

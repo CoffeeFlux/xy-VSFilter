@@ -4,11 +4,14 @@
 #include <gtest/gtest.h>
 
 void OpenTestScript( const char *filename );
+bool TestScriptOpened();
 void OverallTest(float fps = 25, int width=1280, int height=720,
     double start=0, double end=60);
 
 TEST(OverallTest, xxx)
 {
+    if (!TestScriptOpened())
+        GTEST_SKIP() << "no script given on the command line";
     OverallTest();
 }
 
