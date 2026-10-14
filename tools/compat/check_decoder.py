@@ -1604,6 +1604,8 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
     print(dvb_storage_result.stderr, end="", file=sys.stderr)
     composite_storage_executable = destination / ("composite-storage-oracle.exe" if os.name == "nt" else "composite-storage-oracle")
     composite_storage_compile = [arg.replace("find_char_oracle.cpp", "composite_storage_oracle.cpp").replace("find-char-oracle", "composite-storage-oracle") for arg in find_char_compile]
+    if os.name == "nt":
+        composite_storage_compile += ["user32.lib"]  # Actual ATL SetRect/IntersectRect calls.
     run(composite_storage_compile)
     composite_storage_result = run([str(composite_storage_executable)], capture_output=True, text=True)
     print(composite_storage_result.stdout, end="", flush=True)

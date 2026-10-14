@@ -85,6 +85,10 @@ unresolved reference outcomes requiring investigation, never matching results.
   `int` conversions now match the native caller's geometry variables; no
   production code changed for that correction. Those jobs remain failed and
   the corrected fixture needs a new Windows run.
+  The next Windows jobs reached the link step and required `user32.lib` for
+  ATL's actual SetRect/IntersectRect calls; that explicit dependency is now
+  included. Jobs `115895618184` / `115895618554` remain failed link attempts,
+  not comparison results.
 
 * Output `XyBitmap` buffers now use Rust ownership while preserving the native
   address modulo 16, public frame-accessor pointers and logical cache accounting.
