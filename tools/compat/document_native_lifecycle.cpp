@@ -956,6 +956,86 @@ static void add_style_session_lifecycle() {
     }
 }
 
+static void copy_styles_stage(TraceDocument& doc, const char* name) {
+    printf("copy-styles-stage %s\n", name); doc.Dump(name);
+}
+static void copy_styles_session_lifecycle() {
+    {
+        TraceDocument doc(0);
+        STSStyle expected[] = {named_value(1), named_value(2), named_value(3)};
+        expected[0].fontSize = -0.0; expected[1].fontSize = 0.0;
+        const wchar_t* names[] = {L"SelfA", L"SelfB", L"SelfC"};
+        for(int i = 0; i < 3; ++i) {
+            named_add(doc, names[i], expected[i]);
+            doc.AddSTSEntryOnly(CStringW(L"self append"), true, i*10, (i+1)*10, CString(names[i]));
+        }
+        doc.CreateSegments(); doc.Animate(0);
+        const auto segments = segment_snapshot(doc); const unsigned callbacks = change_events[0];
+        copy_styles_stage(doc, "copy-styles-self-before");
+        check(doc.CopyNames(doc, true), "ordinary self append succeeds");
+        check(doc.NamedCount() == 3 && doc.Entries() == 3, "self append retains map and entries");
+        for(int i = 0; i < 3; ++i) {
+            STSStyle actual; check(doc.GetStyle(i, &actual), "self append resolves original style");
+            uint64_t bits, wanted;
+            std::memcpy(&bits, &actual.fontSize, 8); std::memcpy(&wanted, &expected[i].fontSize, 8);
+            check(bits == wanted && actual == expected[i] && same_identity(actual.fontName, expected[i].fontName)
+                && same_identity(doc.Entry(i).style, CString(names[i])), "self append retains exact original values");
+        }
+        require_same_segments(doc, segments, "copy-styles-self-after");
+        check(change_events[0] == callbacks, "self append adds no callback");
+        copy_styles_stage(doc, "copy-styles-self-after");
+    }
+    {
+        TraceDocument source(0), destination(1);
+        named_add(source, L"SmallA", named_value(1));
+        named_add(source, L"SmallB", named_value(2));
+        named_add(source, L"SmallC", named_value(3));
+        for(int i = 0; i < 128; ++i) {
+            CString name; name.Format(L"Grown%d", i); named_add(destination, name, named_value(4));
+        }
+        destination.AddSTSEntryOnly(CStringW(L"replacement keeps records"), true, 0, 10, CString(L"SmallA"));
+        destination.CreateSegments(); destination.Animate(0);
+        const auto segments = segment_snapshot(destination);
+        const unsigned sourceCallbacks = change_events[0], destinationCallbacks = change_events[1];
+        copy_styles_stage(source, "copy-styles-grown-source-before");
+        check(destination.CopyNames(source, false), "replace grown destination map");
+        check(destination.NamedCount() == 3 && destination.Entries() == 1, "replacement retains records and copies three styles");
+        require_same_segments(destination, segments, "copy-styles-grown-result");
+        copy_styles_stage(destination, "copy-styles-grown-result");
+        copy_styles_stage(source, "copy-styles-grown-source-after");
+        check(change_events[0] == sourceCallbacks && change_events[1] == destinationCallbacks, "grown replacement adds no callbacks");
+    }
+    {
+        TraceDocument source(0), destination(1);
+        STSStyle original = named_value(1), equal = original;
+        original.fontSize = -0.0; equal.fontSize = 0.0; equal.fontName.SetAt(2, 0xdcff);
+        named_add(destination, L"Equal", original);
+        named_add(destination, L"Conflict", named_value(1));
+        named_add(destination, L"Conflict2", named_value(3));
+        named_add(source, L"Equal", equal);
+        named_add(source, L"Conflict", named_value(2));
+        named_add(source, L"Missing", named_value(3));
+        const wchar_t* names[] = {L"Equal", L"Conflict", L"Conflict2"};
+        for(int i = 0; i < 3; ++i)
+            destination.AddSTSEntryOnly(CStringW(L"mixed append"), true, i*10, (i+1)*10, CString(names[i]));
+        destination.CreateSegments(); destination.Animate(0);
+        const auto segments = segment_snapshot(destination);
+        const unsigned sourceCallbacks = change_events[0], destinationCallbacks = change_events[1];
+        copy_styles_stage(source, "copy-styles-mixed-source-before");
+        check(destination.CopyNames(source, true), "mixed append succeeds");
+        check(destination.NamedCount() == 5 && destination.HasStoredName(CString(L"Missing"))
+            && same_identity(destination.Entry(1).style, CString(L"Conflict3"))
+            && same_identity(destination.Entry(2).style, CString(L"Conflict2")), "mixed append retains collision sequencing");
+        STSStyle actual; check(destination.GetStyle(0, &actual), "mixed append equal style resolves");
+        uint64_t bits; std::memcpy(&bits, &actual.fontSize, 8);
+        check(bits == UINT64_C(0x8000000000000000) && same_identity(actual.fontName, original.fontName), "mixed equal row retains old full value");
+        require_same_segments(destination, segments, "copy-styles-mixed-result");
+        copy_styles_stage(destination, "copy-styles-mixed-result");
+        copy_styles_stage(source, "copy-styles-mixed-source-after");
+        check(change_events[0] == sourceCallbacks && change_events[1] == destinationCallbacks, "mixed append adds no callbacks");
+    }
+}
+
 class SortDocument : public TraceDocument {
 public:
     unsigned notifications=0;
@@ -1250,6 +1330,7 @@ int main() {
         named_style_lifecycle();
         prepared_style_conflicts();
         add_style_session_lifecycle();
+        copy_styles_session_lifecycle();
         sort_lifecycle();
         base_empty_lifecycle();
         lcid_lifecycle();

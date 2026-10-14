@@ -230,12 +230,14 @@ template<class Style = STSStyle> inline Style StyleValue(const Bytes& bytes) {
 class DocumentOwner;
 class UnknownStylesPass;
 class StyleAddition;
+class NamedStyleCopy;
 class DocumentReply {
     uint64_t id_ = 0;
     explicit DocumentReply(uint64_t id) : id_(id) {}
     friend class DocumentOwner;
     friend class UnknownStylesPass;
     friend class StyleAddition;
+    friend class NamedStyleCopy;
 public:
     DocumentReply(const DocumentReply&) = delete;
     DocumentReply& operator=(const DocumentReply&) = delete;
@@ -262,6 +264,7 @@ struct DocumentQuery { int index; bool found; size_t count; };
 class DocumentOwner {
     friend class UnknownStylesPass;
     friend class StyleAddition;
+    friend class NamedStyleCopy;
     uint64_t id_ = 0;
     template<size_t N> std::array<uint8_t,N> EntryFields(int index) const {
         static_assert(N == XY_DOCUMENT_V1_ENTRY_HEADER_BYTES, "entry header size");
@@ -618,6 +621,47 @@ public:
     }
     void Resume(bool accepted) {
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_unknown_resume_v1(id_,accepted ? 1 : 0);}));
+    }
+};
+// Per-copy state and copied styles remain in Rust. Native code supplies only
+// the same CRT-generated suffix candidates used by direct AddStyle calls.
+class NamedStyleCopy {
+    uint64_t id_ = 0;
+public:
+    NamedStyleCopy(const DocumentOwner& destination, const DocumentOwner& source, bool append) {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_copy_styles_open_v1(
+            destination.id_,source.id_,append ? 1 : 0,out.data(),out.size());}));
+        id_ = DocumentDetail::Load(out,0,8);
+    }
+    NamedStyleCopy(const NamedStyleCopy&) = delete;
+    NamedStyleCopy& operator=(const NamedStyleCopy&) = delete;
+    ~NamedStyleCopy() noexcept {
+        if(id_) { const uint64_t id = id_; id_ = 0;
+            DocumentDetail::Release(DocumentDetail::Invoke([&]{return xy_vsfilter_document_copy_styles_drop_v1(id);})); }
+    }
+    uint32_t Next(CString& name) {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_copy_styles_step_v1(
+            id_,out.data(),out.size());}));
+        DocumentReply reply(DocumentDetail::Load(out,0,8));
+        const auto bytes = reply.Read();
+        DocumentDetail::Shape(bytes.size() >= 16);
+        const uint32_t action = static_cast<uint32_t>(DocumentDetail::Load(bytes,0,4));
+        const uint32_t units = DocumentDetail::Count(DocumentDetail::Size(DocumentDetail::Load(bytes,8,8)));
+        DocumentDetail::Shape(action <= 2 && DocumentDetail::Load(bytes,4,4) == 0 &&
+            (action == 2 || units == 0) && bytes.size() == DocumentDetail::AddSize(16,DocumentDetail::MulSize(units,2)));
+        if(action == 2) { size_t offset = 16; name = DocumentDetail::String(bytes,offset,units); }
+        return action;
+    }
+    bool Submit(const CString& candidate) {
+        const auto bytes = DocumentDetail::Units(candidate);
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_copy_styles_submit_v1(
+            id_,bytes.data(),bytes.size(),out.data(),out.size());}));
+        const uint64_t applied = DocumentDetail::Load(out,0,8);
+        DocumentDetail::Shape(applied <= 1);
+        return applied != 0;
     }
 };
 // Rust owns classification and the complete successful conflict commit.

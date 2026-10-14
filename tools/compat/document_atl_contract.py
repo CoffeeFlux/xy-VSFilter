@@ -9,7 +9,7 @@ import argparse
 import hashlib
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import re
 import shutil
 import subprocess
@@ -435,7 +435,7 @@ def select_cstring_helpers(source, header):
                 if names:
                     add(start, opening + alias.end(), owner,
                         owner + ' helper alias', 'declaration')
-            for match in re.finditer(r'\b(CharNext|StringFindString|StringLength|SafeStringLen)\s*\(', code[opening:last]):
+            for match in re.finditer(r'\b(CharNextW?|StringFindString|StringLength|SafeStringLen)\s*\(', code[opening:last]):
                 start = opening + match.start()
                 prefix = code[opening:start]
                 if prefix.count('{') - prefix.count('}') != 1:
@@ -455,8 +455,13 @@ def select_cstring_helpers(source, header):
                 if body < 0 and semi < 0:
                     raise ValueError('Unterminated CString helper signature')
                 end = closing(code, body) if is_body else semi + 1
-                add(start, end, owner, owner + '::' + match[1],
+                # UNICODE Win32 headers macro-expand CharNext to CharNextW.
+                # Keep the actual spelling; the canonical family is accepted
+                # only when active source origins map to the hashed raw method.
+                family = 'CharNext' if match[1] == 'CharNextW' else match[1]
+                add(start, end, owner, owner + '::' + family,
                     'definition' if is_body else 'declaration')
+                records[-1]['identifier'] = match[1]
     if len(records) > 40 or sum(len(r['excerpt'].encode('utf-8')) for r in records) > 80000:
         raise ValueError('CString helper selections exceed total bound')
     return records
@@ -561,7 +566,9 @@ def preprocessed_origins(text):
     """MSVC /E line markers; unknown/unmapped lines never establish origins."""
     lines, origins = [], []
     header, number = None, None
-    for line in text.splitlines(keepends=True):
+    # MSVC #line numbering and selected offsets count LF, not Python's extra
+    # splitlines separators (form feed/vertical tab are C++ whitespace).
+    for line in re.findall(r'[^\n]*\n|[^\n]+$', text):
         marker = re.match(r'^\s*#\s*(?:line\s+)?(\d+)\s+"([^"\r\n]+)"\s*$', line)
         if marker:
             header = marker[2].replace('\\\\', '\\')
@@ -582,33 +589,33 @@ def select_active_cstring_helpers(stdout, source_name, source_records, included_
     records = select_cstring_helpers(code, 'preprocessed:' + source_name)
     status = cstring_helper_contract(records)
     def path_key(path):
-        return str(path).replace('\\', '/').casefold()
+        # Windows paths permit repeated separators; preserve the drive/root
+        # while canonicalizing filesystem spelling, not C++ body text.
+        return PureWindowsPath(str(path)).as_posix().casefold()
     headers = {path_key(path): digest for path, digest in (included_headers or {}).items()}
     matches = []
     for row in records:
-        if row['kind'] != 'definition':
-            continue
         mapped = origins[row['first_line'] - 1:row['last_line']]
         candidates = []
         for raw in source_records:
-            if raw['kind'] != 'definition' or raw['symbol'] != row['symbol'] or raw['owner'] != row['owner']:
+            if raw['kind'] != row['kind'] or raw['symbol'] != row['symbol'] or raw['owner'] != row['owner']:
                 continue
             key = path_key(raw['header'])
-            # All nonblank active method lines must originate within this raw
-            # method, in the same actually included hashed SDK header.
-            substantive = [(origin, line) for origin, line in zip(mapped, code.splitlines()[row['first_line']-1:row['last_line']]) if line.strip()]
+            # All nonblank active helper/declaration lines must originate within
+            # the corresponding span in the included, hashed SDK header.
+            substantive = [(origin, line) for origin, line in zip(mapped, code.split('\n')[row['first_line']-1:row['last_line']]) if line.strip()]
             if (headers.get(key) != raw.get('header_sha256') or key not in headers or not substantive
                 or any(origin[0] is None or path_key(origin[0]) != key or origin[1] is None
                        or not raw['first_line'] <= origin[1] <= raw['last_line'] for origin, _ in substantive)):
                 continue
             candidates.append(raw)
-        body = csize_body_tokens(row)
-        matches.append({'symbol': row['symbol'], 'active_sha256': row['sha256_utf8'],
-                        'active_body_sha256': sha((body or '').encode()),
+        body = csize_body_tokens(row) if row['kind'] == 'definition' else None
+        matches.append({'symbol': row['symbol'], 'kind': row['kind'], 'identifier': row.get('identifier'), 'active_sha256': row['sha256_utf8'],
+                        'active_body_sha256': sha(body.encode()) if body is not None else None,
                         'source_origins': [{'header': h, 'line': n} for h, n in mapped],
                         'source_matches': [{'sha256': raw['sha256_utf8'],
-                                            'raw_body_sha256': sha((csize_body_tokens(raw) or '').encode()),
-                                            'exact_body_tokens': body == csize_body_tokens(raw)} for raw in candidates]})
+                                            'raw_body_sha256': sha((csize_body_tokens(raw) or '').encode()) if raw['kind'] == 'definition' else None,
+                                            'exact_body_tokens': body == csize_body_tokens(raw) if raw['kind'] == 'definition' else None} for raw in candidates]})
     matched = bool(matches) and all(row['source_matches'] for row in matches)
     return {'complete': status['complete'] and matched and not any('\ufffd' in r['excerpt'] for r in records),
             'scope': 'Authoritative active wide helpers mapped to included SDK source spans; macro expansion need not preserve body tokens',
@@ -689,7 +696,7 @@ def capture_csize_contexts(out, compiler, platform, source_records, protect, rep
         resolved = len(helper_results) == 2 and all(r['complete'] for r in helper_results.values())
         helper_contract['complete'] = resolved
         helper_contract['active_conditions_resolved'] = resolved
-        helper_contract['resolution_basis'] = 'Actual /E native-rust-text and experimental contexts; active method origins map to bounded included SDK source spans, macro-expanded bodies authoritative'
+        helper_contract['resolution_basis'] = 'Actual /E native-rust-text and experimental contexts; active helper and dispatch-declaration origins map to bounded included SDK source spans, macro-expanded bodies authoritative'
         if resolved:
             helper_contract['source_capture_complete'] = True
             helper_contract['active_conditions_unresolved'] = []

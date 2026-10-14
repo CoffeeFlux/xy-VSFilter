@@ -261,6 +261,25 @@ template<class BaseType, class StringTraits = StrTraitATL<BaseType, ChTraitsCRT<
             safe = next(r for r in captured['body_matches'] if r['symbol'].endswith('::SafeStringLen'))
             self.assertFalse(safe['source_matches'][0]['exact_body_tokens'])
             self.assertNotEqual(safe['active_body_sha256'], safe['source_matches'][0]['raw_body_sha256'])
+        # Win32 UNICODE macro spelling, repeated Windows separators, and C++
+        # form-feed whitespace must retain exact LF-based source origins.
+        header=r"C:\sdk\cstringt.h"
+        prologue="int first;\fint second;\nint third;\vint fourth;\n"
+        raw_source=prologue+text
+        raw_rows=contract.select_cstring_helpers(raw_source,header)
+        for row in raw_rows:row['header_sha256']='actual-header-hash'
+        active_source=raw_source.replace('CharNext(', 'CharNextW(')
+        marker='#line 1 '+json.dumps(r"C:\\sdk\\cstringt.h")+'\n'
+        captured=contract.select_active_cstring_helpers((marker+active_source).encode(),'macro-wide',raw_rows,{header:'actual-header-hash'})
+        self.assertTrue(captured['complete'])
+        advanced=next(row for row in captured['selected_definitions'] if row['symbol']=='ChTraitsCRT::CharNext')
+        self.assertEqual(advanced['identifier'],'CharNextW')
+        self.assertTrue(all(row['source_matches'] for row in captured['body_matches']))
+        # Dispatch declarations need source-origin proof as well as methods.
+        wrong_dispatch=[dict(row,header='wrong.h') if row['owner']=='ChTraitsBase' else row for row in raw_rows]
+        self.assertFalse(contract.select_active_cstring_helpers((marker+active_source).encode(),'macro-wide',wrong_dispatch,{header:'actual-header-hash'})['complete'])
+        wrong_name=active_source.replace('CharNextW(', 'CharNextA(')
+        self.assertFalse(contract.select_active_cstring_helpers((marker+wrong_name).encode(),'macro-wide',raw_rows,{header:'actual-header-hash'})['complete'])
         override = text.replace('class StrTraitMFC : public StrTraitATL<XCHAR, ChTraits> {};',
                                 'class StrTraitMFC : public StrTraitATL<XCHAR, ChTraits> { static LPWSTR CharNext(LPCWSTR p) { return 0; } };')
         self.assertFalse(contract.cstring_helper_contract(contract.select_cstring_helpers(override, 'afxstr.h'))['complete'])
