@@ -34,12 +34,38 @@ def cases():
             "multiline": subtitle("first\\nsecond\\nthird")}
 
 
-def inspect(directory, returncode, timed_out=False):
+def error_cases():
+    # Bounded parser errors with no UTF-8 decoding or reference-outcome probes.
+    # These must complete the native SSF exception handler, never crash/timeout.
+    return {
+        "quote-unclosed": ('#literal: "unterminated', "unterminated quoted string"),
+        "quote-newline": ('#literal: "line\nbreak";', "qouted string terminated unexpectedly by a new-line character"),
+        "quote-escape-eof": ('#literal: "tail\\', "qouted string terminated unexpectedly by EOS"),
+        "block-unclosed": ('@#literal { unterminated', "unterminated block"),
+        "block-escape-eof": ('@#literal { tail\\', "block terminated unexpectedly by EOS"),
+    }
+
+
+def inspect(directory, returncode, timed_out=False, expected_error=None):
     trace = (directory / "stdout.txt").read_bytes()
     result = {"returncode": returncode, "stdout_sha256": sha(directory / "stdout.txt"),
               "stderr_sha256": sha(directory / "stderr.txt"), "files": {}, "status": "incomplete"}
     if timed_out:
         result["status"] = "timeout"
+        return result
+    if expected_error is not None:
+        exception = re.fullmatch(rb"ssf exception utf16((?: [0-9a-f]{4})+)\nssf-native-v1 exception complete\n", trace)
+        if returncode != 2 or exception is None or (directory / "stderr.txt").read_bytes():
+            return result
+        if list(directory.glob("dump-*.units")) or list(directory.glob("frame-*.bgra")):
+            return result
+        units = exception[1].split()
+        message = b"".join(int(unit, 16).to_bytes(2, "little") for unit in units).decode("utf-16-le", errors="surrogatepass")
+        if not re.fullmatch(r"Error \(Ln \d+ Col \d+\): " + re.escape(expected_error), message):
+            result["status"] = "control_failed"
+            return result
+        result.update(status="complete", expected_parse_error=expected_error, error_message=message,
+                      blank_frame_observations=0, visible_rendering_parity_frames=0)
         return result
     if returncode != 0 or not trace.endswith(b"ssf-native-v1 complete\n"):
         return result
@@ -80,7 +106,7 @@ def inspect(directory, returncode, timed_out=False):
     return result
 
 
-def capture(probe, source, directory, mode):
+def capture(probe, source, directory, mode, expected_error=None):
     directory.mkdir()
     timed_out = False
     with (directory / "stdout.txt").open("wb") as out, (directory / "stderr.txt").open("wb") as err:
@@ -94,7 +120,7 @@ def capture(probe, source, directory, mode):
     raw = (directory / "stdout.txt").read_bytes()
     (directory / "stdout.raw").write_bytes(raw)
     (directory / "stdout.txt").write_bytes(raw.replace(b"\r\n", b"\n"))
-    return inspect(directory, code, timed_out)
+    return inspect(directory, code, timed_out, expected_error)
 
 
 def equivalent(captures):
@@ -120,21 +146,23 @@ def main():
     harness = {name: sha(ROOT / name) for name in HARNESS}
     report = {"complete": False, "passed": False, "reference_commit": reference, "candidate_commit": commit,
               "platform": args.platform, "probes": probes, "harness_sources": harness, "cases": [],
-              "scope": "Actual separately linked libssf parser, parsed text and node dump in six encodings. Native renderer traces and blank RGBA frames are characterized separately: the pinned FontCache::Create returns NULL after successful CreateFontIndirect. No visible rendering parity is established. WCHAR and UTF-16LE/BOM byte input in borrowed, adopted and copied modes, including mutation of the source after copying; bounded valid fixtures, each side repeated in fresh processes. DirectShow, host playback, other byte encodings and malformed-document coverage remain separate."}
+              "scope": "Actual separately linked libssf parser, parsed text and node dump in six encodings. Native renderer traces and blank RGBA frames are characterized separately: the pinned FontCache::Create returns NULL after successful CreateFontIndirect. No visible rendering parity is established. WCHAR and UTF-16LE/BOM byte input in borrowed, adopted and copied modes, including mutation of the source after copying; bounded valid fixtures plus declared unterminated/newline literal errors with completed native exception handlers, each side repeated in fresh processes. Error line/column and exact UTF-16 messages are compared separately from successful parsing. Crashes, timeouts and unexpected exceptions never pass. DirectShow, host playback, other byte encodings and broader malformed-document coverage remain separate."}
     path = args.output / "report.json"
     path.write_text(json.dumps(report, indent=2) + "\n")
-    expanded = [(name + "-" + mode, text, mode) for name, text in cases().items() for mode in ("wide", "borrow", "copy", "adopt")]
-    for name, text, mode in expanded:
+    modes = ("wide", "borrow", "copy", "adopt")
+    expanded = [(name + "-" + mode, text, mode, None) for name, text in cases().items() for mode in modes]
+    expanded += [(name + "-" + mode, text, mode, error) for name, (text, error) in error_cases().items() for mode in modes]
+    for name, text, mode, expected_error in expanded:
         root = args.output / name
         root.mkdir()
         source = root / "input.utf16"
         source.write_bytes(text.encode("utf-16-le"))
-        entry = {"id": name, "input_sha256": sha(source), "input_mode": mode, "captures": {}}
+        entry = {"id": name, "input_sha256": sha(source), "input_mode": mode, "expected_error": expected_error, "captures": {}}
         report["cases"].append(entry)
         for side, probe in (("reference", args.reference), ("candidate", args.candidate)):
             for repeat in range(2):
                 label = f"{side}-{repeat}"
-                result = capture(probe, source, root / label, mode)
+                result = capture(probe, source, root / label, mode, expected_error)
                 entry["captures"][label] = result
                 if result["status"] != "complete":
                     path.write_text(json.dumps(report, indent=2) + "\n")
@@ -161,6 +189,11 @@ def main():
                 by_name[name + "-" + mode]["captures"][side]["files"] == wide["files"]
                 and by_name[name + "-" + mode]["captures"][side]["stdout_sha256"] == wide["stdout_sha256"]
                 for mode in ("borrow", "copy", "adopt"))
+        for name in error_cases():
+            wide = by_name[name + "-wide"]["captures"][side]
+            report["controls"][side + "-" + name + "-error-input-modes"] = all(
+                by_name[name + "-" + mode]["captures"][side]["stdout_sha256"] == wide["stdout_sha256"]
+                for mode in ("borrow", "copy", "adopt"))
     report["inputs_unchanged"] = (probes == {"reference": sha(args.reference), "candidate": sha(args.candidate)}
                                     and harness == {name: sha(ROOT / name) for name in HARNESS}
                                     and all(c["input_sha256"] == sha(args.output / c["id"] / "input.utf16") for c in report["cases"])
@@ -172,7 +205,7 @@ def main():
     path.write_text(json.dumps(report, indent=2) + "\n")
     if not report["passed"]:
         raise SystemExit("SSF controls or source stability failed")
-    print(f"{len(report['cases'])} native SSF parser/dump cases matched; {len(report['cases']) * 6} blank-frame observations, zero visible rendering parity frames")
+    print(f"{len(cases()) * len(modes)} native SSF parser/dump cases and {len(error_cases()) * len(modes)} expected parser errors matched; {len(cases()) * len(modes) * 6} blank-frame observations, zero visible rendering parity frames")
 
 
 if __name__ == "__main__":

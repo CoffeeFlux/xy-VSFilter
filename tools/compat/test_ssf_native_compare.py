@@ -65,6 +65,30 @@ class EvidenceTests(unittest.TestCase):
         path.write_text(original.replace("text units 0041", "text units"), newline="\n")
         self.assertEqual(MODULE.inspect(self.root, 0)["status"], "control_failed")
 
+    def test_expected_error_requires_exact_declared_message_and_completed_handler(self):
+        for path in list(self.root.glob("dump-*.units")) + list(self.root.glob("frame-*.bgra")):
+            path.unlink()
+        expected = "unterminated quoted string"
+        message = "Error (Ln 1 Col 23): " + expected
+        trace = "ssf exception utf16" + "".join(f" {ord(c):04x}" for c in message) + "\nssf-native-v1 exception complete\n"
+        path = self.root / "stdout.txt"
+        path.write_text(trace, newline="\n")
+        result = MODULE.inspect(self.root, 2, expected_error=expected)
+        self.assertEqual(result["status"], "complete")
+        self.assertEqual(result["error_message"], message)
+        self.assertEqual(result["blank_frame_observations"], 0)
+        self.assertEqual(result["files"], {})
+        self.assertEqual(MODULE.inspect(self.root, 2)["status"], "incomplete")
+        for code in (0, 3, -1073741819):
+            self.assertEqual(MODULE.inspect(self.root, code, expected_error=expected)["status"], "incomplete")
+        self.assertEqual(MODULE.inspect(self.root, 2, True, expected)["status"], "timeout")
+        self.assertEqual(MODULE.inspect(self.root, 2, expected_error="unterminated block")["status"], "control_failed")
+        path.write_text(trace.replace("ssf-native-v1 exception complete\n", ""), newline="\n")
+        self.assertEqual(MODULE.inspect(self.root, 2, expected_error=expected)["status"], "incomplete")
+        path.write_text(trace, newline="\n")
+        (self.root / "dump-0.units").write_bytes(b"")
+        self.assertEqual(MODULE.inspect(self.root, 2, expected_error=expected)["status"], "incomplete")
+
 
 if __name__ == "__main__":
     unittest.main()
