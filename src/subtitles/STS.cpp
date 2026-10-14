@@ -33,6 +33,7 @@
 #include "xy_rust_encoding.h"
 #include "xy_rust_ass_dialogue.h"
 #include "xy_rust_ass_style.h"
+#include "xy_rust_ass_headers.h"
 #include "xy_rust_webvtt.h"
 #include "xy_rust_fields.h"
 #include "xy_rust_segments.h"
@@ -2246,6 +2247,12 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
     bool fRet = false;
 
     int version = 3, sver = 3;
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::AssHeaders headers;
+#define XY_ASS_HEADER(key, id) (entryKind == (id))
+#else
+#define XY_ASS_HEADER(key, id) (entry == (key))
+#endif
 
     ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT601;
     ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_TV;
@@ -2264,6 +2271,12 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 //      catch(...) {continue;}
 
         entry.MakeLower();
+#ifdef XY_VSFILTER_RUST_TEXT
+        const unsigned entryKind = headers.Classify(entry);
+        version = headers.Field(0);
+        sver = headers.Field(1);
+        fRet = headers.Field(2) != 0;
+#endif
 
         if(entry == L"dialogue")
         {
@@ -2462,7 +2475,7 @@ if(sver <= 4)   style->scrAlignment = (style->scrAlignment&4) ? ((style->scrAlig
         {
             fRet = true;
         }
-        else if(entry == L"playresx")
+        else if(XY_ASS_HEADER(L"playresx", 4))
         {
             try {ret.m_dstScreenSize.cx = GetInt(buff);}
             catch(...) {ret.m_dstScreenSize = CSize(0, 0); return(false);}
@@ -2474,7 +2487,7 @@ if(sver <= 4)   style->scrAlignment = (style->scrAlignment&4) ? ((style->scrAlig
                     : ret.m_dstScreenSize.cx * 3 / 4;
             }
         }
-        else if(entry == L"playresy")
+        else if(XY_ASS_HEADER(L"playresy", 5))
         {
             try {ret.m_dstScreenSize.cy = GetInt(buff);}
             catch(...) {ret.m_dstScreenSize = CSize(0, 0); return(false);}
@@ -2486,66 +2499,97 @@ if(sver <= 4)   style->scrAlignment = (style->scrAlignment&4) ? ((style->scrAlig
                     : ret.m_dstScreenSize.cy * 4 / 3;
             }
         }
-        else if(entry == L"layoutresx")
+        else if(XY_ASS_HEADER(L"layoutresx", 6))
         {
             try {ret.m_layout_size.cx = GetInt(buff);}
             catch(...) {ret.m_layout_size = CSize(0, 0); return(false);}
         }
-        else if(entry == L"layoutresy")
+        else if(XY_ASS_HEADER(L"layoutresy", 7))
         {
             try {ret.m_layout_size.cy = GetInt(buff);}
             catch(...) {ret.m_layout_size = CSize(0, 0); return(false);}
         }
-        else if(entry == L"wrapstyle")
+        else if(XY_ASS_HEADER(L"wrapstyle", 8))
         {
             try {ret.m_defaultWrapStyle = GetInt(buff);}
             catch(...) {ret.m_defaultWrapStyle = 1; return(false);}
         }
-        else if(entry == L"scripttype")
+        else if(XY_ASS_HEADER(L"scripttype", 9))
         {
+#ifdef XY_VSFILTER_RUST_TEXT
+            int detected = 0;
+            if(buff.GetLength() >= 4 && !buff.Right(4).CompareNoCase(L"4.00")) detected = 4;
+            else if(buff.GetLength() >= 5 && !buff.Right(5).CompareNoCase(L"4.00+")) detected = 5;
+            else if(buff.GetLength() >= 6 && !buff.Right(6).CompareNoCase(L"4.00++")) detected = 6;
+            headers.ScriptVersion(detected);
+            version = headers.Field(0);
+            sver = headers.Field(1);
+#else
             if(buff.GetLength() >= 4 && !buff.Right(4).CompareNoCase(L"4.00")) version = sver = 4;
             else if(buff.GetLength() >= 5 && !buff.Right(5).CompareNoCase(L"4.00+")) version = sver = 5;
             else if(buff.GetLength() >= 6 && !buff.Right(6).CompareNoCase(L"4.00++")) version = sver = 6;
+#endif
         }
-        else if(entry == L"collisions")
+        else if(XY_ASS_HEADER(L"collisions", 10))
         {
             buff = GetStr(buff);
             buff.MakeLower();
+#ifdef XY_VSFILTER_RUST_TEXT
+            ret.m_collisions = static_cast<int>(headers.Value(buff, 0));
+#else
             ret.m_collisions = buff.Find(L"reverse") >= 0 ? 1 : 0;
+#endif
         }
-        else if(entry == L"scaledborderandshadow")
+        else if(XY_ASS_HEADER(L"scaledborderandshadow", 11))
         {
             buff = GetStr(buff);
             buff.MakeLower();
+#ifdef XY_VSFILTER_RUST_TEXT
+            ret.m_fScaledBAS = headers.Value(buff, 1) != 0;
+#else
             ret.m_fScaledBAS = buff.Find(L"yes") >= 0;
+#endif
         }
-        else if(entry == L"[v4 styles]")
+        else if(XY_ASS_HEADER(L"[v4 styles]", 12))
         {
             fRet = true;
             sver = 4;
         }
-        else if(entry == L"[v4+ styles]")
+        else if(XY_ASS_HEADER(L"[v4+ styles]", 13))
         {
             fRet = true;
             sver = 5;
         }
-        else if(entry == L"[v4++ styles]")
+        else if(XY_ASS_HEADER(L"[v4++ styles]", 14))
         {
             fRet = true;
             sver = 6;
         }
-        else if(entry == L"[events]")
+        else if(XY_ASS_HEADER(L"[events]", 15))
         {
             fRet = true;
         }
-        else if(entry == L"fontname")
+        else if(XY_ASS_HEADER(L"fontname", 16))
         {
             LoadUUEFont(file);
         }
-        else if(entry == L"ycbcr matrix")
+        else if(XY_ASS_HEADER(L"ycbcr matrix", 17))
         {
             buff = GetStr(buff);
             buff.MakeLower();
+#ifdef XY_VSFILTER_RUST_TEXT
+            const unsigned matrix = headers.Value(buff, 2);
+            switch(matrix)
+            {
+            case 1: ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_AUTO; ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_AUTO; break;
+            case 2: ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT601; ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_TV; break;
+            case 3: ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT709; ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_TV; break;
+            case 4: ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT2020; ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_TV; break;
+            case 5: ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT601; ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_PC; break;
+            case 6: ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT709; ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_PC; break;
+            case 7: ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT2020; ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_PC; break;
+            }
+#else
             if (buff.Left(4)==L"none")
             {
                 ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_AUTO;
@@ -2581,10 +2625,12 @@ if(sver <= 4)   style->scrAlignment = (style->scrAlignment&4) ? ((style->scrAlig
                 ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT2020;
                 ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_PC;
             }
+#endif
         }
         if(fEOF) break;
     }
 //    ret.Sort();
+#undef XY_ASS_HEADER
     return(fRet);
 }
 

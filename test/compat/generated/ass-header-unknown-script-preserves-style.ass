@@ -1,0 +1,9 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+[V4 Styles]
+ScriptType: unknown
+Style: Default,Arial,36,16777215,255,0,0,0,0,1,2,1,2,10,10,10,0,1
+[Events]
+Dialogue: 7,0:00:01.00,0:00:04.00,Default,,0,0,0,,Header sample
