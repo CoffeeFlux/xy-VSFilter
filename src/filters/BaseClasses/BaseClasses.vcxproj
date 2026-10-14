@@ -64,17 +64,21 @@
     <ClInclude Include="amextra.h" />
     <ClInclude Include="amfilter.h" />
     <ClInclude Include="cache.h" />
+    <ClInclude Include="checkbmi.h" />
     <ClInclude Include="combase.h" />
     <ClInclude Include="cprop.h" />
     <ClInclude Include="ctlutil.h" />
     <ClInclude Include="ddmm.h" />
     <ClInclude Include="dllsetup.h" />
     <ClInclude Include="dsschedule.h" />
+    <ClInclude Include="dxmperf.h" />
     <ClInclude Include="fourcc.h" />
     <ClInclude Include="measure.h" />
     <ClInclude Include="msgthrd.h" />
     <ClInclude Include="mtype.h" />
     <ClInclude Include="outputq.h" />
+    <ClInclude Include="perflog.h" />
+    <ClInclude Include="perfstruct.h" />
     <ClInclude Include="pstream.h" />
     <ClInclude Include="pullpin.h" />
     <ClInclude Include="refclock.h" />
@@ -99,6 +103,7 @@
     <ClCompile Include="amextra.cpp" />
     <ClCompile Include="amfilter.cpp" />
     <ClCompile Include="amvideo.cpp" />
+    <ClCompile Include="arithutil.cpp" />
     <ClCompile Include="combase.cpp" />
     <ClCompile Include="cprop.cpp" />
     <ClCompile Include="ctlutil.cpp" />
@@ -107,6 +112,7 @@
     <ClCompile Include="dllsetup.cpp" />
     <ClCompile Include="mtype.cpp" />
     <ClCompile Include="outputq.cpp" />
+    <ClCompile Include="perflog.cpp" />
     <ClCompile Include="pstream.cpp" />
     <ClCompile Include="pullpin.cpp" />
     <ClCompile Include="refclock.cpp" />

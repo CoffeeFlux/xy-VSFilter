@@ -1,3 +1,15 @@
+xy-VSFilter notes
+-----------------
+These sources are the Windows 7 SDK DirectShow BaseClasses, taken from
+https://github.com/microsoft/Windows-classic-samples
+(Samples/Win7Samples/multimedia/directshow/baseclasses, commit
+434f6002bdf9cf9829406c3ff2b33387982d6168), with these local changes:
+  - schedule.h is kept as dsschedule.h (see below); refclock.h includes it.
+  - CAMThread uses _beginthreadex instead of CreateThread (from MPC-HC).
+  - ZeroMemory -> SecureZeroMemory at the call sites MPC-HC changed.
+Local changes are marked "xy-VSFilter" in the source where practical.
+The upstream baseclasses.sln/.vcproj are not used; see BaseClasses.vcxproj.
+
 DirectShow Sample -- Base Classes
 ---------------------------------
 
