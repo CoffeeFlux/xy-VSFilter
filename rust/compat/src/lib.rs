@@ -86,3 +86,5 @@ pub mod subrip_cue;
 pub mod pipe_line;
 
 pub mod text_writer;
+
+pub mod layout_rects;

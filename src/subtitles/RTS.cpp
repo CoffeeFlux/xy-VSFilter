@@ -1624,6 +1624,26 @@ void CScreenLayoutAllocator::AdvanceToSegment(int segment, const CAtlArray<int>&
 {
     TRACE_RENDERER_REQUEST("Begin AdvanceToSegment. m_subrects.size:"
         <<m_subrects.GetCount()<<" sa.size:"<<sa.GetCount());
+#ifdef XY_VSFILTER_RUST_TEXT
+    for(size_t i = 0; i < m_subrects.GetCount(); )
+    {
+        const SubRect sr = m_subrects.Get<SubRect>(i);
+        bool fFound = false;
+        if(abs(sr.segment - segment) <= 1)
+        {
+            for(size_t j = 0; j < sa.GetCount() && !fFound; j++)
+            {
+                if(sa[j] == sr.entry)
+                {
+                    m_subrects.Segment(i, segment);
+                    fFound = true;
+                }
+            }
+        }
+        if(!fFound) m_subrects.Remove(i);
+        else i++;
+    }
+#else
     POSITION pos = m_subrects.GetHeadPosition();
     while(pos)
     {
@@ -1643,11 +1663,20 @@ void CScreenLayoutAllocator::AdvanceToSegment(int segment, const CAtlArray<int>&
         }
         if(!fFound) m_subrects.RemoveAt(prev);
     }
+#endif
 }
 
 CRect CScreenLayoutAllocator::AllocRect(CSubtitle* s, int segment, int entry, int layer, int collisions)
 {
     // TODO: handle collisions == 1 (reversed collisions)
+#ifdef XY_VSFILTER_RUST_TEXT
+    const size_t found = m_subrects.Find(segment, entry);
+    if(found < m_subrects.GetCount())
+    {
+        const SubRect sr = m_subrects.Get<SubRect>(found);
+        return(sr.r + CRect(0, -s->m_topborder, 0, -s->m_bottomborder));
+    }
+#else
     POSITION pos = m_subrects.GetHeadPosition();
     while(pos)
     {
@@ -1657,16 +1686,23 @@ CRect CScreenLayoutAllocator::AllocRect(CSubtitle* s, int segment, int entry, in
             return(sr.r + CRect(0, -s->m_topborder, 0, -s->m_bottomborder));
         }
     }
+#endif
     CRect r = s->m_rect + CRect(0, s->m_topborder, 0, s->m_bottomborder);
     bool fSearchDown = s->m_scrAlignment > 3;
     bool fOK;
     do
     {
         fOK = true;
+#ifdef XY_VSFILTER_RUST_TEXT
+        for(size_t i = 0; i < m_subrects.GetCount(); i++)
+        {
+            const SubRect sr = m_subrects.Get<SubRect>(i);
+#else
         pos = m_subrects.GetHeadPosition();
         while(pos)
         {
             SubRect& sr = m_subrects.GetNext(pos);
+#endif
             if(layer == sr.layer && !(r & sr.r).IsRectEmpty())
             {
                 if(fSearchDown)

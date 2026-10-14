@@ -53,7 +53,7 @@ def extract_definition(source, signature):
 def capture_inputs():
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h", ROOT / "include/xy_rust_writer.h",
-              ROOT / "include/xy_rust_drawing.h",
+              ROOT / "include/xy_rust_drawing.h", ROOT / "include/xy_rust_layout.h", ROOT / "src/subtitles/RTS.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
               ROOT / "include/xy_rust_pipe_line.h", ROOT / "include/xy_rust_subrip_cue.h", ROOT / "include/xy_rust_sami_file.h", ROOT / "include/xy_rust_microdvd_style.h", ROOT / "include/xy_rust_font_records.h", ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
@@ -171,6 +171,32 @@ public:
             cc += extract_definition(content.decode("utf-8-sig"), signature) + "\n"
         cc += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_cc.h").write_text(cc, encoding="utf-8")
+    layout_source = original("src/subtitles/RTS.cpp", reference["commit"])
+    layout_header = original("src/subtitles/RTS.h", reference["commit"])
+    layout = '#include "layout_rects_shell.h"\n'
+    for name, content, header_content in (("ReferenceLayout", layout_source, layout_header), ("CandidateLayout", (ROOT / "src/subtitles/RTS.cpp").read_bytes(), (ROOT / "src/subtitles/RTS.h").read_bytes())):
+        layout += f"namespace {name} {{\n"
+        if name == "CandidateLayout":
+            layout += "#define XY_VSFILTER_RUST_TEXT\n"
+        declaration = extract_method(header_content.decode("utf-8-sig"), "class CScreenLayoutAllocator")
+        brace = declaration.index("{") + 1
+        declaration = declaration[:brace] + "\npublic:\n" + declaration[brace:]
+        if name == "CandidateLayout":
+            assert declaration.count("XyRust::LayoutRects m_subrects") == 1
+            declaration = declaration.replace("XyRust::LayoutRects m_subrects", "XyRust::ObservedLayoutRects m_subrects")
+        layout += declaration + ";\n"
+        for signature in ("void CScreenLayoutAllocator::Empty(", "void CScreenLayoutAllocator::AdvanceToSegment(", "CRect CScreenLayoutAllocator::AllocRect("):
+            decoded = content.decode("utf-8-sig")
+            if signature == "CRect CScreenLayoutAllocator::AllocRect(":
+                start = decoded.index(signature)
+                end = decoded.index("// CRenderedTextSubtitle", start)
+                definition = decoded[start:end].rstrip()
+                assert definition.endswith("}")
+            else:
+                definition = extract_definition(decoded, signature)
+            layout += definition + "\n"
+        layout += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_layout_rects.h").write_text(layout, encoding="utf-8")
     realtext_source = original("src/subtitles/RealTextParser.cpp", reference["commit"])
     realtext_header = original("src/subtitles/RealTextParser.h", reference["commit"])
     realtext_class = extract_method(realtext_header.decode("utf-8-sig"), "class CRealTextParser")
@@ -989,6 +1015,14 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     find_char_result = run([str(find_char_executable)], capture_output=True, text=True)
     print(find_char_result.stdout, end="", flush=True)
     print(find_char_result.stderr, end="", file=sys.stderr)
+    layout_executable = destination / ("layout-rects-oracle.exe" if os.name == "nt" else "layout-rects-oracle")
+    layout_compile = [arg.replace("find_char_oracle.cpp", "layout_rects_oracle.cpp").replace("find-char-oracle", "layout-rects-oracle") for arg in find_char_compile]
+    if os.name == "nt":
+        layout_compile += ["user32.lib"]
+    run(layout_compile)
+    layout_result = run([str(layout_executable)], capture_output=True, text=True)
+    print(layout_result.stdout, end="", flush=True)
+    print(layout_result.stderr, end="", file=sys.stderr)
     writer_executable = destination / ("text-writer-oracle.exe" if os.name == "nt" else "text-writer-oracle")
     writer_compile = [arg.replace("find_char_oracle.cpp", "text_writer_oracle.cpp").replace("find-char-oracle", "text-writer-oracle") for arg in find_char_compile]
     run(writer_compile)
@@ -1366,6 +1400,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "webvtt_compile_command": webvtt_compile,
         "webvtt_result": webvtt_result.stdout, "webvtt_stderr": webvtt_result.stderr,
         "webvtt_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring model with host iswspace; Windows comparison required",
+        "layout_rects_compile_command": layout_compile,
+        "layout_rects_result": layout_result.stdout, "layout_rects_stderr": layout_result.stderr,
+        "layout_rects_scope": "Complete pinned CScreenLayoutAllocator methods and class record layout; actual ATL CRect/list/array on Windows, controlled models on portable hosts; exact returned rectangles and full ordered retained records after each operation; native geometry and segment-distance arithmetic retained; representable arithmetic, finite collision sequences and successful allocation only",
         "text_writer_compile_command": writer_compile,
         "text_writer_result": writer_result.stdout, "text_writer_stderr": writer_result.stderr,
         "text_writer_scope": "Complete pinned CTextFile::WriteString; native ATL strings/UTF-8 conversion on Windows, modeled UTF-8 and 16-bit Windows write layout on portable hosts; controlled native write boundaries, exact bytes/default-string arguments, errno/LastError and callback interruptions/source mutation; allocation failures and OS file persistence excluded",
