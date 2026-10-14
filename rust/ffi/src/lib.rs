@@ -161,3 +161,5 @@ mod ellipse_arc;
 mod ellipse_matrix;
 
 mod path_buffer;
+
+mod edge_storage;

@@ -20,6 +20,28 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Persistent ellipse-arc storage has completed all four portable CI targets,
+  Miri, and both Windows renderer architectures. The **706-case / 7,410-frame**
+  corpus and **32 mutations / 224 frames** match exactly on each architecture;
+  exports and declared platform requirements also match. The focused strict-FP
+  scope and ordinary optimized FP-flag limitation remain distinct in the
+  [archived evidence](ellipse-storage-evidence.json).
+* Rust owns scan-conversion row heads and initialized edge records. Scalar
+  insertion and queries preserve reverse insertion order, the zero sentinel,
+  growth and row traversal; native line/curve calculations, sorting, winding
+  and outline allocation remain. No pointer into Rust storage escapes. Fatal
+  ASan/UBSan checks pass on arm64 and under x64 execution: **2,496 histories /
+  7,488 calls / 57,255 emitted spans / 2,401,514 initialized edge-and-row fields**,
+  including **4,944 Rust stores / 1,160,642 writes / 216 growths / zero fallbacks**.
+  The oracle extracts the complete pinned ScanConvert and native insertion
+  statements, with controlled line/curve emission. It checks all path-type bytes
+  at bounded indices, reuse/empty state, output capacity and ambient error/FP
+  state. Native geometry production, unused edge zero/tails, invalid links,
+  constructor state and allocation failures are outside these parity counts.
+  Rust 1.85 tests (137 core, 89 FFI), strict Clippy, default syntax and Python
+  checks pass. The corpus remains **718 cases**; Windows/Miri and actual DLL
+  rendering checks are pending. Sorting/winding, persistent path buffers and
+  native GDI/font behavior remain further migration work.
 * Rust translates and appends the completed GDI point/type output into native
   rasterizer destination tails. `MaybeUninit` output slices allow initialization
   without pretending realloc's new bytes are already valid values. Every point
