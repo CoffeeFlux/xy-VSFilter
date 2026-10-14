@@ -337,6 +337,14 @@ provenance. These are reference observations, not Rust parity. The probes are
 prepared and generation-checked locally; Windows execution is pending. The
 current runner toolchain is recorded but is not yet a frozen reference build.
 
+At `355ef9c9`, run `38612513345` passes the prepared-owner sequence comparison
+on Linux, macOS and Windows x64. The x64 primitive probe fails compilation:
+the ATL types header exposes CRect globally, not as `ATL::CRect`. Remove that
+incorrect using-declaration; no primitive trace or full-matrix pass is claimed
+from this failed probe. Its build log and successful lifecycle artifacts are
+retained locally under `artifacts/ci-38612513345`. The follow-up also normalizes
+extracted line endings before writing generated includes on Windows.
+
 The prior RLE fixture failure remains an integration gate pending CI. A focused
 correction makes owner snapshots use exact allocation-base identity, and avoids
 inventing offset observations for zero-byte copies at adjacent-region boundaries.
