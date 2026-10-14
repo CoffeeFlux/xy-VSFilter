@@ -302,6 +302,21 @@ def mpl2_variants():
         yield "mpl2-format-" + name + ".mpl", data
 
 
+def sami_variants():
+    for name, payload in {
+        "control": "Formatting sample<BR>second line",
+        "italic": "<i>Formatting sample</i><br>second line",
+        "uppercase": "<I>Formatting sample</I><BR>second line",
+        "entities": "Formatting&NBSP;sample&QuOt;text&QUOT;<bR>second line",
+        "mixed": "<B><I>Formatting</i> sample</b><Br>second line",
+        "unicode": "<I>Formatting \u03b1sample</I><BR>second line",
+    }.items():
+        text = ("<SAMI>\r\n<BODY>\r\n<SYNC Start=0><P>" + payload +
+                "\r\n<SYNC Start=4000><P>&nbsp;\r\n</BODY>\r\n</SAMI>\r\n")
+        data = b"\xff\xfe" + text.encode("utf-16le") if name == "unicode" else text.encode("ascii")
+        yield "sami-format-" + name + ".smi", data
+
+
 def timestamps(data):
     matches = re.findall(rb"Dialogue:[^,]*,(\d+):(\d+):(\d+(?:\.\d+)?),(\d+):(\d+):(\d+(?:\.\d+)?)", data)
     if not matches:
@@ -355,7 +370,8 @@ def make_cases(files):
                                                     ("subrip-format-underline", "subrip-format-control"),
                                                     ("realtext-format-italic", "realtext-format-control"),
                                                     ("microdvd-format-italic", "microdvd-format-control"),
-                                                    ("mpl2-format-italic", "mpl2-format-control"))
+                                                    ("mpl2-format-italic", "mpl2-format-control"),
+                                                    ("sami-format-italic", "sami-format-control"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -370,6 +386,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in realtext_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in microdvd_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in mpl2_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in sami_variants()]
     manifest = json.dumps(make_cases(files + generated), indent=2) + "\n"
     expected = generated + [(DEST / "cases.json", manifest.encode("utf-8"))]
     for path, data in expected:

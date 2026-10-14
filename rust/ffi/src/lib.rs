@@ -115,3 +115,5 @@ mod microdvd;
 mod mpl2;
 
 mod remove_tags;
+
+mod case_replace;
