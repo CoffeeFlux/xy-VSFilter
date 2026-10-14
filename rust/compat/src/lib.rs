@@ -70,3 +70,5 @@ pub mod sami;
 pub mod encoding;
 
 pub mod ass_dialogue;
+
+pub mod ass_style;

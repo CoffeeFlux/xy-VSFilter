@@ -1,0 +1,8 @@
+[Script Info]
+PlayResX: 640
+PlayResY: 360
+ScriptType: v4.00+
+[V4+ Styles]
+Style: Default,Arial,36,&H00ffffff,&H000000ff,0,&H80000000,0,0,0,0,100,100,0,0,1,2,1,2,10,10,10,1
+[Events]
+Dialogue: 0,0:00:01.00,0:00:04.00,Default,,0,0,0,,Style sample

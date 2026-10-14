@@ -20,6 +20,29 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns ASS style remainder buffers, version-dependent field order and
+  integer normalization. Legacy outline-color remapping, alpha clamping, negative
+  charset fallback, border-style mapping and alignment bit precedence preserve
+  the reference. Native field/numeric conversion, defaults, assignment order,
+  floating clamps, style-name trimming and style insertion remain in place.
+  Fatal ASan/UBSan comparisons passed **149,383 complete style branches** on arm64
+  and under x64 execution: **146,563 accepted / 2,820 rejected**, **34,199,488
+  callback observation values**, **158 interruptions**, **87 errno changes**,
+  **3,392,250 Rust field steps**, **3,096,138 captured remainders** and **146,571
+  integer normalizations**. Every stored style field, float bits, remaining input
+  and floating status match. Nonzero floating status occurred in 8 arm64 / 32 x64
+  cases, including seeded flags; native floating-status behavior differs by host.
+  Versions 3-6, all UTF-16 values, NULs, missing fields, malformed numeric input,
+  alpha/color/alignment boundaries and explicit nonfinite floats are covered.
+  The pinned constructor/defaults and style branch are extracted directly.
+  GetStr's private TrimLeft call identity was already replaced by the earlier
+  StringField migration; this oracle compares field effects and retained
+  MakeLower/scanf/Add callbacks. Overflowing scanf conversions are excluded.
+  Eight style scripts and an opaque-box/outline visible control expand renderer
+  validation to **478 cases**. Rust 1.85 tests (94 core, 63 FFI), strict Clippy,
+  default syntax and Python harness checks pass. Windows/Miri and full renderer
+  validation are pending. Native numeric/floating behavior, full file/style-map
+  integration and real hosts remain separate work.
 * Safe Rust owns ASS dialogue input, delimiter consumption, version-dependent
   field order, parsed integer storage and raw style/actor/effect/text fields.
   Native `NextInt` still converts each numeric token and retains its error/errno
@@ -87,8 +110,13 @@ unresolved reference outcomes requiring investigation, never matching results.
   attributes, forced termination and an introduced NUL tail. Complete output,
   callback order and errno still match. The prior NUL-input fallback scope is
   unchanged. Rust 1.85 tests (87 core, 59 FFI), strict Clippy, default syntax and
-  corpus freshness pass. Windows/Miri validation is pending. Trimming, native
-  color/numeric conversion and full file/host integration remain separate work.
+  corpus freshness pass. Candidate `d6ea5076` passed all four portable platforms,
+  Miri and both Windows DLL jobs, each matching **430 cases / 4,778 frames** and
+  **32 mutations / 224 frames**, plus dialogs, visible controls, exports and
+  dependencies. Both logs confirm Rust-enabled `STS.cpp` compilation.
+  [Argument evidence](sami-arguments-evidence.json) records verified hashes and
+  stable local validation. Trimming, native color/numeric conversion and full
+  file/host integration remain separate work.
 * Safe Rust owns SAMI's original-case and lowercase buffers, outer tag scan,
   color-fragment insertion and tag deletion. Native preprocessing, font-argument
   extraction operations, the original color table/lookup, `wcstol` and hexadecimal

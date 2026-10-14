@@ -123,3 +123,5 @@ mod sami;
 mod encoding;
 
 mod ass_dialogue;
+
+mod ass_style;
