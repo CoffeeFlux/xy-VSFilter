@@ -92,3 +92,5 @@ mod tests {
 mod transpose;
 
 mod byte_float;
+
+mod gauss_integer;

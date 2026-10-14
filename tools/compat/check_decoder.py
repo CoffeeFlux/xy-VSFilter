@@ -60,7 +60,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_segment_insert.h",
               ROOT / "include/xy_rust_hdmv.h",
               ROOT / "include/xy_rust_dvb.h", ROOT / "include/xy_rust_golomb.h", ROOT / "include/xy_rust_fill.h",
-              ROOT / "src/subtitles/Rasterizer.cpp", ROOT / "include/xy_rust_mask.h", ROOT / "include/xy_rust_bilinear.h", ROOT / "include/xy_rust_be_blur.h", ROOT / "include/xy_rust_be_filter.h", ROOT / "include/xy_rust_transpose.h", ROOT / "include/xy_rust_byte_float.h",
+              ROOT / "src/subtitles/Rasterizer.cpp", ROOT / "include/xy_rust_mask.h", ROOT / "include/xy_rust_bilinear.h", ROOT / "include/xy_rust_be_blur.h", ROOT / "include/xy_rust_gauss_integer.h", ROOT / "include/xy_rust_be_filter.h", ROOT / "include/xy_rust_transpose.h", ROOT / "include/xy_rust_byte_float.h",
               ROOT / "src/subtitles/xy_filter.cpp",
               ROOT / "src/dsutil/GolombBuffer.cpp", ROOT / "src/dsutil/GolombBuffer.h",
               ROOT / "src/subtitles/CompositionObject.cpp",
@@ -382,6 +382,17 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         filters += "#if FILTER_NATIVE_SSE\ntemplate<int ROUNDING_POLICY>\n" + extract_definition(text_source, "void xy_be_filter2_sse(") + "\n#endif\n"
         filters += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_be_filter.h").write_text(filters, encoding="utf-8")
+    integer_gauss = '#include "gauss_integer_shell.h"\n'
+    for name, content in (("ReferenceIntegerGauss", raster_source), ("CandidateIntegerGauss", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+        integer_gauss += f"namespace {name} {{\n"
+        source_text=content.decode("utf-8-sig")
+        volume_bits=re.search(r"static const int VOLUME_BITS = [0-9]+;", source_text[source_text.index("class ass_synth_priv"):]).group(0)
+        integer_gauss += "class ass_synth_priv { public: " + volume_bits + " };\n"
+        if name == "CandidateIntegerGauss":
+            integer_gauss += "#define XY_VSFILTER_RUST_TEXT\n"
+        integer_gauss += extract_definition(source_text, "static void ass_gauss_blur(") + "\n"
+        integer_gauss += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_gauss_integer.h").write_text(integer_gauss, encoding="utf-8")
     blur = '#include "be_blur_shell.h"\n'
     for name, content in (("ReferenceBlur", raster_source), ("CandidateBlur", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         blur += f"namespace {name} {{\n"
@@ -625,6 +636,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     byte_float_result = run([str(byte_float_executable)], capture_output=True, text=True)
     print(byte_float_result.stdout, end="", flush=True)
     print(byte_float_result.stderr, end="", file=sys.stderr)
+    integer_gauss_executable = destination / ("gauss-integer-oracle.exe" if os.name == "nt" else "gauss-integer-oracle")
+    integer_gauss_compile = [arg.replace("fill_oracle.cpp", "gauss_integer_oracle.cpp").replace("fill-oracle", "gauss-integer-oracle") for arg in fill_compile]
+    run(integer_gauss_compile)
+    integer_gauss_result = run([str(integer_gauss_executable)], capture_output=True, text=True)
+    print(integer_gauss_result.stdout, end="", flush=True)
+    print(integer_gauss_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -657,6 +674,8 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "xy_filter_source_sha256": hashlib.sha256(filter_source).hexdigest(),
         "weighted_filter_compile_command": weighted_compile,
         "weighted_filter_result": weighted_result.stdout, "weighted_filter_stderr": weighted_result.stderr,
+        "gauss_integer_compile_command": integer_gauss_compile,
+        "gauss_integer_result": integer_gauss_result.stdout, "gauss_integer_stderr": integer_gauss_result.stderr,
         "byte_float_compile_command": byte_float_compile,
         "byte_float_result": byte_float_result.stdout, "byte_float_stderr": byte_float_result.stderr,
         "float_transpose_compile_command": float_transpose_compile,

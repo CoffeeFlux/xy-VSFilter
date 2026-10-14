@@ -31,6 +31,7 @@
 #include "xy_rust_mask.h"
 #include "xy_rust_bilinear.h"
 #include "xy_rust_be_blur.h"
+#include "xy_rust_gauss_integer.h"
 #endif
 #include "xy_logger.h"
 #include "xy_bitmap.h"
