@@ -84,6 +84,9 @@ namespace ssf
 
 	class MemoryInputStream : public InputStream
 	{
+#ifdef XY_VSFILTER_RUST_TEXT
+        XyRust::SsfMemory m_copy;
+#endif
 		BYTE* m_pBytes;
 		int m_pos, m_len;
 		bool m_fFree;

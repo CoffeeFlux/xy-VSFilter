@@ -147,6 +147,28 @@ pub fn output(character: u16, encoding: u32) -> u64 {
     (count << 48) | (units[2] << 32) | (units[1] << 16) | units[0]
 }
 
+/// An immutable snapshot for MemoryInputStream's copy mode.
+pub struct Memory {
+    bytes: alloc::vec::Vec<u8>,
+}
+impl Memory {
+    pub fn copy(input: &[u8]) -> Option<Self> {
+        let mut bytes = alloc::vec::Vec::new();
+        bytes.try_reserve_exact(input.len()).ok()?;
+        bytes.extend_from_slice(input);
+        Some(Self { bytes })
+    }
+    pub fn data(&self) -> &[u8] {
+        &self.bytes
+    }
+    pub fn read(&self, position: i32) -> i32 {
+        usize::try_from(position)
+            .ok()
+            .and_then(|i| self.bytes.get(i))
+            .map_or(-1, |&byte| i32::from(byte))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

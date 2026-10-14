@@ -1016,6 +1016,18 @@ public:
             ssf_stream_code += extract_definition(ssf_text, signature) + "\n"
         ssf_stream_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_ssf_stream.h").write_text(ssf_stream_code, encoding="utf-8")
+    ssf_memory_code = '#include "ssf_memory_shell.h"\n' + ssf_stream_code
+    for name, content, declaration in (("ReferenceSsf", ssf_source, ssf_header), ("CandidateSsf", (ROOT / "src/subtitles/libssf/Stream.cpp").read_bytes(), (ROOT / "src/subtitles/libssf/Stream.h").read_bytes())):
+        memory_text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        memory_declaration = declaration.decode("utf-8-sig").replace("\r\n", "\n")
+        ssf_memory_code += f"namespace {name} {{\n"
+        if name == "CandidateSsf":
+            ssf_memory_code += "#define XY_VSFILTER_RUST_TEXT\n"
+        ssf_memory_code += extract_definition(memory_declaration, "class MemoryInputStream :").replace("{", "{\npublic:", 1).replace("protected:", "public:").replace("XyRust::SsfMemory", "XyRust::ObservedSsfMemory") + ";\n"
+        for signature in ("MemoryInputStream::MemoryInputStream(", "MemoryInputStream::~MemoryInputStream()", "int MemoryInputStream::NextByte()"):
+            ssf_memory_code += extract_definition(memory_text, signature).replace("new BYTE[len]", "ssfMemoryNew(len)").replace("delete [] m_pBytes", "ssfMemoryDelete(m_pBytes)").replace("memcpy(", "ssfMemoryCopy(") + "\n"
+        ssf_memory_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_ssf_memory.h").write_text(ssf_memory_code, encoding="utf-8")
     filter_source = original("src/subtitles/xy_filter.cpp", reference["commit"])
     gauss_storage_code = '#include "gauss_storage_shell.h"\n'
     for name, content in (("ReferenceGaussStorage", filter_source), ("CandidateGaussStorage", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
@@ -1652,6 +1664,12 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
     ssf_stream_result = run([str(ssf_stream_executable)], capture_output=True, text=True)
     print(ssf_stream_result.stdout, end="", flush=True)
     print(ssf_stream_result.stderr, end="", file=sys.stderr)
+    ssf_memory_executable = destination / ("ssf-memory-oracle.exe" if os.name == "nt" else "ssf-memory-oracle")
+    ssf_memory_compile = [arg.replace("find_char_oracle.cpp", "ssf_memory_oracle.cpp").replace("find-char-oracle", "ssf-memory-oracle") for arg in find_char_compile]
+    run(ssf_memory_compile)
+    ssf_memory_result = run([str(ssf_memory_executable)], capture_output=True, text=True)
+    print(ssf_memory_result.stdout, end="", flush=True)
+    print(ssf_memory_result.stderr, end="", file=sys.stderr)
     ssf_arabic_executable = destination / ("ssf-arabic-oracle.exe" if os.name == "nt" else "ssf-arabic-oracle")
     ssf_arabic_compile = [arg.replace("find_char_oracle.cpp", "ssf_arabic_oracle.cpp").replace("find-char-oracle", "ssf-arabic-oracle") for arg in find_char_compile]
     run(ssf_arabic_compile)
@@ -2192,6 +2210,9 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
         "fraction_storage_compile_command": fraction_storage_compile,
         "fraction_storage_result": fraction_storage_result.stdout, "fraction_storage_stderr": fraction_storage_result.stderr,
         "fraction_storage_scope": "Whole pinned xy_be_blur and xy_calculate_filter with observed filter/transpose calls and scratch ownership under strict FP compilation. x86/x64 execute extracted native SSE kernels against Rust kernels; arm64 substitutes extracted scalar callbacks and does not establish SSE parity. Exact stage bytes/order, output/padding, initialized scratch, cache accounting, signed and fractional pass counts, reuse and native allocation fallback. Positive dimensions at least four avoid an unused native before-base cursor; zero/smaller/negative dimensions, overflowing/nonfinite pass counts, invalid backing and actual allocation failure excluded.",
+        "ssf_memory_compile_command": ssf_memory_compile,
+        "ssf_memory_result": ssf_memory_result.stdout, "ssf_memory_stderr": ssf_memory_result.stderr,
+        "ssf_memory_scope": "Whole pinned MemoryInputStream constructors, destructor and NextByte with guarded native allocation and immutable Rust copy owners. All byte values, copied versus borrowed/adopted source mutation, zero-length native allocation, negative borrowed lengths, repeated EOF, alias relationships, release order, null-borrowed-input exceptions and ambient errors. Modeled Rust decline to successful native copy. NextChar encoding, actual IO, native allocation failure, invalid backing/copy spans and negative copy allocation counts excluded.",
         "ssf_arabic_compile_command": ssf_arabic_compile,
         "ssf_arabic_result": ssf_arabic_result.stdout, "ssf_arabic_stderr": ssf_arabic_result.stderr,
         "ssf_arabic_scope": "Complete pinned 256-row ArabicForms table and IsArabic/Replace overloads. All UTF-16 code units and all four presentation forms, every neighbor unit in both positions with representative centers and both membership states, all center units with boundary neighbors, repeated replacements, zero table entries, surrogate/out-of-range passthrough and ambient error state. Pure scalar Rust bridges. Invalid presentation enum values, external shaping/font selection and actual SSF rendering excluded.",

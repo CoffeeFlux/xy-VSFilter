@@ -20,6 +20,26 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* SSF `MemoryInputStream` now keeps positive-length copied input in an immutable
+  Rust owner and reads it through bounds-checked Rust access. Borrowed buffers,
+  adopted native arrays, zero-length native allocations and the native fallback
+  remain distinct; source mutation cannot alter an owned snapshot. Complete
+  pinned constructors, destructor and NextByte match in ordinary and fatal
+  ASan/UBSan local builds on arm64 and x64: **24,584 histories / 1,662,976 reads /
+  16,949,536 byte, state, allocation and ambient-error fields**. These include
+  **11,264 copy histories / 6,656 borrowed / 6,656 adopted / eight null-pointer
+  exceptions / 5,120 Rust owners and releases / 391,168 Rust reads / 5,120 modeled
+  Rust declines**. Checks cover every byte, later source mutations, repeated EOF,
+  negative borrowed lengths, pointer alias relationships and release order.
+  Actual OOM, invalid copy spans and negative copy allocation counts are excluded.
+  The ownership test retains a read-only byte loan across shared Rust queries
+  and source mutation. **149 core / 106 FFI tests**, formatting, Clippy,
+  34 Python checks (three local skips) and default native syntax pass locally.
+  Windows and Miri validation for this ownership increment are pending.
+  The SSF native probe now expands its six documents across WCHAR and UTF-16LE
+  byte input in borrowed, adopted and copied modes, checking the copied source
+  after deliberate source mutation. The 24-case extension awaits Windows.
+
 * A separate Windows SSF workflow builds the pinned and Rust `libssf`
   libraries and links identical probes against each. Initial native builds
   succeeded, but both visible-output controls failed (`38592814959`): the
@@ -32,9 +52,13 @@ unresolved reference outcomes requiring investigation, never matching results.
   RGBA frames are separately characterized with **zero visible-rendering parity
   frames**. Six bounded valid documents cover comments, Arabic units and
   multiline text at six timestamps. Local evidence-driver tests pass
-  (**34 Python checks, three local skips**); corrected Windows execution is
-  pending. Byte decoding, malformed-document behavior, visible SSF rendering
-  and DirectShow/real-host integration remain separate work.
+  (**34 Python checks, three local skips**). Corrected Windows execution passed
+  on both architectures in run `38593663816` at `2bc2f60e`;
+  `ssf-native-evidence.json` verifies the actual libraries, executables, source
+  hashes, repeated raw traces, dumps and frame files. That six-case WCHAR-input
+  archive excludes the later memory-owner and input-mode extension. Other byte
+  encodings, malformed-document behavior, visible SSF rendering and
+  DirectShow/real-host integration remain separate work.
 
 * SSF Arabic range classification and both character-replacement overloads now
   run in safe Rust with the exact pinned 256-row table. Zero mappings and

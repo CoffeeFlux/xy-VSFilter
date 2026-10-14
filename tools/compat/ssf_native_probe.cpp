@@ -6,6 +6,7 @@
 #include "subtitles/libssf/Renderer.h"
 #include <vector>
 #include <cstdio>
+#include <memory>
 
 static void writeFile(const CStringW& path,const void* data,size_t count){
     FILE* file=NULL;
@@ -21,7 +22,7 @@ public:
     void NextByte(int value){units.push_back(static_cast<unsigned>(value));}
 };
 int wmain(int argc,wchar_t** argv){
-    if(argc!=3)return 64;
+    if(argc!=4)return 64;
     setvbuf(stdout,NULL,_IONBF,0);
     if(!AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0))return 65;
     try{
@@ -34,9 +35,22 @@ int wmain(int argc,wchar_t** argv){
         const bool read=size==0||fread(units.data(),1,size,input)==static_cast<size_t>(size);
         fclose(input);if(!read)return 66;
         const CStringW text(units.data(),size/2),directory(argv[2]);
-        ssf::WCharInputStream stream(text);
+        std::unique_ptr<ssf::InputStream> stream;
+        std::vector<BYTE> bytes(static_cast<size_t>(size)+2);
+        bytes[0]=0xff;bytes[1]=0xfe;if(size)memcpy(bytes.data()+2,units.data(),size);
+        if(wcscmp(argv[3],L"wide")==0)stream.reset(new ssf::WCharInputStream(text));
+        else if(wcscmp(argv[3],L"borrow")==0)stream.reset(new ssf::MemoryInputStream(bytes.data(),static_cast<int>(bytes.size()),false,false));
+        else if(wcscmp(argv[3],L"copy")==0){
+            stream.reset(new ssf::MemoryInputStream(bytes.data(),static_cast<int>(bytes.size()),true,false));
+            // The copied stream must survive mutation of the original bytes.
+            memset(bytes.data(),0x5a,bytes.size());
+        }else if(wcscmp(argv[3],L"adopt")==0){
+            std::unique_ptr<BYTE[]> adopted(new BYTE[bytes.size()]);memcpy(adopted.get(),bytes.data(),bytes.size());
+            stream.reset(new ssf::MemoryInputStream(adopted.get(),static_cast<int>(bytes.size()),false,true));
+            adopted.release();
+        }else return 64;
         ssf::SubtitleFile file;
-        file.Parse(stream);
+        file.Parse(*stream);
         printf("ssf-native-v1 parsed segments %llu\n",static_cast<unsigned long long>(file.m_segments.GetCount()));
         for(int encoding=0;encoding<6;++encoding){
             Output output(static_cast<ssf::Stream::encoding_t>(encoding));file.Dump(output);
