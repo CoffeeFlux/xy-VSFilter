@@ -48,9 +48,6 @@
     <ClCompile Include="VobSubFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VobSubFileRipper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="VobSubImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -144,9 +141,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VobSubFile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VobSubFileRipper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VobSubImage.h">

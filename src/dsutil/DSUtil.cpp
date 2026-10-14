@@ -21,8 +21,6 @@
 
 #include "stdafx.h"
 #include <Vfw.h>
-#include "..\..\include\winddk\devioctl.h"
-#include "..\..\include\winddk\ntddcdrm.h"
 #include "DSUtil.h"
 #include "Mpeg2Def.h"
 #include "vd.h"
@@ -757,101 +755,6 @@ CString BinToCString(BYTE* ptr, int len)
 	}
 
 	return(ret);
-}
-
-static void FindFiles(CString fn, CAtlList<CString>& files)
-{
-	CString path = fn;
-	path.Replace('/', '\\');
-	path = path.Left(path.ReverseFind('\\')+1);
-
-	WIN32_FIND_DATA findData;
-	HANDLE h = FindFirstFile(fn, &findData);
-	if(h != INVALID_HANDLE_VALUE)
-	{
-		do {files.AddTail(path + findData.cFileName);}
-		while(FindNextFile(h, &findData));
-
-		FindClose(h);
-	}
-}
-
-cdrom_t GetCDROMType(TCHAR drive, CAtlList<CString>& files)
-{
-	files.RemoveAll();
-
-	CString path;
-	path.Format(_T("%c:"), drive);
-
-	if(GetDriveType(path + _T("\\")) == DRIVE_CDROM)
-	{
-		// CDROM_VideoCD
-		FindFiles(path + _T("\\mpegav\\avseq??.dat"), files);
-		FindFiles(path + _T("\\mpegav\\avseq??.mpg"), files);
-		FindFiles(path + _T("\\mpeg2\\avseq??.dat"), files);
-		FindFiles(path + _T("\\mpeg2\\avseq??.mpg"), files);
-		FindFiles(path + _T("\\mpegav\\music??.dat"), files);
-		FindFiles(path + _T("\\mpegav\\music??.mpg"), files);
-		FindFiles(path + _T("\\mpeg2\\music??.dat"), files);
-		FindFiles(path + _T("\\mpeg2\\music??.mpg"), files);
-		if(files.GetCount() > 0) return CDROM_VideoCD;
-
-		// CDROM_DVDVideo
-		FindFiles(path + _T("\\VIDEO_TS\\video_ts.ifo"), files);
-		if(files.GetCount() > 0) return CDROM_DVDVideo;
-
-		// CDROM_Audio
-		if(!(GetVersion()&0x80000000))
-		{
-			HANDLE hDrive = CreateFile(CString(_T("\\\\.\\")) + path, GENERIC_READ, FILE_SHARE_READ, NULL, 
-				OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)NULL);
-			if(hDrive != INVALID_HANDLE_VALUE)
-			{
-				DWORD BytesReturned;
-				CDROM_TOC TOC;
-				if(DeviceIoControl(hDrive, IOCTL_CDROM_READ_TOC, NULL, 0, &TOC, sizeof(TOC), &BytesReturned, 0))
-				{
-					for(int i = TOC.FirstTrack; i <= TOC.LastTrack; i++)
-					{
-						// MMC-3 Draft Revision 10g: Table 222 ?Q Sub-channel control field
-						TOC.TrackData[i-1].Control &= 5;
-						if(TOC.TrackData[i-1].Control == 0 || TOC.TrackData[i-1].Control == 1) 
-						{
-							CString fn;
-							fn.Format(_T("%s\\track%02d.cda"), path, i);
-							files.AddTail(fn);
-						}
-					}
-				}
-
-				CloseHandle(hDrive);
-			}
-		}
-		if(files.GetCount() > 0) return CDROM_Audio;
-
-		// it is a cdrom but nothing special
-		return CDROM_Unknown;
-	}
-	
-	return CDROM_NotFound;
-}
-
-CString GetDriveLabel(TCHAR drive)
-{
-	CString label;
-
-	CString path;
-	path.Format(_T("%c:\\"), drive);
-	TCHAR VolumeNameBuffer[MAX_PATH], FileSystemNameBuffer[MAX_PATH];
-	DWORD VolumeSerialNumber, MaximumComponentLength, FileSystemFlags;
-	if(GetVolumeInformation(path, 
-		VolumeNameBuffer, MAX_PATH, &VolumeSerialNumber, &MaximumComponentLength, 
-		&FileSystemFlags, FileSystemNameBuffer, MAX_PATH))
-	{
-		label = VolumeNameBuffer;
-	}
-
-	return(label);
 }
 
 bool GetKeyFrames(CString fn, CUIntArray& kfs)

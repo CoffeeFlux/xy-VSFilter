@@ -61,15 +61,6 @@
     <ResourceCompile Include="VSFilter.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\thirdparty\mfc\afxctrlcontainer.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' Or '$(VisualStudioVersion)'&gt;'10.0'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\thirdparty\mfc\afxglobals.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' Or '$(VisualStudioVersion)'&gt;'10.0'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\thirdparty\mfc\winmdi.cpp">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="DirectVobSub.cpp" />
     <ClCompile Include="DirectVobSubPropPage.cpp" />
     <ClCompile Include="once_logger.cpp">
