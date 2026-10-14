@@ -63,6 +63,12 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_entry_header_v1(uint64_t, uint32
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_segment_header_v1(uint64_t, uint32_t index, uint8_t*, size_t);
 // Query modes: 0 entry, 1 next segment, 2 containing segment; integer TIME only.
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_query_time_v1(uint64_t, uint32_t mode, int64_t time, uint8_t*, size_t);
+// Interpretation fields: 0 mode, 1 subtitle type, 2 encoding. Initially absent;
+// the native constructor supplies its enum constants. Raw signed i32 values are
+// not validated/normalized. Get writes4-byte LE i32; absent => UNRESOLVED_REFERENCE
+// with output untouched. Entry/segment copy/clear retain all interpretation fields.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_set_interpretation_v1(uint64_t owner, uint32_t field, int32_t value);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_get_interpretation_v1(uint64_t owner, uint32_t field, uint8_t*, size_t);
 // Identity fields: 0 name, 1 path. Initially empty; raw UTF16LE units retain
 // all embedded NULs/surrogates. Entry/segment copy/clear retain both identities.
 // Native full Copy/Open orchestration assigns fields explicitly at native points.

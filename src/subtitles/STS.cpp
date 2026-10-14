@@ -3077,13 +3077,25 @@ CSimpleTextSubtitle::CSimpleTextSubtitle()
     : m_document(new XyRust::DocumentOwner)
 #endif
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentType(EXTSRT);
+#else
     m_subtitleType         = EXTSRT;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentMode(TIME);
+#else
     m_mode                 = TIME;
+#endif
     m_dstScreenSize        = CSize(0, 0);
     m_defaultWrapStyle     = 0;
     m_collisions           = 0;
     m_fScaledBAS           = false;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentEncoding(CTextFile::DEFAULT_ENCODING);
+#else
     m_encoding             = CTextFile::DEFAULT_ENCODING;
+#endif
     m_ePARCompensationType = EPCTDisabled;
     m_dPARCompensation     = 1.0;
     m_eYCbCrMatrix         = YCbCrMatrix_AUTO;
@@ -3110,13 +3122,25 @@ void CSimpleTextSubtitle::Copy(CSimpleTextSubtitle& sts)
 #else
     m_name                         = sts.m_name;
 #endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentMode(sts.GetDocumentMode());
+#else
     m_mode                         = sts.m_mode;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentType(sts.GetDocumentType());
+#else
     m_subtitleType                 = sts.m_subtitleType;
+#endif
     m_dstScreenSize                = sts.m_dstScreenSize;
     m_defaultWrapStyle             = sts.m_defaultWrapStyle;
     m_collisions                   = sts.m_collisions;
     m_fScaledBAS                   = sts.m_fScaledBAS;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentEncoding(sts.GetDocumentEncoding());
+#else
     m_encoding                     = sts.m_encoding;
+#endif
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     m_document->CopyDefaultStyle(*sts.m_document);
 #else
@@ -3228,7 +3252,11 @@ void CSimpleTextSubtitle::Add(CStringW str, bool fUnicode, REFERENCE_TIME start,
 
     FastTrim(str);
     if (str.IsEmpty() || start > end) return;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    if (GetDocumentType() == EXTVTT) {
+#else
     if (m_subtitleType == EXTVTT) {
+#endif
         WebVTTCueStrip(str);
         WebVTT2SSA(str);
         if (str.IsEmpty()) return;
@@ -3255,7 +3283,7 @@ void CSimpleTextSubtitle::Add(CStringW str, bool fUnicode, REFERENCE_TIME start,
     sub.readorder  = readorder < 0 ? (int)GetEntryCount() : readorder;
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    m_document->AddPrepared(sub, m_subtitleType == EXTVTT ? 2 : 0);
+    m_document->AddPrepared(sub, GetDocumentType() == EXTVTT ? 2 : 0);
 #else
     int n = (int)GetEntryCount();
 
@@ -3575,7 +3603,11 @@ void CSimpleTextSubtitle::SetForceDefaultStyle( bool value )
 
 void CSimpleTextSubtitle::ConvertToTimeBased(double fps)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    if(GetDocumentMode() == TIME) return;
+#else
     if(m_mode == TIME) return;
+#endif
 
     for(int i = 0, j = GetEntryCount(); i < j; i++)
     {
@@ -3589,14 +3621,22 @@ void CSimpleTextSubtitle::ConvertToTimeBased(double fps)
 #endif
     }
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentMode(TIME);
+#else
     m_mode = TIME;
+#endif
 
     CreateSegments();
 }
 
 void CSimpleTextSubtitle::ConvertToFrameBased(double fps)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    if(GetDocumentMode() == FRAME) return;
+#else
     if(m_mode == FRAME) return;
+#endif
 
     for(int i = 0, j = GetEntryCount(); i < j; i++)
     {
@@ -3610,7 +3650,11 @@ void CSimpleTextSubtitle::ConvertToFrameBased(double fps)
 #endif
     }
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentMode(FRAME);
+#else
     m_mode = FRAME;
+#endif
 
     CreateSegments();
 }
@@ -3618,7 +3662,7 @@ void CSimpleTextSubtitle::ConvertToFrameBased(double fps)
 int CSimpleTextSubtitle::SearchSub(REFERENCE_TIME t, double fps) 
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    if(m_mode == TIME) return m_document->Query(0, t).index;
+    if(GetDocumentMode() == TIME) return m_document->Query(0, t).index;
 #endif
 #if defined(XY_VSFILTER_RUST_TEXT) && !defined(XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL)
     XyRust::TimelineSearch search(0, t, static_cast<int>(GetEntryCount()));
@@ -3790,8 +3834,8 @@ REFERENCE_TIME CSimpleTextSubtitle::TranslateStart(int i, double fps)
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     int n = (int)GetEntryCount();
     return(i < 0 || n <= i ? -1 :
-        m_mode == TIME ? m_document->EntryStart(i) :
-        m_mode == FRAME ? std::llround(m_document->EntryStart(i) * UNITS_FLOAT / fps) :
+        GetDocumentMode() == TIME ? m_document->EntryStart(i) :
+        GetDocumentMode() == FRAME ? std::llround(m_document->EntryStart(i) * UNITS_FLOAT / fps) :
         0);
 #else
     int n = GetEntryCount();
@@ -3807,8 +3851,8 @@ REFERENCE_TIME CSimpleTextSubtitle::TranslateEnd(int i, double fps)
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     int n = (int)GetEntryCount();
     return(i < 0 || n <= i ? -1 :
-        m_mode == TIME ? m_document->EntryEnd(i) :
-        m_mode == FRAME ? std::llround(m_document->EntryEnd(i) * UNITS_FLOAT / fps) :
+        GetDocumentMode() == TIME ? m_document->EntryEnd(i) :
+        GetDocumentMode() == FRAME ? std::llround(m_document->EntryEnd(i) * UNITS_FLOAT / fps) :
         0);
 #else
     int n = GetEntryCount();
@@ -3824,8 +3868,8 @@ REFERENCE_TIME CSimpleTextSubtitle::TranslateSegmentStart(int i, double fps)
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     int n = (int)GetSegmentCount();
     return(i < 0 || n <= i ? -1 :
-        m_mode == TIME ? m_document->SegmentStart(i) :
-        m_mode == FRAME ? std::llround(m_document->SegmentStart(i) * UNITS_FLOAT / fps) :
+        GetDocumentMode() == TIME ? m_document->SegmentStart(i) :
+        GetDocumentMode() == FRAME ? std::llround(m_document->SegmentStart(i) * UNITS_FLOAT / fps) :
         0);
 #else
     int n = GetSegmentCount();
@@ -3841,8 +3885,8 @@ REFERENCE_TIME CSimpleTextSubtitle::TranslateSegmentEnd(int i, double fps)
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     int n = (int)GetSegmentCount();
     return(i < 0 || n <= i ? -1 :
-        m_mode == TIME ? m_document->SegmentEnd(i) :
-        m_mode == FRAME ? std::llround(m_document->SegmentEnd(i) * UNITS_FLOAT / fps) :
+        GetDocumentMode() == TIME ? m_document->SegmentEnd(i) :
+        GetDocumentMode() == FRAME ? std::llround(m_document->SegmentEnd(i) * UNITS_FLOAT / fps) :
         0);
 #else
     int n = GetSegmentCount();
@@ -3864,12 +3908,12 @@ void CSimpleTextSubtitle::TranslateSegmentStartEnd(int i, double fps, /*out*/REF
     }
     else
     {
-        if(m_mode == TIME)
+        if(GetDocumentMode() == TIME)
         {
             start = m_document->SegmentStart(i);
             end = m_document->SegmentEnd(i);
         }
-        else //m_mode == FRAME
+        else //GetDocumentMode() == FRAME
         {
             start = std::llround(m_document->SegmentStart(i) * UNITS_FLOAT / fps);
             end = std::llround(m_document->SegmentEnd(i) * UNITS_FLOAT / fps);
@@ -3978,7 +4022,7 @@ bool CSimpleTextSubtitle::FindNextSegment(REFERENCE_TIME t, double fps,
     int* iSegment, int* nSegments)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    if(m_mode == TIME) {
+    if(GetDocumentMode() == TIME) {
         const XyRust::DocumentQuery query = m_document->Query(1, t);
         if(nSegments) *nSegments = (int)query.count;
         if(iSegment) *iSegment = query.index;
@@ -4016,7 +4060,7 @@ bool CSimpleTextSubtitle::SearchSubs2Snapshot(REFERENCE_TIME t, double fps,
     STSSegment& snapshot, int* iSegment, int* nSegments)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    if(m_mode == TIME) {
+    if(GetDocumentMode() == TIME) {
         const XyRust::DocumentQuery query = m_document->Query(2, t);
         if(iSegment) *iSegment = -1;
         if(nSegments) *nSegments = (int)query.count;
@@ -4074,6 +4118,36 @@ void CSimpleTextSubtitle::OrSegmentAnimated(int iSegment, bool animated)
 }
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+tmode CSimpleTextSubtitle::GetDocumentMode() const
+{
+    return static_cast<tmode>(m_document->Interpretation(0));
+}
+
+exttype CSimpleTextSubtitle::GetDocumentType() const
+{
+    return static_cast<exttype>(m_document->Interpretation(1));
+}
+
+CTextFile::enc CSimpleTextSubtitle::GetDocumentEncoding() const
+{
+    return static_cast<CTextFile::enc>(m_document->Interpretation(2));
+}
+
+void CSimpleTextSubtitle::SetDocumentMode(tmode value)
+{
+    m_document->SetInterpretation(0, static_cast<int32_t>(value));
+}
+
+void CSimpleTextSubtitle::SetDocumentType(exttype value)
+{
+    m_document->SetInterpretation(1, static_cast<int32_t>(value));
+}
+
+void CSimpleTextSubtitle::SetDocumentEncoding(CTextFile::enc value)
+{
+    m_document->SetInterpretation(2, static_cast<int32_t>(value));
+}
+
 CString CSimpleTextSubtitle::GetDocumentName() const
 {
     return m_document->Identity(0);
@@ -4521,9 +4595,21 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
 #else
         m_name = name;
 #endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        SetDocumentType(OpenFuncts[i].type);
+#else
         m_subtitleType = OpenFuncts[i].type;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        SetDocumentMode(OpenFuncts[i].mode);
+#else
         m_mode = OpenFuncts[i].mode;
+#endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        SetDocumentEncoding(f->GetEncoding());
+#else
         m_encoding = f->GetEncoding();
+#endif
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
         SetDocumentPath(f->GetFilePath());
 #else

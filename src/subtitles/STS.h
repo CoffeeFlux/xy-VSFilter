@@ -184,9 +184,15 @@ public:
     CString        m_name;
 #endif
     LCID           m_lcid;
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     exttype        m_subtitleType;
+#endif
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     tmode          m_mode;
+#endif
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     CTextFile::enc m_encoding;
+#endif
 #ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     CString        m_path;
 #endif
@@ -318,6 +324,14 @@ public:
     void OrSegmentAnimated(int iSegment, bool animated);
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    // Interpretation values are supplied by native construction/parsing.
+    tmode GetDocumentMode() const;
+    exttype GetDocumentType() const;
+    CTextFile::enc GetDocumentEncoding() const;
+    void SetDocumentMode(tmode value);
+    void SetDocumentType(exttype value);
+    void SetDocumentEncoding(CTextFile::enc value);
+
     // Identity is raw code units; getters return independent native values.
     CString GetDocumentName() const;
     CString GetDocumentPath() const;

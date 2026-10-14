@@ -13,6 +13,11 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
              b"identity-initial", b"identity-read-independent", b"identity-copy-asymmetric-path",
              b"identity-copy-independent-source", b"identity-callback", b"identity-remove-entries",
              b"identity-empty", b"identity-self-copy", b"identity-open-success"))
+         + b"".join(b"interpretation-stage " + stage + b" mode=0 type=1 encoding=0\n" for stage in (
+             b"interpretation-constructed", b"interpretation-supplied", b"interpretation-copy",
+             b"interpretation-copy-independent", b"interpretation-empty", b"interpretation-self-copy",
+             b"interpretation-microdvd-open", b"interpretation-frame", b"interpretation-frame-noop",
+             b"interpretation-time", b"interpretation-time-noop"))
          + b"saved-file ssa exists=1 bytes=1 41\nsaved-file ass exists=1 bytes=1 41\n"
          + b"saved-file srt exists=1 bytes=1 41\nsaved-file srt-sidecar exists=1 bytes=1 41\n"
          + b"saved-file ssa-sidecar exists=0\nsaved-file ass-sidecar exists=0\n"
@@ -82,6 +87,15 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
         legacy=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith(b"identity-stage "))
         with self.assertRaises(ValueError): compare_traces([legacy]*4,64)
         compare_traces([legacy]*4,64,require_identity_stages=False)
+
+    def test_interpretation_stages_and_archival_opt_out(self):
+        legacy=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith(b"interpretation-stage "))
+        with self.assertRaises(ValueError):compare_traces([legacy]*4,64)
+        compare_traces([legacy]*4,64,require_interpretation_stages=False)
+        changed=TRACE.replace(b"interpretation-stage interpretation-copy mode=0",b"interpretation-stage interpretation-copy mode=1")
+        with self.assertRaises(ValueError):compare_traces([TRACE,TRACE,changed,changed],64)
+        truncated=TRACE.replace(b"interpretation-stage interpretation-empty",b"missing-stage interpretation-empty")
+        with self.assertRaises(ValueError):compare_traces([truncated]*4,64)
 
     def test_rejects_repeat_nondeterminism(self):
         changed = TRACE.replace(b"callback changed", b"callback empty")

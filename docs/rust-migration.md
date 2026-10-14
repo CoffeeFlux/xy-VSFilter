@@ -235,8 +235,8 @@ still requires D4/D5 below and all remaining ownership/fallback accounting.
 | --- | --- | --- |
 | D0 — Freeze the contract | Exact operation/callsite inventory, owner/alias graph and retained-adapter list for DOC-01 through DOC-11 | Source review across STS, RTS, format importers and both style APIs; explicitly track unresolved behavior. Status: in progress. |
 | D1 — Capture complete lifecycles | A pinned-reference document harness for create → add → edit/style-change → copy → sort → seek → clear/reopen → destroy | Compare full initialized document/segment state, observable callback/error order and caller snapshots; use real ATL/CRT on Windows. Include failed operations and repeated calls, with failures never counted as parity. Status: bounded full native-class lifecycle passes on x86/x64 at `04673672`; expanded default-style lifecycle also passes at `d6bd058c` with partial workflow evidence; named-style lifecycles and broader host/failure gates remain open. |
-| D2 — Implement the Rust owner | Safe Rust entries, styles, metadata and segments; coherent document operations reuse existing helpers | Owner/copy/edit/drop tests, raw UTF-16 preservation, bounded access, no native mutable views; native field/type/alias compatibility reviewed. Status: canonical entry/segment ownership integrated experimentally and validated on x86/x64; default and named-style ownership implemented opt-in; bounded default Windows evidence and local safe-map evidence recorded; name/path identity also implemented opt-in; current full Windows style/identity gates pending, remaining scalar metadata native. |
-| D3 — Route every caller | Importers, renderer, style interfaces and export paths use document operations or bounded snapshots | Enumerate and eliminate direct authoritative CAtlArray/CAtlMap entry/style/segment accesses in the Rust-enabled build; preserve callback/lock order and public ABI. Retire superseded fine-grained FFI crossings. Status: entries/segments routed and validated in the opt-in experimental build; style callers use value operations and canonical default/named styles are routed opt-in; name/path identity routed opt-in; changed-code Windows gates pending, remaining scalar metadata native. |
+| D2 — Implement the Rust owner | Safe Rust entries, styles, metadata and segments; coherent document operations reuse existing helpers | Owner/copy/edit/drop tests, raw UTF-16 preservation, bounded access, no native mutable views; native field/type/alias compatibility reviewed. Status: canonical entry/segment ownership integrated experimentally and validated on x86/x64; default and named-style ownership implemented opt-in; bounded default Windows evidence and local safe-map evidence recorded; name/path identity also implemented opt-in; current full Windows style/identity gates pending, mode/type/encoding also implemented opt-in; other scalar metadata native. |
+| D3 — Route every caller | Importers, renderer, style interfaces and export paths use document operations or bounded snapshots | Enumerate and eliminate direct authoritative CAtlArray/CAtlMap entry/style/segment accesses in the Rust-enabled build; preserve callback/lock order and public ABI. Retire superseded fine-grained FFI crossings. Status: entries/segments routed and validated in the opt-in experimental build; style callers use value operations and canonical default/named styles are routed opt-in; name/path identity routed opt-in; changed-code Windows gates pending, mode/type/encoding also implemented opt-in; other scalar metadata native. |
 | D4 — Establish parity | Document lifecycle and integrated DLL comparisons on Windows x86/x64 at one exact candidate commit | Exact records, ordering, times, errors, rendering output and style API behavior; existing corpus/mutations, targeted lifecycle/malformed fixtures, Miri and relevant native checks. Resolve mismatches; no undocumented native document fallback. Status: experimental entry/segment owner passes the full DLL corpus and bounded native-class lifecycle on x86/x64 at `04673672`; subsequent canonical named-style changes await full Windows validation; partial default-style results do not close style API/value or workflow gates. No whole-document closure. |
 | D5 — Close and hand off | Written ownership/access review and applicable consumer validation | Aegisub load/render/seek/reload/close, relevant player/style-edit lifecycles and architecture results. Record finite corpus scope and bounded retained adapters. Until the real-host check is complete, report core-complete/host-validation-pending, never closed. Status: planned. |
 
@@ -871,7 +871,7 @@ Empty and entry removal retain both. The registry's storage-only vector swap
 leaves identity and other metadata in place. The FFI adds one staged input-copy
 crossing and immutable snapshot kinds 5/6; no canonical string pointer escapes.
 
-Local Rust 1.85 validation passes 181 core and 117 FFI tests, with formatting and
+At the identity increment, Rust 1.85 validation passed 181 core and 117 FFI tests, with formatting and
 Clippy. Native probe generation passes. Include-stripped preprocessing of STS,
 RTS, USF and SubtitleInputPin matches `e337fb07` in native/default and Rust-text-only
 modes; the opt-in active source has no native identity fields. These are source
@@ -886,6 +886,35 @@ Windows full-class/style/API/render and real-host gates remain pending, as do al
 wrapper lifetime contracts. Earlier supplied-value/default/map evidence is
 recorded at its own commits and does not pass those current integration gates.
 
+### Experimental interpretation scalar ownership
+
+The opt-in owner now stores supplied native mode, subtitle type and encoding as
+optional raw i32 values. Native construction supplies the existing enum defaults;
+Rust neither duplicates those constants nor introduces enum normalization. Typed
+native facade methods replace canonical `m_mode`, `m_subtitleType` and `m_encoding`.
+This brings the experiment to nine removed native canonical fields/containers;
+other metadata and native parser/CRT/callback/file/host orchestration remain.
+
+Copy assigns these scalars at the original native points. Empty, entry removal
+and the prepared-storage-only vector swap retain them. Existing native TIME/FRAME
+translation and rounding remain in place. Scalar FFI set uses no raw input buffer;
+get validates four output bytes, reads under admission and copies afterward. A
+Rust-only uninitialized optional field reports unresolved-reference status. No
+native invalid-enum histories were executed or assigned compatibility credit.
+
+The full-class probe captures actual initialized constructor defaults and known
+supplied values, Copy independence, Empty/self-copy retention and ordinary
+MicroDVD file Open selecting FRAME. Its existing conversion/no-op histories now
+carry strict scalar stages. The extracted prepared-owner probe has an explicit
+native mode shim; it does not validate canonical interpretation storage.
+
+Rust 1.85 validation passes 182 core and 117 FFI tests, formatting, and 89 Python
+tests with four Windows-only skips. Native source generation and unchanged native/
+Rust-text-only preprocessing against `95b3fc55` pass. All ten identity and
+interpretation facade names now produce scanner candidates; scanner completeness
+is checked separately from inventory self-consistency. Current exact-commit
+Windows full-class/style/API/renderer and real-host gates remain pending.
+
 ## Independent audit and unsafe boundary
 
 The user-requested independent audit is recorded in
@@ -899,13 +928,13 @@ Neither count measures the amount of application behavior replaced.
 The reproducible [Rust unsafe inventory](rust-unsafe-inventory.json) uses
 `python3 tools/compat/audit_rust_boundary.py OUTPUT.json`. It masks comments and
 literals, separates cfg(test) items, and includes all platform/feature branches.
-At the current frozen working-tree sources based on `e337fb07` (exact file
+At the current frozen working-tree sources based on `95b3fc55` (exact file
 hashes recorded by the regenerated inventory):
 
 | Layer | Production source inventory | Meaning |
 | --- | --- | --- |
-| `rust/compat` | 0 unsafe blocks/functions/impls; 7,298 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
-| `rust/ffi` | 353 explicit unsafe blocks, 296 unsafe function declarations, two unsafe impls (allocator and registry admission); 4,992 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
+| `rust/compat` | 0 unsafe blocks/functions/impls; 7,324 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
+| `rust/ffi` | 354 explicit unsafe blocks, 297 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,034 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
 | Tests | 119 unsafe blocks in FFI tests | Exercise valid and deliberately bounded ownership/alias/initialization contracts; not production code |
 
 Unsafe-function declarations and blocks overlap and must not be added as

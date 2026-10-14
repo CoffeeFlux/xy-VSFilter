@@ -2,9 +2,7 @@
 // Test-only IN-MODULE helper: compile into the corresponding filter DLL.
 // All STSStyle/flyweight values remain in that module. No callback-count claim.
 #ifdef XY_DOCUMENT_STYLE_TEST_HELPER
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
+// Retain native Windows min/max macros: pinned ssf::Cache uses max directly.
 #include "subtitles/stdafx.h"
 #include "subtitles/STS.h"
 #include "filters/transform/vsfilter/IDirectVobSubXy.h"
