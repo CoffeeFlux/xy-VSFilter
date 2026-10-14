@@ -191,9 +191,94 @@ impl Decoder {
     }
 }
 
+/// Snapshot the first caption packet before either field is decoded. The
+/// supplied backing can be larger than the native logical scan length.
+pub struct Packet {
+    pub position: i32,
+    pub capacity: usize,
+    pub fields: [[u8; 64]; 2],
+    pub lengths: [usize; 2],
+}
+pub fn extract_packet(input: &[u8], length: i32) -> Option<Packet> {
+    let scan_end = length.checked_sub(9)?;
+    let mut result = Packet {
+        position: length.max(0),
+        capacity: 0,
+        fields: [[0; 64]; 2],
+        lengths: [0; 2],
+    };
+    for position in 0..scan_end.max(0) as usize {
+        if input.get(position..position + 8)? != [0, 0, 1, 0xb2, 0x43, 0x43, 1, 0xf8] {
+            continue;
+        }
+        result.position = position as i32;
+        let count = usize::from(*input.get(position + 8)? & 63);
+        result.capacity = (count + 1) & !1;
+        let mut cursor = position + 9;
+        let mut field_count = 0;
+        while field_count < result.capacity && cursor < 0x800 {
+            for field in 0..2 {
+                let present = *input.get(cursor)? == 255;
+                cursor += 1;
+                if present {
+                    let bytes = input.get(cursor..cursor + 2)?;
+                    let end = result.lengths[field] + 2;
+                    result.fields[field]
+                        .get_mut(result.lengths[field]..end)?
+                        .copy_from_slice(bytes);
+                    result.lengths[field] = end;
+                }
+                cursor += 2;
+                field_count += 1;
+                if field_count >= result.capacity {
+                    break;
+                }
+            }
+        }
+        break;
+    }
+    Some(result)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn packet_first_marker_rounding_and_scan_end_are_preserved() {
+        let mut input = [0x23; 64];
+        input[1..9].copy_from_slice(&[0, 0, 1, 0xb2, 0x43, 0x43, 1, 0xf8]);
+        input[9..16].copy_from_slice(&[1, 255, 0x80, 0, 255, 0xfe, 0xff]);
+        let packet = extract_packet(&input, 64).unwrap();
+        assert_eq!(
+            (packet.position, packet.capacity, packet.lengths),
+            (1, 2, [2, 2])
+        );
+        assert_eq!(&packet.fields[0][..2], &[0x80, 0]);
+        assert_eq!(&packet.fields[1][..2], &[0xfe, 0xff]);
+        assert_eq!(extract_packet(&input, 10).unwrap().position, 10);
+        assert_eq!(extract_packet(&input, 11).unwrap().position, 1);
+        input[9] = 0;
+        input[20..28].copy_from_slice(&[0, 0, 1, 0xb2, 0x43, 0x43, 1, 0xf8]);
+        input[28] = 63;
+        assert_eq!(extract_packet(&input, 64).unwrap().capacity, 0);
+        assert!(extract_packet(&[], i32::MIN).is_none());
+        assert_eq!(extract_packet(&[], -1).unwrap().position, 0);
+    }
+
+    #[test]
+    fn packet_cutoff_is_checked_before_each_pair_and_declines_are_bounded() {
+        let mut input = [0x23; 2054];
+        input[2038..2046].copy_from_slice(&[0, 0, 1, 0xb2, 0x43, 0x43, 1, 0xf8]);
+        input[2046..2053].copy_from_slice(&[63, 255, 1, 2, 255, 3, 4]);
+        let packet = extract_packet(&input, 2048).unwrap();
+        assert_eq!(packet.lengths, [2, 2]);
+        assert!(extract_packet(&input[..2048], 2048).is_none());
+        input[2047] = 0;
+        input[2050] = 0;
+        assert!(extract_packet(&input[..2051], 2051).is_some());
+        assert!(extract_packet(&input[..2050], 2050).is_none());
+    }
+
     #[test]
     fn display_preserves_row_gaps_and_bounded_cross_row_strings() {
         let mut cells = [0u16; 528];

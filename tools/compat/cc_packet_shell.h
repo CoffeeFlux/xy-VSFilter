@@ -21,13 +21,14 @@ static std::vector<uint64_t> packetEvents;
 static const BYTE* packetInput=NULL;
 static size_t packetBacking=0;
 static unsigned packetAllocation=0,packetDeclineMask=0;
+static uint64_t packetPlans=0,packetFallbacks=0,packetWordReads=0,packetNativeWrites=0;
 static uint64_t packetOwners=0,packetLoans=0,packetReleases=0,packetDeclines=0,packetDecodes=0,packetInitialized=0,packetUnwritten=0;
 static PacketRegion& packetRegion(const void* p){for(auto& r:packetRegions)if(r.data==p)return r;packetRequire(false);return packetRegions[0];}
 static uint32_t packetWord(const BYTE* p){
     const auto offset=p-packetInput;packetRequire(offset>=0&&static_cast<size_t>(offset)+4<=packetBacking);
-    uint32_t value=0;std::memcpy(&value,p,4);packetEvents.insert(packetEvents.end(),{7,static_cast<uint64_t>(offset),value});return value;
+    uint32_t value=0;std::memcpy(&value,p,4);++packetWordReads;return value;
 }
-static void packetPut(BYTE* p,size_t index,BYTE value){auto& r=packetRegion(p);packetRequire(index<r.count);p[index]=value;r.initialized[index]=true;packetEvents.insert(packetEvents.end(),{8,index,value});}
+static void packetPut(BYTE* p,size_t index,BYTE value){auto& r=packetRegion(p);packetRequire(index<r.count);p[index]=value;r.initialized[index]=true;++packetNativeWrites;}
 static void packetSnapshot(const PacketRegion& r){
     packetEvents.push_back(r.count);
     for(size_t i=0;i<r.count;++i){packetEvents.push_back(r.initialized[i]);if(r.initialized[i]){packetEvents.push_back(r.data[i]);++packetInitialized;}else ++packetUnwritten;}
@@ -49,6 +50,16 @@ static void packetRelease(void* owner){if(!owner){xy_vsfilter_plane_release(owne
 #undef xy_vsfilter_plane_create
 #undef xy_vsfilter_plane_loan
 #undef xy_vsfilter_plane_release
+#include "xy_rust_cc.h"
+namespace XyRust {
+class ObservedCaptionPacket:public CaptionPacket {public:
+    ObservedCaptionPacket(const uint8_t* input,int length):CaptionPacket(input,length){if(Handled())++packetPlans;else ++packetFallbacks;}
+    void Copy(uint8_t* first,uint8_t* second)const{
+        CaptionPacket::Copy(first,second);
+        unsigned field=0;for(auto* data:{first,second}){auto& r=packetRegion(data);const int count=Length(field++);packetRequire(count>=0&&static_cast<size_t>(count)<=r.count);for(int i=0;i<count;++i)r.initialized[i]=true;}
+    }
+};
+}
 static void packetDecode(BYTE* bytes,int count,int64_t time){
     auto& r=packetRegion(bytes);packetRequire(count>0&&static_cast<size_t>(count)<=r.count);packetEvents.insert(packetEvents.end(),{3,static_cast<uint64_t>(count),static_cast<uint64_t>(time)});
     for(int i=0;i<count;++i){packetRequire(r.initialized[i]);packetEvents.push_back(bytes[i]);bytes[i]^=0x80;}

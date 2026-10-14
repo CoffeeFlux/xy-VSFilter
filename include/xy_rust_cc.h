@@ -8,6 +8,10 @@
 #define XY_CC_CDECL
 #endif
 extern "C" {
+void* XY_CC_CDECL xy_vsfilter_cc_packet_create(const uint8_t*, int32_t);
+int32_t XY_CC_CDECL xy_vsfilter_cc_packet_field(const void*, uint32_t);
+void XY_CC_CDECL xy_vsfilter_cc_packet_copy(const void*, uint8_t*, uint8_t*);
+void XY_CC_CDECL xy_vsfilter_cc_packet_release(void*);
 void* XY_CC_CDECL xy_vsfilter_cc_text_create(const uint16_t*);
 size_t XY_CC_CDECL xy_vsfilter_cc_text_field(const void*, uint32_t, size_t);
 void XY_CC_CDECL xy_vsfilter_cc_text_release(void*);
@@ -20,6 +24,18 @@ uint32_t XY_CC_CDECL xy_vsfilter_cc_put(uint16_t*, int32_t, int32_t, uint16_t);
 }
 #undef XY_CC_CDECL
 namespace XyRust {
+class CaptionPacket {
+    void* owner;
+    CaptionPacket(const CaptionPacket&);
+    CaptionPacket& operator=(const CaptionPacket&);
+public:
+    CaptionPacket(const uint8_t* input,int length):owner(xy_vsfilter_cc_packet_create(input,length)){}
+    ~CaptionPacket(){xy_vsfilter_cc_packet_release(owner);}
+    bool Handled()const{return owner!=NULL;}
+    int Position()const{return xy_vsfilter_cc_packet_field(owner,0);}
+    int Length(unsigned field)const{return xy_vsfilter_cc_packet_field(owner,field+2);}
+    void Copy(uint8_t* first,uint8_t* second)const{xy_vsfilter_cc_packet_copy(owner,first,second);}
+};
 class CaptionText {
     void* owner;
     CaptionText(const CaptionText&);

@@ -387,9 +387,19 @@ void CCDecoder::DecodeCC(BYTE *buff, int len, __int64 time)
 
 void CCDecoder::ExtractCC(BYTE *buff, int len, __int64 time)
 {
-    for (int i = 0; i < len - 9; i++)
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::CaptionPacket packet(buff, len);
+    const int start = packet.Handled() ? packet.Position() : 0;
+#else
+    const int start = 0;
+#endif
+    for (int i = start; i < len - 9; i++)
     {
-        if (*(DWORD *)&buff[i] == 0xb2010000 && *(DWORD *)&buff[i + 4] == 0xf8014343)
+        if (
+#ifdef XY_VSFILTER_RUST_TEXT
+            packet.Handled() ||
+#endif
+            (*(DWORD *)&buff[i] == 0xb2010000 && *(DWORD *)&buff[i + 4] == 0xf8014343))
         {
             i += 8;
             int nBytes = buff[i++] & 0x3f;
@@ -414,6 +424,13 @@ void CCDecoder::ExtractCC(BYTE *buff, int len, __int64 time)
                 {
                     int nBytes1 = 0, nBytes2 = 0;
 
+#ifdef XY_VSFILTER_RUST_TEXT
+                    if (packet.Handled()) {
+                        packet.Copy(pData1, pData2);
+                        nBytes1 = packet.Length(0);
+                        nBytes2 = packet.Length(1);
+                    } else
+#endif
                     for (int j = 0; j < nBytes && i < 0x800;)
                     {
                         if (buff[i++] == 0xff)

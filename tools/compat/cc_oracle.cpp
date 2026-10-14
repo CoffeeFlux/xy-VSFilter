@@ -29,14 +29,14 @@ template<class Decoder> static void observe(const Caption& caption){
         active->mutated=true;
     }
 }
-template<class Decoder> static Outcome decode(const std::vector<BYTE>& input,int length,unsigned initial,int alias,int failure,int mutation,const std::vector<std::vector<BYTE>>* tail){
+template<class Decoder> static Outcome decode(const std::vector<BYTE>& input,int length,unsigned initial,int alias,int failure,int mutation,const std::vector<std::vector<BYTE>>* tail,bool extract=false){
     Decoder decoder;seed(decoder,initial);Outcome result={};active=&result;Context<Decoder>::decoder=&decoder;failureIndex=failure;mutationMode=mutation;ccAddHook=&observe<Decoder>;
     int64_t time=12345;
     const auto step=[&](const std::vector<BYTE>& bytes,int count){
         std::vector<BYTE> source=bytes;BYTE* data=source.data();
         if(alias){data=reinterpret_cast<BYTE*>(alias==1?decoder.m_buff:decoder.m_disp);if(!bytes.empty())std::memcpy(data,bytes.data(),bytes.size());}
         activeSource=data;activeLength=bytes.size();result.events.push_back(time);
-        try{decoder.DecodeCC(data,count,time);}catch(const CaptionInterrupted&){result.interrupted=true;}
+        try{if(extract)decoder.ExtractCC(data,count,time);else decoder.DecodeCC(data,count,time);}catch(const CaptionInterrupted&){result.interrupted=true;}
         state(result.state,decoder);if(!bytes.empty())result.source.insert(result.source.end(),data,data+bytes.size());time+=1000;
     };
     step(input,length);if(tail)for(const auto& bytes:*tail)step(bytes,int(bytes.size()));
@@ -60,7 +60,22 @@ static void compareDisplay(const std::vector<WCHAR>& cells,int64_t start=9876543
     if(!(a==b)){fprintf(stderr,"Caption display mismatch case=%llu failure=%d mutation=%d\n",(unsigned long long)displayCases,failure,mutation);std::abort();}
     ++displayCases;displayInterruptions+=a.interrupted;displayMutations+=a.mutated;for(const auto& caption:a.captions)displayUnits+=caption.text.size();
 }
+static uint64_t extractedPackets=0,extractedCaptions=0,extractedMutations=0;
+static void compareExtract(){
+    const BYTE marker[]={0,0,1,0xb2,0x43,0x43,1,0xf8};
+    for(int offset:{0,1,2038,2041,2050})for(int count:{0,1,2,3,31,63,64,127,255})for(int pattern=0;pattern<4;++pattern)for(unsigned initial:{0u,511u})for(int mutation=0;mutation<3;++mutation){
+        std::vector<BYTE> input(2304,0x23);std::memcpy(input.data()+offset,marker,8);input[offset+8]=static_cast<BYTE>(count);
+        for(int j=0;j<64;++j){size_t pos=offset+9+3*j;input[pos]=pattern==0?0:pattern==1?255:pattern==2?(j%2?255:0):(j%3?255:0);input[pos+1]=j%4?BYTE('A'+j%26):0x94;input[pos+2]=j%4?BYTE('a'+j%26):0x2f;}
+        const auto a=decode<ReferenceCC::CCDecoder>(input,2048,initial,0,-1,mutation,nullptr,true);
+        const auto b=decode<CandidateCC::CCDecoder>(input,2048,initial,0,-1,mutation,nullptr,true);
+        if(!(a==b)){fprintf(stderr,"Caption extraction/decode mismatch offset=%d count=%d pattern=%d initial=%u mutation=%d\n",offset,count,pattern,initial,mutation);std::abort();}
+        ++extractedPackets;extractedCaptions+=a.captions.size();extractedMutations+=a.mutated;
+    }
+    if(!extractedCaptions||!extractedMutations)std::abort();
+    printf("%llu exact complete ExtractCC-to-DecodeCC histories passed (%llu emitted subtitle records / %llu callback mutations; both fields snapshot before callbacks, bounded physical backing including shorter logical scan lengths, native display and cursor transitions, source mutations after extraction and controlled subtitle sink; callback exceptions and allocation failure excluded)\n",(unsigned long long)extractedPackets,(unsigned long long)extractedCaptions,(unsigned long long)extractedMutations);
+}
 int main(){
+    compareExtract();
     for(int x:{INT_MIN,-100,-1,0,1,30,31,32,33,64,INT_MAX})for(int y:{INT_MIN,-100,-1,0,1,14,15,16,17,100,INT_MAX}){
         if(x>=32 && y==INT_MAX)continue;ReferenceCC::CCDecoder a;CandidateCC::CCDecoder b;a.MoveCursor(x,y);b.MoveCursor(x,y);if(a.m_cursor.x!=b.m_cursor.x || a.m_cursor.y!=b.m_cursor.y)std::abort();++cursors;
     }

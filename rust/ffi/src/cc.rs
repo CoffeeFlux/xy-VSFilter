@@ -126,9 +126,112 @@ pub unsafe extern "C" fn xy_vsfilter_cc_put(buffer: *mut u16, x: i32, y: i32, va
     let data = unsafe { core::slice::from_raw_parts_mut(buffer, 528) };
     u32::from(xy_vsfilter_compat::cc::put(data, x, y, value))
 }
+/// # Safety
+/// Positive length denotes that many initialized, immutable input bytes.
+/// No native input borrow survives creation. Nonpositive lengths need no input.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_cc_packet_create(
+    input: *const u8,
+    length: i32,
+) -> *mut xy_vsfilter_compat::cc::Packet {
+    let data = if length <= 0 {
+        &[]
+    } else {
+        // SAFETY: caller supplies the complete declared initialized span.
+        unsafe { core::slice::from_raw_parts(input, length as usize) }
+    };
+    xy_vsfilter_compat::cc::extract_packet(data, length).map_or(core::ptr::null_mut(), |packet| {
+        Box::into_raw(Box::new(packet))
+    })
+}
+/// # Safety
+/// owner is null or a live immutable packet owner. Queries lend no references.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_cc_packet_field(
+    owner: *const xy_vsfilter_compat::cc::Packet,
+    field: u32,
+) -> i32 {
+    if owner.is_null() {
+        return 0;
+    }
+    // SAFETY: caller keeps the unique owner live through scalar queries.
+    let packet = unsafe { &*owner };
+    match field {
+        0 => packet.position,
+        1 => packet.capacity as i32,
+        2 => packet.lengths[0] as i32,
+        3 => packet.lengths[1] as i32,
+        _ => 0,
+    }
+}
+/// # Safety
+/// owner is live and immutable. Each nonempty output field provides writable
+/// bytes for its queried length, disjoint from the owner and the other field.
+/// Outputs may be uninitialized; only their initialized prefixes are written.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_cc_packet_copy(
+    owner: *const xy_vsfilter_compat::cc::Packet,
+    first: *mut u8,
+    second: *mut u8,
+) {
+    // SAFETY: immutable source owner is disjoint from native output storage.
+    let packet = unsafe { &*owner };
+    for (field, destination) in [first, second].into_iter().enumerate() {
+        if packet.lengths[field] != 0 {
+            // SAFETY: outputs have the queried lengths and do not overlap.
+            unsafe {
+                core::ptr::copy_nonoverlapping(
+                    packet.fields[field].as_ptr(),
+                    destination,
+                    packet.lengths[field],
+                )
+            };
+        }
+    }
+}
+/// # Safety
+/// owner is null or the unique live create result, released once after all uses.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_cc_packet_release(owner: *mut xy_vsfilter_compat::cc::Packet) {
+    if !owner.is_null() {
+        // SAFETY: native RAII ends all queries and copies before release.
+        drop(unsafe { Box::from_raw(owner) });
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn packet_plan_owns_fields_and_writes_only_the_queried_prefixes() {
+        let mut input = [
+            0, 0, 1, 0xb2, 0x43, 0x43, 1, 0xf8, 4, 255, 65, 66, 255, 67, 68, 255, 69, 70, 0, 7, 8,
+        ];
+        // SAFETY: initialized input lives through creation only; two disjoint
+        // output arrays exceed the queried prefix lengths. Release ends the
+        // owned plan once, after all queries and copies.
+        unsafe {
+            let owner = xy_vsfilter_cc_packet_create(input.as_ptr(), input.len() as i32);
+            assert!(!owner.is_null());
+            input.fill(0);
+            assert_eq!(xy_vsfilter_cc_packet_field(owner, 0), 0);
+            assert_eq!(xy_vsfilter_cc_packet_field(owner, 1), 4);
+            assert_eq!(xy_vsfilter_cc_packet_field(owner, 2), 4);
+            assert_eq!(xy_vsfilter_cc_packet_field(owner, 3), 2);
+            let mut first = [0xa5; 8];
+            let mut second = [0x5a; 8];
+            xy_vsfilter_cc_packet_copy(owner, first.as_mut_ptr(), second.as_mut_ptr());
+            xy_vsfilter_cc_packet_release(owner);
+            assert_eq!(first, [65, 66, 69, 70, 0xa5, 0xa5, 0xa5, 0xa5]);
+            assert_eq!(second, [67, 68, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a]);
+            let short = [0, 0, 1, 0xb2, 0x43, 0x43, 1, 0xf8, 63, 255];
+            assert!(xy_vsfilter_cc_packet_create(short.as_ptr(), short.len() as i32).is_null());
+            let empty = xy_vsfilter_cc_packet_create(core::ptr::null(), 0);
+            assert!(!empty.is_null());
+            xy_vsfilter_cc_packet_copy(empty, core::ptr::null_mut(), core::ptr::null_mut());
+            xy_vsfilter_cc_packet_release(empty);
+        }
+    }
     #[test]
     fn displayed_text_outlives_the_native_cells() {
         let mut cells = [0u16; 528];

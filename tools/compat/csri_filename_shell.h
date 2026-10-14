@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -15,7 +18,9 @@ typedef char16_t WCHAR;
 #define DEFAULT_CHARSET 1
 #endif
 #define CSRIAPI
+#ifndef TEXT
 #define TEXT(x) x
+#endif
 #define AMTRACE(x) ((void)0)
 typedef const char* csri_rend;
 struct csri_openflag {};
