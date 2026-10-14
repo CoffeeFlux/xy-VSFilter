@@ -274,6 +274,22 @@ def realtext_variants():
         yield "realtext-format-" + name + ".rt", text.encode("ascii")
 
 
+def ass_dialogue_variants():
+    header = SEED.split(b"Dialogue:", 1)[0]
+    normal = b"0,0:00:01.00,0:00:04.00,Default,,0,0,0,,visible"
+    for name, script_header, fields in (
+        ("v3", header.replace(b"ScriptType: v4.00+\r\n", b""), b"Marked=" + normal),
+        ("v4", header.replace(b"ScriptType: v4.00+", b"ScriptType: v4.00"), b"Marked=" + normal),
+        ("v6", header.replace(b"ScriptType: v4.00+", b"ScriptType: v4.00++"), normal.replace(b"0,0,0,,visible", b"0,0,0,30,,visible")),
+        ("missing-tail-fields", header, b"0,0:00:01.00,0:00:04.00,Default,,0,0,0"),
+        ("empty-text", header, normal.replace(b"visible", b"")),
+        ("hex-numbers", header, b"&H0,&H0:&H0:&H1.&H0,&H0:&H0:&H4.&H0,Default,,0x0,&h0,0,,visible"),
+        ("invalid-time", header, normal.replace(b"0:00:01.00", b"0:xx:01.00")),
+        ("style-effect-prefix", header, normal.replace(b"Default", b"***dEfAuLt").replace(b",,visible", b",shared,shared text")),
+    ):
+        yield "ass-dialogue-" + name + ".ass", script_header + b"Dialogue: " + fields + b"\r\n"
+
+
 def encoding_variants():
     # Deliberately omit a Unicode BOM. Preserve raw legacy bytes and select the
     # Windows charset through the style and inline overrides.
@@ -407,6 +423,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in incremental_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in subrip_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in realtext_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in ass_dialogue_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in encoding_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in microdvd_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in mpl2_variants()]

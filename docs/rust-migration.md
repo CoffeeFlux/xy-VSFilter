@@ -20,6 +20,26 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns ASS dialogue input, delimiter consumption, version-dependent
+  field order, parsed integer storage and raw style/actor/effect/text fields.
+  Native `NextInt` still converts each numeric token and retains its error/errno
+  behavior. Missing delimiters intentionally reuse the final field; only ASCII
+  spaces are skipped, NUL terminates fields, legacy Marked values are parsed but
+  ignored, and pre-v6 bottom margins copy the top margin. Native effect-prefix
+  clearing, style normalization, timestamp arithmetic and entry insertion remain.
+  Fatal ASan/UBSan comparisons passed **289,444 complete dialogue branches** on
+  arm64 and under x64 execution: **270,074 accepted / 19,370 rejected**, **270,074
+  entry records**, **28,801,993 callback observation values**, **65 interruptions**,
+  **19,309 errno changes**, and **3,678,681 Rust steps**. The branch and numeric
+  helpers are extracted from pinned source; only MSVC integer-literal suffix
+  spelling is adjusted for portable compilers. Actual ATL/CRT are used on Windows.
+  Cases cover versions 3-6, every UTF-16 value, NULs, missing fields, malformed
+  separators, native numeric overflow replies in non-timestamp fields, and all
+  entry arguments. Unrepresentable timestamp arithmetic is excluded.
+  Eight ASS scripts expand renderer validation to **462 cases**. Rust 1.85 tests
+  (92 core, 62 FFI), strict Clippy, default syntax and Python harness checks pass.
+  Windows/Miri and full renderer validation are pending. Whole file/style parsing,
+  numeric conversion, native cleanup and real host integration remain separate.
 * Safe Rust also owns the remaining source, output and conversion sequence in
   `UnicodeSSAToMBCS` and `MBCSSSAToUnicode`. The wrappers still convert an empty
   prefix before an opening brace, parse only the first qualifying `\fe`, use

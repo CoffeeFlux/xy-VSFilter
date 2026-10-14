@@ -68,3 +68,5 @@ pub mod case_replace;
 pub mod sami;
 
 pub mod encoding;
+
+pub mod ass_dialogue;

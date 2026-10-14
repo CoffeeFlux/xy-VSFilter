@@ -44,6 +44,8 @@ class MicroString {
     std::wstring text;
 #endif
 public:
+    typedef const wchar_t* PCXSTR;
+    typedef wchar_t* PXSTR;
     MicroString(){}
     MicroString(const wchar_t* p):text(p){}
     MicroString(const wchar_t* p,int n)
@@ -140,6 +142,37 @@ public:
 #else
         start=std::max(0,std::min(start,GetLength()));count=std::max(0,std::min(count,GetLength()-start));
         text.erase(static_cast<size_t>(start),static_cast<size_t>(count));return GetLength();
+#endif
+    }
+    wchar_t* GetBuffer(){
+#ifdef _WIN32
+        return text.GetBuffer();
+#else
+        return &text[0];
+#endif
+    }
+    void Empty(){
+#ifdef _WIN32
+        text.Empty();
+#else
+        text.clear();
+#endif
+    }
+    bool operator==(const MicroString& other)const{return std::wcscmp(GetString(),other.GetString())==0;}
+    void TrimLeft(wchar_t unit){
+        microObserve(30,GetString());
+#ifdef _WIN32
+        text.TrimLeft(unit);
+#else
+        size_t n=0;while(n<text.size() && text[n] && text[n]==unit)++n;text.erase(0,n);
+#endif
+    }
+    int CompareNoCase(const wchar_t* other)const{
+        microObserve(31,GetString());
+#ifdef _WIN32
+        return text.CompareNoCase(other);
+#else
+        return wcscasecmp(text.c_str(),other);
 #endif
     }
     bool IsEmpty()const{return GetLength()==0;}
