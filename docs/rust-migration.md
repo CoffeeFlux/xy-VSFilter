@@ -234,8 +234,8 @@ still requires D4/D5 below and all remaining ownership/fallback accounting.
 | Milestone | Deliverable | Required evidence before advancing |
 | --- | --- | --- |
 | D0 — Freeze the contract | Exact operation/callsite inventory, owner/alias graph and retained-adapter list for DOC-01 through DOC-11 | Source review across STS, RTS, format importers and both style APIs; explicitly track unresolved behavior. Status: in progress. |
-| D1 — Capture complete lifecycles | A pinned-reference document harness for create → add → edit/style-change → copy → sort → seek → clear/reopen → destroy | Compare full initialized document/segment state, observable callback/error order and caller snapshots; use real ATL/CRT on Windows. Include failed operations and repeated calls, with failures never counted as parity. Status: planned. |
-| D2 — Implement the Rust owner | Safe Rust entries, styles, metadata and segments; coherent document operations reuse existing helpers | Owner/copy/edit/drop tests, raw UTF-16 preservation, bounded access, no native mutable views; native field/type/alias compatibility reviewed. Status: planned. |
+| D1 — Capture complete lifecycles | A pinned-reference document harness for create → add → edit/style-change → copy → sort → seek → clear/reopen → destroy | Compare full initialized document/segment state, observable callback/error order and caller snapshots; use real ATL/CRT on Windows. Include failed operations and repeated calls, with failures never counted as parity. Status: in progress; prepared-record sequence harness passes locally, full native lifecycle remains open. |
+| D2 — Implement the Rust owner | Safe Rust entries, styles, metadata and segments; coherent document operations reuse existing helpers | Owner/copy/edit/drop tests, raw UTF-16 preservation, bounded access, no native mutable views; native field/type/alias compatibility reviewed. Status: D2a core in progress; prepared entries/segments and TIME queries implemented, production integration pending. |
 | D3 — Route every caller | Importers, renderer, style interfaces and export paths use document operations or bounded snapshots | Enumerate and eliminate direct authoritative CAtlArray/CAtlMap entry/style/segment accesses in the Rust-enabled build; preserve callback/lock order and public ABI. Retire superseded fine-grained FFI crossings. Status: planned. |
 | D4 — Establish parity | Document lifecycle and integrated DLL comparisons on Windows x86/x64 at one exact candidate commit | Exact records, ordering, times, errors, rendering output and style API behavior; existing corpus/mutations, targeted lifecycle/malformed fixtures, Miri and relevant native checks. Resolve mismatches; no undocumented native document fallback. Status: planned. |
 | D5 — Close and hand off | Written ownership/access review and applicable consumer validation | Aegisub load/render/seek/reload/close, relevant player/style-edit lifecycles and architecture results. Record finite corpus scope and bounded retained adapters. Until the real-host check is complete, report core-complete/host-validation-pending, never closed. Status: planned. |
@@ -284,6 +284,68 @@ whole-repository percentage is promised before that measurement. Windows CI
 supports development here. Local Windows is needed for the real-host gate or a
 specific native/debugging question CI cannot resolve, not simply because the
 next source file contains Windows types.
+
+### First document-owner implementation and evidence
+
+The first coordinated increment adds a persistent safe `Document` in
+`rust/compat/src/document.rs`. It owns complete prepared entry records and
+segments, applies incremental insertion directly, and exposes immutable views.
+It covers append-only versus incremental insertion, rebuild, entries-only
+removal, subset clear, animation OR feedback, last-stored-entry correction,
+bounded style rename, independent subset cloning and all three integer TIME
+search modes. Raw UTF-16 fields stay raw. This adds no unsafe Rust or FFI.
+Native production arrays are still authoritative: **zero production owners
+retired in this increment**. It is the first D2a core implementation, not D2a
+integration or document subsystem closure.
+
+[The D0 inventory](rust-document-inventory.json) records 30 reviewed operation
+and caller scopes, all document metadata/default-style fields, source hashes,
+and broad lexical candidates. `tools/compat/audit_document_access.py --check`
+checks source stability, not semantic completeness or reachability. The
+[boundary proposal](rust-document-boundary.md) traces host locks, retained
+stream references, callbacks and destruction. Lifetime admission, reentry and
+all native caller updates remain prerequisites for a production facade.
+
+`tools/compat/document_check.py` extracts the pinned native insertion suffixes,
+segment rebuild/removal and search bodies, plus bounded correction/rename and
+animation statements. Its portable storage shell deliberately bypasses initial
+text/style/WebVTT preprocessing and uses identity TIME translations. Local
+arm64 validation compared 133 sequences, 1,819 mutations/control operations
+and 87,312 queries: 89,131 initialized entry/segment snapshots matched. Two
+reference captures matched; native ASan/UBSan and changed-content/length
+negative controls passed. [The local report](rust-document-local-evidence.json)
+records source, binary, compiler and trace hashes. These are working-tree
+source-hash results, not Windows production evidence. Raw local traces are in
+`artifacts/document/local-arm64`; CI uploads the document traces and reports.
+
+Allocation failure/partial native allocation effects, callback parity, full
+Copy/Empty, metadata/styles, initial rejection, frame conversion and rendering
+remain outside this comparison. Native callback counts are observed only.
+Embedded-NUL style-name comparison is not established by raw-unit preservation;
+rename comparisons use NUL-free style names. Stale-index incremental insertion
+and unresolved WebVTT end-iterator histories are safely refused by the core and
+excluded from reference execution, never counted as parity. These refusals are
+not approved production behavior. Rust unit tests separately cover refusal
+without mutation. Harness failures/timeouts invalidate prior success reports.
+
+The portable CI matrix now runs this sequence comparison on each target, with
+native sanitizer instrumentation only on supported POSIX jobs. Windows x86/x64
+also run `document_windows_probe.py`: actual ATL CString/map histories, extracted
+native STSEntry and renderer comparator bodies, record layouts, finite bounded
+rounding/conversion observations, repeated traces and compiler/header/binary
+provenance. These are reference observations, not Rust parity. The probes are
+prepared and generation-checked locally; Windows execution is pending. The
+current runner toolchain is recorded but is not yet a frozen reference build.
+
+The prior RLE fixture failure remains an integration gate pending CI. A focused
+correction makes owner snapshots use exact allocation-base identity, and avoids
+inventing offset observations for zero-byte copies at adjacent-region boundaries.
+A deterministic adjacent-region control failed with the old lookup; the corrected
+fixture passes 29,120 mutation calls on local arm64/x86_64, both ordinary and
+fatal native ASan/UBSan builds. [Focused evidence](rle-fixture-address-evidence.json)
+records this fixture-only change; it does not establish that the original CI
+failure is resolved or that the full matrix passes. Production RLE code is
+unchanged.
 
 ## Independent audit and unsafe boundary
 
