@@ -23,6 +23,7 @@ def cases():
                 'style.font {face: "Arial"; size: 20;}; @ { ' + text + ' }; };')
     plain = subtitle("SSF compatibility")
     return {"plain": plain,
+            "clock-time": plain.replace("start: 0; stop: 2;", "start: 00:00:00.000; stop: 00:00:02.000;"),
             "comments": "/* before */ // line\r\n" + plain.replace("time {", "time /* middle */ {") + "/* after */",
             "arabic": subtitle("\u0628\u0627\u0628 \u0644\u0627 \u0626\u0628"),
             "arabic-boundaries": subtitle("A \u0604\u0626\u0644\u06ff Z"),
@@ -42,10 +43,15 @@ def inspect(directory, returncode, timed_out=False):
     frames = re.findall(rb"^pixels (\d+) changed (\d+) bounds (-?\d+) (-?\d+) (-?\d+) (-?\d+)$", trace, re.M)
     dumps = re.findall(rb"^dump (\d+) units (\d+)$", trace, re.M)
     segments = re.findall(rb"^ssf-native-v1 parsed segments (\d+)$", trace, re.M)
-    headers = re.findall(rb"^frame (\d+) found [01] subtitles (\d+)$", trace, re.M)
+    headers = re.findall(rb"^frame (\d+) found ([01]) subtitles (\d+)$", trace, re.M)
     if [int(h[0]) for h in headers] != list(range(6)):
         return result
     if len(segments) != 1 or int(segments[0]) == 0 or [int(f[0]) for f in frames] != list(range(6)) or [int(d[0]) for d in dumps] != list(range(6)):
+        return result
+    timeline = [[int(value) for value in header] for header in headers]
+    expected_timeline = [[0, 0, 0], [1, 1, 1], [2, 1, 1], [3, 1, 1], [4, 0, 0], [5, 1, 1]]
+    if timeline != expected_timeline:
+        result["status"] = "control_failed"
         return result
     if any(int(frame[1]) != 0 for frame in frames) or not re.search(rb"^text units [0-9a-f]{4}", trace, re.M) or re.search(rb"^rendered 1 glyphs [0-9a-f]{4}", trace, re.M):
         result["status"] = "control_failed"
@@ -67,7 +73,7 @@ def inspect(directory, returncode, timed_out=False):
             result["status"] = "control_failed"
             return result
         result["files"][name] = sha(path)
-    result.update(status="complete", blank_frame_observations=6, visible_rendering_parity_frames=0, changed_pixels=[int(frame[1]) for frame in frames], segments=int(segments[0]))
+    result.update(status="complete", timeline=timeline, blank_frame_observations=6, visible_rendering_parity_frames=0, changed_pixels=[int(frame[1]) for frame in frames], segments=int(segments[0]))
     return result
 
 

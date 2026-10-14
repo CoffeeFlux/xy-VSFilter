@@ -20,6 +20,26 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* SSF Split now performs separator searches in safe Rust using read-only UTF-16
+  spans. Search stops at NUL from the requested offset while preserving the
+  declared string length for native Mid/Trim and token selection. Native
+  constructors and the complete DoSplit method match locally in ordinary and
+  fatal ASan/UBSan builds on arm64 and x64: **594,144 histories / 34,313,758
+  observed fields / 1,840,894 tokens / 876 interrupted Add calls / 196,608 input
+  separator aliases / 2,106,294 Rust searches**. Every UTF-16 value, embedded NUL,
+  multi-unit/overlapping separators, Min/Def/Max, limits on accepted tokens,
+  repeated clears and partial arrays are checked. Windows uses actual CStringW
+  and ATL; portable builds model strings/arrays and the unchanged Trim boundary.
+  Public token storage, trimming and numeric conversions remain native. Actual
+  allocation failure, invalid CString backing/state, aliases into cleared old
+  arrays and unrepresentable lengths remain excluded. The FFI ownership test
+  checks overlapping input/separator slices across NUL boundaries.
+  **149 core / 108 FFI tests**, formatting, Clippy, 35 Python checks (three
+  local skips) and default native syntax pass; Windows/Miri are pending.
+  Native SSF cases now add colon-separated clock times in all four input modes
+  (**28 cases**) and enforce the expected start/stop/seek timeline. That timing
+  control also agrees with all 192 saved captures from the prior 24-case run.
+
 * SSF BOM recognition and UTF-16 value assembly now use safe Rust. Native code
   still sets unknown encoding before the first read, performs the virtual byte
   callbacks and applies a recognized encoding after the final matching byte.
@@ -37,7 +57,10 @@ unresolved reference outcomes requiring investigation, never matching results.
   either implementation and is not a pass; other UTF-8 decode/overflow domains,
   provider reentry/mutation and actual I/O remain outside this fixture.
   **149 core / 107 FFI tests**, formatting, Clippy, 34 Python checks (three
-  local skips) and default native syntax pass. Windows/Miri are pending.
+  local skips) and default native syntax pass. Both Windows portable jobs
+  (`115969849153`, `115969849364`), Miri (`115969849558`) and native SSF input-mode
+  comparisons (`38598073793`) pass at `62b5c8b7`; complete DLL integration remains
+  separate.
 
 * `ssf-integration-evidence.json` now archives the complete passing stage at
   `75467486`: queue ownership, comment/peek decisions, output encoding and
@@ -69,7 +92,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   (`115962447200`). Windows portable jobs `115962448122` / `115962448169` stopped
   at Python evidence tests: test fixtures emitted CRLF while inspect expects
   capture-normalized LF. The tests now request LF explicitly. Those failures
-  remain failed; actual Windows CStringW leaf execution awaits the corrected run.
+  remain failed. Corrected Windows jobs `115969849153` and `115969849364` now
+  pass at `62b5c8b7`, including actual CStringW alias/UTF-16 comparisons.
 
 * Complete caption packet parsing and CSRI filename evidence is now archived
   at `5f586dac` in `cc-packet-parser-evidence.json`: four portable jobs, Miri,

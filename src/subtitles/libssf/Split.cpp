@@ -22,6 +22,9 @@
 #include "stdafx.h"
 #include "Split.h"
 #include "Exception.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "../../../include/xy_rust_ssf_split.h"
+#endif
 
 namespace ssf
 {
@@ -45,7 +48,11 @@ namespace ssf
 				i <= len && (limit == 0 || GetCount() < limit); 
 				i = j + (int)seplen)
 			{
+#ifdef XY_VSFILTER_RUST_TEXT
+                j = xy_vsfilter_ssf_split_find(reinterpret_cast<const uint16_t*>(str.GetString()), len, reinterpret_cast<const uint16_t*>(sep), seplen, i);
+#else
 				j = str.Find(sep, i);
+#endif
 				if(j < 0) j = len;
 
 				CStringW s = i < j ? str.Mid(i, j - i) : L"";
