@@ -10,6 +10,8 @@
 #include <csignal>
 #include <exception>
 #undef CStringW
+class MicroString;
+static MicroString* activeTrim=NULL;
 static uint64_t microCase=0;
 static const wchar_t* microInput=NULL;
 static int microLength=0,microSide=0;
@@ -141,18 +143,26 @@ public:
 #endif
     }
     void TrimLeft(){
+        MicroString* previous=activeTrim;activeTrim=this;
+        try{
+            microObserve(9,GetString());
 #ifdef _WIN32
-        text.TrimLeft();
+            text.TrimLeft();
 #else
-        size_t i=0;while(i<text.size() && text[i] && std::iswspace(text[i]))++i;text.erase(0,i);
+            size_t i=0;while(i<text.size() && text[i] && std::iswspace(text[i]))++i;text.erase(0,i);
 #endif
+            microObserve(10,GetString());
+        }catch(...){activeTrim=previous;throw;}
+        activeTrim=previous;
     }
     void TrimRight(const wchar_t* chars){
+        microObserve(11,GetString());
 #ifdef _WIN32
         text.TrimRight(chars);
 #else
         while(!text.empty() && text.back() && std::wcschr(chars,text.back()))text.pop_back();
 #endif
+        microObserve(12,GetString());
     }
     MicroString SpanExcluding(const wchar_t* chars)const{
 #ifdef _WIN32

@@ -88,9 +88,96 @@ pub unsafe extern "C" fn xy_vsfilter_sami_release(owner: *mut Sami) {
         drop(unsafe { Box::from_raw(owner) });
     }
 }
+use xy_vsfilter_compat::sami::Arguments;
+/// # Safety
+/// Nonempty input spans length initialized aligned u16 units, immutable for this
+/// call; length*2 fits isize. The outer SAMI owner supplies its non-NUL arguments.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_sami_arguments_create(
+    input: *const u16,
+    length: u32,
+) -> *mut Arguments {
+    let input = if length == 0 {
+        &[]
+    } else {
+        // SAFETY: the native argument snapshot is initialized and immutable.
+        unsafe { core::slice::from_raw_parts(input, length as usize) }
+    };
+    Box::into_raw(Box::new(Arguments::new(input)))
+}
+/// # Safety
+/// owner is live and uniquely accessible. Nonempty input spans length initialized
+/// u16 units, disjoint from owner; length*2 fits isize. No loan escapes this call.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_sami_arguments_accept(
+    owner: *mut Arguments,
+    input: *const u16,
+    length: u32,
+) -> u32 {
+    let input = if length == 0 {
+        &[]
+    } else {
+        // SAFETY: native TrimLeft completed before this initialized loan starts.
+        unsafe { core::slice::from_raw_parts(input, length as usize) }
+    };
+    // SAFETY: noncopyable adapter holds exclusive state between field queries.
+    let state = unsafe { &mut *owner };
+    state.accept(input)
+}
+/// # Safety
+/// owner stays live and immutable throughout this bounded scalar query.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_sami_arguments_field(
+    owner: *const Arguments,
+    group: u32,
+    field: u32,
+    index: u32,
+) -> u32 {
+    // SAFETY: native adapter queries before its unique release.
+    let state = unsafe { &*owner };
+    let text = if group == 0 {
+        &state.remaining
+    } else {
+        &state.value
+    };
+    match field {
+        0 => text.len() as u32,
+        1 => u32::from(text.get(index as usize).copied().unwrap_or(0)),
+        _ => 0,
+    }
+}
+/// # Safety
+/// Return the unique create result exactly once after all calls complete.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_sami_arguments_release(owner: *mut Arguments) {
+    if !owner.is_null() {
+        // SAFETY: adapter returns unique ownership.
+        drop(unsafe { Box::from_raw(owner) });
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn argument_loans_end_before_lookup_and_next_native_trim() {
+        let mut input: alloc::vec::Vec<u16> = "color=red>".encode_utf16().collect();
+        // SAFETY: initialized native-like spans and a live uniquely released
+        // owner; mutation happens after each immutable input loan ends.
+        unsafe {
+            let owner = xy_vsfilter_sami_arguments_create(input.as_ptr(), input.len() as u32);
+            assert_eq!(
+                xy_vsfilter_sami_arguments_accept(owner, input.as_ptr(), input.len() as u32),
+                2
+            );
+            input.fill(0);
+            assert_eq!(xy_vsfilter_sami_arguments_field(owner, 1, 0, 0), 3);
+            assert_eq!(xy_vsfilter_sami_arguments_field(owner, 1, 1, 0), 114);
+            assert_eq!(xy_vsfilter_sami_arguments_field(owner, 0, 1, 0), 62);
+            assert_eq!(xy_vsfilter_sami_arguments_field(owner, 0, 1, u32::MAX), 0);
+            xy_vsfilter_sami_arguments_release(owner);
+        }
+    }
     #[test]
     fn owned_text_and_arguments_survive_input_changes() {
         let mut input = [60u16, 102, 111, 110, 116, 32, 62];

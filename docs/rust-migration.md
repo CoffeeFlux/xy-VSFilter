@@ -20,6 +20,21 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns SAMI font-argument cleanup, the remaining argument buffer and
+  the current color value. Quote/hash removal, exact `color=` recognition, token
+  consumption before lookup, and ignored/empty attributes retain native order.
+  Each remainder is exported for native `TrimLeft`, then freshly captured; tokens
+  stop only at the original ASCII delimiters or NUL, preserving internal CR/LF.
+  Native initial empty-argument trims and color lookup/conversion remain intact.
+  Fatal ASan/UBSan comparisons passed **97,337 whole SAMI conversions** on arm64
+  and under x64 execution: **44,487,130 callback observation values**, **122
+  interruptions**, **163,328 argument owners**, **358,329 accepted trim results**
+  and **98 callback mutations**. Mutations before/after trimming include changed
+  attributes, forced termination and an introduced NUL tail. Complete output,
+  callback order and errno still match. The prior NUL-input fallback scope is
+  unchanged. Rust 1.85 tests (87 core, 59 FFI), strict Clippy, default syntax and
+  corpus freshness pass. Windows/Miri validation is pending. Trimming, native
+  color/numeric conversion and full file/host integration remain separate work.
 * Safe Rust owns SAMI's original-case and lowercase buffers, outer tag scan,
   color-fragment insertion and tag deletion. Native preprocessing, font-argument
   extraction operations, the original color table/lookup, `wcstol` and hexadecimal
@@ -57,9 +72,14 @@ unresolved reference outcomes requiring investigation, never matching results.
   Nonterminating empty-needle and replacement-bearing NUL outcomes are excluded.
   Six SAMI scripts and an italic visible-change control expand the rendering
   corpus to **422 cases**. Rust 1.85 tests (84 core, 57 FFI), strict Clippy,
-  default syntax, corpus freshness and Python harness checks pass. Windows/Miri
-  and complete rendering validation are pending. Native lowercase, SAMI tag/color
-  parsing, allocation failure timing and full host integration remain.
+  default syntax, corpus freshness and Python harness checks pass. Candidate
+  `8327c93c` passed all four portable platforms, Miri and both Windows DLL jobs,
+  each matching **422 cases / 4,730 frames** and **32 mutations / 224 frames**,
+  plus dialogs, visible controls, exports and dependencies. Both logs confirm
+  Rust-enabled `STS.cpp` compilation. [Replacement evidence](case-replace-evidence.json)
+  records verified hashes and stable local validation. Native lowercase, numeric
+  conversion, allocation failure timing and full host integration remain; SAMI
+  tag/color processing is covered by the later increments above.
 * Safe Rust owns `RemoveSSATags` text, brace-removal state and ordered text
   substitutions. Italic tags are converted before brace removal; the first
   charset-aware closing brace wins, an unterminated tail survives, and `\N`,

@@ -84,11 +84,74 @@ impl Sami {
         0
     }
 }
+/// Owned argument remainder and current color value. Creation receives the
+/// non-NUL argument span admitted by the outer SAMI owner. Native TrimLeft runs
+/// on each exported remainder before accept receives the resulting fresh text.
+pub struct Arguments {
+    pub remaining: Vec<u16>,
+    pub value: Vec<u16>,
+}
+impl Arguments {
+    pub fn new(raw: &[u16]) -> Self {
+        Self {
+            remaining: raw
+                .iter()
+                .copied()
+                .filter(|&c| c != 34 && c != 35)
+                .collect(),
+            value: Vec::new(),
+        }
+    }
+    /// 0 end, 1 ignored/empty color, 2 nonempty color value. Consume the complete
+    /// token before requesting any native lookup/conversion, including on skips.
+    pub fn accept(&mut self, trimmed: &[u16]) -> u32 {
+        let end = trimmed
+            .iter()
+            .position(|&c| matches!(c, 0 | 9 | 32 | 62))
+            .unwrap_or(trimmed.len());
+        self.remaining = trimmed[end..].to_vec();
+        self.value.clear();
+        if end == 0 {
+            return 0;
+        }
+        let token = &trimmed[..end];
+        if token.len() > 6
+            && token[..6]
+                .iter()
+                .zip(b"color=")
+                .all(|(&a, &b)| a == u16::from(b))
+        {
+            self.value.extend_from_slice(&token[6..]);
+            2
+        } else {
+            1
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     fn u(s: &str) -> Vec<u16> {
         s.encode_utf16().collect()
+    }
+    #[test]
+    fn argument_removal_and_native_trim_results_keep_original_token_rules() {
+        let mut a = Arguments::new(&u("  co\"lor=\"#red color= color=blue>"));
+        assert_eq!(a.remaining, u("  color=red color= color=blue>"));
+        assert_eq!(a.accept(&u("color=red color= color=blue>")), 2);
+        assert_eq!(a.value, u("red"));
+        assert_eq!(a.remaining, u(" color= color=blue>"));
+        assert_eq!(a.accept(&u("color= color=blue>")), 1);
+        assert!(a.value.is_empty());
+        assert_eq!(a.accept(&u("color=blue>")), 2);
+        assert_eq!(a.remaining, u(">"));
+        assert_eq!(a.accept(&u(">")), 0);
+        assert_eq!(a.accept(&u("color=red\0tail")), 2);
+        assert_eq!(a.remaining, u("\0tail"));
+        assert_eq!(a.accept(&u("\0tail")), 0);
+        assert_eq!(a.accept(&u("color=red\r\nother")), 2);
+        assert_eq!(a.value, u("red\r\nother"));
     }
     #[test]
     fn unterminated_font_removes_first_inserted_unit_too() {
