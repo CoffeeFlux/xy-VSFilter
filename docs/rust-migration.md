@@ -616,8 +616,9 @@ same pinned reference, export/dependency checks, COM cases and exact-frame corpu
 Experimental artifacts use the `renderer-evidence-ARCH-rust-document` name;
 `summarize_evidence.py --document-storage rust-experimental` requires matching
 build metadata and the experimental macro in the compiler log. Native-only
-evidence cannot satisfy that selection. Actual Windows owner compilation and
-full renderer results are pending for this integration.
+evidence cannot satisfy that selection. Actual Windows owner compilation now
+passes on both architectures; full renderer results remain pending for this
+integration.
 
 The focused Windows probe also compiles the exact adapter against actual ATL
 types and compares its complete records, segment membership and scalar results
@@ -627,8 +628,29 @@ The current experimental lookup facade is checked with aliased output pointers
 in TIME and bounded FRAME cases; a negative control changes a string suffix
 after an embedded NUL to verify that full stored values are compared. This
 probe covers prepared storage operations, not native parsing, metadata or the
-whole public class ABI. Local source generation and Python checks pass; actual
-Windows execution remains required.
+whole public class ABI. At `30d087bd`, both Windows architectures pass 3,745
+checks across 32 states with identical repeated traces and empty stderr. Source,
+generated inputs, binaries and traces were rehashed; Miri also passes. See
+[rust-document-owner-windows-evidence.json](rust-document-owner-windows-evidence.json).
+The broad compatibility workflow failed later because its older Add extractor
+still expected the direct native count spelling. The extractor now retains the
+whole prepared-entry suffix and binds count facades in its legacy shells; all
+source extraction and the three affected C++ fixture builds pass locally. The
+failed run remains separate from these focused passes.
+
+`document_native_lifecycle.py` adds a complementary gate after the DLL smoke
+check. It links `document_native_lifecycle.cpp` separately against each checkout's
+actual Release libraries and calls full CSimpleTextSubtitle methods, without
+extracted method bodies. The bounded sequence covers copying into a nonempty
+destination, self-copy, repeated Empty, native style renaming, text/Unicode
+editing, sorting, frame/time conversion and notification order. Callback reads
+observe rebuilt state after Rust access ends. Complete initialized metadata,
+styles, entries and segments are serialized; two executions per side must match
+exactly. The runner preserves failed/partial observations, hashes libraries,
+headers and executables, and refuses existing output directories. Local evidence
+validation tests pass; actual Windows linking and lifecycle results are pending.
+Allocator failure, dialog reentry, concurrent close and real-host validation
+remain outside this bounded sequence.
 
 ## Independent audit and unsafe boundary
 
