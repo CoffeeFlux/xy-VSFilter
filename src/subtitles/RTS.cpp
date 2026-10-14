@@ -3637,10 +3637,18 @@ STDMETHODIMP CRenderedTextSubtitle::RenderEx( IXySubRenderFrame**subRenderFrame,
     }
 
     SIZE layout_size = original_video_size;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    const CSize document_layout_size = GetDocumentLayoutSize();
+    if (document_layout_size.cx > 0 && document_layout_size.cy > 0) {
+        layout_size.cx = document_layout_size.cx;
+        layout_size.cy = document_layout_size.cy;
+    }
+#else
     if (m_layout_size.cx > 0 && m_layout_size.cy > 0) {
         layout_size.cx = m_layout_size.cx;
         layout_size.cy = m_layout_size.cy;
     }
+#endif
 
     XyColorSpace color_space = XY_CS_ARGB;
     switch(spd_type)

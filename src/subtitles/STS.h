@@ -205,7 +205,9 @@ public:
     int            m_collisions;
     bool           m_fScaledBAS;
 #endif
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     CSize          m_layout_size;
+#endif
 
 #ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     CSTSStyleMap   m_styles;
@@ -347,6 +349,10 @@ public:
     YCbCrRange GetDocumentColorRange() const;
     void SetDocumentColorRange(YCbCrRange value);
 
+    CSize GetDocumentLayoutSize() const;
+    void SetDocumentLayoutSize(const CSize& value);
+    void SetDocumentLayoutWidth(int value);
+    void SetDocumentLayoutHeight(int value);
     CSize GetDocumentScreenSize() const;
     void SetDocumentScreenSize(const CSize& value);
     void SetDocumentScreenWidth(int value);

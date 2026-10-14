@@ -79,6 +79,39 @@ jobs:
         with:
           name: document-style-api-compile-${{ matrix.platform }}
           path: artifacts/document-style-api-compile/${{ matrix.platform }}/
+  document_preparation:
+    runs-on: windows-2022
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: x64
+            arch: x64
+          - platform: Win32
+            arch: amd64_x86
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: 4911cacb102bc0cbd41449793e54473265b04e62
+          path: baseline-preparation
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Capture pinned document preparation with actual Windows strings
+        shell: pwsh
+        run: |
+          & python tools\compat\document_prepare_check.py --reference-root "$pwd\baseline-preparation" --platform ${{ matrix.platform }} --output "artifacts\document-preparation\${{ matrix.platform }}"
+          if ($LASTEXITCODE -ne 0) { throw "Document preparation capture incomplete; inspect report.json" }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: document-preparation-${{ matrix.platform }}
+          path: artifacts/document-preparation/${{ matrix.platform }}/
   atl_contract:
     runs-on: windows-2022
     timeout-minutes: 10

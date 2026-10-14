@@ -235,8 +235,8 @@ still requires D4/D5 below and all remaining ownership/fallback accounting.
 | --- | --- | --- |
 | D0 — Freeze the contract | Exact operation/callsite inventory, owner/alias graph and retained-adapter list for DOC-01 through DOC-11 | Source review across STS, RTS, format importers and both style APIs; explicitly track unresolved behavior. Status: in progress. |
 | D1 — Capture complete lifecycles | A pinned-reference document harness for create → add → edit/style-change → copy → sort → seek → clear/reopen → destroy | Compare full initialized document/segment state, observable callback/error order and caller snapshots; use real ATL/CRT on Windows. Include failed operations and repeated calls, with failures never counted as parity. Status: bounded full native-class lifecycle passes on x86/x64 at `04673672`; expanded default-style lifecycle also passes at `d6bd058c` with partial workflow evidence; named-style lifecycles and broader host/failure gates remain open. |
-| D2 — Implement the Rust owner | Safe Rust entries, styles, metadata and segments; coherent document operations reuse existing helpers | Owner/copy/edit/drop tests, raw UTF-16 preservation, bounded access, no native mutable views; native field/type/alias compatibility reviewed. Supplied LCID is now owned opt-in without a constructor default. Status: canonical entries/segments, default/named styles, name/path, interpretation, script layout and initialized forced/PAR/color values implemented opt-in. Partial/bounded evidence is recorded separately; current full Windows gates pending; simple/layout_size remain native. |
-| D3 — Route every caller | Importers, renderer, style interfaces and export paths use document operations or bounded snapshots | Enumerate and eliminate direct authoritative storage accesses in the Rust-enabled build; preserve callback/lock order and public ABI. Retire superseded fine-grained FFI crossings. Supplied LCID is now owned opt-in without a constructor default. Status: current opt-in owners route through scalar/value facades; unchanged default branches verified by source preprocessing. Full changed-code Windows gates pending; simple/layout_size and native orchestration remain. |
+| D2 — Implement the Rust owner | Safe Rust entries, styles, metadata and segments; coherent document operations reuse existing helpers | Owner/copy/edit/drop tests, raw UTF-16 preservation, bounded access, no native mutable views; native field/type/alias compatibility reviewed. Supplied LCID and layout size are owned opt-in; layout constructor provenance is recorded separately. Status: canonical entries/segments, default/named styles, name/path, interpretation, script layout and initialized forced/PAR/color values implemented opt-in. Partial/bounded evidence is recorded separately; current full Windows gates pending; `m_simple` remains native. |
+| D3 — Route every caller | Importers, renderer, style interfaces and export paths use document operations or bounded snapshots | Enumerate and eliminate direct authoritative storage accesses in the Rust-enabled build; preserve callback/lock order and public ABI. Retire superseded fine-grained FFI crossings. Supplied LCID and layout size are owned opt-in; layout constructor provenance is recorded separately. Status: current opt-in owners route through scalar/value facades; unchanged default branches verified by source preprocessing. Full changed-code Windows gates pending; `m_simple` and native orchestration remain. |
 | D4 — Establish parity | Document lifecycle and integrated DLL comparisons on Windows x86/x64 at one exact candidate commit | Exact records, ordering, times, errors, rendering output and style API behavior; existing corpus/mutations, targeted lifecycle/malformed fixtures, Miri and relevant native checks. Resolve mismatches; no undocumented native document fallback. Status: experimental entry/segment owner passes the full DLL corpus and bounded native-class lifecycle on x86/x64 at `04673672`; subsequent canonical named-style changes await full Windows validation; partial default-style results do not close style API/value or workflow gates. No whole-document closure. |
 | D5 — Close and hand off | Written ownership/access review and applicable consumer validation | Aegisub load/render/seek/reload/close, relevant player/style-edit lifecycles and architecture results. Record finite corpus scope and bounded retained adapters. Until the real-host check is complete, report core-complete/host-validation-pending, never closed. Status: planned. |
 
@@ -1158,10 +1158,10 @@ count remains 19.
 
 The private fe24 x86/x64 CSize source captures show a zeroing body, but its
 active condition remains unresolved. The new tool separately captures the
-actual preprocessed default-constructor body in native, Rust-text and
+actual preprocessed default-constructor body in native/Rust-text and
 experimental subtitles contexts. It retains bounded private excerpts only,
 executes no objects and leaves the runtime PROBE unchanged. Windows evidence
-for this new capture remains pending.
+for this capture was pending at that stage; the verified result is linked below.
 
 The separate style API test host now creates an empty Software registry
 scaffold. In run 38648351874, x64 job 116140719750, reference setup diagnostics
@@ -1169,6 +1169,45 @@ verified expected resources and matching loaded modules, but opening
 `Software\Gabest\VSFilter\DefTextPathes` returned error 2. The correction seeds no
 value and retains the assertion; its Windows result remains pending. This test
 setup repair is not a document behavior change or style API passing evidence.
+
+
+### Layout-size ownership
+
+The experimental document now owns the signed layout-size pair separately from
+screen resolution. The constructor supplies an actual native `CSize()` value.
+[Active constructor evidence](rust-document-layout-constructor-evidence.json)
+at `7f3e5c9c` verifies the zeroing body in both native/Rust-text and experimental
+subtitles contexts on x86/x64. It verifies private preprocessed source and
+repository-header provenance, not a native object-value read; external toolchain
+and discarded full-stream hashes retain their stated runner-reported limits.
+
+ASS numeric parsing remains native: LayoutResX and LayoutResY update only their
+axis, while a numeric exception resets both axes and rejects the parser attempt.
+Copy and Empty retain destination layout size. RenderEx still uses the supplied
+pair only when both dimensions are positive; otherwise it selects the entire
+original video size pair. Cache/scaling arithmetic remains native.
+
+A separate short x86/x64 CI job captures the exact pinned Add/entry-only
+preparation suffix and SetStr LF-only replacement with actual MFC CStringW. Its
+620 bounded observations include embedded NULs, raw surrogates and stars, with
+complete trace/provenance/repeat checks. Local validation is generation-only;
+native execution and Rust preparation/routing parity remain pending. Private
+CString source selectors are separate; the runtime map PROBE is unchanged.
+
+Local checks pass 194 core and 117 FFI tests, 115 Python tests with four
+Windows-only skips, pinned formatting and all-target Clippy. Generated-probe
+and eight-file preprocessing checks pass. Corpus generation checks 34 existing
+and 370 generated fixtures, totaling 814 cases. Eight new layout fixtures add
+16 file/memory cases; all prior 798 case objects and control metadata are
+unchanged. These renderer comparisons await Windows execution.
+
+Nine explicitly initialized full-class stages cover Copy/Empty/self-Copy
+retention, source independence, width-only/height-only/repeated ordinary ASS
+headers and a small nonpositive pair. Four parser callbacks observe the parsed
+values. No new bad-numeric/dialog or constructor-default runtime history is
+executed. Current layout-size lifecycle, rendering and host Windows gates remain
+pending. The opt-in retired field/container count is 20; m_simple remains native
+with its unresolved pre-Open source contract.
 
 
 ### Coarse selected-state Copy boundary
@@ -1221,13 +1260,13 @@ Neither count measures the amount of application behavior replaced.
 The reproducible [Rust unsafe inventory](rust-unsafe-inventory.json) uses
 `python3 tools/compat/audit_rust_boundary.py OUTPUT.json`. It masks comments and
 literals, separates cfg(test) items, and includes all platform/feature branches.
-At the current frozen working-tree sources based on `d4bdbad4` (exact file
+At the current frozen working-tree sources based on `7f3e5c9c` (exact file
 hashes recorded by the regenerated inventory):
 
 | Layer | Production source inventory | Meaning |
 | --- | --- | --- |
-| `rust/compat` | 0 unsafe blocks/functions/impls; 7,680 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
-| `rust/ffi` | 359 explicit unsafe blocks, 302 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,268 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
+| `rust/compat` | 0 unsafe blocks/functions/impls; 7,706 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
+| `rust/ffi` | 359 explicit unsafe blocks, 302 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,308 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
 | Tests | 119 unsafe blocks in FFI tests | Exercise valid and deliberately bounded ownership/alias/initialization contracts; not production code |
 
 Unsafe-function declarations and blocks overlap and must not be added as

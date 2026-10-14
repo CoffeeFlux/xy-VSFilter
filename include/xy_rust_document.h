@@ -102,7 +102,9 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_get_metadata_v1(uint64_t owner, 
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_set_par_bits_v1(uint64_t owner, uint64_t bits);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_get_par_bits_v1(uint64_t owner, uint8_t*, size_t);
 // Script fields:0 width,1 height,2 wrap,3 collisions (raw signed i32),4 scaled
-// borders/shadows (strict0/1). Initially absent until native initialization.
+// borders/shadows (strict0/1); 5 layout width, 6 layout height (raw i32).
+// Initially absent until native initialization. Layout is separate from script size;
+// selected-state Copy, Empty and prepared-storage operations retain layout.
 // Absent get => UNRESOLVED_REFERENCE with unchanged output. Scalar get writes4
 // LE bytes; size get writes8 (width,height) in one admission. Size set changes
 // only width/height in one admission. Storage copy/clear retain all fields;
@@ -111,6 +113,8 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_set_script_field_v1(uint64_t own
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_get_script_field_v1(uint64_t owner, uint32_t field, uint8_t*, size_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_set_script_size_v1(uint64_t owner, int32_t width, int32_t height);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_get_script_size_v1(uint64_t owner, uint8_t*, size_t);
+// Supplies both raw layout axes in one admission; does not alter script size.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_set_layout_size_v1(uint64_t owner, int32_t width, int32_t height);
 // Interpretation fields: 0 mode, 1 subtitle type, 2 encoding. Initially absent;
 // the native constructor supplies its enum constants. Raw signed i32 values are
 // not validated/normalized. Get writes4-byte LE i32; absent => UNRESOLVED_REFERENCE
@@ -149,7 +153,9 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_named_style_lookup_v1(uint64_t o
 // then internal Default key only on missing, then owned default only on missing.
 // Missing supplied forced/default state => UNRESOLVED_REFERENCE. Index is rawu32;
 // forced selection bypasses entry bounds. Replies are immutable owned snapshots.
-// Missing ordinals or nonzero identity/Sort indexes return OUT_OF_RANGE. Full entry wire is the
+// Kind10 layout snapshot(index0): width:i32@0/height:i32@4; either absent
+// axis => UNRESOLVED_REFERENCE. Native constructor supplies CSize() explicitly.
+// Missing ordinals or nonzero identity/Sort/layout indexes return OUT_OF_RANGE. Full entry wire is the
 // 64-byte header followed by text/style/actor/effect raw UTF-16LE arrays. Full
 // segment wire is the 32-byte header followed by u32LE member indexes.
 // Entry header offsets: start:i64@0, end:i64@8, margins:i32[4]@16

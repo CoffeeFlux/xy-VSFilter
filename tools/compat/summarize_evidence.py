@@ -30,7 +30,7 @@ BITMAP_SOURCES = ["hdmv_source_sha256", "hdmv_golomb_source_sha256",
 
 def document_lifecycle_requirements(verified_probe_source):
     """Archive gates follow invocations in the hash-verified candidate probe."""
-    calls = set(re.findall(rb"(?m)^\s*(named_style_lifecycle|identity_lifecycle|interpretation_lifecycle|layout_lifecycle|metadata_lifecycle|copy_selected_lifecycle|prepared_style_conflicts|sort_lifecycle|base_empty_lifecycle|lcid_lifecycle|resolution_lifecycle)\(\);\s*$", verified_probe_source))
+    calls = set(re.findall(rb"(?m)^\s*(named_style_lifecycle|identity_lifecycle|interpretation_lifecycle|layout_lifecycle|metadata_lifecycle|copy_selected_lifecycle|prepared_style_conflicts|sort_lifecycle|base_empty_lifecycle|lcid_lifecycle|resolution_lifecycle|layout_size_lifecycle)\(\);\s*$", verified_probe_source))
     return {"require_named_stages": b"named_style_lifecycle" in calls,
             "require_identity_stages": b"identity_lifecycle" in calls,
             "require_interpretation_stages": b"interpretation_lifecycle" in calls,
@@ -41,7 +41,8 @@ def document_lifecycle_requirements(verified_probe_source):
             "require_sort_stages": b"sort_lifecycle" in calls,
             "require_base_empty_stages": b"base_empty_lifecycle" in calls,
             "require_lcid_stages": b"lcid_lifecycle" in calls,
-            "require_resolution_stages": b"resolution_lifecycle" in calls}
+            "require_resolution_stages": b"resolution_lifecycle" in calls,
+            "require_layout_size_stages": b"layout_size_lifecycle" in calls}
 
 
 def load(path):

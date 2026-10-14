@@ -220,6 +220,79 @@ inline CSize::CSize() { second(); }
         self.assertIn('#include <STS.h>', contract.CSIZE_CONTEXT_SOURCE)
         self.assertNotIn('CSize', contract.CSIZE_CONTEXT_SOURCE)
 
+    def test_cstring_preparation_exact_overloads_and_inherited_empty(self):
+        text = """#pragma once
+class CSimpleStringT {
+public:
+ typedef SyntheticUnit XCHAR;
+ typedef const XCHAR* PCXSTR;
+ bool IsEmpty() const noexcept { return length == 0; }
+ int unrelated;
+};
+class CStringT : public CSimpleStringT {
+public:
+ typedef CSimpleStringT CThisSimpleString;
+ typedef typename CThisSimpleString::XCHAR XCHAR;
+ typedef typename CThisSimpleString::PCXSTR PCXSTR;
+ int Remove(_In_ XCHAR value) { const char* text="}"; return selected_remove(); }
+ int Remove(XCHAR* other) { return wrong_pointer(); }
+ int Replace(_In_z_ PCXSTR old_value, _In_z_ PCXSTR new_value) { return selected_replace(); }
+ int Replace(XCHAR old_value, XCHAR new_value) { return wrong_character_pair(); }
+ void TrimLeft(_In_ XCHAR value) { selected_trim(); }
+ void TrimLeft() { wrong_whitespace(); }
+ void TrimLeft(PCXSTR values) { wrong_set(); }
+ void Helper() { Remove(XCHAR()); }
+};
+class Unrelated { int Remove(XCHAR value) { return 99; } };
+"""
+        rows = contract.select_cstring_preparation(text, 'cstringt.h')
+        status = contract.cstring_preparation_contract(rows)
+        self.assertTrue(status['complete'])
+        self.assertEqual(set(status['definition_counts'].values()), {1})
+        methods = [r for r in rows if r['kind'] == 'definition']
+        self.assertEqual({r['symbol'] for r in methods},
+                         {'CStringT::Remove(XCHAR)', 'CStringT::Replace(PCXSTR,PCXSTR)',
+                          'CStringT::TrimLeft(XCHAR)', 'CSimpleStringT::IsEmpty()'})
+        excerpts = '\n'.join(r['excerpt'] for r in rows)
+        self.assertNotIn('wrong_', excerpts)
+        self.assertNotIn('Helper', excerpts)
+        self.assertNotIn('int unrelated', excerpts)
+        self.assertTrue(any(r['symbol'] == 'CStringT argument/base alias' for r in rows))
+        for row in rows:
+            self.assertEqual(row['sha256_utf8'], contract.sha(row['excerpt'].encode()))
+            self.assertEqual(row['source_utf8_sha256'], contract.sha(text.encode()))
+
+    def test_cstring_preparation_qualified_definitions_and_conditions(self):
+        text = """class CStringT { public: int Remove(XCHAR value); };
+template<class T>
+int CStringT<T>::Remove(XCHAR value) { return 1; }
+#if STRING_FEATURE
+class CSimpleStringT { public: bool IsEmpty() const { return false; } };
+#endif
+"""
+        rows = contract.select_cstring_preparation(text, 'cstringt.h')
+        remove = [r for r in rows if r['symbol'] == 'CStringT::Remove(XCHAR)']
+        self.assertEqual([r['kind'] for r in remove], ['declaration', 'definition'])
+        status = contract.cstring_preparation_contract(rows)
+        self.assertFalse(status['complete'])
+        self.assertFalse(status['source_capture_complete'])
+        self.assertFalse(status['active_conditions_resolved'])
+        body = 'class CStringT { public: void TrimLeft(XCHAR unit) {\n#ifdef BODY_FEATURE\n adjust();\n#endif\n} };'
+        rows = contract.select_cstring_preparation(body, 'cstringt.h')
+        trim = next(r for r in rows if r['kind'] == 'definition')
+        self.assertEqual(trim['internal_conditions'][0]['directive'], '#ifdef BODY_FEATURE')
+        self.assertFalse(contract.cstring_preparation_contract(rows)['active_conditions_resolved'])
+
+    def test_cstring_preparation_never_resolves_ambiguous_or_oversized_methods(self):
+        text = 'class CStringT { public: int Remove(XCHAR value) { return 1; } int Remove(XCHAR value) { return 2; } };'
+        status = contract.cstring_preparation_contract(contract.select_cstring_preparation(text, 'cstringt.h'))
+        self.assertEqual(status['definition_counts']['Remove(XCHAR)'], 2)
+        self.assertFalse(status['source_capture_complete'])
+        oversized = 'class CStringT { public: int Replace(PCXSTR a, PCXSTR b) {\n' + 'statement();\n' * 501 + '} };'
+        with self.assertRaises(ValueError):
+            contract.select_cstring_preparation(oversized, 'cstringt.h')
+        self.assertFalse(contract.cstring_preparation_contract([])['complete'])
+
     def trace(self):
         rows = [{'event': 'provenance', 'pointer_bits': 64, 'cstring_type': 'ATL::CStringT<wchar_t, StrTraitMFC<wchar_t>>'}]
         seq = 0

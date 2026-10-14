@@ -270,6 +270,120 @@ def csize_source_contract(records):
             'unresolved': (([] if unambiguous else ['Missing or ambiguous selected CSize default constructor/class declaration'])
                            + (['Active CSize conditional directives are not evaluated'] if unknown else []))}
 
+CSTRING_PREPARATION_HEADERS = ('cstringt.h', 'atlsimpstr.h')
+CSTRING_PREPARATION_METHODS = ('Remove', 'Replace', 'TrimLeft', 'IsEmpty')
+
+
+def select_cstring_preparation(source, header):
+    """Select only the raw-code-unit overloads used by native Add preparation."""
+    code = masked(source)
+    owners = [(name, first, last) for name in ('CStringT', 'CSimpleStringT')
+              for first, last in class_ranges(code, name)]
+    records = []
+
+    def add(start, end, owner, symbol, kind):
+        line_start = code.rfind('\n', 0, start) + 1
+        if not re.search(r'[;{}]', code[line_start:start]):
+            start = line_start
+        excerpt = source[start:end]
+        if len(excerpt.encode('utf-8')) > 24000 or excerpt.count('\n') + 1 > 500:
+            raise ValueError('CString preparation excerpt exceeds bound: ' + symbol)
+        internal = []
+        raw_lines = excerpt.splitlines()
+        for index, line in enumerate(masked(excerpt).splitlines()):
+            if re.match(r'\s*#\s*(?:if|ifdef|ifndef|elif|else|endif)\b', line):
+                directive = raw_lines[index].strip()
+                following = index + 1
+                while directive.endswith('\\') and following < len(raw_lines):
+                    directive += '\n' + raw_lines[following].strip()
+                    following += 1
+                internal.append({'first_line': source.count('\n', 0, start) + index + 1,
+                                 'directive': directive})
+        records.append({'header': str(header), 'symbol': symbol, 'owner': owner, 'kind': kind,
+                        'first_line': source.count('\n', 0, start) + 1,
+                        'last_line': source.count('\n', 0, end) + 1,
+                        'source_utf8_sha256': sha(source.encode('utf-8')),
+                        'sha256_utf8': sha(excerpt.encode('utf-8')), 'excerpt': excerpt,
+                        'conditional_context': conditional_context(source, start),
+                        'internal_conditions': internal})
+
+    for owner, first, last in owners:
+        opening = code.find('{', first, last)
+        add(first, opening, owner, owner + ' class/base', 'declaration')
+        # Only argument/base aliases, at class depth one; never unrelated fields.
+        for match in re.finditer(r'\b(?:typedef|using)\b[^;{}]*\b(?:XCHAR|PCXSTR|CThisSimpleString)\b[^;{}]*;', code[opening:last]):
+            start = opening + match.start()
+            prefix = code[opening:start]
+            if prefix.count('{') - prefix.count('}') == 1:
+                add(start, opening + match.end(), owner, owner + ' argument/base alias', 'declaration')
+    pattern = r'\b(' + '|'.join(CSTRING_PREPARATION_METHODS) + r')\s*\('
+    for match in re.finditer(pattern, code):
+        owner = None
+        enclosing = next(((name, a, b) for name, a, b in owners if a <= match.start() < b), None)
+        if enclosing:
+            name, first, _ = enclosing
+            opening = code.find('{', first)
+            fragment = code[opening:match.start()]
+            if fragment.count('{') - fragment.count('}') == 1:
+                owner = name
+        else:
+            prefix = code[max(0, match.start() - 500):match.start()]
+            qualified = re.search(r'\b(CStringT|CSimpleStringT)\s*<[^;{}]*::\s*$', prefix)
+            if qualified:
+                owner = qualified[1]
+        if owner is None:
+            continue
+        method = match[1]
+        paren = code.find('(', match.start())
+        after = closing(code, paren, '(', ')')
+        params = code[paren + 1:after - 1]
+        chars = len(re.findall(r'\bXCHAR\b', params))
+        strings = len(re.findall(r'\bPCXSTR\b', params))
+        if method == 'IsEmpty':
+            if params.strip() not in ('', 'void'):
+                continue
+            suffix = '()'
+        elif owner != 'CStringT' or re.search(r'[*&]', params):
+            continue
+        elif method in ('Remove', 'TrimLeft') and chars == 1 and strings == 0 and ',' not in params:
+            suffix = '(XCHAR)'
+        elif method == 'Replace' and strings == 2 and chars == 0 and params.count(',') == 1:
+            suffix = '(PCXSTR,PCXSTR)'
+        else:
+            continue
+        body, semi = code.find('{', after), code.find(';', after)
+        is_body = body >= 0 and (semi < 0 or body < semi)
+        if body < 0 and semi < 0:
+            raise ValueError('Unterminated CString preparation signature')
+        end = closing(code, body) if is_body else semi + 1
+        add(match.start(), end, owner, owner + '::' + method + suffix,
+            'definition' if is_body else 'declaration')
+    if len(records) > 32 or sum(len(row['excerpt'].encode('utf-8')) for row in records) > 80000:
+        raise ValueError('CString preparation selections exceed total bound')
+    return records
+
+
+def cstring_preparation_contract(records):
+    required = {'Remove(XCHAR)': 'CStringT::Remove(XCHAR)',
+                'Replace(PCXSTR,PCXSTR)': 'CStringT::Replace(PCXSTR,PCXSTR)',
+                'TrimLeft(XCHAR)': 'CStringT::TrimLeft(XCHAR)',
+                'IsEmpty()': None}
+    counts = {name: sum(row['kind'] == 'definition' and
+                       (row['symbol'] == symbol if symbol else row['symbol'] in ('CStringT::IsEmpty()', 'CSimpleStringT::IsEmpty()'))
+                       for row in records) for name, symbol in required.items()}
+    unknown = [{'header': row['header'], 'first_line': row['first_line'],
+                'symbol': row['symbol'],
+                'conditional_context': [c for c in row['conditional_context'] if not c['include_guard']],
+                'internal_conditions': row['internal_conditions']}
+               for row in records if row['internal_conditions'] or any(not c['include_guard'] for c in row['conditional_context'])]
+    unique = all(count == 1 for count in counts.values())
+    return {'scope': 'Selected SDK source overloads for native Add final preparation; no string transformation runtime parity claim',
+            'source_capture_complete': unique, 'complete': unique and not unknown,
+            'definition_counts': counts, 'active_conditions_resolved': not unknown,
+            'active_conditions_unresolved': unknown,
+            'unresolved': (([] if unique else ['Missing or ambiguous required CString preparation definitions'])
+                           + (['Selected CString conditional directives are not evaluated'] if unknown else []))}
+
 CSIZE_CONTEXT_SOURCE = '''// Source-only preprocessing; no object declarations or execution.
 #include <stdafx.h>
 #include <STS.h>
@@ -520,6 +634,7 @@ def main():
         report.update(included_header_sha256=headers,linker_observed_library_sha256=libraries,binary_sha256=protect(exe))
         excerpts=[]
         csize_excerpts=[]
+        preparation_excerpts=[]
         for header in headers:
             if Path(header).name.lower() in SELECTED_HEADERS:
                 try:
@@ -535,6 +650,20 @@ def main():
                     csize_excerpts+=selected
                 except (ValueError, UnicodeError) as error:
                     report.setdefault('csize_source_extraction_errors', []).append({'header': header, 'error': str(error)})
+            if Path(header).name.lower() in CSTRING_PREPARATION_HEADERS:
+                try:
+                    text=Path(header).read_bytes().decode('utf-8-sig',errors='strict')
+                    selected=select_cstring_preparation(text,header)
+                    for row in selected: row['header_sha256']=headers[header]
+                    preparation_excerpts+=selected
+                except (ValueError, UnicodeError) as error:
+                    report.setdefault('cstring_preparation_extraction_errors', []).append({'header': header, 'error': str(error)})
+        report['cstring_preparation_contract']=cstring_preparation_contract(preparation_excerpts)
+        if report.get('cstring_preparation_extraction_errors'):
+            report['cstring_preparation_contract']['complete']=False
+            report['cstring_preparation_contract']['source_capture_complete']=False
+            report['cstring_preparation_contract']['unresolved'].append('Selected CString source extraction failed')
+        excerpts+=preparation_excerpts
         report['csize_source_contract']=csize_source_contract(csize_excerpts)
         if report.get('csize_source_extraction_errors'):
             report['csize_source_contract']['complete']=False

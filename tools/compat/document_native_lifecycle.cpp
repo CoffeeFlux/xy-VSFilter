@@ -61,7 +61,7 @@ struct MetadataValue {
 class TraceDocument : public CSimpleTextSubtitle {
     unsigned id_;
     MetadataValue initial_metadata_{},last_callback_metadata_{};
-    CSize initial_screen_,last_callback_screen_;int initial_wrap_,initial_collisions_;bool initial_scaled_;
+    CSize initial_screen_,last_callback_screen_,last_callback_layout_size_;int initial_wrap_,initial_collisions_;bool initial_scaled_;
     int initial_mode_;exttype initial_type_;CTextFile::enc initial_encoding_;
 public:
     explicit TraceDocument(unsigned id) : id_(id) {
@@ -74,7 +74,7 @@ public:
         LCIDValue(1033+id);Type(EXTSRT);Mode(TIME);Encoding(CTextFile::UTF8);
         Path(id ? CString(L"destination-path") : CString(L"source-path"));
         Screen(CSize(640+id,480+id));Wrap(int(id));Collisions(int(id));
-        Scaled(id!=0);m_layout_size=CSize(800+id,600+id);
+        Scaled(id!=0);LayoutSize(CSize(800+id,600+id));
         STSStyle initialDefault;initialDefault.charSet=ANSI_CHARSET;initialDefault.fontSize=19+id;
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
         m_document->SetDefaultStyle(initialDefault);
@@ -84,6 +84,21 @@ public:
         Forced(false);PARType(EPCTDownscale);PAR(1.25+id);Matrix(YCbCrMatrix_BT709);Range(YCbCrRange_PC);
     }
     ~TraceDocument() override {printf("event %u %u destructor-body\n",++sequence,id_);}
+    CSize LayoutSize() const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        return GetDocumentLayoutSize();
+#else
+        return m_layout_size;
+#endif
+    }
+    void LayoutSize(const CSize& value) {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        SetDocumentLayoutSize(value);
+#else
+        m_layout_size=value;
+#endif
+    }
+    CSize LastCallbackLayoutSize() const {return last_callback_layout_size_;}
     LCID LCIDValue() const {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
         return GetDocumentLCID();
@@ -372,7 +387,7 @@ public:
         printf("metadata %d",m_simple);units(Name());
         printf(" %lu %d %d %d",static_cast<unsigned long>(LCIDValue()),int(Type()),Mode(),int(Encoding()));units(Path());
         printf(" %ld %ld %d %d %d %ld %ld %d %d",Screen().cx,Screen().cy,
-            Wrap(),Collisions(),Scaled(),m_layout_size.cx,m_layout_size.cy,
+            Wrap(),Collisions(),Scaled(),LayoutSize().cx,LayoutSize().cy,
             Forced(),int(PARType()));
         real(PAR());printf(" %d %d\n",int(Matrix()),int(Range()));
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
@@ -408,6 +423,7 @@ protected:
     void OnChanged() override {
         last_callback_metadata_=Metadata();
         last_callback_screen_=Screen();
+        last_callback_layout_size_=LayoutSize();
         ++change_events[id_];printf("event %u %u changed-enter\n",++sequence,id_);Dump("callback-state");
         // Actual native read operations reenter after rebuild's Rust loan ends.
         // They never mutate/reallocate reference storage during the callback.
@@ -959,7 +975,7 @@ static void base_empty_lifecycle() {
     const CString name=doc.Name(),path=doc.Path();const MetadataValue metadata=doc.Metadata();
     const int mode=doc.Mode(),wrap=doc.Wrap(),collisions=doc.Collisions();const exttype type=doc.Type();
     const CTextFile::enc encoding=doc.Encoding();const bool scaled=doc.Scaled(),simple=doc.m_simple;
-    const LCID lcid=doc.LCIDValue();const CSize layout=doc.m_layout_size;
+    const LCID lcid=doc.LCIDValue();const CSize layout=doc.LayoutSize();
     named_add(doc,L"EmptyA",named_value(1));named_add(doc,L"EmptyB",named_value(2));
     for(int i=0;i<3;++i){const wchar_t payload[]={wchar_t(L'A'+i),0,wchar_t(0xd800+i),L'Z'};
         doc.AddSTSEntryOnly(CStringW(payload,4),true,i*10,i*10+20,CString(i%2?L"EmptyB":L"EmptyA"));}
@@ -972,7 +988,7 @@ static void base_empty_lifecycle() {
         check(doc.Entries()==0&&doc.Segments()==0&&doc.NamedCount()==0&&doc.Screen()==CSize(0,0),"Empty clears only owned collections/screen");
         check(same_identity(doc.Name(),name)&&same_identity(doc.Path(),path)&&same_metadata(doc.Metadata(),metadata)
             &&doc.Mode()==mode&&doc.Type()==type&&doc.Encoding()==encoding&&doc.Wrap()==wrap&&doc.Collisions()==collisions&&doc.Scaled()==scaled
-            &&doc.m_simple==simple&&doc.LCIDValue()==lcid&&doc.m_layout_size==layout,"Empty retains initialized identity/metadata");
+            &&doc.m_simple==simple&&doc.LCIDValue()==lcid&&doc.LayoutSize()==layout,"Empty retains initialized identity/metadata");
         STSStyle actual;check(doc.GetDefaultStyle(actual)&&actual==defaultValue&&same_identity(actual.fontName,defaultValue.fontName),"Empty retains complete default");
         uint64_t bits;std::memcpy(&bits,&actual.fontSize,8);check(bits==UINT64_C(0x8000000000000000),"Empty preserves default signedzero");
         printf("empty-stage %s\n",stage);doc.Dump(stage);
@@ -1039,6 +1055,34 @@ static void resolution_lifecycle() {
     check(bits==UINT64_C(0x8000000000000000),"resolved default signedzero retained");
     check(change_events[0]==notifications,"resolution queries/default replacement do not notify");
 }
+static void layout_size_lifecycle() {
+    TraceDocument source(0),destination(1);
+    source.LayoutSize(CSize(320,240));destination.LayoutSize(CSize(800,600));
+    source.AddSTSEntryOnly(CStringW(L"layout size source"),true,0,10);
+    auto stage=[&](const char* name,const CSize& expectedSource,const CSize& expectedDestination){
+        check(source.LayoutSize()==expectedSource&&destination.LayoutSize()==expectedDestination,"layout size retention/independence");
+        printf("layout-size-stage %s source=%ld,%ld destination=%ld,%ld\n",name,source.LayoutSize().cx,source.LayoutSize().cy,destination.LayoutSize().cx,destination.LayoutSize().cy);
+        source.Dump(name);destination.Dump(name);
+    };
+    stage("layout-size-supplied",CSize(320,240),CSize(800,600));
+    destination.Copy(source);stage("layout-size-copy-retained",CSize(320,240),CSize(800,600));
+    source.LayoutSize(CSize(352,288));stage("layout-size-source-independent",CSize(352,288),CSize(800,600));
+    destination.Empty();destination.Empty();stage("layout-size-empty-retained",CSize(352,288),CSize(800,600));
+    destination.Copy(destination);stage("layout-size-self-copy-retained",CSize(352,288),CSize(800,600));
+    auto parse=[&](const char* label,const char* headers,const CSize& expected){
+        SavedFiles fixture(L"document-lifecycle-layout-size.ass");const CStringA text=ass_fixture(headers);
+        {CFile output;check(output.Open(fixture.name,CFile::modeCreate|CFile::modeWrite|CFile::typeBinary)!=FALSE,"layout size fixture create");output.Write(text.GetString(),text.GetLength());}
+        FixtureTextFile input(CTextFile::UTF8);check(input.Open(fixture.name),"layout size fixture input");input.SetFixturePath(fixture.name);
+        const unsigned before=change_events[1];check(destination.Open(&input,ANSI_CHARSET,CString(L"layout size fixture")),"ordinary ASS layout size Open");
+        check(change_events[1]==before+1&&destination.LastCallbackLayoutSize()==expected,"layout size Open callback parser result");
+        printf("layout-size-callback %s width=%ld height=%ld\n",label,expected.cx,expected.cy);
+        stage(label,CSize(352,288),expected);
+    };
+    parse("layout-size-parser-x","LayoutResX: 640\r\n",CSize(640,600));
+    parse("layout-size-parser-y","LayoutResY: 360\r\n",CSize(640,360));
+    parse("layout-size-parser-repeated","LayoutResY: 480\r\nLayoutResX: 800\r\nLayoutResY: 600\r\nLayoutResX: 720\r\n",CSize(720,600));
+    parse("layout-size-parser-nonpositive","LayoutResX: -2\r\nLayoutResY: 0\r\n",CSize(-2,0));
+}
 int main() {
     try {
         if(!AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0))throw std::runtime_error("AfxWinInit failed");
@@ -1056,6 +1100,7 @@ int main() {
         base_empty_lifecycle();
         lcid_lifecycle();
         resolution_lifecycle();
+        layout_size_lifecycle();
         named_style_exports();
         {
             TraceDocument source(0),destination(1);populate(source);populate(destination);

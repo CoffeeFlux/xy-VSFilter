@@ -97,6 +97,21 @@ pub enum StyleResolutionError {
     Uninitialized,
 }
 
+/// Layout axes remain absent until explicitly supplied by the native adapter.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum LayoutField {
+    Width,
+    Height,
+}
+impl LayoutField {
+    fn index(self) -> usize {
+        match self {
+            Self::Width => 0,
+            Self::Height => 1,
+        }
+    }
+}
+
 /// Native interpretation enum values are stored without normalization.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum InterpretationField {
@@ -209,6 +224,7 @@ pub struct RetiredEmpty {
 /// or the selective field assignments in native Copy.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Document {
+    layout: [Option<i32>; 2],
     lcid: Option<u32>,
     metadata: [Option<i32>; 3],
     forced_default: Option<bool>,
@@ -277,6 +293,18 @@ impl Document {
     }
     pub fn replace_par_bits(&mut self, value: u64) -> Option<u64> {
         self.par_bits.replace(value)
+    }
+    pub fn layout_field(&self, field: LayoutField) -> Option<i32> {
+        self.layout[field.index()]
+    }
+    pub fn replace_layout_field(&mut self, field: LayoutField, value: i32) -> Option<i32> {
+        self.layout[field.index()].replace(value)
+    }
+    pub fn layout_size(&self) -> Option<[i32; 2]> {
+        Some([self.layout[0]?, self.layout[1]?])
+    }
+    pub fn set_layout_size(&mut self, width: i32, height: i32) {
+        self.layout = [Some(width), Some(height)];
     }
     pub fn script_field(&self, field: ScriptField) -> Option<i32> {
         self.script[field.index()]
@@ -1283,6 +1311,34 @@ mod tests {
         }
         assert_eq!(source.interpretation(InterpretationField::Mode), Some(-1));
     }
+    #[test]
+    fn supplied_layout_is_independent_and_retained_by_native_copy_phases() {
+        let mut source = Document::default();
+        let mut destination = Document::default();
+        assert_eq!(source.layout_size(), None);
+        assert_eq!(
+            source.replace_layout_field(LayoutField::Width, i32::MIN),
+            None
+        );
+        assert_eq!(source.layout_size(), None);
+        assert_eq!(source.layout_field(LayoutField::Width), Some(i32::MIN));
+        source.replace_layout_field(LayoutField::Height, i32::MAX);
+        assert_eq!(source.layout_size(), Some([i32::MIN, i32::MAX]));
+        let cloned = source.clone();
+        source.set_layout_size(-3, 4);
+        assert_eq!(cloned.layout_size(), Some([i32::MIN, i32::MAX]));
+        destination.set_layout_size(11, -12);
+        destination.copy_storage_from(&source);
+        let retired = destination.replace_selected_state(source.selected_state());
+        drop(retired);
+        destination.remove_all_entries();
+        destination.clear_entries_and_segments();
+        drop(destination.empty());
+        assert_eq!(destination.layout_size(), Some([11, -12]));
+        assert_eq!(source.layout_size(), Some([-3, 4]));
+        assert_eq!(destination.script_size(), Some([0, 0]));
+    }
+
     #[test]
     fn supplied_script_fields_and_size_have_independent_retention() {
         let mut source = Document::default();
