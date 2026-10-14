@@ -23,6 +23,8 @@ static std::vector<int64_t> realTextAttributeEvents;
 static int realTextFailure=-1,realTextAttempts=0,realTextMutation=0;
 static bool realTextMutated=false;
 static void (*realTextTagHook)(int,const std::wstring&)=nullptr;
+static void (*realTextLowerHook)(wint_t,wint_t)=nullptr;
+static wint_t realTextLower(wint_t c){const wint_t result=::towlower(c);if(realTextLowerHook)realTextLowerHook(c,result);return result;}
 static void realTextStringEvent(const std::wstring& text){realTextAttributeEvents.push_back(text.size());for(wchar_t c:text)realTextAttributeEvents.push_back(c);}
 static void realTextAttributeHook(int action,const std::wstring& name){
     if(realTextTagHook)realTextTagHook(action,name);
@@ -57,3 +59,4 @@ static int realTextToInt(const wchar_t* text){
 #define iswdigit realTextDigit
 #define iswspace realTextSpace
 #define _wtoi realTextToInt
+#define towlower realTextLower

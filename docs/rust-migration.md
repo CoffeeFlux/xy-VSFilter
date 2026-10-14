@@ -20,6 +20,19 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns `StringToLower` output and iteration state. Each raw UTF-16
+  unit still passes through native `towlower`; neither Rust Unicode decoding nor
+  a replacement case table is used. Source length is re-read after each native
+  callback, so a shortened, extended or modified source behaves as before.
+  Fatal ASan/UBSan comparisons passed **218,239 cases** on each local
+  architecture across **three available locale selections**, including **203,036
+  changed outputs**, **871,657 native conversions**, **67 injected interruptions**
+  and **966 live input mutations**. Every UTF-16 value is compared within each
+  available native locale; locale availability and counts can differ on CI.
+  All 100,064 tag-output cases and 30,058 complete parser runs pass with the
+  lowercase owner active. Rust 1.85 tests (67 core, 44 FFI), strict Clippy and
+  default-branch syntax checks pass. Windows/Miri validation is pending.
+  Native allocation failure timing remains unverified.
 * Safe Rust owns `ExtractString` text scanning and the text appended by
   `ExtractTextTag`. Leading whitespace still uses native classification. An
   initial `<` or empty input clears the output only when error recovery is on;
