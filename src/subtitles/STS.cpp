@@ -430,6 +430,20 @@ static void LogSegments(const CAtlArray<STSSegment>& segments)
 #endif
 }
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+static void LogStyles(const CSimpleTextSubtitle& document)
+{
+#if ENABLE_XY_LOG_TEXT_SUBTITLE
+    TRACE_SUB("m_styles count:"<<document.GetStyleCount());
+    for(size_t ordinal = 0; ; ordinal++)
+    {
+        CString name;
+        if(!document.GetStyleNameAt(ordinal, name)) break;
+        TRACE_SUB("\tm_styles["<<name<<"]");
+    }
+#endif
+}
+#else
 static void LogStyles(const CSTSStyleMap& styles)
 {
 #if ENABLE_XY_LOG_TEXT_SUBTITLE
@@ -441,6 +455,7 @@ static void LogStyles(const CSTSStyleMap& styles)
     }
 #endif
 }
+#endif
 //
 
 static DWORD CharSetToCodePage(DWORD dwCharSet)
@@ -2922,7 +2937,11 @@ void CSimpleTextSubtitle::Copy(CSimpleTextSubtitle& sts)
     m_defaultStyle                 = sts.m_defaultStyle;
 #endif
     m_fForcedDefaultStyle          = sts.m_fForcedDefaultStyle;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    CopyNamedStylesFrom(sts);
+#else
     CopyStyles     (sts.m_styles  );
+#endif
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     m_document->CopyFrom(*sts.m_document);
 #else
@@ -2945,6 +2964,30 @@ void CSTSStyleMap::Free()
     RemoveAll();
 }
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+bool CSimpleTextSubtitle::CopyNamedStylesFrom(const CSimpleTextSubtitle& source, bool fAppend)
+{
+    // Empty the destination before reading source state: self replacement must
+    // enumerate the now-empty map, not a previously captured snapshot.
+    if(!fAppend) m_styles.Free();
+    for(size_t ordinal = 0; ; ordinal++)
+    {
+        CString key;
+        if(!source.GetStyleNameAt(ordinal, key)) break;
+        STSStyle* value = DEBUG_NEW STSStyle;
+        if(!value) return false;
+        try
+        {
+            if(!source.GetStyleValueAt(ordinal, *value)) { delete value; return false; }
+        }
+        catch(...) { delete value; throw; }
+        // Ownership passes at the same per-row native AddStyle point. Do not
+        // prefetch later rows or retain a second authoritative style table.
+        AddStyle(key, value);
+    }
+    return true;
+}
+#else
 bool CSimpleTextSubtitle::CopyStyles(const CSTSStyleMap& styles, bool fAppend)
 {
     if(!fAppend) m_styles.Free();
@@ -2966,6 +3009,8 @@ bool CSimpleTextSubtitle::CopyStyles(const CSTSStyleMap& styles, bool fAppend)
 
     return(true);
 }
+
+#endif
 
 void CSimpleTextSubtitle::Empty()
 {
@@ -3195,7 +3240,11 @@ void CSimpleTextSubtitle::ChangeUnknownStylesToDefault()
         else
         {
             last_style = stse.style;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            last_style_changed_to_unknow = !HasNamedStyle(stse.style);
+#else
             last_style_changed_to_unknow = !m_styles.Lookup(stse.style, val);
+#endif
             if (last_style_changed_to_unknow)
             {
                 if(!unknown.Lookup(stse.style, val))
@@ -3279,7 +3328,11 @@ void CSimpleTextSubtitle::AddStyle(CString name, STSStyle* style)
 
 bool CSimpleTextSubtitle::SetDefaultStyle(STSStyle& s)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    LogStyles(*this);
+#else
     LogStyles(m_styles);
+#endif
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     m_document->SetDefaultStyle(s);
@@ -3716,13 +3769,19 @@ bool CSimpleTextSubtitle::HasNamedStyle(LPCWSTR name) const
     return m_styles.Lookup(name) != NULL;
 }
 
+CSimpleTextSubtitle::NamedStyleLookup CSimpleTextSubtitle::LookupNamedStyle(LPCWSTR name, STSStyle* output) const
+{
+    STSStyle* value = NULL;
+    if(!m_styles.Lookup(name, value)) return NamedStyleLookup::Missing;
+    if(!value) return NamedStyleLookup::Null;
+    if(output) *output = *value;
+    return NamedStyleLookup::Value;
+}
+
 bool CSimpleTextSubtitle::GetNamedStyleCopy(const CString& name, STSStyle& value) const
 {
-    STSStyle* style = NULL;
     // Named renderer reset explicitly falls back for both absent and null values.
-    if(!m_styles.Lookup(name, style) || !style) return false;
-    value = *style;
-    return true;
+    return LookupNamedStyle(name, &value) == NamedStyleLookup::Value;
 }
 
 bool CSimpleTextSubtitle::GetEntryStyleCopy(int i, STSStyle& value)
@@ -3767,7 +3826,14 @@ bool CSimpleTextSubtitle::GetStyleValueAt(size_t ordinal, STSStyle& value) const
     {
         const CSTSStyleMap::CPair* pair = m_styles.GetNext(pos);
         if(!pair) return false;
-        if(ordinal == 0) { value = *pair->m_value; return true; }
+        if(ordinal == 0)
+        {
+            // A present null pointee is an unresolved native dereference, never
+            // an absent row or a passing empty value comparison.
+            if(!pair->m_value) throw XyRust::DocumentStatusError(XY_DOCUMENT_V1_UNRESOLVED_REFERENCE);
+            value = *pair->m_value;
+            return true;
+        }
         ordinal--;
     }
     return false;

@@ -70,6 +70,14 @@ def one(root, pattern):
     return files[0]
 
 
+def production_dll(root, side, name):
+    # Instrumented style-test DLLs live under candidate/artifacts as well.
+    # Only the original build output is eligible for renderer/export evidence.
+    files = list((root / side / "bin").glob(f"lib*/**/Release/{name}"))
+    assert len(files) == 1, (root, side, name, files)
+    return files[0]
+
+
 def summarize_comparison(root, base, name, reference, mutation_count):
     path = base / name / "report.json"
     report = load(path)
@@ -111,7 +119,7 @@ def summarize_comparison(root, base, name, reference, mutation_count):
     summary["dialog_observations"] = dialogs_by_case
     summary["timeline_observations"] = timeline_by_case
     for side, directory in [("reference", "baseline"), ("candidate", "candidate")]:
-        assert sha(one(root / directory, "VSFilter.dll")) == report[side + "_dll"]["sha256"]
+        assert sha(production_dll(root, directory, "VSFilter.dll")) == report[side + "_dll"]["sha256"]
     return summary
 
 
@@ -145,8 +153,8 @@ def summarize_native(run, platform, candidate, reference, document_storage="nati
             "no_added_imports_or_changed_platform_headers": True,
             "exports_report_sha256": sha(exports),
             "dependencies_report_sha256": sha(dependencies),
-            "baseline_sha256": sha(one(root / "baseline", name)),
-            "candidate_sha256": sha(one(root / "candidate", name)),
+            "baseline_sha256": sha(production_dll(root, "baseline", name)),
+            "candidate_sha256": sha(production_dll(root, "candidate", name)),
         }
     com_path = base / "com-contracts/report.json"
     # Older increments predate this contract gate. Once the driver's source is
@@ -218,7 +226,9 @@ def summarize_native(run, platform, candidate, reference, document_storage="nati
             raw = windows_source_bytes(commit, name)
             lf = raw.replace(b"\r\n", b"\n")
             assert digest in {hashlib.sha256(data).hexdigest() for data in (raw, lf, lf.replace(b"\n", b"\r\n"))}
-        compare_traces(traces, 32 if platform == "Win32" else 64)
+        candidate_probe = windows_source_bytes(candidate, "tools/compat/document_native_lifecycle.cpp")
+        compare_traces(traces, 32 if platform == "Win32" else 64,
+                       require_named_stages=b"named_style_lifecycle();" in candidate_probe)
         assert [hashlib.sha256(trace).hexdigest() for trace in traces] == document["trace_sha256"]
         entry["checks"]["document-lifecycle"] = {
             "report_sha256": sha(path), "equal": True, "trace_lines": document["trace_lines"],
@@ -288,12 +298,15 @@ def summarize_style_api(directory, candidate, reference, platform, production_dl
                 for mode in ("normal", "long-name") for repeat in range(2)}
     assert len(runs) == 16 and {(r["side"], r["class"], r["mode"], r["repeat"]) for r in runs} == expected
     groups = {}
+    has_video_setup = b'status("setup.video_check",h)' in windows_source_bytes(
+        candidate, "tools/compat/document_style_api_probe.cpp")
     for run in runs:
         stdout = directory / run["trace"]
         stderr = stdout.with_suffix(".stderr")
         assert sha(stdout) == run["stdout_sha256"] and sha(stderr) == run["stderr_sha256"]
         data = stdout.read_bytes()
-        validate_trace(data, stderr.read_bytes(), run["returncode"], run["mode"], 32 if platform == "Win32" else 64)
+        validate_trace(data, stderr.read_bytes(), run["returncode"], run["mode"], 32 if platform == "Win32" else 64,
+                       video_setup=has_video_setup and run["class"] == "CDirectVobSubFilter")
         groups.setdefault((run["class"], run["mode"]), []).append(data)
     assert all(len(traces) == 4 and all(t == traces[0] for t in traces) for traces in groups.values())
     return {"report_sha256": sha(path), "equal": True, "class_mode_pairs": 4, "executions": 16,

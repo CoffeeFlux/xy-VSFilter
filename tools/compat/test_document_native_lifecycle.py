@@ -5,7 +5,15 @@ from document_native_lifecycle import compare_traces
 
 TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
          b"segment 0 10 20\ncallback changed\ntext 0041\n"
-         b"document-native-lifecycle-v1 complete\n")
+         + b"".join(b"named-stage " + stage + b"\n" for stage in (
+             b"named-initial", b"named-equal-duplicate", b"named-conflict-collision",
+             b"named-numeric-collision", b"named-copy-replace", b"named-copy-independent",
+             b"named-copy-append", b"named-self-clear", b"named-empty"))
+         + b"saved-file ssa exists=1 bytes=1 41\nsaved-file ass exists=1 bytes=1 41\n"
+         + b"saved-file srt exists=1 bytes=1 41\nsaved-file srt-sidecar exists=1 bytes=1 41\n"
+         + b"saved-file ssa-sidecar exists=0\nsaved-file ass-sidecar exists=0\n"
+         + b"saved-file srt-no-map exists=1 bytes=1 41\nsaved-file srt-no-map-sidecar exists=0\n"
+         + b"document-native-lifecycle-v1 complete\n")
 
 
 class NativeLifecycleEvidenceTests(unittest.TestCase):
@@ -28,6 +36,35 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
         changed = TRACE.replace(b"0041,0000,0042", b"0041,0000,0043")
         with self.assertRaises(ValueError):
             compare_traces([TRACE, TRACE, changed, changed], 64)
+
+    def test_rejects_missing_named_stage_even_when_both_sides_match(self):
+        truncated = TRACE.replace(b"named-stage named-copy-append\n", b"")
+        with self.assertRaises(ValueError):
+            compare_traces([truncated] * 4, 64)
+
+    def test_legacy_trace_requires_explicit_named_stage_opt_out(self):
+        legacy = b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith((b"named-stage ", b"saved-file ")))
+        with self.assertRaises(ValueError):
+            compare_traces([legacy] * 4, 64)
+        compare_traces([legacy] * 4, 64, require_named_stages=False)
+        changed = legacy.replace(b"0041,0000,0042", b"0041,0000,0043")
+        with self.assertRaises(ValueError):
+            compare_traces([legacy, legacy, changed, changed], 64, require_named_stages=False)
+
+    def test_rejects_missing_or_changed_saved_bytes(self):
+        missing = TRACE.replace(b"saved-file srt-sidecar exists=1 bytes=1 41\n", b"")
+        with self.assertRaises(ValueError):
+            compare_traces([missing] * 4, 64)
+        changed = TRACE.replace(b"saved-file ass exists=1 bytes=1 41", b"saved-file ass exists=1 bytes=1 42")
+        with self.assertRaises(ValueError):
+            compare_traces([TRACE, TRACE, changed, changed], 64)
+
+    def test_rejects_changed_named_order_and_value(self):
+        observed = TRACE.replace(b"named-stage named-initial\n", b"named-stage named-initial\nname Alpha\nstyle 1\nname Beta\nstyle 2\n")
+        for changed in (observed.replace(b"name Alpha\nstyle 1\nname Beta\nstyle 2", b"name Beta\nstyle 2\nname Alpha\nstyle 1"),
+                        observed.replace(b"style 2", b"style 3")):
+            with self.assertRaises(ValueError):
+                compare_traces([observed, observed, changed, changed], 64)
 
     def test_rejects_repeat_nondeterminism(self):
         changed = TRACE.replace(b"callback changed", b"callback empty")
