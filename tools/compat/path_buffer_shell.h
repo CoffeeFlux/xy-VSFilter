@@ -26,7 +26,7 @@ struct PathContext {
 };
 static PathContext* pathContext=NULL;
 static int livePathBuffers=0;
-static uint64_t pathRustOwners=0,pathRustLoans=0,pathRustReleases=0,pathRustFallbacks=0;
+static uint64_t pathRustOwners=0,pathRustLoans=0,pathRustReleases=0,pathRustFallbacks=0,pathRustAppends=0,pathRustAppendDeclines=0;
 static std::map<void*,size_t> pathAllocations;
 static std::vector<uint64_t> pathAllocationEvents;
 static int pathAllocationFailure=0,pathAllocationCalls=0;
@@ -71,6 +71,9 @@ class ObservedPathBuffer:public PathBuffer {
 public:
     explicit ObservedPathBuffer(int n):PathBuffer(n){if(Ready()){++pathRustOwners;PathTemporaryCreated();}else ++pathRustFallbacks;}
     template<class Point,class Byte>void Loan(Point*& points,Byte*& types){++pathRustLoans;PathBuffer::Loan(points,types);}
+    template<class Point,class Byte>bool Append(Point* points,Byte* types,int dx,int dy){
+        bool ok=PathBuffer::Append(points,types,dx,dy);if(ok)++pathRustAppends;else ++pathRustAppendDeclines;return ok;
+    }
     void Release(){if(Ready()){++pathRustReleases;PathBuffer::Release();PathTemporaryReleased();}}
 };
 }

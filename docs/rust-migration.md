@@ -20,6 +20,22 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Rust translates and appends the completed GDI point/type output into native
+  rasterizer destination tails. `MaybeUninit` output slices allow initialization
+  without pretending realloc's new bytes are already valid values. Every point
+  addition is checked before any output changes; decline retains native arithmetic
+  and first obtains fresh source loans. Point-before-type order and the final native
+  count update remain. Fatal ASan/UBSan checks pass on arm64 and under x64 execution:
+  **13,399 Rust appends / zero arithmetic fallbacks**, within **21,901 non-break
+  PartialEndPath calls / 5,335,418 buffer fields / 191,214 callback observations /
+  329,792 appended points**. Cases include signed limits, large representable
+  offsets, all 256 type bytes and retries. **5,815 modeled breakpoint continuations**
+  remain separate from native parity counts. The FFI test verifies unchanged
+  destinations on decline and fresh-loan provenance before resuming native access.
+  Rust 1.85 tests (135 core, 88 FFI), strict Clippy, default syntax and Python
+  checks pass. The corpus remains **718 cases**; Windows/Miri and renderer checks
+  are pending. Native destination allocation, GDI behavior and host integration
+  remain separate work; native overflow outcomes are excluded from comparisons.
 * Rust owns the temporary type/point arrays filled by GDI in
   `PathData::PartialEndPath`. A single FFI call lends both disjoint output buffers;
   native GDI and the append loop finish all accesses before the owner is released.
@@ -102,8 +118,10 @@ unresolved reference outcomes requiring investigation, never matching results.
   arithmetic and successful allocation; floating-point intersections stay native.
   Rust 1.85 tests (131 core, 83 FFI), strict Clippy, default syntax and Python
   checks pass. Four fractional/thin-ellipse scripts expand the renderer corpus
-  to **698 cases**. Windows/Miri and renderer checks are pending. Ellipse storage,
-  float calculations, outer span lists and actual-host integration remain.
+  to **698 cases**. Windows x86/x64, Linux, macOS and Miri passed; paired Windows
+  DLLs match **698 cases / 7,330 frames**, plus **32 mutations / 224 frames**, on
+  each architecture. See [integer ellipse evidence](ellipse-arc-evidence.json).
+  Float calculations, outer span lists and actual-host integration remain.
 * Rust owns the fixed slots and indices of outline arc queues. Removed slots,
   tail wrap, the capacity-minus-one full rule and writes to individual fields
   are preserved; C++ receives copied records rather than storage pointers. Native

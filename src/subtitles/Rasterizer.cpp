@@ -3356,11 +3356,23 @@ bool PathData::PartialEndPath(HDC hdc, long dx, long dy)
         }
         if(pNewTypes && pNewPoints && nPoints == GetPath(hdc, pPoints, pTypes, nPoints))
         {
-            for(int i = 0; i < nPoints; ++i)
+#ifdef XY_VSFILTER_RUST_TEXT
+            bool copied = false;
+            if (temporary.Ready())
             {
-                mpPathPoints[mPathPoints + i].x = pPoints[i].x + dx;
-                mpPathPoints[mPathPoints + i].y = pPoints[i].y + dy;
-                mpPathTypes[mPathPoints + i] = pTypes[i];
+                copied = temporary.Append(mpPathPoints + mPathPoints, mpPathTypes + mPathPoints, dx, dy);
+                // End the Rust source borrow before resuming native reads.
+                if (!copied) temporary.Loan(pPoints, pTypes);
+            }
+            if (!copied)
+#endif
+            {
+                for(int i = 0; i < nPoints; ++i)
+                {
+                    mpPathPoints[mPathPoints + i].x = pPoints[i].x + dx;
+                    mpPathPoints[mPathPoints + i].y = pPoints[i].y + dy;
+                    mpPathTypes[mPathPoints + i] = pTypes[i];
+                }
             }
             mPathPoints += nPoints;
 #ifdef XY_VSFILTER_RUST_TEXT
