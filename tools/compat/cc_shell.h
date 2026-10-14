@@ -71,3 +71,13 @@ public:
     void Sort(){std::abort();}
     void SaveAs(const CString&,int,int,int){std::abort();}
 };
+
+static uint64_t ccTextHandled=0,ccTextFallback=0;
+namespace XyRust {
+class ObservedCaptionText:public CaptionText {
+public:
+    explicit ObservedCaptionText(const uint16_t* cells):CaptionText(cells){}
+    bool Handled()const{const bool handled=CaptionText::Handled();if(handled)++ccTextHandled;else ++ccTextFallback;return handled;}
+};
+}
+#define CaptionText ObservedCaptionText

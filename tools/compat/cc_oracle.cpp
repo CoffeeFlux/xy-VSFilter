@@ -24,7 +24,7 @@ template<class Decoder> static void observe(const Caption& caption){
     active->events.insert(active->events.end(),{caption.unicode,caption.start,caption.end,int64_t(caption.text.size())});for(uint16_t c:caption.text)active->events.push_back(c);state(active->events,decoder);
     if(active->attempts++==failureIndex)throw CaptionInterrupted();
     if(!active->mutated && mutationMode){
-        if(mutationMode==1){decoder.m_buff[0][0]=WCHAR('Z');decoder.MoveCursor(31,15);decoder.m_time=-777;decoder.m_fEndOfCaption=!decoder.m_fEndOfCaption;}
+        if(mutationMode==1){decoder.m_buff[0][0]=WCHAR('Z');decoder.m_disp[0][0]=WCHAR('Y');decoder.MoveCursor(31,15);decoder.m_time=-777;decoder.m_fEndOfCaption=!decoder.m_fEndOfCaption;}
         if(mutationMode==2 && activeLength)activeSource[0]^=0x44;
         active->mutated=true;
     }
@@ -48,6 +48,18 @@ static void compare(const std::vector<BYTE>& input,unsigned initial=0,int alias=
     if(!(a==b)){fprintf(stderr,"Caption decode mismatch case=%llu length=%d initial=%u alias=%d failure=%d mutation=%d\n",(unsigned long long)comparisons,length,initial,alias,failure,mutation);std::abort();}
     ++comparisons;decodeCalls+=1+(tail?tail->size():0);captions+=a.captions.size();interruptions+=a.interrupted;mutations+=a.mutated;aliases+=alias!=0;
 }
+static uint64_t displayCases=0,displayUnits=0,displayInterruptions=0,displayMutations=0;
+template<class Decoder> static Outcome saveDisplay(const std::vector<WCHAR>& cells,int64_t start,int64_t end,int failure,int mutation){
+    Decoder decoder;seed(decoder,511);decoder.m_time=start;std::memcpy(decoder.m_disp,cells.data(),sizeof(decoder.m_disp));
+    Outcome result={};active=&result;Context<Decoder>::decoder=&decoder;activeSource=nullptr;activeLength=0;failureIndex=failure;mutationMode=mutation;ccAddHook=&observe<Decoder>;
+    try{decoder.SaveDisp(end);}catch(const CaptionInterrupted&){result.interrupted=true;}
+    state(result.state,decoder);result.captions=decoder.m_sts.entries;ccAddHook=nullptr;active=nullptr;return result;
+}
+static void compareDisplay(const std::vector<WCHAR>& cells,int64_t start=9876543210LL,int64_t end=-9876543210LL,int failure=-1,int mutation=0){
+    const auto a=saveDisplay<ReferenceCC::CCDecoder>(cells,start,end,failure,mutation),b=saveDisplay<CandidateCC::CCDecoder>(cells,start,end,failure,mutation);
+    if(!(a==b)){fprintf(stderr,"Caption display mismatch case=%llu failure=%d mutation=%d\n",(unsigned long long)displayCases,failure,mutation);std::abort();}
+    ++displayCases;displayInterruptions+=a.interrupted;displayMutations+=a.mutated;for(const auto& caption:a.captions)displayUnits+=caption.text.size();
+}
 int main(){
     for(int x:{INT_MIN,-100,-1,0,1,30,31,32,33,64,INT_MAX})for(int y:{INT_MIN,-100,-1,0,1,14,15,16,17,100,INT_MAX}){
         if(x>=32 && y==INT_MAX)continue;ReferenceCC::CCDecoder a;CandidateCC::CCDecoder b;a.MoveCursor(x,y);b.MoveCursor(x,y);if(a.m_cursor.x!=b.m_cursor.x || a.m_cursor.y!=b.m_cursor.y)std::abort();++cursors;
@@ -67,6 +79,17 @@ int main(){
         const std::vector<BYTE> first(packet.begin(),packet.begin()+split);const std::vector<std::vector<BYTE>> tail={std::vector<BYTE>(packet.begin()+split,packet.end()),{0x94,0x2f},{0x94,0x2c}};
         compare(first,initial,alias,failure,0,-1,&tail);
     }
-    if(!captions || !interruptions || !mutations || !aliases)return 1;
+    for(unsigned unit=0;unit<=0xffff;++unit){std::vector<WCHAR> cells(528,0);const unsigned cell=unit%512;cells[(cell/32)*33+cell%32]=WCHAR(unit);compareDisplay(cells,int64_t(unit)*65537-2147483648LL,12345);}
+    for(unsigned gap=0;gap<528;++gap){std::vector<WCHAR> cells(528,WCHAR('Q'));cells[527]=0;cells[gap]=0;compareDisplay(cells);}
+    for(unsigned value=0;value<8000;++value){std::vector<WCHAR> cells(528,0);for(unsigned i=0;i<527;++i){random^=random<<13;random^=random>>17;random^=random<<5;cells[i]=random%7?WCHAR(random&0xffff):0;}compareDisplay(cells);}
+    for(unsigned pattern=0;pattern<4;++pattern){std::vector<WCHAR> cells(528,0);for(unsigned i=0;i<527;++i){if(pattern==1)cells[i]=WCHAR('A');if(pattern==2 && i%3==0)cells[i]=WCHAR(0xd800);if(pattern==3 && i%33==32)cells[i]=WCHAR('X');}
+        for(int64_t start:{LLONG_MIN,0LL,LLONG_MAX})for(int64_t end:{LLONG_MIN,0LL,LLONG_MAX})for(int failure=-1;failure<2;++failure)for(int mutation=0;mutation<2;++mutation)compareDisplay(cells,start,end,failure,mutation);
+    }
+    // Candidate-only decline control: no native comparison reads beyond the
+    // declared initialized display when no terminator can be found there.
+    uint16_t allNonzero[528];for(auto& value:allNonzero)value=1;
+    void* owner=xy_vsfilter_cc_text_create(allNonzero);if(xy_vsfilter_cc_text_field(owner,0,0)!=0)return 1;xy_vsfilter_cc_text_release(owner);
+    if(!captions || !interruptions || !mutations || !aliases || !ccTextHandled || ccTextFallback || !displayUnits || !displayInterruptions || !displayMutations)return 1;
+    printf("%llu exact SaveDisp comparisons passed (%llu emitted UTF-16 units, %llu injected Add interruptions, %llu callback mutations, %llu Rust text selections, %llu native fallbacks; row gaps, bounded cross-row strings, every UTF-16 value, native timestamp truncation and input state; unterminated scans beyond declared backing excluded)\n",(unsigned long long)displayCases,(unsigned long long)displayUnits,(unsigned long long)displayInterruptions,(unsigned long long)displayMutations,(unsigned long long)ccTextHandled,(unsigned long long)ccTextFallback);
     printf("%llu exact caption sequences / %llu DecodeCC calls, %llu cursor moves and %llu cell writes passed (%llu emitted subtitle records, %llu injected Add interruptions, %llu callback mutations, %llu input/backing aliases; every byte pair, doubled controls, split/repeated calls, empty/equal displays, every UTF-16 value, 33-cell row layout and full display/buffer state; raw file I/O and unrepresentable arithmetic excluded)\n",(unsigned long long)comparisons,(unsigned long long)decodeCalls,(unsigned long long)cursors,(unsigned long long)cellWrites,(unsigned long long)captions,(unsigned long long)interruptions,(unsigned long long)mutations,(unsigned long long)aliases);
 }

@@ -87,6 +87,17 @@ void CCDecoder::PutChar(WCHAR c)
 
 void CCDecoder::SaveDisp(__int64 time)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    static_assert(sizeof(WCHAR) == sizeof(uint16_t), "caption cells must contain UTF-16 units");
+    XyRust::CaptionText text(reinterpret_cast<const uint16_t*>(m_disp));
+    if (text.Handled()) {
+        CStringW str;
+        for (size_t i = 0; i < text.Length(); ++i) str += static_cast<WCHAR>(text.Unit(i));
+        if (str.IsEmpty()) return;
+        m_sts.Add(str, true, (int)m_time, (int)time);
+        return;
+    }
+#endif
     CStringW str;
 
     for (int row = 0; row < 16; row++)
