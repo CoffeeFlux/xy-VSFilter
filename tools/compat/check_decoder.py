@@ -1195,6 +1195,40 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         filters += "#if FILTER_NATIVE_SSE\ntemplate<int ROUNDING_POLICY>\n" + extract_definition(text_source, "void xy_be_filter2_sse(") + "\n#endif\n"
         filters += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_be_filter.h").write_text(filters, encoding="utf-8")
+    fraction_code = '#include "fraction_storage_shell.h"\n'
+    for name, kernels, transposes, content in (("ReferenceFraction", "ReferenceFilter", "ReferenceTranspose", filter_source), ("CandidateFraction", "CandidateFilter", "CandidateTranspose", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
+        fraction_text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        fraction_code += f"namespace {name} {{\nconst int ROUND_HALF_TO_EVEN = {kernels}::ROUND_HALF_TO_EVEN;\n"
+        fraction_code += f"""
+template<int Policy> void xy_be_filter_sse(PUINT8 p,int w,int h,int pitch) {{
+    filterStage(p,w,h,pitch,NULL,false);
+#if FILTER_NATIVE_SSE
+    {kernels}::xy_be_filter_sse<Policy>(p,w,h,pitch);
+#else
+    {kernels}::xy_be_filter_c<Policy>(p,w,h,pitch);
+#endif
+    filterStage(p,w,h,pitch,NULL,true);
+}}
+template<int Policy> void xy_be_filter2_sse(PUINT8 p,int w,int h,int pitch,PCUINT f) {{
+    filterStage(p,w,h,pitch,f,false);
+#if FILTER_NATIVE_SSE
+    {kernels}::xy_be_filter2_sse<Policy>(p,w,h,pitch,f);
+#else
+    {kernels}::xy_be_filter2_c<Policy>(p,w,h,pitch,f);
+#endif
+    filterStage(p,w,h,pitch,f,true);
+}}
+void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h,int ss) {{
+    transposeBefore(dst,dw,ds,src,w,h,ss);
+    {transposes}::xy_byte_2_byte_transpose_c(dst,dw,ds,src,w,h,ss);
+    transposeAfter(dst,dw,ds,w);
+}}
+"""
+        fraction_code += extract_definition(fraction_text, "void xy_calculate_filter(") + "\n"
+        if name == "CandidateFraction":
+            fraction_code += "#define XY_VSFILTER_RUST_TEXT\n"
+        fraction_code += extract_definition(fraction_text, "void xy_be_blur(") + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_fraction_storage.h").write_text(fraction_code, encoding="utf-8")
     integer_gauss = '#include "gauss_integer_shell.h"\n'
     for name, content in (("ReferenceIntegerGauss", raster_source), ("CandidateIntegerGauss", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         integer_gauss += f"namespace {name} {{\n"
@@ -1540,6 +1574,18 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     dvb_storage_result = run([str(dvb_storage_executable)], capture_output=True, text=True)
     print(dvb_storage_result.stdout, end="", flush=True)
     print(dvb_storage_result.stderr, end="", file=sys.stderr)
+    fraction_storage_executable = destination / ("fraction-storage-oracle.exe" if os.name == "nt" else "fraction-storage-oracle")
+    fraction_storage_compile = [arg.replace("find_char_oracle.cpp", "fraction_storage_oracle.cpp").replace("find-char-oracle", "fraction-storage-oracle") for arg in find_char_compile]
+    if os.name == "nt":
+        fraction_storage_compile += ["/fp:strict"]
+    else:
+        if sys.platform != "darwin":
+            fraction_storage_compile[0] = "clang++"
+        fraction_storage_compile += ["-ffp-model=strict"]
+    run(fraction_storage_compile)
+    fraction_storage_result = run([str(fraction_storage_executable)], capture_output=True, text=True)
+    print(fraction_storage_result.stdout, end="", flush=True)
+    print(fraction_storage_result.stderr, end="", file=sys.stderr)
     clip_fade_executable = destination / ("clip-fade-oracle.exe" if os.name == "nt" else "clip-fade-oracle")
     clip_fade_compile = [arg.replace("find_char_oracle.cpp", "clip_fade_oracle.cpp").replace("find-char-oracle", "clip-fade-oracle") for arg in find_char_compile]
     # GCC's trapping/rounding options still permit delaying the conversion on
@@ -1984,6 +2030,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "gauss_planes_compile_command": gauss_planes_compile,
         "gauss_planes_result": gauss_planes_result.stdout, "gauss_planes_stderr": gauss_planes_result.stderr,
         "gauss_planes_scope": "Whole pinned GaussianBlur with controlled coefficient factories and Gaussian kernel. Exact metadata, initialized-byte masks and values, untouched padding, native memset/memcpy footprints, source aliases and ignored extra input border, retained shared lifetimes and cache accounting. Every modeled copy checks extents and source initialization; unwritten bytes are never read. Second-plane failure modeled; first-plane failure, source/output object aliasing, inconsistent geometry and actual OOM excluded.",
+        "fraction_storage_compile_command": fraction_storage_compile,
+        "fraction_storage_result": fraction_storage_result.stdout, "fraction_storage_stderr": fraction_storage_result.stderr,
+        "fraction_storage_scope": "Whole pinned xy_be_blur and xy_calculate_filter with observed filter/transpose calls and scratch ownership under strict FP compilation. x86/x64 execute extracted native SSE kernels against Rust kernels; arm64 substitutes extracted scalar callbacks and does not establish SSE parity. Exact stage bytes/order, output/padding, initialized scratch, cache accounting, signed and fractional pass counts, reuse and native allocation fallback. Positive dimensions at least four avoid an unused native before-base cursor; zero/smaller/negative dimensions, overflowing/nonfinite pass counts, invalid backing and actual allocation failure excluded.",
         "gauss_storage_compile_command": gauss_storage_compile,
         "gauss_storage_result": gauss_storage_result.stdout, "gauss_storage_stderr": gauss_storage_result.stderr,
         "gauss_storage_scope": "Complete pinned xy_gaussian_blur with controlled byte/float, filter and transpose callbacks; exact region offsets, callback arguments, initialized scratch handoff, output/padding bytes, logical cache accounting and successful native fallback after modeled Rust decline. Unwritten scratch bytes are never read or compared. Invalid kernel/dimension domains and actual allocation failure are excluded; underlying filter arithmetic has separate leaf comparisons.",

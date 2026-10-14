@@ -20,6 +20,26 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Fractional `xy_be_blur` now owns its transpose scratch through Rust while
+  preserving horizontal filtering, transpose, vertical filtering, transpose-back
+  and release order. Ordinary and fatal ASan/UBSan comparisons pass locally on
+  both architectures: **46,712 calls / 9,358,792 output-and-guard bytes /
+  71,826,912 initialized stage/scratch fields / 3,492,296 allocation/stage
+  observations / 42,932 changed outputs / 23,612 Rust owners, loans and releases /
+  23,100 modeled Rust declines to native allocation**. The x64 campaign runs the
+  actual pinned SSE filters against the candidate Rust kernels; arm64 uses
+  extracted scalar filter callbacks and does not establish SSE parity. The
+  native coefficient calculation is retained, with strict FP compilation for
+  these extracted observations. Signed, integer and fractional pass counts,
+  padding, repeated calls, every byte value, intermediate pixels and logical
+  cache accounting match. Dimensions below four are excluded from this oracle
+  because a native filter forms an unused before-base cursor; they are not
+  counted as passes. Invalid backing, nonfinite/overflowing passes and actual
+  allocation failure are also excluded. A new FFI ownership test covers an
+  unwritten scratch loan becoming transpose output, then input, then being
+  released after copy-back with row padding intact. **146 core / 100 FFI tests**
+  and Python checks pass; Windows and Miri validation remain pending.
+
 * `CVobSubImage::Scale2x` now uses an exclusive Rust scratch owner under the
   normal Rust switch, without changing persistent image storage or copyability.
   The whole pinned method matches on arm64 and x64 with fatal ASan/UBSan:

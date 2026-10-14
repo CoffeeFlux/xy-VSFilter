@@ -47,6 +47,52 @@ pub unsafe extern "C" fn xy_vsfilter_plane_release(owner: *mut Plane) {
 mod tests {
     use super::*;
     #[test]
+    fn transpose_scratch_changes_from_output_to_input_without_reborrowing_owner() {
+        let owner = xy_vsfilter_plane_create(7 * 4);
+        assert!(!owner.is_null());
+        let mut pixels = [0xa5u8; 9 * 4];
+        for y in 0..4 {
+            for x in 0..7 {
+                pixels[y * 9 + x] = (y * 7 + x) as u8;
+            }
+        }
+        let mut expected = pixels;
+        expected[2 * 9 + 3] = 255;
+        // SAFETY: scratch is an exclusive loan, fully initialized by the first
+        // transpose before any read. Both calls use disjoint regions. Only
+        // active pixels are copied back; native row padding remains untouched.
+        unsafe {
+            let scratch = xy_vsfilter_plane_loan(owner);
+            assert_eq!(
+                crate::transpose::xy_vsfilter_byte_transpose(
+                    scratch,
+                    4,
+                    4,
+                    pixels.as_ptr(),
+                    7,
+                    4,
+                    9,
+                ),
+                1
+            );
+            scratch.add(3 * 4 + 2).write(255);
+            assert_eq!(
+                crate::transpose::xy_vsfilter_byte_transpose(
+                    pixels.as_mut_ptr(),
+                    7,
+                    9,
+                    scratch,
+                    4,
+                    7,
+                    4,
+                ),
+                1
+            );
+            xy_vsfilter_plane_release(owner);
+        }
+        assert_eq!(pixels, expected);
+    }
+    #[test]
     fn packet_fragments_initialize_a_prefix_before_an_independent_complete_copy() {
         let owner = xy_vsfilter_plane_create(257);
         let copy_owner = xy_vsfilter_plane_create(257);
