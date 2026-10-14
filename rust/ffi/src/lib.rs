@@ -97,3 +97,4 @@ mod gauss_integer;
 
 mod vobsub_packet;
 mod vobsub_pixels;
+mod vobsub_rle;

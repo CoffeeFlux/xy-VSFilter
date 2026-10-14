@@ -129,10 +129,28 @@ bool CVobSubImage::Decode(BYTE* lpData, size_t packetSize, size_t dataSize, int 
     while (nOffset[nPlane] < end[nPlane]) {
         DWORD code;
 
-        if ((code = GetNibble(lpData)) >= 0x4
+#ifdef XY_VSFILTER_RUST_TEXT
+        code = 0;
+        bool explicit_run = false;
+        for (uint32_t stage = 0; stage < 4; ++stage) {
+            const uint64_t step = xy_vsfilter_vobsub_code_step(code, GetNibble(lpData), stage);
+            code = static_cast<DWORD>(step);
+            if (step >> 32) {
+                explicit_run = (step >> 32) == 1;
+                break;
+            }
+        }
+#endif
+        if (
+#ifdef XY_VSFILTER_RUST_TEXT
+            explicit_run
+#else
+            (code = GetNibble(lpData)) >= 0x4
                 || (code = (code << 4) | GetNibble(lpData)) >= 0x10
                 || (code = (code << 4) | GetNibble(lpData)) >= 0x40
-                || (code = (code << 4) | GetNibble(lpData)) >= 0x100) {
+                || (code = (code << 4) | GetNibble(lpData)) >= 0x100
+#endif
+        ) {
             DrawPixels(p, code >> 2, code & 3);
             if ((p.x += code >> 2) < rect.right) {
                 continue;
@@ -302,11 +320,17 @@ BYTE CVobSubImage::GetNibble(const BYTE* lpData)
 {
     size_t& off = nOffset[nPlane];
     BYTE ret = lpData[off];
+#ifdef XY_VSFILTER_RUST_TEXT
+    const uint32_t step = xy_vsfilter_vobsub_nibble(ret, fAligned ? 1 : 0);
+    ret = static_cast<BYTE>(step);
+    fAligned = (step & 0x100) != 0;
+#else
     if (fAligned) {
         ret >>= 4;
     }
     ret &= 0x0f;
     fAligned = !fAligned;
+#endif
     if (fAligned) {
         off++;
     }
