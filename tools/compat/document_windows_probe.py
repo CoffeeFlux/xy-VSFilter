@@ -53,10 +53,10 @@ def main():
     paths = ["src/subtitles/STS.cpp", "src/subtitles/RTS.cpp", "src/subtitles/STS.h",
              "src/dsutil/DSUtil.h", "src/common.props"]
     sources = {p: source(p) for p in paths}
-    sts = sources[paths[0]].decode("utf-8-sig")
-    rts = sources[paths[1]].decode("utf-8-sig")
-    macros = sources[paths[3]].decode("utf-8-sig")
-    entry_match = re.search(r"typedef struct\s*\{[^}]+\} STSEntry;", sources[paths[2]].decode("utf-8-sig"))
+    sts = sources[paths[0]].decode("utf-8-sig").replace("\r\n", "\n")
+    rts = sources[paths[1]].decode("utf-8-sig").replace("\r\n", "\n")
+    macros = sources[paths[3]].decode("utf-8-sig").replace("\r\n", "\n")
+    entry_match = re.search(r"typedef struct\s*\{[^}]+\} STSEntry;", sources[paths[2]].decode("utf-8-sig").replace("\r\n", "\n"))
     if not entry_match:
         raise RuntimeError("Pinned STSEntry extraction failed")
     entry_declaration = entry_match.group(0)

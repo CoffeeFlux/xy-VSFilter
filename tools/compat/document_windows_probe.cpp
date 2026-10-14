@@ -20,7 +20,6 @@
 
 // The actual pinned STSEntry declaration is extracted below. Native Sort uses
 // qsort on these CString-bearing records; only bounded comparator inputs run.
-using ATL::CRect;
 struct LSub { int idx, layer, readorder; };
 #include "document_windows_extracted.inc"
 
