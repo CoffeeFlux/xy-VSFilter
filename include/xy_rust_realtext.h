@@ -10,6 +10,10 @@
 #define XY_REALTEXT_CDECL
 #endif
 extern "C" {
+void* XY_REALTEXT_CDECL xy_vsfilter_realtext_text_create();
+uint32_t XY_REALTEXT_CDECL xy_vsfilter_realtext_text_next(void*, const uint16_t*, size_t, uint32_t, uint32_t);
+size_t XY_REALTEXT_CDECL xy_vsfilter_realtext_text_field(const void*, uint32_t, size_t);
+void XY_REALTEXT_CDECL xy_vsfilter_realtext_text_release(void*);
 void* XY_REALTEXT_CDECL xy_vsfilter_realtext_tag_create();
 uint32_t XY_REALTEXT_CDECL xy_vsfilter_realtext_tag_next(void*, const uint16_t*, size_t, uint32_t, uint32_t, uint32_t);
 size_t XY_REALTEXT_CDECL xy_vsfilter_realtext_tag_field(const void*, uint32_t, size_t);
@@ -32,6 +36,29 @@ void XY_REALTEXT_CDECL xy_vsfilter_realtext_timecode_release(void*);
 }
 #undef XY_REALTEXT_CDECL
 namespace XyRust {
+class RealTextText {
+    void* owner;
+    RealTextText(const RealTextText&);
+    RealTextText& operator=(const RealTextText&);
+public:
+    RealTextText():owner(xy_vsfilter_realtext_text_create()){}
+    ~RealTextText(){xy_vsfilter_realtext_text_release(owner);}
+    uint32_t Next(const std::wstring& input,bool ignore,bool response){
+#ifdef _WIN32
+        static_assert(sizeof(wchar_t)==sizeof(uint16_t),"native strings must contain UTF-16 units");
+        return xy_vsfilter_realtext_text_next(owner,reinterpret_cast<const uint16_t*>(input.data()),input.size(),ignore?1:0,response?1:0);
+#else
+        const std::vector<uint16_t> units(input.begin(),input.end());
+        return xy_vsfilter_realtext_text_next(owner,units.data(),units.size(),ignore?1:0,response?1:0);
+#endif
+    }
+    size_t Field(uint32_t field)const{return xy_vsfilter_realtext_text_field(owner,field,0);}
+    std::wstring Value()const{
+        const size_t length=Field(2);std::wstring result(length,L'\0');
+        for(size_t i=0;i<length;++i)result[i]=static_cast<wchar_t>(xy_vsfilter_realtext_text_field(owner,3,i));
+        return result;
+    }
+};
 class RealTextTag {
     void* owner;
     RealTextTag(const RealTextTag&);

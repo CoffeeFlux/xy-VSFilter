@@ -20,6 +20,23 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns `ExtractString` text scanning and the text appended by
+  `ExtractTextTag`. Leading whitespace still uses native classification. An
+  initial `<` or empty input clears the output only when error recovery is on;
+  reaching EOF after ordinary text appends that text, returns false and leaves
+  the source untouched. Native append and source consumption retain their order.
+  Identical source/output objects use the native fallback.
+  Fatal ASan/UBSan comparisons passed **377,504 cases** and **20 terminating
+  native alias cases** on arm64 and under x64 execution: **149,849 successful
+  returns**, **137,659 changed inputs**, **479,593 whitespace operations**, **672
+  injected interruptions** and **2,903 callback mutations**. Unterminated
+  self-appending aliases are excluded. The integrated RealText oracle now also
+  compares **30,058 complete parses**, including 10,000 three-call sequences
+  reusing parser objects through successful and malformed documents. It checks
+  persisted line maps and all window/font tag fields and center state.
+  Rust 1.85 tests (66 core, 43 FFI), strict Clippy, corpus freshness and default
+  syntax checks pass. Windows/Miri validation is pending; allocation failure
+  timing remains unverified, and the outer document parser still uses C++.
 * Safe Rust owns the `ExtractTag` state machine, including comments, prefix
   recovery, partial name/flag changes and source consumption. Comment names keep
   the leading `!`; a comment delimiter at EOF still returns false without

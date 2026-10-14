@@ -17,13 +17,26 @@ static void compare(const std::vector<TagInput>& input,unsigned ignore=0,int min
     if(!(a==b)){fprintf(stderr,"RealText tag mismatch case=%llu count=%zu ignore=%u min=%d max=%d\n",(unsigned long long)comparisons,input.size(),ignore,minimum,maximum);std::abort();}
     ++comparisons;nonempty+=!a.text.empty();units+=a.text.size();conversions+=a.conversions.size();
 }
-static void parse(const std::wstring& text){
-    ReferenceRealText::CRealTextParser a;CandidateRealText::CRealTextParser b;
-    realTextConversions.clear();const bool ar=a.ParseRealText(text);const auto ac=realTextConversions;
-    realTextConversions.clear();const bool br=b.ParseRealText(text);const auto bc=realTextConversions;
-    const auto& as=a.GetParsedSubtitles();const auto& bs=b.GetParsedSubtitles();
-    if(ar!=br || ac!=bc || as.m_mapLines!=bs.m_mapLines || as.m_bCenter!=bs.m_bCenter || as.m_WindowTag.m_szName!=bs.m_WindowTag.m_szName || as.m_WindowTag.m_mapAttributes!=bs.m_WindowTag.m_mapAttributes){fprintf(stderr,"RealText full parse mismatch\n");std::abort();}++parses;
+template<class A,class B> static bool sameTag(const A& a,const B& b){
+    return a.m_szName==b.m_szName && a.m_bOpen==b.m_bOpen && a.m_bClose==b.m_bClose && a.m_bComment==b.m_bComment && a.m_bText==b.m_bText && a.m_mapAttributes==b.m_mapAttributes;
 }
+static void parseSequence(const std::vector<std::wstring>& texts,unsigned options=0){
+    ReferenceRealText::CRealTextParser a;CandidateRealText::CRealTextParser b;
+    a.m_bTryToIgnoreErrors=b.m_bTryToIgnoreErrors=(options&1)==0;
+    a.m_bIgnoreFont=b.m_bIgnoreFont=(options&2)!=0;
+    a.m_bIgnoreFontWeight=b.m_bIgnoreFontWeight=(options&4)!=0;
+    a.m_bIgnoreFontSize=b.m_bIgnoreFontSize=(options&8)!=0;
+    a.m_bIgnoreFontColor=b.m_bIgnoreFontColor=(options&16)!=0;
+    a.m_bIgnoreFontFace=b.m_bIgnoreFontFace=(options&32)!=0;
+    a.m_iDefaultSubtitleDurationInMillisecs=b.m_iDefaultSubtitleDurationInMillisecs=options&64?0:4000;
+    for(const auto& text:texts){
+        realTextConversions.clear();const bool ar=a.ParseRealText(text);const auto ac=realTextConversions;
+        realTextConversions.clear();const bool br=b.ParseRealText(text);const auto bc=realTextConversions;
+        const auto& as=a.GetParsedSubtitles();const auto& bs=b.GetParsedSubtitles();
+        if(ar!=br || ac!=bc || as.m_mapLines!=bs.m_mapLines || as.m_bCenter!=bs.m_bCenter || !sameTag(as.m_WindowTag,bs.m_WindowTag) || !sameTag(as.m_FontTag,bs.m_FontTag)){fprintf(stderr,"RealText full parse mismatch case=%llu options=%u\n",(unsigned long long)parses,options);std::abort();}++parses;
+    }
+}
+static void parse(const std::wstring& text){parseSequence({text});}
 int main(){
     const std::wstring names[]={L"br",L"b",L"i",L"font",L"u",L"B",L"Font",L"",L"text",L" ",std::wstring(L"font\0tail",9)};
     const std::wstring sizes[]={L"",L"0",L"1",L"13",L"14",L"25",L"26",L"2147483647",L"-1",L"+20",L" 20",L"20px",std::wstring(L"20\0x",4),L"\u0662\u0660"};
@@ -46,6 +59,14 @@ int main(){
     }
     parse(L"<window><time begin=\"0\" end=\"4\"/><i></i></window>");
     parse(L"<window><time begin=\"0\"/><i>first<time begin=\"4\"/><clear/>second</i></window>");
+    const std::wstring fragments[]={L"<window width='300'>",L"</window>",L"<center/>",L"<time begin='1' end='4'/>",L"<time begin='3'/>",L"<time begin='0' end='2'/>",L"<clear/>",L"<i>",L"</i>",L"<b/>",L"<font size='20' color='red'>",L"</font>",L"<!comment>",L"<required>",L"<unknown>",L" body ",L"\n\t",L"<br/>",L"<font a='one\" b='two'>",L"<incomplete",std::wstring(L"raw\0text",8)};
+    const std::wstring primer=L"<window><center><time begin='0'/>first<time begin='3'/><clear/><font face='Arial'>second</font></window>";
+    for(unsigned value=0;value<10000;++value){
+        std::wstring middle;for(unsigned i=0;i<value%31;++i){random^=random<<13;random^=random>>17;random^=random<<5;middle+=fragments[random%21];}
+        // Reuse each parser across success and failure: its stored subtitles,
+        // window and center state intentionally survive subsequent parses.
+        parseSequence({primer,middle,value%2?L"<time begin='0' end='2'/>last<clear/>":L"<window changed='yes'><time begin='1'/>unfinished"},value%128);
+    }
     const auto control=execute<CandidateRealText::CRealTextParser>({{L"i",3,{}},text},0,14,25);
     if(control.text!=L"<i>text" || !nonempty || !conversions){fprintf(stderr,"RealText output controls failed\n");return 1;}
     printf("%llu exact RealText tag-output comparisons and %llu complete native parses passed (%llu nonempty outputs, %llu compared UTF-16 units, %llu native classification/conversion observation values; all ignore flags, open/close/text precedence, ordered raw attributes, font-size boundaries, every UTF-16 code unit and formatting-only suppression)\n",(unsigned long long)comparisons,(unsigned long long)parses,(unsigned long long)nonempty,(unsigned long long)units,(unsigned long long)conversions);

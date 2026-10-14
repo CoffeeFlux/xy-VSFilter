@@ -24,6 +24,7 @@ pub mod mask;
 pub mod realtext;
 pub mod realtext_attributes;
 pub mod realtext_tag;
+pub mod realtext_text;
 pub mod realtext_timecode;
 pub mod segment_insert;
 pub mod segments;
