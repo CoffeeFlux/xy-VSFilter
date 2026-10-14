@@ -100,6 +100,38 @@ jobs:
           bash ./build_vsfilter.sh -platform "${{ matrix.vsfplat }}" -compiler VS2022 -voff
           cp License.txt bin/
 
+      - name: Check binary hardening
+        run: |
+          msvc_dir="$(cygpath -u "$VS170COMNTOOLS")../../VC/Tools/MSVC"
+          dumpbins=("$msvc_dir"/*/bin/Hostx64/x64/dumpbin.exe)
+          dumpbin="$(printf '%s\n' "${dumpbins[@]}" | sort -V | tail -1)"
+          required=("Dynamic base" "NX compatible" "Control Flow Guard" "CET compatible")
+          if [ "${{ matrix.vsfplat }}" = x64 ] ; then
+              required+=("High Entropy Virtual Addresses")
+          fi
+          fail=0
+          for dll in bin/lib*/*/Release/*.dll ; do
+              headers="$("$dumpbin" -nologo -headers "$dll")"
+              for flag in "${required[@]}" ; do
+                  if ! grep -qF "$flag" <<< "$headers" ; then
+                      echo "::error::$dll: missing '$flag'"
+                      fail=1
+                  fi
+              done
+              # .rdata must stay a separate, non-executable section
+              if ! grep -qE '^ +\.rdata name$' <<< "$headers" ; then
+                  echo "::error::$dll: no .rdata section (merged into .text?)"
+                  fail=1
+              fi
+              if [ "${{ matrix.vsfplat }}" = Win32 ] &&
+                 ! "$dumpbin" -nologo -loadconfig "$dll" | grep -qF "Safe Exception Handler Table" ; then
+                  echo "::error::$dll: no SafeSEH table"
+                  fail=1
+              fi
+              echo "$dll: checked"
+          done
+          exit $fail
+
       - name: Prune incompatible files
         if: steps.config.outputs.delete != ''
         run: |
