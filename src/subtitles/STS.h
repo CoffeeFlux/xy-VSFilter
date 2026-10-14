@@ -193,12 +193,8 @@ public:
     bool           m_fScaledBAS;
     CSize          m_layout_size;
 
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-private:
-#endif
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     CSTSStyleMap   m_styles;
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-public:
 #endif
 
     bool           m_fForcedDefaultStyle;
@@ -308,7 +304,7 @@ public:
     void OrSegmentAnimated(int iSegment, bool animated);
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    // Native-backed named-style access; supplied default storage is Rust-owned;
+    // Named/default style storage is Rust-owned in the experimental build;
     // enumeration copies only one requested row and exposes no map/pointee loan.
     enum class NamedStyleLookup { Missing, Null, Value };
     NamedStyleLookup LookupNamedStyle(LPCWSTR name, STSStyle* output = NULL) const;

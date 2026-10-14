@@ -189,6 +189,168 @@ pub extern "C" fn xy_vsfilter_document_copy_default_style_v1(destination: u64, s
     drop(retired);
     OK
 }
+/// # Safety
+/// Output follows the byte-buffer contract, capacity >=4.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_named_style_count_v1(
+    owner: u64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 4));
+    let count = required!(admitted(|registry| {
+        let count = registry
+            .document(owner)
+            .map_err(registry_error)?
+            .named_styles()
+            .count();
+        if count > i32::MAX as usize {
+            return Err(COUNT_OVERFLOW);
+        }
+        Ok(count as u32)
+    }));
+    // SAFETY: output validated above; registry loan has ended.
+    unsafe { write_output(output, &count.to_le_bytes()) };
+    OK
+}
+/// # Safety
+/// Inputs follow the byte-buffer contract. Key is raw UTF16LE; empty style wire
+/// denotes a present null value. Inputs are copied/decoded before admission.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_named_style_put_v1(
+    owner: u64,
+    key: *const u8,
+    key_length: usize,
+    style: *const u8,
+    style_length: usize,
+) -> u32 {
+    if key_length % 2 != 0 {
+        return INVALID_INPUT;
+    }
+    if key_length / 2 > i32::MAX as usize {
+        return COUNT_OVERFLOW;
+    }
+    // SAFETY: caller supplies the documented live input regions.
+    let key = required!(unsafe { copy_input(key, key_length) });
+    // SAFETY: same input contract, independent of key overlap.
+    let style = required!(unsafe { copy_input(style, style_length) });
+    let mut key = Some(units(&key));
+    let mut value = Some(if style.is_empty() {
+        None
+    } else {
+        Some(required!(
+            style_wire::decode(&style).map_err(style_wire_error)
+        ))
+    });
+    let retired = required!(admitted(|registry| {
+        let map = registry
+            .document_mut(owner)
+            .map_err(registry_error)?
+            .named_styles_mut();
+        let key_ref = key.as_ref().ok_or(INVALID_INPUT)?;
+        if let Some(old) = map.get_mut(key_ref) {
+            return Ok(Some(core::mem::replace(
+                old,
+                value.take().ok_or(INVALID_INPUT)?,
+            )));
+        }
+        if map.count() >= i32::MAX as usize {
+            return Err(COUNT_OVERFLOW);
+        }
+        Ok(map.insert(
+            key.take().ok_or(INVALID_INPUT)?,
+            value.take().ok_or(INVALID_INPUT)?,
+        ))
+    }));
+    drop(retired);
+    OK
+}
+/// # Safety
+/// Key follows the byte-buffer contract and is raw UTF16LE. Missing is a no-op.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_named_style_remove_v1(
+    owner: u64,
+    key: *const u8,
+    length: usize,
+) -> u32 {
+    if length % 2 != 0 {
+        return INVALID_INPUT;
+    }
+    if length / 2 > i32::MAX as usize {
+        return COUNT_OVERFLOW;
+    }
+    // SAFETY: caller supplies the documented live input region.
+    let key = required!(unsafe { copy_input(key, length) });
+    let key = units(&key);
+    let retired = required!(admitted(|registry| Ok(registry
+        .document_mut(owner)
+        .map_err(registry_error)?
+        .named_styles_mut()
+        .remove(&key))));
+    drop(retired);
+    OK
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_named_style_clear_v1(owner: u64) -> u32 {
+    let retired = required!(admitted(|registry| Ok(registry
+        .document_mut(owner)
+        .map_err(registry_error)?
+        .named_styles_mut()
+        .clear())));
+    drop(retired);
+    OK
+}
+/// # Safety
+/// Key follows the byte-buffer contract; output capacity >=16. Overlap allowed.
+/// Snapshot request is exactly 0 or 1. Output remains untouched on all errors.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_named_style_lookup_v1(
+    owner: u64,
+    key: *const u8,
+    length: usize,
+    snapshot_requested: u32,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 16));
+    if snapshot_requested > 1 || length % 2 != 0 {
+        return INVALID_INPUT;
+    }
+    if length / 2 > i32::MAX as usize {
+        return COUNT_OVERFLOW;
+    }
+    // SAFETY: caller supplies the documented live key region.
+    let key = required!(unsafe { copy_input(key, length) });
+    let key = units(&key);
+    let (state, bytes) = required!(admitted(|registry| {
+        let map = registry
+            .document(owner)
+            .map_err(registry_error)?
+            .named_styles();
+        match map.get(&key) {
+            None => Ok((0u32, None)),
+            Some(None) => Ok((1u32, None)),
+            Some(Some(value)) => Ok((
+                2u32,
+                if snapshot_requested != 0 {
+                    Some(style_wire::encode(value).map_err(style_wire_error)?)
+                } else {
+                    None
+                },
+            )),
+        }
+    }));
+    let id = match bytes {
+        Some(bytes) => required!(insert(Resource::Snapshot(bytes))),
+        None => 0,
+    };
+    let mut reply = [0u8; 16];
+    reply[..4].copy_from_slice(&state.to_le_bytes());
+    reply[8..].copy_from_slice(&id.to_le_bytes());
+    // SAFETY: validated before admission/snapshot insertion; no live loans now.
+    unsafe { write_output(output, &reply) };
+    OK
+}
 #[no_mangle]
 pub extern "C" fn xy_vsfilter_document_destroy_v1(owner: u64) -> u32 {
     status(
@@ -315,7 +477,7 @@ pub unsafe extern "C" fn xy_vsfilter_document_snapshot_open_v1(
     capacity: usize,
 ) -> u32 {
     required!(output_capacity(output, capacity, 8));
-    if kind > 2 {
+    if kind > 4 {
         return INVALID_INPUT;
     }
     let bytes = required!(admitted(|registry| {
@@ -330,12 +492,37 @@ pub unsafe extern "C" fn xy_vsfilter_document_snapshot_open_v1(
                     .ok_or(OUT_OF_RANGE)?,
             )
             .map_err(wire_error),
-            _ => {
+            2 => {
                 if index != 0 {
                     return Err(OUT_OF_RANGE);
                 }
                 style_wire::encode(document.default_style().ok_or(OUT_OF_RANGE)?)
                     .map_err(style_wire_error)
+            }
+            _ => {
+                let (key, value) = document
+                    .named_styles()
+                    .iter()
+                    .nth(index as usize)
+                    .ok_or(OUT_OF_RANGE)?;
+                if kind == 3 {
+                    if key.len() > i32::MAX as usize {
+                        return Err(COUNT_OVERFLOW);
+                    }
+                    let length = key
+                        .len()
+                        .checked_mul(2)
+                        .filter(|&n| n <= isize::MAX as usize)
+                        .ok_or(COUNT_OVERFLOW)?;
+                    let mut bytes = Vec::with_capacity(length);
+                    for unit in key {
+                        bytes.extend_from_slice(&unit.to_le_bytes());
+                    }
+                    Ok(bytes)
+                } else {
+                    style_wire::encode(value.as_ref().ok_or(UNRESOLVED_REFERENCE)?)
+                        .map_err(style_wire_error)
+                }
             }
         }
     }));
@@ -739,7 +926,7 @@ mod tests {
             );
             assert_eq!(output, [0xa5; 8]);
             assert_eq!(
-                xy_vsfilter_document_snapshot_open_v1(source, 3, 0, output.as_mut_ptr(), 8),
+                xy_vsfilter_document_snapshot_open_v1(source, 5, 0, output.as_mut_ptr(), 8),
                 INVALID_INPUT
             );
             assert_eq!(output, [0xa5; 8]);
@@ -796,6 +983,243 @@ mod tests {
             assert_eq!(xy_vsfilter_document_destroy_v1(target), OK);
             assert_ne!(read_snapshot(snapshot), style);
             assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
+            // Named values, raw keys, null presence and reply ownership.
+            let owner = create();
+            let destination = create();
+            let key = [65u8, 0, 0, 0, 0, 216];
+            let alias = [65u8, 0, 0, 0, 255, 220];
+            let mut value = vec![0u8; style_wire::HEADER_BYTES + 4];
+            value[64..68].copy_from_slice(&2u32.to_le_bytes());
+            value[192..].copy_from_slice(&[0, 216, 255, 220]);
+            value[72..80].copy_from_slice(&0x7ff0000000000042u64.to_le_bytes());
+            let mut reply = [0xa5; 16];
+            assert_eq!(
+                xy_vsfilter_document_named_style_lookup_v1(
+                    owner,
+                    key.as_ptr(),
+                    key.len(),
+                    1,
+                    reply.as_mut_ptr(),
+                    16
+                ),
+                OK
+            );
+            assert_eq!(reply, [0; 16]);
+            assert_eq!(
+                xy_vsfilter_document_named_style_put_v1(
+                    owner,
+                    key.as_ptr(),
+                    key.len(),
+                    value.as_ptr(),
+                    value.len()
+                ),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_named_style_lookup_v1(
+                    owner,
+                    alias.as_ptr(),
+                    alias.len(),
+                    0,
+                    reply.as_mut_ptr(),
+                    16
+                ),
+                OK
+            );
+            assert_eq!(u32::from_le_bytes(reply[..4].try_into().unwrap()), 2);
+            assert_eq!(&reply[4..], &[0; 12]);
+            assert_eq!(
+                xy_vsfilter_document_named_style_lookup_v1(
+                    owner,
+                    alias.as_ptr(),
+                    alias.len(),
+                    1,
+                    reply.as_mut_ptr(),
+                    16
+                ),
+                OK
+            );
+            let saved = u64::from_le_bytes(reply[8..].try_into().unwrap());
+            assert_ne!(saved, 0);
+            assert_eq!(read_snapshot(saved), value);
+            let key_snapshot = open_snapshot(owner, 3);
+            assert_eq!(read_snapshot(key_snapshot), vec![65, 0]);
+            let value_snapshot = open_snapshot(owner, 4);
+            assert_eq!(read_snapshot(value_snapshot), value);
+            assert_eq!(
+                xy_vsfilter_document_named_style_put_v1(
+                    saved,
+                    key.as_ptr(),
+                    key.len(),
+                    value.as_ptr(),
+                    value.len()
+                ),
+                BAD_HANDLE
+            );
+            let before = state(owner);
+            reply.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_document_named_style_lookup_v1(
+                    owner,
+                    key.as_ptr(),
+                    key.len(),
+                    1,
+                    reply.as_mut_ptr(),
+                    15
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(reply, [0xa5; 16]);
+            assert_eq!(state(owner), before);
+            assert_eq!(
+                xy_vsfilter_document_named_style_lookup_v1(
+                    owner,
+                    key.as_ptr(),
+                    key.len(),
+                    2,
+                    reply.as_mut_ptr(),
+                    16
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(reply, [0xa5; 16]);
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_named_style_lookup_v1(
+                        owner,
+                        key.as_ptr(),
+                        key.len(),
+                        1,
+                        reply.as_mut_ptr(),
+                        16
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(reply, [0xa5; 16]);
+            assert_eq!(state(owner), before);
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_named_style_put_v1(
+                        owner,
+                        key.as_ptr(),
+                        key.len(),
+                        value.as_ptr(),
+                        value.len()
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(state(owner), before);
+            let mut small_count = [0xa5; 4];
+            assert_eq!(
+                xy_vsfilter_document_named_style_count_v1(owner, small_count.as_mut_ptr(), 3),
+                INVALID_INPUT
+            );
+            assert_eq!(small_count, [0xa5; 4]);
+
+            assert_eq!(
+                xy_vsfilter_document_named_style_put_v1(
+                    owner,
+                    key.as_ptr(),
+                    1,
+                    value.as_ptr(),
+                    value.len()
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(state(owner), before);
+            assert_eq!(
+                xy_vsfilter_document_named_style_put_v1(
+                    destination,
+                    key.as_ptr(),
+                    key.len(),
+                    value.as_ptr(),
+                    value.len()
+                ),
+                OK
+            );
+            let destination_before = state(destination);
+            assert_eq!(
+                xy_vsfilter_document_named_style_put_v1(
+                    owner,
+                    key.as_ptr(),
+                    key.len(),
+                    ptr::null(),
+                    0
+                ),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_named_style_lookup_v1(
+                    owner,
+                    key.as_ptr(),
+                    key.len(),
+                    1,
+                    reply.as_mut_ptr(),
+                    16
+                ),
+                OK
+            );
+            assert_eq!(u32::from_le_bytes(reply[..4].try_into().unwrap()), 1);
+            assert_eq!(&reply[4..], &[0; 12]);
+            reply.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_document_snapshot_open_v1(owner, 4, 0, reply.as_mut_ptr(), 16),
+                UNRESOLVED_REFERENCE
+            );
+            assert_eq!(reply, [0xa5; 16]);
+            assert_eq!(xy_vsfilter_document_copy_storage_v1(destination, owner), OK);
+            assert_eq!(
+                state(destination).named_styles(),
+                destination_before.named_styles()
+            );
+            assert_eq!(
+                state(destination).clone().named_styles(),
+                destination_before.named_styles()
+            );
+            assert_eq!(xy_vsfilter_document_clear_storage_v1(destination), OK);
+            assert_eq!(xy_vsfilter_document_remove_entries_v1(destination), OK);
+            assert_eq!(
+                state(destination).named_styles(),
+                destination_before.named_styles()
+            );
+            let mut count = [0xa5; 4];
+            assert_eq!(
+                xy_vsfilter_document_named_style_count_v1(owner, count.as_mut_ptr(), 4),
+                OK
+            );
+            assert_eq!(u32::from_le_bytes(count), 1);
+            assert_eq!(
+                xy_vsfilter_document_named_style_remove_v1(owner, alias.as_ptr(), alias.len()),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_named_style_remove_v1(owner, alias.as_ptr(), alias.len()),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_named_style_lookup_v1(
+                    owner,
+                    key.as_ptr(),
+                    key.len(),
+                    1,
+                    reply.as_mut_ptr(),
+                    16
+                ),
+                OK
+            );
+            assert_eq!(reply, [0; 16]);
+            assert_eq!(xy_vsfilter_document_named_style_clear_v1(destination), OK);
+            assert_eq!(state(destination).named_styles().count(), 0);
+            assert_eq!(xy_vsfilter_document_destroy_v1(owner), OK);
+            assert_eq!(xy_vsfilter_document_destroy_v1(destination), OK);
+            assert_eq!(read_snapshot(saved), value);
+            assert_eq!(read_snapshot(value_snapshot), value);
+            assert_eq!(read_snapshot(key_snapshot), vec![65, 0]);
+            for id in [saved, value_snapshot, key_snapshot] {
+                assert_eq!(xy_vsfilter_document_snapshot_drop_v1(id), OK);
+            }
             let mut sentinel = [0xa5; 80];
             assert_eq!(
                 xy_vsfilter_document_create_v1(ptr::null_mut(), 0),

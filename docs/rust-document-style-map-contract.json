@@ -1,0 +1,790 @@
+{
+  "schema": "document-style-map-contract-v1",
+  "scope": "Source-indexed installed MFC CString/CAtlMap primitive contract; not named-style ownership or full AddStyle/CopyStyles compatibility",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "workflow_run": 38641065757,
+  "workflow_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38641065757",
+  "captures": [
+    {
+      "platform": "Win32",
+      "capture_commit": "d8b7c0b3d2e9184510dd2bc6727333ea44d257be",
+      "report_sha256": "6c855acfe5951ba991235e79b4bbb154faffb05017210f1dccae851d2a2775ec",
+      "retained_artifacts_sha256": {
+        "report.json": "6c855acfe5951ba991235e79b4bbb154faffb05017210f1dccae851d2a2775ec",
+        "probe.cpp": "f377170c5a120b4c8964c04fedd661800c943e15505de6a0bd28bc2b65c4c866",
+        "probe.exe": "f8b5833e08201a37ff078f9ffbb647fc7e4c9b2f07257e389e3d33984f6cc0ca",
+        "build.stdout": "965447325b3ab98d95560dd1b08b88ee92226dae6a6d2f25b94f1f301e6721ed",
+        "build.stderr": "ca67167a7ea7d4bf8fbeeb103170bbf775d17c76d04e4ebda190363771b853ab",
+        "trace-0.stdout": "38f55461a33737828ab386654f7d6402f176489a5007ab9221530a0cf089da51",
+        "trace-0.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "trace-1.stdout": "38f55461a33737828ab386654f7d6402f176489a5007ab9221530a0cf089da51",
+        "trace-1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "selected-sdk-definitions.private.json": "5e6f21dd7ffd4992c596550e874f07fa65c3469e09a1b2789bc3cee13389876e",
+        "observations.json": "c045e4eb176d60593cbeb7d95e9312259613022b1210f76546a85e891a25cad3"
+      },
+      "environment": {
+        "VCToolsVersion": "14.44.35207",
+        "VCToolsInstallDir": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\",
+        "WindowsSDKVersion": "10.0.26100.0\\",
+        "VSCMD_ARG_TGT_ARCH": "x86",
+        "INCLUDE": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\include;C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include;C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Auxiliary\\VS\\include;C:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.26100.0\\ucrt;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.26100.0\\\\um;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.26100.0\\\\shared;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.26100.0\\\\winrt;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.26100.0\\\\cppwinrt;C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.8\\include\\um",
+        "LIB": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\lib\\x86;C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\lib\\x86;C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.8\\lib\\um\\x86;C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.26100.0\\ucrt\\x86;C:\\Program Files (x86)\\Windows Kits\\10\\\\lib\\10.0.26100.0\\\\um\\x86"
+      },
+      "provenance": {
+        "event": "provenance",
+        "pointer_bits": 32,
+        "msc": 194435229,
+        "atl": 3584,
+        "cstring_type": "class ATL::CStringT<wchar_t,class StrTraitMFC<wchar_t,class ATL::ChTraitsCRT<wchar_t> > >",
+        "hash_bits": 32,
+        "arg_is_lpcwstr": true,
+        "arg_is_const_cstring_ref": false
+      },
+      "selected_header_sha256": {
+        "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\afxstr.h": "f1bef3d417082e6818a6424376481d484d0052955a2a5aa8c7697e8103b4514e",
+        "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\cstringt.h": "946be7ebc817f7d3214920af5a57d4f71175444f78c5bc408fae3ff5019e127d",
+        "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlstr.h": "0c13f0173d4417e69cde99a1854702bdc494c0dd1a68ba8a3a4ea7d5dfe9af2c",
+        "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h": "7fc0634c45fb4788cf2c78572040a082fb763e51c7cb517e1c3cb701265cb38f"
+      },
+      "state_count": 398,
+      "key_count": 10,
+      "repeat_equal": true,
+      "stderr_empty": true
+    },
+    {
+      "platform": "x64",
+      "capture_commit": "d8b7c0b3d2e9184510dd2bc6727333ea44d257be",
+      "report_sha256": "bd4a2b7d1ac841bda42f3518b9c762ef246746d12133deff30e00166df04b55a",
+      "retained_artifacts_sha256": {
+        "report.json": "bd4a2b7d1ac841bda42f3518b9c762ef246746d12133deff30e00166df04b55a",
+        "probe.cpp": "f377170c5a120b4c8964c04fedd661800c943e15505de6a0bd28bc2b65c4c866",
+        "probe.exe": "eae1d6c876907c6e23e9f5ffb14606845c53ede0add854d918b85c530ac9fb6b",
+        "build.stdout": "1ca1aeaf8a0379374c7a3c219f7ce56f15fa20e5bcc2be94b2d2618dfa370a82",
+        "build.stderr": "f72a2cff4aa61571c4d8f4785e19aa0675fffc5bc89804f2c3e914ffe6089837",
+        "trace-0.stdout": "08f661f9f4951c8569d9f30f39e9ef5a1d2d5f7151aed703f8d4ea4a83709b27",
+        "trace-0.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "trace-1.stdout": "08f661f9f4951c8569d9f30f39e9ef5a1d2d5f7151aed703f8d4ea4a83709b27",
+        "trace-1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "selected-sdk-definitions.private.json": "5e6f21dd7ffd4992c596550e874f07fa65c3469e09a1b2789bc3cee13389876e",
+        "observations.json": "d62b3e0810f7d58368918a71cfe9dbbef0dd9c72c24452bb629f3d03624da482"
+      },
+      "environment": {
+        "VCToolsVersion": "14.44.35207",
+        "VCToolsInstallDir": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\",
+        "WindowsSDKVersion": "10.0.26100.0\\",
+        "VSCMD_ARG_TGT_ARCH": "x64",
+        "INCLUDE": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\include;C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include;C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Auxiliary\\VS\\include;C:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.26100.0\\ucrt;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.26100.0\\\\um;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.26100.0\\\\shared;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.26100.0\\\\winrt;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.26100.0\\\\cppwinrt;C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.8\\include\\um",
+        "LIB": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\lib\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\lib\\x64;C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.8\\lib\\um\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.26100.0\\ucrt\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\\\lib\\10.0.26100.0\\\\um\\x64"
+      },
+      "provenance": {
+        "event": "provenance",
+        "pointer_bits": 64,
+        "msc": 194435229,
+        "atl": 3584,
+        "cstring_type": "class ATL::CStringT<wchar_t,class StrTraitMFC<wchar_t,class ATL::ChTraitsCRT<wchar_t> > >",
+        "hash_bits": 32,
+        "arg_is_lpcwstr": true,
+        "arg_is_const_cstring_ref": false
+      },
+      "selected_header_sha256": {
+        "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\afxstr.h": "f1bef3d417082e6818a6424376481d484d0052955a2a5aa8c7697e8103b4514e",
+        "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\cstringt.h": "946be7ebc817f7d3214920af5a57d4f71175444f78c5bc408fae3ff5019e127d",
+        "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlstr.h": "0c13f0173d4417e69cde99a1854702bdc494c0dd1a68ba8a3a4ea7d5dfe9af2c",
+        "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h": "7fc0634c45fb4788cf2c78572040a082fb763e51c7cb517e1c3cb701265cb38f"
+      },
+      "state_count": 398,
+      "key_count": 10,
+      "repeat_equal": true,
+      "stderr_empty": true
+    }
+  ],
+  "cross_architecture_state_key_events_equal": true,
+  "source_review_facts": [
+    "Actual CString type is ATL::CStringT<wchar_t, StrTraitMFC<...>> and key input type is LPCWSTR. CPair constructs stored CString from that pointer; keys therefore retain the prefix before first NUL. Raw caller CString logical length remains separately observable.",
+    "CStringElementTraits hash is unsigned 32-bit, initial zero, multiply by 33 then add each unsigned Windows wchar code unit through first NUL; equality dispatches to StringCompare.",
+    "Constructor defaults are 17 bins, f32 optimal/low/high loads 0.75/0.25/2.25 and block size10. Threshold products use f32 then native size_t conversion; low thresholds below17 become zero. PickSize uses the captured ordered prime table, not inferred prime generation.",
+    "Insertion, removal and rehash chain traversal/order must follow captured GetNode/NewNode/RemoveNode/FreeNode/Rehash bodies; public enumeration makes history observable.",
+    "RemoveAll internally disables rehash before its IsLocked test, so this capture implementation retains bin count when cleared."
+  ],
+  "limits": [
+    "No SDK excerpts copied into this JSON or repository; bounded private excerpts remain in the CI artifacts.",
+    "Retained probe source/binary/logs/traces/structured observations/definition excerpts rehashed locally; original installed compiler/SDK/library files unavailable locally and their reported hashes cannot be independently rehashed here.",
+    "398 state events and ten key/hash cases per architecture, each repeated; no universal algorithm proof or safe Rust parity established by this capture alone.",
+    "SDK/toolchain are identified by actual hashes/version, not a permanent pinned reference environment.",
+    "AddStyle duplicate naming, CopyStyles append/self behavior, native allocation/failure/reentry, serializer bytes and host rendering require separate full-class gates."
+  ],
+  "definition_index": [
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\afxstr.h",
+      "symbol": "CString alias",
+      "kind": "declaration",
+      "first_line": 101,
+      "last_line": 101,
+      "sha256_utf8": "d7cf321a66de954d983224516e5ebe9be1c3804bf110d54b60b8aba9c59f8ae7"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\afxstr.h",
+      "symbol": "CString alias",
+      "kind": "declaration",
+      "first_line": 102,
+      "last_line": 102,
+      "sha256_utf8": "c4fefe1b70c011a5cd8001a632f3efb119d68260a7bff6fb5cdd4a7089feeb25"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\afxstr.h",
+      "symbol": "CString alias",
+      "kind": "declaration",
+      "first_line": 103,
+      "last_line": 103,
+      "sha256_utf8": "e84725664bd903e0356e92dd15c6c8469a1eaa738b7acaeef6f7a71de811d972"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\afxstr.h",
+      "symbol": "CString alias",
+      "kind": "declaration",
+      "first_line": 107,
+      "last_line": 107,
+      "sha256_utf8": "c5cf9c4ea86ccfae4208002d9629e815a771bb75cb8c4c0eb7520f63f96fb399"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\afxstr.h",
+      "symbol": "CString alias",
+      "kind": "declaration",
+      "first_line": 108,
+      "last_line": 108,
+      "sha256_utf8": "80be4ea980ea166c330f8c420e8a058275a0dd3179a0074afb696b351b3375a0"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\afxstr.h",
+      "symbol": "CString alias",
+      "kind": "declaration",
+      "first_line": 109,
+      "last_line": 109,
+      "sha256_utf8": "5be26dd3f0389f1c7289b0c9b7e3bf2ef4ec4c81a9314bf0469e9595da062ba6"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\cstringt.h",
+      "symbol": "Hash",
+      "kind": "definition",
+      "first_line": 3216,
+      "last_line": 3228,
+      "sha256_utf8": "8e0b62b312b3af241783d9c10163cae2067497d5c25c15ee7eaa436971323511"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\cstringt.h",
+      "symbol": "CompareElements",
+      "kind": "definition",
+      "first_line": 3230,
+      "last_line": 3235,
+      "sha256_utf8": "8874880f007c908fb26a8ce2a96ff301092bb7f6c6a336ad4470638841c0c563"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\cstringt.h",
+      "symbol": "CompareElementsOrdered",
+      "kind": "definition",
+      "first_line": 3237,
+      "last_line": 3242,
+      "sha256_utf8": "2c4bd80f522f1ca211c4d47734db3da35c576dc6c3756e16512407d90b5db1bc"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\cstringt.h",
+      "symbol": "argument/load declaration",
+      "kind": "declaration",
+      "first_line": 3194,
+      "last_line": 3194,
+      "sha256_utf8": "23e698e7fa50660900cd7d1dba0686ebf1b57756efe8524779e06dc63eec9a34"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlstr.h",
+      "symbol": "CString alias",
+      "kind": "declaration",
+      "first_line": 1306,
+      "last_line": 1307,
+      "sha256_utf8": "0417ea5053e726053ed28327e053c1a76d7634669af4a4d11dac39a49036209c"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlstr.h",
+      "symbol": "CString alias",
+      "kind": "declaration",
+      "first_line": 1309,
+      "last_line": 1310,
+      "sha256_utf8": "84eaf0b16ebb93f456186f0329f2c95a1d9636517573eb3d9e2a8c815982c643"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlstr.h",
+      "symbol": "CString alias",
+      "kind": "declaration",
+      "first_line": 1313,
+      "last_line": 1313,
+      "sha256_utf8": "318d57f4b9ddde2de0806c092ab358abcfe3b98dd6e2601dd9f5988ee93654c2"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "CPair",
+      "kind": "definition",
+      "first_line": 2110,
+      "last_line": 2113,
+      "sha256_utf8": "62f313fd4582557ccf8073aaa11748088b59b4fb23429ca0345bea025fdd28e5"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "CNode",
+      "kind": "definition",
+      "first_line": 2125,
+      "last_line": 2131,
+      "sha256_utf8": "456e0080906b9c478a1a483432c1ba6905188bc9575784f88205ca6aad8c38ea"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "CAtlMap",
+      "kind": "declaration",
+      "first_line": 2145,
+      "last_line": 2150,
+      "sha256_utf8": "35ae2b8cae6e169aaba71436ccd37a816601a34031229af66ced525bf7297441"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "Lookup",
+      "kind": "declaration",
+      "first_line": 2158,
+      "last_line": 2158,
+      "sha256_utf8": "657c3f52f02b2320c24c63ea2b2502a9f4f9e8a4eac985dc95fd72646c3225f4"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "Lookup",
+      "kind": "declaration",
+      "first_line": 2159,
+      "last_line": 2159,
+      "sha256_utf8": "52a9379715c62fac8d254fd799a9877d04e7e935bf5d16b88d6554462a0afd40"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "operator[]",
+      "kind": "declaration",
+      "first_line": 2160,
+      "last_line": 2160,
+      "sha256_utf8": "8a93f420c3fde8300742014355664a91a8eebdbde87b35ce029d4115d19f12a7"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "SetAt",
+      "kind": "declaration",
+      "first_line": 2162,
+      "last_line": 2164,
+      "sha256_utf8": "5d09d09503449c6a8580b0a7c3ecea259accec585b309b50d0cbf3152cfaee1f"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "RemoveKey",
+      "kind": "declaration",
+      "first_line": 2169,
+      "last_line": 2169,
+      "sha256_utf8": "16ce500e94e81871bb0ab0f38d48d133f186cfe6ebd1c3e843c7b99aa4db993b"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "RemoveAll",
+      "kind": "declaration",
+      "first_line": 2170,
+      "last_line": 2170,
+      "sha256_utf8": "2ea4b81bf999889614f6352d6628a7803804c01508c44c43dd5ac4ca19d0523a"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "GetStartPosition",
+      "kind": "declaration",
+      "first_line": 2173,
+      "last_line": 2173,
+      "sha256_utf8": "ce7bad85642c792ffaf713d7459cb8d4bca3381affeae6e42932c02e2357cd7a"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "GetNextAssoc",
+      "kind": "declaration",
+      "first_line": 2174,
+      "last_line": 2177,
+      "sha256_utf8": "8e375a9af136e82539e21b52577121f3f4ed92a058f6b0dbe2aa8d55efcd30f4"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "GetNext",
+      "kind": "declaration",
+      "first_line": 2178,
+      "last_line": 2178,
+      "sha256_utf8": "484ec6152a564294cbee774d0d4a5a9a6343bb0747f1efb33087495a8300e396"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "GetNext",
+      "kind": "declaration",
+      "first_line": 2179,
+      "last_line": 2179,
+      "sha256_utf8": "0f3d9675d66225abb8e637bae08ca96312d3f1d498ef91a250b0e429d2986bdc"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "GetNextKey",
+      "kind": "declaration",
+      "first_line": 2180,
+      "last_line": 2180,
+      "sha256_utf8": "6fd588270d523b2a93d332ad59a853173a91501248ce58f4d0be96fc842436e0"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "GetHashTableSize",
+      "kind": "declaration",
+      "first_line": 2193,
+      "last_line": 2193,
+      "sha256_utf8": "97eb397739e9032dc0b1d0ec85c6a4666116a6a035979985a8d42a1f7fa8c6db"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "InitHashTable",
+      "kind": "declaration",
+      "first_line": 2194,
+      "last_line": 2196,
+      "sha256_utf8": "ee7214900c68044517e1cac2551a8327725d3cb1d838937ab68a561d8f6cfc1f"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "EnableAutoRehash",
+      "kind": "declaration",
+      "first_line": 2197,
+      "last_line": 2197,
+      "sha256_utf8": "470bd3c58009afe44d9ef7078d496d7aa11c8e5bb31a454b3bfd5f1cfb2f7372"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "DisableAutoRehash",
+      "kind": "declaration",
+      "first_line": 2198,
+      "last_line": 2198,
+      "sha256_utf8": "5040f200271c64fcd98cc2ce2385a19238a5f0db924d94017da2977b933db62c"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "Rehash",
+      "kind": "declaration",
+      "first_line": 2199,
+      "last_line": 2199,
+      "sha256_utf8": "d2d2c8bb9b421f2031c1cfb6165e48f9566ab142d5e54314654b0377f8f858d3"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "SetOptimalLoad",
+      "kind": "declaration",
+      "first_line": 2200,
+      "last_line": 2204,
+      "sha256_utf8": "66202166b1135fa55d05909b5678f556461dfd3186b4e08ac0aab078d84c660e"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "IsLocked",
+      "kind": "declaration",
+      "first_line": 2226,
+      "last_line": 2226,
+      "sha256_utf8": "a21cc67fd261679d2ce067bd48e1559ab3fdcd5be33167b439e653ebc269ba88"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "PickSize",
+      "kind": "declaration",
+      "first_line": 2227,
+      "last_line": 2227,
+      "sha256_utf8": "16af9f560da6b4f045476b5d24cf22d9f3f8cae3ad5e2a160885232eae72d8fb"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "NewNode",
+      "kind": "declaration",
+      "first_line": 2228,
+      "last_line": 2231,
+      "sha256_utf8": "b1e8b7f18e7e7c18994df4b18b608aae539520e27a6bef6e80149f9b1c5ea323"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "FreeNode",
+      "kind": "declaration",
+      "first_line": 2232,
+      "last_line": 2232,
+      "sha256_utf8": "01b4799f38a5a0c8402f33bb9cb8f03da97df4512529ce85f4ebb4c7968ac39f"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "GetNode",
+      "kind": "declaration",
+      "first_line": 2234,
+      "last_line": 2238,
+      "sha256_utf8": "fb1ccf01efe8370ecd787b0a37a7448a5b01543addbe07d018983b59bc792432"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "RemoveNode",
+      "kind": "declaration",
+      "first_line": 2243,
+      "last_line": 2245,
+      "sha256_utf8": "e171040afe647bec43f8c0133a83e93edfde5691e0fad33d03d6a4cb581f2fd3"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "FindNextNode",
+      "kind": "declaration",
+      "first_line": 2246,
+      "last_line": 2246,
+      "sha256_utf8": "b72b486723bc0117f4f9e290323b93a39ee54952162e07d5c0f1b88923fefc0d"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "UpdateRehashThresholds",
+      "kind": "declaration",
+      "first_line": 2247,
+      "last_line": 2247,
+      "sha256_utf8": "e48436cfb7d0b9d8ebc3895eca0108a6d6d845906ed7f863326844f0f90cbbdd"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "~CAtlMap",
+      "kind": "declaration",
+      "first_line": 2250,
+      "last_line": 2250,
+      "sha256_utf8": "dd0b37ca5c965ff4f1a171223e7b741b079e10c83a8b0fcba50d05973968679b"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "CAtlMap",
+      "kind": "declaration",
+      "first_line": 2254,
+      "last_line": 2254,
+      "sha256_utf8": "f638c4e511b2b86a46f465094d6cd74854724b93cc4fcc85e7373d4f59ed7e96"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "operator[]",
+      "kind": "definition",
+      "first_line": 2308,
+      "last_line": 2323,
+      "sha256_utf8": "c0800a24f35faa2ad94cc9ddb6f34712b210a614d02d556d505442765cb7cd90"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "GetHashTableSize",
+      "kind": "definition",
+      "first_line": 2325,
+      "last_line": 2329,
+      "sha256_utf8": "019926114c171da1957af3287d880863a87e82cf3ecc1296fe80d2726b0c57b5"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "DisableAutoRehash",
+      "kind": "definition",
+      "first_line": 2393,
+      "last_line": 2397,
+      "sha256_utf8": "b68cb3d58eaa5b1952233ab8ee197bfcbaf807e1b467996c40d6bf596edc61ed"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "EnableAutoRehash",
+      "kind": "definition",
+      "first_line": 2399,
+      "last_line": 2404,
+      "sha256_utf8": "69408f93a7bc3e2f3a8197fef9981c6b11af0e8ffb068c6629bd7b6c4fa34e30"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "IsLocked",
+      "kind": "definition",
+      "first_line": 2406,
+      "last_line": 2410,
+      "sha256_utf8": "9a32440ee6e9d9e4fb625fefe3f3492785936b9c18e33928e9cfedbaf28afa76"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "PickSize",
+      "kind": "definition",
+      "first_line": 2423,
+      "last_line": 2444,
+      "sha256_utf8": "31fd664245ac990ca2ff245afb8c7fae4898f2483e81cba20ab2b00f0cb86c72"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "GetStartPosition",
+      "kind": "definition",
+      "first_line": 2470,
+      "last_line": 2488,
+      "sha256_utf8": "c525d0c0f67f3a29b71271121c6b043cbf2a35829cf906628663312b9b7ff75a"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "SetAt",
+      "kind": "definition",
+      "first_line": 2490,
+      "last_line": 2520,
+      "sha256_utf8": "a87619a1e40751d8412bcbff36c1bd6325df030dc8e96ee43f9d0fff19fe96f8"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "CAtlMap",
+      "kind": "definition",
+      "first_line": 2534,
+      "last_line": 2558,
+      "sha256_utf8": "bd9eb2b94d2b628522a5a170e5c69cf08b9a55e2f2459bdde6c9d68fc367595f"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "SetOptimalLoad",
+      "kind": "definition",
+      "first_line": 2560,
+      "last_line": 2582,
+      "sha256_utf8": "79995933cc7723fecea250b2d05ab2871e13a516c2807d4fe46d84b50ce4d585"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "UpdateRehashThresholds",
+      "kind": "definition",
+      "first_line": 2584,
+      "last_line": 2593,
+      "sha256_utf8": "877c19d9de9ffb44cb8cbd4fd671cb76644368861421e13bb708482ce3ceef48"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "InitHashTable",
+      "kind": "definition",
+      "first_line": 2595,
+      "last_line": 2623,
+      "sha256_utf8": "e3ddc6ac2a44d1d7a2edc4a5dcb8de3e0b7e59b72bc7b4c610394e98f9123322"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "RemoveAll",
+      "kind": "definition",
+      "first_line": 2625,
+      "last_line": 2658,
+      "sha256_utf8": "cb9053ce01ff9b6e96dc017eac88459dabd70be58561a5f48338f83c190a70a8"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "~CAtlMap",
+      "kind": "definition",
+      "first_line": 2660,
+      "last_line": 2671,
+      "sha256_utf8": "9c834c2ea1f58d32cdd552095b52f6dd71c56491cf77b0e182960ca34aa10e4d"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "NewNode",
+      "kind": "definition",
+      "first_line": 2676,
+      "last_line": 2731,
+      "sha256_utf8": "198787e6a8d8729bac7276b0721c9be47f3edc87c0d8bb6d22328d9afff201fb"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "FreeNode",
+      "kind": "definition",
+      "first_line": 2735,
+      "last_line": 2756,
+      "sha256_utf8": "7b778609ccc172ab6d034cdac5435e05397de82d140688084912376af68026db"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "GetNode",
+      "kind": "definition",
+      "first_line": 2769,
+      "last_line": 2799,
+      "sha256_utf8": "b005b222aba89c51747e0d67670f2699ce18a8c0281a6ebe2935336b7e869ede"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "Lookup",
+      "kind": "definition",
+      "first_line": 2822,
+      "last_line": 2834,
+      "sha256_utf8": "d0bfd69a6851b406b917fc950a9f67d4762b4c79f36a7c2fb92b34856ae7a3a7"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "Lookup",
+      "kind": "definition",
+      "first_line": 2836,
+      "last_line": 2848,
+      "sha256_utf8": "04d9094b4d9541baa9ed7574176890e0f4154fae4981196aa65a1b329525b53f"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "RemoveKey",
+      "kind": "definition",
+      "first_line": 2850,
+      "last_line": 2868,
+      "sha256_utf8": "245fa87c45524e4dd664750645398007682305e72782a353521d36cd60aa8665"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "RemoveNode",
+      "kind": "definition",
+      "first_line": 2870,
+      "last_line": 2890,
+      "sha256_utf8": "45ff60f3035862627490c7c491419ccb0e6a9eb99646f4cbb55a215366283777"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "Rehash",
+      "kind": "definition",
+      "first_line": 2918,
+      "last_line": 2975,
+      "sha256_utf8": "365e39a808052f3dd3819d8de1ed5dbfe3cf9e6ab01ba3462dce9a0286e6e446"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "GetNextAssoc",
+      "kind": "definition",
+      "first_line": 2977,
+      "last_line": 2995,
+      "sha256_utf8": "12fc1fb0e4bffc64f6220beaaa064a7749b16fee5d7cb13666a30969d02480d0"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "GetNext",
+      "kind": "definition",
+      "first_line": 2997,
+      "last_line": 3013,
+      "sha256_utf8": "062e52ffe38b2458494f54d0fddc3159d6b4723c292177e3e6db10514418015c"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "GetNext",
+      "kind": "definition",
+      "first_line": 3015,
+      "last_line": 3028,
+      "sha256_utf8": "31c7d09dad3e038ea5f4f7276b9da624e667f3b29037e3429b8af0ed44b586f7"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "GetNextKey",
+      "kind": "definition",
+      "first_line": 3030,
+      "last_line": 3046,
+      "sha256_utf8": "665b145b05aba7ad821041ec119fd55e53d71ecc95f260dd6afa5809b70c8cba"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "FindNextNode",
+      "kind": "definition",
+      "first_line": 3084,
+      "last_line": 3118,
+      "sha256_utf8": "b0578c791683cb032a178f22be7937fb7a88df4eb7affef52851d09374f84c7b"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "argument/load declaration",
+      "kind": "declaration",
+      "first_line": 2101,
+      "last_line": 2101,
+      "sha256_utf8": "0e0d70ee7ebb06ee9c093844f6f2a89ba1db3debaeea7a1621b65f05b25e6950"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "argument/load declaration",
+      "kind": "declaration",
+      "first_line": 2103,
+      "last_line": 2103,
+      "sha256_utf8": "ba1b3595b41f1978bb8e5b95dee344bd77b6e57fa9b9507e3c29dafa94a564cf"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "argument/load declaration",
+      "kind": "declaration",
+      "first_line": 2214,
+      "last_line": 2214,
+      "sha256_utf8": "17d94700ba658867c7bbfa25bcba8bce8272a75a89f1497020f4562897a7e2a7"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "argument/load declaration",
+      "kind": "declaration",
+      "first_line": 2215,
+      "last_line": 2215,
+      "sha256_utf8": "9dd3a089f9db4a78dc4e5252570d9d439499d8b4db955c7f8775a2297e203eeb"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "argument/load declaration",
+      "kind": "declaration",
+      "first_line": 2216,
+      "last_line": 2216,
+      "sha256_utf8": "f6d4a6049ea733d988a6c74f2b8a972c24fc1d0bba66cbe15c3ec42de4d74cb4"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "argument/load declaration",
+      "kind": "declaration",
+      "first_line": 2217,
+      "last_line": 2217,
+      "sha256_utf8": "7f8f0a02f92f5bba15ab82a1f422f9a6e67392281e9fd83009951388ab0908e1"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "argument/load declaration",
+      "kind": "declaration",
+      "first_line": 2218,
+      "last_line": 2218,
+      "sha256_utf8": "65f8d0214d1c25959585328c305da15e164115b050b51b07d74709783025bfca"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "argument/load declaration",
+      "kind": "declaration",
+      "first_line": 2219,
+      "last_line": 2219,
+      "sha256_utf8": "d2d35ead5f51ab8bb9630243bf6a28a7410050e7454730371c8eeb263a8357ac"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "argument/load declaration",
+      "kind": "declaration",
+      "first_line": 109,
+      "last_line": 109,
+      "sha256_utf8": "6ff4e31608f3e7749ff2d1fd43561247fcda5b053ef3006bf0c1b36a8b896694"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "CPair field declaration",
+      "kind": "declaration",
+      "first_line": 2116,
+      "last_line": 2116,
+      "sha256_utf8": "2312f2987038dcf457e5ec75bda3e52d47263d0844ce4844cc7360f39a13d7c3"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "CPair field declaration",
+      "kind": "declaration",
+      "first_line": 2117,
+      "last_line": 2117,
+      "sha256_utf8": "afabe12331edddcad1f443bbfad29867358eb9f68f9370942373a56eef336cc1"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "CNode field declaration",
+      "kind": "declaration",
+      "first_line": 2140,
+      "last_line": 2140,
+      "sha256_utf8": "6b72a3c9a30cec3020cafa8a828b8000cd4f6f38b568490a5c6a0289b633f648"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "CNode field declaration",
+      "kind": "declaration",
+      "first_line": 2141,
+      "last_line": 2141,
+      "sha256_utf8": "09ab0ac9731aa155b7c03e6bbfe427ae5cc9252315c63d1aaab82594c7521dc5"
+    },
+    {
+      "header": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\ATLMFC\\include\\atlcoll.h",
+      "symbol": "s_anPrimes",
+      "kind": "definition",
+      "first_line": 2413,
+      "last_line": 2421,
+      "sha256_utf8": "b0781538fc3e2724cdb8992a7eb8d4b1103881953ba7f4998fe6f4c9a1f28871"
+    }
+  ]
+}

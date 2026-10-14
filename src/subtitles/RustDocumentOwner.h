@@ -2,8 +2,8 @@
 #pragma once
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 // Experimental native value boundary only. Canonical entries/segments live in
-// Rust, including the supplied default style. Named styles, metadata, string
-// preparation and CRT numeric/sort choices remain native.
+// Rust, including supplied default and named style values. Metadata, string
+// preparation and CRT numeric/sort/name-generation choices remain native.
 #include "STS.h"
 #include "xy_rust_document.h"
 #include <windows.h>
@@ -328,6 +328,52 @@ public:
     template<class Style = STSStyle> Style DefaultStyle() const { return DocumentDetail::StyleValue<Style>(Snapshot(2,0).Read()); }
     void CopyDefaultStyle(const DocumentOwner& source) {
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_copy_default_style_v1(id_,source.id_);}));
+    }
+    size_t NamedStyleCount() const {
+        std::array<uint8_t,4> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_named_style_count_v1(id_,out.data(),out.size());}));
+        return static_cast<size_t>(DocumentDetail::Load(out,0,4));
+    }
+    // 0 missing, 1 present-null, 2 supplied value. All materialization happens
+    // after the Rust call and uses an independent immutable snapshot.
+    template<class Style = STSStyle> uint32_t LookupNamedStyle(const CString& name, Style* output = nullptr) const {
+        const auto key = DocumentDetail::Units(name); std::array<uint8_t,16> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_named_style_lookup_v1(id_,key.data(),key.size(),output?1:0,out.data(),out.size());}));
+        const uint32_t state = static_cast<uint32_t>(DocumentDetail::Load(out,0,4));
+        const uint64_t snapshot = DocumentDetail::Load(out,8,8);
+        DocumentDetail::Shape(state <= 2 && DocumentDetail::Load(out,4,4) == 0 &&
+            ((snapshot != 0) == (output != nullptr && state == 2)));
+        if(snapshot) { DocumentReply reply(snapshot); *output = DocumentDetail::StyleValue<Style>(reply.Read()); }
+        return state;
+    }
+    template<class Style> void PutNamedStyle(const CString& name, const Style& value) {
+        const auto key = DocumentDetail::Units(name); const auto bytes = DocumentDetail::StyleBytes(value);
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_named_style_put_v1(id_,key.data(),key.size(),bytes.data(),bytes.size());}));
+    }
+    void PutNullNamedStyle(const CString& name) {
+        const auto key = DocumentDetail::Units(name);
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_named_style_put_v1(id_,key.data(),key.size(),nullptr,0);}));
+    }
+    void RemoveNamedStyle(const CString& name) {
+        const auto key = DocumentDetail::Units(name);
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_named_style_remove_v1(id_,key.data(),key.size());}));
+    }
+    void ClearNamedStyles() {
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_named_style_clear_v1(id_);}));
+    }
+    bool NamedStyleNameAt(size_t ordinal, CString& value) const {
+        const uint32_t index = DocumentDetail::Count(ordinal); std::array<uint8_t,8> out{};
+        const uint32_t status = DocumentDetail::Invoke([&]{return xy_vsfilter_document_snapshot_open_v1(id_,3,index,out.data(),out.size());});
+        if(status == XY_DOCUMENT_V1_OUT_OF_RANGE) return false; DocumentDetail::Check(status);
+        DocumentReply reply(DocumentDetail::Load(out,0,8)); const auto bytes = reply.Read();
+        DocumentDetail::Shape(bytes.size()%2 == 0); size_t offset = 0;
+        value = DocumentDetail::String(bytes,offset,DocumentDetail::Count(bytes.size()/2)); return true;
+    }
+    template<class Style> bool NamedStyleValueAt(size_t ordinal, Style& value) const {
+        const uint32_t index = DocumentDetail::Count(ordinal); std::array<uint8_t,8> out{};
+        const uint32_t status = DocumentDetail::Invoke([&]{return xy_vsfilter_document_snapshot_open_v1(id_,4,index,out.data(),out.size());});
+        if(status == XY_DOCUMENT_V1_OUT_OF_RANGE) return false; DocumentDetail::Check(status);
+        DocumentReply reply(DocumentDetail::Load(out,0,8)); value = DocumentDetail::StyleValue<Style>(reply.Read()); return true;
     }
     void CopyFrom(const DocumentOwner& source) {DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_copy_storage_v1(id_,source.id_);}));}
     void Clear() {DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_clear_storage_v1(id_);}));}

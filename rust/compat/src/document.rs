@@ -5,8 +5,8 @@
 //! Callers must perform native text/style preparation and its initial rejection
 //! checks before supplying records (the suffix begins at STSEntry construction);
 //! raw code units are retained, including unpaired surrogates and embedded NULs.
-//! Supplied initialized default-style values are also owned here. Native named
-//! styles, metadata, Add parsing, full Copy orchestration, CRT sort and encoding
+//! Supplied initialized default and named-style values are also owned here. Native
+//! map orchestration, metadata, Add parsing, full Copy orchestration, CRT sort and encoding
 //! conversion remain outside this API. Allocation failure/partial native
 //! mutation and callbacks are outside this API's comparison domain.
 use alloc::{vec, vec::Vec};
@@ -82,6 +82,7 @@ pub struct QueryResult {
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Document {
     default_style: Option<crate::document_style::StyleValue>,
+    named_styles: crate::document_style_map::StyleMap<Option<crate::document_style::StyleValue>>,
     entries: Vec<PreparedEntry>,
     segments: Vec<DocumentSegment>,
 }
@@ -98,6 +99,16 @@ impl Document {
         core::mem::replace(&mut self.default_style, value)
     }
 
+    pub fn named_styles(
+        &self,
+    ) -> &crate::document_style_map::StyleMap<Option<crate::document_style::StyleValue>> {
+        &self.named_styles
+    }
+    pub fn named_styles_mut(
+        &mut self,
+    ) -> &mut crate::document_style_map::StyleMap<Option<crate::document_style::StyleValue>> {
+        &mut self.named_styles
+    }
     pub fn entries(&self) -> &[PreparedEntry] {
         &self.entries
     }
@@ -308,6 +319,14 @@ impl Document {
     pub fn copy_storage_from(&mut self, source: &Document) {
         self.segments = source.segments.clone();
         self.entries = source.entries.clone();
+    }
+
+    /// Swap only prepared storage; all default, named and future metadata fields
+    /// remain at their respective owners. The caller retires the swapped-out
+    /// vectors after any registry admission ends.
+    pub fn swap_prepared_storage(&mut self, other: &mut Document) {
+        core::mem::swap(&mut self.segments, &mut other.segments);
+        core::mem::swap(&mut self.entries, &mut other.entries);
     }
 
     /// Accepts the native CRT's computed ordering as original storage indices.
@@ -807,5 +826,23 @@ mod tests {
         assert_eq!(destination.default_style(), Some(&second));
         assert_eq!(destination.replace_default_style(None), Some(second));
         assert_eq!(source.default_style(), Some(&first));
+    }
+    #[test]
+    fn named_style_clone_and_storage_operations_are_independent() {
+        let mut source = Document::default();
+        let mut destination = Document::default();
+        source
+            .named_styles_mut()
+            .insert(alloc::vec![65, 0, 0xd800], None);
+        destination.named_styles_mut().insert(alloc::vec![66], None);
+        let expected = destination.named_styles().clone();
+        assert_eq!(source.clone().named_styles(), source.named_styles());
+        destination.copy_storage_from(&source);
+        destination.remove_all_entries();
+        destination.clear_entries_and_segments();
+        assert_eq!(destination.named_styles(), &expected);
+        let retired = source.named_styles_mut().clear();
+        assert_eq!(retired, alloc::vec![None]);
+        assert_eq!(destination.named_styles(), &expected);
     }
 }

@@ -55,8 +55,10 @@ jobs:
         include:
           - platform: x64
             arch: x64
+            target: x86_64-pc-windows-msvc
           - platform: Win32
             arch: amd64_x86
+            target: i686-pc-windows-msvc
     steps:
       - uses: actions/checkout@v4
       - uses: ilammy/msvc-dev-cmd@v1
@@ -70,11 +72,29 @@ jobs:
         run: |
           & python tools\compat\document_atl_contract.py --platform ${{ matrix.platform }} --output "artifacts\document-atl-contract\${{ matrix.platform }}"
           if ($LASTEXITCODE -ne 0) { throw "ATL contract capture incomplete; inspect report.json" }
+      - name: Install pinned Rust for map comparison
+        run: |
+          rustup toolchain install 1.85.0 --profile minimal --target ${{ matrix.target }}
+          rustup default 1.85.0
+      - name: Compare safe Rust named-style map histories
+        shell: pwsh
+        run: |
+          & python tools\compat\document_style_map_check.py --native-contract "artifacts\document-atl-contract\${{ matrix.platform }}" --target ${{ matrix.target }} --output "artifacts\document-style-map\${{ matrix.platform }}"
+          if ($LASTEXITCODE -ne 0) { throw "Safe named-style map comparison failed; inspect report.json" }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: document-atl-contract-${{ matrix.platform }}
           path: artifacts/document-atl-contract/${{ matrix.platform }}/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: document-style-map-${{ matrix.platform }}
+          path: |
+            artifacts/document-style-map/${{ matrix.platform }}/report.json
+            artifacts/document-style-map/${{ matrix.platform }}/*.stdout
+            artifacts/document-style-map/${{ matrix.platform }}/*.stderr
+            artifacts/document-style-map/${{ matrix.platform }}/cargo-target/**/release/examples/document_style_map_trace.exe
   renderer:
     runs-on: windows-2022
     timeout-minutes: 60

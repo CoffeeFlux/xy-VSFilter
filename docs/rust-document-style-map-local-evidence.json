@@ -1,0 +1,69 @@
+{
+  "schema": "document-style-map-local-evidence-v1",
+  "scope": "Local aarch64 Rust execution compared with retained native Windows primitive captures; not Windows Rust or full named-style integration",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "candidate_base_commit": "8e2af103e23e4900ffa4df92eac692aea3b13d31",
+  "working_tree_source_hashes": true,
+  "captures": {
+    "Win32": {
+      "report_sha256": "dd53f81e44bdea1e5b7f16b65359d1df1cb8e2a60e1c7bf6932d893ce880304f",
+      "native_report_sha256": "6c855acfe5951ba991235e79b4bbb154faffb05017210f1dccae851d2a2775ec",
+      "native_capture_commit": "d8b7c0b3d2e9184510dd2bc6727333ea44d257be",
+      "candidate_base_commit": "8e2af103e23e4900ffa4df92eac692aea3b13d31",
+      "source_sha256": {
+        "tools/compat/document_style_map_check.py": "5362df8af7530725a077cce5c5c1cbae518ceaadd5d1ad0d39ba0b3c2e42e72e",
+        "tools/compat/document_atl_contract.py": "48d3a9f3ba939db27222119c0f03911fbffbb4d23d982b2d6477d29aed70d89f",
+        "rust/compat/src/document_style_map.rs": "a8c113e7ed5e0111507763b977eebf08f37ade03ae482076925239c0573508c7",
+        "rust/compat/src/lib.rs": "461b34df5e6699f853096d358deead0851f589e274ce8b2bb6efebca7a506ccd",
+        "rust/compat/examples/document_style_map_trace.rs": "12912ab81b9b376a68c47d9c61e5e6663aeb13350778f5f14e8e1b73024f8295",
+        "rust/compat/Cargo.toml": "9f325d80554a26bfb2f50237382694f8e121072e2ce52a34cebf3fa118cce6d1",
+        "Cargo.toml": "37d81b9748493b9bb9eb818d6e1dcf5991a7626b0981b0e3ac7f45d2e2ab6097",
+        "Cargo.lock": "fd9331e0dc6b0183bf14e2e8c13939684182d7ec437ac1fac54abbaac8da7335"
+      },
+      "state_count": 398,
+      "key_count": 10,
+      "repeat_equal": true,
+      "stderr_empty": true,
+      "equal": true,
+      "rust_target": "host-native",
+      "rustc_version": "rustc 1.85.0 (4d91de4e4 2025-02-17)\nbinary: rustc\ncommit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688\ncommit-date: 2025-02-17\nhost: aarch64-apple-darwin\nrelease: 1.85.0\nLLVM version: 19.1.7",
+      "trace_sha256": [
+        "c66112709b9dc203041b9ed842ae879f7d2f9ce8cc6f1243f88aac90edb58922",
+        "c66112709b9dc203041b9ed842ae879f7d2f9ce8cc6f1243f88aac90edb58922"
+      ]
+    },
+    "x64": {
+      "report_sha256": "dc60ad6d009ef22e610fbd280a2c7f0c49565772c7add62413c0e2bf9dfcf8ff",
+      "native_report_sha256": "bd4a2b7d1ac841bda42f3518b9c762ef246746d12133deff30e00166df04b55a",
+      "native_capture_commit": "d8b7c0b3d2e9184510dd2bc6727333ea44d257be",
+      "candidate_base_commit": "8e2af103e23e4900ffa4df92eac692aea3b13d31",
+      "source_sha256": {
+        "tools/compat/document_style_map_check.py": "5362df8af7530725a077cce5c5c1cbae518ceaadd5d1ad0d39ba0b3c2e42e72e",
+        "tools/compat/document_atl_contract.py": "48d3a9f3ba939db27222119c0f03911fbffbb4d23d982b2d6477d29aed70d89f",
+        "rust/compat/src/document_style_map.rs": "a8c113e7ed5e0111507763b977eebf08f37ade03ae482076925239c0573508c7",
+        "rust/compat/src/lib.rs": "461b34df5e6699f853096d358deead0851f589e274ce8b2bb6efebca7a506ccd",
+        "rust/compat/examples/document_style_map_trace.rs": "12912ab81b9b376a68c47d9c61e5e6663aeb13350778f5f14e8e1b73024f8295",
+        "rust/compat/Cargo.toml": "9f325d80554a26bfb2f50237382694f8e121072e2ce52a34cebf3fa118cce6d1",
+        "Cargo.toml": "37d81b9748493b9bb9eb818d6e1dcf5991a7626b0981b0e3ac7f45d2e2ab6097",
+        "Cargo.lock": "fd9331e0dc6b0183bf14e2e8c13939684182d7ec437ac1fac54abbaac8da7335"
+      },
+      "state_count": 398,
+      "key_count": 10,
+      "repeat_equal": true,
+      "stderr_empty": true,
+      "equal": true,
+      "rust_target": "host-native",
+      "rustc_version": "rustc 1.85.0 (4d91de4e4 2025-02-17)\nbinary: rustc\ncommit-hash: 4d91de4e48198da2e33413efdcd9cd2cc0c46688\ncommit-date: 2025-02-17\nhost: aarch64-apple-darwin\nrelease: 1.85.0\nLLVM version: 19.1.7",
+      "trace_sha256": [
+        "c66112709b9dc203041b9ed842ae879f7d2f9ce8cc6f1243f88aac90edb58922",
+        "c66112709b9dc203041b9ed842ae879f7d2f9ce8cc6f1243f88aac90edb58922"
+      ]
+    }
+  },
+  "limits": [
+    "398 states and ten keys are bounded primitive histories, not all map inputs or document lifecycle closure.",
+    "Native retained probe/source/binary/traces/definition artifacts verified; original installed SDK/compiler/library files not available for local rehash.",
+    "No native AddStyle/CopyStyles/export/style API or rendering executed by this comparison.",
+    "Current named-style/default/core/FFI/native orchestration requires changed-code Windows x86/x64 gates; production remains native."
+  ]
+}
