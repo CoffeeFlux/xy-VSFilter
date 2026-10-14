@@ -52,7 +52,7 @@ def extract_definition(source, signature):
 
 def capture_inputs():
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
-              ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h", ROOT / "include/xy_rust_writer.h",
+              ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h", ROOT / "include/xy_rust_writer.h", ROOT / "include/xy_rust_seek.h",
               ROOT / "include/xy_rust_drawing.h", ROOT / "include/xy_rust_layout.h", ROOT / "include/xy_rust_text_runs.h", ROOT / "include/xy_rust_wrap.h", ROOT / "include/xy_rust_line_layout.h", ROOT / "src/subtitles/RTS.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
               ROOT / "include/xy_rust_pipe_line.h", ROOT / "include/xy_rust_subrip_cue.h", ROOT / "include/xy_rust_sami_file.h", ROOT / "include/xy_rust_microdvd_style.h", ROOT / "include/xy_rust_font_records.h", ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
@@ -129,6 +129,21 @@ public:
         reader += "\n#undef CTextFile\n#undef XY_VSFILTER_RUST_TEXT\n"
     reader += "#undef __super\n#undef XY_LOG_ERROR\n"
     (destination / "original_text_reader.h").write_text(reader, encoding="utf-8")
+    seek = '#include "text_seek_shell.h"\n#define __super NativeSeekFile\n'
+    for name, content in (("ReferenceSeek", source), ("CandidateSeek", candidate_source)):
+        seek += f"namespace {name} {{\n"
+        seek += "class CTextFile : public NativeSeekFile { public: ULONGLONG GetPosition()const; ULONGLONG GetLength()const; ULONGLONG Seek(LONGLONG,UINT); };\n"
+        if name == "CandidateSeek":
+            seek += "#define XY_VSFILTER_RUST_TEXT\n"
+        for signature in ("ULONGLONG CTextFile::GetPosition(", "ULONGLONG CTextFile::GetLength(", "ULONGLONG CTextFile::Seek("):
+            definition = extract_definition(content.decode("utf-8-sig"), signature)
+            if name == "CandidateSeek" and "::Seek(" in signature:
+                assert definition.count("XyRust::SeekTarget") == 1
+                definition = definition.replace("XyRust::SeekTarget", "XyRust::ObservedSeekTarget")
+            seek += definition + "\n"
+        seek += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    seek += "#undef __super\n"
+    (destination / "original_text_seek.h").write_text(seek, encoding="utf-8")
     writer = '#include "text_writer_shell.h"\n'
     for name, content in (("ReferenceTextWriter", source), ("CandidateTextWriter", candidate_source)):
         writer += f"namespace {name} {{\n"
@@ -1080,6 +1095,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     layout_result = run([str(layout_executable)], capture_output=True, text=True)
     print(layout_result.stdout, end="", flush=True)
     print(layout_result.stderr, end="", file=sys.stderr)
+    seek_executable = destination / ("text-seek-oracle.exe" if os.name == "nt" else "text-seek-oracle")
+    seek_compile = [arg.replace("find_char_oracle.cpp", "text_seek_oracle.cpp").replace("find-char-oracle", "text-seek-oracle") for arg in find_char_compile]
+    run(seek_compile)
+    seek_result = run([str(seek_executable)], capture_output=True, text=True)
+    print(seek_result.stdout, end="", flush=True)
+    print(seek_result.stderr, end="", file=sys.stderr)
     writer_executable = destination / ("text-writer-oracle.exe" if os.name == "nt" else "text-writer-oracle")
     writer_compile = [arg.replace("find_char_oracle.cpp", "text_writer_oracle.cpp").replace("find-char-oracle", "text-writer-oracle") for arg in find_char_compile]
     run(writer_compile)
@@ -1469,6 +1490,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "layout_rects_compile_command": layout_compile,
         "layout_rects_result": layout_result.stdout, "layout_rects_stderr": layout_result.stderr,
         "layout_rects_scope": "Complete pinned CScreenLayoutAllocator methods and class record layout; actual ATL CRect/list/array on Windows, controlled models on portable hosts; exact returned rectangles and full ordered retained records after each operation; Rust collision passes and segment retention, native border geometry; errno/Windows LastError; representable arithmetic, finite collision sequences and successful allocation only",
+        "text_seek_compile_command": seek_compile,
+        "text_seek_result": seek_result.stdout, "text_seek_stderr": seek_result.stderr,
+        "text_seek_scope": "Complete pinned Seek/GetPosition/GetLength with controlled native file callbacks and buffer bookkeeping; exact unsigned wrap/signed clamp, returned target and state, interruptions/mutations, errno/Windows LastError; physical signed addition overflow excluded; full reader oracle separately exercises actual Rust buffer",
         "text_writer_compile_command": writer_compile,
         "text_writer_result": writer_result.stdout, "text_writer_stderr": writer_result.stderr,
         "text_writer_scope": "Complete pinned CTextFile::WriteString; native ATL strings/UTF-8 conversion on Windows, modeled UTF-8 and 16-bit Windows write layout on portable hosts; controlled native write boundaries, exact bytes/default-string arguments, errno/LastError and callback interruptions/source mutation; allocation failures and OS file persistence excluded",

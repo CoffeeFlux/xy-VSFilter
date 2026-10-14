@@ -29,6 +29,7 @@
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_text.h"
 #include "xy_rust_writer.h"
+#include "xy_rust_seek.h"
 #endif
 
 CTextFile::CTextFile(enc e)
@@ -163,15 +164,20 @@ ULONGLONG CTextFile::Seek(LONGLONG lOff, UINT nFrom)
 	ULONGLONG pos = GetPosition();
 	ULONGLONG len = GetLength();
 
-	switch(nFrom)
+#ifdef XY_VSFILTER_RUST_TEXT
+	if(!XyRust::SeekTarget(pos, len, lOff, nFrom, m_offset))
+#endif
 	{
-	default:
-	case begin: lOff = lOff; break;
-	case current: lOff = pos + lOff; break;
-	case end: lOff = len - lOff; break;
-	}
+		switch(nFrom)
+		{
+		default:
+		case begin: lOff = lOff; break;
+		case current: lOff = pos + lOff; break;
+		case end: lOff = len - lOff; break;
+		}
 
-	lOff = max((LONGLONG)min((ULONGLONG)lOff, len), 0ll) + m_offset;
+		lOff = max((LONGLONG)min((ULONGLONG)lOff, len), 0ll) + m_offset;
+	}
 
 	pos = __super::Seek(lOff, begin) - m_offset;
 #ifdef XY_VSFILTER_RUST_TEXT

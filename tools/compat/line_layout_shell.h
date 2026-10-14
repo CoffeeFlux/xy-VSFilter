@@ -10,6 +10,7 @@
 #include "xy_rust_line_layout.h"
 #ifdef _WIN32
 #include <atlbase.h>
+#include <atlcoll.h>
 #include <atltypes.h>
 #else
 typedef void* POSITION;
