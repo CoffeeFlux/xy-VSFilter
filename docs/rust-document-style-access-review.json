@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "review_commit": "89fcce4776571aba5670cbffbfe65a41224788c6",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "scope": "Read-only next-stage review; styles/default style/metadata remain native, no owner retired by this review.",
+  "source_sha256": {
+    "src/subtitles/STS.h": "b112b8aad3f6cef010730b04f0fa79b1cb71f60f7def6feac82ae75d8ea254c0",
+    "src/subtitles/STS.cpp": "6080640ba6a4b2e2cd5c91d0dfb2aa6870dba232843818e307a5b3e58051d981",
+    "src/subtitles/RTS.cpp": "39e1997599b7b8483412c727e0e32343bbd6b705c271a4425080a528cb49d9ff",
+    "src/subtitles/CCDecoder.cpp": "177ae6361bbcb04d5eeb3252d591223c18514937bd9f4a592c024bb040402f03",
+    "src/filters/transform/vsfilter/DirectVobSubFilter.cpp": "89376fd289819964693358224a4bbcf476abe6eda867cc9b40bc1b3b31930437",
+    "src/filters/transform/vsfilter/xy_sub_filter.cpp": "e5785ed292904af26117126214f299c6c30b33409cb132ba361ba49a61d08cb8",
+    "src/filters/transform/vsfilter/IDirectVobSubXy.h": "604b58cdab075a7ec222d7170162b9e415436e6963b1b389bd801b7cb6db0622"
+  },
+  "canonical_pointer_access": {
+    "GetStyle(int)": "Pointer getter currently consumed by immediate copy overload and GetCharSet; RTS uses the copy overload.",
+    "CreateDefaultStyle": "Returns default-style address; active CCDecoder caller discards it.",
+    "SubStyle.style": "Public ABI storage supplied by caller; filter getters copy STSStyle into it. No map pointer returned by those getters.",
+    "local_map_pointers": "Named renderer reset, both filter APIs and SaveAs use local pointers/pairs; absence of more repository callers is not an external-lifetime proof."
+  },
+  "required_behavior": [
+    "Expose ATL enumeration in historical insertion/removal/copy order.",
+    "Equal duplicate AddStyle deletes incoming value without changing map order; differing duplicate removes/reinserts under generated name and renames existing entries before inserting replacement.",
+    "Preserve CString first-NUL comparisons, raw logical lengths and full-unit assignments as distinct operations.",
+    "Use native STSStyle equality: fontName CString equality and floating ==, including NaN and signed-zero behavior.",
+    "Both filter setters check count and validate every name before any updates, then consume inputs sequentially including duplicate names/null style slots; notify after updates.",
+    "Both filter getters validate each logical name length and preserve partial preceding output, wcscpy_s NUL termination, and sequential writes to possibly shared caller output storage.",
+    "Metadata assignments stay at existing points; GetStreamInfo returns LCID zero despite stored m_lcid."
+  ],
+  "proposed_next_slice": {
+    "files": [
+      "src/subtitles/STS.h",
+      "src/subtitles/STS.cpp",
+      "src/subtitles/RTS.cpp",
+      "src/subtitles/CCDecoder.cpp",
+      "src/filters/transform/vsfilter/DirectVobSubFilter.cpp",
+      "src/filters/transform/vsfilter/xy_sub_filter.cpp"
+    ],
+    "operations": [
+      "GetStyleCount",
+      "ordered owned style snapshots",
+      "HasNamedStyle",
+      "TryGetNamedStyleCopy",
+      "GetEntryStyleCopy",
+      "SetExistingStyleValue",
+      "ResetDefaultStyle"
+    ],
+    "order": [
+      "Introduce native-backed value accessors and capture actual style API output/partial-update behavior.",
+      "Route renderer, both filter APIs and CCDecoder while retaining native canonical ownership.",
+      "Route STS internal style access/copy/export operations, then remove canonical pointer getters only from migrated configuration.",
+      "Model map ordering/key semantics and move style/default-style values into safe owner after differential evidence."
+    ],
+    "retained_adapter": "Incoming AddStyle STSStyle* ownership must be consumed/disposed at matching points; no new canonical Rust loans."
+  },
+  "gates": [
+    "Value snapshot allocation changes need explicit failure-scope review.",
+    "Actual Windows x86/x64 full class and filter style API comparisons.",
+    "Default-style and document metadata ownership remain separate work.",
+    "Host stream selection/retention audit remains required."
+  ]
+}

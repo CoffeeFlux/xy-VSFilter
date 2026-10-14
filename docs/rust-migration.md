@@ -649,8 +649,20 @@ styles, entries and segments are serialized; two executions per side must match
 exactly. The runner preserves failed/partial observations, hashes libraries,
 headers and executables, and refuses existing output directories. Local evidence
 validation tests pass; actual Windows linking and lifecycle results are pending.
+The first Windows attempt at `89fcce47` built both DLLs and passed the smoke
+comparison, then failed compiling the reference probe because its C++17 flag
+removed `auto_ptr`/`unary_function` required by bundled headers. The probe now
+uses C++14, matching the native build; this compiler failure is not a lifecycle
+comparison result.
 Allocator failure, dialog reentry, concurrent close and real-host validation
 remain outside this bounded sequence.
+
+The next style-ownership slice is recorded in
+[rust-document-style-access-review.json](rust-document-style-access-review.json).
+It identifies native-backed value operations for renderer, both filter style
+APIs and CCDecoder before moving styles. Map enumeration history, first-NUL
+comparison versus logical name length, validation-before-update and partial
+output order must survive. This review retires no style or metadata owner.
 
 ## Independent audit and unsafe boundary
 
