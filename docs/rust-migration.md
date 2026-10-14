@@ -20,6 +20,25 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Gaussian floating-point coefficient tables now use a Rust byte owner with a
+  reserved 16-byte physical prefix, preserving native alignment and cursor
+  formation while counting only logical table bytes. Native floating-point
+  calculations, allocation order, same-key early returns and deep copies remain
+  intact. Complete pinned constructors, private reinitialization, copies and
+  destructors match in strict-FP ordinary and fatal ASan/UBSan local builds on
+  arm64 and x64: **2,646 histories / 1,532,154 fields / 1,325,824 initialized
+  bytes / 1,940 independent deep copies / 882 actual vendored Boost flyweight
+  cache histories / 676 modeled init failures / 240 retained-table negative-width
+  states / 2,627 Rust owners, loans and releases / 3,933 modeled Rust declines**.
+  **706 positive-count null-source copies are excluded before execution**, not
+  passes. Copy allocation failure, nonfinite/overflowing widths and actual OOM
+  remain excluded. Prefix storage is never read or initialized. Flyweight
+  sharing, handle assignment and final release are exercised; whole Windows
+  renderer integration remains pending. Existing bitmap alignment semantics
+  are unchanged and its sanitizer comparisons still pass. Rust remains
+  **146 core / 101 FFI tests**, with prefix loans extended through 16/32 bytes;
+  formatting, Clippy, Python checks and default native syntax pass locally.
+
 * The initial x64 COM probe matched eight scoped cases; the two autoloader
   apartment cases have an unresolved reference pin-ID outcome, recorded in
   `autoloader-pin-id-scope.json`. These are not parity passes and are no longer
