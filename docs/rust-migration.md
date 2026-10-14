@@ -20,6 +20,28 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Output `XyBitmap` buffers now use Rust ownership while preserving the native
+  address modulo 16, public frame-accessor pointers and logical cache accounting.
+  The owner reserves alignment slack without exposing or initializing it; zero
+  sizes retain native allocation identity. The pinned constructor, create, clear,
+  destructor, `GetBitmap` and `GetBitmapExtra` match locally under ordinary and
+  fatal ASan/UBSan builds on arm64 and x64: **3,833 bitmap histories / 13,458,870
+  state, initialization, accessor and allocation fields / 3,942,912 initialized
+  bytes / 583,168 unwritten cells tracked without reads / 434,226 accessor calls /
+  24 modeled null object allocations / 1,360 zero-byte native allocations /
+  1,224 Rust owners, loans and releases / 1,224 modeled Rust declines**.
+  Checks cover all alignment residues, negative positions, packed and planar
+  layouts, plane offsets, partial padding writes surviving clears, optional
+  outputs, invalid indices, shared-frame ownership and final-alias release.
+  Allocation and clear primitives are controlled; native pixel-allocation
+  failure, invalid/overflowing geometry and actual COM host lifetimes remain
+  excluded. Uninitialized `bpp` and padding are never read. Rust tests exercise
+  all 16 shifted output loans with untouched alignment slack: **146 core /
+  101 FFI tests**, formatting, Clippy and Python checks pass. Native default
+  syntax passes on both local architectures. Windows renderer, platform and
+  Miri checks for this increment are pending; the text corpus alone does not
+  establish planar consumer-host integration.
+
 * Fractional `xy_be_blur` now owns its transpose scratch through Rust while
   preserving horizontal filtering, transpose, vertical filtering, transpose-back
   and release order. Ordinary and fatal ASan/UBSan comparisons pass locally on

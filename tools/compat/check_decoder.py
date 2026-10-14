@@ -64,6 +64,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_hdmv.h",
               ROOT / "include/xy_rust_dvb.h", ROOT / "include/xy_rust_golomb.h", ROOT / "include/xy_rust_fill.h",
               ROOT / "src/subtitles/Rasterizer.cpp", ROOT / "include/xy_rust_mask.h", ROOT / "include/xy_rust_bilinear.h", ROOT / "include/xy_rust_be_blur.h", ROOT / "include/xy_rust_gauss_integer.h", ROOT / "include/xy_rust_be_filter.h", ROOT / "include/xy_rust_transpose.h", ROOT / "include/xy_rust_byte_float.h",
+              ROOT / "src/subtitles/xy_bitmap.cpp", ROOT / "src/subtitles/xy_bitmap.h", ROOT / "src/filters/transform/vsfilter/XySubRenderIntf.h", ROOT / "include/xy_rust_shifted_plane.h",
               ROOT / "src/subtitles/xy_filter.cpp", ROOT / "src/subtitles/VobSubImage.cpp", ROOT / "src/subtitles/VobSubImage.h", ROOT / "include/xy_rust_vobsub.h",
               ROOT / "src/dsutil/GolombBuffer.cpp", ROOT / "src/dsutil/GolombBuffer.h",
               ROOT / "src/subtitles/DVBSub.cpp", ROOT / "src/subtitles/DVBSub.h", ROOT / "src/subtitles/HdmvSub.cpp", ROOT / "src/subtitles/HdmvSub.h", ROOT / "src/subtitles/CompositionObject.cpp", ROOT / "src/subtitles/CompositionObject.h", ROOT / "include/xy_rust_byte_storage.h",
@@ -929,6 +930,24 @@ public:
         definition = definition.replace("XyRust::PlaneAllocation", "XyRust::ObservedGaussPlaneAllocation")
         gauss_planes_code += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_gauss_planes.h").write_text(gauss_planes_code, encoding="utf-8")
+    bitmap_source = original("src/subtitles/xy_bitmap.cpp", reference["commit"])
+    bitmap_header = original("src/subtitles/xy_bitmap.h", reference["commit"])
+    bitmap_interface = original("src/filters/transform/vsfilter/XySubRenderIntf.h", reference["commit"]).decode("utf-8-sig")
+    bitmap_code = '#include "bitmap_storage_shell.h"\n'
+    bitmap_code += extract_definition(bitmap_interface, "enum XyColorSpace") + ";\n"
+    bitmap_code += extract_definition(bitmap_interface, "struct XyPlannerFormatExtra") + ";\n"
+    for name, content, declaration in (("ReferenceBitmap", bitmap_source, bitmap_header), ("CandidateBitmap", (ROOT / "src/subtitles/xy_bitmap.cpp").read_bytes(), (ROOT / "src/subtitles/xy_bitmap.h").read_bytes())):
+        bitmap_text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        bitmap_declaration = declaration.decode("utf-8-sig").replace("\r\n", "\n")
+        bitmap_code += f"namespace {name} {{\n"
+        if name == "CandidateBitmap":
+            bitmap_code += "#define XY_VSFILTER_RUST_TEXT\n"
+        bitmap_code += extract_definition(bitmap_declaration, "class XyBitmap").replace("private:", "public:").replace("XyRust::ShiftedPlaneStorage", "XyRust::ObservedShiftedPlaneStorage") + ";\nBITMAP_FRAME_CLASS\n"
+        for signature in ("XyBitmap::~XyBitmap()", "XyBitmap * XyBitmap::CreateBitmap(", "void XyBitmap::ClearBitmap(", "STDMETHODIMP XySubRenderFrame::GetBitmap(", "STDMETHODIMP XySubRenderFrame::GetBitmapExtra("):
+            bitmap_method = extract_definition(bitmap_text, signature).replace("DEBUG_NEW XyBitmap()", "bitmapNew<XyBitmap>()").replace("memsetd(", "bitmapSetWords(").replace("memset(", "bitmapSet(")
+            bitmap_code += bitmap_method + "\n"
+        bitmap_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_bitmap_storage.h").write_text(bitmap_code, encoding="utf-8")
     filter_source = original("src/subtitles/xy_filter.cpp", reference["commit"])
     gauss_storage_code = '#include "gauss_storage_shell.h"\n'
     for name, content in (("ReferenceGaussStorage", filter_source), ("CandidateGaussStorage", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
@@ -1574,6 +1593,12 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
     dvb_storage_result = run([str(dvb_storage_executable)], capture_output=True, text=True)
     print(dvb_storage_result.stdout, end="", flush=True)
     print(dvb_storage_result.stderr, end="", file=sys.stderr)
+    bitmap_storage_executable = destination / ("bitmap-storage-oracle.exe" if os.name == "nt" else "bitmap-storage-oracle")
+    bitmap_storage_compile = [arg.replace("find_char_oracle.cpp", "bitmap_storage_oracle.cpp").replace("find-char-oracle", "bitmap-storage-oracle") for arg in find_char_compile]
+    run(bitmap_storage_compile)
+    bitmap_storage_result = run([str(bitmap_storage_executable)], capture_output=True, text=True)
+    print(bitmap_storage_result.stdout, end="", flush=True)
+    print(bitmap_storage_result.stderr, end="", file=sys.stderr)
     fraction_storage_executable = destination / ("fraction-storage-oracle.exe" if os.name == "nt" else "fraction-storage-oracle")
     fraction_storage_compile = [arg.replace("find_char_oracle.cpp", "fraction_storage_oracle.cpp").replace("find-char-oracle", "fraction-storage-oracle") for arg in find_char_compile]
     if os.name == "nt":
@@ -2030,6 +2055,9 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
         "gauss_planes_compile_command": gauss_planes_compile,
         "gauss_planes_result": gauss_planes_result.stdout, "gauss_planes_stderr": gauss_planes_result.stderr,
         "gauss_planes_scope": "Whole pinned GaussianBlur with controlled coefficient factories and Gaussian kernel. Exact metadata, initialized-byte masks and values, untouched padding, native memset/memcpy footprints, source aliases and ignored extra input border, retained shared lifetimes and cache accounting. Every modeled copy checks extents and source initialization; unwritten bytes are never read. Second-plane failure modeled; first-plane failure, source/output object aliasing, inconsistent geometry and actual OOM excluded.",
+        "bitmap_storage_compile_command": bitmap_storage_compile,
+        "bitmap_storage_result": bitmap_storage_result.stdout, "bitmap_storage_stderr": bitmap_storage_result.stderr,
+        "bitmap_storage_scope": "Whole pinned bitmap constructor/CreateBitmap/ClearBitmap/destructor and GetBitmap/GetBitmapExtra accessors. Allocation and byte/word clears controlled, exact pointer alignment residue, plane offsets, initialized masks and bytes, retained packed padding, logical cache accounting, zero-sized native fallback, optional accessor outputs and shared lifetimes observed. Uninitialized bpp and padding never read. Native object-null allocation modeled; native pixel-allocation failure, invalid/overflowing geometry and actual COM host lifetimes excluded.",
         "fraction_storage_compile_command": fraction_storage_compile,
         "fraction_storage_result": fraction_storage_result.stdout, "fraction_storage_stderr": fraction_storage_result.stderr,
         "fraction_storage_scope": "Whole pinned xy_be_blur and xy_calculate_filter with observed filter/transpose calls and scratch ownership under strict FP compilation. x86/x64 execute extracted native SSE kernels against Rust kernels; arm64 substitutes extracted scalar callbacks and does not establish SSE parity. Exact stage bytes/order, output/padding, initialized scratch, cache accounting, signed and fractional pass counts, reuse and native allocation fallback. Positive dimensions at least four avoid an unused native before-base cursor; zero/smaller/negative dimensions, overflowing/nonfinite pass counts, invalid backing and actual allocation failure excluded.",

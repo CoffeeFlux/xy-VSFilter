@@ -4,6 +4,9 @@
 #include <atltypes.h>
 #include <memory>
 #include "XySubRenderIntf.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "xy_rust_shifted_plane.h"
+#endif
 
 class XyBitmap
 {
@@ -36,6 +39,9 @@ public:
     static void BltPack( SubPicDesc& spd, POINT pos, SIZE size, LPCVOID pixels, int pitch );
 private:
     static void ClearBitmap(XyBitmap *bitmap);
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::ShiftedPlaneStorage m_storage;
+#endif
 };
 
 class XySubRenderFrame: public CUnknown, public IXySubRenderFrame

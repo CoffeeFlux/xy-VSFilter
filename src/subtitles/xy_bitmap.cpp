@@ -29,6 +29,10 @@ static inline void FlipAlphaValueSSE(BYTE *data, int w)
 
 XyBitmap::~XyBitmap()
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (m_storage.Ready()) m_storage.Reset();
+    else
+#endif
     xy_free(bits);
 }
 
@@ -51,11 +55,21 @@ XyBitmap * XyBitmap::CreateBitmap( const CRect& target_rect, MemLayout layout )
     {
     case PACK:
         result->pitch = w16*4;
+#ifdef XY_VSFILTER_RUST_TEXT
+        result->bits = result->m_storage.Allocate(4*w16*result->h, (result->x*4)&15)
+            ? result->m_storage.Data() : xy_malloc(4*w16*result->h, (result->x*4)&15);
+#else
         result->bits = xy_malloc(4*w16*result->h, (result->x*4)&15);
+#endif
         result->plans[0] = reinterpret_cast<BYTE*>(result->bits);
         break;
     case PLANNA:
+#ifdef XY_VSFILTER_RUST_TEXT
+        result->bits = result->m_storage.Allocate(4*w16*result->h, result->x&15)
+            ? result->m_storage.Data() : xy_malloc(4*w16*result->h, result->x&15);
+#else
         result->bits = xy_malloc(4*w16*result->h, result->x&15);
+#endif
         result->pitch = w16;
         result->plans[0] = reinterpret_cast<BYTE*>(result->bits);
         result->plans[1] = result->plans[0] + result->pitch * result->h;
