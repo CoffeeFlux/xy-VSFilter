@@ -350,6 +350,14 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         vobsub += extract_definition(content.decode("utf-8-sig"), "void CVobSubImage::GetPacketInfo(") + "\n"
         vobsub += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_vobsub_packet.h").write_text(vobsub, encoding="utf-8")
+    vobsub_pixels = '#include "vobsub_pixels_shell.h"\n'
+    for name, content in (("ReferenceVobPixels", vobsub_source), ("CandidateVobPixels", (ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
+        vobsub_pixels += f"VOBSUB_PIXELS_SHELL({name})\n#define CVobSubImage {name}\n"
+        if name == "CandidateVobPixels":
+            vobsub_pixels += "#define XY_VSFILTER_RUST_TEXT\n"
+        vobsub_pixels += extract_definition(content.decode("utf-8-sig"), "void CVobSubImage::DrawPixels(") + "\n"
+        vobsub_pixels += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_vobsub_pixels.h").write_text(vobsub_pixels, encoding="utf-8")
     byte_float = '#include "byte_float_shell.h"\n'
     for name, content in (("ReferenceByteFloat", filter_source), ("CandidateByteFloat", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
         byte_float += f"namespace {name} {{\n"
@@ -657,6 +665,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     vobsub_result = run([str(vobsub_executable)], capture_output=True, text=True)
     print(vobsub_result.stdout, end="", flush=True)
     print(vobsub_result.stderr, end="", file=sys.stderr)
+    vobsub_pixels_executable = destination / ("vobsub-pixels-oracle.exe" if os.name == "nt" else "vobsub-pixels-oracle")
+    vobsub_pixels_compile = [arg.replace("fill_oracle.cpp", "vobsub_pixels_oracle.cpp").replace("fill-oracle", "vobsub-pixels-oracle") for arg in fill_compile]
+    run(vobsub_pixels_compile)
+    vobsub_pixels_result = run([str(vobsub_pixels_executable)], capture_output=True, text=True)
+    print(vobsub_pixels_result.stdout, end="", flush=True)
+    print(vobsub_pixels_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -690,6 +704,8 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "vobsub_source_sha256": hashlib.sha256(vobsub_source).hexdigest(),
         "vobsub_packet_compile_command": vobsub_compile,
         "vobsub_packet_result": vobsub_result.stdout, "vobsub_packet_stderr": vobsub_result.stderr,
+        "vobsub_pixels_compile_command": vobsub_pixels_compile,
+        "vobsub_pixels_result": vobsub_pixels_result.stdout, "vobsub_pixels_stderr": vobsub_pixels_result.stderr,
         "weighted_filter_compile_command": weighted_compile,
         "weighted_filter_result": weighted_result.stdout, "weighted_filter_stderr": weighted_result.stderr,
         "gauss_integer_compile_command": integer_gauss_compile,

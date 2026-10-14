@@ -20,6 +20,20 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust DVD pixel-run clipping and filling preserve the original left-edge
+  length retention, including runs ending exactly at the left edge, right-edge
+  truncation, initial rejection order and pixel indexing. Palette reads remain
+  native and finish before the exclusive output loan; each run uses one color
+  snapshot, while later calls observe earlier writes to overlapping palettes.
+  Output is write-only and may be uninitialized. Unsupported arithmetic/layouts
+  retain native handling before any write.
+  Fatal ASan/UBSan comparisons passed **913,647 cases / 1,871,149,056 bytes** on
+  arm64 and under x64 execution. Both per-call checkpoints include the complete
+  initialized fixture, with **473,623 visibly changed cases**, **607,744 palette
+  alias cases**, **1,827,275 Rust-handled clipping calls**, **24 fallback calls**
+  and **948,488 Rust-filled spans**. Rust tests (51 core, 29 FFI), strict Clippy
+  and both default native branch syntax checks pass. Windows/Miri validation is
+  pending for this increment. DVD RLE, trimming and buffer ownership remain native.
 * Safe Rust DVD/VobSub control-packet parsing returns patches for only the fields
   assigned by the original. It preserves inclusive rectangle coordinates,
   palette/transparency nibble order, 16-bit command-counter wrapping, forced
@@ -35,9 +49,14 @@ unresolved reference outcomes requiring investigation, never matching results.
   **854,918 Rust-handled calls** and **56,690 fallback calls**. All palette and
   transparency words are covered, alongside timing, rectangle/offset, control
   target, counter-wrap and retained-state cases. Rust tests (49 core, 28 FFI),
-  strict Clippy and both default native branch syntax checks pass. Windows/Miri
-  validation is pending for this increment. DVD RLE, buffer ownership and real
-  bitmap-subtitle host playback remain separate work.
+  strict Clippy and both default native branch syntax checks pass. Candidate
+  `5007763e` passed all four CI platforms, Miri and both Windows DLL jobs. Each
+  DLL job matched **354 cases / 4,334 frames** and **32 mutations / 224 frames**,
+  plus dialogs, visible controls, exports and dependencies. Both logs confirm
+  Rust-enabled `VobSubImage.cpp` compilation.
+  [VobSub packet evidence](vobsub-packet-evidence.json) records verified source/DLL
+  hashes and scope. DVD RLE, buffer ownership and real bitmap-subtitle host
+  playback remain separate work; the CSRI text corpus does not validate DVD playback.
 * Safe Rust table-driven integer Gaussian accumulation owns initialized input,
   scratch and output storage. It preserves the original cumulative edges,
   asymmetric table traversal, skipped radius-zero first row/column, conditional

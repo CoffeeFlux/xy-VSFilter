@@ -315,6 +315,25 @@ BYTE CVobSubImage::GetNibble(const BYTE* lpData)
 
 void CVobSubImage::DrawPixels(CPoint p, int length, size_t colorId)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    const uint64_t span = xy_vsfilter_vobsub_clip(rect.left, rect.top, rect.right, rect.bottom, p.x, p.y, length);
+    if (span != static_cast<uint64_t>(-1)) {
+        const uint32_t count = static_cast<uint32_t>(span >> 32);
+        if (!count) return;
+        RGBQUAD c;
+        if (!fCustomPal) {
+            c = orgpal[pal[colorId].pal];
+            c.rgbReserved = (pal[colorId].tr << 4) | pal[colorId].tr;
+        } else {
+            c = cuspal[colorId];
+        }
+        const uint32_t color = static_cast<uint32_t>(c.rgbBlue)
+            | (static_cast<uint32_t>(c.rgbGreen) << 8)
+            | (static_cast<uint32_t>(c.rgbRed) << 16)
+            | (static_cast<uint32_t>(c.rgbReserved) << 24);
+        if (xy_vsfilter_vobsub_fill(reinterpret_cast<uint8_t*>(lpPixels + static_cast<uint32_t>(span)), count, color)) return;
+    }
+#endif
     if (length <= 0
             || p.x + length < rect.left
             || p.x >= rect.right
