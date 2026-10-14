@@ -121,6 +121,14 @@
     [
       "ass-header-scaled-substring-memory",
       "ass-header-scaled-control-memory"
+    ],
+    [
+      "microdvd-style-italic-file",
+      "microdvd-style-control-file"
+    ],
+    [
+      "microdvd-style-italic-memory",
+      "microdvd-style-control-memory"
     ]
   ],
   "cases": [
@@ -10596,6 +10604,222 @@
         "4.0000001",
         "2.50",
         "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "microdvd-style-control-file",
+      "script": "test/compat/generated/microdvd-style-control.sub",
+      "sha256": "39255a45a11e358b15ab40822f22c303892981c6b8dcc1b0327e24a77c0c5ad9",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "microdvd-style-control-memory",
+      "script": "test/compat/generated/microdvd-style-control.sub",
+      "sha256": "39255a45a11e358b15ab40822f22c303892981c6b8dcc1b0327e24a77c0c5ad9",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "microdvd-style-italic-file",
+      "script": "test/compat/generated/microdvd-style-italic.sub",
+      "sha256": "45b1e30006703f037026cefc3d731c7863ed3af08567fddf3438d1029ed1c892",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "microdvd-style-italic-memory",
+      "script": "test/compat/generated/microdvd-style-italic.sub",
+      "sha256": "45b1e30006703f037026cefc3d731c7863ed3af08567fddf3438d1029ed1c892",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "microdvd-style-color-file",
+      "script": "test/compat/generated/microdvd-style-color.sub",
+      "sha256": "4236a9934917cf74f04d24ac2c595484fd253bfaba7315f2a5645d022fa48ed2",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "microdvd-style-color-memory",
+      "script": "test/compat/generated/microdvd-style-color.sub",
+      "sha256": "4236a9934917cf74f04d24ac2c595484fd253bfaba7315f2a5645d022fa48ed2",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "microdvd-style-repeated-flags-file",
+      "script": "test/compat/generated/microdvd-style-repeated-flags.sub",
+      "sha256": "5c38f208946346a2f1fc55b697afae8465d96f40aff6b4362a4725585a0e936b",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "microdvd-style-repeated-flags-memory",
+      "script": "test/compat/generated/microdvd-style-repeated-flags.sub",
+      "sha256": "5c38f208946346a2f1fc55b697afae8465d96f40aff6b4362a4725585a0e936b",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "microdvd-style-unclosed-font-file",
+      "script": "test/compat/generated/microdvd-style-unclosed-font.sub",
+      "sha256": "cd4c4c0a1587d1cfd041e4852b2bdd1785c5a7f87a7985288577ddc99cd24532",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "microdvd-style-unclosed-font-memory",
+      "script": "test/compat/generated/microdvd-style-unclosed-font.sub",
+      "sha256": "cd4c4c0a1587d1cfd041e4852b2bdd1785c5a7f87a7985288577ddc99cd24532",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "microdvd-style-nested-ignored-file",
+      "script": "test/compat/generated/microdvd-style-nested-ignored.sub",
+      "sha256": "b06e9a8eab9388486a6209c7f47b028de66b71a1c20d3a92ce2352e611d4b151",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "microdvd-style-nested-ignored-memory",
+      "script": "test/compat/generated/microdvd-style-nested-ignored.sub",
+      "sha256": "b06e9a8eab9388486a6209c7f47b028de66b71a1c20d3a92ce2352e611d4b151",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
       ],
       "stride_padding": 16,
       "fill_seed": 31

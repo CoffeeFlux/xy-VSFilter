@@ -162,6 +162,13 @@ public:
         text.erase(static_cast<size_t>(start),static_cast<size_t>(count));return GetLength();
 #endif
     }
+    void SetAt(int index,wchar_t unit){
+#ifdef _WIN32
+        text.SetAt(index,unit);
+#else
+        text.at(static_cast<size_t>(index))=unit;
+#endif
+    }
     wchar_t* GetBuffer(){
 #ifdef _WIN32
         return text.GetBuffer();

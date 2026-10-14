@@ -361,6 +361,19 @@ def encoding_variants():
         yield "encoding-" + name + ".ass", script.replace(b"COMPAT_TEXT", payload)
 
 
+def microdvd_style_variants():
+    for name, tags in (
+        ("control", "{f:Arial}{s:24}{p:1}"),
+        ("italic", "{f:Arial}{s:24}{p:1}{y:i}"),
+        ("color", "{f:Arial}{s:24}{c:$00ff00}"),
+        ("repeated-flags", "{f:Arial}{s:24}{Y:BIUS}{y:}"),
+        ("unclosed-font", "{s:24}{f:Arial"),
+        ("nested-ignored", "{unknown{y:i}}{f:Arial}{s:24}"),
+    ):
+        data = "{Named}" + tags + "\r\n{0}{100}Style sample\r\n"
+        yield "microdvd-style-" + name + ".sub", data.encode("ascii")
+
+
 def microdvd_variants():
     for name, payload in {
         "control": "Formatting sample|second line",
@@ -466,7 +479,8 @@ def make_cases(files):
                                                     ("sami-format-font-black", "sami-format-font-zero"),
                                                     ("encoding-western", "encoding-western-control"),
                                                     ("ass-style-v5-box", "ass-style-v5-outline"),
-                                                    ("ass-header-scaled-substring", "ass-header-scaled-control"))
+                                                    ("ass-header-scaled-substring", "ass-header-scaled-control"),
+                                                    ("microdvd-style-italic", "microdvd-style-control"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -483,6 +497,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in ass_style_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_dialogue_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in encoding_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in microdvd_style_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in microdvd_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in mpl2_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in sami_variants()]

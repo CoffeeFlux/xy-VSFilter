@@ -20,6 +20,25 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns `GetMicroDVDStyle` source and tag traversal. Searches stop at
+  NUL, the first closing brace wins, an unclosed tag retains its counted tail,
+  and nested tag starts are not revisited. Native one-unit lowercase, prefix
+  comparisons, numeric scans, defaults and style-field assignments remain intact.
+  Persistent flags, the unused caller charset and unnormalized numeric values
+  retain their reference behavior.
+  Fatal ASan/UBSan comparisons passed **158,703 complete style conversions** on
+  arm64 and under x64 execution: **152,337 changed styles**, **13,940,817 callback
+  observation values**, **3,635 errno changes**, and **525,415 Rust traversal
+  steps**. All stored fields and float bits match, including every UTF-16 value,
+  NULs, nested/unclosed tags, repeated flags and native callback ordering. Nonzero
+  floating status appeared in 2 arm64 / 3,637 x64 cases including seeded flags.
+  Position fixtures require successful scans; overflowing scanf conversions and
+  allocation failures are excluded.
+  Six named-style MicroDVD scripts and an italic visible control expand renderer
+  validation to **506 cases**. Rust 1.85 tests (100 core, 66 FFI), strict Clippy,
+  default syntax and Python harness checks pass. Windows/Miri and full renderer
+  validation are pending. Native numeric/case behavior, the file loader/style
+  map and real-host integration remain separate work.
 * Safe Rust owns embedded-font record buffering and `LoadUUEFont` line decisions.
   Exact section prefixes still terminate after consuming their header; lowercase
   variants and `[V4++ Styles]` are still treated as record data. `fontname:` flushes
@@ -81,8 +100,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   MakeLower/scanf/Add callbacks. Overflowing scanf conversions are excluded.
   Eight style scripts and an opaque-box/outline visible control expand renderer
   validation to **478 cases**. Rust 1.85 tests (94 core, 63 FFI), strict Clippy,
-  default syntax and Python harness checks pass. Windows/Miri and full renderer
-  validation are pending. Native numeric/floating behavior, full file/style-map
+  default syntax and Python harness checks pass. Candidate `6fe4f321` passed all
+  four portable platforms, Miri and both Windows DLL jobs, each matching **478
+  cases / 5,210 frames** and **32 mutations / 224 frames**, plus dialogs, visible
+  controls, exports and dependencies. Both logs confirm Rust-enabled `STS.cpp`
+  compilation. [Style evidence](ass-style-evidence.json) records verified hashes
+  and stable local validation. Native numeric/floating behavior, full file/style-map
   integration and real hosts remain separate work.
 * Safe Rust owns ASS dialogue input, delimiter consumption, version-dependent
   field order, parsed integer storage and raw style/actor/effect/text fields.

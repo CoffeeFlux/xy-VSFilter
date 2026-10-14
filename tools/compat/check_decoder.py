@@ -55,7 +55,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
               ROOT / "include/xy_rust_drawing.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
-              ROOT / "include/xy_rust_font_records.h", ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
+              ROOT / "include/xy_rust_microdvd_style.h", ROOT / "include/xy_rust_font_records.h", ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
               ROOT / "include/xy_rust_cc.h", ROOT / "src/subtitles/CCDecoder.cpp", ROOT / "src/subtitles/CCDecoder.h",
               ROOT / "include/xy_rust_segments.h",
@@ -204,6 +204,23 @@ public:
         webvtt += extract_definition(content.decode("utf-8-sig"), "static void WebVTTCueStrip(") + "\n"
         webvtt += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_webvtt.h").write_text(webvtt, encoding="utf-8")
+    micro_style = '#include "microdvd_style_shell.h"\n'
+    for signature in ("STSStyle::STSStyle(", "void STSStyle::SetDefault("):
+        micro_style += extract_definition(font_source.decode("utf-8-sig"), signature) + "\n"
+    for name, content in (("ReferenceMicroDvdStyle", font_source), ("CandidateMicroDvdStyle", candidate_font)):
+        decoded = content.decode("utf-8-sig")
+        micro_style += f"namespace {name} {{\n"
+        if name == "CandidateMicroDvdStyle":
+            micro_style += "#define XY_VSFILTER_RUST_TEXT\n"
+        start = decoded.index("static STSStyle* GetMicroDVDStyle(")
+        end = decoded.index("static CStringW MicroDVD2SSA(", start)
+        definition = decoded[start:end].rstrip()
+        assert definition.endswith("}")
+        if name == "CandidateMicroDvdStyle":
+            assert definition.count("XyRust::MicroDvdStyle tags") == 1
+            definition = definition.replace("XyRust::MicroDvdStyle tags", "XyRust::ObservedMicroDvdStyle tags")
+        micro_style += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_microdvd_style.h").write_text(micro_style, encoding="utf-8")
     document = '#include "ass_document_shell.h"\n'
     for signature in ("STSStyle::STSStyle(", "void STSStyle::SetDefault("):
         document += extract_definition(font_source.decode("utf-8-sig"), signature) + "\n"
@@ -910,6 +927,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     find_char_result = run([str(find_char_executable)], capture_output=True, text=True)
     print(find_char_result.stdout, end="", flush=True)
     print(find_char_result.stderr, end="", file=sys.stderr)
+    micro_style_executable = destination / ("microdvd-style-oracle.exe" if os.name == "nt" else "microdvd-style-oracle")
+    micro_style_compile = [arg.replace("find_char_oracle.cpp", "microdvd_style_oracle.cpp").replace("find-char-oracle", "microdvd-style-oracle") for arg in find_char_compile]
+    run(micro_style_compile)
+    micro_style_result = run([str(micro_style_executable)], capture_output=True, text=True)
+    print(micro_style_result.stdout, end="", flush=True)
+    print(micro_style_result.stderr, end="", file=sys.stderr)
     document_executable = destination / ("ass-document-oracle.exe" if os.name == "nt" else "ass-document-oracle")
     document_compile = [arg.replace("find_char_oracle.cpp", "ass_document_oracle.cpp").replace("find-char-oracle", "ass-document-oracle") for arg in find_char_compile]
     run(document_compile)
@@ -1257,6 +1280,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "webvtt_compile_command": webvtt_compile,
         "webvtt_result": webvtt_result.stdout, "webvtt_stderr": webvtt_result.stderr,
         "webvtt_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring model with host iswspace; Windows comparison required",
+        "microdvd_style_compile_command": micro_style_compile,
+        "microdvd_style_result": micro_style_result.stdout, "microdvd_style_stderr": micro_style_result.stderr,
+        "microdvd_style_scope": "Whole pinned GetMicroDVDStyle and native defaults; native ATL/CRT on Windows, portable strings elsewhere; all stored fields/float bits, native case/prefix/scan order, errno and floating flags; successful position scans and representable scanf values only; allocation failures and full file/style-map integration excluded",
         "ass_document_compile_command": document_compile,
         "ass_document_result": document_result.stdout, "ass_document_stderr": document_result.stderr,
         "ass_document_scope": "Complete pinned OpenSubStationAlpha and LoadUUEFont, including migrated header/dialogue/style/font-record owners; ignored loader replies and mutations; native ATL/CRT in Windows CI, portable strings elsewhere; controlled line I/O, FastTrim utility, style-map and font-registration boundaries; complete retained settings, entry arguments, input position, callback order/interruption and partial failures; representable numeric arithmetic only",
