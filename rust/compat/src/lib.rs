@@ -35,6 +35,7 @@ pub mod gauss_integer;
 
 pub mod vobsub_outline;
 pub mod vobsub_packet;
+pub mod vobsub_path;
 pub mod vobsub_pixels;
 pub mod vobsub_rle;
 pub mod vobsub_scale;
