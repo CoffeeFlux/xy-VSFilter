@@ -394,6 +394,16 @@ def ellipse_arc_variants():
         yield "ellipse-arc-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
 
 
+def ellipse_storage_variants():
+    for name, payload in {
+        "lookup-edge": br"{\xbord8\ybord8}O W I table",
+        "beyond-lookup": br"{\xbord8.125\ybord8.125}O W I table",
+        "narrow-tall": br"{\xbord1\ybord20}O W I table",
+        "wide-short": br"{\xbord20\ybord1}O W I table",
+    }.items():
+        yield "ellipse-storage-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
+
+
 def layout_rect_variants():
     prefix = SEED[:SEED.index(b"Dialogue:")]
     for name, alignment, second_layer, border, collisions, multiline in (
@@ -701,6 +711,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in span_merge_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in arc_queue_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ellipse_arc_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in ellipse_storage_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in realtext_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_header_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_style_variants()]

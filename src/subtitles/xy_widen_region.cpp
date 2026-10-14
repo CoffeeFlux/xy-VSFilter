@@ -118,6 +118,9 @@ public:
     float m_f_rx, m_f_ry;
     double m_f_half_inv_rx, m_f_half_inv_ry;
 
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::EllipseArc m_arc;
+#endif
     int *m_left_arc;
     int *m_left_arc_base;
 
@@ -605,13 +608,18 @@ int XyEllipse::init( int rx, int ry )
     {
         return -1;
     }
-    m_left_arc_base = DEBUG_NEW int[2*ry+2];
-    if (!m_left_arc_base)
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (!m_arc.Initialize(rx, ry))
+#endif
     {
-        return -1;
+        m_left_arc_base = DEBUG_NEW int[2*ry+2];
+        if (!m_left_arc_base)
+        {
+            return -1;
+        }
+        gen_left_arc(m_left_arc_base, rx, ry);
+        m_left_arc = m_left_arc_base + ry;
     }
-    gen_left_arc(m_left_arc_base, rx, ry);
-    m_left_arc = m_left_arc_base + ry;
     m_rx = rx;
     m_ry = ry;
     m_f_rx = rx;
@@ -624,21 +632,33 @@ int XyEllipse::init( int rx, int ry )
 
 int XyEllipse::get_left_arc_x( int y ) const
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (m_arc.Ready()) return m_arc.AtOffset(y);
+#endif
     return m_left_arc[y];
 }
 
 int XyEllipse::get_left_arc_x( XY_POINT center, int y ) const
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (m_arc.Ready()) return XY_POINT_X(center) + m_arc.AtOffset(y-XY_POINT_Y(center));
+#endif
     return XY_POINT_X(center) + m_left_arc[y-XY_POINT_Y(center)];
 }
 
 int XyEllipse::get_right_arc_x( int y ) const
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (m_arc.Ready()) return -m_arc.AtOffset(y);
+#endif
     return -m_left_arc[y];
 }
 
 int XyEllipse::get_right_arc_x( XY_POINT center, int y ) const
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (m_arc.Ready()) return XY_POINT_X(center) - m_arc.AtOffset(y-XY_POINT_Y(center));
+#endif
     return XY_POINT_X(center) - m_left_arc[y-XY_POINT_Y(center)];
 }
 

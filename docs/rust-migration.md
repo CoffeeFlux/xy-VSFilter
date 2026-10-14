@@ -20,6 +20,26 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Rust retains the generated integer ellipse table for the complete native
+  ellipse lifetime. Coordinate queries copy scalar values; no Rust storage
+  pointer escapes. Native float fields, intersection-table generation and
+  intersection formulas stay in C++. Fatal ASan/UBSan comparisons pass on arm64
+  and under x64 execution with FP-observable compiler settings: **4,270 histories /
+  4,270 Rust owners / 2,652,942 direct and translated arc queries / 2,879,952
+  intersection returns / 17,802,044 initialized matrix fields / 12,810 rejected
+  reinitializations**. Another **867,234 negative-offset checks** compare candidate
+  translated coordinates with direct native signed-index reads; the original
+  unsigned-pointer expression remains a renderer-CI boundary.
+  Ordinary optimized x64 initialization showed an ambient FP-flag mismatch,
+  reproduced between two reference calls after allocation-history perturbation.
+  It is unresolved and not counted as passing. See [FP scope and reproduction](ellipse-storage-fp-scope.json).
+  FP-observable extracted compilation does not establish ordinary optimized
+  ambient-flag equivalence. Actual Windows DLL comparisons remain required.
+  Uninitialized matrix rows, invalid indices and allocation failures are excluded.
+  Rust 1.85 tests (131 core, 84 FFI), strict Clippy, default syntax and Python
+  checks pass. Four lookup-boundary/aspect-ratio scripts expand the renderer corpus
+  to **706 cases**. Windows/Miri and renderer checks are pending. Native float
+  matrix ownership, outer span lists and actual-host integration remain.
 * Rust generates integer ellipse arcs using the pinned two-phase update order,
   including the unusual base-relative fill read. It exports only written cells
   into native storage; untouched cells and padding remain untouched. Negative
@@ -101,9 +121,11 @@ unresolved reference outcomes requiring investigation, never matching results.
   are excluded. FP observations include seeded flags.
   Rust 1.85 tests (122 core, 79 FFI), strict Clippy, default syntax and Python
   checks pass. Six scale/baseline/clip scripts and a visible scale control expand
-  the renderer corpus to **654 cases**. Windows/Miri and renderer checks for this
-  increment are pending. Numeric conversion, geometry arithmetic, rasterizer
-  buffers and actual-host integration remain native/separate work.
+  the renderer corpus to **654 cases**. Windows x86/x64, Linux, macOS and Miri
+  passed; paired Windows DLLs match **654 cases / 6,890 frames**, plus **32 mutations /
+  224 frames**, on each architecture. See [drawing-storage evidence](drawing-storage-evidence.json).
+  Numeric conversion, geometry arithmetic, rasterizer buffers and actual-host
+  integration remain native/separate work.
 * Safe Rust prepares drawing command separators before the existing raw-token
   traversal. Each lowercase command gets the same preceding `*`, including
   command letters inside arbitrary text. Existing separators and raw UTF-16 are
