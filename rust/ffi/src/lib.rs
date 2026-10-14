@@ -121,3 +121,5 @@ mod case_replace;
 mod sami;
 
 mod encoding;
+
+mod ass_dialogue;

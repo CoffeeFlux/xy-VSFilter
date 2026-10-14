@@ -31,6 +31,7 @@
 #include "xy_rust_case_replace.h"
 #include "xy_rust_sami.h"
 #include "xy_rust_encoding.h"
+#include "xy_rust_ass_dialogue.h"
 #include "xy_rust_webvtt.h"
 #include "xy_rust_fields.h"
 #include "xy_rust_segments.h"
@@ -2267,6 +2268,30 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
         {
             try
             {
+#ifdef XY_VSFILTER_RUST_TEXT
+                XyRust::AssDialogue dialogue(buff, version);
+                int reply = 0;
+                while(dialogue.Step(reply))
+                {
+                    CStringW token = dialogue.Text<CStringW>(0);
+                    CStringW::PXSTR cursor = token.GetBuffer();
+                    reply = NextInt(&cursor, dialogue.Separator());
+                }
+                const int layer = dialogue.Number(0);
+                const int hh1 = dialogue.Number(1), mm1 = dialogue.Number(2);
+                const int ss1 = dialogue.Number(3), ms1_div10 = dialogue.Number(4);
+                const int hh2 = dialogue.Number(5), mm2 = dialogue.Number(6);
+                const int ss2 = dialogue.Number(7), ms2_div10 = dialogue.Number(8);
+                CString Style = dialogue.Text<CStringW>(1);
+                CString Actor = dialogue.Text<CStringW>(2);
+                CString Effect = dialogue.Text<CStringW>(3);
+                CRect marginRect;
+                marginRect.left = dialogue.Number(9);
+                marginRect.right = dialogue.Number(10);
+                marginRect.top = dialogue.Number(11);
+                marginRect.bottom = dialogue.Number(12);
+                CStringW buff2 = dialogue.Text<CStringW>(4);
+#else
                 CStringW::PXSTR __buff = buff.GetBuffer();
                 int hh1, mm1, ss1, ms1_div10, hh2, mm2, ss2, ms2_div10, layer = 0;
                 CString Style, Actor, Effect;
@@ -2291,6 +2316,7 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
                 Effect = TryNextStr(&__buff);
 
                 CStringW buff2 = __buff;
+#endif
                 int len = min(Effect.GetLength(), buff2.GetLength());
                 if(Effect.Left(len) == buff2.Left(len)) Effect.Empty();
 
