@@ -20,6 +20,22 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust normalizes closed-caption cursors and writes initialized cells in
+  the original 16-by-33 backing. Columns at or beyond 32 advance only one row;
+  rows at or beyond 16 wrap to zero. Negative coordinates clamp first. Each
+  row's 33rd cell remains untouched, and native cursor advancement follows the
+  Rust write. Unrepresentable cursor arithmetic declines to the existing path.
+  Fatal ASan/UBSan comparisons passed **143,978 complete native `DecodeCC`
+  calls**, **117 cursor moves** and **65,536 cell writes** on arm64 and under
+  x64 execution: **528 emitted subtitle records**, **111 injected Add
+  interruptions**, **270 callback mutations** and **8,432 source/backing aliases**.
+  Every byte pair, doubled controls and every UTF-16 cell value are covered.
+  The harness uses actual Windows ATL strings in CI, a portable UTF-16 string
+  model locally, and a fixture subtitle sink. Raw logging/files, native integer
+  overflow and actual caption-ripper integration are outside these comparisons.
+  Rust 1.85 tests (73 core, 49 FFI), strict Clippy and default syntax checks pass.
+  Windows/Miri validation is pending. Command dispatch, backing ownership and
+  native subtitle/file output remain to be migrated or separately validated.
 * Safe Rust owns the outer `ParseRealText` document state machine. It preserves
   comment precedence, separate text/tag paths, start-before-end conversion,
   rendering before line insertion, history advancement afterward, open-before-
@@ -79,7 +95,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   parser cases and 100,064 tag-output cases also pass. Fixtures constrain native
   arithmetic to representable values; overflow outcomes are not counted.
   Rust 1.85 tests (68 core, 45 FFI), strict Clippy and both default syntax checks
-  pass. Windows/Miri validation is pending. Allocation failure timing for the
+  pass. Candidate `40302134` passed all four portable platforms, Miri and both
+  Windows DLL jobs, each matching **382 cases / 4,490 frames** and **32 mutations
+  / 224 frames**, plus dialogs, visible controls, exports and dependencies. Both
+  logs confirm Rust-enabled `RealTextParser.cpp` compilation.
+  [Timing-history evidence](realtext-timeline-evidence.json) records verified
+  hashes and stable local validation. Allocation failure timing for the
   owned history and native map still needs separate validation.
 * Safe Rust owns `StringToLower` output and iteration state. Each raw UTF-16
   unit still passes through native `towlower`; neither Rust Unicode decoding nor
@@ -92,7 +113,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   available native locale; locale availability and counts can differ on CI.
   All 100,064 tag-output cases and 30,058 complete parser runs pass with the
   lowercase owner active. Rust 1.85 tests (67 core, 44 FFI), strict Clippy and
-  default-branch syntax checks pass. Windows/Miri validation is pending.
+  default-branch syntax checks pass. Candidate `5b8fb1ed` passed all four
+  portable platforms, Miri and both Windows DLL jobs, each matching **382 cases
+  / 4,490 frames** and **32 mutations / 224 frames**, plus dialogs, visible
+  controls, exports and dependencies. Both native logs confirm Rust-enabled
+  `RealTextParser.cpp` compilation. [Lowercase evidence](realtext-lower-evidence.json)
+  records verified hashes and stable local validation.
   Native allocation failure timing remains unverified.
 * Safe Rust owns `ExtractString` text scanning and the text appended by
   `ExtractTextTag`. Leading whitespace still uses native classification. An
