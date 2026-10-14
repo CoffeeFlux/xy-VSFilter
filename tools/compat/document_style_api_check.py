@@ -30,7 +30,7 @@ def wrapper_xml(project, helper, root, out, intermediate, library_dir):
 <PropertyGroup><OutDir>{x(out)}\\</OutDir><IntDir>{x(intermediate)}\\</IntDir></PropertyGroup>
 <Import Project="{x(project.name)}" />
 <ItemDefinitionGroup><Link><AdditionalLibraryDirectories>{x(library_dir)};%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories></Link></ItemDefinitionGroup>
-<ItemGroup><ClCompile Include="{x(helper)}"><PrecompiledHeader>NotUsing</PrecompiledHeader><AdditionalOptions>/Y- %(AdditionalOptions)</AdditionalOptions><PreprocessorDefinitions>XY_DOCUMENT_STYLE_TEST_HELPER;%(PreprocessorDefinitions)</PreprocessorDefinitions><AdditionalIncludeDirectories>{x(root / 'src')};%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories></ClCompile></ItemGroup>
+<ItemGroup><ClCompile Include="{x(helper)}"><PrecompiledHeader>NotUsing</PrecompiledHeader><AdditionalOptions>/Y- %(AdditionalOptions)</AdditionalOptions><PreprocessorDefinitions>XY_DOCUMENT_STYLE_TEST_HELPER;%(PreprocessorDefinitions)</PreprocessorDefinitions><AdditionalIncludeDirectories>{x(root / 'src')};{x(project.parent)};%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories></ClCompile></ItemGroup>
 </Project>'''
 
 

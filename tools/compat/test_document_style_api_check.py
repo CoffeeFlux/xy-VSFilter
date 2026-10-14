@@ -52,7 +52,7 @@ class StyleRunnerTests(unittest.TestCase):
 
     def test_wrapper_has_isolated_helper_and_paths(self):
         import xml.etree.ElementTree as ET
-        text = check.wrapper_xml(Path('/repo/VSFilter.vcxproj'), Path('/helper/a&b.cpp'), Path('/repo'), Path('/out'), Path('/int'), Path('/libs'))
+        text = check.wrapper_xml(Path('/repo/src/filters/VSFilter.vcxproj'), Path('/helper/a&b.cpp'), Path('/repo'), Path('/out'), Path('/int'), Path('/libs'))
         root = ET.fromstring(text)
         ns = {'m': 'http://schemas.microsoft.com/developer/msbuild/2003'}
         self.assertEqual(root.find('m:Import', ns).attrib['Project'], 'VSFilter.vcxproj')
@@ -61,6 +61,8 @@ class StyleRunnerTests(unittest.TestCase):
         self.assertEqual(helper.find('m:PrecompiledHeader', ns).text, 'NotUsing')
         self.assertIn('/Y-', helper.find('m:AdditionalOptions', ns).text)
         self.assertIn('XY_DOCUMENT_STYLE_TEST_HELPER', helper.find('m:PreprocessorDefinitions', ns).text)
+        self.assertEqual(helper.find('m:AdditionalIncludeDirectories', ns).text,
+                         '/repo/src;/repo/src/filters;%(AdditionalIncludeDirectories)')
         self.assertIn('/libs;', text)
         self.assertNotIn('RustTextDecoder', text)
         self.assertNotIn('ModuleDefinitionFile', text)
