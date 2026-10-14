@@ -23,4 +23,5 @@ extern "C" uint32_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_nibble(uint8_t byte, uint
 extern "C" uint64_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_code_step(uint32_t code, uint8_t nibble, uint32_t stage);
 extern "C" uint32_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_bounds(const uint8_t* source, int32_t width, int32_t height, int32_t* output);
 extern "C" uint32_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_crop(const uint8_t* source, int32_t pitch, int32_t width, int32_t height, uint8_t* destination, const uint8_t* protected_object, size_t protected_length);
+extern "C" uint32_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_scale(const uint32_t* source, uint32_t* destination, int32_t width, int32_t height);
 #undef XY_VOBSUB_CDECL
