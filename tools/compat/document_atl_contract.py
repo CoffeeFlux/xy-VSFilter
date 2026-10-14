@@ -138,6 +138,138 @@ def select_definitions(source, header):
         raise ValueError('selected SDK excerpts exceed total limit')
     return records
 
+CSIZE_HEADERS = ('atltypes.h', 'afx.h', 'afx.inl')
+
+
+def conditional_context(source, offset):
+    """Record source guards, without pretending to evaluate SDK conditions."""
+    lines = masked(source[:offset]).splitlines()
+    full = source.splitlines()
+    masked_full = masked(source).splitlines()
+    stack = []
+    for index, line in enumerate(lines):
+        match = re.match(r'\s*#\s*(if|ifdef|ifndef|elif|else|endif)\b(.*)', line)
+        if not match:
+            continue
+        directive, expression = match.groups()
+        raw_directive = full[index].strip()
+        continuation = index + 1
+        while raw_directive.endswith('\\') and continuation < len(full):
+            raw_directive += '\n' + full[continuation].strip()
+            continuation += 1
+        if directive in ('if', 'ifdef', 'ifndef'):
+            # A conventional header guard is scaffolding, not a choice between
+            # alternative constructor implementations. Other guards stay unknown.
+            guard = re.fullmatch(r'\s*([A-Za-z_]\w*)\s*', expression)
+            following = next((value.strip() for value in masked_full[index + 1:]
+                              if value.strip()), '')
+            scaffolding = all(not value.strip() or re.fullmatch(r'\s*#\s*pragma\s+once\s*', value)
+                              for value in lines[:index])
+            include_guard = (scaffolding and not stack and directive == 'ifndef' and guard is not None
+                             and re.match(r'#\s*define\s+' + re.escape(guard[1]) + r'\b', following) is not None)
+            stack.append({'first_line': index + 1, 'directive': raw_directive,
+                          'branch_line': index + 1, 'branch': raw_directive,
+                          'include_guard': include_guard})
+        elif directive in ('elif', 'else'):
+            if not stack:
+                raise ValueError('unmatched conditional branch before CSize definition')
+            stack[-1] = {**stack[-1], 'branch_line': index + 1, 'branch': raw_directive,
+                         'include_guard': False}
+        elif stack:
+            stack.pop()
+        else:
+            raise ValueError('unmatched conditional end before CSize definition')
+    if sum(len(row['directive']) + len(row['branch']) for row in stack) > 2048 or len(stack) > 16:
+        raise ValueError('CSize conditional context exceeds bound')
+    return stack
+
+
+def select_csize_definitions(source, header):
+    """Only CSize class/base declaration and zero-argument ctor signatures/body.
+
+    No construction or read is performed. Conditional alternatives are retained
+    as unresolved source authority, rather than selected using guessed macros.
+    """
+    code = masked(source)
+    ranges = class_ranges(code, 'CSize')
+    records = []
+
+    def add(start, end, symbol, kind):
+        line_start = code.rfind('\n', 0, start) + 1
+        if code[line_start:start].strip() in ('', 'inline', '_ATLINLINE'):
+            start = line_start
+        excerpt = source[start:end]
+        if len(excerpt.encode('utf-8')) > 2048 or excerpt.count('\n') + 1 > 40:
+            raise ValueError('CSize excerpt exceeds bounded source selection')
+        internal = []
+        raw_lines = excerpt.splitlines()
+        for number, line in enumerate(masked(excerpt).splitlines()):
+            if re.match(r'\s*#\s*(?:if|ifdef|ifndef|elif|else|endif)\b', line):
+                directive = raw_lines[number].strip()
+                following = number + 1
+                while directive.endswith('\\') and following < len(raw_lines):
+                    directive += '\n' + raw_lines[following].strip()
+                    following += 1
+                internal.append({'first_line': source.count('\n', 0, start) + number + 1,
+                                 'directive': directive})
+        records.append({'header': str(header), 'symbol': symbol, 'kind': kind,
+                        'first_line': source.count('\n', 0, start) + 1,
+                        'last_line': source.count('\n', 0, end) + 1,
+                        'internal_conditions': internal,
+                        'source_utf8_sha256': sha(source.encode('utf-8')),
+                        'sha256_utf8': sha(excerpt.encode('utf-8')), 'excerpt': excerpt,
+                        'conditional_context': conditional_context(source, start)})
+
+    for first, last in ranges:
+        opening = code.find('{', first, last)
+        add(first, opening, 'CSize class/base', 'declaration')
+    pattern = r'\bCSize\s*::\s*CSize\s*\(\s*(?:void\s*)?\)|\bCSize\s*\(\s*(?:void\s*)?\)'
+    for match in re.finditer(pattern, code):
+        if match.start() > 0 and code[match.start() - 1] == '~':
+            continue
+        qualified = '::' in match[0]
+        if not qualified:
+            enclosing = next(((a, b) for a, b in ranges if a < match.start() < b), None)
+            if enclosing is None:
+                continue
+            opening = code.find('{', enclosing[0])
+            prefix = code[opening:match.start()]
+            if prefix.count('{') - prefix.count('}') != 1:
+                continue
+        after = match.end()
+        body, semi = code.find('{', after), code.find(';', after)
+        if semi < 0 and body < 0:
+            raise ValueError('unterminated CSize constructor signature')
+        is_body = body >= 0 and (semi < 0 or body < semi)
+        end = closing(code, body) if is_body else semi + 1
+        # A defaulted/deleted declaration is source evidence too; no guessed body.
+        signature = code[after:body if is_body else semi]
+        if ':' in signature:
+            raise ValueError('CSize constructor initializer requires explicit source review')
+        kind = 'definition' if is_body or re.search(r'=\s*default\b', signature) else 'declaration'
+        if re.search(r'=\s*delete\b', signature):
+            kind = 'deleted-declaration'
+        add(match.start(), end, 'CSize::CSize default', kind)
+    if len(records) > 16 or sum(len(row['excerpt'].encode('utf-8')) for row in records) > 8192:
+        raise ValueError('CSize excerpts exceed total source selection bound')
+    return records
+
+
+def csize_source_contract(records):
+    defaults = [row for row in records if row['symbol'] == 'CSize::CSize default' and row['kind'] == 'definition']
+    declarations = [row for row in records if row['symbol'] == 'CSize class/base']
+    unknown = [dict(header=row['header'], first_line=row['first_line'],
+                    conditional_context=[c for c in row['conditional_context'] if not c['include_guard']],
+                    internal_conditions=row['internal_conditions'])
+               for row in records if row['internal_conditions'] or any(not c['include_guard'] for c in row['conditional_context'])]
+    unambiguous = len(defaults) == 1 and len(declarations) == 1
+    return {'scope': 'Source-only selected CSize default constructor; no default object values read or inferred',
+            'source_capture_complete': unambiguous, 'complete': unambiguous and not unknown,
+            'default_definition_count': len(defaults), 'class_declaration_count': len(declarations),
+            'active_conditions_resolved': not unknown, 'active_conditions_unresolved': unknown,
+            'unresolved': (([] if unambiguous else ['Missing or ambiguous selected CSize default constructor/class declaration'])
+                           + (['Active CSize conditional directives are not evaluated'] if unknown else []))}
+
 
 PROBE = r'''// Generated bounded native contract observation, no SDK implementation copied.
 #define WIN32_LEAN_AND_MEAN
@@ -257,6 +389,7 @@ def main():
             if Path(match[1]).is_file():libraries[match[1]]=protect(match[1])
         report.update(included_header_sha256=headers,linker_observed_library_sha256=libraries,binary_sha256=protect(exe))
         excerpts=[]
+        csize_excerpts=[]
         for header in headers:
             if Path(header).name.lower() in SELECTED_HEADERS:
                 try:
@@ -264,6 +397,20 @@ def main():
                     excerpts+=select_definitions(text,header)
                 except (ValueError, UnicodeError) as error:
                     report.setdefault('source_extraction_errors', []).append({'header': header, 'error': str(error)})
+            if Path(header).name.lower() in CSIZE_HEADERS:
+                try:
+                    text=Path(header).read_bytes().decode('utf-8-sig',errors='strict')
+                    selected=select_csize_definitions(text,header)
+                    for row in selected: row['header_sha256']=headers[header]
+                    csize_excerpts+=selected
+                except (ValueError, UnicodeError) as error:
+                    report.setdefault('csize_source_extraction_errors', []).append({'header': header, 'error': str(error)})
+        report['csize_source_contract']=csize_source_contract(csize_excerpts)
+        if report.get('csize_source_extraction_errors'):
+            report['csize_source_contract']['complete']=False
+            report['csize_source_contract']['source_capture_complete']=False
+            report['csize_source_contract']['unresolved'].append('Selected CSize source extraction failed')
+        excerpts+=csize_excerpts
         required=('CAtlMap','Lookup','Rehash','PickSize','UpdateRehashThresholds','SetOptimalLoad','Hash','CompareElements','operator[]','RemoveNode','RemoveKey','RemoveAll','s_anPrimes','CPair')
         private=out/'selected-sdk-definitions.private.json';private.write_text(json.dumps({'redistribution':'Private review excerpts only; do not check in SDK source','definitions':excerpts},indent=2)+'\n');report['selected_definitions_sha256']=protect(private)
         report['definition_index']=[{k:v for k,v in r.items() if k!='excerpt'} for r in excerpts]

@@ -474,6 +474,8 @@ public:
         DocumentReply reply(DocumentDetail::Load(out,0,8)); value = DocumentDetail::StyleValue<Style>(reply.Read()); return true;
     }
     void CopyFrom(const DocumentOwner& source) {DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_copy_storage_v1(id_,source.id_);}));}
+    // Base document Empty only: renderer Deinit/virtual dispatch stay native.
+    void Empty() {DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_empty_v1(id_);}));}
     void Clear() {DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_clear_storage_v1(id_);}));}
     void RemoveEntries() {DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_remove_entries_v1(id_);}));}
     void Rebuild() {DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_rebuild_segments_v1(id_);}));}

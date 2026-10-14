@@ -1071,6 +1071,36 @@ approval remain pending. See the scalar Sort source hashes and preprocessing
 record in [the document inventory](rust-document-inventory.json).
 
 
+### Coarse base Empty boundary
+
+The opt-in native base `Empty` now invokes one safe owner operation. It resets
+only the screen pair, clears the named map while retaining its bin shape, then
+detaches segments and entries. Retired owned style values, segments and entries
+drop after registry admission. Native virtual dispatch, renderer Deinit before
+base Empty, and Copy's separate map clearing remain in place.
+
+Local validation passes 191 core and 117 FFI tests, formatting and Clippy,
+and 104 Python tests with four Windows-only skips. Generation-only extraction
+and eight-file preprocessing pass. The local arm64 portable checker completes
+with stable captured inputs; its existing architecture/native exclusions remain.
+This portable result does not validate the Windows owner integration.
+
+A bounded full-class fixture starts with finite styles, raw code-unit records
+and stale animated segments. It checks collection clearing, screen reset,
+retention of every initialized metadata field, raw name/path and default style,
+repeated Empty and reuse. Existing grow/Empty/shrink and Copy callback histories
+remain part of the comparison. Required stage checks reject incomplete traces.
+Exact changed-source Windows lifecycle, rendering and host comparisons remain
+pending, along with native allocation failure and allocator reentry behavior.
+This consolidates an existing boundary; the opt-in retired count remains 18.
+
+
+The portable extraction check now fences the native Add suffix instead of
+counting braces across alternative preprocessor branches; the compiler still
+selects the complete native suffix. A separate tool captures a narrow private
+SDK CSize constructor excerpt and provenance only. Its runtime probe is
+unchanged, and no CSize Windows behavior or constructor default is inferred.
+
 ### Coarse selected-state Copy boundary
 
 Native Copy still invokes virtual Empty first, then reads the source. The opt-in
@@ -1121,13 +1151,13 @@ Neither count measures the amount of application behavior replaced.
 The reproducible [Rust unsafe inventory](rust-unsafe-inventory.json) uses
 `python3 tools/compat/audit_rust_boundary.py OUTPUT.json`. It masks comments and
 literals, separates cfg(test) items, and includes all platform/feature branches.
-At the current frozen working-tree sources based on `2b5efca4` (exact file
+At the current frozen working-tree sources based on `611d7ff9` (exact file
 hashes recorded by the regenerated inventory):
 
 | Layer | Production source inventory | Meaning |
 | --- | --- | --- |
-| `rust/compat` | 0 unsafe blocks/functions/impls; 7,617 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
-| `rust/ffi` | 359 explicit unsafe blocks, 302 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,222 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
+| `rust/compat` | 0 unsafe blocks/functions/impls; 7,634 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
+| `rust/ffi` | 359 explicit unsafe blocks, 302 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,238 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
 | Tests | 119 unsafe blocks in FFI tests | Exercise valid and deliberately bounded ownership/alias/initialization contracts; not production code |
 
 Unsafe-function declarations and blocks overlap and must not be added as

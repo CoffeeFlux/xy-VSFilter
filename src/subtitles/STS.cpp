@@ -3433,14 +3433,9 @@ bool CSimpleTextSubtitle::CopyStyles(const CSTSStyleMap& styles, bool fAppend)
 void CSimpleTextSubtitle::Empty()
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    SetDocumentScreenSize(CSize(0, 0));
+    m_document->Empty();
 #else
     m_dstScreenSize = CSize(0, 0);
-#endif
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    m_document->ClearNamedStyles();
-    m_document->Clear();
-#else
     m_styles.Free();
     m_segments.RemoveAll();
     m_entries.RemoveAll();

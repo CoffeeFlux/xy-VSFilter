@@ -184,6 +184,15 @@ fn style_rename_count(
         Ok(())
     }
 }
+/// Base Empty retirement order is named values, segments, then entries.
+/// Map keys/node storage are still dropped while clearing the map; allocator
+/// reentry and native allocation/deletion timing remain outside the contract.
+#[derive(Debug)]
+pub struct RetiredEmpty {
+    pub styles: Vec<Option<crate::document_style::StyleValue>>,
+    pub segments: Vec<DocumentSegment>,
+    pub entries: Vec<PreparedEntry>,
+}
 /// Clone creates independent storage; it does not emulate native Copy callbacks
 /// or the selective field assignments in native Copy.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -598,6 +607,19 @@ impl Document {
         self.entries.clear();
     }
     /// Only this subset's storage; not native Empty's metadata/style reset.
+    /// Base Empty only: caller retains native virtual dispatch/Deinit. No
+    /// callback, default reset, or unrelated metadata reset occurs here.
+    pub fn empty(&mut self) -> RetiredEmpty {
+        self.set_script_size(0, 0);
+        let styles = self.named_styles.clear();
+        let segments = core::mem::take(&mut self.segments);
+        let entries = core::mem::take(&mut self.entries);
+        RetiredEmpty {
+            styles,
+            segments,
+            entries,
+        }
+    }
     pub fn clear_entries_and_segments(&mut self) {
         self.entries.clear();
         self.segments.clear();
@@ -1421,5 +1443,78 @@ mod tests {
             style_rename_count(usize::MAX, true, true),
             Err(StyleRenameError::CountOverflow)
         );
+    }
+    #[test]
+    fn base_empty_retires_stale_storage_and_preserves_full_other_state() {
+        let mut d = Document::default();
+        d.replace_identity(IdentityField::Name, alloc::vec![65, 0, 0xd800]);
+        d.replace_identity(IdentityField::Path, alloc::vec![80, 0, 0xdcff]);
+        for field in [
+            InterpretationField::Mode,
+            InterpretationField::SubtitleType,
+            InterpretationField::Encoding,
+        ] {
+            d.replace_interpretation(field, -7);
+        }
+        for field in [
+            ScriptField::Width,
+            ScriptField::Height,
+            ScriptField::Wrap,
+            ScriptField::Collisions,
+        ] {
+            d.replace_script_field(field, -9);
+        }
+        d.replace_scaled_bas(true);
+        d.replace_forced_default(true);
+        d.replace_par_bits(0x7ff0000000000042);
+        for field in [
+            MetadataField::PARType,
+            MetadataField::ColorMatrix,
+            MetadataField::ColorRange,
+        ] {
+            d.replace_metadata(field, -11);
+        }
+        d.replace_default_style(Some(rename_value(13)));
+        for key in 0..65 {
+            d.named_styles_mut()
+                .insert(alloc::vec![key], Some(rename_value(key as u8)));
+        }
+        d.add_prepared(entry(0, 10, -1), AddMode::Add).unwrap();
+        d.feedback_animation(0, true).unwrap();
+        d.remove_all_entries();
+        let before = d.clone();
+        let bins = d.named_styles().bin_count();
+        let retired = d.empty();
+        assert_eq!(
+            retired.styles,
+            before
+                .named_styles()
+                .iter()
+                .map(|(_, v)| v.clone())
+                .collect::<Vec<_>>()
+        );
+        assert_eq!(retired.segments, before.segments());
+        assert!(retired.segments[0].animated);
+        assert!(retired.entries.is_empty());
+        let mut expected = before.clone();
+        expected.script[0] = Some(0);
+        expected.script[1] = Some(0);
+        expected.named_styles.clear();
+        expected.segments.clear();
+        expected.entries.clear();
+        assert_eq!(d, expected);
+        assert_eq!(d.named_styles().bin_count(), bins);
+        let again = d.empty();
+        assert!(again.styles.is_empty() && again.segments.is_empty() && again.entries.is_empty());
+        assert_eq!(d, expected);
+        // Selected self-Copy after Empty is unchanged; storage self-copy is empty.
+        let selected = d.selected_state();
+        d.replace_selected_state(selected);
+        assert_eq!(d, expected);
+        let raw = entry(0, 10, 0);
+        d.add_prepared(raw.clone(), AddMode::EntryOnly).unwrap();
+        let retired = d.empty();
+        assert_eq!(retired.entries, alloc::vec![raw]);
+        assert_eq!(d, expected);
     }
 }
