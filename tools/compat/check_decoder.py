@@ -52,7 +52,7 @@ def extract_definition(source, signature):
 
 def capture_inputs():
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
-              ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
+              ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h", ROOT / "include/xy_rust_writer.h",
               ROOT / "include/xy_rust_drawing.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
               ROOT / "include/xy_rust_pipe_line.h", ROOT / "include/xy_rust_subrip_cue.h", ROOT / "include/xy_rust_sami_file.h", ROOT / "include/xy_rust_microdvd_style.h", ROOT / "include/xy_rust_font_records.h", ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
@@ -129,6 +129,18 @@ public:
         reader += "\n#undef CTextFile\n#undef XY_VSFILTER_RUST_TEXT\n"
     reader += "#undef __super\n#undef XY_LOG_ERROR\n"
     (destination / "original_text_reader.h").write_text(reader, encoding="utf-8")
+    writer = '#include "text_writer_shell.h"\n'
+    for name, content in (("ReferenceTextWriter", source), ("CandidateTextWriter", candidate_source)):
+        writer += f"namespace {name} {{\n"
+        writer += "class CTextFile : public WriterBase { public: enum {DEFAULT_ENCODING,UTF8,LE16,BE16}; int m_encoding; explicit CTextFile(int e):m_encoding(e){} void WriteString(LPCWSTR); };\n"
+        if name == "CandidateTextWriter":
+            writer += "#define XY_VSFILTER_RUST_TEXT\n"
+        definition = extract_definition(content.decode("utf-8-sig"), "void CTextFile::WriteString(")
+        if name == "CandidateTextWriter":
+            assert definition.count("XyRust::TextWriter buffer") == 3
+            definition = definition.replace("XyRust::TextWriter buffer", "XyRust::ObservedTextWriter buffer")
+        writer += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_text_writer.h").write_text(writer, encoding="utf-8")
     font_source = original("src/subtitles/STS.cpp", reference["commit"])
     candidate_font = (ROOT / "src/subtitles/STS.cpp").read_bytes()
     font = font_source.decode("utf-8-sig").split("#include", 1)[0]
@@ -977,6 +989,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     find_char_result = run([str(find_char_executable)], capture_output=True, text=True)
     print(find_char_result.stdout, end="", flush=True)
     print(find_char_result.stderr, end="", file=sys.stderr)
+    writer_executable = destination / ("text-writer-oracle.exe" if os.name == "nt" else "text-writer-oracle")
+    writer_compile = [arg.replace("find_char_oracle.cpp", "text_writer_oracle.cpp").replace("find-char-oracle", "text-writer-oracle") for arg in find_char_compile]
+    run(writer_compile)
+    writer_result = run([str(writer_executable)], capture_output=True, text=True)
+    print(writer_result.stdout, end="", flush=True)
+    print(writer_result.stderr, end="", file=sys.stderr)
     pipe_line_executable = destination / ("pipe-line-oracle.exe" if os.name == "nt" else "pipe-line-oracle")
     pipe_line_compile = [arg.replace("find_char_oracle.cpp", "pipe_line_oracle.cpp").replace("find-char-oracle", "pipe-line-oracle") for arg in find_char_compile]
     run(pipe_line_compile)
@@ -1348,6 +1366,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "webvtt_compile_command": webvtt_compile,
         "webvtt_result": webvtt_result.stdout, "webvtt_stderr": webvtt_result.stderr,
         "webvtt_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring model with host iswspace; Windows comparison required",
+        "text_writer_compile_command": writer_compile,
+        "text_writer_result": writer_result.stdout, "text_writer_stderr": writer_result.stderr,
+        "text_writer_scope": "Complete pinned CTextFile::WriteString; native ATL strings/UTF-8 conversion on Windows, modeled UTF-8 and 16-bit Windows write layout on portable hosts; controlled native write boundaries, exact bytes/default-string arguments, errno/LastError and callback interruptions/source mutation; allocation failures and OS file persistence excluded",
         "pipe_line_compile_command": pipe_line_compile,
         "pipe_line_result": pipe_line_result.stdout, "pipe_line_stderr": pipe_line_result.stderr,
         "pipe_line_scope": "Complete pinned OpenOldSubRipper/OpenVPlayer and FindChar; native ATL/CRT/codepage APIs on Windows, portable strings and codepage models elsewhere; controlled file/trim/Add boundaries; exact output records, input positions, errno and ordered callbacks/interruption; representable numeric arithmetic",

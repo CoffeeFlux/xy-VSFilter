@@ -28,6 +28,7 @@
 #include "Utf8.h"
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_text.h"
+#include "xy_rust_writer.h"
 #endif
 
 CTextFile::CTextFile(enc e)
@@ -260,22 +261,37 @@ void CTextFile::WriteString(LPCWSTR lpsz/*CStringW str*/)
 	}
 	else if(m_encoding == UTF8)
 	{
+#ifdef XY_VSFILTER_RUST_TEXT
+		XyRust::TextWriter buffer(str, false);
+		str = buffer.Text<CStringW>();
+#else
 		str.Replace(L"\n", L"\r\n");
+#endif
 		CW2AEX<1024> utf8(str, CP_UTF8);
 		Write(utf8, ::strlen(utf8));
 	}
 	else if(m_encoding == LE16)
 	{
+#ifdef XY_VSFILTER_RUST_TEXT
+		XyRust::TextWriter buffer(str, false);
+		Write(buffer.Data(), buffer.Size());
+#else
 		str.Replace(L"\n", L"\r\n");
 		Write((LPCWSTR)str, str.GetLength()*2);
+#endif
 	}
 	else if(m_encoding == BE16)
 	{
+#ifdef XY_VSFILTER_RUST_TEXT
+		XyRust::TextWriter buffer(str, true);
+		Write(buffer.Data(), buffer.Size());
+#else
 		str.Replace(L"\n", L"\r\n");
 		for (unsigned int i = 0, l = str.GetLength(); i < l; i++) {
 			str.SetAt(i, ((str[i] >> 8) & 0x00ff) | ((str[i] << 8) & 0xff00));
 		}
 		Write((LPCWSTR)str, str.GetLength() * 2);
+#endif
 	}
 }
 
