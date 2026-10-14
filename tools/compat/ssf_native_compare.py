@@ -71,12 +71,12 @@ def inspect(directory, returncode, timed_out=False):
     return result
 
 
-def capture(probe, source, directory):
+def capture(probe, source, directory, mode):
     directory.mkdir()
     timed_out = False
     with (directory / "stdout.txt").open("wb") as out, (directory / "stderr.txt").open("wb") as err:
         try:
-            run = subprocess.run([str(probe), str(source), str(directory)], stdout=out, stderr=err, timeout=20)
+            run = subprocess.run([str(probe), str(source), str(directory), mode], stdout=out, stderr=err, timeout=20)
             code = run.returncode
         except subprocess.TimeoutExpired:
             timed_out, code = True, None
@@ -111,20 +111,21 @@ def main():
     harness = {name: sha(ROOT / name) for name in HARNESS}
     report = {"complete": False, "passed": False, "reference_commit": reference, "candidate_commit": commit,
               "platform": args.platform, "probes": probes, "harness_sources": harness, "cases": [],
-              "scope": "Actual separately linked libssf parser, parsed text and node dump in six encodings. Native renderer traces and blank RGBA frames are characterized separately: the pinned FontCache::Create returns NULL after successful CreateFontIndirect. No visible rendering parity is established. WCHAR input with bounded valid SSF fixtures, each side repeated in fresh processes. DirectShow, host playback, byte-stream decoding and malformed-document coverage remain separate."}
+              "scope": "Actual separately linked libssf parser, parsed text and node dump in six encodings. Native renderer traces and blank RGBA frames are characterized separately: the pinned FontCache::Create returns NULL after successful CreateFontIndirect. No visible rendering parity is established. WCHAR and UTF-16LE/BOM byte input in borrowed, adopted and copied modes, including mutation of the source after copying; bounded valid fixtures, each side repeated in fresh processes. DirectShow, host playback, other byte encodings and malformed-document coverage remain separate."}
     path = args.output / "report.json"
     path.write_text(json.dumps(report, indent=2) + "\n")
-    for name, text in cases().items():
+    expanded = [(name + "-" + mode, text, mode) for name, text in cases().items() for mode in ("wide", "borrow", "copy", "adopt")]
+    for name, text, mode in expanded:
         root = args.output / name
         root.mkdir()
         source = root / "input.utf16"
         source.write_bytes(text.encode("utf-16-le"))
-        entry = {"id": name, "input_sha256": sha(source), "captures": {}}
+        entry = {"id": name, "input_sha256": sha(source), "input_mode": mode, "captures": {}}
         report["cases"].append(entry)
         for side, probe in (("reference", args.reference), ("candidate", args.candidate)):
             for repeat in range(2):
                 label = f"{side}-{repeat}"
-                result = capture(probe, source, root / label)
+                result = capture(probe, source, root / label, mode)
                 entry["captures"][label] = result
                 if result["status"] != "complete":
                     path.write_text(json.dumps(report, indent=2) + "\n")
@@ -136,10 +137,17 @@ def main():
     by_name = {c["id"]: c for c in report["cases"]}
     report["controls"] = {}
     for side in ("reference-0", "reference-1", "candidate-0", "candidate-1"):
-        a = by_name["plain"]["captures"][side]["files"]
-        b = by_name["comments"]["captures"][side]["files"]
-        c = by_name["arabic"]["captures"][side]["files"]
-        report["controls"][side] = a == b and a["dump-5.units"] != c["dump-5.units"]
+        for mode in ("wide", "borrow", "copy", "adopt"):
+            a = by_name["plain-" + mode]["captures"][side]["files"]
+            b = by_name["comments-" + mode]["captures"][side]["files"]
+            c = by_name["arabic-" + mode]["captures"][side]["files"]
+            report["controls"][side + "-" + mode] = a == b and a["dump-5.units"] != c["dump-5.units"]
+        for name in cases():
+            wide = by_name[name + "-wide"]["captures"][side]
+            report["controls"][side + "-" + name + "-input-modes"] = all(
+                by_name[name + "-" + mode]["captures"][side]["files"] == wide["files"]
+                and by_name[name + "-" + mode]["captures"][side]["stdout_sha256"] == wide["stdout_sha256"]
+                for mode in ("borrow", "copy", "adopt"))
     report["inputs_unchanged"] = (probes == {"reference": sha(args.reference), "candidate": sha(args.candidate)}
                                     and harness == {name: sha(ROOT / name) for name in HARNESS}
                                     and all(c["input_sha256"] == sha(args.output / c["id"] / "input.utf16") for c in report["cases"])

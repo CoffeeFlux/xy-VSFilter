@@ -9,6 +9,10 @@
 #endif
 struct XYRustSsfPeek {uint32_t phase;int32_t previous,result;};
 extern "C" {
+void* XY_SSF_CDECL xy_vsfilter_ssf_memory_create(const uint8_t*,int32_t);
+const uint8_t* XY_SSF_CDECL xy_vsfilter_ssf_memory_data(const void*);
+int32_t XY_SSF_CDECL xy_vsfilter_ssf_memory_read(const void*,int32_t);
+void XY_SSF_CDECL xy_vsfilter_ssf_memory_release(void*);
 uint64_t XY_SSF_CDECL xy_vsfilter_ssf_output(uint16_t,uint32_t);
 uint32_t XY_SSF_CDECL xy_vsfilter_ssf_peek_step(XYRustSsfPeek*,size_t,int32_t,int32_t,int32_t);
 void* XY_SSF_CDECL xy_vsfilter_ssf_queue_create();
@@ -20,6 +24,19 @@ void XY_SSF_CDECL xy_vsfilter_ssf_queue_release(void*);
 }
 #undef XY_SSF_CDECL
 namespace XyRust {
+class SsfMemory {
+    void* owner;
+    SsfMemory(const SsfMemory&);
+    SsfMemory& operator=(const SsfMemory&);
+public:
+    SsfMemory():owner(NULL){}
+    ~SsfMemory(){Reset();}
+    bool Assign(const uint8_t* input,int length){Reset();owner=xy_vsfilter_ssf_memory_create(input,length);return Ready();}
+    bool Ready()const{return owner!=NULL;}
+    const uint8_t* Data()const{return xy_vsfilter_ssf_memory_data(owner);}
+    int Read(int position)const{return xy_vsfilter_ssf_memory_read(owner,position);}
+    void Reset(){xy_vsfilter_ssf_memory_release(owner);owner=NULL;}
+};
 class SsfLookahead {
     void* owner;
     SsfLookahead(const SsfLookahead&);

@@ -69,9 +69,81 @@ pub extern "C" fn xy_vsfilter_ssf_output(character: u16, encoding: u32) -> u64 {
     xy_vsfilter_compat::ssf_stream::output(character, encoding)
 }
 
+/// # Safety
+/// For positive length, input is initialized and readable for length bytes.
+/// The copied data never retains references to the caller's input.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_ssf_memory_create(
+    input: *const u8,
+    length: i32,
+) -> *mut xy_vsfilter_compat::ssf_stream::Memory {
+    if length <= 0 {
+        return core::ptr::null_mut();
+    }
+    // SAFETY: the native copy-mode constructor supplies its input span.
+    let bytes = unsafe { core::slice::from_raw_parts(input, length as usize) };
+    xy_vsfilter_compat::ssf_stream::Memory::copy(bytes).map_or(core::ptr::null_mut(), |memory| {
+        Box::into_raw(Box::new(memory))
+    })
+}
+/// # Safety
+/// owner is a live immutable copy owner. The returned bytes remain read-only
+/// until release. Neither native code nor another Rust call may mutate them.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_ssf_memory_data(
+    owner: *const xy_vsfilter_compat::ssf_stream::Memory,
+) -> *const u8 {
+    // SAFETY: the native owner remains alive throughout all immutable loans.
+    unsafe { &*owner }.data().as_ptr()
+}
+/// # Safety
+/// owner is live and immutable; position is a copied scalar.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_ssf_memory_read(
+    owner: *const xy_vsfilter_compat::ssf_stream::Memory,
+    position: i32,
+) -> i32 {
+    // SAFETY: shared access only; the byte lookup is bounds checked in Rust.
+    unsafe { &*owner }.read(position)
+}
+/// # Safety
+/// owner is null or the unique create result; all byte uses have ended.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_ssf_memory_release(
+    owner: *mut xy_vsfilter_compat::ssf_stream::Memory,
+) {
+    if !owner.is_null() {
+        // SAFETY: the native owner ends every immutable loan before release.
+        drop(unsafe { Box::from_raw(owner) });
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn copied_memory_is_independent_and_shared_queries_preserve_the_read_loan() {
+        let mut input = [0, 255, 128, 65];
+        // SAFETY: input has four initialized bytes. The owner copies them;
+        // source mutations and shared queries cannot invalidate its read loan.
+        unsafe {
+            let owner = xy_vsfilter_ssf_memory_create(input.as_ptr(), 4);
+            assert!(!owner.is_null());
+            let data = xy_vsfilter_ssf_memory_data(owner);
+            input.fill(9);
+            assert_eq!(input, [9; 4]);
+            for (i, expected) in [0, 255, 128, 65].into_iter().enumerate() {
+                assert_eq!(xy_vsfilter_ssf_memory_read(owner, i as i32), expected);
+                assert_eq!(*data.add(i), expected as u8);
+            }
+            assert_eq!(xy_vsfilter_ssf_memory_read(owner, -1), -1);
+            assert_eq!(xy_vsfilter_ssf_memory_read(owner, 4), -1);
+            xy_vsfilter_ssf_memory_release(owner);
+            assert!(xy_vsfilter_ssf_memory_create(core::ptr::null(), 0).is_null());
+            xy_vsfilter_ssf_memory_release(core::ptr::null_mut());
+        }
+    }
+
     #[test]
     fn peek_stack_state_ends_each_borrow_before_character_callbacks() {
         let owner = xy_vsfilter_ssf_queue_create();

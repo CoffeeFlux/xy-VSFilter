@@ -221,8 +221,15 @@ namespace ssf
 	{
 		if(fCopy)
 		{
+#ifdef XY_VSFILTER_RUST_TEXT
+            if(m_copy.Assign(pBytes, len))
+                m_pBytes = const_cast<BYTE*>(m_copy.Data());
+            else
+#endif
+            {
 			m_pBytes = new BYTE[len];
 			if(m_pBytes) memcpy(m_pBytes, pBytes, len);
+            }
 			m_fFree = true;
 		}
 		else
@@ -236,6 +243,10 @@ namespace ssf
 
 	MemoryInputStream::~MemoryInputStream()
 	{
+#ifdef XY_VSFILTER_RUST_TEXT
+        if(m_copy.Ready()) m_copy.Reset();
+        else
+#endif
 		if(m_fFree) delete [] m_pBytes;
 		m_pBytes = NULL;
 	}
@@ -244,6 +255,9 @@ namespace ssf
 	{
 		if(!m_pBytes) ThrowError(_T("memory stream pointer is NULL"));
 		if(m_pos >= m_len) return Stream::EOS;
+#ifdef XY_VSFILTER_RUST_TEXT
+        if(m_copy.Ready()) return m_copy.Read(m_pos++);
+#endif
 		return (int)m_pBytes[m_pos++];
 	}
 
