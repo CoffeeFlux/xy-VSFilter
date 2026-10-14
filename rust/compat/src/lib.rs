@@ -9,6 +9,7 @@
 extern crate alloc;
 
 pub mod ass_tags;
+pub mod be_blur;
 pub mod bilinear;
 pub mod drawing;
 pub mod drawing_tokens;

@@ -60,7 +60,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_segment_insert.h",
               ROOT / "include/xy_rust_hdmv.h",
               ROOT / "include/xy_rust_dvb.h", ROOT / "include/xy_rust_golomb.h", ROOT / "include/xy_rust_fill.h",
-              ROOT / "src/subtitles/Rasterizer.cpp", ROOT / "include/xy_rust_mask.h", ROOT / "include/xy_rust_bilinear.h",
+              ROOT / "src/subtitles/Rasterizer.cpp", ROOT / "include/xy_rust_mask.h", ROOT / "include/xy_rust_bilinear.h", ROOT / "include/xy_rust_be_blur.h",
               ROOT / "src/dsutil/GolombBuffer.cpp", ROOT / "src/dsutil/GolombBuffer.h",
               ROOT / "src/subtitles/CompositionObject.cpp",
               ROOT / "include/xy_rust_timeline_search.h",
@@ -339,6 +339,17 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         hdmv += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     hdmv += "#endif\n"
     (destination / "original_hdmv.h").write_text(hdmv, encoding="utf-8")
+    blur = '#include "be_blur_shell.h"\n'
+    for name, content in (("ReferenceBlur", raster_source), ("CandidateBlur", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+        blur += f"namespace {name} {{\n"
+        if name == "CandidateBlur":
+            blur += "#define XY_VSFILTER_RUST_TEXT\n"
+            blur += extract_definition(content.decode("utf-8-sig"), "static void xyRustBeBlur(") + "\n"
+        blur += extract_definition(content.decode("utf-8-sig"), "static void be_blur_c(") + "\n"
+        blur += "#if BLUR_NATIVE_SSE\n"
+        blur += extract_definition(content.decode("utf-8-sig"), "static void be_blur(") + "\n"
+        blur += "#endif\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_be_blur.h").write_text(blur, encoding="utf-8")
     bilinear = '#include "bilinear_shell.h"\n'
     for name, content in (("ReferenceBilinear", raster_source), ("CandidateBilinear", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         bilinear += f"namespace {name} {{\n"
@@ -530,6 +541,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     bilinear_result = run([str(bilinear_executable)], capture_output=True, text=True)
     print(bilinear_result.stdout, end="", flush=True)
     print(bilinear_result.stderr, end="", file=sys.stderr)
+    blur_executable = destination / ("be-blur-oracle.exe" if os.name == "nt" else "be-blur-oracle")
+    blur_compile = [arg.replace("fill_oracle.cpp", "be_blur_oracle.cpp").replace("fill-oracle", "be-blur-oracle") for arg in fill_compile]
+    run(blur_compile)
+    blur_result = run([str(blur_executable)], capture_output=True, text=True)
+    print(blur_result.stdout, end="", flush=True)
+    print(blur_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -559,6 +576,8 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "hdmv_golomb_source_sha256": hashlib.sha256(golomb_source).hexdigest(),
         "hdmv_golomb_header_sha256": hashlib.sha256(golomb_header).hexdigest(),
         "hdmv_raster_source_sha256": hashlib.sha256(raster_source).hexdigest(),
+        "be_blur_compile_command": blur_compile,
+        "be_blur_result": blur_result.stdout, "be_blur_stderr": blur_result.stderr,
         "bilinear_compile_command": bilinear_compile,
         "bilinear_result": bilinear_result.stdout, "bilinear_stderr": bilinear_result.stderr,
         "mask_compile_command": mask_compile,
