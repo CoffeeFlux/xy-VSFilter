@@ -885,6 +885,56 @@ static void prepared_style_conflicts() {
         check(change_events[0]==callbacks,"removal shrink conflict does not notify");
     }
 }
+class SortDocument : public TraceDocument {
+public:
+    unsigned notifications=0;
+    const char* expected=NULL;
+    SortDocument():TraceDocument(0){}
+protected:
+    void OnChanged() override {
+        ++notifications;
+        if(!expected)return; // initial real CreateSegments notification
+        check(Entries()==12&&Segments()>0,"Sort callback observes rebuilt records");
+        printf("sort-callback %s entries=%zu segments=%zu",expected,Entries(),Segments());
+        for(size_t i=0;i<Entries();++i){const STSEntry e=Entry(int(i));printf(" %d",e.marginRect.left);}
+        printf("\n");
+        for(size_t i=0;i<Segments();++i){const STSSegment seg=Segment(int(i));
+            check(!seg.animated&&seg.subs.GetCount()>0,"Sort callback rebuilt animation/membership");
+            for(size_t j=0;j<seg.subs.GetCount();++j){check(seg.subs[j]>=0&&size_t(seg.subs[j])<Entries(),"Sort callback segment index");
+                const STSEntry e=Entry(seg.subs[j]);check(e.start<=seg.start&&e.end>=seg.end,"Sort callback membership observes final records");}}
+    }
+};
+static void sort_lifecycle() {
+    SortDocument doc;
+    const int starts[12]={20,0,10,10,10,10,0,20,-10,10,0,20};
+    const int layers[12]={1,0,2,2,2,-1,1,0,0,2,0,1};
+    const int orders[12]={4,3,7,7,7,3,7,3,0,2,3,4};
+    std::vector<STSEntry> originals;
+    for(int i=0;i<12;++i){
+        const wchar_t payload[]={wchar_t(L'A'+i),0,wchar_t(0xd800+i),wchar_t(L'a'+i)};
+        const wchar_t name[]={L'S',wchar_t(L'A'+i),0,wchar_t(0xdc00+i)};
+        doc.AddSTSEntryOnly(CStringW(payload,4),true,starts[i],starts[i]+30,CString(name,4),
+            CString(L"actor"),CString(L"effect"),CRect(i,100+i,200+i,300+i),layers[i],orders[i]);
+        originals.push_back(doc.Entry(i));
+    }
+    doc.CreateSegments();doc.Animate(0);
+    printf("sort-stage sort-input\n");doc.Dump("sort-input");
+    const char* stages[]={"sort-time","sort-time-repeat","sort-readorder","sort-readorder-repeat"};
+    for(int n=0;n<4;++n){
+        doc.expected=stages[n];const unsigned before=doc.notifications;
+        doc.Sort(n>=2);check(doc.notifications==before+1,"Sort exactly one OnChanged");
+        bool seen[12]={};
+        for(size_t j=0;j<doc.Entries();++j){const STSEntry e=doc.Entry(int(j));const int id=e.marginRect.left;
+            check(id>=0&&id<12&&!seen[id],"Sort original identity bijection");seen[id]=true;
+            const STSEntry& old=originals[size_t(id)];
+            check(same_identity(e.str,old.str)&&same_identity(e.style,old.style)&&same_identity(e.actor,old.actor)&&same_identity(e.effect,old.effect)
+                &&e.marginRect==old.marginRect&&e.fUnicode==old.fUnicode&&e.start==old.start&&e.end==old.end&&e.layer==old.layer&&e.readorder==old.readorder,"Sort preserves complete initialized record");
+        }
+        printf("sort-stage %s\n",stages[n]);doc.Dump(stages[n]);
+        doc.Animate(0); // each subsequent Sort must rebuild, including repeated same comparator
+    }
+    doc.expected=NULL;
+}
 int main() {
     try {
         if(!AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0))throw std::runtime_error("AfxWinInit failed");
@@ -898,6 +948,7 @@ int main() {
         identity_lifecycle();
         named_style_lifecycle();
         prepared_style_conflicts();
+        sort_lifecycle();
         named_style_exports();
         {
             TraceDocument source(0),destination(1);populate(source);populate(destination);

@@ -1,0 +1,172 @@
+{
+  "schema": 1,
+  "kind": "partial-experimental-script-layout-lifecycle-evidence",
+  "candidate_commit": "dc11cd69045f708f43f096ccb2dddafd4dfe9b73",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "workflow_run": 38645033463,
+  "workflow_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38645033463",
+  "job_id": 116129660990,
+  "architectures": {
+    "x64": {
+      "report": "artifacts/ci-38645033463/renderer-evidence-x64-rust-document/candidate/artifacts/native/x64/document-lifecycle/report.json",
+      "report_sha256": "20251911121cda8bf98806e6bf2fddcd1a8d9aa542558fbb5eb7ac85a907fc97",
+      "independently_verified": {
+        "probe_sha256": "3f549780487ad0f165988e1053457575d0ec5f56fd04facfaf12a060a5516703",
+        "runner_sha256": "fb9cf4cf03ef121e37224b0f7f18582f62f094362fa9e49d33605352c181df1f",
+        "validator_requirements_from_hash_verified_probe": {
+          "require_named_stages": true,
+          "require_identity_stages": true,
+          "require_interpretation_stages": true,
+          "require_layout_stages": true,
+          "require_metadata_stages": false,
+          "require_selected_copy_stages": false,
+          "require_style_rename_stages": false,
+          "require_sort_stages": false
+        },
+        "trace_count": 4,
+        "trace_lines_each": 1577,
+        "trace_sha256": [
+          "b2026f2a63dc9dcca6e4f0422733c05d4b499a9bf71cfad1ab32c66885d87960",
+          "b2026f2a63dc9dcca6e4f0422733c05d4b499a9bf71cfad1ab32c66885d87960",
+          "b2026f2a63dc9dcca6e4f0422733c05d4b499a9bf71cfad1ab32c66885d87960",
+          "b2026f2a63dc9dcca6e4f0422733c05d4b499a9bf71cfad1ab32c66885d87960"
+        ],
+        "four_traces_identical": true,
+        "runtime_stderr_empty": true,
+        "builds": {
+          "reference": {
+            "binary_sha256": "291f97e8c4faea677bda21a80d9b9dfdbf7dd00e9a96673d84b00ae11616e75c",
+            "pe_machine": "0x8664",
+            "source_header_count_verified": 850,
+            "external_header_hash_count_runner_reported": 419,
+            "library_sha256_runner_reported": {
+              "D:\\a\\xy-VSFilter\\xy-VSFilter\\baseline\\bin\\lib_17.0\\x64\\strmbaseR.lib": "2a524bfde5a2125fd9577fafc7009c8c9819ea5ac7aa0e29cad7b514386f11c0",
+              "D:\\a\\xy-VSFilter\\xy-VSFilter\\baseline\\bin\\lib_17.0\\x64\\dsutilR.lib": "cb2ba0bd662ad4f9ca9593dde9bfb0aafadef1b1a34d99588aa6050204542821",
+              "D:\\a\\xy-VSFilter\\xy-VSFilter\\baseline\\bin\\lib_17.0\\x64\\subtitlesR.lib": "c62c13d2b087a995c9d85cb023e1ef733e9a25fb38e806c70b5a61fea935ed94",
+              "D:\\a\\xy-VSFilter\\xy-VSFilter\\baseline\\bin\\lib_17.0\\x64\\subpicR.lib": "22f24017ee25c5de7686b03c80c03c263ee05922c4d968f2dab22d3dda5cf4f8",
+              "D:\\a\\xy-VSFilter\\xy-VSFilter\\baseline\\bin\\lib_17.0\\x64\\basevideofilterR.lib": "4e1a442749eeee47cf1d5100525492fe9525695aadc9b2b45ab77245bb9ee505",
+              "D:\\a\\xy-VSFilter\\xy-VSFilter\\baseline\\bin\\lib_17.0\\x64\\libssfR.lib": "988672a34020170e32a1756ff56e18903751131cb2093ebca6829db80c5b1d81",
+              "D:\\a\\xy-VSFilter\\xy-VSFilter\\baseline\\bin\\lib_17.0\\x64\\log4cplus_staticRU.lib": "434d0134169338873b006924f2fd31f31783813839ea31e41d6dc629daac1de8",
+              "D:\\a\\xy-VSFilter\\xy-VSFilter\\baseline\\bin\\lib_17.0\\x64\\KasumiR.lib": "470f4d13ae17e375118722d04a0ceac29f9a0a63dbd7e0d63f0e89fe66fee834",
+              "D:\\a\\xy-VSFilter\\xy-VSFilter\\baseline\\bin\\lib_17.0\\x64\\systemR.lib": "0131bc14cbdc02986c81bfb9cc1a685f3b8791f6daf71ed4445b0c36b9300692",
+              "D:\\a\\xy-VSFilter\\xy-VSFilter\\baseline\\bin\\lib_17.0\\x64\\unrarR.lib": "fb62444f19105e0e300213b3cc7e628f72f78acd9ed0d7eaaaa9776e80082a12"
+            },
+            "source_header_set_sha256": "212902552bb6c357ad495d96927a77fb6b744cf7ba3f14eae9c5aed645644396"
+          },
+          "candidate": {
+            "binary_sha256": "510f40d53683ecf96d271b17b5816bae86ff63a1d182e2ae3781e5b76ceccb6f",
+            "pe_machine": "0x8664",
+            "source_header_count_verified": 856,
+            "external_header_hash_count_runner_reported": 419,
+            "library_sha256_runner_reported": {
+              "D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\bin\\lib_17.0\\x64\\strmbaseR.lib": "032ae8af607348c366180f64e4651944505ef3cf5a1b79ecf227f5ef2d5a75bb",
+              "D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\bin\\lib_17.0\\x64\\dsutilR.lib": "3987f18521cbec0b7e6d3f199ea7940b99d93e2f46ff1f8331b1a07ca02d168e",
+              "D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\bin\\lib_17.0\\x64\\subtitlesR.lib": "650fbe95587ee25ddd353d08b3778d000d9a58fb8e4d0252564b9ed82daad052",
+              "D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\bin\\lib_17.0\\x64\\subpicR.lib": "c6d7ed1020a42f35cf3164f638859738bfce8f136c52af3222e77c75b7d68269",
+              "D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\bin\\lib_17.0\\x64\\basevideofilterR.lib": "b8af91cbf3055160ca76ea91088830ecec8e4373e5bc4ef5e324849e31d6a6f0",
+              "D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\bin\\lib_17.0\\x64\\libssfR.lib": "59a78941efc318b7dbe03d13a4868df9eabc348693659a873cc0c3aca000780b",
+              "D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\bin\\lib_17.0\\x64\\log4cplus_staticRU.lib": "6eadf9953bb501c8e39363ce5837490a104bbdeb07b83a3ec01a0ed553d41191",
+              "D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\bin\\lib_17.0\\x64\\KasumiR.lib": "2f1bbd4edc5fd0a1d2815dc0937fdf6767aab7fcc953c6af2cf50d058e7682ef",
+              "D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\bin\\lib_17.0\\x64\\systemR.lib": "f22b1d30b9057dd5041f900dd935a2bc945e1a52738c01db3b18c5bf9a39732e",
+              "D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\bin\\lib_17.0\\x64\\unrarR.lib": "e6248844d2db1692a83266ca6fc36ba7d0ded4c2460dbf4bbf204bfab15793e1",
+              "D:\\a\\xy-VSFilter\\xy-VSFilter\\candidate\\target\\x86_64-pc-windows-msvc\\release\\xy_vsfilter_ffi.lib": "26a49e300418b91f9933835a3477cb6714f0000a58da9baa0f7708ef8173e06c"
+            },
+            "source_header_set_sha256": "830ce7211d2c93f988ecdd59d8cdc6dcc3f55045a394ecddfa738f80b2fb1da0"
+          }
+        },
+        "stage_labels": {
+          "default-value": [
+            "default-supplied",
+            "default-read-independent",
+            "default-retained-empty",
+            "default-copied",
+            "default-copy-source-independent",
+            "default-self-copy-retained",
+            "default-reset"
+          ],
+          "resolved-style": [
+            "default-fallback",
+            "mapped-default-fallback",
+            "mapped-named",
+            "forced-missing",
+            "forced-named",
+            "unforced-named",
+            "forced-reset"
+          ],
+          "layout-stage": [
+            "layout-constructed",
+            "layout-supplied",
+            "layout-copy",
+            "layout-copy-independent",
+            "layout-empty",
+            "layout-self-copy",
+            "layout-open-fallback",
+            "layout-open-x1280",
+            "layout-open-y1024",
+            "layout-open-repeated"
+          ],
+          "interpretation-stage": [
+            "interpretation-constructed",
+            "interpretation-supplied",
+            "interpretation-copy",
+            "interpretation-copy-independent",
+            "interpretation-empty",
+            "interpretation-self-copy",
+            "interpretation-microdvd-open",
+            "interpretation-frame",
+            "interpretation-frame-noop",
+            "interpretation-time",
+            "interpretation-time-noop"
+          ],
+          "identity-stage": [
+            "identity-initial",
+            "identity-read-independent",
+            "identity-copy-asymmetric-path",
+            "identity-copy-independent-source",
+            "identity-callback",
+            "identity-remove-entries",
+            "identity-empty",
+            "identity-self-copy",
+            "identity-open-success"
+          ],
+          "named-stage": [
+            "named-initial",
+            "named-equal-duplicate",
+            "named-conflict-collision",
+            "named-numeric-collision",
+            "named-copy-replace",
+            "named-copy-independent",
+            "named-copy-append",
+            "named-self-clear",
+            "named-empty"
+          ]
+        },
+        "layout_callback_observations": [
+          "layout-callback layout-open-fallback width=0 height=0",
+          "layout-callback layout-open-x1280 width=1280 height=1024",
+          "layout-callback layout-open-y1024 width=1280 height=1024",
+          "layout-callback layout-open-repeated width=-8 height=600"
+        ]
+      },
+      "runner_assertions": {
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "stderr_empty": true,
+        "inputs_unchanged": true
+      }
+    },
+    "Win32": {
+      "status": "pending/unverified for this archived lifecycle gate"
+    }
+  },
+  "verification": "Existing current compare_traces validator run with explicit archival requirements derived from exact hash-verified dc11 probe; source/header Git hashes normalized for Windows bytes, both PE binaries and all four traces independently rehashed. No native execution or build rerun.",
+  "remaining_gates": [
+    "No full workflow or experimental renderer approval. This job stopped later at reference style API setup path-readback assertion before video/load/style API comparisons.",
+    "Win32 linked lifecycle exact-source evidence remains unverified.",
+    "Later metadata, selected-copy, prepared-rename and scalar-Sort changes require their own exact-source Windows lifecycle gates; their archival requirements are explicitly false because the dc11 probe does not invoke them.",
+    "External toolchain/SDK files and static libraries are represented by runner-reported hashes, not independently reacquired.",
+    "Allocation/partial-failure, reentry/concurrency and real host memory-lifetime closure remain unresolved."
+  ],
+  "production_switch_authorized": false
+}

@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "scope": "Experimental persistent document containers/styles/identity/interpretation/scriptlayout/initializedmetadata; defaultproduction unchanged",
-  "measured_base_commit": "5aa0abb44beae5fbbc8ffb5650a915f4f2ce1d13",
+  "measured_base_commit": "2b5efca4286c2afcf6a498c07e1dcdc75be3e768",
   "working_tree_source_hashes": true,
   "core_unsafe": {
     "production_block": 0,
@@ -30,9 +30,9 @@
   "new_boundary_files": [
     {
       "path": "rust/ffi/src/document.rs",
-      "sha256": "8189f4302583b6a62b97b1777320ab03982be0be7f791038e2190a83d81f159d",
-      "physical_lines_including_tests": 2632,
-      "nonblank_code_lines_excluding_tests": 965,
+      "sha256": "a6fb154c1e412a68cff7f5e57df53334b53b565240d0ac482510fa484298bc35",
+      "physical_lines_including_tests": 2725,
+      "nonblank_code_lines_excluding_tests": 971,
       "counts": {
         "production_block": 33,
         "production_function": 29,
@@ -252,162 +252,162 @@
           "test": false
         },
         {
-          "line": 816,
+          "line": 822,
           "kind": "block",
           "test": false
         },
         {
-          "line": 823,
+          "line": 829,
           "kind": "function",
           "test": false
         },
         {
-          "line": 833,
+          "line": 839,
           "kind": "block",
           "test": false
         },
         {
-          "line": 841,
+          "line": 847,
           "kind": "function",
           "test": false
         },
         {
-          "line": 859,
+          "line": 865,
           "kind": "block",
           "test": false
         },
         {
-          "line": 875,
+          "line": 881,
           "kind": "function",
           "test": false
         },
         {
-          "line": 891,
+          "line": 897,
           "kind": "block",
           "test": false
         },
         {
-          "line": 911,
+          "line": 917,
           "kind": "block",
           "test": false
         },
         {
-          "line": 918,
+          "line": 924,
           "kind": "function",
           "test": false
         },
         {
-          "line": 933,
+          "line": 939,
           "kind": "block",
           "test": false
         },
         {
-          "line": 943,
+          "line": 949,
           "kind": "function",
           "test": false
         },
         {
-          "line": 951,
+          "line": 957,
           "kind": "block",
           "test": false
         },
         {
-          "line": 962,
+          "line": 968,
           "kind": "function",
           "test": false
         },
         {
-          "line": 973,
+          "line": 979,
           "kind": "block",
           "test": false
         },
         {
-          "line": 974,
+          "line": 980,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1003,
+          "line": 1009,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1010,
+          "line": 1016,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1021,
+          "line": 1027,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1028,
+          "line": 1034,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1081,
+          "line": 1087,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1098,
+          "line": 1104,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1111,
-          "kind": "function",
-          "test": true
-        },
-        {
-          "line": 1115,
-          "kind": "block",
-          "test": true
-        },
-        {
-          "line": 1137,
+          "line": 1117,
           "kind": "function",
           "test": true
         },
         {
-          "line": 1140,
+          "line": 1121,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1152,
+          "line": 1143,
           "kind": "function",
           "test": true
         },
         {
-          "line": 1156,
+          "line": 1146,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1161,
+          "line": 1158,
           "kind": "function",
           "test": true
         },
         {
-          "line": 1165,
+          "line": 1162,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1170,
+          "line": 1167,
+          "kind": "function",
+          "test": true
+        },
+        {
+          "line": 1171,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1194,
+          "line": 1176,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1203,
+          "line": 1200,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 1209,
           "kind": "block",
           "test": true
         }
@@ -471,7 +471,7 @@
   "added_unsafe_impls": 1,
   "retired_native_owners": 18,
   "retired_ffi_crossings": 0,
-  "review": "Prepared style conflict packet input-copy and unsafe export measured against actual frozen files; old primitive diagnostic exports retained. No full Windows or allocation/reentry parity claim.",
+  "review": "Immutable scalar Sort snapshot measurement; native full-width CRT qsort retained. No full Windows or allocation/reentry parity claim.",
   "remaining_contracts": [
     "Changed-code Windows x86/x64 full-class named/default lifecycle, style API/value and renderer comparisons",
     "Native wrapper publication/destruction and real host lifetimes",
@@ -1052,29 +1052,65 @@
         "test_trait": 0,
         "test_other": 0
       }
+    },
+    {
+      "status": "superseded prepared-rename source measurement",
+      "measured_base_commit": "5aa0abb44beae5fbbc8ffb5650a915f4f2ce1d13",
+      "source_hashes": {
+        "src/subtitles/STS.h": "ed723ecdf765261961960355f8f5b9a1a4f8bd788fa23e0ffaf75a63e2531d99",
+        "src/subtitles/STS.cpp": "a2db15d63f24c98db49842d869d73358c81551e3ff72d11c0f324df6d847f605",
+        "src/subtitles/RTS.cpp": "a75521771024bcf73b5ce3aeca32b371bf0d2481d67ab026c71827163a2c9e88",
+        "src/subtitles/USFSubtitles.cpp": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
+        "src/subtitles/SubtitleInputPin.cpp": "7352c0c8410ddab487fdbb437f952502810496b2f3967955b9908bf46152a7e3",
+        "src/filters/transform/vsfilter/DirectVobSubFilter.cpp": "d6e056e9357234b9935fe3a8760655df8e1c3c0a5fa6a9954d343ea0234033af",
+        "src/filters/transform/vsfilter/xy_sub_filter.cpp": "680a96edc424c3a4324b514c5f74fded15857d3525b78d114c5394205dac8f9d",
+        "src/filters/transform/vsfilter/plugins.cpp": "38526740c55b4bc51642925d1ded688ebdd0ff26a01b5a5dd7f587add31df3da",
+        "src/subtitles/RustDocumentOwner.h": "4a125cd871a0c3c29776df2e310d0903d227e08b2d9bfa16678995002079725d",
+        "rust/compat/src/document.rs": "f9c299c453e592f378f403be4b7567af6c64ca5081f92de17275a874ce3dcbb0",
+        "rust/ffi/src/document.rs": "8189f4302583b6a62b97b1777320ab03982be0be7f791038e2190a83d81f159d",
+        "rust/ffi/src/document_registry.rs": "dd7f9eeea1bc353364e067c1ce2f4e99f8b0fb3eb5b2336340836ade9b270729",
+        "include/xy_rust_document.h": "c2f7fe7f5c28b0092f0b6f4ee106afc524b86b4488b16c1ad234a619adf91da5",
+        "tools/compat/document_native_lifecycle.cpp": "ed892df0d67e91aa11d5cfa26db7818bfabe8a942babac9c138f42208c17800f",
+        "tools/compat/document_native_lifecycle.py": "4664db81b611ae1739c72d0ddc62324157dea91d1b936514fc453c4ae34eaf23",
+        "tools/compat/summarize_evidence.py": "18563afbb0e9d27a34b97209b1ecba5c7f3dd9fd5d25ca4a830c4b94dfff3d3d",
+        "tools/compat/audit_document_access.py": "3bec90ce7ee4439b09eb9ef8330bf6961c9832679d7695b48d32f034dbd03c52",
+        "rust/compat/src/document_wire.rs": "d87916c286f5e0f2c35cbde64928adba5799dcde8d854197135bf0f8f277380a"
+      },
+      "ffi_total": {
+        "production_block": 359,
+        "production_function": 302,
+        "production_impl": 2,
+        "production_trait": 0,
+        "production_other": 0,
+        "test_block": 119,
+        "test_function": 4,
+        "test_impl": 0,
+        "test_trait": 0,
+        "test_other": 0
+      }
     }
   ],
   "retired_native_owners_scope": "Eighteen native fields/containers opt-in only; defaultproduction retirementzero",
   "measurement_method": "Current audit_rust_boundary.inventory over actual Rust source, comments/literals masked and test items separated; counts overlap and do not establish soundness. Historical original snapshot retained.",
   "source_hashes": {
     "src/subtitles/STS.h": "ed723ecdf765261961960355f8f5b9a1a4f8bd788fa23e0ffaf75a63e2531d99",
-    "src/subtitles/STS.cpp": "a2db15d63f24c98db49842d869d73358c81551e3ff72d11c0f324df6d847f605",
+    "src/subtitles/STS.cpp": "308f11edf1cdae2196a2a4e1b6450961669de2a7095394c95c0fc57e60ab5fc7",
     "src/subtitles/RTS.cpp": "a75521771024bcf73b5ce3aeca32b371bf0d2481d67ab026c71827163a2c9e88",
     "src/subtitles/USFSubtitles.cpp": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
     "src/subtitles/SubtitleInputPin.cpp": "7352c0c8410ddab487fdbb437f952502810496b2f3967955b9908bf46152a7e3",
     "src/filters/transform/vsfilter/DirectVobSubFilter.cpp": "d6e056e9357234b9935fe3a8760655df8e1c3c0a5fa6a9954d343ea0234033af",
     "src/filters/transform/vsfilter/xy_sub_filter.cpp": "680a96edc424c3a4324b514c5f74fded15857d3525b78d114c5394205dac8f9d",
     "src/filters/transform/vsfilter/plugins.cpp": "38526740c55b4bc51642925d1ded688ebdd0ff26a01b5a5dd7f587add31df3da",
-    "src/subtitles/RustDocumentOwner.h": "4a125cd871a0c3c29776df2e310d0903d227e08b2d9bfa16678995002079725d",
+    "src/subtitles/RustDocumentOwner.h": "1dd0ccf1b1a21364861f3ecfda749c2cbeca3edd570515b202237fb5b786f87d",
     "rust/compat/src/document.rs": "f9c299c453e592f378f403be4b7567af6c64ca5081f92de17275a874ce3dcbb0",
-    "rust/ffi/src/document.rs": "8189f4302583b6a62b97b1777320ab03982be0be7f791038e2190a83d81f159d",
+    "rust/ffi/src/document.rs": "a6fb154c1e412a68cff7f5e57df53334b53b565240d0ac482510fa484298bc35",
     "rust/ffi/src/document_registry.rs": "dd7f9eeea1bc353364e067c1ce2f4e99f8b0fb3eb5b2336340836ade9b270729",
-    "include/xy_rust_document.h": "c2f7fe7f5c28b0092f0b6f4ee106afc524b86b4488b16c1ad234a619adf91da5",
-    "tools/compat/document_native_lifecycle.cpp": "ed892df0d67e91aa11d5cfa26db7818bfabe8a942babac9c138f42208c17800f",
-    "tools/compat/document_native_lifecycle.py": "4664db81b611ae1739c72d0ddc62324157dea91d1b936514fc453c4ae34eaf23",
-    "tools/compat/summarize_evidence.py": "18563afbb0e9d27a34b97209b1ecba5c7f3dd9fd5d25ca4a830c4b94dfff3d3d",
-    "tools/compat/audit_document_access.py": "3bec90ce7ee4439b09eb9ef8330bf6961c9832679d7695b48d32f034dbd03c52",
-    "rust/compat/src/document_wire.rs": "d87916c286f5e0f2c35cbde64928adba5799dcde8d854197135bf0f8f277380a"
+    "include/xy_rust_document.h": "df8f769f6e1224d0e048ba0feb0707a1de4bac88d975be356a1769337f8e278f",
+    "tools/compat/document_native_lifecycle.cpp": "a6f6675988e5e8dedff77f00132adcf576d4f2431ef1338fa49709483aab3b61",
+    "tools/compat/document_native_lifecycle.py": "28bb924077d769d01c860152727bf35a0dae8c38829203d8cd77c11985ca1e08",
+    "tools/compat/summarize_evidence.py": "92f283bfd2556c587ae46e1c11616ce3b44b549d0c038a1d91fb86a9b00b6424",
+    "tools/compat/audit_document_access.py": "5fbd3bb1bc4428a403a3dcd80ce0ab94f2aad01d44a6b04bc19fce20e3cb20bf",
+    "rust/compat/src/document_wire.rs": "d262d8ed966acfd26c14bf2716df4b930737f226cb266fdbdd450de472b74039"
   },
   "default_style_extension": {
     "set": "xy_vsfilter_document_set_default_style_v1 copies input and decodes before admission; validates handle before taking pending value; retired Option drops outside admission, including failure/Busy pending input.",
@@ -1349,6 +1385,184 @@
     "validation": {
       "local": "189 core +117 FFI tests, fmt/Clippy;93 Python tests with4Windows-only skips, including15 lifecycle+4summarizer controls; generation-only extraction pass. No local native execution.",
       "windows": "Exact prepared-rename full-class lifecycle/style API/rendering/host gates pending; earlier evidence not relabeled."
+    },
+    "owner_count_opt_in": 18,
+    "remaining_native_metadata": [
+      "m_simple",
+      "m_lcid",
+      "m_layout_size"
+    ]
+  },
+  "scalar_sort_snapshot_extension": {
+    "base_head": "2b5efca4286c2afcf6a498c07e1dcdc75be3e768",
+    "source_state": "Frozen working-tree scalar Sort snapshot; hashes identify actual content",
+    "source_hashes": {
+      "src/subtitles/STS.h": "ed723ecdf765261961960355f8f5b9a1a4f8bd788fa23e0ffaf75a63e2531d99",
+      "src/subtitles/STS.cpp": "308f11edf1cdae2196a2a4e1b6450961669de2a7095394c95c0fc57e60ab5fc7",
+      "src/subtitles/RTS.cpp": "a75521771024bcf73b5ce3aeca32b371bf0d2481d67ab026c71827163a2c9e88",
+      "src/subtitles/USFSubtitles.cpp": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
+      "src/subtitles/SubtitleInputPin.cpp": "7352c0c8410ddab487fdbb437f952502810496b2f3967955b9908bf46152a7e3",
+      "src/filters/transform/vsfilter/DirectVobSubFilter.cpp": "d6e056e9357234b9935fe3a8760655df8e1c3c0a5fa6a9954d343ea0234033af",
+      "src/filters/transform/vsfilter/xy_sub_filter.cpp": "680a96edc424c3a4324b514c5f74fded15857d3525b78d114c5394205dac8f9d",
+      "src/filters/transform/vsfilter/plugins.cpp": "38526740c55b4bc51642925d1ded688ebdd0ff26a01b5a5dd7f587add31df3da",
+      "src/subtitles/RustDocumentOwner.h": "1dd0ccf1b1a21364861f3ecfda749c2cbeca3edd570515b202237fb5b786f87d",
+      "rust/compat/src/document.rs": "f9c299c453e592f378f403be4b7567af6c64ca5081f92de17275a874ce3dcbb0",
+      "rust/ffi/src/document.rs": "a6fb154c1e412a68cff7f5e57df53334b53b565240d0ac482510fa484298bc35",
+      "rust/ffi/src/document_registry.rs": "dd7f9eeea1bc353364e067c1ce2f4e99f8b0fb3eb5b2336340836ade9b270729",
+      "include/xy_rust_document.h": "df8f769f6e1224d0e048ba0feb0707a1de4bac88d975be356a1769337f8e278f",
+      "tools/compat/document_native_lifecycle.cpp": "a6f6675988e5e8dedff77f00132adcf576d4f2431ef1338fa49709483aab3b61",
+      "tools/compat/document_native_lifecycle.py": "28bb924077d769d01c860152727bf35a0dae8c38829203d8cd77c11985ca1e08",
+      "tools/compat/summarize_evidence.py": "92f283bfd2556c587ae46e1c11616ce3b44b549d0c038a1d91fb86a9b00b6424",
+      "tools/compat/audit_document_access.py": "5fbd3bb1bc4428a403a3dcd80ce0ab94f2aad01d44a6b04bc19fce20e3cb20bf",
+      "rust/compat/src/document_wire.rs": "d262d8ed966acfd26c14bf2716df4b930737f226cb266fdbdd450de472b74039"
+    },
+    "preprocessing_evidence": [
+      {
+        "path": "src/filters/transform/vsfilter/DirectVobSubFilter.cpp",
+        "base_sha256": "d6e056e9357234b9935fe3a8760655df8e1c3c0a5fa6a9954d343ea0234033af",
+        "current_sha256": "d6e056e9357234b9935fe3a8760655df8e1c3c0a5fa6a9954d343ea0234033af",
+        "default_branch_preprocessing": {
+          "native-default": {
+            "same_preprocessed_text": true,
+            "sha256": "d39cf042d69b80020a68f4dc81edd1c9c450cbf37dd90b5c97c8f52aa8c43d2f"
+          },
+          "rust-text-only": {
+            "same_preprocessed_text": true,
+            "sha256": "d39cf042d69b80020a68f4dc81edd1c9c450cbf37dd90b5c97c8f52aa8c43d2f"
+          }
+        },
+        "experimental_preprocessed_sha256": "e4c4a5364c2e23897070965535a9ed9bedf7c73ca6be611a43203556e985e0a0",
+        "active_native_initialized_metadata_tokens_absent": true
+      },
+      {
+        "path": "src/filters/transform/vsfilter/plugins.cpp",
+        "base_sha256": "38526740c55b4bc51642925d1ded688ebdd0ff26a01b5a5dd7f587add31df3da",
+        "current_sha256": "38526740c55b4bc51642925d1ded688ebdd0ff26a01b5a5dd7f587add31df3da",
+        "default_branch_preprocessing": {
+          "native-default": {
+            "same_preprocessed_text": true,
+            "sha256": "6792c4cfecbec9ddeb52d71559c4c39c2e88b2b53fb7b984880a4c13b1d13328"
+          },
+          "rust-text-only": {
+            "same_preprocessed_text": true,
+            "sha256": "6792c4cfecbec9ddeb52d71559c4c39c2e88b2b53fb7b984880a4c13b1d13328"
+          }
+        },
+        "experimental_preprocessed_sha256": "790529faab6373ebd931fd81340a61696835f9f1f64933259429010f3e49f151",
+        "active_native_initialized_metadata_tokens_absent": true
+      },
+      {
+        "path": "src/filters/transform/vsfilter/xy_sub_filter.cpp",
+        "base_sha256": "680a96edc424c3a4324b514c5f74fded15857d3525b78d114c5394205dac8f9d",
+        "current_sha256": "680a96edc424c3a4324b514c5f74fded15857d3525b78d114c5394205dac8f9d",
+        "default_branch_preprocessing": {
+          "native-default": {
+            "same_preprocessed_text": true,
+            "sha256": "b063cc6bf1a77a3ccbcd53b84fba7665efd979398861049c907790fe879891d2"
+          },
+          "rust-text-only": {
+            "same_preprocessed_text": true,
+            "sha256": "b063cc6bf1a77a3ccbcd53b84fba7665efd979398861049c907790fe879891d2"
+          }
+        },
+        "experimental_preprocessed_sha256": "7da18bb6d2ef79d58774c52f2b072a476495fa6424c44f08215f8be74d233271",
+        "active_native_initialized_metadata_tokens_absent": true
+      },
+      {
+        "path": "src/subtitles/RTS.cpp",
+        "base_sha256": "a75521771024bcf73b5ce3aeca32b371bf0d2481d67ab026c71827163a2c9e88",
+        "current_sha256": "a75521771024bcf73b5ce3aeca32b371bf0d2481d67ab026c71827163a2c9e88",
+        "default_branch_preprocessing": {
+          "native-default": {
+            "same_preprocessed_text": true,
+            "sha256": "546b0779eea017e81b1641c84c665c7072df5384e9278e5051f1738075df2c3d"
+          },
+          "rust-text-only": {
+            "same_preprocessed_text": true,
+            "sha256": "bcd96ae9caac7a048689fd3649f21e0a73aa6d4f7750ca58558d14d8e74c7686"
+          }
+        },
+        "experimental_preprocessed_sha256": "5cc98678ee5c01808d45e53bc63b12e63a34a3693721f00943a9d5eef7cd6c85",
+        "active_native_initialized_metadata_tokens_absent": true
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "base_sha256": "a2db15d63f24c98db49842d869d73358c81551e3ff72d11c0f324df6d847f605",
+        "current_sha256": "308f11edf1cdae2196a2a4e1b6450961669de2a7095394c95c0fc57e60ab5fc7",
+        "default_branch_preprocessing": {
+          "native-default": {
+            "same_preprocessed_text": true,
+            "sha256": "ef9c7261e588670a3848b8fa3a45fba10e9fc9e0180a09636db4b257316c6c19"
+          },
+          "rust-text-only": {
+            "same_preprocessed_text": true,
+            "sha256": "d500d49d1f4012017c3d4198cd86b880c536e8b02f18b605331fd178f324729f"
+          }
+        },
+        "experimental_preprocessed_sha256": "aa6a025fe5bbf2168359ce7201ff23e74ca0ba7b9c5360c6334776d81ba3bd03",
+        "active_native_initialized_metadata_tokens_absent": true
+      },
+      {
+        "path": "src/subtitles/STS.h",
+        "base_sha256": "ed723ecdf765261961960355f8f5b9a1a4f8bd788fa23e0ffaf75a63e2531d99",
+        "current_sha256": "ed723ecdf765261961960355f8f5b9a1a4f8bd788fa23e0ffaf75a63e2531d99",
+        "default_branch_preprocessing": {
+          "native-default": {
+            "same_preprocessed_text": true,
+            "sha256": "5d6cd0064ec5775198407bfdcf517f312e65aee97d57022b836c4c9dc73956ee"
+          },
+          "rust-text-only": {
+            "same_preprocessed_text": true,
+            "sha256": "5d6cd0064ec5775198407bfdcf517f312e65aee97d57022b836c4c9dc73956ee"
+          }
+        },
+        "experimental_preprocessed_sha256": "b4f3fa3c09bd4852df5020ca75dc7f9c19f08626ffc26b290815440a979e4c7f",
+        "active_native_initialized_metadata_tokens_absent": true
+      },
+      {
+        "path": "src/subtitles/SubtitleInputPin.cpp",
+        "base_sha256": "7352c0c8410ddab487fdbb437f952502810496b2f3967955b9908bf46152a7e3",
+        "current_sha256": "7352c0c8410ddab487fdbb437f952502810496b2f3967955b9908bf46152a7e3",
+        "default_branch_preprocessing": {
+          "native-default": {
+            "same_preprocessed_text": true,
+            "sha256": "8d647f9a88d7240470fe50358889a789471c77987cfdc2759dd42e2320700d6a"
+          },
+          "rust-text-only": {
+            "same_preprocessed_text": true,
+            "sha256": "8d647f9a88d7240470fe50358889a789471c77987cfdc2759dd42e2320700d6a"
+          }
+        },
+        "experimental_preprocessed_sha256": "3f782617d727b4e411197885d6ec70a1449b89aaecc7b5e71c9234669b9b39eb",
+        "active_native_initialized_metadata_tokens_absent": true
+      },
+      {
+        "path": "src/subtitles/USFSubtitles.cpp",
+        "base_sha256": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
+        "current_sha256": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
+        "default_branch_preprocessing": {
+          "native-default": {
+            "same_preprocessed_text": true,
+            "sha256": "e84591d6becfd3205e1b3276e86d6dcfcb15426364df3149baa7756072f7ac39"
+          },
+          "rust-text-only": {
+            "same_preprocessed_text": true,
+            "sha256": "e84591d6becfd3205e1b3276e86d6dcfcb15426364df3149baa7756072f7ac39"
+          }
+        },
+        "experimental_preprocessed_sha256": "ec1b4cae6a0e0392c67de4041f69734d61e4dea19ce7701f5079ecae2557f16a",
+        "active_native_initialized_metadata_tokens_absent": true
+      }
+    ],
+    "scope": [
+      "Immutable snapshot kind7/index0 is8-byte header countu32/reservedzero then16-byte records starti64/layeri32/readorderi32. No payload strings cross this snapshot.",
+      "Native MaterializeSortRecords constructs actual full-width initialized STSEntry scratch records, ordinal in marginleft, empty strings, false Unicode,end0 and other margins0. Original native CRT comparators/qsort sizeof(STSEntry), permutation gather, Reorder and OnChanged remain. No narrower-key qsort or stable Rustsort substitution.",
+      "Twelve fully initialized native records include exact/mixed comparator ties and rawNUL/unpaired-codeunit payloads. Four normal/repeated/readorder/repeated Sort calls preserve complete records and use full paired dumps. Compact callbacks validate rebuilt segment membership and animation cleared, with exactlyone OnChanged each.",
+      "Eight-file include-stripped native/Rusttext preprocessing equality is source-only, not compilation/reachability/locking or nativefailure proof."
+    ],
+    "validation": {
+      "local": "190core+117FFI=307Rust,fmt/Clippy;94Python tests with4Windows-only skips, including16lifecycle+4summarizer controls; generation-only /tmp/xy-document-scalar-sort passes. No local native execution.",
+      "windows": "Exact-code Sort fullclass/styleAPI/render/host gates pending. dc11 verifiedx64 layout lifecycle predates this change; Win32layout pending."
     },
     "owner_count_opt_in": 18,
     "remaining_native_metadata": [

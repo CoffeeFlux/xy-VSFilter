@@ -764,7 +764,7 @@ pub unsafe extern "C" fn xy_vsfilter_document_snapshot_open_v1(
     capacity: usize,
 ) -> u32 {
     required!(output_capacity(output, capacity, 8));
-    if kind > 6 {
+    if kind > 7 {
         return INVALID_INPUT;
     }
     let bytes = required!(admitted(|registry| {
@@ -799,7 +799,7 @@ pub unsafe extern "C" fn xy_vsfilter_document_snapshot_open_v1(
                         .map_err(style_wire_error)
                 }
             }
-            _ => {
+            5 | 6 => {
                 if index != 0 {
                     return Err(OUT_OF_RANGE);
                 }
@@ -808,6 +808,12 @@ pub unsafe extern "C" fn xy_vsfilter_document_snapshot_open_v1(
                 } else {
                     IdentityField::Path
                 }))
+            }
+            _ => {
+                if index != 0 {
+                    return Err(OUT_OF_RANGE);
+                }
+                wire::encode_sort_snapshot(document.entries()).map_err(wire_error)
             }
         }
     }));
@@ -1211,7 +1217,7 @@ mod tests {
             );
             assert_eq!(output, [0xa5; 8]);
             assert_eq!(
-                xy_vsfilter_document_snapshot_open_v1(source, 7, 0, output.as_mut_ptr(), 8),
+                xy_vsfilter_document_snapshot_open_v1(source, 8, 0, output.as_mut_ptr(), 8),
                 INVALID_INPUT
             );
             assert_eq!(output, [0xa5; 8]);
@@ -1268,6 +1274,93 @@ mod tests {
             assert_eq!(xy_vsfilter_document_destroy_v1(target), OK);
             assert_ne!(read_snapshot(snapshot), style);
             assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
+            // Scalar Sort snapshots never borrow strings or live owner storage.
+            let owner = create();
+            let empty = open_snapshot(owner, 7);
+            assert_eq!(read_snapshot(empty), vec![0; 8]);
+            admitted(|registry| {
+                let d = registry.document_mut(owner).map_err(registry_error)?;
+                for (start, layer, order) in [(5, 2, 7), (1, 1, 8)] {
+                    let mut e = wire::decode_entry(&entry(start, start + 10)).unwrap();
+                    e.layer = layer;
+                    e.readorder = order;
+                    d.add_prepared(e, AddMode::EntryOnly).unwrap();
+                }
+                Ok(())
+            })
+            .unwrap();
+            let before = state(owner);
+            let snapshot = open_snapshot(owner, 7);
+            let bytes = read_snapshot(snapshot);
+            assert_eq!(bytes, wire::encode_sort_snapshot(before.entries()).unwrap());
+            assert_eq!(
+                wire::decode_sort_snapshot(&bytes).unwrap(),
+                vec![
+                    wire::SortScalar {
+                        start: 5,
+                        layer: 2,
+                        readorder: 7
+                    },
+                    wire::SortScalar {
+                        start: 1,
+                        layer: 1,
+                        readorder: 8
+                    }
+                ]
+            );
+            let mut output = [0xa5; 8];
+            assert_eq!(
+                xy_vsfilter_document_snapshot_open_v1(owner, 7, 1, output.as_mut_ptr(), 8),
+                OUT_OF_RANGE
+            );
+            assert_eq!(output, [0xa5; 8]);
+            assert_eq!(
+                xy_vsfilter_document_snapshot_open_v1(owner, 7, 0, output.as_mut_ptr(), 7),
+                INVALID_INPUT
+            );
+            assert_eq!(output, [0xa5; 8]);
+            assert_eq!(
+                xy_vsfilter_document_snapshot_open_v1(snapshot, 7, 0, output.as_mut_ptr(), 8),
+                BAD_HANDLE
+            );
+            assert_eq!(output, [0xa5; 8]);
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_snapshot_open_v1(
+                        owner,
+                        7,
+                        0,
+                        output.as_mut_ptr(),
+                        8
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(output, [0xa5; 8]);
+            admitted(|registry| {
+                let d = registry.document_mut(owner).map_err(registry_error)?;
+                d.set_prepared_text(0, vec![0xd800, 0, 65], Some(false))
+                    .unwrap();
+                d.set_entry_time(0, true, -10).unwrap();
+                d.reorder_entries(&[1, 0]).unwrap();
+                Ok(())
+            })
+            .unwrap();
+            assert_eq!(read_snapshot(snapshot), bytes);
+            assert_eq!(read_snapshot(empty), vec![0; 8]);
+            let changed = open_snapshot(owner, 7);
+            let changed_bytes = read_snapshot(changed);
+            assert_ne!(changed_bytes, bytes);
+            assert_eq!(
+                wire::decode_sort_snapshot(&changed_bytes).unwrap()[1].start,
+                -10
+            );
+            assert_eq!(xy_vsfilter_document_destroy_v1(owner), OK);
+            assert_eq!(read_snapshot(snapshot), bytes);
+            assert_eq!(read_snapshot(changed), changed_bytes);
+            for id in [empty, snapshot, changed] {
+                assert_eq!(xy_vsfilter_document_snapshot_drop_v1(id), OK);
+            }
             // Prepared conflict relocation consumes one fully validated packet.
             let owner = create();
             let mut base = [0u8; style_wire::HEADER_BYTES];
