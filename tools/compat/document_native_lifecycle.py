@@ -139,7 +139,7 @@ def main():
                 "src/thirdparty/VirtualDub/h", "src/thirdparty", "include", "include/unrar")]
             exe = work / "document-native-lifecycle.exe"
             command = ["cl", "/nologo", "/Bv", "/O2", "/Oi", "/Ob2", "/fp:precise", "/EHsc",
-                       "/std:c++17", "/MT", "/Gy", "/showIncludes"]
+                       "/std:c++14", "/MT", "/Gy", "/showIncludes"]
             command += ["/D" + define for define in defines]
             command += ["/I" + str(path) for path in includes]
             command += [str(SOURCE), "/Fo:" + str(work / "probe.obj"), "/Fe:" + str(exe),
