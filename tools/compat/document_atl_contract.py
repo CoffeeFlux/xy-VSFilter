@@ -17,10 +17,11 @@ import subprocess
 ROOT = Path(__file__).resolve().parents[2]
 MAP_METHODS = ('CAtlMap', '~CAtlMap', 'CPair', 'CNode', 'GetHashTableSize', 'GetStartPosition',
                'GetNext', 'GetNextAssoc', 'GetNextKey', 'Lookup', 'operator[]',
-               'SetAt', 'RemoveKey', 'RemoveAll', 'InitHashTable', 'SetOptimalLoad',
+               'SetAt', 'RemoveNode', 'RemoveKey', 'RemoveAll', 'InitHashTable', 'SetOptimalLoad',
                'Rehash', 'PickSize', 'UpdateRehashThresholds', 'NewNode', 'FreeNode',
                'GetNode', 'FindNextNode', 'IsLocked', 'EnableAutoRehash', 'DisableAutoRehash')
 TRAIT_CLASSES = ('CStringElementTraits', 'CStringElementTraitsBase', 'CElementTraitsBase')
+SELECTED_HEADERS = ('atlcoll.h', 'atlstr.h', 'atlsimpstr.h', 'atlbase.h', 'atlcore.h', 'afxstr.h', 'cstringt.h')
 TRAIT_METHODS = ('Hash', 'CompareElements', 'CompareElementsOrdered')
 
 
@@ -108,6 +109,7 @@ def select_definitions(source, header):
         prefix = code[line_start:match.start()]
         if re.search(r'\b(?:return|if|while|for)\b|[.=!]', prefix): continue
         paren = code.find('(', match.start()); after = closing(code, paren, '(', ')')
+        if code[after:].lstrip().startswith(','): continue  # initializer call, not constructor definition
         body = code.find('{', after); semi = code.find(';', after)
         end = closing(code, body) if body >= 0 and (semi < 0 or body < semi) else semi + 1
         if end <= after: continue
@@ -119,6 +121,17 @@ def select_definitions(source, header):
             line = match[0]
             if not re.search(r'\b(?:typedef|using|UINT|ULONG|float|double|size_t)\b', line): continue
             add(first + match.start(), first + match.end(), 'argument/load declaration', 'declaration')
+    for name in ('CPair', 'CNode'):
+        for first, last in class_ranges(code, name):
+            if not any(a <= first < b for a, b in maps): continue
+            for match in re.finditer(r'^[^\n]*\b(?:m_key|m_value|m_pNext|m_nHash)\b[^\n]*;', code[first:last], re.M):
+                line = match[0].strip()
+                if re.match(r'(?:const\s+)?(?:K|V|CNode\s*\*|UINT|ULONG)\s*', line):
+                    add(first + match.start(), first + match.end(), name + ' field declaration', 'declaration')
+    for match in re.finditer(r'\bs_anPrimes\s*\[[^\]]*\]\s*=\s*\{', code):
+        end = closing(code, code.find('{', match.start()))
+        if code[end:].lstrip().startswith(';'): end = code.find(';', end) + 1
+        add(match.start(), end, 's_anPrimes', 'definition')
     for match in re.finditer(r'^[^\n]*\btypedef\b[^\n]*\bCString(?:W|A)?\s*;', code, re.M):
         add(match.start(), match.end(), 'CString alias', 'declaration')
     if sum(len(row['excerpt']) for row in records) > 180000:
@@ -245,15 +258,16 @@ def main():
         report.update(included_header_sha256=headers,linker_observed_library_sha256=libraries,binary_sha256=protect(exe))
         excerpts=[]
         for header in headers:
-            if Path(header).name.lower() in ('atlcoll.h','atlstr.h','atlsimpstr.h','atlbase.h','atlcore.h','afxstr.h'):
-                raw=Path(header).read_bytes();text=raw.decode('utf-8-sig',errors='strict')
-                excerpts+=select_definitions(text,header)
-        required=('CAtlMap','Lookup','Rehash','PickSize','UpdateRehashThresholds','SetOptimalLoad','Hash','CompareElements','operator[]','RemoveKey','RemoveAll')
+            if Path(header).name.lower() in SELECTED_HEADERS:
+                try:
+                    raw=Path(header).read_bytes();text=raw.decode('utf-8-sig',errors='strict')
+                    excerpts+=select_definitions(text,header)
+                except (ValueError, UnicodeError) as error:
+                    report.setdefault('source_extraction_errors', []).append({'header': header, 'error': str(error)})
+        required=('CAtlMap','Lookup','Rehash','PickSize','UpdateRehashThresholds','SetOptimalLoad','Hash','CompareElements','operator[]','RemoveNode','RemoveKey','RemoveAll','s_anPrimes','CPair')
         private=out/'selected-sdk-definitions.private.json';private.write_text(json.dumps({'redistribution':'Private review excerpts only; do not check in SDK source','definitions':excerpts},indent=2)+'\n');report['selected_definitions_sha256']=protect(private)
         report['definition_index']=[{k:v for k,v in r.items() if k!='excerpt'} for r in excerpts]
         report['missing_required_definitions']=[name for name in required if not any(r['symbol']==name and r['kind']=='definition' for r in excerpts)]
-        if report['missing_required_definitions']:
-            raise ValueError('required selected ATL definitions unavailable; inspect retained partial excerpts')
         traces=[]
         for i in range(2):
             result=run([str(exe)],'trace-'+str(i),30)
@@ -264,7 +278,10 @@ def main():
         if subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT).decode().strip()!=report['candidate_commit'] or subprocess.check_output(['git','status','--porcelain','--untracked-files=no'],cwd=ROOT):raise ValueError('source changed')
         for path,expected in stable.items():
             if sha(Path(path).read_bytes())!=expected:raise ValueError('input/artifact changed: '+path)
-        report.update(complete=True,repeat_equal=True,stderr_empty=True,artifact_sha256=stable)
+        report.update(repeat_equal=True,stderr_empty=True,artifact_sha256=stable,behavior_capture_complete=True)
+        if report['missing_required_definitions'] or report.get('source_extraction_errors'):
+            raise ValueError('required selected ATL definitions unavailable; native observations and partial excerpts retained')
+        report['complete']=True
     except Exception as error:
         report['unresolved']=str(error);raise
     finally:save()

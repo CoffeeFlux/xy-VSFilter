@@ -39,6 +39,33 @@ public:
             self.assertGreaterEqual(row['last_line'], row['first_line'])
         self.assertFalse(any('Not retained' in r['excerpt'] for r in selected))
 
+    def test_cstringt_specialization_primes_pair_fields_and_remove_node(self):
+        self.assertIn('cstringt.h', contract.SELECTED_HEADERS)
+        text = """class CAtlMap {
+ class CPair {
+ public:
+  const K m_key;
+  V m_value;
+  CPair(KINARGTYPE key) : m_key(key) { }
+ };
+ void RemoveNode(CNode* node) { FreeNode(node); }
+};
+static const UINT s_anPrimes[] = {17, 37, UINT_MAX};
+class CStringElementTraits< CStringT<BaseType, StringTraits> > {
+public:
+ static ULONG Hash(_In_ INARGTYPE str) throw() { return 7; }
+ static bool CompareElements(
+   _In_ INARGTYPE a,
+   _In_ INARGTYPE b) throw() { return a == b; }
+};
+"""
+        rows = contract.select_definitions(text, 'cstringt.h')
+        symbols = [row['symbol'] for row in rows]
+        for name in ('Hash', 'CompareElements', 's_anPrimes', 'CPair field declaration', 'CPair', 'RemoveNode'):
+            self.assertIn(name, symbols)
+        prime = next(row for row in rows if row['symbol'] == 's_anPrimes')
+        self.assertIn('{17, 37, UINT_MAX}', prime['excerpt'])
+
     def test_native_probe_uses_document_mfc_string_setup(self):
         self.assertLess(contract.PROBE.index('#include <afx.h>'), contract.PROBE.index('#include <atlcoll.h>'))
         self.assertNotIn('#include <windows.h>', contract.PROBE)
