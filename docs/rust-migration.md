@@ -831,9 +831,10 @@ executables, with target/PE and retained-source/binary/trace checks. This remain
 a bounded generic-map result, separate from full named-owner integration. The installed SDK
 contract is identified by hashes; future toolchain drift is not silently accepted.
 
-Native AddStyle still decides value equality, scans the full logical name for a
-numeric suffix, generates names through the CRT, and performs remove/insert and
-entry renames in its original order through value operations. A missing-key null
+The experimental AddStyle now classifies equality and commits map/entry changes
+in safe Rust. Native code scans the full logical name for a numeric suffix and
+generates names through the original CRT expressions. See the coarse style
+addition boundary below. A missing-key null
 insertion remains permitted. Duplicate AddStyle calls involving a null old/new
 style have an unresolved reference outcome: the experiment returns an explicit
 unresolved status instead of executing an unsafe history or claiming parity.
@@ -1011,7 +1012,7 @@ or authorization to switch default production.
 
 ### Prepared AddStyle conflict boundary
 
-The experimental AddStyle conflict path now commits removal of the old key,
+At the earlier prepared-conflict increment, the experimental AddStyle path committed removal of the old key,
 reinsertion of the captured previous style at the native-selected name, and
 matching entry-style renames through one `CommitStyleRename` packet. Native
 classification, equality, CRT suffix generation and collision lookup remain in
@@ -1300,6 +1301,45 @@ preprocessing, generated native probes, lexical inventory and whitespace checks
 pass. The active helper-source capture now uses preprocessor line mappings to
 retain authoritative expanded bodies without guessing macro substitutions.
 
+### Coarse style addition boundary
+
+The experimental AddStyle now delegates empty-name normalization, missing/equal/
+unequal classification, collision presence and the complete mutation tail to
+safe Rust. Missing names insert directly; native-equal duplicates retain the old
+value, including its exact floating-point bits and raw font-name suffix. Unequal
+styles create an owned session. Native code retains the original digit scan,
+CRT suffix parsing, formatting and increment order, submitting each candidate.
+An occupied candidate leaves the document unchanged. A free candidate commits
+old-key removal, previous-value relocation, matching entry renames and final
+incoming insertion in that order, with no callback or retained document loan.
+The old prepared-rename diagnostic seam remains available.
+
+A logically empty name becomes Default. A nonempty name beginning with NUL does
+not: map construction stores its empty prefix. Equality and map lookup preserve
+their first-NUL rules, while the native suffix scan receives the complete logical
+name. A missing-key null insertion remains defined; duplicate null dereference
+histories remain explicitly unresolved. No native null-history probe is added.
+
+The begin boundary validates output capacity and reserves two registry slots and
+packet capacity before classification can mutate the owner. It returns snapshot
+and session IDs together, allowing the C++ wrapper to release both resources if
+reply decoding or CString construction throws. Submit stages its candidate before
+admission and returns retired style/entry values for destruction afterward. These
+are two unsafe exports using the existing input-copy/output-write helpers (five
+new explicit unsafe blocks), with no new raw helper or unsafe implementation.
+Allocation/partial-failure timing, allocator reentry and native pointer-alias
+histories remain outside the bounded compatibility claim.
+
+Three new full-class stages check both directions of signed-zero equality with
+post-NUL font differences, retention of the old complete style, unchanged entry
+names and animated segments, and the distinct empty-name/leading-NUL cases.
+Existing occupied-suffix, raw-name and map-shrink histories remain required.
+Local validation passes 209 core and 119 FFI tests, pinned Rust 1.85 formatting
+and all-target Clippy, and 133 Python tests with four Windows-only skips.
+Generated probes, unchanged default/RustText preprocessing and inventories pass.
+Windows validation of this new session remains pending. The canonical retired
+owner count remains 20; consolidating operations does not retire another field.
+
 ### Newly verified x64 integration and preparation evidence
 
 [The retained x64 evidence](rust-document-x64-7f-evidence.json) for `7f3e5c9c`,
@@ -1375,13 +1415,13 @@ Neither count measures the amount of application behavior replaced.
 The reproducible [Rust unsafe inventory](rust-unsafe-inventory.json) uses
 `python3 tools/compat/audit_rust_boundary.py OUTPUT.json`. It masks comments and
 literals, separates cfg(test) items, and includes all platform/feature branches.
-At the current frozen working-tree sources based on `61e91fa3` (exact file
+At the current frozen working-tree sources based on `0976ec8a` (exact file
 hashes recorded by the regenerated inventory):
 
 | Layer | Production source inventory | Meaning |
 | --- | --- | --- |
-| `rust/compat` | 0 unsafe blocks/functions/impls; 8,021 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
-| `rust/ffi` | 363 explicit unsafe blocks, 305 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,505 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
+| `rust/compat` | 0 unsafe blocks/functions/impls; 8,225 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
+| `rust/ffi` | 368 explicit unsafe blocks, 307 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,659 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
 | Tests | 119 unsafe blocks in FFI tests | Exercise valid and deliberately bounded ownership/alias/initialization contracts; not production code |
 
 Unsafe-function declarations and blocks overlap and must not be added as

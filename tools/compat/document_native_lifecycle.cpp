@@ -916,6 +916,46 @@ static void prepared_style_conflicts() {
         check(change_events[0]==callbacks,"removal shrink conflict does not notify");
     }
 }
+static void add_style_session_lifecycle() {
+    {
+        TraceDocument doc(0);STSStyle negative=named_value(1),positive=named_value(2);
+        negative.fontSize=-0.0;positive.fontSize=0.0;
+        named_add(doc,L"ZeroNeg",negative);named_add(doc,L"ZeroPos",positive);
+        doc.AddSTSEntryOnly(CStringW(L"negative zero"),true,0,10,CString(L"ZeroNeg"),CString(L"actor"),CString(L"effect"),CRect(1,2,3,4),1,7);
+        doc.AddSTSEntryOnly(CStringW(L"positive zero"),true,10,20,CString(L"ZeroPos"),CString(L"actor2"),CString(L"effect2"),CRect(5,6,7,8),2,8);
+        doc.CreateSegments();doc.Animate(0);const auto segments=segment_snapshot(doc);const unsigned callbacks=change_events[0];
+        printf("add-style-stage add-style-equal-before\n");doc.Dump("add-style-equal-before");
+        STSStyle incomingNegative=negative,incomingPositive=positive;
+        incomingNegative.fontSize=0.0;incomingPositive.fontSize=-0.0;
+        incomingNegative.fontName.SetAt(2,0xdcff);incomingPositive.fontName.SetAt(2,0xdfff);
+        check(incomingNegative==negative&&incomingPositive==positive,"native signedzero/postNUL duplicate equality");
+        named_add(doc,L"ZeroNeg",incomingNegative);named_add(doc,L"ZeroPos",incomingPositive);
+        check(doc.NamedCount()==2&&same_identity(doc.Entry(0).style,CString(L"ZeroNeg"))&&same_identity(doc.Entry(1).style,CString(L"ZeroPos")),"equal duplicates do not rename or grow map");
+        const STSStyle expected[]={negative,positive};const char* names[]={"ZeroNeg","ZeroPos"};
+        for(int i=0;i<2;++i){STSStyle actual;check(doc.GetStyle(i,&actual),"signedzero retained owned style");uint64_t bits,wanted;
+            std::memcpy(&bits,&actual.fontSize,8);std::memcpy(&wanted,&expected[i].fontSize,8);
+            check(bits==wanted&&same_identity(actual.fontName,expected[i].fontName),"equal duplicate retains original raw float bits and full font units");
+            printf("add-style-retained %s bits=%016llx font",names[i],static_cast<unsigned long long>(bits));units(actual.fontName);printf("\n");}
+        require_same_segments(doc,segments,"add-style-equal-after");
+        check(change_events[0]==callbacks,"equal duplicates do not notify");
+        printf("add-style-stage add-style-equal-after\n");doc.Dump("add-style-equal-after");
+    }
+    {
+        TraceDocument doc(0);STSStyle first=named_value(1),second=named_value(2);const unsigned callbacks=change_events[0];
+        STSStyle* owned=new STSStyle;*owned=first;doc.AddStyle(CString(),owned);
+        const wchar_t raw[]={0,L'K'};const CString leadingNul(raw,2);
+        owned=new STSStyle;*owned=second;doc.AddStyle(leadingNul,owned);
+        doc.AddSTSEntryOnly(CStringW(L"logical empty normalized"),true,0,10,CString(L"Default"));
+        doc.AddSTSEntryOnly(CStringW(L"nonempty leading NUL"),true,10,20,leadingNul);
+        check(doc.NamedCount()==2&&doc.HasStoredName(CString(L"Default"))&&doc.HasStoredName(CString()),"logical empty becomes Default while leading NUL creates empty stored key");
+        STSStyle normal,empty;check(doc.GetStyle(0,&normal)&&doc.GetStyle(1,&empty),"separate name class resolutions");
+        check(normal==first&&empty==second&&same_identity(doc.Entry(1).style,leadingNul),"name classes retain separate values and raw entry name");
+        printf("add-style-stage add-style-name-classes\n");doc.Dump("add-style-name-classes");
+        check(change_events[0]==callbacks,"name classification adds no callbacks");
+        printf("add-style-name-classes count=%zu default=1 empty=1 default-size=%d empty-size=%d entry",doc.NamedCount(),int(normal.fontSize),int(empty.fontSize));units(doc.Entry(1).style);printf("\n");
+    }
+}
+
 class SortDocument : public TraceDocument {
 public:
     unsigned notifications=0;
@@ -1209,6 +1249,7 @@ int main() {
         identity_lifecycle();
         named_style_lifecycle();
         prepared_style_conflicts();
+        add_style_session_lifecycle();
         sort_lifecycle();
         base_empty_lifecycle();
         lcid_lifecycle();

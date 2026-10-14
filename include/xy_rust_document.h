@@ -205,6 +205,16 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_remove_entries_v1(uint64_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_animation_or_v1(uint64_t, uint32_t segment, uint32_t animated);
 // No rebuild. Result: applied:u32, reserved-zero:u32, end:i64 (zero if absent).
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_correct_last_end_v1(uint64_t, int64_t bound, uint8_t*, size_t);
+// Coarse AddStyle: nullable wire is zero bytes. Begin output16 holds
+// snapshotID:u64,runID:u64(0Done), before caller constructs native values.
+// Begin snapshot packet24:
+// action:u32(0Done/1Conflict),reserved-zero:u32,run:u64(0Done),units:u64,
+// normalized full raw UTF-16LE name (also supplied for Done).
+// Submit preserves occupied candidates including null; applied:u64LE 0/1.
+// Native CRT candidate naming and native temporary destruction stay outside ABI.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_add_style_begin_v1(uint64_t owner,const uint8_t* name,size_t name_bytes,const uint8_t* style,size_t style_bytes,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_add_style_submit_v1(uint64_t run,const uint8_t* candidate,size_t bytes,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_add_style_drop_v1(uint64_t run);
 // Typed unknown-style pass bound to a live owner. Each step returns an immutable
 // snapshot: kind:u32(0 Done/1 Advanced/2 Warning), reserved-zero:u32, units:u64,
 // then full raw UTF-16LE warning name. Release registry admission before dialogs.
