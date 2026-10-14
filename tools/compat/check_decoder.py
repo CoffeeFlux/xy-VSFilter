@@ -55,7 +55,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
               ROOT / "include/xy_rust_drawing.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
-              ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
+              ROOT / "include/xy_rust_font_records.h", ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
               ROOT / "include/xy_rust_cc.h", ROOT / "src/subtitles/CCDecoder.cpp", ROOT / "src/subtitles/CCDecoder.h",
               ROOT / "include/xy_rust_segments.h",
@@ -213,7 +213,11 @@ public:
         if name == "CandidateAssDocument":
             document += "#define XY_VSFILTER_RUST_TEXT\n"
         for signature in ("static inline CStringW GetStr(", "static inline int GetInt(", "static inline double GetFloat(", "static inline CStringW::PCXSTR TryNextStr(", "static inline int NextInt(", "static bool LoadUUEFont("):
-            document += extract_definition(decoded, signature) + "\n"
+            definition = extract_definition(decoded, signature)
+            if name == "CandidateAssDocument" and signature == "static bool LoadUUEFont(":
+                assert definition.count("XyRust::FontRecords records") == 1
+                definition = definition.replace("XyRust::FontRecords records", "XyRust::ObservedFontRecords records")
+            document += definition + "\n"
         start = decoded.index("static bool OpenSubStationAlpha(")
         end = decoded.index("static bool OpenXombieSub(", start)
         definition = decoded[start:end].rstrip()
@@ -1255,7 +1259,7 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "webvtt_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring model with host iswspace; Windows comparison required",
         "ass_document_compile_command": document_compile,
         "ass_document_result": document_result.stdout, "ass_document_stderr": document_result.stderr,
-        "ass_document_scope": "Complete pinned OpenSubStationAlpha and LoadUUEFont, including migrated dialogue/style branches; native ATL/CRT in Windows CI, portable strings elsewhere; controlled line I/O, FastTrim utility, style-map and font-registration boundaries; complete retained settings, entry arguments, input position, callback order/interruption and partial failures; representable numeric arithmetic only",
+        "ass_document_scope": "Complete pinned OpenSubStationAlpha and LoadUUEFont, including migrated header/dialogue/style/font-record owners; ignored loader replies and mutations; native ATL/CRT in Windows CI, portable strings elsewhere; controlled line I/O, FastTrim utility, style-map and font-registration boundaries; complete retained settings, entry arguments, input position, callback order/interruption and partial failures; representable numeric arithmetic only",
         "ass_style_compile_command": style_compile,
         "ass_style_result": style_result.stdout, "ass_style_stderr": style_result.stderr,
         "ass_style_scope": "Complete pinned style branch and native defaults; actual ATL/CRT in Windows CI, portable string model elsewhere; remaining input, all style fields/float bits, errno/floating flags, retained numeric callbacks and interruptions; GetStr private TrimLeft call identity already replaced by prior StringField migration; overflowing scanf conversions and full file/style-map integration excluded",

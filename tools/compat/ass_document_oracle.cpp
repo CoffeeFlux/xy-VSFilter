@@ -24,6 +24,23 @@ static std::vector<DocumentLine> script(const std::vector<std::wstring>& lines,b
     std::vector<DocumentLine> result;for(const auto& line:lines)result.push_back({line,true});
     if(!result.empty())result.back().success=finalSuccess;return result;
 }
+static uint64_t fontComparisons=0,fontInterruptions=0,fontCallbacks=0;
+static void compareFonts(const std::vector<DocumentLine>& lines,unsigned mode=0,int failure=-1){
+    std::wstring diagnostic;for(const auto& line:lines){diagnostic+=line.text;diagnostic+=L'\n';}
+    microCase=fontComparisons;microInput=diagnostic.data();microLength=static_cast<int>(diagnostic.size());microSide=0;
+    DocumentFile first(lines,true),second(lines,true);
+    bool resultA=false,resultB=false,exceptionA=false,exceptionB=false;
+    documentMutate=false;activeDocument=NULL;fontReplyMode=mode;searchFailure=failure;searchAttempts=0;searchEvents.clear();errno=EDOM;
+    try{resultA=ReferenceAssDocument::LoadUUEFont(&first);}catch(const SearchInterrupted&){exceptionA=true;}
+    const int errnoA=errno;const auto events=searchEvents;const int attempts=searchAttempts;
+    searchAttempts=0;searchEvents.clear();errno=EDOM;microSide=1;
+    try{resultB=CandidateAssDocument::LoadUUEFont(&second);}catch(const SearchInterrupted&){exceptionB=true;}
+    const int errnoB=errno;
+    if(resultA!=resultB || exceptionA!=exceptionB || first.position!=second.position || events!=searchEvents || errnoA!=errnoB){
+        fprintf(stderr,"Font record mismatch mode=%u failure=%d results=%d/%d exceptions=%d/%d read=%zu/%zu callbacks=%zu/%zu errno=%d/%d\n",mode,failure,resultA,resultB,exceptionA,exceptionB,first.position,second.position,events.size(),searchEvents.size(),errnoA,errnoB);std::abort();
+    }
+    ++fontComparisons;fontCallbacks+=events.size();fontInterruptions+=failure>=0 && attempts>failure;
+}
 int main(){
     microDiagnostics();microObserveFieldTrims=false;
     const std::wstring style=L"Style: Default,Arial,36,16777215,255,0,0,0,0,0,0,100,100,0,0,1,2,1,2,10,10,10,1";
@@ -55,6 +72,23 @@ int main(){
         for(unsigned i=0;i<n%17;++i){random^=random<<13;random^=random>>17;random^=random<<5;input.push_back(headers[random%(sizeof(headers)/sizeof(*headers))]);}
         input.push_back(style);input.push_back(dialogue);compare(script(input,n%3!=0),n%2==0,-1,n%5==0);
     }
+    const uint64_t documentReadCount=documentReads,documentFontCount=documentFonts;
+    const uint64_t recordOwnerStart=recordOwners,recordLineStart=recordLines,recordAppendStart=recordAppends,recordClearStart=recordClears;
+    const wchar_t* records[]={L"",L" ",L"abcd",L"fontname:",L"fontname: sample",L"Fontname: sample",L"[Script Info]",L"[V4 Styles]",L"[V4+ Styles]",L"[V4++ Styles]",L"[Events]tail",L"[events]",L"[Fonts]",L"[Graphics]",L"[unknown]"};
+    for(const auto* first:records)for(const auto* second:records)for(unsigned mode=0;mode<3;++mode){
+        compareFonts(script({first,second,L"tail"}),mode);
+        compareFonts(script({first,second},false),mode);
+    }
+    for(unsigned unit=0;unit<=0xffff;++unit){
+        std::wstring text=L"a";text.push_back(static_cast<wchar_t>(unit));text+=L"b";
+        compareFonts(script({L"head",text,L"fontname: next",text,L"[Events]",L"ignored"}),unit%3);
+        compareFonts(script({text},false));
+    }
+    const auto fontRecords=script({L"fontname: empty",L"first",L"fontname: second",L"second",L"[Events]"});
+    for(unsigned mode=0;mode<3;++mode)for(int failure=0;failure<14;++failure)compareFonts(fontRecords,mode,failure);
+    fontReplyMode=0;
+    if(!fontComparisons || !fontInterruptions || !recordOwners || !recordLines || !recordAppends || !recordClears)return 1;
+    printf("%llu exact LoadUUEFont comparisons passed (%llu callback observation values, %llu injected interruptions; %llu Rust record owners / %llu classified lines / %llu appended fragments / %llu cleared records; empty flushes, exact case-sensitive section prefixes, consumed headers, ignored font-loader return values and mutations, final-read failure, raw UTF-16/NULs; OS font registration modeled)\n",(unsigned long long)fontComparisons,(unsigned long long)fontCallbacks,(unsigned long long)fontInterruptions,(unsigned long long)(recordOwners-recordOwnerStart),(unsigned long long)(recordLines-recordLineStart),(unsigned long long)(recordAppends-recordAppendStart),(unsigned long long)(recordClears-recordClearStart));
     if(!accepted || !rejected || !escaped || !styles || !dialogues || !interruptions || !documentFonts || !documentMutations || !styleOwners || !dialogueOwners || !headerOwners || !headerClassifications || !headerValues || !headerVersions)return 1;
-    printf("%llu exact ASS document comparisons passed (%llu accepted, %llu rejected, %llu escaping exceptions, %llu style calls, %llu dialogue calls, %llu callback observation values, %llu injected interruptions, %llu read callbacks, %llu font callbacks, %llu read-time setting mutations; %llu header owners / %llu classifications / %llu value selections / %llu version replies; complete pinned OpenSubStationAlpha and LoadUUEFont with migrated style/dialogue branches; final-line EOF, repeated headers, charset versions, partial state and file position; line I/O/FastTrim/style-map/font-registration boundaries modeled, unrepresentable numeric arithmetic excluded)\n",(unsigned long long)comparisons,(unsigned long long)accepted,(unsigned long long)rejected,(unsigned long long)escaped,(unsigned long long)styles,(unsigned long long)dialogues,(unsigned long long)callbacks,(unsigned long long)interruptions,(unsigned long long)documentReads,(unsigned long long)documentFonts,(unsigned long long)documentMutations,(unsigned long long)headerOwners,(unsigned long long)headerClassifications,(unsigned long long)headerValues,(unsigned long long)headerVersions);
+    printf("%llu exact ASS document comparisons passed (%llu accepted, %llu rejected, %llu escaping exceptions, %llu style calls, %llu dialogue calls, %llu callback observation values, %llu injected interruptions, %llu read callbacks, %llu font callbacks, %llu read-time setting mutations; %llu header owners / %llu classifications / %llu value selections / %llu version replies; complete pinned OpenSubStationAlpha and LoadUUEFont with migrated style/dialogue branches; final-line EOF, repeated headers, charset versions, partial state and file position; line I/O/FastTrim/style-map/font-registration boundaries modeled, unrepresentable numeric arithmetic excluded)\n",(unsigned long long)comparisons,(unsigned long long)accepted,(unsigned long long)rejected,(unsigned long long)escaped,(unsigned long long)styles,(unsigned long long)dialogues,(unsigned long long)callbacks,(unsigned long long)interruptions,(unsigned long long)documentReadCount,(unsigned long long)documentFontCount,(unsigned long long)documentMutations,(unsigned long long)headerOwners,(unsigned long long)headerClassifications,(unsigned long long)headerValues,(unsigned long long)headerVersions);
 }
