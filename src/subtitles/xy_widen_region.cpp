@@ -129,6 +129,14 @@ public:
     int *m_cross_matrix;
     int *m_cross_matrix_base;
 private:
+    class CrossCoordinates
+    {
+        int* center;
+    public:
+        explicit CrossCoordinates(int* p):center(p){}
+        int Get(int y) const { return center[y]; }
+        void Set(int y, int value) { center[y] = value; }
+    };
     int cross_left(int dx, int dy) const;
 
     XyEllipse(const XyEllipse&);
@@ -691,9 +699,13 @@ int XyEllipse::init_cross_point()
     float rx_divide_ry = m_f_rx/m_f_ry;
     float ry_2 = m_ry * m_ry;
 
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::EllipseScratch cross_x(m_ry);
+#else
     std::vector<int> cross_x_base(2*m_ry+1+1);
-    int *cross_x = &cross_x_base[0] + m_ry + 1;
-    cross_x[-m_ry-1] = m_rx;
+    CrossCoordinates cross_x(&cross_x_base[0] + m_ry + 1);
+#endif
+    cross_x.Set(-m_ry-1, m_rx);
     for (int dy=-2*m_ry;dy<=-1;dy++)
     {
         static bool first = true;
@@ -707,30 +719,30 @@ int XyEllipse::init_cross_point()
             float fx_2 = ry_2 - float(y)*float(y);
             if (fx_2<0) fx_2 = 0;
             float f_cross_x = rx_divide_ry * ( sqrt(fxo_2)-sqrt(fx_2) );
-            cross_x[y] = ceil(f_cross_x);
+            cross_x.Set(y, ceil(f_cross_x));
             //This assertion may fail, e.g. when (m_rx,m_ry)=(15,19) and dy=y=-19, because of rounding of float
-            // ASSERT(cross_x[y]<=cross_x[y-1] && abs(cross_x[y])<=m_rx);
-            cross_x[y] = min(cross_x[y-1], max(min(cross_x[y],m_rx),-m_rx));
+            // ASSERT(cross_x.Get(y)<=cross_x.Get(y-1) && abs(cross_x.Get(y))<=m_rx);
+            cross_x.Set(y, min(cross_x.Get(y-1), max(min(cross_x.Get(y),m_rx),-m_rx)));
         }
 
 
         y--;
-        //[ -m_rx, cross_x[y] )
-        for (int j=-m_rx;j<cross_x[y];j++)
+        //[ -m_rx, cross_x.Get(y) )
+        for (int j=-m_rx;j<cross_x.Get(y);j++)
         {
             set_cross_point(dy, j, MAX_CROSS_LINE);
         }
         for ( ;y>-m_ry;y-- )
         {
-            //[ cross_x[y], cross_x[y-1] )
-            for (int j=cross_x[y];j<cross_x[y-1];j++)
+            //[ cross_x.Get(y), cross_x.Get(y-1) )
+            for (int j=cross_x.Get(y);j<cross_x.Get(y-1);j++)
             {
                 set_cross_point(dy, j, y);
             }
         }
-        set_cross_point(dy, cross_x[y], y);
-        //[ cross_x[y], m_rx ]
-        for (int j=cross_x[y];j<=m_rx;j++)
+        set_cross_point(dy, cross_x.Get(y), y);
+        //[ cross_x.Get(y), m_rx ]
+        for (int j=cross_x.Get(y);j<=m_rx;j++)
         {
             set_cross_point(dy, j, MIN_CROSS_LINE);
         }

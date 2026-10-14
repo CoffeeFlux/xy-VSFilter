@@ -13,6 +13,15 @@
 #include <windows.h>
 #endif
 #include "xy_rust_ellipse.h"
+static uint64_t ellipseScratchOwners=0,ellipseScratchReads=0,ellipseScratchWrites=0,ellipseScratchFallbacks=0;
+namespace XyRust {
+class ObservedEllipseScratch : public EllipseScratch {
+public:
+    explicit ObservedEllipseScratch(int ry):EllipseScratch(ry){if(Ready())++ellipseScratchOwners;else ++ellipseScratchFallbacks;}
+    int Get(int y)const{++ellipseScratchReads;return EllipseScratch::Get(y);}
+    void Set(int y,int value){++ellipseScratchWrites;EllipseScratch::Set(y,value);}
+};
+}
 #define ASSERT(x) ((void)0)
 #define DEBUG_NEW new
 #ifdef min

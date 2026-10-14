@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdexcept>
+#include <vector>
 #ifdef _MSC_VER
 #define XY_ELLIPSE_CDECL __cdecl
 #else
@@ -17,9 +18,33 @@ void* XY_ELLIPSE_CDECL xy_vsfilter_ellipse_matrix_create(int32_t,int32_t);
 uint32_t XY_ELLIPSE_CDECL xy_vsfilter_ellipse_matrix_set(void*,int32_t,int32_t,int32_t);
 int64_t XY_ELLIPSE_CDECL xy_vsfilter_ellipse_matrix_get(const void*,int32_t,int32_t);
 void XY_ELLIPSE_CDECL xy_vsfilter_ellipse_matrix_release(void*);
+void* XY_ELLIPSE_CDECL xy_vsfilter_ellipse_scratch_create(int32_t);
+uint32_t XY_ELLIPSE_CDECL xy_vsfilter_ellipse_scratch_set(void*,int32_t,int32_t);
+int64_t XY_ELLIPSE_CDECL xy_vsfilter_ellipse_scratch_get(const void*,int32_t);
+void XY_ELLIPSE_CDECL xy_vsfilter_ellipse_scratch_release(void*);
 }
 #undef XY_ELLIPSE_CDECL
 namespace XyRust {
+class EllipseScratch {
+    void* owner;
+    int origin;
+    std::vector<int> fallback;
+    EllipseScratch(const EllipseScratch&);EllipseScratch& operator=(const EllipseScratch&);
+public:
+    explicit EllipseScratch(int ry):owner(xy_vsfilter_ellipse_scratch_create(ry)),origin(ry+1),fallback(owner?0:2*ry+2){}
+    ~EllipseScratch(){xy_vsfilter_ellipse_scratch_release(owner);}
+    bool Ready()const{return owner!=NULL;}
+    void Set(int y,int value){
+        if(owner){if(!xy_vsfilter_ellipse_scratch_set(owner,y,value))throw std::out_of_range("ellipse scratch coordinate");}
+        else fallback.at(static_cast<size_t>(int64_t(origin)+y))=value;
+    }
+    int Get(int y)const{
+        if(!owner)return fallback.at(static_cast<size_t>(int64_t(origin)+y));
+        int64_t value=xy_vsfilter_ellipse_scratch_get(owner,y);
+        if(value==INT64_MIN)throw std::out_of_range("ellipse scratch coordinate");
+        return static_cast<int>(value);
+    }
+};
 class EllipseMatrix {
     void* owner;
     EllipseMatrix(const EllipseMatrix&);EllipseMatrix& operator=(const EllipseMatrix&);

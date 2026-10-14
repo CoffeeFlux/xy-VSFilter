@@ -759,6 +759,10 @@ public:
         end = text.index("class WidenRegionCreaterImpl", start)
         definition = text[start:end] + extract_definition(text, "int gen_left_arc(") + "\n"
         definition += text[text.index("XyEllipse::XyEllipse()"):]
+        if name == "CandidateEllipseStorage":
+            assert definition.count("XyRust::EllipseScratch cross_x") == 1
+            definition = definition.replace("XyRust::EllipseScratch cross_x", "XyRust::ObservedEllipseScratch cross_x")
+
         if os.name != "nt":
             definition = definition.replace("__int64", "int64_t")
         storage_code += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"

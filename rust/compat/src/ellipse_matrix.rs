@@ -75,3 +75,60 @@ mod tests {
         assert!(Matrix::new(i32::MAX, i32::MAX).is_none());
     }
 }
+
+/// Native vector<int> scratch cells are value-initialized to zero, including
+/// cells retained between intersection rows. The centered index is ry+1.
+pub struct Scratch {
+    ry: i32,
+    cells: Vec<i32>,
+}
+impl Scratch {
+    pub fn new(ry: i32) -> Option<Self> {
+        if !(1..=8320).contains(&ry) {
+            return None;
+        }
+        let count = 2 * ry as usize + 2;
+        let mut cells = Vec::new();
+        cells.try_reserve_exact(count).ok()?;
+        cells.resize(count, 0);
+        Some(Self { ry, cells })
+    }
+    fn index(&self, y: i32) -> Option<usize> {
+        if y < -self.ry - 1 || y > self.ry {
+            None
+        } else {
+            Some((y + self.ry + 1) as usize)
+        }
+    }
+    pub fn get(&self, y: i32) -> Option<i32> {
+        self.index(y).map(|index| self.cells[index])
+    }
+    pub fn set(&mut self, y: i32, value: i32) -> bool {
+        let Some(index) = self.index(y) else {
+            return false;
+        };
+        self.cells[index] = value;
+        true
+    }
+}
+#[cfg(test)]
+mod scratch_tests {
+    use super::*;
+    #[test]
+    fn centered_zero_cells_and_row_retention_match_native_vector() {
+        let mut scratch = Scratch::new(2).unwrap();
+        for y in -3..=2 {
+            assert_eq!(scratch.get(y), Some(0));
+        }
+        assert!(scratch.set(-3, 17));
+        assert!(scratch.set(2, i32::MIN));
+        assert!(scratch.set(0, i32::MAX));
+        assert!(!scratch.set(-4, 12));
+        assert_eq!(scratch.get(-3), Some(17));
+        assert_eq!(scratch.get(0), Some(i32::MAX));
+        assert_eq!(scratch.get(2), Some(i32::MIN));
+        assert_eq!(scratch.get(3), None);
+        assert!(Scratch::new(8320).is_some());
+        assert!(Scratch::new(8321).is_none());
+    }
+}
