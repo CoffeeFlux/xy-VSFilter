@@ -20,6 +20,21 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust performs `CSubtitle::GetWrapWidth` arithmetic with stack-owned state.
+  Native font measurements, full-line accumulation and ordered word traversal
+  remain. Strict width comparisons, skipped words, style 3's final adjustment,
+  negative widths and scanning beyond line breaks preserve the pinned behavior.
+  Checked arithmetic declines before changing state; the native calculation stays
+  available. Fatal ASan/UBSan comparisons passed **113,182 complete calls** on
+  arm64 and under x64 execution: **93,574 changed results / 662,553 traversal
+  observations**, **90,531 Rust initializations / 53,136 word steps / 90,531
+  completed results**, and zero fallbacks. The preflight excludes **36 cases**
+  outside representable native arithmetic; those are not passing comparisons.
+  Separate Rust/FFI checks verify unchanged state/output on arithmetic decline.
+  Rust 1.85 tests (115 core, 75 FFI), strict Clippy, default syntax and Python
+  harness checks pass. Eight wrap scripts and a visible wrapping control expand
+  the renderer corpus to **602 cases**. Windows/Miri and renderer checks for
+  this increment are pending; native font metrics and host integration remain.
 * Safe Rust now prepares rendered-text escapes (`\N`, `\n`, `\h`) and owns
   run storage and traversal. Soft breaks retain the exact wrap-style condition;
   embedded-NUL strings retain native replacement before reimport into Rust.
@@ -82,9 +97,10 @@ unresolved reference outcomes requiring investigation, never matching results.
   containers are controlled models. Allocation failures remain outside this test.
   Eight collision scripts, repeated forward/backward sampling and a layer visible
   control expand renderer validation to **570 cases**. Rust 1.85 tests (107 core,
-  71 FFI), strict Clippy, default syntax and Python harness checks pass. Windows/
-  Miri and full renderer validation are pending; geometry and broader host
-  playback remain native/integration work.
+  71 FFI), strict Clippy, default syntax and Python harness checks pass. All four
+  platform reports, Miri and Windows x86/x64 renderer checks passed; see
+  [verified layout-storage evidence](layout-rects-evidence.json). Geometry moved
+  in the following increment; broader host playback remains integration work.
 * Safe Rust owns `CTextFile::WriteString` Unicode output buffers. Every LF gains
   a preceding CR, including CRLF becoming CRCRLF, and UTF-16 writes preserve raw
   code units in the selected byte order. Initial CString NUL termination, native

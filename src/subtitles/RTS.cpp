@@ -28,6 +28,7 @@
 #include "xy_rust_drawing.h"
 #include "xy_rust_drawing_tokens.h"
 #include "xy_rust_text_runs.h"
+#include "xy_rust_wrap.h"
 #endif
 #include "draw_item.h"
 #include "cache_manager.h"
@@ -1468,6 +1469,20 @@ int CSubtitle::GetWrapWidth(POSITION pos, int maxwidth)
         if(maxwidth > 0)
         {
             int fullwidth = GetFullLineWidth(pos);
+#ifdef XY_VSFILTER_RUST_TEXT
+            XyRust::WrapWidth wrap(fullwidth, maxwidth);
+            if(wrap.Valid())
+            {
+                POSITION next = pos;
+                while(next && wrap.NeedsWord())
+                {
+                    SharedPtrCWord w = m_words.GetNext(next);
+                    if(!wrap.Push(w->m_width)) break;
+                }
+                int result;
+                if(wrap.Finish(fullwidth, m_wrapStyle, result)) return(result);
+            }
+#endif
             int minwidth = fullwidth / ((abs(fullwidth) / maxwidth) + 1);
             int width = 0, wordwidth = 0;
             while(pos && width < minwidth)
