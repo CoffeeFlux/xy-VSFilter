@@ -23,6 +23,81 @@ pub fn clip_row(destination: &mut [MaybeUninit<u8>], source: &[u8], inverse: boo
     true
 }
 
+pub fn banner_fade(data: &mut [u8], width: usize, fade: i32, delta: i32) -> bool {
+    if width == 0 || width > i32::MAX as usize || data.len() % width != 0 || fade <= 0 {
+        return false;
+    }
+    if delta != 16384 / fade {
+        return false;
+    }
+    let fade = fade as usize;
+    let delta = delta as u32;
+    for row in data.chunks_exact_mut(width) {
+        let mut alpha = 0;
+        for byte in &mut row[..fade.min(width)] {
+            *byte = ((u32::from(*byte) * alpha) >> 14) as u8;
+            alpha += delta;
+        }
+        alpha = 16384 - (fade.saturating_sub(width) as u32) * delta;
+        for byte in &mut row[width.saturating_sub(fade)..] {
+            *byte = ((u32::from(*byte) * alpha) >> 14) as u8;
+            alpha -= delta;
+        }
+    }
+    true
+}
+
+/// One native scroll pass. Geometry and floating-point conversions stay in
+/// their original caller order; all bounds/arithmetic are checked before writes.
+#[allow(clippy::too_many_arguments)]
+pub fn scroll_fade(
+    data: &mut [u8],
+    width: usize,
+    first: i32,
+    last: i32,
+    alpha: i32,
+    delta: i32,
+    clear_before: bool,
+    clear_after: bool,
+) -> bool {
+    if width == 0 || data.len() > i32::MAX as usize || data.len() % width != 0 || first < 0 {
+        return false;
+    }
+    let height = data.len() / width;
+    if first as usize >= height || i64::from(last) > height as i64 {
+        return false;
+    }
+    let rows = (i64::from(last) - i64::from(first)).max(0);
+    let final_alpha = i64::from(alpha) + rows * i64::from(delta);
+    if i32::try_from(final_alpha).is_err() {
+        return false;
+    }
+    if rows > 0 {
+        let last_alpha = final_alpha - i64::from(delta);
+        if i32::try_from(i64::from(alpha) * 255).is_err()
+            || i32::try_from(last_alpha * 255).is_err()
+        {
+            return false;
+        }
+    }
+    let start = first as usize * width;
+    let end = (first as usize + rows as usize) * width;
+    if clear_before {
+        data[..start].fill(0);
+    }
+    let mut alpha = alpha;
+    for row in data[start..end].chunks_exact_mut(width) {
+        for byte in row {
+            *byte = ((i32::from(*byte) * alpha) >> 14) as u8;
+        }
+        alpha += delta;
+    }
+    if clear_after {
+        data[end..].fill(0);
+    }
+    true
+}
+
 pub fn scalar(source: u8, body: u8, mask: u8, color_alpha: i32, flags: u32) -> u8 {
     let coverage = if flags & 1 != 0 {
         source.saturating_sub(body)
@@ -75,6 +150,30 @@ pub fn block(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn overlapping_banner_edges_apply_twice_in_native_order() {
+        let mut pixels = [64; 3];
+        assert!(banner_fade(&mut pixels, 3, 4, 4096));
+        assert_eq!(pixels, [0, 8, 8]);
+    }
+    #[test]
+    fn empty_scroll_interval_still_clears_the_requested_side() {
+        let mut pixels = [64; 6];
+        assert!(scroll_fade(
+            &mut pixels,
+            2,
+            1,
+            -3,
+            16384,
+            -4096,
+            false,
+            true
+        ));
+        assert_eq!(pixels, [64, 64, 0, 0, 0, 0]);
+        let before = pixels;
+        assert!(!scroll_fade(&mut pixels, 2, 0, 3, i32::MAX, 1, true, true));
+        assert_eq!(pixels, before);
+    }
     #[test]
     fn clip_inversion_wraps_outside_nominal_coverage() {
         assert_eq!(

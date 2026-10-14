@@ -682,6 +682,18 @@ public:
         preparation_code += block + "result.emplace_back(c,s);\n}\nreturn result;\n}\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_drawing_preparation.h").write_text(preparation_code, encoding="utf-8")
 
+    clip_fade = '#include "clip_fade_shell.h"\n'
+    for name, content in (("ReferenceFade", original("src/subtitles/RTS.cpp", reference["commit"])), ("CandidateFade", (ROOT / "src/subtitles/RTS.cpp").read_bytes())):
+        text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        clip_fade += f"namespace {name} {{\nCLIP_FADE_CLASS\n"
+        if name == "CandidateFade":
+            clip_fade += "#define XY_VSFILTER_RUST_TEXT\n"
+        for method_name in ("PaintBannerClipper", "PaintScrollClipper"):
+            method = extract_method(text, f"GrayImage2* CClipper::{method_name}()")
+            method = method.replace("xy_vsfilter_banner_fade(", "observedBannerFade(").replace("xy_vsfilter_scroll_fade(", "observedScrollFade(")
+            clip_fade += method + "\n"
+        clip_fade += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_clip_fade.h").write_text(clip_fade, encoding="utf-8")
     clip_mask = '#include "clip_mask_shell.h"\n'
     for name, content in (("ReferenceClip", original("src/subtitles/RTS.cpp", reference["commit"])), ("CandidateClip", (ROOT / "src/subtitles/RTS.cpp").read_bytes())):
         text = content.decode("utf-8-sig").replace("\r\n", "\n")
@@ -1477,6 +1489,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     gauss_planes_result = run([str(gauss_planes_executable)], capture_output=True, text=True)
     print(gauss_planes_result.stdout, end="", flush=True)
     print(gauss_planes_result.stderr, end="", file=sys.stderr)
+    clip_fade_executable = destination / ("clip-fade-oracle.exe" if os.name == "nt" else "clip-fade-oracle")
+    clip_fade_compile = [arg.replace("find_char_oracle.cpp", "clip_fade_oracle.cpp").replace("find-char-oracle", "clip-fade-oracle") for arg in find_char_compile]
+    run(clip_fade_compile)
+    clip_fade_result = run([str(clip_fade_executable)], capture_output=True, text=True)
+    print(clip_fade_result.stdout, end="", flush=True)
+    print(clip_fade_result.stderr, end="", file=sys.stderr)
     hdmv_storage_executable = destination / ("hdmv-storage-oracle.exe" if os.name == "nt" else "hdmv-storage-oracle")
     hdmv_storage_compile = [arg.replace("find_char_oracle.cpp", "hdmv_storage_oracle.cpp").replace("find-char-oracle", "hdmv-storage-oracle") for arg in find_char_compile]
     run(hdmv_storage_compile)
@@ -1884,6 +1902,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "path_align_compile_command": path_align_compile,
         "path_align_result": path_align_result.stdout, "path_align_stderr": path_align_result.stderr,
         "path_align_scope": "Complete pinned PathData::AlignLeftTop over initialized point/type buffers; actual Windows POINT/ATL geometry; exact guarded buffers, origin/size, errno/FP/Windows error state; native cleanup modeled, outputs disjoint and representable arithmetic only",
+        "clip_fade_compile_command": clip_fade_compile,
+        "clip_fade_result": clip_fade_result.stdout, "clip_fade_stderr": clip_fade_result.stderr,
+        "clip_fade_scope": "Whole pinned PaintBannerClipper/PaintScrollClipper with controlled initialized base-mask producer. Native float conversions and ordering, integer divisions, overlapping fades, signed/offscreen/reversed endpoints, empty-interval clearing, all source bytes, reuse and null returns. Zero-divisor cases with non-null base output are excluded before either call, never passes; overflowing native arithmetic/conversions, invalid backing and actual OOM excluded.",
         "hdmv_storage_compile_command": hdmv_storage_compile,
         "hdmv_storage_result": hdmv_storage_result.stdout, "hdmv_storage_stderr": hdmv_storage_result.stderr,
         "hdmv_storage_scope": "Whole pinned constructor/destructor, AllocSegment and byte-sample ParseSample with real reference/candidate Golomb readers. All segment tags, split/short/multiple packets, retained capacity/tails, exact initialized masks and bytes, null/empty calls and modeled Rust decline to successful native allocation. Presentation/segment consumers and Reset are controlled; partial-tail dispatch observes metadata only, never uninitialized bytes. Negative caller lengths, source-buffer aliasing, native debug traps and actual OOM excluded.",

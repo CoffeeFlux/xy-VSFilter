@@ -1,4 +1,72 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
+fn fade_length(width: i32, height: i32) -> Option<usize> {
+    if width <= 0 || height <= 0 {
+        return None;
+    }
+    usize::try_from(width.checked_mul(height)?).ok()
+}
+
+/// # Safety
+/// data exclusively addresses width*height initialized writable bytes for a
+/// positive accepted layout. Rejected layouts do not borrow or change data.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_banner_fade(
+    data: *mut u8,
+    width: i32,
+    height: i32,
+    fade: i32,
+    delta: i32,
+) -> u32 {
+    let Some(length) = fade_length(width, height) else {
+        return 0;
+    };
+    if data.is_null() {
+        return 0;
+    }
+    // SAFETY: checked positive layout; native mask is initialized in full.
+    let bytes = unsafe { core::slice::from_raw_parts_mut(data, length) };
+    u32::from(xy_vsfilter_compat::mask::banner_fade(
+        bytes,
+        width as usize,
+        fade,
+        delta,
+    ))
+}
+
+/// # Safety
+/// Same initialized exclusive plane contract as banner_fade. The native caller
+/// retains geometry/conversion ordering and invokes one pass at a time.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_scroll_fade(
+    data: *mut u8,
+    width: i32,
+    height: i32,
+    first: i32,
+    last: i32,
+    alpha: i32,
+    delta: i32,
+    flags: u32,
+) -> u32 {
+    let Some(length) = fade_length(width, height) else {
+        return 0;
+    };
+    if data.is_null() {
+        return 0;
+    }
+    // SAFETY: checked layout; core preflights the complete pass before writes.
+    let bytes = unsafe { core::slice::from_raw_parts_mut(data, length) };
+    u32::from(xy_vsfilter_compat::mask::scroll_fade(
+        bytes,
+        width as usize,
+        first,
+        last,
+        alpha,
+        delta,
+        flags & 1 != 0,
+        flags & 2 != 0,
+    ))
+}
+
 /// # Safety
 /// For a positive accepted count, source holds count initialized bytes and
 /// destination holds count writable bytes. Access is exclusive until return.
@@ -91,6 +159,30 @@ pub extern "C" fn xy_vsfilter_mask_block(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn initialized_plane_loan_survives_ordered_scroll_passes() {
+        let owner = crate::plane::xy_vsfilter_plane_create(12);
+        assert!(!owner.is_null());
+        // SAFETY: one live plane loan, initialized in full, then two sequential
+        // exclusive FFI borrows; native view ends before owner release.
+        unsafe {
+            let data = crate::plane::xy_vsfilter_plane_loan(owner);
+            core::ptr::write_bytes(data, 64, 12);
+            assert_eq!(xy_vsfilter_scroll_fade(data, 3, 4, 1, 3, 0, 8192, 1), 1);
+            assert_eq!(
+                core::slice::from_raw_parts(data, 12),
+                &[0, 0, 0, 0, 0, 0, 32, 32, 32, 64, 64, 64]
+            );
+            assert_eq!(
+                xy_vsfilter_scroll_fade(data, 3, 4, 2, 4, 16384, -8192, 2),
+                1
+            );
+            assert_eq!(core::slice::from_raw_parts(data.add(6), 6), &[32; 6]);
+            assert_eq!(xy_vsfilter_banner_fade(data, 3, 4, 4, 4096), 1);
+            assert_eq!(core::slice::from_raw_parts(data.add(6), 3), &[0, 4, 4]);
+            crate::plane::xy_vsfilter_plane_release(owner);
+        }
+    }
     #[test]
     fn clip_rows_initialize_only_active_bytes_and_decline_aliases() {
         use core::mem::MaybeUninit;
