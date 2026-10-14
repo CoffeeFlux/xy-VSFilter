@@ -2,6 +2,7 @@
 #pragma once
 #include <stddef.h>
 #include <stdint.h>
+#include <vector>
 #ifdef _MSC_VER
 #define XY_LAYOUT_CDECL __cdecl
 #else
@@ -14,6 +15,8 @@ void XY_LAYOUT_CDECL xy_vsfilter_layout_edit(void*,uint32_t,size_t,int32_t);
 size_t XY_LAYOUT_CDECL xy_vsfilter_layout_count(const void*);
 int32_t XY_LAYOUT_CDECL xy_vsfilter_layout_field(const void*,size_t,uint32_t);
 size_t XY_LAYOUT_CDECL xy_vsfilter_layout_find(const void*,int32_t,int32_t);
+uint32_t XY_LAYOUT_CDECL xy_vsfilter_layout_advance(void*,int32_t,const int32_t*,size_t);
+uint32_t XY_LAYOUT_CDECL xy_vsfilter_layout_place(const void*,int32_t*,int32_t,uint32_t);
 void XY_LAYOUT_CDECL xy_vsfilter_layout_release(void*);
 }
 #undef XY_LAYOUT_CDECL
@@ -30,6 +33,17 @@ public:
     void Remove(size_t index){xy_vsfilter_layout_edit(owner,1,index,0);}
     void Segment(size_t index,int segment){xy_vsfilter_layout_edit(owner,2,index,segment);}
     size_t Find(int segment,int entry)const{return xy_vsfilter_layout_find(owner,segment,entry);}
+    template<class Array> bool Advance(int segment,const Array& active){
+        std::vector<int32_t> entries(active.GetCount());
+        for(size_t i=0;i<entries.size();++i)entries[i]=active[i];
+        return xy_vsfilter_layout_advance(owner,segment,entries.data(),entries.size())!=0;
+    }
+    template<class Rect> bool Place(Rect& rect,int layer,bool down)const{
+        int32_t fields[]={rect.left,rect.top,rect.right,rect.bottom};
+        if(!xy_vsfilter_layout_place(owner,fields,layer,down?1:0))return false;
+        rect.left=fields[0];rect.top=fields[1];rect.right=fields[2];rect.bottom=fields[3];
+        return true;
+    }
     template<class Record> void AddTail(const Record& record){
         const int32_t fields[]={record.r.left,record.r.top,record.r.right,record.r.bottom,record.segment,record.entry,record.layer};
         xy_vsfilter_layout_add(owner,fields);

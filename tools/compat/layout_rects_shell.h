@@ -50,11 +50,13 @@ public:
 #endif
 struct CSubtitle {CRect m_rect;int m_topborder,m_bottomborder,m_scrAlignment;};
 #define TRACE_RENDERER_REQUEST(message) ((void)0)
-static uint64_t layoutOwners=0,layoutAdds=0,layoutRemoves=0,layoutUpdates=0,layoutFinds=0,layoutClears=0;
+static uint64_t layoutOwners=0,layoutAdds=0,layoutRemoves=0,layoutUpdates=0,layoutFinds=0,layoutClears=0,layoutAdvanceHandled=0,layoutAdvanceFallback=0,layoutPlaceHandled=0,layoutPlaceFallback=0;
 namespace XyRust {
 class ObservedLayoutRects : public LayoutRects {
 public:
     ObservedLayoutRects(){++layoutOwners;}
+    template<class Array> bool Advance(int segment,const Array& active){bool handled=LayoutRects::Advance(segment,active);if(handled)++layoutAdvanceHandled;else ++layoutAdvanceFallback;return handled;}
+    template<class Rect> bool Place(Rect& rect,int layer,bool down)const{bool handled=LayoutRects::Place(rect,layer,down);if(handled)++layoutPlaceHandled;else ++layoutPlaceFallback;return handled;}
     template<class Record> void AddTail(const Record& r){++layoutAdds;LayoutRects::AddTail(r);}
     void Remove(size_t i){++layoutRemoves;LayoutRects::Remove(i);}
     void Segment(size_t i,int segment){++layoutUpdates;LayoutRects::Segment(i,segment);}
