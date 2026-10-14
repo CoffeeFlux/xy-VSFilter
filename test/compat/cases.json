@@ -201,6 +201,14 @@
     [
       "drawing-storage-control-memory",
       "drawing-storage-fractional-scale-memory"
+    ],
+    [
+      "span-merge-control-file",
+      "span-merge-horizontal-border-file"
+    ],
+    [
+      "span-merge-control-memory",
+      "span-merge-horizontal-border-memory"
     ]
   ],
   "cases": [
@@ -12166,6 +12174,270 @@
       "id": "path-align-positive-fraction-memory",
       "script": "test/compat/generated/path-align-positive-fraction.ass",
       "sha256": "513d0ba7f7fea102f81814c38a12d40473befd9f68f2bec92732ad5b6ca510f7",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "span-merge-control-file",
+      "script": "test/compat/generated/span-merge-control.ass",
+      "sha256": "c738a0f37f03a98a8bb65a9fd7111256033ed98237c2128462cda797341b8dd4",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "span-merge-control-memory",
+      "script": "test/compat/generated/span-merge-control.ass",
+      "sha256": "c738a0f37f03a98a8bb65a9fd7111256033ed98237c2128462cda797341b8dd4",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "span-merge-horizontal-border-file",
+      "script": "test/compat/generated/span-merge-horizontal-border.ass",
+      "sha256": "b997ea2fa37714d3534695398a4220f6a4065fda64a7f182b5c3ba0282bfe71f",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "span-merge-horizontal-border-memory",
+      "script": "test/compat/generated/span-merge-horizontal-border.ass",
+      "sha256": "b997ea2fa37714d3534695398a4220f6a4065fda64a7f182b5c3ba0282bfe71f",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "span-merge-small-border-file",
+      "script": "test/compat/generated/span-merge-small-border.ass",
+      "sha256": "f69eb28805ec70272a6659bdd510567a57aa3e015cab99c40ac8d57347456815",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "span-merge-small-border-memory",
+      "script": "test/compat/generated/span-merge-small-border.ass",
+      "sha256": "f69eb28805ec70272a6659bdd510567a57aa3e015cab99c40ac8d57347456815",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "span-merge-drawing-holes-file",
+      "script": "test/compat/generated/span-merge-drawing-holes.ass",
+      "sha256": "f4660c6cce63f0d973a96ea064afb3a58c33a5f9c672507d1b46032aa6beb0fc",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "span-merge-drawing-holes-memory",
+      "script": "test/compat/generated/span-merge-drawing-holes.ass",
+      "sha256": "f4660c6cce63f0d973a96ea064afb3a58c33a5f9c672507d1b46032aa6beb0fc",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "span-merge-italic-karaoke-file",
+      "script": "test/compat/generated/span-merge-italic-karaoke.ass",
+      "sha256": "d996830aa7898ae84cc78070c4fa69aa0b81479fecab24e6031054eb2b4ad405",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "span-merge-italic-karaoke-memory",
+      "script": "test/compat/generated/span-merge-italic-karaoke.ass",
+      "sha256": "d996830aa7898ae84cc78070c4fa69aa0b81479fecab24e6031054eb2b4ad405",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "span-merge-scaled-file",
+      "script": "test/compat/generated/span-merge-scaled.ass",
+      "sha256": "6395fe701bd702f114e54829bee1a54fd651367cbf648601252abd1d01b93e9e",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "span-merge-scaled-memory",
+      "script": "test/compat/generated/span-merge-scaled.ass",
+      "sha256": "6395fe701bd702f114e54829bee1a54fd651367cbf648601252abd1d01b93e9e",
       "open": "memory",
       "width": 1280,
       "height": 720,
