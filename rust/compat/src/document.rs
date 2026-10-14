@@ -5,8 +5,9 @@
 //! Callers must perform native text/style preparation and its initial rejection
 //! checks before supplying records (the suffix begins at STSEntry construction);
 //! raw code units are retained, including unpaired surrogates and embedded NULs.
-//! Supplied initialized default and named-style values are also owned here. Native
-//! map orchestration, metadata, Add parsing, full Copy orchestration, CRT sort and encoding
+//! Raw document name/path and supplied initialized default/named styles are owned
+//! here. Native map orchestration, other metadata, Add parsing, full Copy
+//! orchestration, CRT sort and encoding
 //! conversion remain outside this API. Allocation failure/partial native
 //! mutation and callbacks are outside this API's comparison domain.
 use alloc::{vec, vec::Vec};
@@ -77,16 +78,41 @@ pub struct QueryResult {
     pub count: i32,
 }
 
+/// Raw document identity; CString preparation and path interpretation stay native.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum IdentityField {
+    Name,
+    Path,
+}
+
 /// Clone creates independent storage; it does not emulate native Copy callbacks
-/// or copying the document's still-native named styles and metadata.
+/// or the selective field assignments in native Copy.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Document {
+    name: Vec<u16>,
+    path: Vec<u16>,
     default_style: Option<crate::document_style::StyleValue>,
     named_styles: crate::document_style_map::StyleMap<Option<crate::document_style::StyleValue>>,
     entries: Vec<PreparedEntry>,
     segments: Vec<DocumentSegment>,
 }
 impl Document {
+    pub fn identity(&self, field: IdentityField) -> &[u16] {
+        match field {
+            IdentityField::Name => &self.name,
+            IdentityField::Path => &self.path,
+        }
+    }
+    /// Returns old raw units for destruction after boundary admission ends.
+    pub fn replace_identity(&mut self, field: IdentityField, value: Vec<u16>) -> Vec<u16> {
+        core::mem::replace(
+            match field {
+                IdentityField::Name => &mut self.name,
+                IdentityField::Path => &mut self.path,
+            },
+            value,
+        )
+    }
     /// Absent until the native adapter supplies an initialized style.
     pub fn default_style(&self) -> Option<&crate::document_style::StyleValue> {
         self.default_style.as_ref()
@@ -844,5 +870,33 @@ mod tests {
         let retired = source.named_styles_mut().clear();
         assert_eq!(retired, alloc::vec![None]);
         assert_eq!(destination.named_styles(), &expected);
+    }
+    #[test]
+    fn raw_identity_clone_replace_and_prepared_storage_are_independent() {
+        let mut source = Document::default();
+        let mut destination = Document::default();
+        assert!(source.identity(IdentityField::Name).is_empty());
+        assert!(source.identity(IdentityField::Path).is_empty());
+        let raw = alloc::vec![65, 0, 0xd800, 0xdcff, 0xffff];
+        assert!(source
+            .replace_identity(IdentityField::Name, raw.clone())
+            .is_empty());
+        source.replace_identity(IdentityField::Path, alloc::vec![80, 0, 66]);
+        let cloned = source.clone();
+        destination.replace_identity(IdentityField::Name, alloc::vec![90]);
+        destination.copy_storage_from(&source);
+        destination.clear_entries_and_segments();
+        destination.remove_all_entries();
+        assert_eq!(destination.identity(IdentityField::Name), &[90]);
+        assert!(destination.identity(IdentityField::Path).is_empty());
+        assert_eq!(
+            source.replace_identity(IdentityField::Name, alloc::vec![]),
+            raw
+        );
+        assert_eq!(
+            cloned.identity(IdentityField::Name),
+            &[65, 0, 0xd800, 0xdcff, 0xffff]
+        );
+        assert_eq!(source.identity(IdentityField::Path), &[80, 0, 66]);
     }
 }

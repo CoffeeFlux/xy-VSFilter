@@ -46,6 +46,39 @@ permissions:
   contents: read
 
 jobs:
+  style_api_compile:
+    runs-on: windows-2022
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: x64
+            arch: x64
+          - platform: Win32
+            arch: amd64_x86
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: 4911cacb102bc0cbd41449793e54473265b04e62
+          path: baseline-compile
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile actual style API helper against reference and candidate headers
+        shell: pwsh
+        run: |
+          & python tools\compat\document_style_api_compile.py --reference-root "$pwd\baseline-compile" --platform ${{ matrix.platform }} --output "artifacts\document-style-api-compile\${{ matrix.platform }}"
+          if ($LASTEXITCODE -ne 0) { throw "Style API helper compile-only check failed; inspect report.json" }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: document-style-api-compile-${{ matrix.platform }}
+          path: artifacts/document-style-api-compile/${{ matrix.platform }}/
   atl_contract:
     runs-on: windows-2022
     timeout-minutes: 10

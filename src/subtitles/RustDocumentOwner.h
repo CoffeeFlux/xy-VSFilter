@@ -2,8 +2,9 @@
 #pragma once
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 // Experimental native value boundary only. Canonical entries/segments live in
-// Rust, including supplied default and named style values. Metadata, string
-// preparation and CRT numeric/sort/name-generation choices remain native.
+// Rust, including supplied default/named styles and raw name/path identity.
+// Other metadata, string preparation and CRT numeric/sort/name-generation
+// choices remain native.
 #include "STS.h"
 #include "xy_rust_document.h"
 #include <windows.h>
@@ -328,6 +329,17 @@ public:
     template<class Style = STSStyle> Style DefaultStyle() const { return DocumentDetail::StyleValue<Style>(Snapshot(2,0).Read()); }
     void CopyDefaultStyle(const DocumentOwner& source) {
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_copy_default_style_v1(id_,source.id_);}));
+    }
+    CString Identity(uint32_t field) const {
+        DocumentDetail::Shape(field <= 1); std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_snapshot_open_v1(id_,5+field,0,out.data(),out.size());}));
+        DocumentReply reply(DocumentDetail::Load(out,0,8)); const auto bytes = reply.Read();
+        DocumentDetail::Shape(bytes.size()%2 == 0); size_t offset = 0;
+        return DocumentDetail::String(bytes,offset,DocumentDetail::Count(bytes.size()/2));
+    }
+    void SetIdentity(uint32_t field, const CString& value) {
+        DocumentDetail::Shape(field <= 1); const auto bytes = DocumentDetail::Units(value);
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_set_identity_v1(id_,field,bytes.data(),bytes.size());}));
     }
     size_t NamedStyleCount() const {
         std::array<uint8_t,4> out{};

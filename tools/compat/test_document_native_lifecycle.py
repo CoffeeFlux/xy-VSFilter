@@ -9,6 +9,10 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
              b"named-initial", b"named-equal-duplicate", b"named-conflict-collision",
              b"named-numeric-collision", b"named-copy-replace", b"named-copy-independent",
              b"named-copy-append", b"named-self-clear", b"named-empty"))
+         + b"".join(b"identity-stage " + stage + b" name 4 004e 0000 d800 0058 path 4 0050 0000 dcff 0059\n" for stage in (
+             b"identity-initial", b"identity-read-independent", b"identity-copy-asymmetric-path",
+             b"identity-copy-independent-source", b"identity-callback", b"identity-remove-entries",
+             b"identity-empty", b"identity-self-copy", b"identity-open-success"))
          + b"saved-file ssa exists=1 bytes=1 41\nsaved-file ass exists=1 bytes=1 41\n"
          + b"saved-file srt exists=1 bytes=1 41\nsaved-file srt-sidecar exists=1 bytes=1 41\n"
          + b"saved-file ssa-sidecar exists=0\nsaved-file ass-sidecar exists=0\n"
@@ -65,6 +69,19 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
                         observed.replace(b"style 2", b"style 3")):
             with self.assertRaises(ValueError):
                 compare_traces([observed, observed, changed, changed], 64)
+
+    def test_identity_stages_required_with_order_and_complete_values(self):
+        removed = b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith(b"identity-stage identity-empty "))
+        with self.assertRaises(ValueError): compare_traces([removed]*4,64)
+        reordered = TRACE.replace(b"identity-stage identity-empty ", b"identity-stage temporary ").replace(b"identity-stage identity-self-copy ",b"identity-stage identity-empty ").replace(b"identity-stage temporary ",b"identity-stage identity-self-copy ")
+        with self.assertRaises(ValueError): compare_traces([reordered]*4,64)
+        changed = TRACE.replace(b"d800 0058",b"d800 005a")
+        with self.assertRaises(ValueError): compare_traces([TRACE,TRACE,changed,changed],64)
+
+    def test_archival_identity_opt_out_is_explicit(self):
+        legacy=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith(b"identity-stage "))
+        with self.assertRaises(ValueError): compare_traces([legacy]*4,64)
+        compare_traces([legacy]*4,64,require_identity_stages=False)
 
     def test_rejects_repeat_nondeterminism(self):
         changed = TRACE.replace(b"callback changed", b"callback empty")

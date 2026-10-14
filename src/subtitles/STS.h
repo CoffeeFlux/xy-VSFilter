@@ -180,12 +180,16 @@ protected:
 
 public:
     bool           m_simple;
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     CString        m_name;
+#endif
     LCID           m_lcid;
     exttype        m_subtitleType;
     tmode          m_mode;
     CTextFile::enc m_encoding;
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     CString        m_path;
+#endif
 
     CSize          m_dstScreenSize;
     int            m_defaultWrapStyle;
@@ -314,6 +318,12 @@ public:
     void OrSegmentAnimated(int iSegment, bool animated);
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    // Identity is raw code units; getters return independent native values.
+    CString GetDocumentName() const;
+    CString GetDocumentPath() const;
+    void SetDocumentName(const CString& value);
+    void SetDocumentPath(const CString& value);
+
     // Named/default style storage is Rust-owned in the experimental build;
     // enumeration copies only one requested row and exposes no map/pointee loan.
     enum class NamedStyleLookup { Missing, Null, Value };

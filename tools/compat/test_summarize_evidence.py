@@ -3,10 +3,18 @@ import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
-from summarize_evidence import normalize_windows_source, windows_source_bytes, production_dll
+from summarize_evidence import normalize_windows_source, windows_source_bytes, production_dll, document_lifecycle_requirements
 
 
 class WindowsHeaderProvenance(unittest.TestCase):
+    def test_lifecycle_archive_requirements_follow_verified_invocations(self):
+        self.assertEqual(document_lifecycle_requirements(b"old probe"),
+                         {"require_named_stages": False, "require_identity_stages": False})
+        source=b"int main() {\n    named_style_lifecycle();\n    identity_lifecycle();\n}"
+        self.assertEqual(document_lifecycle_requirements(source),
+                         {"require_named_stages": True, "require_identity_stages": True})
+        self.assertFalse(document_lifecycle_requirements(b'// identity_lifecycle();\n"identity_lifecycle();"')['require_identity_stages'])
+
     def test_production_dll_excludes_instrumented_copies(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
