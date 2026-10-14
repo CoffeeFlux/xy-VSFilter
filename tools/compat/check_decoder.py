@@ -66,7 +66,7 @@ def capture_inputs():
               ROOT / "src/subtitles/Rasterizer.cpp", ROOT / "include/xy_rust_mask.h", ROOT / "include/xy_rust_bilinear.h", ROOT / "include/xy_rust_be_blur.h", ROOT / "include/xy_rust_gauss_integer.h", ROOT / "include/xy_rust_be_filter.h", ROOT / "include/xy_rust_transpose.h", ROOT / "include/xy_rust_byte_float.h",
               ROOT / "src/subtitles/xy_filter.cpp", ROOT / "src/subtitles/VobSubImage.cpp", ROOT / "include/xy_rust_vobsub.h",
               ROOT / "src/dsutil/GolombBuffer.cpp", ROOT / "src/dsutil/GolombBuffer.h",
-              ROOT / "src/subtitles/HdmvSub.cpp", ROOT / "src/subtitles/HdmvSub.h", ROOT / "src/subtitles/CompositionObject.cpp", ROOT / "src/subtitles/CompositionObject.h", ROOT / "include/xy_rust_byte_storage.h",
+              ROOT / "src/subtitles/DVBSub.cpp", ROOT / "src/subtitles/DVBSub.h", ROOT / "src/subtitles/HdmvSub.cpp", ROOT / "src/subtitles/HdmvSub.h", ROOT / "src/subtitles/CompositionObject.cpp", ROOT / "src/subtitles/CompositionObject.h", ROOT / "include/xy_rust_byte_storage.h",
               ROOT / "include/xy_rust_timeline_search.h",
               ROOT / "src/subtitles/TextFile.h",
               ROOT / "src/subtitles/TextFile.cpp", ROOT / "src/subtitles/STS.cpp",
@@ -682,6 +682,24 @@ public:
         preparation_code += block + "result.emplace_back(c,s);\n}\nreturn result;\n}\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_drawing_preparation.h").write_text(preparation_code, encoding="utf-8")
 
+    dvb_storage = '#include "dvb_storage_shell.h"\n'
+    reference_dvb_storage_header = original("src/subtitles/DVBSub.h", reference["commit"])
+    for name, content, dvb_storage_header in (("ReferenceDvbStorage", original("src/subtitles/DVBSub.cpp", reference["commit"]), reference_dvb_storage_header), ("CandidateDvbStorage", (ROOT / "src/subtitles/DVBSub.cpp").read_bytes(), (ROOT / "src/subtitles/DVBSub.h").read_bytes())):
+        text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        dvb_storage_header = dvb_storage_header.decode("utf-8-sig").replace("\r\n", "\n")
+        if name == "CandidateDvbStorage":
+            dvb_storage += "#define XY_VSFILTER_RUST_TEXT\n"
+        dvb_storage += re.search(r"#define BUFFER_CHUNK_GROW [^\n]+", text).group(0) + "\n"
+        dvb_storage += f"namespace {name} {{\nclass CDVBSub:public CBaseSub {{public:\n"
+        start = dvb_storage_header.index("    int                 m_nBufferSize;")
+        end = dvb_storage_header.index("    CAtlList<DVB_PAGE*> m_Pages;", start)
+        dvb_storage += dvb_storage_header[start:end]
+        dvb_storage += "DVB_STORAGE_CALLBACK_FIELDS\nCDVBSub();~CDVBSub();void Reset();HRESULT AddToBuffer(BYTE*,int);\n};\n"
+        for signature in ("CDVBSub::CDVBSub(void)", "CDVBSub::~CDVBSub(void)", "void CDVBSub::Reset()", "HRESULT CDVBSub::AddToBuffer("):
+            method = extract_method(text, signature).replace("DEBUG_NEW BYTE[m_nBufferSize]", "rleAllocate(m_nBufferSize)").replace("memcpy_s(", "dvbCopy(")
+            dvb_storage += method + "\n"
+        dvb_storage += "}\n#undef XY_VSFILTER_RUST_TEXT\n#undef BUFFER_CHUNK_GROW\n"
+    (destination / "original_dvb_storage.h").write_text(dvb_storage, encoding="utf-8")
     clip_fade = '#include "clip_fade_shell.h"\n'
     for name, content in (("ReferenceFade", original("src/subtitles/RTS.cpp", reference["commit"])), ("CandidateFade", (ROOT / "src/subtitles/RTS.cpp").read_bytes())):
         text = content.decode("utf-8-sig").replace("\r\n", "\n")
@@ -1489,6 +1507,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     gauss_planes_result = run([str(gauss_planes_executable)], capture_output=True, text=True)
     print(gauss_planes_result.stdout, end="", flush=True)
     print(gauss_planes_result.stderr, end="", file=sys.stderr)
+    dvb_storage_executable = destination / ("dvb-storage-oracle.exe" if os.name == "nt" else "dvb-storage-oracle")
+    dvb_storage_compile = [arg.replace("find_char_oracle.cpp", "dvb_storage_oracle.cpp").replace("find-char-oracle", "dvb-storage-oracle") for arg in find_char_compile]
+    run(dvb_storage_compile)
+    dvb_storage_result = run([str(dvb_storage_executable)], capture_output=True, text=True)
+    print(dvb_storage_result.stdout, end="", flush=True)
+    print(dvb_storage_result.stderr, end="", file=sys.stderr)
     clip_fade_executable = destination / ("clip-fade-oracle.exe" if os.name == "nt" else "clip-fade-oracle")
     clip_fade_compile = [arg.replace("find_char_oracle.cpp", "clip_fade_oracle.cpp").replace("find-char-oracle", "clip-fade-oracle") for arg in find_char_compile]
     run(clip_fade_compile)
@@ -1902,6 +1926,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "path_align_compile_command": path_align_compile,
         "path_align_result": path_align_result.stdout, "path_align_stderr": path_align_result.stderr,
         "path_align_scope": "Complete pinned PathData::AlignLeftTop over initialized point/type buffers; actual Windows POINT/ATL geometry; exact guarded buffers, origin/size, errno/FP/Windows error state; native cleanup modeled, outputs disjoint and representable arithmetic only",
+        "dvb_storage_compile_command": dvb_storage_compile,
+        "dvb_storage_result": dvb_storage_result.stdout, "dvb_storage_stderr": dvb_storage_result.stderr,
+        "dvb_storage_scope": "Whole pinned constructor/destructor/Reset/AddToBuffer with controlled allocation/deletion, successful memcpy_s and page-container boundaries. Exact initialization masks and bytes, all marker bytes and ignored fourth byte, short logical inputs with aligned four-byte physical backing, consumed prefix retention, growth/copy/release order, restart/reuse, retained-capacity size-limit bypass and mixed Rust/native fallback histories. Negative/overflowing sizes, invalid physical backing, overlapping copies, aliases invalidated by growth, native debug traps and actual OOM excluded.",
         "clip_fade_compile_command": clip_fade_compile,
         "clip_fade_result": clip_fade_result.stdout, "clip_fade_stderr": clip_fade_result.stderr,
         "clip_fade_scope": "Whole pinned PaintBannerClipper/PaintScrollClipper with controlled initialized base-mask producer. Native float conversions and ordering, integer divisions, overlapping fades, signed/offscreen/reversed endpoints, empty-interval clearing, all source bytes, reuse and null returns. Zero-divisor cases with non-null base output are excluded before either call, never passes; overflowing native arithmetic/conversions, invalid backing and actual OOM excluded.",

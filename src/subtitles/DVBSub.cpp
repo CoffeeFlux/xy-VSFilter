@@ -43,6 +43,10 @@ CDVBSub::CDVBSub(void)
 CDVBSub::~CDVBSub(void)
 {
     Reset();
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (m_bufferStorage.Ready()) m_bufferStorage.Reset();
+    else
+#endif
     SAFE_DELETE(m_pBuffer);
 }
 
@@ -127,11 +131,23 @@ HRESULT CDVBSub::AddToBuffer(BYTE* pData, int nSize)
 
             BYTE* pPrev = m_pBuffer;
             m_nBufferSize = max(m_nBufferWritePos + nSize, m_nBufferSize + BUFFER_CHUNK_GROW);
+#ifdef XY_VSFILTER_RUST_TEXT
+            XyRust::ByteStorage next_buffer;
+            if (next_buffer.Allocate(m_nBufferSize)) m_pBuffer = next_buffer.Data();
+            else
+#endif
             m_pBuffer = DEBUG_NEW BYTE[m_nBufferSize];
             if (pPrev != NULL) {
                 memcpy_s(m_pBuffer, m_nBufferSize, pPrev, m_nBufferWritePos);
+#ifdef XY_VSFILTER_RUST_TEXT
+                if (m_bufferStorage.Ready()) m_bufferStorage.Reset();
+                else
+#endif
                 SAFE_DELETE(pPrev);
             }
+#ifdef XY_VSFILTER_RUST_TEXT
+            m_bufferStorage.Swap(next_buffer);
+#endif
         }
         memcpy_s(m_pBuffer + m_nBufferWritePos, m_nBufferSize, pData, nSize);
         m_nBufferWritePos += nSize;

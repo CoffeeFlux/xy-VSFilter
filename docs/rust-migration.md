@@ -20,6 +20,26 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Rust owns DVB packet-buffer growth and preserves allocation/copy/release order.
+  A native handle swap transfers the new owner's existing loan after the old
+  initialized prefix is copied and released. Fatal ASan/UBSan and ordinary
+  comparisons pass on both local architectures: **2,459 whole AddToBuffer calls /
+  25,467,428 retained state fields / 10,903,458 initialized bytes / 3,638,876
+  unwritten cells tracked without reads / 28,590 allocation-copy-reset
+  observations / 511 growths / 1,948 capacity reuses / 72 disjoint source aliases /
+  398 Rust owners, loans and releases / 113 modeled Rust declines**. Mixed
+  Rust/native histories preserve both transfer directions. **Nine rejections,
+  1,053 ignored chunks and three retained-capacity size-limit bypasses** match:
+  the native limit is checked on growth, so reuse can accept a larger packet than
+  fresh allocation. Whole pinned constructor/destructor/Reset and AddToBuffer
+  cover every marker byte, the ignored fourth byte, short logical chunks with
+  aligned four-byte physical backing, consumed-prefix retention and restarts.
+  Allocation/deletion, successful memcpy_s and page containers are controlled;
+  negative/overflowing sizes, short physical backing, overlapping copies,
+  source aliases invalidated by growth, native debug traps and actual OOM remain
+  excluded. Default syntax and Python checks pass. Rust remains at the tested
+  146-core/98-FFI fade increment. The **798-case text corpus** is unchanged;
+  Windows/Miri and DVB host playback remain pending.
 * Safe Rust performs banner and scroll mask fades while native floating-point
   conversions, integer division and their order remain in the caller. Banner
   overlap applies both edges sequentially. Scroll passes preserve reversed or
