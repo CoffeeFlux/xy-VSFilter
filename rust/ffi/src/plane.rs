@@ -47,6 +47,40 @@ pub unsafe extern "C" fn xy_vsfilter_plane_release(owner: *mut Plane) {
 mod tests {
     use super::*;
     #[test]
+    fn caption_fields_decode_only_initialized_prefixes_of_independent_loans() {
+        let first = xy_vsfilter_plane_create(64);
+        let second = xy_vsfilter_plane_create(64);
+        assert!(!first.is_null() && !second.is_null());
+        // SAFETY: each unique owner lends once. Only the written prefixes are
+        // passed to the caption decoder, and all decoder borrows end before
+        // the corresponding plane is released. The other loan remains live.
+        unsafe {
+            let a = xy_vsfilter_plane_loan(first);
+            let b = xy_vsfilter_plane_loan(second);
+            core::ptr::copy_nonoverlapping(b"AB".as_ptr(), a, 2);
+            core::ptr::copy_nonoverlapping(b"CDEF".as_ptr(), b, 4);
+            for (owner, data, expected) in [(first, a, &b"AB"[..]), (second, b, &b"CDEF"[..])] {
+                let decoder = crate::cc::xy_vsfilter_cc_decoder_create(expected.len() as i32);
+                for &unit in expected {
+                    assert_eq!(
+                        crate::cc::xy_vsfilter_cc_decoder_next(decoder, data, expected.len()),
+                        1
+                    );
+                    assert_eq!(
+                        crate::cc::xy_vsfilter_cc_decoder_field(decoder, 1),
+                        i32::from(unit)
+                    );
+                }
+                assert_eq!(
+                    crate::cc::xy_vsfilter_cc_decoder_next(decoder, data, expected.len()),
+                    0
+                );
+                crate::cc::xy_vsfilter_cc_decoder_release(decoder);
+                xy_vsfilter_plane_release(owner);
+            }
+        }
+    }
+    #[test]
     fn shifted_output_loans_leave_alignment_slack_unwritten() {
         let input = [
             0u8, 1, 63, 64, 127, 128, 254, 255, 7, 9, 11, 13, 17, 19, 23, 29, 31,
