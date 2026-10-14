@@ -10,6 +10,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstddef>
+#include <initializer_list>
 #define TRACE_SUB(...) ((void)0)
 #include "document_facade_extracted.inc"
 
