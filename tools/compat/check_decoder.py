@@ -906,6 +906,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     realtext_format_result = run([str(realtext_format_executable)], capture_output=True, text=True)
     print(realtext_format_result.stdout, end="", flush=True)
     print(realtext_format_result.stderr, end="", file=sys.stderr)
+    realtext_lists_executable = destination / ("realtext-lists-oracle.exe" if os.name == "nt" else "realtext-lists-oracle")
+    realtext_lists_compile = [arg.replace("fill_oracle.cpp", "realtext_lists_oracle.cpp").replace("fill-oracle", "realtext-lists-oracle") for arg in fill_compile]
+    run(realtext_lists_compile)
+    realtext_lists_result = run([str(realtext_lists_executable)], capture_output=True, text=True)
+    print(realtext_lists_result.stdout, end="", flush=True)
+    print(realtext_lists_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -949,6 +955,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "vobsub_scale_result": vobsub_scale_result.stdout, "vobsub_scale_stderr": vobsub_scale_result.stderr,
         "vobsub_outline_compile_command": vobsub_outline_compile,
         "vobsub_outline_result": vobsub_outline_result.stdout, "vobsub_outline_stderr": vobsub_outline_result.stderr,
+        "realtext_lists_compile_command": realtext_lists_compile,
+        "realtext_lists_result": realtext_lists_result.stdout, "realtext_lists_stderr": realtext_lists_result.stderr,
+        "realtext_lists_scope": "owned current/open tag lists with copied raw names, flags and ordered attributes; native list-operation fixture shell calls pinned PopTag, plus complete ParseRealText composition; allocation failure timing unverified",
         "realtext_format_compile_command": realtext_format_compile,
         "realtext_format_result": realtext_format_result.stdout, "realtext_format_stderr": realtext_format_result.stderr,
         "realtext_format_scope": "signed timestamp components and original linear precision divisor; native stream construction, locale, separators, insertion order and OutputSRT retained; unrepresentable precision arithmetic excluded from parity",
