@@ -21,6 +21,9 @@
 #pragma once
 
 #include "Rasterizer.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "xy_rust_byte_storage.h"
+#endif
 
 
 struct HDMV_PALETTE {
@@ -105,6 +108,9 @@ public:
 public:
     static bool m_output_tv_range_rgb;//fix me
 private:
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::ByteStorage m_rleStorage;
+#endif
     BYTE* m_pRLEData;
     int   m_nRLEDataSize;
     int   m_nRLEPos;

@@ -40,6 +40,10 @@ CompositionObject::CompositionObject()
 
 CompositionObject::~CompositionObject()
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (m_rleStorage.Ready()) m_rleStorage.Reset();
+    else
+#endif
     delete [] m_pRLEData;
 }
 
@@ -145,7 +149,16 @@ void CompositionObject::InitColor(const SubPicDesc& spd)
 
 void CompositionObject::SetRLEData(const BYTE* pBuffer, int nSize, int nTotalSize)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (m_rleStorage.Ready()) m_rleStorage.Reset();
+    else
+#endif
     delete [] m_pRLEData;
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (nSize >= 0 && nSize <= nTotalSize && m_rleStorage.Allocate(nTotalSize))
+        m_pRLEData = m_rleStorage.Data();
+    else
+#endif
     m_pRLEData     = DEBUG_NEW BYTE[nTotalSize];
     m_nRLEDataSize = nTotalSize;
     m_nRLEPos      = nSize;

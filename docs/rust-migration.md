@@ -20,6 +20,36 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Shifted-plane ownership, bilinear scratch, paired fixed-blur scratch plus
+  BeBlur outputs, and bounded legacy-blur outputs have each completed all four
+  portable targets, Miri and both Windows renderer jobs. The first two stages
+  matched **754 cases / 7,890 frames** per Windows architecture; the latter two
+  matched **762 cases / 7,970 frames**. Each also matched **32 mutations / 224
+  frames**, exports and declared platform requirements. Verified source/DLL
+  hashes and per-stage limits are archived in [shifted-plane evidence](variance-evidence.json),
+  [bilinear evidence](bilinear-storage-evidence.json), [edge-blur evidence](blur-planes-evidence.json)
+  and [legacy-blur evidence](legacy-blur-evidence.json). Legacy layout exclusions
+  and the initial failed unchecked campaign remain explicitly outside passes.
+* Rust now owns positive-sized CompositionObject RLE allocations through a single
+  native byte loan. Allocated and appended lengths remain distinct; native
+  writes initialize only their original footprints, and zero-sized allocations
+  keep the native path. Fatal ASan/UBSan comparisons pass on arm64 and under x64
+  execution: **29,120 mutation calls / 13,487,977 state fields / 3,300,483
+  initialized bytes / 1,305,173 unwritten cells tracked without reads / 286,912
+  allocation-copy observations / 17,312 complete deep copies / 11,772 Rust
+  owners, loans and releases**. **11,700 modeled Rust declines** use successful
+  native allocation. Whole pinned Set/Append/destructor/Copy and accessors retain
+  palette state, chunking, disjoint aliases into the initialized prefix, reuse,
+  and errno/FP/Windows error state. The **4,160 assertion observations** model
+  diagnostics around the Release oversized-append rejection; native Debug traps
+  are not executed. **9,728 incomplete-copy fixtures are excluded**, never passes.
+  Partial-tail copying/consumption, replacement-source aliasing, negative or
+  overflowing lengths and actual OOM remain outside this evidence. A new Miri
+  test covers fragment initialization and an independent copy outliving its
+  source. Rust 1.85 tests (143 core, 96 FFI), strict Clippy, default syntax on both
+  local architectures and Python checks pass. Windows/Miri are pending. The
+  **770-case text-renderer corpus** is unchanged and does not establish PGS/DVB
+  playback through this storage boundary; those host sequences remain required.
 * Rust owns GaussianBlur output planes without adding initialization to native
   padding. The full-caller oracle tracks written-byte masks separately and reads
   only initialized bytes. Fatal ASan/UBSan comparisons pass on arm64 and under
@@ -2461,7 +2491,7 @@ These results cover this increment, not completion of renderer ownership.
 | VirtualDub | `plugins.cpp`, bundled SDK headers | Export calling conventions, filter negotiation, scripting, RGB orientation, lifecycle |
 | Text formats | `STS.cpp`, `TextFile.cpp`, `RealTextParser.cpp`, `USFSubtitles.cpp`, `libssf` | SSA/ASS, SubRip variants, SubViewer, MicroDVD, SAMI, WebVTT, VPlayer, XombieSub, USF, MPL2, RealText and SSF parsing/recovery |
 | Timeline and event ordering | `STS.cpp`, `STS.h` | Segment construction, incremental edits and lookup have differential tests; native entry preparation/storage/sorting, frame/time conversion and host-driven mutation/lifecycle sequences still need migration and broader integration coverage |
-| Bitmap subtitles | `VobSub*`, `HdmvSub*`, `DVBSub*`, `CompositionObject*`, `CCDecoder*` | HDMV/DVB run states, DVB field assembly and DVD control-packet parsing have extracted oracles; RLE buffer ownership, remaining packet assembly, DVD pixel decoding, PGS/SUP and DVB host playback, closed captions and external file behavior remain |
+| Bitmap subtitles | `VobSub*`, `HdmvSub*`, `DVBSub*`, `CompositionObject*`, `CCDecoder*` | HDMV/DVB run states, DVB field assembly and DVD control-packet parsing have extracted oracles; RLE partial-tail consumers, remaining packet assembly, DVD pixel decoding, PGS/SUP and DVB host playback, closed captions and external file behavior remain |
 | Layout/rendering | `RTS.cpp`, `Rasterizer.cpp`, caches, overlay/clip code | Every tag's recovery and interaction, drawings, clipping, transforms, karaoke, blur/border/shadow, GDI/font metrics and fallback |
 | Compositing/color | `subpic`, SIMD/assembly, conversion tables | All RGB/YUV formats, high bit depths, interlace/subsampling, pitch/orientation, alpha and rounding |
 | Supporting behavior | `dsutil`, `decss`, vendored libraries, settings | Encodings, code pages, font attachments, file/network access, archive inputs, persistence and remaining unsafe dependencies |
@@ -2482,7 +2512,7 @@ the native oracle where needed:
 | `STS.cpp` entry sorting and frame/time conversion | Own entry ordering and conversion state, with native callbacks initially | `Sort` uses CRT `qsort` with separate normal/readorder comparators; capture equal-key permutations and comparator results before choosing a Rust sorting algorithm. Preserve start-before-end conversion, `llround`, mode changes and the final `CreateSegments` call. |
 | `STS.cpp` field splitting and numeric parsing | Raw UTF-16 fields, cursor/mutation state, error recovery | Both field scanners are now ported, preserving final-field reuse, distinct whitespace rules and separator mutation. Keep CRT numeric conversion until overflow, locale, end-pointer and rounding results are captured. |
 | Remaining `RTS.cpp` drawing parsing | Command replacement, numeric consumption and final native path storage; command state is now ported | `SpanIncluding`'s return value is ignored; commands split inside arbitrary text; `s` falls through to `p`; the apparent Bezier truncation uses an incremented counter and must not be "fixed." Keep `wcstod` and float-to-LONG conversion at the native boundary initially. |
-| `CompositionObject.cpp` bitmap storage and field parsing | HDMV/DVB run state and DVB field dispatch are ported; common reader transitions are ported; next capture RLE storage and packet assembly | Preserve allocated versus appended lengths, reader offsets, palette state and transparent runs. Keep native palette conversion/compositing until those stages have separate exact-byte oracles. |
+| `CompositionObject.cpp` bitmap storage and field parsing | HDMV/DVB run state and DVB field dispatch are ported; common reader transitions and positive-sized RLE allocation ownership are ported; next capture packet assembly and partial-tail consumers | Preserve allocated versus appended lengths, reader offsets, palette state and transparent runs. Keep native palette conversion/compositing until those stages have separate exact-byte oracles. |
 | `xy_filter.cpp` and raster/compositing kernels | Safe slice ownership and scalar arithmetic implementations | Capture each active SIMD path's operation order, padding, overlap and rounding. Scalar C++ output alone does not establish equality with the SIMD implementation used by a DLL. |
 
 The standalone `CGolombBuffer` oracle now covers reset, raw buffer copying,
@@ -2491,8 +2521,8 @@ Exp-Golomb codes, alongside the renderer oracles. Failed reads shift cached stat
 before returning zero; peeks can refill and move the byte cursor; alignment
 changes the count without clearing stored bits. `GetBufferPos` exposes the raw
 cursor whereas `GetPos` subtracts cached whole bytes. Wider reads and unusual
-cached states retain the native fallback. RLE ownership still needs a separate
-approach to preserve the distinction between allocated and appended lengths.
+cached states retain the native fallback. RLE allocation ownership now preserves allocated versus appended lengths.
+Partial-tail copying and consumption still require separate compatibility evidence.
 
 These are code boundaries, not promises that a finite corpus covers every quirk.
 Each replacement needs the same sequence used for the buffered reader: extract

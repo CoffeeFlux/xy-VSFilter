@@ -47,6 +47,38 @@ pub unsafe extern "C" fn xy_vsfilter_plane_release(owner: *mut Plane) {
 mod tests {
     use super::*;
     #[test]
+    fn packet_fragments_initialize_a_prefix_before_an_independent_complete_copy() {
+        let owner = xy_vsfilter_plane_create(257);
+        let copy_owner = xy_vsfilter_plane_create(257);
+        assert!(!owner.is_null() && !copy_owner.is_null());
+        // SAFETY: each owner lends once. Only the growing initialized prefix
+        // is read; the complete copy has independent storage and outlives its
+        // source. Neither owner is borrowed again while native views are live.
+        unsafe {
+            let data = xy_vsfilter_plane_loan(owner);
+            let copied = xy_vsfilter_plane_loan(copy_owner);
+            let input = core::array::from_fn::<_, 257, _>(|i| i as u8);
+            let mut position = 0;
+            for count in [0, 1, 3, 7, 31, 127, 88] {
+                core::ptr::copy_nonoverlapping(
+                    input.as_ptr().add(position),
+                    data.add(position),
+                    count,
+                );
+                position += count;
+                assert_eq!(
+                    core::slice::from_raw_parts(data, position),
+                    &input[..position]
+                );
+            }
+            assert_eq!(position, input.len());
+            core::ptr::copy_nonoverlapping(data, copied, position);
+            xy_vsfilter_plane_release(owner);
+            assert_eq!(core::slice::from_raw_parts(copied, position), &input);
+            xy_vsfilter_plane_release(copy_owner);
+        }
+    }
+    #[test]
     fn disjoint_float_regions_share_an_owner_without_reading_unwritten_padding() {
         let owner = xy_vsfilter_plane_create(64);
         assert!(!owner.is_null());

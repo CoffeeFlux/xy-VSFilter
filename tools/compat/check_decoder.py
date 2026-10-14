@@ -66,7 +66,7 @@ def capture_inputs():
               ROOT / "src/subtitles/Rasterizer.cpp", ROOT / "include/xy_rust_mask.h", ROOT / "include/xy_rust_bilinear.h", ROOT / "include/xy_rust_be_blur.h", ROOT / "include/xy_rust_gauss_integer.h", ROOT / "include/xy_rust_be_filter.h", ROOT / "include/xy_rust_transpose.h", ROOT / "include/xy_rust_byte_float.h",
               ROOT / "src/subtitles/xy_filter.cpp", ROOT / "src/subtitles/VobSubImage.cpp", ROOT / "include/xy_rust_vobsub.h",
               ROOT / "src/dsutil/GolombBuffer.cpp", ROOT / "src/dsutil/GolombBuffer.h",
-              ROOT / "src/subtitles/CompositionObject.cpp",
+              ROOT / "src/subtitles/CompositionObject.cpp", ROOT / "src/subtitles/CompositionObject.h", ROOT / "include/xy_rust_byte_storage.h",
               ROOT / "include/xy_rust_timeline_search.h",
               ROOT / "src/subtitles/TextFile.h",
               ROOT / "src/subtitles/TextFile.cpp", ROOT / "src/subtitles/STS.cpp",
@@ -684,6 +684,27 @@ public:
 
     hdmv_source = original("src/subtitles/CompositionObject.cpp", reference["commit"])
     candidate_hdmv = (ROOT / "src/subtitles/CompositionObject.cpp").read_bytes()
+    rle_storage = '#include "rle_storage_shell.h"\n'
+    reference_rle_header = original("src/subtitles/CompositionObject.h", reference["commit"])
+    for name, content, header in (("ReferenceRle", hdmv_source, reference_rle_header), ("CandidateRle", candidate_hdmv, (ROOT / "src/subtitles/CompositionObject.h").read_bytes())):
+        text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        header = header.decode("utf-8-sig").replace("\r\n", "\n")
+        if name == "CandidateRle":
+            rle_storage += "#define XY_VSFILTER_RUST_TEXT\n"
+        rle_storage += f"namespace {name} {{\nclass CompositionObject {{public:\n"
+        start = header.index("private:", header.index("CompositionObject* Copy()")) + len("private:")
+        end = header.index("    CAtlArray<HDMV_PALETTE>", start)
+        rle_storage += header[start:end] + "RLE_OTHER_FIELDS\n"
+        rle_storage += "CompositionObject();~CompositionObject();void SetRLEData(const BYTE*,int,int);void AppendRLEData(const BYTE*,int);\n"
+        for signature in ("const BYTE* GetRLEData()", "int   GetRLEDataSize()", "bool  IsRLEComplete()", "CompositionObject* Copy()"):
+            rle_storage += extract_method(header, signature) + "\n"
+        rle_storage += "};\n"
+        for signature in ("CompositionObject::CompositionObject()", "CompositionObject::~CompositionObject()", "void CompositionObject::SetRLEData(", "void CompositionObject::AppendRLEData("):
+            method = extract_method(text, signature)
+            method = method.replace("delete [] m_pRLEData;", "rleRelease(m_pRLEData);").replace("DEBUG_NEW BYTE[nTotalSize]", "rleAllocate(nTotalSize)").replace("memcpy(", "rleCopy(")
+            rle_storage += method + "\n"
+        rle_storage += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_rle_storage.h").write_text(rle_storage, encoding="utf-8")
     golomb_source = original("src/dsutil/GolombBuffer.cpp", reference["commit"])
     golomb_header = original("src/dsutil/GolombBuffer.h", reference["commit"])
     raster_source = original("src/subtitles/Rasterizer.cpp", reference["commit"])
@@ -1424,6 +1445,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     gauss_planes_result = run([str(gauss_planes_executable)], capture_output=True, text=True)
     print(gauss_planes_result.stdout, end="", flush=True)
     print(gauss_planes_result.stderr, end="", file=sys.stderr)
+    rle_storage_executable = destination / ("rle-storage-oracle.exe" if os.name == "nt" else "rle-storage-oracle")
+    rle_storage_compile = [arg.replace("find_char_oracle.cpp", "rle_storage_oracle.cpp").replace("find-char-oracle", "rle-storage-oracle") for arg in find_char_compile]
+    run(rle_storage_compile)
+    rle_storage_result = run([str(rle_storage_executable)], capture_output=True, text=True)
+    print(rle_storage_result.stdout, end="", flush=True)
+    print(rle_storage_result.stderr, end="", file=sys.stderr)
     pipe_line_executable = destination / ("pipe-line-oracle.exe" if os.name == "nt" else "pipe-line-oracle")
     pipe_line_compile = [arg.replace("find_char_oracle.cpp", "pipe_line_oracle.cpp").replace("find-char-oracle", "pipe-line-oracle") for arg in find_char_compile]
     run(pipe_line_compile)
@@ -1813,6 +1840,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "path_align_compile_command": path_align_compile,
         "path_align_result": path_align_result.stdout, "path_align_stderr": path_align_result.stderr,
         "path_align_scope": "Complete pinned PathData::AlignLeftTop over initialized point/type buffers; actual Windows POINT/ATL geometry; exact guarded buffers, origin/size, errno/FP/Windows error state; native cleanup modeled, outputs disjoint and representable arithmetic only",
+        "rle_storage_compile_command": rle_storage_compile,
+        "rle_storage_result": rle_storage_result.stdout, "rle_storage_stderr": rle_storage_result.stderr,
+        "rle_storage_scope": "Whole pinned SetRLEData, AppendRLEData, destructor, Copy and accessors with controlled allocation and checked copy boundaries. Exact allocated/appended lengths, initialized masks and bytes, complete deep copies including palette state, zero-sized native allocation, bounded disjoint source aliases and modeled Rust decline to successful native allocation. Assertion diagnostics are modeled; only Release continuation behavior is compared. Incomplete tails are never read or copied; partial-tail consumers, source replacement aliasing, negative/overflowing lengths and actual OOM excluded.",
         "gauss_planes_compile_command": gauss_planes_compile,
         "gauss_planes_result": gauss_planes_result.stdout, "gauss_planes_stderr": gauss_planes_result.stderr,
         "gauss_planes_scope": "Whole pinned GaussianBlur with controlled coefficient factories and Gaussian kernel. Exact metadata, initialized-byte masks and values, untouched padding, native memset/memcpy footprints, source aliases and ignored extra input border, retained shared lifetimes and cache accounting. Every modeled copy checks extents and source initialization; unwritten bytes are never read. Second-plane failure modeled; first-plane failure, source/output object aliasing, inconsistent geometry and actual OOM excluded.",
