@@ -234,10 +234,10 @@ still requires D4/D5 below and all remaining ownership/fallback accounting.
 | Milestone | Deliverable | Required evidence before advancing |
 | --- | --- | --- |
 | D0 — Freeze the contract | Exact operation/callsite inventory, owner/alias graph and retained-adapter list for DOC-01 through DOC-11 | Source review across STS, RTS, format importers and both style APIs; explicitly track unresolved behavior. Status: in progress. |
-| D1 — Capture complete lifecycles | A pinned-reference document harness for create → add → edit/style-change → copy → sort → seek → clear/reopen → destroy | Compare full initialized document/segment state, observable callback/error order and caller snapshots; use real ATL/CRT on Windows. Include failed operations and repeated calls, with failures never counted as parity. Status: in progress; prepared-record sequence harness passes locally, full native lifecycle remains open. |
-| D2 — Implement the Rust owner | Safe Rust entries, styles, metadata and segments; coherent document operations reuse existing helpers | Owner/copy/edit/drop tests, raw UTF-16 preservation, bounded access, no native mutable views; native field/type/alias compatibility reviewed. Status: D2a core in progress; prepared entries/segments and TIME queries implemented, production integration pending. |
-| D3 — Route every caller | Importers, renderer, style interfaces and export paths use document operations or bounded snapshots | Enumerate and eliminate direct authoritative CAtlArray/CAtlMap entry/style/segment accesses in the Rust-enabled build; preserve callback/lock order and public ABI. Retire superseded fine-grained FFI crossings. Status: entries/segments routed in opt-in experimental build; Windows validation pending; styles/metadata remain native. |
-| D4 — Establish parity | Document lifecycle and integrated DLL comparisons on Windows x86/x64 at one exact candidate commit | Exact records, ordering, times, errors, rendering output and style API behavior; existing corpus/mutations, targeted lifecycle/malformed fixtures, Miri and relevant native checks. Resolve mismatches; no undocumented native document fallback. Status: experimental entry/segment owner passes full x64 DLL corpus at `30d087bd`; x86 and full-class lifecycle checks pending; remaining document owners still native. |
+| D1 — Capture complete lifecycles | A pinned-reference document harness for create → add → edit/style-change → copy → sort → seek → clear/reopen → destroy | Compare full initialized document/segment state, observable callback/error order and caller snapshots; use real ATL/CRT on Windows. Include failed operations and repeated calls, with failures never counted as parity. Status: bounded full native-class lifecycle passes on x86/x64 at `04673672`; expanded default-style coverage and broader host/failure lifecycles remain open. |
+| D2 — Implement the Rust owner | Safe Rust entries, styles, metadata and segments; coherent document operations reuse existing helpers | Owner/copy/edit/drop tests, raw UTF-16 preservation, bounded access, no native mutable views; native field/type/alias compatibility reviewed. Status: canonical entry/segment ownership integrated experimentally and validated on x86/x64; default-style ownership implemented with Windows validation pending; named styles and metadata remain native. |
+| D3 — Route every caller | Importers, renderer, style interfaces and export paths use document operations or bounded snapshots | Enumerate and eliminate direct authoritative CAtlArray/CAtlMap entry/style/segment accesses in the Rust-enabled build; preserve callback/lock order and public ABI. Retire superseded fine-grained FFI crossings. Status: entries/segments routed and validated in the opt-in experimental build; external style callers use value operations, default-style routing awaits Windows validation, named styles/metadata remain native. |
+| D4 — Establish parity | Document lifecycle and integrated DLL comparisons on Windows x86/x64 at one exact candidate commit | Exact records, ordering, times, errors, rendering output and style API behavior; existing corpus/mutations, targeted lifecycle/malformed fixtures, Miri and relevant native checks. Resolve mismatches; no undocumented native document fallback. Status: experimental entry/segment owner passes the full DLL corpus and bounded native-class lifecycle on x86/x64 at `04673672`; subsequent style API/default-style changes await validation. No whole-document closure. |
 | D5 — Close and hand off | Written ownership/access review and applicable consumer validation | Aegisub load/render/seek/reload/close, relevant player/style-edit lifecycles and architecture results. Record finite corpus scope and bounded retained adapters. Until the real-host check is complete, report core-complete/host-validation-pending, never closed. Status: planned. |
 
 Important compatibility cases already visible in source include self-copy after
@@ -699,6 +699,14 @@ projects, commands, compiler environment, sources, fixtures, binaries and traces
 are retained. Local negative controls pass; actual Windows style-API results
 remain pending. This is no claim about graph integration, callback counts,
 allocation failure or complete style ownership.
+
+The first x64 style-API attempt (`00f08db3`, run `38628600925`) failed
+compiling the reference test DLL: the out-of-tree helper could not resolve
+`xy_logger.h` from `subtitles/stdafx.h`. The wrapper now adds the actual filter
+project directory to the helper's include paths. The failed build is retained
+under that run's `document-style-api` evidence; it reached no style-API runtime
+comparison and does not establish a behavioral mismatch. Windows validation
+of the corrected harness remains pending.
 
 
 ### D2b supplied style values
