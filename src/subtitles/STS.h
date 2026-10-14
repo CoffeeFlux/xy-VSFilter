@@ -209,7 +209,9 @@ public:
     CSTSStyleMap   m_styles;
 #endif
 
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     bool           m_fForcedDefaultStyle;
+#endif
 #ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     STSStyle       m_defaultStyle;
 #endif
@@ -222,8 +224,10 @@ public:
         EPCTAccurateSize = 3
     };
 
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     EPARCompensationType m_ePARCompensationType;
     double               m_dPARCompensation;
+#endif
 
     enum YCbCrMatrix
     {
@@ -238,8 +242,10 @@ public:
         YCbCrRange_TV,
         YCbCrRange_AUTO
     };
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     YCbCrMatrix    m_eYCbCrMatrix;
     YCbCrRange     m_eYCbCrRange;
+#endif
 public:
     CSimpleTextSubtitle();
     virtual ~CSimpleTextSubtitle();
@@ -316,6 +322,17 @@ public:
     void OrSegmentAnimated(int iSegment, bool animated);
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    bool GetDocumentForcedDefaultStyle() const;
+    void SetDocumentForcedDefaultStyle(bool value);
+    EPARCompensationType GetDocumentPARType() const;
+    void SetDocumentPARType(EPARCompensationType value);
+    double GetDocumentPARCompensation() const;
+    void SetDocumentPARCompensation(double value);
+    YCbCrMatrix GetDocumentColorMatrix() const;
+    void SetDocumentColorMatrix(YCbCrMatrix value);
+    YCbCrRange GetDocumentColorRange() const;
+    void SetDocumentColorRange(YCbCrRange value);
+
     CSize GetDocumentScreenSize() const;
     void SetDocumentScreenSize(const CSize& value);
     void SetDocumentScreenWidth(int value);

@@ -332,6 +332,27 @@ public:
     void CopyDefaultStyle(const DocumentOwner& source) {
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_copy_default_style_v1(id_,source.id_);}));
     }
+    int32_t Metadata(uint32_t field) const {
+        DocumentDetail::Shape(field <= 3); std::array<uint8_t,4> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_get_metadata_v1(id_,field,out.data(),out.size());}));
+        return DocumentDetail::I32(DocumentDetail::Load(out,0,4));
+    }
+    void SetMetadata(uint32_t field, int32_t value) {
+        DocumentDetail::Shape(field <= 3);
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_set_metadata_v1(id_,field,value);}));
+    }
+    double PARCompensation() const {
+        static_assert(sizeof(double) == sizeof(uint64_t), "Native PAR bit transport width");
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_get_par_bits_v1(id_,out.data(),out.size());}));
+        const uint64_t bits = DocumentDetail::Load(out,0,8);
+        double value; std::memcpy(&value,&bits,sizeof value); return value;
+    }
+    void SetPARCompensation(double value) {
+        static_assert(sizeof(double) == sizeof(uint64_t), "Native PAR bit transport width");
+        uint64_t bits; std::memcpy(&bits,&value,sizeof bits);
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_set_par_bits_v1(id_,bits);}));
+    }
     CSize ScreenSize() const {
         std::array<uint8_t,8> out{};
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_get_script_size_v1(id_,out.data(),out.size());}));

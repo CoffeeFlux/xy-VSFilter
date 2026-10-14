@@ -24,6 +24,18 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
              b"layout-open-y1024", b"layout-open-repeated"))
          + b"".join(b"layout-callback " + stage + b" width=0 height=0\n" for stage in (
              b"layout-open-fallback", b"layout-open-x1280", b"layout-open-y1024", b"layout-open-repeated"))
+         + b"".join(b"metadata-stage " + stage + b" forced=0 par-type=0 par-bits 3ff0000000000000 matrix=3 range=2\n" for stage in (
+             b"metadata-constructed", b"metadata-supplied", b"metadata-copy-forced-only",
+             b"metadata-copy-independent", b"metadata-empty", b"metadata-self-copy",
+             b"metadata-forced-style", b"metadata-unforced-style", b"metadata-color-none",
+             b"metadata-color-tv601", b"metadata-color-tv709", b"metadata-color-tv2020",
+             b"metadata-color-pc601", b"metadata-color-pc709", b"metadata-color-pc2020",
+             b"metadata-color-unrecognized", b"metadata-color-repeated", b"metadata-fallback-srt",
+             b"metadata-fallback-microdvd"))
+         + b"".join(b"metadata-callback " + stage + b" forced=0 par-type=0 par-bits 3ff0000000000000 matrix=3 range=2\n" for stage in (
+             b"metadata-color-none", b"metadata-color-tv601", b"metadata-color-tv709", b"metadata-color-tv2020",
+             b"metadata-color-pc601", b"metadata-color-pc709", b"metadata-color-pc2020", b"metadata-color-unrecognized",
+             b"metadata-color-repeated", b"metadata-fallback-srt", b"metadata-fallback-microdvd"))
          + b"saved-file ssa exists=1 bytes=1 41\nsaved-file ass exists=1 bytes=1 41\n"
          + b"saved-file srt exists=1 bytes=1 41\nsaved-file srt-sidecar exists=1 bytes=1 41\n"
          + b"saved-file ssa-sidecar exists=0\nsaved-file ass-sidecar exists=0\n"
@@ -112,6 +124,19 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
         changed=TRACE.replace(b"layout-callback layout-open-fallback width=0",b"layout-callback layout-open-fallback width=384")
         with self.assertRaises(ValueError):compare_traces([TRACE,TRACE,changed,changed],64)
         changed=TRACE.replace(b"layout-stage layout-self-copy width=0",b"layout-stage layout-self-copy width=32")
+        with self.assertRaises(ValueError):compare_traces([TRACE,TRACE,changed,changed],64)
+
+    def test_initialized_metadata_gate_and_archival_opt_out(self):
+        legacy=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith((b"metadata-stage ",b"metadata-callback ")))
+        with self.assertRaises(ValueError):compare_traces([legacy]*4,64)
+        compare_traces([legacy]*4,64,require_metadata_stages=False)
+        missing=TRACE.replace(b"metadata-callback metadata-fallback-srt",b"missing-callback metadata-fallback-srt")
+        with self.assertRaises(ValueError):compare_traces([missing]*4,64)
+        invalid=TRACE.replace(b"par-bits 3ff0000000000000",b"par-bits 3ff000000000000")
+        with self.assertRaises(ValueError):compare_traces([invalid]*4,64)
+        changed=TRACE.replace(b"metadata-stage metadata-copy-forced-only forced=0",b"metadata-stage metadata-copy-forced-only forced=1")
+        with self.assertRaises(ValueError):compare_traces([TRACE,TRACE,changed,changed],64)
+        changed=TRACE.replace(b"metadata-callback metadata-color-pc709 forced=0 par-type=0 par-bits 3ff0000000000000 matrix=3",b"metadata-callback metadata-color-pc709 forced=0 par-type=0 par-bits 3ff0000000000000 matrix=1")
         with self.assertRaises(ValueError):compare_traces([TRACE,TRACE,changed,changed],64)
 
     def test_rejects_repeat_nondeterminism(self):

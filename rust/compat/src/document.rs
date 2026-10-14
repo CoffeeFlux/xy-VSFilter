@@ -5,11 +5,11 @@
 //! Callers must perform native text/style preparation and its initial rejection
 //! checks before supplying records (the suffix begins at STSEntry construction);
 //! raw code units are retained, including unpaired surrogates and embedded NULs.
-//! Raw name/path, supplied interpretation/script scalars and initialized default/named
+//! Raw name/path, supplied interpretation/script/render metadata and initialized
 //! styles are owned here. Native map orchestration, other metadata, Add parsing,
 //! full Copy orchestration, CRT sort and encoding conversion remain outside this
-//! API. Allocation failure/partial native
-//! mutation and callbacks are outside this API's comparison domain.
+//! API. Allocation failure/partial native mutation and callbacks are outside this
+//! API's comparison domain.
 use alloc::{vec, vec::Vec};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -119,10 +119,29 @@ impl ScriptField {
         }
     }
 }
+/// Supplied native render metadata enums; no range normalization.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum MetadataField {
+    PARType,
+    ColorMatrix,
+    ColorRange,
+}
+impl MetadataField {
+    fn index(self) -> usize {
+        match self {
+            Self::PARType => 0,
+            Self::ColorMatrix => 1,
+            Self::ColorRange => 2,
+        }
+    }
+}
 /// Clone creates independent storage; it does not emulate native Copy callbacks
 /// or the selective field assignments in native Copy.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Document {
+    metadata: [Option<i32>; 3],
+    forced_default: Option<bool>,
+    par_bits: Option<u64>,
     script: [Option<i32>; 4],
     scaled_bas: Option<bool>,
     interpretation: [Option<i32>; 3],
@@ -134,6 +153,25 @@ pub struct Document {
     segments: Vec<DocumentSegment>,
 }
 impl Document {
+    pub fn metadata(&self, field: MetadataField) -> Option<i32> {
+        self.metadata[field.index()]
+    }
+    pub fn replace_metadata(&mut self, field: MetadataField, value: i32) -> Option<i32> {
+        self.metadata[field.index()].replace(value)
+    }
+    pub fn forced_default(&self) -> Option<bool> {
+        self.forced_default
+    }
+    pub fn replace_forced_default(&mut self, value: bool) -> Option<bool> {
+        self.forced_default.replace(value)
+    }
+    /// Opaque IEEE double bits: no floating-point operations occur in storage.
+    pub fn par_bits(&self) -> Option<u64> {
+        self.par_bits
+    }
+    pub fn replace_par_bits(&mut self, value: u64) -> Option<u64> {
+        self.par_bits.replace(value)
+    }
     pub fn script_field(&self, field: ScriptField) -> Option<i32> {
         self.script[field.index()]
     }
@@ -1026,5 +1064,53 @@ mod tests {
         source.set_script_size(0, 0);
         assert_eq!(source.script_field(ScriptField::Collisions), Some(i32::MIN));
         assert_eq!(source.scaled_bas(), Some(true));
+    }
+    #[test]
+    fn supplied_render_metadata_bits_clone_and_storage_retention() {
+        let mut source = Document::default();
+        let mut destination = Document::default();
+        assert_eq!(source.par_bits(), None);
+        assert_eq!(source.forced_default(), None);
+        for field in [
+            MetadataField::PARType,
+            MetadataField::ColorMatrix,
+            MetadataField::ColorRange,
+        ] {
+            assert_eq!(source.metadata(field), None);
+            source.replace_metadata(field, i32::MIN);
+            destination.replace_metadata(field, i32::MAX);
+        }
+        source.replace_forced_default(true);
+        destination.replace_forced_default(false);
+        destination.replace_par_bits(0x3ff0000000000000);
+        for bits in [
+            0u64,
+            1 << 63,
+            1,
+            u64::MAX,
+            0x7ff0000000000000,
+            0xfff0000000000000,
+            0x7ff0000000000001,
+            0x7ff8000000000042,
+        ] {
+            source.replace_par_bits(bits);
+            let cloned = source.clone();
+            source.replace_par_bits(!bits);
+            assert_eq!(cloned.par_bits(), Some(bits));
+            destination.copy_storage_from(&source);
+            destination.remove_all_entries();
+            destination.clear_entries_and_segments();
+            assert_eq!(destination.par_bits(), Some(0x3ff0000000000000));
+            assert_eq!(destination.forced_default(), Some(false));
+            assert_eq!(cloned.forced_default(), Some(true));
+            for field in [
+                MetadataField::PARType,
+                MetadataField::ColorMatrix,
+                MetadataField::ColorRange,
+            ] {
+                assert_eq!(destination.metadata(field), Some(i32::MAX));
+                assert_eq!(cloned.metadata(field), Some(i32::MIN));
+            }
+        }
     }
 }

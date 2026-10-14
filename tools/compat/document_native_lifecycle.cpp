@@ -51,12 +51,21 @@ public:
 };
 #endif
 
+struct MetadataValue {
+    bool forced;
+    CSimpleTextSubtitle::EPARCompensationType parType;
+    double par;
+    CSimpleTextSubtitle::YCbCrMatrix matrix;
+    CSimpleTextSubtitle::YCbCrRange range;
+};
 class TraceDocument : public CSimpleTextSubtitle {
     unsigned id_;
+    MetadataValue initial_metadata_{},last_callback_metadata_{};
     CSize initial_screen_,last_callback_screen_;int initial_wrap_,initial_collisions_;bool initial_scaled_;
     int initial_mode_;exttype initial_type_;CTextFile::enc initial_encoding_;
 public:
     explicit TraceDocument(unsigned id) : id_(id) {
+        initial_metadata_=Metadata();
         initial_screen_=Screen();initial_wrap_=Wrap();initial_collisions_=Collisions();initial_scaled_=Scaled();
         initial_mode_=Mode();initial_type_=Type();initial_encoding_=Encoding();
         // Assign every observed metadata scalar before the first observation;
@@ -72,10 +81,82 @@ public:
 #else
         m_defaultStyle=initialDefault;
 #endif
-        m_fForcedDefaultStyle=false;m_ePARCompensationType=EPCTDownscale;
-        m_dPARCompensation=1.25+id;m_eYCbCrMatrix=YCbCrMatrix_BT709;m_eYCbCrRange=YCbCrRange_PC;
+        Forced(false);PARType(EPCTDownscale);PAR(1.25+id);Matrix(YCbCrMatrix_BT709);Range(YCbCrRange_PC);
     }
     ~TraceDocument() override {printf("event %u %u destructor-body\n",++sequence,id_);}
+    bool Forced() const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        return GetDocumentForcedDefaultStyle();
+#else
+        return m_fForcedDefaultStyle;
+#endif
+    }
+    void Forced(bool value) {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        SetDocumentForcedDefaultStyle(value);
+#else
+        m_fForcedDefaultStyle=value;
+#endif
+    }
+    EPARCompensationType PARType() const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        return GetDocumentPARType();
+#else
+        return m_ePARCompensationType;
+#endif
+    }
+    void PARType(EPARCompensationType value) {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        SetDocumentPARType(value);
+#else
+        m_ePARCompensationType=value;
+#endif
+    }
+    double PAR() const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        return GetDocumentPARCompensation();
+#else
+        return m_dPARCompensation;
+#endif
+    }
+    void PAR(double value) {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        SetDocumentPARCompensation(value);
+#else
+        m_dPARCompensation=value;
+#endif
+    }
+    YCbCrMatrix Matrix() const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        return GetDocumentColorMatrix();
+#else
+        return m_eYCbCrMatrix;
+#endif
+    }
+    void Matrix(YCbCrMatrix value) {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        SetDocumentColorMatrix(value);
+#else
+        m_eYCbCrMatrix=value;
+#endif
+    }
+    YCbCrRange Range() const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        return GetDocumentColorRange();
+#else
+        return m_eYCbCrRange;
+#endif
+    }
+    void Range(YCbCrRange value) {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        SetDocumentColorRange(value);
+#else
+        m_eYCbCrRange=value;
+#endif
+    }
+    MetadataValue Metadata() const {return {Forced(),PARType(),PAR(),Matrix(),Range()};}
+    MetadataValue InitialMetadata() const {return initial_metadata_;}
+    MetadataValue CallbackMetadata() const {return last_callback_metadata_;}
     CSize Screen() const {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
         return GetDocumentScreenSize();
@@ -266,8 +347,8 @@ public:
         printf(" %lu %d %d %d",static_cast<unsigned long>(m_lcid),int(Type()),Mode(),int(Encoding()));units(Path());
         printf(" %ld %ld %d %d %d %ld %ld %d %d",Screen().cx,Screen().cy,
             Wrap(),Collisions(),Scaled(),m_layout_size.cx,m_layout_size.cy,
-            m_fForcedDefaultStyle,int(m_ePARCompensationType));
-        real(m_dPARCompensation);printf(" %d %d\n",int(m_eYCbCrMatrix),int(m_eYCbCrRange));
+            Forced(),int(PARType()));
+        real(PAR());printf(" %d %d\n",int(Matrix()),int(Range()));
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
         style(m_document->DefaultStyle());
 #else
@@ -299,6 +380,7 @@ public:
     }
 protected:
     void OnChanged() override {
+        last_callback_metadata_=Metadata();
         last_callback_screen_=Screen();
         ++change_events[id_];printf("event %u %u changed-enter\n",++sequence,id_);Dump("callback-state");
         // Actual native read operations reenter after rebuild's Rust loan ends.
@@ -569,10 +651,14 @@ static void layout_stage(TraceDocument& doc,const char* stage,const CSize& scree
     check(doc.Screen()==screen&&doc.Wrap()==wrap&&doc.Collisions()==collisions&&doc.Scaled()==scaled,"script layout values");
     printf("layout-stage %s width=%ld height=%ld wrap=%d collisions=%d scaled=%d\n",stage,doc.Screen().cx,doc.Screen().cy,doc.Wrap(),doc.Collisions(),doc.Scaled());doc.Dump(stage);
 }
-static void layout_open(const char* label,const char* headers,const CSize& expected,int wrap,int collisions,bool scaled,const CSize& callbackSize) {
-    TraceDocument doc(0);SavedFiles fixture(L"document-lifecycle-layout.ass");
+static CStringA ass_fixture(const char* headers) {
     CStringA text("[Script Info]\r\nScriptType: v4.00+\r\n");text+=headers;
     text+="[V4+ Styles]\r\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\r\nStyle: Default,Arial,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1\r\n[Events]\r\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\r\nDialogue: 0,0:00:00.00,0:00:01.00,Default,,0,0,0,,ordinary layout\r\n";
+    return text;
+}
+static void layout_open(const char* label,const char* headers,const CSize& expected,int wrap,int collisions,bool scaled,const CSize& callbackSize) {
+    TraceDocument doc(0);SavedFiles fixture(L"document-lifecycle-layout.ass");
+    const CStringA text=ass_fixture(headers);
     {CFile output;check(output.Open(fixture.name,CFile::modeCreate|CFile::modeWrite|CFile::typeBinary)!=FALSE,"layout fixture create");output.Write(text.GetString(),text.GetLength());}
     FixtureTextFile input(CTextFile::UTF8);check(input.Open(fixture.name),"layout fixture input");input.SetFixturePath(fixture.name);
     check(input.GetFilePath()==fixture.name,"deterministic layout label");unsigned before=change_events[0];
@@ -597,12 +683,75 @@ static void layout_lifecycle() {
     layout_open("layout-open-y1024","PlayResY: 1024\r\n",CSize(1280,1024),0,0,false,CSize(1280,1024));
     layout_open("layout-open-repeated","PlayResX: 1280\r\nPlayResY: 600\r\nPlayResX: -8\r\nWrapStyle: -2\r\nWrapStyle: 7\r\nCollisions: prefixREVERSEsuffix\r\nScaledBorderAndShadow: notYESexact\r\n",CSize(-8,600),7,1,true,CSize(-8,600));
 }
+static bool same_metadata(const MetadataValue& a,const MetadataValue& b) {
+    uint64_t left,right;std::memcpy(&left,&a.par,8);std::memcpy(&right,&b.par,8);
+    return a.forced==b.forced&&a.parType==b.parType&&left==right&&a.matrix==b.matrix&&a.range==b.range;
+}
+static void metadata_line(const char* prefix,const char* stage,const MetadataValue& value) {
+    printf("%s %s forced=%d par-type=%d par-bits",prefix,stage,value.forced,int(value.parType));real(value.par);
+    printf(" matrix=%d range=%d\n",int(value.matrix),int(value.range));
+}
+static void metadata_stage(TraceDocument& doc,const char* stage,const MetadataValue& expected) {
+    check(same_metadata(doc.Metadata(),expected),"initialized metadata values");
+    metadata_line("metadata-stage",stage,doc.Metadata());doc.Dump(stage);
+}
+static void metadata_open(const char* stage,const char* headers,bool ass,bool microdvd,
+                          CSimpleTextSubtitle::YCbCrMatrix matrix,CSimpleTextSubtitle::YCbCrRange range) {
+    TraceDocument doc(0);doc.Matrix(CSimpleTextSubtitle::YCbCrMatrix_BT2020);doc.Range(CSimpleTextSubtitle::YCbCrRange_PC);
+    SavedFiles fixture(L"document-lifecycle-metadata.sub");
+    const CStringA text=ass?ass_fixture(headers):CStringA(microdvd?"{0}{25}ordinary metadata\r\n":"1\r\n00:00:00,000 --> 00:00:01,000\r\nordinary metadata\r\n\r\n");
+    {CFile output;check(output.Open(fixture.name,CFile::modeCreate|CFile::modeWrite|CFile::typeBinary)!=FALSE,"metadata fixture create");output.Write(text.GetString(),text.GetLength());}
+    FixtureTextFile input(CTextFile::UTF8);check(input.Open(fixture.name),"metadata fixture input");input.SetFixturePath(fixture.name);
+    check(input.GetFilePath()==fixture.name,"deterministic metadata label");unsigned before=change_events[0];
+    check(doc.Open(&input,ANSI_CHARSET,CString(L"metadata fixture")),"ordinary metadata Open");
+    const MetadataValue expected={false,CSimpleTextSubtitle::EPCTDownscale,1.25,matrix,range};
+    check(change_events[0]==before+1&&same_metadata(doc.CallbackMetadata(),expected),"Open callback metadata");
+    metadata_line("metadata-callback",stage,doc.CallbackMetadata());metadata_stage(doc,stage,expected);
+}
+static void metadata_lifecycle() {
+    TraceDocument source(0),destination(1);
+    const MetadataValue initial={false,CSimpleTextSubtitle::EPCTDisabled,1.0,CSimpleTextSubtitle::YCbCrMatrix_AUTO,CSimpleTextSubtitle::YCbCrRange_AUTO};
+    check(same_metadata(source.InitialMetadata(),initial),"actual constructor metadata defaults");
+    metadata_line("metadata-stage","metadata-constructed",source.InitialMetadata());
+    source.SetForceDefaultStyle(true);source.PARType(CSimpleTextSubtitle::EPCTAccurateSize);source.PAR(1.5);
+    source.Matrix(CSimpleTextSubtitle::YCbCrMatrix_BT2020);source.Range(CSimpleTextSubtitle::YCbCrRange_TV);
+    const MetadataValue supplied=source.Metadata();metadata_stage(source,"metadata-supplied",supplied);
+    destination.Forced(false);destination.PARType(CSimpleTextSubtitle::EPCTUpscale);destination.PAR(2.5);
+    destination.Matrix(CSimpleTextSubtitle::YCbCrMatrix_BT709);destination.Range(CSimpleTextSubtitle::YCbCrRange_PC);
+    MetadataValue copied=destination.Metadata();copied.forced=true;
+    unsigned sourceChanges=change_events[0],destinationChanges=change_events[1];
+    destination.Copy(source);metadata_stage(destination,"metadata-copy-forced-only",copied);
+    destination.Forced(false);destination.PAR(3.5);metadata_stage(source,"metadata-copy-independent",supplied);
+    source.Empty();metadata_stage(source,"metadata-empty",supplied);
+    source.Copy(source);metadata_stage(source,"metadata-self-copy",supplied);
+    STSStyle suppliedDefault;suppliedDefault.charSet=SHIFTJIS_CHARSET;suppliedDefault.fontSize=29;
+    check(source.SetDefaultStyle(suppliedDefault),"metadata default setup");
+    STSStyle* mapped=new STSStyle;mapped->charSet=GREEK_CHARSET;STSStyle mappedValue=*mapped;source.AddStyle(CString(L"Default"),mapped);
+    source.AddSTSEntryOnly(CStringW(L"metadata style"),true,0,10000000);
+    resolved(source,0,suppliedDefault,"metadata-forced-default");metadata_stage(source,"metadata-forced-style",supplied);
+    source.SetForceDefaultStyle(false);resolved(source,0,mappedValue,"metadata-unforced-mapped");
+    MetadataValue unforced=supplied;unforced.forced=false;metadata_stage(source,"metadata-unforced-style",unforced);
+    check(change_events[0]==sourceChanges&&change_events[1]==destinationChanges,"metadata set/copy/empty/style lookups do not notify");
+    using Doc=CSimpleTextSubtitle;
+    metadata_open("metadata-color-none","YCbCr Matrix: NONEsuffix\r\n",true,false,Doc::YCbCrMatrix_AUTO,Doc::YCbCrRange_AUTO);
+    metadata_open("metadata-color-tv601","YCbCr Matrix: TV.601suffix\r\n",true,false,Doc::YCbCrMatrix_BT601,Doc::YCbCrRange_TV);
+    metadata_open("metadata-color-tv709","YCbCr Matrix: TV.709suffix\r\n",true,false,Doc::YCbCrMatrix_BT709,Doc::YCbCrRange_TV);
+    metadata_open("metadata-color-tv2020","YCbCr Matrix: TV.2020suffix\r\n",true,false,Doc::YCbCrMatrix_BT2020,Doc::YCbCrRange_TV);
+    metadata_open("metadata-color-pc601","YCbCr Matrix: PC.601suffix\r\n",true,false,Doc::YCbCrMatrix_BT601,Doc::YCbCrRange_PC);
+    metadata_open("metadata-color-pc709","YCbCr Matrix: PC.709suffix\r\n",true,false,Doc::YCbCrMatrix_BT709,Doc::YCbCrRange_PC);
+    metadata_open("metadata-color-pc2020","YCbCr Matrix: PC.2020suffix\r\n",true,false,Doc::YCbCrMatrix_BT2020,Doc::YCbCrRange_PC);
+    metadata_open("metadata-color-unrecognized","YCbCr Matrix: unrecognized\r\n",true,false,Doc::YCbCrMatrix_BT601,Doc::YCbCrRange_TV);
+    metadata_open("metadata-color-repeated","YCbCr Matrix: tv.601\r\nYCbCr Matrix: pc.709suffix\r\nYCbCr Matrix: unrecognized\r\n",true,false,Doc::YCbCrMatrix_BT709,Doc::YCbCrRange_PC);
+    metadata_open("metadata-fallback-srt","",false,false,Doc::YCbCrMatrix_BT601,Doc::YCbCrRange_TV);
+    metadata_open("metadata-fallback-microdvd","",false,true,Doc::YCbCrMatrix_BT601,Doc::YCbCrRange_TV);
+}
 int main() {
     try {
         if(!AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0))throw std::runtime_error("AfxWinInit failed");
         printf("provenance pointer_bits=%zu\n",sizeof(void*)*8);
         printf("environment ansi=%u oem=%u\n",GetACP(),GetOEMCP());
         default_style_lifecycle();
+        metadata_lifecycle();
         layout_lifecycle();
         interpretation_lifecycle();
         identity_lifecycle();
