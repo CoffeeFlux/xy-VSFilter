@@ -61,7 +61,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_hdmv.h",
               ROOT / "include/xy_rust_dvb.h", ROOT / "include/xy_rust_golomb.h", ROOT / "include/xy_rust_fill.h",
               ROOT / "src/subtitles/Rasterizer.cpp", ROOT / "include/xy_rust_mask.h", ROOT / "include/xy_rust_bilinear.h", ROOT / "include/xy_rust_be_blur.h", ROOT / "include/xy_rust_gauss_integer.h", ROOT / "include/xy_rust_be_filter.h", ROOT / "include/xy_rust_transpose.h", ROOT / "include/xy_rust_byte_float.h",
-              ROOT / "src/subtitles/xy_filter.cpp",
+              ROOT / "src/subtitles/xy_filter.cpp", ROOT / "src/subtitles/VobSubImage.cpp", ROOT / "include/xy_rust_vobsub.h",
               ROOT / "src/dsutil/GolombBuffer.cpp", ROOT / "src/dsutil/GolombBuffer.h",
               ROOT / "src/subtitles/CompositionObject.cpp",
               ROOT / "include/xy_rust_timeline_search.h",
@@ -262,6 +262,7 @@ public:
     golomb_header = original("src/dsutil/GolombBuffer.h", reference["commit"])
     raster_source = original("src/subtitles/Rasterizer.cpp", reference["commit"])
     filter_source = original("src/subtitles/xy_filter.cpp", reference["commit"])
+    vobsub_source = original("src/subtitles/VobSubImage.cpp", reference["commit"])
     golomb = '#pragma once\n#include "golomb_shell.h"\n'
     candidate_golomb = (ROOT / "src/dsutil/GolombBuffer.cpp").read_bytes()
     candidate_golomb_header = (ROOT / "src/dsutil/GolombBuffer.h").read_bytes()
@@ -341,6 +342,14 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         hdmv += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     hdmv += "#endif\n"
     (destination / "original_hdmv.h").write_text(hdmv, encoding="utf-8")
+    vobsub = '#include "vobsub_packet_shell.h"\n'
+    for name, content in (("ReferenceVobSub", vobsub_source), ("CandidateVobSub", (ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
+        vobsub += f"VOBSUB_PACKET_SHELL({name})\n#define CVobSubImage {name}\n"
+        if name == "CandidateVobSub":
+            vobsub += "#define XY_VSFILTER_RUST_TEXT\n"
+        vobsub += extract_definition(content.decode("utf-8-sig"), "void CVobSubImage::GetPacketInfo(") + "\n"
+        vobsub += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_vobsub_packet.h").write_text(vobsub, encoding="utf-8")
     byte_float = '#include "byte_float_shell.h"\n'
     for name, content in (("ReferenceByteFloat", filter_source), ("CandidateByteFloat", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
         byte_float += f"namespace {name} {{\n"
@@ -642,6 +651,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     integer_gauss_result = run([str(integer_gauss_executable)], capture_output=True, text=True)
     print(integer_gauss_result.stdout, end="", flush=True)
     print(integer_gauss_result.stderr, end="", file=sys.stderr)
+    vobsub_executable = destination / ("vobsub-packet-oracle.exe" if os.name == "nt" else "vobsub-packet-oracle")
+    vobsub_compile = [arg.replace("fill_oracle.cpp", "vobsub_packet_oracle.cpp").replace("fill-oracle", "vobsub-packet-oracle") for arg in fill_compile]
+    run(vobsub_compile)
+    vobsub_result = run([str(vobsub_executable)], capture_output=True, text=True)
+    print(vobsub_result.stdout, end="", flush=True)
+    print(vobsub_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -672,6 +687,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "hdmv_golomb_header_sha256": hashlib.sha256(golomb_header).hexdigest(),
         "hdmv_raster_source_sha256": hashlib.sha256(raster_source).hexdigest(),
         "xy_filter_source_sha256": hashlib.sha256(filter_source).hexdigest(),
+        "vobsub_source_sha256": hashlib.sha256(vobsub_source).hexdigest(),
+        "vobsub_packet_compile_command": vobsub_compile,
+        "vobsub_packet_result": vobsub_result.stdout, "vobsub_packet_stderr": vobsub_result.stderr,
         "weighted_filter_compile_command": weighted_compile,
         "weighted_filter_result": weighted_result.stdout, "weighted_filter_stderr": weighted_result.stderr,
         "gauss_integer_compile_command": integer_gauss_compile,

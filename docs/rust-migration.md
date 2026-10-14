@@ -20,6 +20,24 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust DVD/VobSub control-packet parsing returns patches for only the fields
+  assigned by the original. It preserves inclusive rectangle coordinates,
+  palette/transparency nibble order, 16-bit command-counter wrapping, forced
+  flags, delay/current-time ordering, future-block stopping, unknown-command
+  advancement, forward control targets and retained state across calls.
+  The boundary reads only consumed initialized bytes and does not inspect old
+  object fields that the packet would overwrite. Warning/assertion paths decline
+  before applying a patch, preserving native diagnostic and partial-state order;
+  packets aliasing the object retain native incremental reads and writes.
+  Local fatal ASan/UBSan tests passed **304,134 exact comparisons** on arm64 and
+  under x64 execution, including **965,093 state/diagnostic observations**,
+  **526 injected diagnostic interruptions**, **4 object-alias cases**,
+  **854,918 Rust-handled calls** and **56,690 fallback calls**. All palette and
+  transparency words are covered, alongside timing, rectangle/offset, control
+  target, counter-wrap and retained-state cases. Rust tests (49 core, 28 FFI),
+  strict Clippy and both default native branch syntax checks pass. Windows/Miri
+  validation is pending for this increment. DVD RLE, buffer ownership and real
+  bitmap-subtitle host playback remain separate work.
 * Safe Rust table-driven integer Gaussian accumulation owns initialized input,
   scratch and output storage. It preserves the original cumulative edges,
   asymmetric table traversal, skipped radius-zero first row/column, conditional
@@ -51,12 +69,15 @@ unresolved reference outcomes requiring investigation, never matching results.
   and **237,258 fallback calls**. All byte values and floating-point exception
   flags are checked; a control confirms scalar/SSE aliases can differ.
   Rust tests (46 core, 24 FFI), strict Clippy and default native branch syntax
-  checks pass. Windows/Miri validation is pending for this increment.
+  checks pass. Candidate `856eac29` passed all four CI platforms, Miri and both
+  Windows DLL jobs; both logs confirm Rust-enabled `xy_filter.cpp` compilation.
   The DLL corpus now has **354 cases**, adding focused integer/fractional edge
   blur, Gaussian blur, combined/animated/clipped effects and alternate output
   geometry/orientation. Three new file/memory control pairs require visible
-  differences from unblurred drawings. These expanded renderer checks are
-  pending Windows execution, separate from the earlier 322-case evidence.
+  differences from unblurred drawings. Each Windows DLL job matched **354 cases /
+  4,334 frames** and **32 mutations / 224 frames**, plus dialogs, visible controls,
+  exports and dependencies. [Byte-to-float evidence](byte-float-evidence.json)
+  records verified source/DLL hashes and scope.
 * Safe Rust float-to-float transposition handles disjoint positive-pitch
   layouts containing finite normal values or signed zeros. It moves initialized
   bit patterns through the same owned matrix storage as byte transposition;
@@ -70,8 +91,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   and **687,726 fallback calls**. Tests compare all output bits and floating-point
   exception flags, including special-value fallback behavior. Byte transpose
   regression tests still pass. Rust tests (45 core, 23 FFI), strict Clippy and
-  default native branch syntax checks pass. Windows/Miri validation is pending
-  for this increment; float-to-byte conversion remains native.
+  default native branch syntax checks pass. Candidate `7a81ca63` passed all four
+  CI platforms, Miri and both Windows DLL jobs. Each DLL job matched **322 cases /
+  4,026 frames** and **32 mutations / 224 frames**, plus dialogs, visible controls,
+  exports and dependencies. Both logs confirm Rust-enabled `xy_filter.cpp`
+  compilation. [Float-transpose evidence](float-transpose-evidence.json) records
+  verified source/DLL hashes and scope; float-to-byte conversion remains native.
 * Safe Rust byte-matrix transposition handles positive-pitch, non-overlapping
   layouts behind the existing switch. Native active source rows are copied into
   owned Rust storage; safe Rust transposes and adds the original zero extension.
@@ -960,7 +985,7 @@ and the validation scope for each increment.
 | VirtualDub | `plugins.cpp`, bundled SDK headers | Export calling conventions, filter negotiation, scripting, RGB orientation, lifecycle |
 | Text formats | `STS.cpp`, `TextFile.cpp`, `RealTextParser.cpp`, `USFSubtitles.cpp`, `libssf` | SSA/ASS, SubRip variants, SubViewer, MicroDVD, SAMI, WebVTT, VPlayer, XombieSub, USF, MPL2, RealText and SSF parsing/recovery |
 | Timeline and event ordering | `STS.cpp`, `STS.h` | Segment construction, incremental edits and lookup have differential tests; native entry preparation/storage/sorting, frame/time conversion and host-driven mutation/lifecycle sequences still need migration and broader integration coverage |
-| Bitmap subtitles | `VobSub*`, `HdmvSub*`, `DVBSub*`, `CompositionObject*`, `CCDecoder*` | HDMV and DVB run states and DVB field assembly have extracted oracles; RLE buffer ownership, packet parsing, DVD/VobSub, PGS/SUP and DVB host playback, closed captions and external file behavior remain |
+| Bitmap subtitles | `VobSub*`, `HdmvSub*`, `DVBSub*`, `CompositionObject*`, `CCDecoder*` | HDMV/DVB run states, DVB field assembly and DVD control-packet parsing have extracted oracles; RLE buffer ownership, remaining packet assembly, DVD pixel decoding, PGS/SUP and DVB host playback, closed captions and external file behavior remain |
 | Layout/rendering | `RTS.cpp`, `Rasterizer.cpp`, caches, overlay/clip code | Every tag's recovery and interaction, drawings, clipping, transforms, karaoke, blur/border/shadow, GDI/font metrics and fallback |
 | Compositing/color | `subpic`, SIMD/assembly, conversion tables | All RGB/YUV formats, high bit depths, interlace/subsampling, pitch/orientation, alpha and rounding |
 | Supporting behavior | `dsutil`, `decss`, vendored libraries, settings | Encodings, code pages, font attachments, file/network access, archive inputs, persistence and remaining unsafe dependencies |
