@@ -32,6 +32,7 @@ on:
       - 'include/xy_rust_bilinear.h'
       - 'include/xy_rust_be_blur.h'
       - 'include/xy_rust_be_filter.h'
+      - 'include/xy_rust_transpose.h'
       - 'include/xy_rust_timeline_search.h'
       - 'src/**'
       - 'tools/compat/**'

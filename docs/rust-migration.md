@@ -20,6 +20,21 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust byte-matrix transposition handles positive-pitch, non-overlapping
+  layouts behind the existing switch. Native active source rows are copied into
+  owned Rust storage; safe Rust transposes and adds the original zero extension.
+  The boundary copies completed rows to writable output without borrowing its
+  uninitialized contents or either buffer's pitch gaps. Overlapping buffers,
+  unusual dimensions/pitches and allocation refusal retain the native path.
+  Local fatal ASan/UBSan comparisons passed **218,043 cases / 1,786,208,256
+  bytes** on arm64 and under x64 execution, including **83,818 visibly changed
+  cases**, **16,200 nearby/alias cases**, **15,234 Rust-handled calls** and
+  **320,052 fallback calls**. A control demonstrates that aliases require the
+  original incremental read/write order. Nonterminating native traversal is
+  excluded from parity counts. Rust tests (45 core, 22 FFI), strict Clippy and
+  default native branch syntax checks pass; boundary tests use intentionally
+  uninitialized pitch gaps and output. Windows/Miri validation is pending for
+  this increment. Float transposes remain native.
 * Safe Rust weighted horizontal filtering covers fractional blur arithmetic
   behind the existing switch. Scalar full-width products and narrowing remain
   distinct from SSE word products and saturating additions. The original
@@ -62,7 +77,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   guards and the unused scratch argument across repeated passes and negative/zero
   stride. A reference-only control confirms scalar/SSE alias results can differ.
   Rust tests (42 core, 19 FFI), strict Clippy and default native branch syntax
-  checks pass. Windows validation is pending for this increment.
+  checks pass. Candidate `488b020a` passed all four CI platforms, Miri and both
+  Windows DLL jobs. Each DLL job matched **322 corpus cases / 4,026 frames**
+  and **32 mutations / 224 frames**, plus dialogs, visible controls, exports and
+  dependencies. Both logs confirm Rust-enabled `Rasterizer.cpp` compilation.
+  [Fixed-blur evidence](be-blur-evidence.json) records verified source/DLL hashes
+  and scope.
 * Safe Rust bilinear subpixel rows for horizontal/vertical factors zero through
   eight, behind the existing switch. The bridge lends one initialized byte row
   and its disjoint WORD column history at a time. Row borrows end before later

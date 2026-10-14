@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_be_filter.h"
+#include "xy_rust_transpose.h"
 #endif
 
 typedef const UINT8 CUINT8, *PCUINT8;
@@ -1339,6 +1340,11 @@ void xy_byte_2_byte_transpose_c(UINT8 *dst, int dst_width, int dst_stride,
     PCUINT8 src, int width, int height, int src_stride)
 {
     ASSERT(dst_width >= height);
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (xy_vsfilter_byte_transpose(dst, dst_width, dst_stride, src, width, height, src_stride)) {
+        return;
+    }
+#endif
     PUINT8 dst_byte = reinterpret_cast<PUINT8>(dst);
     PCUINT8 src_end = src + width;
     PCUINT8 src2_end = reinterpret_cast<PCUINT8>(src) + height*src_stride;

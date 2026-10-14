@@ -88,3 +88,5 @@ mod tests {
         assert_eq!(xy_vsfilter_next_char(0, 0, 0), 0xffff_ffff);
     }
 }
+
+mod transpose;

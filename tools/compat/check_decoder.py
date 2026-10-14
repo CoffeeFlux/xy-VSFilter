@@ -60,7 +60,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_segment_insert.h",
               ROOT / "include/xy_rust_hdmv.h",
               ROOT / "include/xy_rust_dvb.h", ROOT / "include/xy_rust_golomb.h", ROOT / "include/xy_rust_fill.h",
-              ROOT / "src/subtitles/Rasterizer.cpp", ROOT / "include/xy_rust_mask.h", ROOT / "include/xy_rust_bilinear.h", ROOT / "include/xy_rust_be_blur.h", ROOT / "include/xy_rust_be_filter.h",
+              ROOT / "src/subtitles/Rasterizer.cpp", ROOT / "include/xy_rust_mask.h", ROOT / "include/xy_rust_bilinear.h", ROOT / "include/xy_rust_be_blur.h", ROOT / "include/xy_rust_be_filter.h", ROOT / "include/xy_rust_transpose.h",
               ROOT / "src/subtitles/xy_filter.cpp",
               ROOT / "src/dsutil/GolombBuffer.cpp", ROOT / "src/dsutil/GolombBuffer.h",
               ROOT / "src/subtitles/CompositionObject.cpp",
@@ -341,6 +341,14 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         hdmv += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     hdmv += "#endif\n"
     (destination / "original_hdmv.h").write_text(hdmv, encoding="utf-8")
+    transpose = '#include "transpose_shell.h"\n'
+    for name, content in (("ReferenceTranspose", filter_source), ("CandidateTranspose", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
+        transpose += f"namespace {name} {{\n"
+        if name == "CandidateTranspose":
+            transpose += "#define XY_VSFILTER_RUST_TEXT\n"
+        transpose += extract_definition(content.decode("utf-8-sig"), "void xy_byte_2_byte_transpose_c(") + "\n"
+        transpose += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_transpose.h").write_text(transpose, encoding="utf-8")
     filters = '#include "be_filter_shell.h"\n'
     for name, content in (("ReferenceFilter", filter_source), ("CandidateFilter", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
         filters += f"namespace {name} {{\n"
@@ -583,6 +591,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     weighted_result = run([str(weighted_executable)], capture_output=True, text=True)
     print(weighted_result.stdout, end="", flush=True)
     print(weighted_result.stderr, end="", file=sys.stderr)
+    transpose_executable = destination / ("transpose-oracle.exe" if os.name == "nt" else "transpose-oracle")
+    transpose_compile = [arg.replace("fill_oracle.cpp", "transpose_oracle.cpp").replace("fill-oracle", "transpose-oracle") for arg in fill_compile]
+    run(transpose_compile)
+    transpose_result = run([str(transpose_executable)], capture_output=True, text=True)
+    print(transpose_result.stdout, end="", flush=True)
+    print(transpose_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -615,6 +629,8 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "xy_filter_source_sha256": hashlib.sha256(filter_source).hexdigest(),
         "weighted_filter_compile_command": weighted_compile,
         "weighted_filter_result": weighted_result.stdout, "weighted_filter_stderr": weighted_result.stderr,
+        "transpose_compile_command": transpose_compile,
+        "transpose_result": transpose_result.stdout, "transpose_stderr": transpose_result.stderr,
         "be_filter_compile_command": filter_compile,
         "be_filter_result": filter_result.stdout, "be_filter_stderr": filter_result.stderr,
         "be_blur_compile_command": blur_compile,
