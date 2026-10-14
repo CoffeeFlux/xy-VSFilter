@@ -20,6 +20,25 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust byte-to-float conversion owns a complete output row and constructs
+  the exact binary32 representation of each byte using integer arithmetic.
+  It preserves positive-zero extension, source-row overlap and zero/overlapping
+  destination strides for disjoint source/output spans. Only initialized active
+  input rows are borrowed; output and pitch gaps are not. Source/output aliases,
+  negative traversal and unsupported layouts retain their scalar/SSE native
+  paths. The Windows x86 component oracle uses `/arch:IA32`.
+  Local fatal ASan/UBSan tests passed **145,152 scalar comparisons** on arm64
+  and **201,600 comparisons** under x64 execution, including **56,448 actual
+  SSE comparisons**, **10,368 nearby/alias cases**, **77,238 Rust-handled calls**
+  and **237,258 fallback calls**. All byte values and floating-point exception
+  flags are checked; a control confirms scalar/SSE aliases can differ.
+  Rust tests (46 core, 24 FFI), strict Clippy and default native branch syntax
+  checks pass. Windows/Miri validation is pending for this increment.
+  The DLL corpus now has **354 cases**, adding focused integer/fractional edge
+  blur, Gaussian blur, combined/animated/clipped effects and alternate output
+  geometry/orientation. Three new file/memory control pairs require visible
+  differences from unblurred drawings. These expanded renderer checks are
+  pending Windows execution, separate from the earlier 322-case evidence.
 * Safe Rust float-to-float transposition handles disjoint positive-pitch
   layouts containing finite normal values or signed zeros. It moves initialized
   bit patterns through the same owned matrix storage as byte transposition;
@@ -77,7 +96,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   under every policy in a full eight-pixel SIMD group plus scalar tail, and
   covers padding, guards, width/alignment boundaries and negative/zero strides.
   Rust tests (43 core, 20 FFI), strict Clippy and both default native branch
-  syntax checks pass. Windows validation is pending for this increment.
+  syntax checks pass. Candidate `37e4cd2a` passed all four CI platforms, Miri
+  and both Windows DLL jobs. Each DLL job matched **322 corpus cases / 4,026
+  frames** and **32 mutations / 224 frames**, plus dialogs, visible controls,
+  exports and dependencies. Both logs confirm Rust-enabled `xy_filter.cpp`
+  compilation. [Horizontal-filter evidence](be-filter-evidence.json) records
+  verified source/DLL hashes and scope.
 * Safe Rust fixed 3x3 blur column-state updates and pixel arithmetic, behind the
   existing switch for widths/heights of at least two. Native adapters retain
   one-byte scalar and eight-byte SSE source snapshots, output order, and the

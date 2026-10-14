@@ -28,3 +28,5 @@ pub mod text_reader;
 pub mod timeline_search;
 
 pub mod transpose;
+
+pub mod byte_float;

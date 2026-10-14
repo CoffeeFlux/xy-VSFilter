@@ -17,6 +17,30 @@
     [
       "drawing-state-spline-close-twice-memory",
       "drawing-state-control-memory"
+    ],
+    [
+      "raster-be-one-file",
+      "raster-control-file"
+    ],
+    [
+      "raster-be-one-memory",
+      "raster-control-memory"
+    ],
+    [
+      "raster-be-fraction-high-file",
+      "raster-control-file"
+    ],
+    [
+      "raster-be-fraction-high-memory",
+      "raster-control-memory"
+    ],
+    [
+      "raster-gaussian-medium-file",
+      "raster-control-file"
+    ],
+    [
+      "raster-gaussian-medium-memory",
+      "raster-control-memory"
     ]
   ],
   "cases": [
@@ -2810,6 +2834,622 @@
       "id": "utf8-truncated-no-bom-memory",
       "script": "test/compat/generated/utf8-truncated-no-bom.ass",
       "sha256": "5167c6e63f3a60d8040841ffe0a5721f93b64ba0f0b41a2d4cbb9a31662a4bbc",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-control-file",
+      "script": "test/compat/generated/raster-control.ass",
+      "sha256": "8406e208370950a642eb591d9b3656f569c907c1093c8d062aa0d8b66831abbc",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-control-memory",
+      "script": "test/compat/generated/raster-control.ass",
+      "sha256": "8406e208370950a642eb591d9b3656f569c907c1093c8d062aa0d8b66831abbc",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-be-one-file",
+      "script": "test/compat/generated/raster-be-one.ass",
+      "sha256": "d06083edd4a8320ba2f621cd0a18ac2953ddd48c4a107606c9e2ce59baaca319",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-be-one-memory",
+      "script": "test/compat/generated/raster-be-one.ass",
+      "sha256": "d06083edd4a8320ba2f621cd0a18ac2953ddd48c4a107606c9e2ce59baaca319",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-be-three-file",
+      "script": "test/compat/generated/raster-be-three.ass",
+      "sha256": "5f15c546b37f2746ab3151f6f914e25cc8c9eae77fc7a2cc3028df3f329444ab",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-be-three-memory",
+      "script": "test/compat/generated/raster-be-three.ass",
+      "sha256": "5f15c546b37f2746ab3151f6f914e25cc8c9eae77fc7a2cc3028df3f329444ab",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-be-fraction-low-file",
+      "script": "test/compat/generated/raster-be-fraction-low.ass",
+      "sha256": "7ea1c3a7384e827cb3c9bf2c3d558420db620019a68ac3ccfb6b5f7f5ffb800b",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-be-fraction-low-memory",
+      "script": "test/compat/generated/raster-be-fraction-low.ass",
+      "sha256": "7ea1c3a7384e827cb3c9bf2c3d558420db620019a68ac3ccfb6b5f7f5ffb800b",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-be-fraction-high-file",
+      "script": "test/compat/generated/raster-be-fraction-high.ass",
+      "sha256": "809e15453598c478e8fad924e8da5bc433918eba09ec6bad4d5a178e252ad9bf",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-be-fraction-high-memory",
+      "script": "test/compat/generated/raster-be-fraction-high.ass",
+      "sha256": "809e15453598c478e8fad924e8da5bc433918eba09ec6bad4d5a178e252ad9bf",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-be-mixed-file",
+      "script": "test/compat/generated/raster-be-mixed.ass",
+      "sha256": "6bc037db5243e6ff65ba05f67ed3b0421a90b48cc3e418532d2ec219b78bfe09",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-be-mixed-memory",
+      "script": "test/compat/generated/raster-be-mixed.ass",
+      "sha256": "6bc037db5243e6ff65ba05f67ed3b0421a90b48cc3e418532d2ec219b78bfe09",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-be-mixed-repeat-file",
+      "script": "test/compat/generated/raster-be-mixed-repeat.ass",
+      "sha256": "fcd9850416f19270bb44202b132b45a1700dfe8e3db87438296fddbc22572d24",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-be-mixed-repeat-memory",
+      "script": "test/compat/generated/raster-be-mixed-repeat.ass",
+      "sha256": "fcd9850416f19270bb44202b132b45a1700dfe8e3db87438296fddbc22572d24",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-be-multiple-file",
+      "script": "test/compat/generated/raster-be-multiple.ass",
+      "sha256": "973de4d9e726f32b9acd5bacb1f9fe4997fce5a92a603205bae0c9d0d68cd6cb",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-be-multiple-memory",
+      "script": "test/compat/generated/raster-be-multiple.ass",
+      "sha256": "973de4d9e726f32b9acd5bacb1f9fe4997fce5a92a603205bae0c9d0d68cd6cb",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-gaussian-small-file",
+      "script": "test/compat/generated/raster-gaussian-small.ass",
+      "sha256": "bec6dd3d81e821e2a70070938ea02f5a8572e4b4fc36ce958d96a344605f9e1c",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-gaussian-small-memory",
+      "script": "test/compat/generated/raster-gaussian-small.ass",
+      "sha256": "bec6dd3d81e821e2a70070938ea02f5a8572e4b4fc36ce958d96a344605f9e1c",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-gaussian-medium-file",
+      "script": "test/compat/generated/raster-gaussian-medium.ass",
+      "sha256": "9f4d448f74c3ddfb7345f3e1aa5b5e8b132ddab41bfd6e2b28d7d7fbda5d6acf",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-gaussian-medium-memory",
+      "script": "test/compat/generated/raster-gaussian-medium.ass",
+      "sha256": "9f4d448f74c3ddfb7345f3e1aa5b5e8b132ddab41bfd6e2b28d7d7fbda5d6acf",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-gaussian-large-file",
+      "script": "test/compat/generated/raster-gaussian-large.ass",
+      "sha256": "a539f70be33f0a33e0d7b67e9abe3b87a0fc1a01b9c5688f64a93ad63be690fe",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-gaussian-large-memory",
+      "script": "test/compat/generated/raster-gaussian-large.ass",
+      "sha256": "a539f70be33f0a33e0d7b67e9abe3b87a0fc1a01b9c5688f64a93ad63be690fe",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-combined-file",
+      "script": "test/compat/generated/raster-combined.ass",
+      "sha256": "ce6784fdc0a996296d76047e01613829caabede465708d3ccaddb8fb8c776f19",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-combined-memory",
+      "script": "test/compat/generated/raster-combined.ass",
+      "sha256": "ce6784fdc0a996296d76047e01613829caabede465708d3ccaddb8fb8c776f19",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-animated-file",
+      "script": "test/compat/generated/raster-animated.ass",
+      "sha256": "7e70cca24e99985bd75bc31b2d3a03c1ca460a7796d03a272cc6844ea54e8386",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-animated-memory",
+      "script": "test/compat/generated/raster-animated.ass",
+      "sha256": "7e70cca24e99985bd75bc31b2d3a03c1ca460a7796d03a272cc6844ea54e8386",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-clipped-file",
+      "script": "test/compat/generated/raster-clipped.ass",
+      "sha256": "2efb186118e4e1bca2cc1f4efaf2887b25fee6038ca343c0ee37fdb8c526c1e0",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "raster-clipped-memory",
+      "script": "test/compat/generated/raster-clipped.ass",
+      "sha256": "2efb186118e4e1bca2cc1f4efaf2887b25fee6038ca343c0ee37fdb8c526c1e0",
       "open": "memory",
       "width": 1280,
       "height": 720,
@@ -8018,6 +8658,86 @@
         "2",
         "4",
         "2"
+      ]
+    },
+    {
+      "id": "raster-be-mixed-geometry-641-359",
+      "script": "test/compat/generated/raster-be-mixed.ass",
+      "sha256": "6bc037db5243e6ff65ba05f67ed3b0421a90b48cc3e418532d2ec219b78bfe09",
+      "open": "memory",
+      "width": 641,
+      "height": 359,
+      "stride_padding": 12,
+      "bottom_up": false,
+      "fill_seed": 173,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2",
+        "1"
+      ]
+    },
+    {
+      "id": "raster-be-mixed-geometry-640-360",
+      "script": "test/compat/generated/raster-be-mixed.ass",
+      "sha256": "6bc037db5243e6ff65ba05f67ed3b0421a90b48cc3e418532d2ec219b78bfe09",
+      "open": "memory",
+      "width": 640,
+      "height": 360,
+      "stride_padding": 0,
+      "bottom_up": true,
+      "fill_seed": 173,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2",
+        "1"
+      ]
+    },
+    {
+      "id": "raster-gaussian-medium-geometry-641-359",
+      "script": "test/compat/generated/raster-gaussian-medium.ass",
+      "sha256": "9f4d448f74c3ddfb7345f3e1aa5b5e8b132ddab41bfd6e2b28d7d7fbda5d6acf",
+      "open": "memory",
+      "width": 641,
+      "height": 359,
+      "stride_padding": 12,
+      "bottom_up": false,
+      "fill_seed": 173,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2",
+        "1"
+      ]
+    },
+    {
+      "id": "raster-gaussian-medium-geometry-640-360",
+      "script": "test/compat/generated/raster-gaussian-medium.ass",
+      "sha256": "9f4d448f74c3ddfb7345f3e1aa5b5e8b132ddab41bfd6e2b28d7d7fbda5d6acf",
+      "open": "memory",
+      "width": 640,
+      "height": 360,
+      "stride_padding": 0,
+      "bottom_up": true,
+      "fill_seed": 173,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2",
+        "1"
       ]
     }
   ]

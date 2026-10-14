@@ -90,3 +90,5 @@ mod tests {
 }
 
 mod transpose;
+
+mod byte_float;
