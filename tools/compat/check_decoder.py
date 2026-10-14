@@ -54,7 +54,8 @@ def capture_inputs():
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h", ROOT / "include/xy_rust_writer.h", ROOT / "include/xy_rust_seek.h",
               ROOT / "include/xy_rust_drawing.h", ROOT / "include/xy_rust_layout.h", ROOT / "include/xy_rust_text_runs.h", ROOT / "include/xy_rust_wrap.h", ROOT / "include/xy_rust_line_layout.h", ROOT / "src/subtitles/RTS.h",
-              ROOT / "include/xy_rust_drawing_tokens.h", ROOT / "include/xy_rust_path_align.h", ROOT / "include/xy_rust_spans.h",
+              ROOT / "include/xy_rust_drawing_tokens.h", ROOT / "include/xy_rust_path_align.h", ROOT / "include/xy_rust_spans.h", ROOT / "include/xy_rust_arc_queue.h",
+              ROOT / "src/subtitles/xy_widen_region.cpp", ROOT / "src/subtitles/xy_circular_array_queue.h",
               ROOT / "include/xy_rust_pipe_line.h", ROOT / "include/xy_rust_subrip_cue.h", ROOT / "include/xy_rust_sami_file.h", ROOT / "include/xy_rust_microdvd_style.h", ROOT / "include/xy_rust_font_records.h", ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
               ROOT / "include/xy_rust_cc.h", ROOT / "src/subtitles/CCDecoder.cpp", ROOT / "src/subtitles/CCDecoder.h",
@@ -716,6 +717,24 @@ public:
             definition = definition.replace("unsigned __int64", "uint64_t").replace("__int64", "int64_t")
         span_merge += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_span_merge.h").write_text(span_merge, encoding="utf-8")
+    queue_header = original("src/subtitles/xy_circular_array_queue.h", reference["commit"])
+    (destination / "original_arc_queue.h").write_bytes(queue_header)
+    widen_source = original("src/subtitles/xy_widen_region.cpp", reference["commit"])
+    arc_code = '#include "arc_queue_shell.h"\n'
+    for name, content in (("ReferenceArcs", widen_source), ("CandidateArcs", (ROOT / "src/subtitles/xy_widen_region.cpp").read_bytes())):
+        text = content.decode("utf-8-sig")
+        arc_code += f"namespace {name} {{\n"
+        if name == "CandidateArcs":
+            arc_code += "#define XY_VSFILTER_RUST_TEXT\n#ifdef XY_VSFILTER_RUST_TEXT\ntypedef XyRust::ArcQueue<LinkArcItem> LinkArc;\n#else\ntypedef XYCircularArrayQueue<LinkArcItem> LinkArc;\n#endif\n"
+            for signature in ("static void ArcAppend(", "static void ArcCenter(", "static void ArcDeadline("):
+                arc_code += extract_definition(text, signature) + "\n"
+        else:
+            arc_code += "typedef XYCircularArrayQueue<LinkArcItem> LinkArc;\n"
+        arc_code += "class WidenRegionCreaterImpl { public: ArcEllipse* m_ellipse; explicit WidenRegionCreaterImpl(ArcEllipse* e):m_ellipse(e){} int cross_left(const LinkArc&,XY_POINT); void add_left(LinkArc*,XY_POINT); void add_right(LinkArc*,XY_POINT); };\n"
+        for signature in ("int WidenRegionCreaterImpl::cross_left(", "void WidenRegionCreaterImpl::add_left(", "void WidenRegionCreaterImpl::add_right("):
+            arc_code += extract_definition(text, signature) + "\n"
+        arc_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_arc_updates.h").write_text(arc_code, encoding="utf-8")
     filter_source = original("src/subtitles/xy_filter.cpp", reference["commit"])
     vobsub_source = original("src/subtitles/VobSubImage.cpp", reference["commit"])
     golomb = '#pragma once\n#include "golomb_shell.h"\n'
@@ -1188,6 +1207,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     writer_result = run([str(writer_executable)], capture_output=True, text=True)
     print(writer_result.stdout, end="", flush=True)
     print(writer_result.stderr, end="", file=sys.stderr)
+    arc_executable = destination / ("arc-queue-oracle.exe" if os.name == "nt" else "arc-queue-oracle")
+    arc_compile = [arg.replace("find_char_oracle.cpp", "arc_queue_oracle.cpp").replace("find-char-oracle", "arc-queue-oracle") for arg in find_char_compile]
+    run(arc_compile)
+    arc_result = run([str(arc_executable)], capture_output=True, text=True)
+    print(arc_result.stdout, end="", flush=True)
+    print(arc_result.stderr, end="", file=sys.stderr)
     pipe_line_executable = destination / ("pipe-line-oracle.exe" if os.name == "nt" else "pipe-line-oracle")
     pipe_line_compile = [arg.replace("find_char_oracle.cpp", "pipe_line_oracle.cpp").replace("find-char-oracle", "pipe-line-oracle") for arg in find_char_compile]
     run(pipe_line_compile)
@@ -1577,6 +1602,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "path_align_compile_command": path_align_compile,
         "path_align_result": path_align_result.stdout, "path_align_stderr": path_align_result.stderr,
         "path_align_scope": "Complete pinned PathData::AlignLeftTop over initialized point/type buffers; actual Windows POINT/ATL geometry; exact guarded buffers, origin/size, errno/FP/Windows error state; native cleanup modeled, outputs disjoint and representable arithmetic only",
+        "arc_queue_compile_command": arc_compile,
+        "arc_queue_result": arc_result.stdout, "arc_queue_stderr": arc_result.stderr,
+        "arc_queue_scope": "Pinned circular queue and complete add_left/add_right/cross_left methods with controlled native ellipse callbacks; initialized positive capacities and nonnegative representable indices/counts, successful allocation; every physical slot including removed slots, callback order, errno/FP/Windows error state. Ellipse math and outer span/list algorithm remain native and require renderer comparisons.",
         "span_merge_compile_command": span_compile,
         "span_merge_result": span_result.stdout, "span_merge_stderr": span_result.stderr,
         "span_merge_scope": "Pinned OverlapRegion with leftover-A loop guarded before entry and excluded, never treated as a passing comparison; direct Rust decline checked for excluded cases. Exact terminating span outputs/order, source preservation, vector capacity, errno/FP flags, repeated production widening; native offsets retained, dy>=0 and successful allocation only",

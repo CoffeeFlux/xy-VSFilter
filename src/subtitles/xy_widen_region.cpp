@@ -4,6 +4,9 @@
 #include <vector>
 #include "xy_circular_array_queue.h"
 #include <math.h>
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "xy_rust_arc_queue.h"
+#endif
 
 //terminology
 //  @left arc : left part of an ellipse
@@ -40,7 +43,38 @@ struct LinkArcItem
     int dead_line;
 };
 
+#ifdef XY_VSFILTER_RUST_TEXT
+typedef XyRust::ArcQueue<LinkArcItem> LinkArc;
+#else
 typedef XYCircularArrayQueue<LinkArcItem> LinkArc;
+#endif
+
+static void ArcAppend(LinkArc& arc, XY_POINT center, int deadline)
+{
+#ifdef XY_VSFILTER_RUST_TEXT
+    arc.append(center, deadline);
+#else
+    LinkArcItem& item = arc.inc_1_at_tail();
+    item.arc_center = center;
+    item.dead_line = deadline;
+#endif
+}
+static void ArcCenter(LinkArc& arc, int index, XY_POINT center)
+{
+#ifdef XY_VSFILTER_RUST_TEXT
+    arc.set_center(index, center);
+#else
+    arc.get_at(index).arc_center = center;
+#endif
+}
+static void ArcDeadline(LinkArc& arc, int index, int deadline)
+{
+#ifdef XY_VSFILTER_RUST_TEXT
+    arc.set_deadline(index, deadline);
+#else
+    arc.get_at(index).dead_line = deadline;
+#endif
+}
 
 struct LinkSpan
 {
@@ -188,9 +222,9 @@ void WidenRegionCreaterImpl::xy_overlap_region(SpanBuffer* dst, const SpanBuffer
     LinkSpan &sentinel = link_span_list.GetAt(link_span_list.AddTail());
     sentinel.left.init(2*ry+2);
     sentinel.right.init(2*ry+2);
-    LinkArcItem& item = sentinel.left.inc_1_at_tail();
-    XY_POINT_SET(item.arc_center, MAX_X, 0);
-    item.dead_line = MAX_CROSS_LINE;
+    XY_POINT sentinel_center;
+    XY_POINT_SET(sentinel_center, MAX_X, 0);
+    ArcAppend(sentinel.left, sentinel_center, MAX_CROSS_LINE);
 
     for ( ;it_src!=it_src_end; it_src++)
     {
@@ -203,7 +237,9 @@ void WidenRegionCreaterImpl::xy_overlap_region(SpanBuffer* dst, const SpanBuffer
             dst_line = line - ry;
             ASSERT(!link_span_list.IsEmpty() && !link_span_list.GetTail().left.empty());
             ASSERT(XY_POINT_X(link_span_list.GetTail().left.get_at(0).arc_center)==MAX_X);
-            XY_POINT_SET(link_span_list.GetTail().left.get_at(0).arc_center, MAX_X, line-1);//update sentinel
+            XY_POINT sentinel_center;
+            XY_POINT_SET(sentinel_center, MAX_X, line-1);
+            ArcCenter(link_span_list.GetTail().left, 0, sentinel_center);//update sentinel
             pos = link_span_list.GetHeadPosition();
         }
         while(true)
@@ -226,15 +262,10 @@ void WidenRegionCreaterImpl::xy_overlap_region(SpanBuffer* dst, const SpanBuffer
             {
                 LinkSpan &new_span = link_span_list.GetAt(link_span_list.InsertBefore(pos, LinkSpan()));
                 new_span.left.init(2*ry+2);
-                LinkArcItem& item = new_span.left.inc_1_at_tail();
-
-                item.arc_center = SPAN_PTR_LEFT(it_src);
-                item.dead_line = line+ry+1;
+                ArcAppend(new_span.left, SPAN_PTR_LEFT(it_src), line+ry+1);
 
                 new_span.right.init(2*ry+2);
-                LinkArcItem& item2 = new_span.right.inc_1_at_tail();
-                item2.arc_center = SPAN_PTR_RIGHT(it_src);
-                item2.dead_line = line+ry+1;
+                ArcAppend(new_span.right, SPAN_PTR_RIGHT(it_src), line+ry+1);
                 break;
             }
         }
@@ -286,7 +317,7 @@ void WidenRegionCreaterImpl::add_left( LinkArc* arc, XY_POINT center )
         }
         else if  ( y+line>arc->get_at(i-1).dead_line )
         {
-            arc->get_at(i).dead_line = y+line;
+            ArcDeadline(*arc, i, y+line);
             break;
         }
         else
@@ -304,12 +335,10 @@ void WidenRegionCreaterImpl::add_left( LinkArc* arc, XY_POINT center )
         }
         else
         {
-            arc->get_at(0).dead_line = y + line;
+            ArcDeadline(*arc, 0, y + line);
         }
     }
-    LinkArcItem& item = arc->inc_1_at_tail();
-    item.arc_center = center;
-    item.dead_line = line + ry + 1;
+    ArcAppend(*arc, center, line + ry + 1);
 }
 
 void WidenRegionCreaterImpl::add_right( LinkArc* arc, XY_POINT center )
@@ -330,7 +359,7 @@ void WidenRegionCreaterImpl::add_right( LinkArc* arc, XY_POINT center )
         }
         else if ( y+line>arc->get_at(i-1).dead_line )
         {
-            arc->get_at(i).dead_line = y+line;
+            ArcDeadline(*arc, i, y+line);
             break;
         }
         else
@@ -348,13 +377,10 @@ void WidenRegionCreaterImpl::add_right( LinkArc* arc, XY_POINT center )
         else if (y<MAX_CROSS_LINE)
         {
             ASSERT(y+line<=arc->get_at(0).dead_line);
-            XY_POINT& arc_center = arc->get_at(0).arc_center;
-            arc->get_at(0).dead_line = y + line;
+            ArcDeadline(*arc, 0, y + line);
         }
     }
-    LinkArcItem& item = arc->inc_1_at_tail();
-    item.arc_center = center;
-    item.dead_line = line + ry + 1;
+    ArcAppend(*arc, center, line + ry + 1);
 }
 
 void WidenRegionCreaterImpl::add_line( SpanBuffer* dst, LinkSpanList& spans, int cur_dst_line, int dead_line )

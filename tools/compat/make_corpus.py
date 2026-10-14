@@ -370,6 +370,20 @@ def span_merge_variants():
         yield "span-merge-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
 
 
+def arc_queue_variants():
+    for name, payload in {
+        "control": br"{\xbord0\ybord0}O W I loops",
+        "round": br"{\xbord5\ybord5}O W I loops",
+        "tall": br"{\xbord1\ybord9}O W I loops",
+        "wide": br"{\xbord9\ybord1}O W I loops",
+        "holes": br"{\xbord4\ybord6\p1}m 0 0 l 80 0 80 60 0 60 m 20 20 l 20 40 60 40 60 20{\p0}",
+        "spline": br"{\xbord2.5\ybord3.75\p1}m 0 0 s 0 80 80 80 80 0 c{\p0}",
+        "rotated": br"{\xbord5\ybord7\frz23\i1}Outline curves",
+        "animated": br"{\xbord1\ybord1\t(0,2000,\xbord9\ybord6)}Changing outline",
+    }.items():
+        yield "arc-queue-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
+
+
 def layout_rect_variants():
     prefix = SEED[:SEED.index(b"Dialogue:")]
     for name, alignment, second_layer, border, collisions, multiline in (
@@ -652,7 +666,8 @@ def make_cases(files):
                                                     ("wrap-width-style-0", "wrap-width-style-2"),
                                                     ("line-layout-align-1", "line-layout-align-9"),
                                                     ("drawing-storage-control", "drawing-storage-fractional-scale"),
-                                                    ("span-merge-control", "span-merge-horizontal-border"))
+                                                    ("span-merge-control", "span-merge-horizontal-border"),
+                                                    ("arc-queue-control", "arc-queue-round"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -674,6 +689,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in drawing_storage_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in path_alignment_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in span_merge_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in arc_queue_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in realtext_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_header_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_style_variants()]

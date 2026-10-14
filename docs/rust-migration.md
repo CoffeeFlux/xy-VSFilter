@@ -20,6 +20,22 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Rust owns the fixed slots and indices of outline arc queues. Removed slots,
+  tail wrap, the capacity-minus-one full rule and writes to individual fields
+  are preserved; C++ receives copied records rather than storage pointers. Native
+  ellipse math, arc/list traversal and span output remain. Fatal ASan/UBSan
+  comparisons pass on arm64 and under x64 execution: **1,280 queue histories /
+  655,360 operations / 55,585,968 physical slot fields**, plus **288,000 complete
+  arc updates / 708,599 native ellipse callbacks**, including **15,051 full
+  rejections / 5,491 tail wraps**. The oracle compares pinned queue code and
+  complete add_left/add_right/cross_left bodies with controlled ellipse replies,
+  exact records, callback order, errno, FP flags and Windows error state.
+  Scope is initialized positive capacity, nonnegative representable indices and
+  counts, successful allocation; native OOM and debug assertions are separate.
+  Rust 1.85 tests (128 core, 82 FFI), strict Clippy and Python checks pass.
+  Eight ellipse-outline scripts and a visible outline control expand the renderer
+  corpus to **690 cases**. Windows/Miri and renderer checks are pending. Native
+  ellipse storage, geometry, outer lists and real-host integration remain.
 * Safe Rust owns ordered outline-span merge results before native export. Native
   reserve/swap, offset construction and destination growth stay in order; ties,
   touching/reversed spans, unsigned coordinate wrap and vector capacity match.
@@ -100,15 +116,17 @@ unresolved reference outcomes requiring investigation, never matching results.
   6,096 injected exceptions** on both local architectures with the actual Rust
   buffer. Native OS file operations are modeled in these extracted tests.
   Rust 1.85 tests (120 core, 77 FFI), strict Clippy, default syntax and Python
-  checks pass. The renderer corpus remains **626 cases**; Windows/Miri and native
-  renderer checks for this increment are pending. Actual-host file I/O and
-  filesystem error integration remain separate work.
+  checks pass. Windows x86/x64, Linux, macOS and Miri passed; paired Windows DLLs
+  match **626 cases / 6,610 frames**, plus **32 mutations / 224 frames**, on each
+  architecture. See [seek and block-layout evidence](text-seek-evidence.json).
+  Actual-host file I/O and filesystem errors remain separate work.
 * Block-layout helper run
   [38542340983](https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38542340983)
   failed compilation on both Windows architectures because the test shell omitted
   `atlcoll.h`, which declares `POSITION`. The missing include is corrected; those
   failed jobs are not compatibility evidence. Production block-layout code is
-  unchanged by this harness fix, and corrected Windows checks are pending.
+  unchanged by this harness fix. Corrected Windows checks and full renderer
+  comparisons passed at `2d339328`; see [verified evidence](text-seek-evidence.json).
 * Safe Rust grows subtitle block dimensions and computes final alignment in
   `CSubtitle::MakeLines`. Native line creation/insertion, top-border capture,
   bottom-border rereading and partial results retain their exact order, including
@@ -123,9 +141,9 @@ unresolved reference outcomes requiring investigation, never matching results.
   insertion are controlled boundaries; Windows uses actual ATL geometry.
   Rust 1.85 tests (118 core, 76 FFI), strict Clippy, default syntax and Python
   checks pass. Twelve alignment/empty-line scripts and a visible alignment control
-  expand the renderer corpus to **626 cases**. Windows/Miri and full renderer
-  checks for this increment are pending; native line construction and actual-host
-  integration remain separate work.
+  expand the renderer corpus to **626 cases**. Corrected Windows/Miri and full
+  renderer checks passed at `2d339328`; see [verified evidence](text-seek-evidence.json).
+  Native line construction and actual-host integration remain separate work.
 * Safe Rust performs `CSubtitle::GetWrapWidth` arithmetic with stack-owned state.
   Native font measurements, full-line accumulation and ordered word traversal
   remain. Strict width comparisons, skipped words, style 3's final adjustment,
