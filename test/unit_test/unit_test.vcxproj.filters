@@ -21,6 +21,9 @@
     <ClCompile Include="blit_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="interned_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="memory_open_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

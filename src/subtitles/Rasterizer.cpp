@@ -27,7 +27,6 @@
 #include "Rasterizer.h"
 #include <math.h>
 #include "xy_logger.h"
-#include <boost/flyweight/key_value.hpp>
 #include "xy_bitmap.h"
 #include "xy_widen_region.h"
 
@@ -154,16 +153,6 @@ private:
         return 0;
     }
 
-};
-
-// GaussianFilter = GaussianCoefficients
-template<typename GaussianFilter>
-struct GaussianFilterKey
-{
-    const double& operator()(const GaussianFilter& x)const
-    {
-        return x.sigma;
-    }
 };
 
 void xy_gaussian_blur(PUINT8 dst, int dst_stride,
@@ -318,8 +307,6 @@ static void Bilinear(unsigned char *buf, int w, int h, int stride, int x_factor,
 
 bool Rasterizer::Rasterize(const ScanLineData2& scan_line_data2, int xsub, int ysub, SharedPtrOverlay overlay)
 {
-    using namespace ::boost::flyweights;
-
     if(!overlay)
     {
         return false;
@@ -428,8 +415,6 @@ bool Rasterizer::Blur(const Overlay& input_overlay, float be_strength,
     double target_scale_x, double target_scale_y, 
     SharedPtrOverlay output_overlay)
 {
-    using namespace ::boost::flyweights;
-
     ASSERT(IsItReallyBlur(be_strength, gaussian_blur_strength));
     if(!output_overlay || !IsItReallyBlur(be_strength, gaussian_blur_strength))
     {
@@ -469,8 +454,6 @@ bool Rasterizer::GaussianBlur( const Overlay& input_overlay, double gaussian_blu
     double target_scale_x, double target_scale_y, 
     SharedPtrOverlay output_overlay )
 {
-    using namespace ::boost::flyweights;
-
     ASSERT(output_overlay);
     output_overlay->CleanUp();
     output_overlay->mfWideOutlineEmpty = input_overlay.mfWideOutlineEmpty;
@@ -487,10 +470,8 @@ bool Rasterizer::GaussianBlur( const Overlay& input_overlay, double gaussian_blu
     if( gaussian_blur_radius_y < 1 && gaussian_blur_strength>GAUSSIAN_BLUR_THREHOLD )
         gaussian_blur_radius_y = 1;//make sure that it really do a blur
 
-    flyweight<key_value<double, GaussianCoefficients, GaussianFilterKey<GaussianCoefficients>>, no_locking>
-        fw_filter_x(gaussian_blur_strength_x);
-    flyweight<key_value<double, GaussianCoefficients, GaussianFilterKey<GaussianCoefficients>>, no_locking>
-        fw_filter_y(gaussian_blur_strength_y);
+    XyInternedByKey<double, GaussianCoefficients> fw_filter_x(gaussian_blur_strength_x);
+    XyInternedByKey<double, GaussianCoefficients> fw_filter_y(gaussian_blur_strength_y);
 
     const GaussianCoefficients& filter_x = fw_filter_x.get();
     const GaussianCoefficients& filter_y = fw_filter_y.get();

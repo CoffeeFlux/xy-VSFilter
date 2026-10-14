@@ -26,7 +26,6 @@
 #include "../SubPic/SubPicProviderImpl.h"
 #include "../SubPic/ISimpleSubPic.h"
 #include <atlcoll.h>
-#include <boost/flyweight/key_value.hpp>
 #include <memory>
 #include "mru_cache.h"
 #include "xy_int_map.h"
@@ -47,7 +46,7 @@ public:
     CMyFont(const STSStyleBase& style);
 };
 
-typedef ::boost::flyweights::flyweight<::boost::flyweights::key_value<STSStyleBase, CMyFont>, ::boost::flyweights::no_locking> FwCMyFont;
+typedef XyInternedByKey<STSStyleBase, CMyFont> FwCMyFont;
 
 class CPolygon;
 

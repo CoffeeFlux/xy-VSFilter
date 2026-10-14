@@ -1,10 +1,9 @@
 #pragma once
 
-#include <boost/flyweight.hpp>
-#include <boost/flyweight/set_factory.hpp>
-#include <boost/flyweight/no_tracking.hpp>
-#include <boost/flyweight/no_locking.hpp>
+#include <stdint.h>
+#include <functional>
 #include <memory>
+#include <unordered_map>
 #include <afx.h>
 
 #include "mru_cache.h"
@@ -17,8 +16,6 @@ struct std::equal_to<CRect>
         return (_Left == _Right)==TRUE;
     }
 };
-
-typedef ::boost::flyweights::flyweight<CRect, ::boost::flyweights::no_locking> FwRect;
 
 template<
     typename V,
@@ -138,3 +135,131 @@ static inline std::size_t hash_value(const CRect& s)
     hash += s.top;
     return hash;
 }
+
+struct XyHashValue
+{
+    template<typename T>
+    std::size_t operator()(const T& v) const { return hash_value(v); }
+};
+
+// Interns values of T: equal values share one immutable copy, which is freed
+// along with its last handle. Handles to equal values therefore compare equal.
+// T needs hash_value() and operator==. Not thread-safe.
+template<typename T>
+class XyInterned
+{
+public:
+    XyInterned() : m_value(Intern(T())) {}
+    XyInterned(const T& v) : m_value(Intern(v)) {}
+    XyInterned& operator=(const T& v) { m_value = Intern(v); return *this; }
+
+    const T& get() const { return *m_value; }
+    operator const T&() const { return *m_value; }
+
+    friend bool operator==(const XyInterned& a, const XyInterned& b) { return a.m_value == b.m_value; }
+    friend bool operator!=(const XyInterned& a, const XyInterned& b) { return a.m_value != b.m_value; }
+
+    // Number of distinct values currently interned.
+    static std::size_t Count() { return GetTable().size(); }
+
+private:
+    struct Hash
+    {
+        std::size_t operator()(const T* v) const { return XyHashValue()(*v); }
+    };
+    struct Equal
+    {
+        bool operator()(const T* a, const T* b) const { return std::equal_to<T>()(*a, *b); }
+    };
+    typedef std::unordered_map<const T*, std::weak_ptr<const T>, Hash, Equal> Table;
+
+    // Never destroyed, so handles in static objects can outlive it at exit.
+    static Table& GetTable()
+    {
+        static Table* table = new Table;
+        return *table;
+    }
+
+    static std::shared_ptr<const T> Intern(const T& v)
+    {
+        Table& table = GetTable();
+        typename Table::iterator it = table.find(&v);
+        if (it != table.end()) {
+            if (std::shared_ptr<const T> existing = it->second.lock()) {
+                return existing;
+            }
+            table.erase(it);
+        }
+        std::shared_ptr<const T> value(new T(v), [](const T* p) {
+            Table& table = GetTable();
+            typename Table::iterator it = table.find(p);
+            if (it != table.end() && it->first == p) {
+                table.erase(it);
+            }
+            delete p;
+        });
+        table.emplace(value.get(), value);
+        return value;
+    }
+
+    std::shared_ptr<const T> m_value;
+};
+
+// Builds a V from each distinct key K once and shares it while any handle to
+// it exists. K needs hash_value() and operator==, and V a constructor taking
+// const K&. Not thread-safe.
+template<typename K, typename V>
+class XyInternedByKey
+{
+public:
+    template<typename A>
+    explicit XyInternedByKey(const A& key) : m_value(Get(K(key))) {}
+
+    const V& get() const { return *m_value; }
+    operator const V&() const { return *m_value; }
+
+    // Number of distinct keys currently with a value.
+    static std::size_t Count() { return GetTable().size(); }
+
+private:
+    struct Entry
+    {
+        std::weak_ptr<const V> value;
+        const V* raw;
+    };
+    typedef std::unordered_map<K, Entry, XyHashValue> Table;
+
+    // Never destroyed, so handles in static objects can outlive it at exit.
+    static Table& GetTable()
+    {
+        static Table* table = new Table;
+        return *table;
+    }
+
+    static std::shared_ptr<const V> Get(const K& key)
+    {
+        Table& table = GetTable();
+        typename Table::iterator it = table.find(key);
+        if (it != table.end()) {
+            if (std::shared_ptr<const V> existing = it->second.value.lock()) {
+                return existing;
+            }
+            table.erase(it);
+        }
+        std::shared_ptr<const V> value(new V(key), [key](const V* p) {
+            Table& table = GetTable();
+            typename Table::iterator it = table.find(key);
+            if (it != table.end() && it->second.raw == p) {
+                table.erase(it);
+            }
+            delete p;
+        });
+        Entry entry = { value, value.get() };
+        table.emplace(key, entry);
+        return value;
+    }
+
+    std::shared_ptr<const V> m_value;
+};
+
+typedef XyInterned<CRect> FwRect;

@@ -40,7 +40,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IncludePath>$(SolutionDir)src\filters\transform\vsfilter;$(SolutionDir)src\filters\BaseClasses;$(SolutionDir)src\thirdparty\boost_lib\;$(SolutionDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)src\filters\transform\vsfilter;$(SolutionDir)src\filters\BaseClasses;$(SolutionDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="BaseVideoFilter.cpp" />

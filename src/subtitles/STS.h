@@ -94,7 +94,7 @@ public:
     friend STSStyle& operator <<= (STSStyle& s, const CString& style);
 };
 
-typedef ::boost::flyweights::flyweight<STSStyle, ::boost::flyweights::no_locking> FwSTSStyle;
+typedef XyInterned<STSStyle> FwSTSStyle;
 
 //for FwSTSStyle
 static inline std::size_t hash_value(const STSStyleBase& s)
