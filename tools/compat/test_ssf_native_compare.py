@@ -18,7 +18,8 @@ class EvidenceTests(unittest.TestCase):
             count = int(index >= 2)
             lines.append(f"dump {index} units {count}")
             (self.root / f"dump-{index}.units").write_bytes(bytes(4 * count))
-            lines.append(f"frame {index} found 1 subtitles 1")
+            active = int(index not in (0, 4))
+            lines.append(f"frame {index} found {active} subtitles {active}")
             lines.append(f"pixels {index} changed {0} bounds 0 0 20 20")
             changed = 0
             (self.root / f"frame-{index}.bgra").write_bytes(b"\x01\x00\x00\xff" * changed + b"\x00\x00\x00\xff" * (320 * 180 - changed))
@@ -49,6 +50,11 @@ class EvidenceTests(unittest.TestCase):
 
     def test_blank_characterization_must_match_actual_pixels(self):
         (self.root / "frame-2.bgra").write_bytes(b"\x01\x00\x00\xff" * (320 * 180))
+        self.assertEqual(MODULE.inspect(self.root, 0)["status"], "control_failed")
+
+    def test_timing_control_rejects_a_subtitle_after_its_stop(self):
+        path = self.root / "stdout.txt"
+        path.write_text(path.read_text().replace("frame 4 found 0 subtitles 0", "frame 4 found 1 subtitles 1"), newline="\n")
         self.assertEqual(MODULE.inspect(self.root, 0)["status"], "control_failed")
 
     def test_missing_completion_and_empty_text_fail(self):

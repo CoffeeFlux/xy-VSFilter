@@ -72,6 +72,7 @@ def capture_inputs():
               ROOT / "src/subtitles/TextFile.h",
               ROOT / "src/subtitles/TextFile.cpp", ROOT / "src/subtitles/STS.cpp",
               ROOT / "src/subtitles/RTS.cpp", ROOT / "tools/compat/reference.json"]
+    inputs += [ROOT / "src/subtitles/libssf/Split.cpp", ROOT / "src/subtitles/libssf/Split.h", ROOT / "include/xy_rust_ssf_split.h"]
     inputs += [ROOT / "src/subtitles/libssf/Arabic.cpp", ROOT / "src/subtitles/libssf/Arabic.h", ROOT / "include/xy_rust_ssf_arabic.h"]
     inputs += [ROOT / "src/filters/transform/vsfilter/csriapi.cpp", ROOT / "src/subtitles/libssf/Stream.cpp", ROOT / "src/subtitles/libssf/Stream.h", ROOT / "include/xy_rust_ssf_stream.h"]
     inputs += [ROOT / "src/thirdparty/boost_lib/boost/flyweight.hpp"]
@@ -985,6 +986,18 @@ public:
             csri_filename_code += filename_method + "\n"
         csri_filename_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_csri_filename.h").write_text(csri_filename_code, encoding="utf-8")
+    ssf_split_code = '#include "ssf_split_shell.h"\n'
+    for name, content, declaration in (("ReferenceSplit", original("src/subtitles/libssf/Split.cpp", reference["commit"]), original("src/subtitles/libssf/Split.h", reference["commit"])), ("CandidateSplit", (ROOT / "src/subtitles/libssf/Split.cpp").read_bytes(), (ROOT / "src/subtitles/libssf/Split.h").read_bytes())):
+        split_text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        split_declaration = declaration.decode("utf-8-sig").replace("\r\n", "\n")
+        ssf_split_code += f"namespace {name} {{\n"
+        if name == "CandidateSplit":
+            ssf_split_code += "#define XY_VSFILTER_RUST_TEXT\n"
+        ssf_split_code += extract_definition(split_declaration, "class Split :").replace("CAtlArray<CStringW>", "SsfSplitArray<CStringW>") + ";\n"
+        for signature in ("Split::Split(LPCWSTR", "Split::Split(WCHAR", "void Split::DoSplit("):
+            ssf_split_code += extract_definition(split_text, signature).replace('L""', "splitEmpty").replace("wcslen(", "ssfSplitLength(").replace("xy_vsfilter_ssf_split_find(", "ssfSplitFind(") + "\n"
+        ssf_split_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_ssf_split.h").write_text(ssf_split_code, encoding="utf-8")
     ssf_arabic_code = '#include "ssf_arabic_shell.h"\n'
     for name, content, declaration in (("ReferenceArabic", original("src/subtitles/libssf/Arabic.cpp", reference["commit"]), original("src/subtitles/libssf/Arabic.h", reference["commit"])), ("CandidateArabic", (ROOT / "src/subtitles/libssf/Arabic.cpp").read_bytes(), (ROOT / "src/subtitles/libssf/Arabic.h").read_bytes())):
         arabic_text = content.decode("utf-8-sig").replace("\r\n", "\n")
@@ -1693,6 +1706,12 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
     ssf_stream_result = run([str(ssf_stream_executable)], capture_output=True, text=True)
     print(ssf_stream_result.stdout, end="", flush=True)
     print(ssf_stream_result.stderr, end="", file=sys.stderr)
+    ssf_split_executable = destination / ("ssf-split-oracle.exe" if os.name == "nt" else "ssf-split-oracle")
+    ssf_split_compile = [arg.replace("find_char_oracle.cpp", "ssf_split_oracle.cpp").replace("find-char-oracle", "ssf-split-oracle") for arg in find_char_compile]
+    run(ssf_split_compile)
+    ssf_split_result = run([str(ssf_split_executable)], capture_output=True, text=True)
+    print(ssf_split_result.stdout, end="", flush=True)
+    print(ssf_split_result.stderr, end="", file=sys.stderr)
     ssf_bom_executable = destination / ("ssf-bom-oracle.exe" if os.name == "nt" else "ssf-bom-oracle")
     ssf_bom_compile = [arg.replace("find_char_oracle.cpp", "ssf_bom_oracle.cpp").replace("find-char-oracle", "ssf-bom-oracle") for arg in find_char_compile]
     run(ssf_bom_compile)
@@ -2251,6 +2270,9 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
         "fraction_storage_compile_command": fraction_storage_compile,
         "fraction_storage_result": fraction_storage_result.stdout, "fraction_storage_stderr": fraction_storage_result.stderr,
         "fraction_storage_scope": "Whole pinned xy_be_blur and xy_calculate_filter with observed filter/transpose calls and scratch ownership under strict FP compilation. x86/x64 execute extracted native SSE kernels against Rust kernels; arm64 substitutes extracted scalar callbacks and does not establish SSE parity. Exact stage bytes/order, output/padding, initialized scratch, cache accounting, signed and fractional pass counts, reuse and native allocation fallback. Positive dimensions at least four avoid an unused native before-base cursor; zero/smaller/negative dimensions, overflowing/nonfinite pass counts, invalid backing and actual allocation failure excluded.",
+        "ssf_split_compile_command": ssf_split_compile,
+        "ssf_split_result": ssf_split_result.stdout, "ssf_split_stderr": ssf_split_result.stderr,
+        "ssf_split_scope": "Complete pinned Split constructors and DoSplit with controlled Add interruptions. Every UTF-16 value, embedded NUL, multi-unit/overlapping separators, separator aliases into input, Min/Def/Max, accepted-token limits, repeated clear/split and retained partial arrays. Actual Windows CStringW/ATL or portable UTF-16 string/array model (including a controlled Trim boundary). Only read-only separator search moves to Rust; trimming, public array storage and numeric conversion remain native. Actual allocation failure, invalid CString backing/state, separator aliases into cleared old arrays and unrepresentable lengths excluded.",
         "ssf_bom_compile_command": ssf_bom_compile,
         "ssf_bom_result": ssf_bom_result.stdout, "ssf_bom_stderr": ssf_bom_result.stderr,
         "ssf_bom_scope": "Complete pinned NextChar with controlled NextByte and literal exception boundary. Exact BOM short-circuit consumption, encoding state on interruptions, unknown retries and ambient errors; exhaustive byte tails after EF and all UTF-16-valued first/second provider results. Only defined native decoding paths used (ASCII UTF-8 and bounded UTF-16); known UTF-8 EOF excluded before both calls, not a pass. Arbitrary UTF-8 decode prefixes/overflow, provider reentry/mutation, IO and visible SSF rendering excluded. UTF-8 decoding remains native; safe Rust owns transient BOM decisions and UTF-16 assembly, preserving the original big-endian-labeled branch order.",
