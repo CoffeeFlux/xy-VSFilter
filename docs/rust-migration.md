@@ -20,6 +20,23 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* SSF input lookahead now uses a safe Rust queue of raw character values. Native
+  comment skipping, whitespace decisions, line/column updates and character
+  provider calls remain in place. Pinned stream base methods and complete
+  push/pop/peek/get/whitespace operations match locally in ordinary and fatal
+  ASan/UBSan runs on arm64 and x64: **15,808 histories / 189,696 operations /
+  3,368,648 fields / 10,271 provider interruptions / 6,405 empty-pop exceptions /
+  93,064 non-EOS results / 15,808 queue owners and releases / 146,431 pushes /
+  120,975 pops**. Repeated EOF, NUL, UTF-16 values, comments and partial queues
+  after provider exceptions retain their state and ordering. Windows uses the
+  actual ATL list as reference; portable builds use a deque. NextChar and the
+  ThrowError boundary are controlled. Encoding, actual file I/O and SSF rendering,
+  allocation failure, negative non-EOS values, counter overflow and unbounded
+  recursion remain excluded. CSRI opens the RTS parser and cannot establish SSF
+  renderer coverage. **149 core / 104 FFI tests**, formatting, Clippy, 29 Python
+  checks (three local skips), both local sanitizer builds and default native
+  syntax pass. Windows build/integration and Miri are pending for this increment.
+
 * Safe Rust now scans caption packet headers and owns snapshots of both fields
   before native decoding begins. The native path remains when the declared
   input span cannot cover reads made by the original parser. No count-byte or
@@ -36,8 +53,9 @@ unresolved reference outcomes requiring investigation, never matching results.
   match. Raw file I/O, actual allocation failure, extraction callback exceptions,
   short physical backing and unrepresentable native arithmetic remain excluded.
   **148 core / 103 FFI tests**, formatting, Clippy, 29 Python checks (three
-  local skips) and default native syntax pass. Miri and Windows execution for
-  this parser increment are pending.
+  local skips) and default native syntax pass. Both Windows portable jobs
+  (`115931349086`, `115931349176`) and Miri (`115931349190`) now pass; complete
+  renderer integration for this parser increment remains pending.
 
 * `composite-integration-evidence.json` now archives the complete passing stage
   at `fe6928d4`: all four portable jobs, Miri, both Windows renderer jobs and the
@@ -65,7 +83,9 @@ unresolved reference outcomes requiring investigation, never matching results.
   Windows fixture jobs `115924888551` / `115924888814` failed because the helper
   typedef `OpenFile` collided with the SDK function; the fixture now uses
   CSRI-specific names. The production source is unchanged by that repair, and
-  corrected Windows execution remains pending.
+  corrected Windows execution now passes in jobs `115931349086` and
+  `115931349176` at `5f586dac`, including the actual UTF-8 conversion API.
+  The earlier compilation failures remain failed; renderer integration is pending.
 
 * `CCDecoder::ExtractCC` now owns both temporary caption-field buffers through
   Rust while retaining the native packet loop, decoder calls and release order.

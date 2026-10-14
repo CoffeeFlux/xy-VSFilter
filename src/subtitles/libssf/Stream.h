@@ -22,6 +22,9 @@
 #pragma once
 
 #include "Exception.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "../../../include/xy_rust_ssf_stream.h"
+#endif
 
 namespace ssf
 {
@@ -46,7 +49,11 @@ namespace ssf
 
 	class InputStream : public Stream
 	{
+#ifdef XY_VSFILTER_RUST_TEXT
+		XyRust::SsfLookahead m_queue;
+#else
 		CAtlList<int> m_queue;
+#endif
 		int PushChar(), PopChar();
 
 		int NextChar();
