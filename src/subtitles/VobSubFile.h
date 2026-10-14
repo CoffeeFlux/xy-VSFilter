@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <array>
 #include <atlcoll.h>
 #include "VobSubImage.h"
 #include "../SubPic/ISubPic.h"

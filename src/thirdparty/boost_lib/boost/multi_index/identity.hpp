@@ -1,4 +1,4 @@
-/* Copyright 2003-2013 Joaquin M Lopez Munoz.
+/* Copyright 2003-2025 Joaquin M Lopez Munoz.
  * Distributed under the Boost Software License, Version 1.0.
  * (See accompanying file LICENSE_1_0.txt or copy at
  * http://www.boost.org/LICENSE_1_0.txt)
@@ -14,15 +14,13 @@
 #endif
 
 #include <boost/config.hpp>
-#include <boost/mpl/if.hpp>
+#include <boost/core/enable_if.hpp>
+#include <boost/detail/workaround.hpp>
+#include <boost/mp11/utility.hpp>
 #include <boost/multi_index/identity_fwd.hpp>
 #include <boost/type_traits/is_const.hpp>
-#include <boost/type_traits/remove_const.hpp>
-#include <boost/utility/enable_if.hpp>
-
-#if !defined(BOOST_NO_SFINAE)
 #include <boost/type_traits/is_convertible.hpp>
-#endif
+#include <boost/type_traits/remove_const.hpp>
 
 namespace boost{
 
@@ -39,7 +37,7 @@ namespace detail{
  * mean a  type  P such that, given a p of type P
  *   *...n...*x is convertible to Type&, for some n>=1.
  * Examples of chained pointers are raw and smart pointers, iterators and
- * arbitrary combinations of these (vg. Type** or auto_ptr<Type*>.)
+ * arbitrary combinations of these (vg. Type** or unique_ptr<Type*>.)
  */
 
 template<typename Type>
@@ -49,12 +47,7 @@ struct const_identity_base
 
   template<typename ChainedPtr>
 
-#if !defined(BOOST_NO_SFINAE)
   typename disable_if<is_convertible<const ChainedPtr&,Type&>,Type&>::type
-#else
-  Type&
-#endif 
-  
   operator()(const ChainedPtr& x)const
   {
     return operator()(*x);
@@ -71,7 +64,14 @@ struct const_identity_base
   }
 
   Type& operator()(
-    const reference_wrapper<typename remove_const<Type>::type>& x)const
+    const reference_wrapper<typename remove_const<Type>::type>& x
+
+#if BOOST_WORKAROUND(BOOST_MSVC,==1310)
+/* http://lists.boost.org/Archives/boost/2015/10/226135.php */
+    ,int=0
+#endif
+
+  )const
   { 
     return x.get();
   }
@@ -86,13 +86,8 @@ struct non_const_identity_base
   
   template<typename ChainedPtr>
 
-#if !defined(BOOST_NO_SFINAE)
   typename disable_if<
     is_convertible<const ChainedPtr&,const Type&>,Type&>::type
-#else
-  Type&
-#endif 
-    
   operator()(const ChainedPtr& x)const
   {
     return operator()(*x);
@@ -123,10 +118,10 @@ struct non_const_identity_base
 
 template<class Type>
 struct identity:
-  mpl::if_c<
-    is_const<Type>::value,
+  mp11::mp_if<
+    is_const<Type>,
     detail::const_identity_base<Type>,detail::non_const_identity_base<Type>
-  >::type
+  >
 {
 };
 

@@ -1,4 +1,4 @@
-/* Copyright 2003-2013 Joaquin M Lopez Munoz.
+/* Copyright 2003-2025 Joaquin M Lopez Munoz.
  * Distributed under the Boost Software License, Version 1.0.
  * (See accompanying file LICENSE_1_0.txt or copy at
  * http://www.boost.org/LICENSE_1_0.txt)
@@ -15,9 +15,10 @@
 
 #include <boost/config.hpp> /* keep it first to prevent nasty warns in MSVC */
 #include <algorithm>
-#include <boost/detail/allocator_utilities.hpp>
+#include <boost/core/noncopyable.hpp>
+#include <boost/core/allocator_access.hpp>
 #include <boost/multi_index/detail/adl_swap.hpp>
-#include <boost/noncopyable.hpp>
+#include <boost/type_traits/integral_constant.hpp>
 #include <memory>
 
 namespace boost{
@@ -45,18 +46,15 @@ namespace detail{
 template<typename T,typename Allocator=std::allocator<T> >
 struct auto_space:private noncopyable
 {
-  typedef typename boost::detail::allocator::rebind_to<
-    Allocator,T
-  >::type::pointer pointer;
+  typedef allocator_rebind_t<Allocator,T>  allocator;
+  typedef allocator_pointer_t<allocator>   pointer;
+  typedef allocator_size_type_t<allocator> size_type;
 
-  explicit auto_space(const Allocator& al=Allocator(),std::size_t n=1):
-  al_(al),n_(n),data_(n_?al_.allocate(n_):pointer(0))
+  explicit auto_space(const Allocator& al=Allocator(),size_type n=1):
+  al_(al),n_(n),data_(n_?allocator_allocate(al_,n_):pointer(0))
   {}
 
-  ~auto_space()
-  {
-    if(n_)al_.deallocate(data_,n_);
-  }
+  ~auto_space(){if(n_)allocator_deallocate(al_,data_,n_);}
 
   Allocator get_allocator()const{return al_;}
 
@@ -64,16 +62,30 @@ struct auto_space:private noncopyable
 
   void swap(auto_space& x)
   {
-    if(al_!=x.al_)adl_swap(al_,x.al_);
+    swap(
+      x,
+      boost::integral_constant<
+        bool,
+        allocator_propagate_on_container_swap_t<allocator>::value>());
+  }
+
+  void swap(auto_space& x,boost::true_type /* swap_allocators */)
+  {
+    adl_swap(al_,x.al_);
     std::swap(n_,x.n_);
     std::swap(data_,x.data_);
   }
     
+  void swap(auto_space& x,boost::false_type /* swap_allocators */)
+  {
+    std::swap(n_,x.n_);
+    std::swap(data_,x.data_);
+  }
+
 private:
-  typename boost::detail::allocator::rebind_to<
-    Allocator,T>::type                          al_;
-  std::size_t                                   n_;
-  pointer                                       data_;
+  allocator al_;
+  size_type n_;
+  pointer   data_;
 };
 
 template<typename T,typename Allocator>
