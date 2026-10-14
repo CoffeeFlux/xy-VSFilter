@@ -35,8 +35,10 @@ public:
     bool operator==(const wchar_t* p)const{return std::wcscmp(text.c_str(),p)==0;}
 };
 #endif
-static uint64_t rustSearches=0,rustSearchSteps=0;
+static uint64_t rustSearches=0,rustSearchSteps=0,rustUnicodeSearches=0;
 namespace XyRust {
+template<class String> int ObservedUnicode(const String& input,uint16_t target,int position){++rustUnicodeSearches;return FindUnicode(input,target,position);}
+
 class ObservedSearch : public FindChar {
 public:
     ObservedSearch(uint16_t target,int position,int length):FindChar(target,position,length){++rustSearches;}

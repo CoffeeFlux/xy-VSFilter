@@ -288,6 +288,20 @@ def microdvd_variants():
         yield "microdvd-format-" + name + ".sub", ("{0}{100}" + payload + "\r\n").encode("ascii")
 
 
+def mpl2_variants():
+    for name, payload in {
+        "control": "Formatting sample|second line",
+        "italic": "/Formatting sample|/second line",
+        "interior-slash": "Formatting /sample|second /line",
+        "empty-lines": "/|/Formatting||/sample|/",
+        "mixed": "/{Y:b}Formatting|/{f:Arial}sample",
+        "unicode": "/Formatting \u03b1sample|/second line",
+    }.items():
+        text = "[0][40]" + payload + "\r\n"
+        data = b"\xff\xfe" + text.encode("utf-16le") if name == "unicode" else text.encode("ascii")
+        yield "mpl2-format-" + name + ".mpl", data
+
+
 def timestamps(data):
     matches = re.findall(rb"Dialogue:[^,]*,(\d+):(\d+):(\d+(?:\.\d+)?),(\d+):(\d+):(\d+(?:\.\d+)?)", data)
     if not matches:
@@ -340,7 +354,8 @@ def make_cases(files):
                                                     ("subrip-format-italic", "subrip-format-control"),
                                                     ("subrip-format-underline", "subrip-format-control"),
                                                     ("realtext-format-italic", "realtext-format-control"),
-                                                    ("microdvd-format-italic", "microdvd-format-control"))
+                                                    ("microdvd-format-italic", "microdvd-format-control"),
+                                                    ("mpl2-format-italic", "mpl2-format-control"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -354,6 +369,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in subrip_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in realtext_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in microdvd_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in mpl2_variants()]
     manifest = json.dumps(make_cases(files + generated), indent=2) + "\n"
     expected = generated + [(DEST / "cases.json", manifest.encode("utf-8"))]
     for path, data in expected:

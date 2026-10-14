@@ -2,9 +2,29 @@
 #pragma once
 #include "find_char_shell.h"
 #include "xy_rust_microdvd.h"
+#include "xy_rust_mpl2.h"
 #include <cstring>
 #include <algorithm>
+#include <csignal>
+#include <exception>
 #undef CStringW
+static uint64_t microCase=0;
+static const wchar_t* microInput=NULL;
+static int microLength=0,microSide=0;
+static void microFailureContext(){
+    fprintf(stderr,"MicroDVD fixture context: case=%llu side=%d length=%d attempts=%d units=",(unsigned long long)microCase,microSide,microLength,searchAttempts);
+    for(int i=0;i<microLength && i<96;++i)fprintf(stderr,"%04x,",unsigned(microInput[i]));
+    fprintf(stderr,"\n");fflush(stderr);
+}
+static void microDiagnostics(){
+    std::signal(SIGABRT,[](int){microFailureContext();std::_Exit(4);});
+    std::set_terminate([](){microFailureContext();fprintf(stderr,"Unhandled native exception\n");fflush(stderr);std::_Exit(5);});
+#ifdef _WIN32
+    _set_invalid_parameter_handler([](const wchar_t* expression,const wchar_t* function,const wchar_t*,unsigned line,uintptr_t){
+        microFailureContext();fprintf(stderr,"CRT rejected parameter: function=%ls expression=%ls line=%u\n",function?function:L"?",expression?expression:L"?",line);fflush(stderr);std::_Exit(6);
+    });
+#endif
+}
 static uint64_t microSearches=0,microSteps=0,microTagCallbacks=0;
 static void microObserve(unsigned kind,const wchar_t* text){
     ++microTagCallbacks;searchObserve(kind,0);
@@ -68,6 +88,16 @@ public:
     MicroString& operator+=(const MicroString& p){text+=p.text;return *this;}
     MicroString& operator+=(const wchar_t* p){text+=p;return *this;}
     MicroString& operator+=(wchar_t p){text+=p;return *this;}
+    friend MicroString operator+(const wchar_t* prefix,const MicroString& rest){MicroString result(prefix);result+=rest;return result;}
+    int Replace(const wchar_t* from,const wchar_t* to){
+#ifdef _WIN32
+        return text.Replace(from,to);
+#else
+        const std::wstring needle(from),replacement(to);size_t pos=0;int count=0;
+        while((pos=text.find(needle,pos))!=std::wstring::npos){text.replace(pos,needle.size(),replacement);pos+=replacement.size();++count;}
+        return count;
+#endif
+    }
     void MakeLower(){
         microObserve(4,GetString());
 #ifdef _WIN32
@@ -137,7 +167,13 @@ static int microScan(const wchar_t* text,const wchar_t* fmt,int* x,wchar_t* c,un
 #endif
     if(result!=3){fprintf(stderr,"Fixture outside successful move-scan scope\n");std::abort();}return result;
 }
+static uint64_t mplHandled=0,mplFallbacks=0;
 namespace XyRust {
+class ObservedMPL2 : public MPL2 {
+public:
+    template<class String> bool Convert(const String& input,String& output){bool result=MPL2::Convert(input,output);if(result)++mplHandled;else ++mplFallbacks;return result;}
+};
+
 class ObservedMicroDVD : public MicroDVD {
 public:
     explicit ObservedMicroDVD(int length):MicroDVD(length){++microSearches;}

@@ -3,16 +3,19 @@
 static uint64_t comparisons=0,changed=0,units=0,callbacks=0,interruptions=0;
 static std::vector<uint16_t> contents(const CStringW& text){std::vector<uint16_t> out;for(int i=0;i<text.GetLength();++i)out.push_back(static_cast<uint16_t>(text[i]));return out;}
 static void compare(const std::wstring& input,bool unicode,int charset,int failure=-1){
+    microCase=comparisons;microInput=input.data();microLength=static_cast<int>(input.size());microSide=0;
     CStringW source(input.data(),static_cast<int>(input.size()));const auto before=contents(source);
     std::vector<uint16_t> a,b;bool ia=false,ib=false;
     searchFailure=failure;searchMode=0;searchAttempts=0;searchEvents.clear();
     try{a=contents(ReferenceMicroDVD::MicroDVD2SSA(source,unicode,charset));}catch(const SearchInterrupted&){ia=true;}
     const auto events=searchEvents;searchAttempts=0;searchEvents.clear();
+    microSide=1;
     try{b=contents(CandidateMicroDVD::MicroDVD2SSA(source,unicode,charset));}catch(const SearchInterrupted&){ib=true;}
     if(a!=b || ia!=ib || events!=searchEvents || contents(source)!=before){fprintf(stderr,"MicroDVD mismatch case=%llu length=%zu unicode=%d charset=%d failure=%d output=%zu/%zu callbacks=%zu/%zu\n",(unsigned long long)comparisons,input.size(),unicode,charset,failure,a.size(),b.size(),events.size(),searchEvents.size());std::abort();}
     ++comparisons;changed+=!ia && a!=before;units+=a.size();callbacks+=events.size();interruptions+=ia;
 }
 int main(){
+    microDiagnostics();
     const wchar_t* pieces[]={L"",L"|",L"abc",L"{",L"}",L"{x:q}",L"{y:bius}",L"{Y:i}",L"{c:$1234Ab}",L"{C:$0}",L"{f:Arial}",L"{F:}",L"{s:23.5}",L"{S:0}",L"{h:128}",L"{H:0}",L"{o:-3,4}",L"{O:2;0}",L"{\\fe128}",L"{\\fe}",L"{y:BIs}",L"{f:unterminated"};
     const unsigned base=sizeof(pieces)/sizeof(*pieces);const int charsets[]={0,1,128,129,130,134,136,-1};
     unsigned combinations=1;

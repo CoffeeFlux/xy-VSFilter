@@ -26,6 +26,7 @@
 #include "xy_rust_subrip.h"
 #include "xy_rust_find_char.h"
 #include "xy_rust_microdvd.h"
+#include "xy_rust_mpl2.h"
 #include "xy_rust_webvtt.h"
 #include "xy_rust_fields.h"
 #include "xy_rust_segments.h"
@@ -435,7 +436,13 @@ static DWORD CharSetToCodePage(DWORD dwCharSet)
 
 static int FindChar(CStringW str, WCHAR c, int pos, bool fUnicode, int CharSet)
 {
-    if(fUnicode) return(str.Find(c, pos));
+    if(fUnicode)
+    {
+#ifdef XY_VSFILTER_RUST_TEXT
+        if(pos >= 0) return XyRust::FindUnicode(str, static_cast<uint16_t>(c), pos);
+#endif
+        return(str.Find(c, pos));
+    }
 
 #ifdef XY_VSFILTER_RUST_TEXT
     DWORD cp = CharSetToCodePage(CharSet);
@@ -2370,6 +2377,11 @@ static bool OpenUSF(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 
 static CStringW MPL22SSA(CStringW str, bool fUnicode, int CharSet)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::MPL2 convert;
+    CStringW prepared;
+    if(convert.Convert(str, prepared)) return MicroDVD2SSA(prepared, fUnicode, CharSet);
+#endif
     // Convert MPL2 italic tags to MicroDVD italic tags
     if (str[0] == L'/') {
         str = L"{y:i}" + str.Mid(1);

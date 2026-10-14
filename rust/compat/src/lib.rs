@@ -58,3 +58,5 @@ pub mod vobsub_trim;
 pub mod find_char;
 
 pub mod microdvd;
+
+pub mod mpl2;

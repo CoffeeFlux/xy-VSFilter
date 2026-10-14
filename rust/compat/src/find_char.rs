@@ -101,6 +101,32 @@ impl Search {
         }
     }
 }
+/// CString's Unicode Find begins at the supplied position, ignoring any earlier
+/// NUL. It stops at the first subsequent NUL and can match the implicit sentinel,
+/// but a start at or past GetLength returns -1 even when searching for NUL.
+pub fn unicode(input: &[u16], target: u16, position: i32) -> i32 {
+    let Ok(start) = usize::try_from(position) else {
+        return -1;
+    };
+    if start >= input.len() {
+        return -1;
+    }
+    for (offset, unit) in input[start..]
+        .iter()
+        .copied()
+        .chain(core::iter::once(0))
+        .enumerate()
+    {
+        if unit == target {
+            return (start + offset) as i32;
+        }
+        if unit == 0 {
+            break;
+        }
+    }
+    -1
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -134,5 +160,19 @@ mod tests {
         assert_eq!(s.value, 0);
         assert_eq!(s.step(&input, false), 1);
         assert_eq!(s.value, 50);
+    }
+}
+
+#[cfg(test)]
+mod unicode_tests {
+    use super::unicode;
+    #[test]
+    fn nul_before_start_is_ignored_but_nul_at_start_terminates() {
+        let input = [0, 0xd800, 65, 0, 66];
+        assert_eq!(unicode(&input, 65, 0), -1);
+        assert_eq!(unicode(&input, 65, 1), 2);
+        assert_eq!(unicode(&input, 0, 4), 5);
+        assert_eq!(unicode(&input, 0, 5), -1);
+        assert_eq!(unicode(&[], 0, 0), -1);
     }
 }

@@ -111,3 +111,5 @@ mod vobsub_trim;
 mod find_char;
 
 mod microdvd;
+
+mod mpl2;
