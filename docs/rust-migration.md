@@ -20,6 +20,21 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Rust owns GaussianBlur output planes without adding initialization to native
+  padding. The full-caller oracle tracks written-byte masks separately and reads
+  only initialized bytes. Fatal ASan/UBSan comparisons pass on arm64 and under
+  x64 execution: **5,544 calls / 2,364,832 metadata and initialized-state fields /
+  946,832 initialized bytes / 415,728 unwritten cells tracked without reads /
+  214,204 allocation/factory/filter observations / 8,284 Rust owners, loans and
+  releases**. Cases preserve native zero/copy footprints, body/border selection,
+  ignored extra input borders, source aliases, output reuse and **4,142 retained
+  shared planes**. **64 false returns** model failure of the second allocation.
+  Coefficient factories and the Gaussian producer are controlled; every modeled
+  copy validates extents and source initialization. First-plane failure,
+  source/output object aliasing, inconsistent geometry and actual OOM remain
+  excluded. Default syntax and Python checks pass; Rust is unchanged from the
+  tested 143-core/95-FFI scratch increment. Four body/border Gaussian fixtures
+  expand the corpus to **770 cases**; Windows/Miri and actual DLL checks are pending.
 * Rust owns Gaussian filtering's combined horizontal/vertical scratch buffer.
   Native region layout, alignment, pointer offsets, stage order and release
   before MMX-state reset remain unchanged; scalar accounting preserves logical
@@ -2426,6 +2441,14 @@ Use `RUN/Win32` or `RUN/x64` when selecting a successful architecture job from
 a workflow whose other job did not complete. This never relabels that workflow
 as successful. The checked-in summaries additionally record reviewed job links
 and the validation scope for each increment.
+
+The initial raster-plane ownership stage (`873cba58`) is now fully archived in
+`plane-evidence.json`: all four portable platforms, Miri, and both Windows DLL
+jobs passed. Each Windows architecture matched 746 corpus cases / 7,810 frames
+and the 32-case mutation campaign / 224 frames, with unchanged exports and
+dependencies. The stable local sanitizer campaign also completed; focused
+whole-Rasterize checks recorded 74,478 Rust plane owners, loans and releases.
+These results cover this increment, not completion of renderer ownership.
 
 ## Coverage map and remaining migration
 

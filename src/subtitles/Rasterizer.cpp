@@ -1293,7 +1293,12 @@ bool Rasterizer::GaussianBlur( const Overlay& input_overlay, double gaussian_blu
 
     output_overlay->mOverlayPitch = (output_overlay->mOverlayWidth+15)&~15;
 
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::PlaneAllocation rust_blur_plan(output_overlay->mOverlayPitch * output_overlay->mOverlayHeight);
+    BYTE* blur_plan = rust_blur_plan.Ready() ? rust_blur_plan.Data() : reinterpret_cast<BYTE*>(xy_malloc(output_overlay->mOverlayPitch * output_overlay->mOverlayHeight));
+#else
     BYTE* blur_plan = reinterpret_cast<BYTE*>(xy_malloc(output_overlay->mOverlayPitch * output_overlay->mOverlayHeight));
+#endif
     //memset(blur_plan, 0, output_overlay->mOverlayPitch * output_overlay->mOverlayHeight);
 
     const BYTE* plan_input = input_overlay.mfWideOutlineEmpty ? input_overlay.mBody.get() : input_overlay.mBorder.get();    
@@ -1304,17 +1309,34 @@ bool Rasterizer::GaussianBlur( const Overlay& input_overlay, double gaussian_blu
         filter_y.g_f, filter_y.g_r, filter_y.g_w_ex);
     if (input_overlay.mfWideOutlineEmpty)
     {
+#ifdef XY_VSFILTER_RUST_TEXT
+        if(rust_blur_plan.Ready()) rust_blur_plan.Attach(output_overlay->mBody);
+        else
+#endif
         output_overlay->mBody.reset(blur_plan, xy_free);
     }
     else
     {
+#ifdef XY_VSFILTER_RUST_TEXT
+        if(rust_blur_plan.Ready()) rust_blur_plan.Attach(output_overlay->mBorder);
+        else
+#endif
         output_overlay->mBorder.reset(blur_plan, xy_free);
 
+#ifdef XY_VSFILTER_RUST_TEXT
+        XyRust::PlaneAllocation rust_body(output_overlay->mOverlayPitch * output_overlay->mOverlayHeight);
+        BYTE* body = rust_body.Ready() ? rust_body.Data() : reinterpret_cast<BYTE*>(xy_malloc(output_overlay->mOverlayPitch * output_overlay->mOverlayHeight));
+#else
         BYTE* body = reinterpret_cast<BYTE*>(xy_malloc(output_overlay->mOverlayPitch * output_overlay->mOverlayHeight));
+#endif
         if( body==NULL )
         {
             return false;
         }        
+#ifdef XY_VSFILTER_RUST_TEXT
+        if(rust_body.Ready()) rust_body.Attach(output_overlay->mBody);
+        else
+#endif
         output_overlay->mBody.reset(body, xy_free);
         memset(body, 0, output_overlay->mOverlayPitch * (bluradjust_y>>3));
         body += (bluradjust_y>>3)*output_overlay->mOverlayPitch;

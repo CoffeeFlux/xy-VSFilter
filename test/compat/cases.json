@@ -257,6 +257,14 @@
     [
       "blur-planes-control-memory",
       "blur-planes-body-memory"
+    ],
+    [
+      "gauss-planes-body-light-file",
+      "gauss-planes-body-wide-file"
+    ],
+    [
+      "gauss-planes-body-light-memory",
+      "gauss-planes-body-wide-memory"
     ]
   ],
   "cases": [
@@ -12838,6 +12846,182 @@
       "id": "arc-queue-animated-memory",
       "script": "test/compat/generated/arc-queue-animated.ass",
       "sha256": "10970619f3b28a254798607b2f6c0f0b8ca8a4d9f3bbaa175dc8561f65d980a7",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "gauss-planes-body-light-file",
+      "script": "test/compat/generated/gauss-planes-body-light.ass",
+      "sha256": "2992a77feba646350066be83d0b40cf14d1fc7b5ea4a4f5d5f1106792f1653fd",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "gauss-planes-body-light-memory",
+      "script": "test/compat/generated/gauss-planes-body-light.ass",
+      "sha256": "2992a77feba646350066be83d0b40cf14d1fc7b5ea4a4f5d5f1106792f1653fd",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "gauss-planes-body-wide-file",
+      "script": "test/compat/generated/gauss-planes-body-wide.ass",
+      "sha256": "c1be801f99d18a212c7a8a85fd95ef9a64fb01319e00b991292507844726d210",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "gauss-planes-body-wide-memory",
+      "script": "test/compat/generated/gauss-planes-body-wide.ass",
+      "sha256": "c1be801f99d18a212c7a8a85fd95ef9a64fb01319e00b991292507844726d210",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "gauss-planes-border-light-file",
+      "script": "test/compat/generated/gauss-planes-border-light.ass",
+      "sha256": "045014f606810286f0d273e46ff3265e0fabd2453c88e90f1b3e8b19f4182486",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "gauss-planes-border-light-memory",
+      "script": "test/compat/generated/gauss-planes-border-light.ass",
+      "sha256": "045014f606810286f0d273e46ff3265e0fabd2453c88e90f1b3e8b19f4182486",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "gauss-planes-border-wide-file",
+      "script": "test/compat/generated/gauss-planes-border-wide.ass",
+      "sha256": "40fcaf1bf6a05d80809a39266ef220502dd44c41922922b53e91f820b4d4b14c",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "gauss-planes-border-wide-memory",
+      "script": "test/compat/generated/gauss-planes-border-wide.ass",
+      "sha256": "40fcaf1bf6a05d80809a39266ef220502dd44c41922922b53e91f820b4d4b14c",
       "open": "memory",
       "width": 1280,
       "height": 720,
