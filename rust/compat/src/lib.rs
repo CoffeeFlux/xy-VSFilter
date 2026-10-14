@@ -27,6 +27,7 @@ pub mod subrip;
 pub mod text;
 pub mod text_reader;
 pub mod timeline_search;
+pub mod webvtt;
 
 pub mod transpose;
 

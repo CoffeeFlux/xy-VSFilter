@@ -24,6 +24,7 @@
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_text.h"
 #include "xy_rust_subrip.h"
+#include "xy_rust_webvtt.h"
 #include "xy_rust_fields.h"
 #include "xy_rust_segments.h"
 #include "xy_rust_segment_insert.h"
@@ -592,6 +593,13 @@ static CStringW SubRipper2SSA(CStringW str, int CharSet)
 
 static void WebVTTCueStrip(CStringW& str)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    const int p = XyRust::WebVTTCuePrefix(str);
+    if (p > 0) {
+        str.Delete(0, p);
+        str.TrimLeft();
+    }
+#else
     int p = str.Find(L'\n');
     if (p > 0) {
         if (str.Left(6) == _T("align:") || str.Left(9) == _T("position:") || str.Left(9) == _T("vertical:") || str.Left(5) == _T("line:") || str.Left(5) == _T("size:")) {
@@ -599,6 +607,7 @@ static void WebVTTCueStrip(CStringW& str)
             str.TrimLeft();
         }
     }
+#endif
 }
 
 using WebVTTcolorData = struct _WebVTTcolorData { std::wstring color; std::wstring bg; bool applied = false; }; 
