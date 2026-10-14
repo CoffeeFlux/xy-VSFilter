@@ -20,6 +20,9 @@
  */
 
 #include "stdafx.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "xy_rust_path_align.h"
+#endif
 #include <string.h>
 #include <cmath>
 #include <vector>
@@ -2171,6 +2174,15 @@ bool PathData::PartialEndPath(HDC hdc, long dx, long dy)
 
 void PathData::AlignLeftTop(CPoint *left_top, CSize *size)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    int32_t geometry[4];
+    if(XyRust::AlignPath(mpPathPoints, mPathPoints, geometry))
+    {
+        *left_top = CPoint(geometry[0], geometry[1]);
+        *size = CSize(geometry[2], geometry[3]);
+        return;
+    }
+#endif
     int minx = INT_MAX;
     int miny = INT_MAX;
     int maxx = INT_MIN;

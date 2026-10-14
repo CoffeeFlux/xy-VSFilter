@@ -149,3 +149,5 @@ mod wrap_width;
 mod line_layout;
 
 mod text_seek;
+
+mod path_align;

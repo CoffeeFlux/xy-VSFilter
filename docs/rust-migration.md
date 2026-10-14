@@ -20,6 +20,22 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust aligns initialized rasterizer path points and computes origin/size.
+  Negative-coordinate shifts, eight-unit origin alignment, the extra size unit,
+  point-write order and final native output assignments are preserved. Empty paths
+  retain native cleanup. Arithmetic is validated across the whole buffer before
+  mutation; a decline leaves both points and temporary geometry unchanged.
+  Fatal ASan/UBSan comparisons passed **67,939 complete calls** on arm64 and under
+  x64 execution: **888,124 point observations / 63,114 changed buffers**, **67,570
+  Rust alignments / 369 native empty-path fallbacks**. All point/type guards and
+  exact origin/size, errno, FP flags and Windows error state are compared. The
+  **19,345 arithmetic-domain exclusions** are not passing cases; Rust/FFI tests
+  separately verify transactional decline. Geometry outputs are disjoint in the
+  oracle, and native cleanup is modeled; Windows uses actual POINT/ATL geometry.
+  Rust 1.85 tests (124 core, 80 FFI), strict Clippy, default syntax and Python
+  checks pass. Four fractional-coordinate scripts expand the renderer corpus to
+  **662 cases**. Windows/Miri and full renderer checks for this increment are
+  pending; rasterizer buffer allocation and actual-host integration remain.
 * CPolygon now retains its drawing types/points in a Rust owner through native
   scaling, independent polygon copies, cache reuse and rasterizer handoff. The
   temporary parsed path transfers ownership instead of copying into native arrays;
@@ -107,8 +123,11 @@ unresolved reference outcomes requiring investigation, never matching results.
   Separate Rust/FFI checks verify unchanged state/output on arithmetic decline.
   Rust 1.85 tests (115 core, 75 FFI), strict Clippy, default syntax and Python
   harness checks pass. Eight wrap scripts and a visible wrapping control expand
-  the renderer corpus to **602 cases**. Windows/Miri and renderer checks for
-  this increment are pending; native font metrics and host integration remain.
+  the renderer corpus to **602 cases**. All four platform reports, Miri and both
+  Windows renderers passed **602 cases / 6,370 frames**, plus **32 mutation cases /
+  224 frames**, with matching dialogs, controls, exports and dependencies; see
+  [verified wrap-width evidence](wrap-width-evidence.json). Native font metrics
+  and host integration remain.
 * Safe Rust now prepares rendered-text escapes (`\N`, `\n`, `\h`) and owns
   run storage and traversal. Soft breaks retain the exact wrap-style condition;
   embedded-NUL strings retain native replacement before reimport into Rust.

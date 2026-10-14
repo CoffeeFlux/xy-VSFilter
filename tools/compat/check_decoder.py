@@ -54,7 +54,7 @@ def capture_inputs():
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h", ROOT / "include/xy_rust_writer.h", ROOT / "include/xy_rust_seek.h",
               ROOT / "include/xy_rust_drawing.h", ROOT / "include/xy_rust_layout.h", ROOT / "include/xy_rust_text_runs.h", ROOT / "include/xy_rust_wrap.h", ROOT / "include/xy_rust_line_layout.h", ROOT / "src/subtitles/RTS.h",
-              ROOT / "include/xy_rust_drawing_tokens.h",
+              ROOT / "include/xy_rust_drawing_tokens.h", ROOT / "include/xy_rust_path_align.h",
               ROOT / "include/xy_rust_pipe_line.h", ROOT / "include/xy_rust_subrip_cue.h", ROOT / "include/xy_rust_sami_file.h", ROOT / "include/xy_rust_microdvd_style.h", ROOT / "include/xy_rust_font_records.h", ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
               ROOT / "include/xy_rust_cc.h", ROOT / "src/subtitles/CCDecoder.cpp", ROOT / "src/subtitles/CCDecoder.h",
@@ -686,6 +686,18 @@ public:
     golomb_source = original("src/dsutil/GolombBuffer.cpp", reference["commit"])
     golomb_header = original("src/dsutil/GolombBuffer.h", reference["commit"])
     raster_source = original("src/subtitles/Rasterizer.cpp", reference["commit"])
+    path_align = '#include "path_align_shell.h"\n'
+    for name, content in (("ReferenceAlign", raster_source), ("CandidateAlign", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+        path_align += f"namespace {name} {{\n"
+        path_align += "class PathData : public AlignState { public: PathData(const std::vector<POINT>& p,int n):AlignState(p,n){} void AlignLeftTop(CPoint*,CSize*); };\n"
+        if name == "CandidateAlign":
+            path_align += "#define XY_VSFILTER_RUST_TEXT\n"
+        definition = extract_definition(content.decode("utf-8-sig"), "void PathData::AlignLeftTop(")
+        if name == "CandidateAlign":
+            assert definition.count("XyRust::AlignPath") == 1
+            definition = definition.replace("XyRust::AlignPath", "XyRust::ObservedAlignPath")
+        path_align += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_path_align.h").write_text(path_align, encoding="utf-8")
     filter_source = original("src/subtitles/xy_filter.cpp", reference["commit"])
     vobsub_source = original("src/subtitles/VobSubImage.cpp", reference["commit"])
     golomb = '#pragma once\n#include "golomb_shell.h"\n'
@@ -1140,6 +1152,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     seek_result = run([str(seek_executable)], capture_output=True, text=True)
     print(seek_result.stdout, end="", flush=True)
     print(seek_result.stderr, end="", file=sys.stderr)
+    path_align_executable = destination / ("path-align-oracle.exe" if os.name == "nt" else "path-align-oracle")
+    path_align_compile = [arg.replace("find_char_oracle.cpp", "path_align_oracle.cpp").replace("find-char-oracle", "path-align-oracle") for arg in find_char_compile]
+    run(path_align_compile)
+    path_align_result = run([str(path_align_executable)], capture_output=True, text=True)
+    print(path_align_result.stdout, end="", flush=True)
+    print(path_align_result.stderr, end="", file=sys.stderr)
     writer_executable = destination / ("text-writer-oracle.exe" if os.name == "nt" else "text-writer-oracle")
     writer_compile = [arg.replace("find_char_oracle.cpp", "text_writer_oracle.cpp").replace("find-char-oracle", "text-writer-oracle") for arg in find_char_compile]
     run(writer_compile)
@@ -1532,6 +1550,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "text_seek_compile_command": seek_compile,
         "text_seek_result": seek_result.stdout, "text_seek_stderr": seek_result.stderr,
         "text_seek_scope": "Complete pinned Seek/GetPosition/GetLength with controlled native file callbacks and buffer bookkeeping; exact unsigned wrap/signed clamp, returned target and state, interruptions/mutations, errno/Windows LastError; physical signed addition overflow excluded; full reader oracle separately exercises actual Rust buffer",
+        "path_align_compile_command": path_align_compile,
+        "path_align_result": path_align_result.stdout, "path_align_stderr": path_align_result.stderr,
+        "path_align_scope": "Complete pinned PathData::AlignLeftTop over initialized point/type buffers; actual Windows POINT/ATL geometry; exact guarded buffers, origin/size, errno/FP/Windows error state; native cleanup modeled, outputs disjoint and representable arithmetic only",
         "text_writer_compile_command": writer_compile,
         "text_writer_result": writer_result.stdout, "text_writer_stderr": writer_result.stderr,
         "text_writer_scope": "Complete pinned CTextFile::WriteString; native ATL strings/UTF-8 conversion on Windows, modeled UTF-8 and 16-bit Windows write layout on portable hosts; controlled native write boundaries, exact bytes/default-string arguments, errno/LastError and callback interruptions/source mutation; allocation failures and OS file persistence excluded",
