@@ -12,6 +12,8 @@
 #endif
 extern "C" {
 void* XY_DRAWING_TOKENS_CDECL xy_vsfilter_drawing_tokens_create(const uint16_t*, uint32_t);
+uint32_t XY_DRAWING_TOKENS_CDECL xy_vsfilter_drawing_tokens_prepare(void*);
+void XY_DRAWING_TOKENS_CDECL xy_vsfilter_drawing_tokens_reset(void*,const uint16_t*,uint32_t);
 size_t XY_DRAWING_TOKENS_CDECL xy_vsfilter_drawing_tokens_field(const void*, uint32_t, size_t, size_t);
 void XY_DRAWING_TOKENS_CDECL xy_vsfilter_drawing_tokens_release(void*);
 }
@@ -33,6 +35,12 @@ public:
         if (!owner) abort();
     }
     ~DrawingTokens() { xy_vsfilter_drawing_tokens_release(owner); }
+    bool Prepare(){cursor=0;return xy_vsfilter_drawing_tokens_prepare(owner)!=0;}
+    template<class String> void Reset(const String& input){
+        std::vector<uint16_t> units(static_cast<size_t>(input.GetLength()));
+        for(int i=0;i<input.GetLength();++i)units[i]=static_cast<uint16_t>(input[i]);
+        xy_vsfilter_drawing_tokens_reset(owner,units.data(),static_cast<uint32_t>(units.size()));cursor=0;
+    }
     template<typename String> bool Next(String& parameters, uint16_t& command) {
         if (cursor >= xy_vsfilter_drawing_tokens_field(owner, 0, 0, 0)) return false;
         command = static_cast<uint16_t>(xy_vsfilter_drawing_tokens_field(owner, 1, cursor, 0));

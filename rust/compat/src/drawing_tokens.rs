@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Derived from CPolygon::ParseStr, Copyright (C) 2003-2006 Gabest.
-//! Raw UTF-16 drawing tokens after native command replacement. Models the
-//! original Tokenize/TrimLeft sequence, including embedded NULs. The preceding
-//! CString replacements remain native: their NUL behavior can expose stale
-//! allocation contents and has no stable safe-Rust specification yet.
+//! Raw UTF-16 drawing preparation and the original Tokenize/TrimLeft sequence.
+//! Embedded-NUL input retains native command replacement before tokenization.
 use alloc::vec::Vec;
 use core::ops::Range;
 
@@ -23,7 +21,10 @@ pub struct Tokens {
 
 impl Tokens {
     pub fn scan(input: &[u16]) -> Self {
-        let units = input.to_vec();
+        Self::from_units(input.to_vec())
+    }
+
+    fn from_units(units: Vec<u16>) -> Self {
         let mut tokens = Vec::new();
         let mut cursor = 0;
         while cursor < units.len() {
@@ -52,6 +53,34 @@ impl Tokens {
             cursor += 1;
         }
         Self { units, tokens }
+    }
+
+    /// Each native replacement inserts '*' before one lowercase command. Their
+    /// replacement text introduces no other command, so one forward pass gives
+    /// the same result. Declines leave the raw owner unchanged.
+    pub fn prepare(&mut self) -> bool {
+        if self.units.contains(&0) {
+            return false;
+        }
+        let extra = self.units.iter().filter(|&&unit| command(unit)).count();
+        let Some(length) = self.units.len().checked_add(extra) else {
+            return false;
+        };
+        if length > i32::MAX as usize {
+            return false;
+        }
+        let mut prepared = Vec::new();
+        if prepared.try_reserve_exact(length).is_err() {
+            return false;
+        }
+        for &unit in &self.units {
+            if command(unit) {
+                prepared.push(42);
+            }
+            prepared.push(unit);
+        }
+        *self = Self::from_units(prepared);
+        true
     }
 
     pub fn tokens(&self) -> &[Token] {
@@ -86,5 +115,24 @@ mod tests {
         assert_eq!(t.parameters(1).unwrap(), &[50]);
         assert!(Tokens::scan(&[0, 109, 32, 49]).tokens().is_empty());
         assert_eq!(Tokens::scan(&[109, 0, 0, 108]).tokens().len(), 1);
+    }
+
+    #[test]
+    fn preparation_splits_commands_inside_arbitrary_text() {
+        let mut tokens = Tokens::scan(&"junk 0x1p+4**m 1 2".encode_utf16().collect::<Vec<_>>());
+        assert!(tokens.prepare());
+        let commands: Vec<_> = tokens.tokens().iter().map(|t| t.command).collect();
+        assert_eq!(commands, vec![106, 110, 112, 109]);
+        assert_eq!(tokens.parameters(1).unwrap(), &[107, 32, 48, 120, 49]);
+        assert_eq!(tokens.parameters(2).unwrap(), &[43, 52]);
+        assert_eq!(tokens.parameters(3).unwrap(), &[49, 32, 50]);
+    }
+
+    #[test]
+    fn preparation_declines_nul_without_changing_tokens() {
+        let mut tokens = Tokens::scan(&[109, 32, 49, 0, 108, 32, 50]);
+        assert!(!tokens.prepare());
+        assert_eq!(tokens.units, &[109, 32, 49, 0, 108, 32, 50]);
+        assert_eq!(tokens.parameters(1).unwrap(), &[50]);
     }
 }

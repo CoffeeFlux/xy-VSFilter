@@ -319,6 +319,22 @@ def line_layout_variants():
         yield "line-layout-" + name + ".ass", seed.replace(b"COMPAT_TEXT", payload)
 
 
+
+def drawing_preparation_variants():
+    for name, path in {
+        "control": br"m 0 0 l 64 0 64 64 0 64",
+        "adjacent": br"m0 0l64 0l64 64l0 64",
+        "asterisks": br"**m 0 0***l 64 0**l 64 64*l 0 64",
+        "prefix-junk": br"junk m 0 0 l 64 0 64 64 0 64",
+        "embedded-command-letters": br"m 0 0 line64 0 line64 64 line0 64",
+        "hex-exponent-letter": br"m 0 0 l 0x1p+6 0 64 64 0 64",
+        "uppercase": br"m 0 0 L64 0l64 64l0 64",
+        "tab": b"m\t0 0\tl\t64 0 64 64 0 64",
+    }.items():
+        payload = br"{\p1}" + path + br"{\p0}after"
+        yield "drawing-prepare-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
+
+
 def layout_rect_variants():
     prefix = SEED[:SEED.index(b"Dialogue:")]
     for name, alignment, second_layer, border, collisions, multiline in (
@@ -617,6 +633,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in text_run_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in wrap_width_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in line_layout_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in drawing_preparation_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in realtext_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_header_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_style_variants()]
