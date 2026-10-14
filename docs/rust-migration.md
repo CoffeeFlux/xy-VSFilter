@@ -20,6 +20,19 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* A separate Windows SSF integration workflow now builds the pinned and Rust
+  `libssf` libraries and links identical probes against each. Six bounded valid
+  documents exercise comments, Arabic replacement and multiline text through
+  the real parser, node dump in all six encodings, GDI/font renderer and raw
+  320x180 RGBA frames at six timestamps including a repeated seek. Each side
+  runs twice in fresh processes; incomplete output, nonzero exit, timeouts,
+  missing pixels, mismatched traces and invisible controls cannot pass. Raw
+  dumps, frames, executables, library hashes and build logs are retained.
+  Local evidence-driver tests pass (**34 Python checks, three local skips**).
+  Native compilation/execution is pending; this does not yet establish SSF
+  renderer parity. Byte-stream decoding, malformed-document behavior and
+  DirectShow/real-host integration remain separate work.
+
 * SSF Arabic range classification and both character-replacement overloads now
   run in safe Rust with the exact pinned 256-row table. Zero mappings and
   neighbor decisions based solely on the `0x0600..0x06ff` range are retained;
@@ -69,8 +82,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   comment runs remain excluded. CSRI opens the RTS parser and cannot establish
   SSF renderer coverage. **149 core / 105 FFI tests**, formatting, Clippy,
   29 Python checks (three local skips), both local sanitizer builds and default
-  native syntax pass. Miri passes at `154a1120` (`115943572360`); Windows build/integration
-  remains pending. Both Windows portable jobs passed for the preceding
+  native syntax pass. Miri and both Windows portable jobs pass at `154a1120` (`115943572360`,
+  `115943572000`, `115943572386`); full native build/integration remains pending. Both Windows portable jobs passed for the preceding
   queue-only increment `209402aa` (`115936712952`, `115936713551`).
 
 * Safe Rust now scans caption packet headers and owns snapshots of both fields

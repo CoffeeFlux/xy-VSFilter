@@ -1,0 +1,58 @@
+name: Windows SSF differential
+on:
+  workflow_dispatch:
+  push:
+    branches: ['rust/**']
+    paths:
+      - '.github/workflows/ssf-native-compat.yml'
+      - 'rust/**'
+      - 'src/subtitles/libssf/**'
+      - 'src/common.props'
+      - 'src/rust-text.props'
+      - 'include/xy_rust_ssf*'
+      - 'tools/compat/ssf_native*'
+      - 'tools/compat/run_ssf_native.ps1'
+permissions:
+  contents: read
+jobs:
+  ssf:
+    runs-on: windows-2022
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: x64
+            arch: x64
+            target: x86_64-pc-windows-msvc
+          - platform: Win32
+            arch: amd64_x86
+            target: i686-pc-windows-msvc
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: candidate
+          fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          path: baseline
+          ref: 4911cacb102bc0cbd41449793e54473265b04e62
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Rust
+        run: |
+          rustup toolchain install 1.85.0 --profile minimal --target ${{ matrix.target }}
+          rustup default 1.85.0
+      - name: Build and compare actual SSF parser and renderer
+        shell: pwsh
+        run: |
+          & candidate\tools\compat\run_ssf_native.ps1 -Platform ${{ matrix.platform }} -Baseline "$pwd\baseline"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ssf-evidence-${{ matrix.platform }}
+          path: candidate/artifacts/ssf-native/
