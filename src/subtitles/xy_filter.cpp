@@ -1435,7 +1435,12 @@ void xy_be_blur(PUINT8 src, int width, int height, int stride, float pass_x, flo
     XyFilter2 filter2 = xy_be_filter2_sse<ROUND_HALF_TO_EVEN>;
 
     int stride_ver = height;
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::PlaneAllocation rust_scratch(width*height);
+    PUINT8 tmp = rust_scratch.Ready() ? rust_scratch.Data() : reinterpret_cast<PUINT8>(xy_malloc(width*height));
+#else
     PUINT8 tmp = reinterpret_cast<PUINT8>(xy_malloc(width*height));
+#endif
     ASSERT(tmp);
     // horizontal pass
     int pass_x_int = static_cast<int>(pass_x);
@@ -1469,6 +1474,10 @@ void xy_be_blur(PUINT8 src, int width, int height, int stride, float pass_x, flo
     // transpose
     xy_byte_2_byte_transpose_c(src, width, stride, tmp, height, width, stride_ver);
 
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (rust_scratch.Ready()) rust_scratch.Reset();
+    else
+#endif
     xy_free(tmp);
     return;
 }
