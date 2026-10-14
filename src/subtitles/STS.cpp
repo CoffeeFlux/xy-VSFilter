@@ -4326,10 +4326,9 @@ int CSimpleTextSubtitle::GetCharSet(int i)
 CStringW CSimpleTextSubtitle::GetStrW(int i, bool fSSA)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    STSEntry stse = m_document->Entry(i);
+    return ApplyDocumentTextOperation(m_document->TextOperation(i, fSSA ? 0 : 1));
 #else
     STSEntry const& stse = m_entries.GetAt(i);
-#endif
     int CharSet = GetCharSet(i);
 
     CStringW str = stse.str;
@@ -4341,6 +4340,7 @@ CStringW CSimpleTextSubtitle::GetStrW(int i, bool fSSA)
         str = RemoveSSATags(str, true, CharSet);
 
     return str;
+#endif
 }
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL

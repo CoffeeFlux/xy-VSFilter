@@ -1379,6 +1379,37 @@ suite passes 215 core and 120 FFI tests, pinned formatting and all-target Clippy
 and 134 Python tests with four Windows-only skips. Changed-source Windows
 lifecycle, API and rendering comparisons remain pending; owner count stays 20.
 
+### Owned document text operations
+
+GetStrW, GetStrWA and ConvertUnicode now ask the safe owner for an immutable
+text-operation reply containing raw text, charset and the selected conversion
+and tag-removal actions. They no longer materialize an entire native STSEntry,
+including unrelated actor/effect/style/timing fields. Actual SSA conversion,
+Windows codepage calls and tag-removal adapters still run outside admission.
+
+The core checks entry bounds first. Same-flag ConvertUnicode returns NoOp before
+charset resolution or cloning text. Getters always resolve charset, even when
+no conversion is needed. A resolved null style remains a distinct false/-1 tag
+for the native assertion and release behavior; no null native probe is added.
+Raw UTF-16 units and owned reply independence are preserved. No document or style
+reference survives the call, and no generation-based rejection is introduced.
+
+Conversion commits through the existing prepared-text boundary, replacing text
+before setting the requested Unicode flag. That boundary now transfers the old
+allocation out for destruction after admission and validates the entry before
+consuming staged input. Getters never mutate; conversion and setters do not
+rebuild segments or call OnChanged. SetStr's LF preparation remains native while
+its CString source gate is pending.
+
+Four new full-class stages exercise valid Shift-JIS packed/wide round trips,
+all four getter/SSA combinations, repeated same-flag conversions, retained animated
+segments and callbacks, and independent raw Unicode getter copies. Four core plan
+tests and an exact old-allocation retirement test pass. Local validation passes
+220 core and 120 FFI tests, pinned formatting and all-target Clippy, and 135
+Python tests with four Windows-only skips. Generation and unchanged native-branch
+preprocessing also pass. Windows validation of this change remains pending. One new unsafe output wrapper uses
+the existing write helper; the core retains zero unsafe code and owner count 20.
+
 ### Newly verified x64 integration and preparation evidence
 
 [The retained x64 evidence](rust-document-x64-7f-evidence.json) for `7f3e5c9c`,
@@ -1475,13 +1506,13 @@ Neither count measures the amount of application behavior replaced.
 The reproducible [Rust unsafe inventory](rust-unsafe-inventory.json) uses
 `python3 tools/compat/audit_rust_boundary.py OUTPUT.json`. It masks comments and
 literals, separates cfg(test) items, and includes all platform/feature branches.
-At the current frozen working-tree sources based on `23a69442` (exact file
+At the current frozen working-tree sources based on `f570dd2b` (exact file
 hashes recorded by the regenerated inventory):
 
 | Layer | Production source inventory | Meaning |
 | --- | --- | --- |
-| `rust/compat` | 0 unsafe blocks/functions/impls; 8,421 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
-| `rust/ffi` | 372 explicit unsafe blocks, 310 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,886 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
+| `rust/compat` | 0 unsafe blocks/functions/impls; 8,500 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
+| `rust/ffi` | 373 explicit unsafe blocks, 311 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,954 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
 | Tests | 119 unsafe blocks in FFI tests | Exercise valid and deliberately bounded ownership/alias/initialization contracts; not production code |
 
 Unsafe-function declarations and blocks overlap and must not be added as

@@ -552,6 +552,43 @@ static void require_same_segments(const TraceDocument& doc,const std::vector<STS
 static void style_rename_stage(TraceDocument& doc,const char* stage) {
     printf("style-rename-stage %s\n",stage);doc.Dump(stage);
 }
+static void text_plan_lifecycle() {
+    TraceDocument doc(0);STSStyle japanese;japanese.charSet=SHIFTJIS_CHARSET;named_add(doc,L"JapaneseText",japanese);
+    const wchar_t sjis[]={0x82,0xa0};
+    CStringW packed(L"{\\i1}");packed+=CStringW(sjis,2);packed+=L"{\\i}\\NZ";
+    CStringW wide(L"{\\i1}\x3042{\\i}\\NZ");
+    CStringW plainPacked(L"<i>");plainPacked+=CStringW(sjis,2);plainPacked+=L"</i>\nZ";
+    const CStringW plainWide(L"<i>\x3042</i>\nZ");
+    doc.AddSTSEntryOnly(packed,false,0,10,CString(L"JapaneseText"),CString(L"actor"),CString(L"effect"),CRect(1,2,3,4),2,7);
+    doc.CreateSegments();doc.Animate(0);const auto segments=segment_snapshot(doc);const unsigned callbacks=change_events[0];
+    auto stage=[&](const char* name,bool unicode){
+        check(doc.IsEntryUnicode(0)==unicode&&same_identity(doc.Entry(0).str,unicode?wide:packed),"text plan exact stored text and flag");
+        printf("text-plan-stage %s\n",name);doc.Dump(name);
+        for(int ssa=1;ssa>=0;--ssa)for(int nativeWide=1;nativeWide>=0;--nativeWide){
+            const CStringW value=nativeWide?doc.GetStrW(0,ssa!=0):doc.GetStrWA(0,ssa!=0);
+            const CStringW& expected=ssa?(nativeWide?wide:packed):(nativeWide?plainWide:plainPacked);
+            check(same_identity(value,expected),"text getter exact supplied Shift-JIS/SSA result");
+            printf("text-plan-get %s wide=%d ssa=%d",name,nativeWide,ssa);units(value);printf("\n");}
+    };
+    stage("text-plan-packed-input",false);
+    doc.ConvertUnicode(0,true);stage("text-plan-wide",true);
+    doc.ConvertUnicode(0,true);check(same_identity(doc.Entry(0).str,wide)&&doc.IsEntryUnicode(0),"wide conversion noop retains state");
+    require_same_segments(doc,segments,"text-plan-wide-noop");printf("text-plan-noop wide=1 callbacks=0\n");
+    doc.ConvertUnicode(0,false);stage("text-plan-packed-roundtrip",false);
+    doc.ConvertUnicode(0,false);check(same_identity(doc.Entry(0).str,packed)&&!doc.IsEntryUnicode(0),"packed conversion noop retains state");
+    require_same_segments(doc,segments,"text-plan-packed-noop");printf("text-plan-noop wide=0 callbacks=0\n");
+    // Raw Unicode getter true is identity, with no native byte conversion of
+    // this entry. EntryOnly retains the existing animated segments unchanged.
+    const wchar_t raw[]={L'R',0,0xd83d,0xde00,L'Z'};
+    doc.AddSTSEntryOnly(CStringW(raw,5),true,10,20,CString(L"JapaneseText"));
+    CStringW owned=doc.GetStrW(1,true);check(same_identity(owned,CStringW(raw,5)),"raw Unicode getter preserves full units");
+    owned.SetAt(4,L'Q');printf("text-plan-owned-mutated");units(owned);printf("\n");
+    const CStringW reread=doc.GetStrW(1,true);check(same_identity(reread,CStringW(raw,5)),"raw getter copy suffix mutation independent");
+    printf("text-plan-owned-reread");units(reread);printf("\n");
+    require_same_segments(doc,segments,"text-plan-final");check(change_events[0]==callbacks,"text plans do not rebuild or notify");
+    printf("text-plan-stage text-plan-raw-independent\n");doc.Dump("text-plan-raw-independent");
+}
+
 static void named_style_lifecycle() {
     TraceDocument source(0),destination(1);
     const STSStyle first=named_value(1),second=named_value(2),third=named_value(3);
@@ -1322,6 +1359,7 @@ int main() {
         printf("provenance pointer_bits=%zu\n",sizeof(void*)*8);
         printf("environment ansi=%u oem=%u\n",GetACP(),GetOEMCP());
         default_style_lifecycle();
+        text_plan_lifecycle();
         copy_selected_lifecycle();
         metadata_lifecycle();
         layout_lifecycle();
