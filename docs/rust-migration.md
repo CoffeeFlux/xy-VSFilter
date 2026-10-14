@@ -20,6 +20,16 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* The repaired ownership integration stage at `f5c748a9` is now fully archived
+  in `ownership-integration-evidence.json`: all four portable jobs, Miri, and
+  both renderer jobs passed. Each architecture matched **798 cases / 8,426
+  frames**, all visibility controls, and **32 mutation cases / 224 frames**,
+  with unchanged exports and declared dependencies. This integrates Gaussian
+  output planes, RLE/HDMV/DVB storage, vector masks and fades. Persistent VobSub
+  ownership remains a disabled experiment; later ownership increments and the
+  COM probe have separate pending results. GCC ambient FP effects remain
+  unresolved as recorded, and the original failed jobs remain failed.
+
 * Windows integration now includes a disconnected COM contract probe for all
   five filter classes across the three DLLs: DirectVobSub, its autoloading
   variant, XySubFilter, its autoloader, and XySubFilterConsumer. Class UUIDs come
@@ -54,6 +64,11 @@ unresolved reference outcomes requiring investigation, never matching results.
   Portable runs exercise the native x64 scalar delegation; actual Win32 SIMD
   still needs Windows. Rust remains **146 core / 101 FFI tests**; default syntax
   and Python checks pass. Windows integration for this increment is pending.
+  Initial Windows portable jobs `115887597956` / `115887598202` failed to
+  compile the fixture's mixed `LONG`/`int` min/max expressions. Explicit bounded
+  `int` conversions now match the native caller's geometry variables; no
+  production code changed for that correction. Those jobs remain failed and
+  the corrected fixture needs a new Windows run.
 
 * Output `XyBitmap` buffers now use Rust ownership while preserving the native
   address modulo 16, public frame-accessor pointers and logical cache accounting.

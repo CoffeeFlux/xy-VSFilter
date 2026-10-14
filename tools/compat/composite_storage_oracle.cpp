@@ -44,13 +44,13 @@ static void compare(int w,int h,int sub,int flags,bool border,int maskMode,int c
     // Multicolor callbacks start at different x offsets. Keep a physical final
     // row for their native post-row cursors, without extending allocations.
     if(colorMode>=2&&clipMode==0)clip.bottom=y+h-1;
-    int xo=std::max(0,clip.left-x),yo=std::max(0,clip.top-y);
-    int cw=std::min(w-xo,clip.right-std::max(x,clip.left));
-    int ch=std::min(h-yo,clip.bottom-std::max(y,clip.top));
+    int xo=std::max<int>(0,clip.left-x),yo=std::max<int>(0,clip.top-y);
+    int cw=std::min<int>(w-xo,clip.right-std::max<int>(x,clip.left));
+    int ch=std::min<int>(h-yo,clip.bottom-std::max<int>(y,clip.top));
     if(colorMode!=0&&flags&&(!(flags&2)||border)&&cw>0&&ch>0&&yo+ch==h&&(xo>0||colorMode>=2)){++exclusions;return;}
     std::vector<DWORD> colors;
     if(colorMode==1)colors={0x7f123456U,0xffffffffU};
-    if(colorMode>=2){const DWORD middle=colorMode==2?0xffabcdefU:0x07123456U;colors={0x07123456U,0,middle,static_cast<DWORD>(xo+std::max(0,cw)/2),0x00123456U,static_cast<DWORD>(xo+std::max(0,cw)),0xff000000U,0xffffffffU};}
+    if(colorMode>=2){const DWORD middle=colorMode==2?0xffabcdefU:0x07123456U;colors={0x07123456U,0,middle,static_cast<DWORD>(xo+std::max<int>(0,cw)/2),0x00123456U,static_cast<DWORD>(xo+std::max<int>(0,cw)),0xff000000U,0xffffffffU};}
     const auto a=execute<ReferenceComposite::Overlay,ReferenceComposite::Rasterizer>(w,h,sub,flags,border,maskMode,clip,colors,decline,true);
     const auto b=execute<CandidateComposite::Overlay,CandidateComposite::Rasterizer>(w,h,sub,flags,border,maskMode,clip,colors,decline,false);
     if(!(a==b)){fprintf(stderr,"Composite mask mismatch size=%d,%d sub=%d flags=%d border=%d mask=%d clip=%d colors=%d decline=%d\n",w,h,sub,flags,border,maskMode,clipMode,colorMode,decline);std::abort();}
