@@ -1,10 +1,25 @@
 import unittest
+import tempfile
+from pathlib import Path
 from unittest.mock import patch
 
-from summarize_evidence import normalize_windows_source, windows_source_bytes
+from summarize_evidence import normalize_windows_source, windows_source_bytes, production_dll
 
 
 class WindowsHeaderProvenance(unittest.TestCase):
+    def test_production_dll_excludes_instrumented_copies(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            production = root / 'candidate/bin/lib_17.0/x64/Release/VSFilter.dll'
+            helper = root / 'candidate/artifacts/native/x64/document-style-api/candidate/VSFilter/VSFilter.dll'
+            for path in (production, helper):
+                path.parent.mkdir(parents=True)
+                path.write_bytes(b'fixture')
+            self.assertEqual(production_dll(root, 'candidate', 'VSFilter.dll'), production)
+            production.unlink()
+            with self.assertRaises(AssertionError):
+                production_dll(root, 'candidate', 'VSFilter.dll')
+
     def test_compiler_spelling_resolves_to_tracked_path(self):
         self.assertEqual(normalize_windows_source(r"src\subtitles\..\DSUtil\DSUtil.h"),
                          "src/dsutil/dsutil.h")

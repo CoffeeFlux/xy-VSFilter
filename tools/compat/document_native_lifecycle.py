@@ -36,7 +36,7 @@ def git(root, *args):
     return subprocess.check_output(["git", "-C", str(root), *args], timeout=60).decode().strip()
 
 
-def validate_trace(data, pointer_bits):
+def validate_trace(data, pointer_bits, *, require_named_stages=True):
     lines = data.splitlines()
     if not lines or lines[0] != f"provenance pointer_bits={pointer_bits}".encode():
         raise ValueError("missing or incorrect native architecture provenance")
@@ -46,12 +46,26 @@ def validate_trace(data, pointer_bits):
         if not any(line.startswith(prefix) for line in lines):
             raise ValueError(f"missing native lifecycle trace section {prefix!r}")
 
+    if require_named_stages:
+        for stage in ("named-initial", "named-equal-duplicate", "named-conflict-collision",
+                      "named-numeric-collision", "named-copy-replace", "named-copy-independent",
+                      "named-copy-append", "named-self-clear", "named-empty"):
+            if f"named-stage {stage}".encode() not in lines:
+                raise ValueError(f"missing named style lifecycle stage {stage}")
+        for observation in (b"saved-file ssa exists=1 bytes=", b"saved-file ass exists=1 bytes=",
+                            b"saved-file srt exists=1 bytes=", b"saved-file srt-sidecar exists=1 bytes=",
+                            b"saved-file ssa-sidecar exists=0", b"saved-file ass-sidecar exists=0",
+                            b"saved-file srt-no-map exists=1 bytes=", b"saved-file srt-no-map-sidecar exists=0"):
+            if not any(line.startswith(observation) for line in lines):
+                raise ValueError(f"missing named style export observation {observation!r}")
 
-def compare_traces(traces, pointer_bits):
+
+
+def compare_traces(traces, pointer_bits, *, require_named_stages=True):
     if len(traces) != 4:
         raise ValueError("two reference and two candidate executions required")
     for trace in traces:
-        validate_trace(trace, pointer_bits)
+        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages)
     if any(trace != traces[0] for trace in traces[1:]):
         raise ValueError("native lifecycle traces differ or are nondeterministic")
 

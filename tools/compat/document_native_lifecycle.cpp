@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <exception>
 #include <stdexcept>
+#include <vector>
 
 static unsigned sequence = 0, empty_events[2] = {}, change_events[2] = {};
 static void check(bool value, const char* message) {
@@ -36,6 +37,19 @@ static void style(const STSStyle& value) {
     real(value.fontAngleZ);real(value.fontAngleX);real(value.fontAngleY);real(value.fontShiftX);real(value.fontShiftY);
     printf(" %d\n",value.relativeTo);
 }
+
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+// The pinned class already grants this friend; neither checkout defines it.
+// A probe-local accessor invokes the real private method, including append and
+// self-clear behavior, without rewriting it or changing access specifications.
+class CSubtitleEditorDlg {
+public:
+    static bool CopyNames(CSimpleTextSubtitle& destination,
+                          const CSimpleTextSubtitle& source, bool append) {
+        return destination.CopyStyles(source.m_styles,append);
+    }
+};
+#endif
 
 class TraceDocument : public CSimpleTextSubtitle {
     unsigned id_;
@@ -93,6 +107,20 @@ public:
         OrSegmentAnimated(index,true);
 #endif
     }
+    size_t NamedCount() const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        return GetStyleCount();
+#else
+        return m_styles.GetCount();
+#endif
+    }
+    bool CopyNames(TraceDocument& source, bool append) {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        return CopyNamedStylesFrom(source,append);
+#else
+        return CSubtitleEditorDlg::CopyNames(*this,source,append);
+#endif
+    }
     void Dump(const char* stage) const {
         printf("state %u %u %s %zu %zu\n",++sequence,id_,stage,Entries(),Segments());
         printf("metadata %d",m_simple);units(m_name);
@@ -106,9 +134,15 @@ public:
 #else
         style(m_defaultStyle);
 #endif
-        printf("styles %zu\n",m_styles.GetCount());
+        printf("styles %zu\n",NamedCount());
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        for(size_t i=0;i<NamedCount();++i){CString name;STSStyle value;
+            check(GetStyleNameAt(i,name)&&GetStyleValueAt(i,value),"named ordinal read");
+            printf("name");units(name);printf("\n");style(value);}
+#else
         POSITION pos=m_styles.GetStartPosition();
         while(pos){CString name;STSStyle* value=NULL;m_styles.GetNextAssoc(pos,name,value);printf("name");units(name);printf("\n");style(*value);}
+#endif
         for(size_t i=0;i<Entries();i++) {
             const STSEntry e=Entry(int(i));printf("entry %zu",i);units(e.str);units(e.style);units(e.actor);units(e.effect);
             printf(" %d %ld %ld %ld %ld %d %lld %lld %d\n",e.fUnicode,e.marginRect.left,e.marginRect.top,
@@ -224,12 +258,100 @@ static void default_style_lifecycle() {
     check(change_events[0]==notifications,"default resolution/reset do not notify");
     source.Dump("default-resolution-final");
 }
+static STSStyle named_value(int id) {
+    STSStyle result;result.charSet=ANSI_CHARSET;result.fontSize=20+id;
+    result.fontSpacing=id*0.25;result.colors[0]=0x112200+id;
+    const wchar_t raw[]={L'N',0,static_cast<wchar_t>(0xd800+id),L'Z'};
+    result.fontName=CString(raw,4);return result;
+}
+static void named_add(TraceDocument& doc,const wchar_t* name,const STSStyle& value) {
+    STSStyle* owned=new STSStyle;*owned=value;doc.AddStyle(CString(name),owned);
+}
+static void named_stage(TraceDocument& doc,const char* label) {
+    printf("named-stage %s\n",label);doc.Dump(label);
+}
+static void named_style_lifecycle() {
+    TraceDocument source(0),destination(1);
+    unsigned before0=change_events[0],before1=change_events[1];
+    const STSStyle first=named_value(1),second=named_value(2),third=named_value(3);
+    named_add(source,L"Named",first);named_add(source,L"Named2",second);named_add(source,L"Named3",third);
+    source.AddSTSEntryOnly(CStringW(L"rename target"),true,0,10,CString(L"Named"));
+    source.AddSTSEntryOnly(CStringW(L"collision stays"),true,10,20,CString(L"Named2"));
+    named_stage(source,"named-initial");
+    // Native CString font equality ignores the suffix, but retained storage must
+    // keep the original full font units when the incoming equal value is freed.
+    STSStyle equal=first;equal.fontName.SetAt(2,0xdcff);
+    check(equal==first,"native equal duplicate fixture");
+    named_add(source,L"Named",equal);check(source.NamedCount()==3,"equal duplicate count");
+    named_stage(source,"named-equal-duplicate");
+    named_add(source,L"Named",second);check(source.NamedCount()==4,"conflict count");
+    check(source.Entry(0).style==L"Named4"&&source.Entry(1).style==L"Named2","collision rename feedback");
+    named_stage(source,"named-conflict-collision");
+    source.AddSTSEntryOnly(CStringW(L"second rename"),true,20,30,CString(L"Named"));
+    named_add(source,L"Named",third);check(source.Entry(2).style==L"Named5","second suffix collision");
+    named_add(source,L"Named9",first);named_add(source,L"Named10",second);
+    source.AddSTSEntryOnly(CStringW(L"numeric suffix"),true,30,40,CString(L"Named9"));
+    named_add(source,L"Named9",third);check(source.Entry(3).style==L"Named11","numeric suffix collision");
+    named_stage(source,"named-numeric-collision");
+    check(destination.CopyNames(source,false),"replace named copy");
+    named_stage(destination,"named-copy-replace");source.Dump("named-copy-source");
+    named_add(destination,L"Named",first);
+    named_stage(destination,"named-copy-independent");source.Dump("named-independent-source");
+    // Append routes every row through actual AddStyle, preserving map traversal,
+    // duplicate equality and conflict rename sequencing.
+    check(destination.CopyNames(source,true),"append named copy");
+    named_stage(destination,"named-copy-append");source.Dump("named-append-source");
+    check(destination.CopyNames(destination,false),"self named replace");
+    check(destination.NamedCount()==0,"self named replace clears before reading");
+    named_stage(destination,"named-self-clear");
+    check(destination.CopyNames(source,false),"copy after self clear");
+    destination.Empty();check(destination.NamedCount()==0,"Empty frees named styles");
+    named_stage(destination,"named-empty");
+    check(change_events[0]==before0&&change_events[1]==before1,"named operations do not notify");
+}
+struct SavedFiles {
+    CString name;
+    explicit SavedFiles(const wchar_t* value):name(value){DeleteFile(name);DeleteFile(name+L".style");}
+    ~SavedFiles(){DeleteFile(name);DeleteFile(name+L".style");}
+};
+static void saved_bytes(const CString& path,const char* label,bool expected) {
+    const bool exists=GetFileAttributes(path)!=INVALID_FILE_ATTRIBUTES;
+    printf("saved-file %s exists=%d",label,exists);check(exists==expected,"export file presence");
+    if(!exists){printf("\n");return;}
+    CFile file;check(file.Open(path,CFile::modeRead|CFile::typeBinary)!=FALSE,"read saved file");
+    const ULONGLONG length=file.GetLength();check(length>0&&length<=1024*1024,"saved file exceeds bounded trace or is empty");
+    std::vector<BYTE> bytes(static_cast<size_t>(length));
+    check(file.Read(bytes.data(),static_cast<UINT>(bytes.size()))==bytes.size(),"short saved file read");
+    printf(" bytes=%zu",bytes.size());for(BYTE byte:bytes)printf(" %02x",unsigned(byte));printf("\n");
+}
+static void named_style_exports() {
+    TraceDocument document(0);STSStyle first=named_value(1),second=named_value(2);
+    first.fontName=L"Arial";second.fontName=L"Courier New";
+    named_add(document,L"Default",first);named_add(document,L"Export",second);
+    document.AddSTSEntryOnly(CStringW(L"ordinary export\nsecond line"),true,1000000,20000000,CString(L"Export"),CString(L"actor"));
+    document.AddSTSEntryOnly(CStringW(L"default export"),true,21000000,30000000,CString(L"Default"));
+    const exttype types[]={EXTSSA,EXTASS,EXTSRT};
+    const wchar_t* paths[]={L"document-lifecycle-save.ssa",L"document-lifecycle-save.ass",L"document-lifecycle-save.srt"};
+    const char* labels[]={"ssa","ass","srt"};
+    for(int i=0;i<3;++i){SavedFiles files(paths[i]);
+        check(document.SaveAs(files.name,types[i],25.0,CTextFile::UTF8),"named style SaveAs");
+        saved_bytes(files.name,labels[i],true);
+        saved_bytes(files.name+L".style",i==0?"ssa-sidecar":i==1?"ass-sidecar":"srt-sidecar",i==2);
+    }
+    document.Empty();
+    document.AddSTSEntryOnly(CStringW(L"without mapped default"),true,0,10000000,CString(L"Default"));
+    SavedFiles absent(L"document-lifecycle-no-sidecar.srt");
+    check(document.SaveAs(absent.name,EXTSRT,25.0,CTextFile::UTF8),"no mapped style SaveAs");
+    saved_bytes(absent.name,"srt-no-map",true);saved_bytes(absent.name+L".style","srt-no-map-sidecar",false);
+}
 int main() {
     try {
         if(!AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0))throw std::runtime_error("AfxWinInit failed");
         printf("provenance pointer_bits=%zu\n",sizeof(void*)*8);
         printf("environment ansi=%u oem=%u\n",GetACP(),GetOEMCP());
         default_style_lifecycle();
+        named_style_lifecycle();
+        named_style_exports();
         {
             TraceDocument source(0),destination(1);populate(source);populate(destination);
             unsigned notifications=change_events[1];
@@ -251,7 +373,7 @@ int main() {
             notifications=change_events[1];destination.Empty();destination.Empty();destination.Dump("repeated-empty");
             check(change_events[1]==notifications,"Empty does not notify");
             destination.Copy(source);destination.Copy(destination);destination.Dump("self-copy");
-            check(destination.Entries()==0&&destination.Segments()==0&&destination.m_styles.GetCount()==0,"self-copy reads after Empty");
+            check(destination.Entries()==0&&destination.Segments()==0&&destination.NamedCount()==0,"self-copy reads after Empty");
             check(destination.m_dstScreenSize==CSize(0,0),"self-copy screen size reset");
             source.Copy(source);source.Dump("source-self-copy");
             populate(source);source.Dump("nonempty-before-destruction");

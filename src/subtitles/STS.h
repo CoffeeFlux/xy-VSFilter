@@ -193,7 +193,13 @@ public:
     bool           m_fScaledBAS;
     CSize          m_layout_size;
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+private:
+#endif
     CSTSStyleMap   m_styles;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+public:
+#endif
 
     bool           m_fForcedDefaultStyle;
 #ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
@@ -312,8 +318,11 @@ public:
     void OrSegmentAnimated(int iSegment, bool animated);
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    // Native-backed value access. Style/default storage remains canonical here;
+    // Native-backed named-style access; supplied default storage is Rust-owned;
     // enumeration copies only one requested row and exposes no map/pointee loan.
+    enum class NamedStyleLookup { Missing, Null, Value };
+    NamedStyleLookup LookupNamedStyle(LPCWSTR name, STSStyle* output = NULL) const;
+    bool CopyNamedStylesFrom(const CSimpleTextSubtitle& source, bool fAppend = false);
     size_t GetStyleCount() const;
     bool HasNamedStyle(LPCWSTR name) const;
     bool GetNamedStyleCopy(const CString& name, STSStyle& value) const;
@@ -341,7 +350,9 @@ public:
 
     friend bool OpenMicroDVD(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet);
 private:
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     bool CopyStyles(const CSTSStyleMap& styles, bool fAppend = false);
+#endif
 };
 
 extern BYTE   CharSetList[];

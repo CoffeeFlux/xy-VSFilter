@@ -796,6 +796,24 @@ Rust-text-only STS code against `b49b367a`; this is source evidence, not native
 compilation. Allocation/failure timing, allocator reentry and real-host lifetime
 remain explicit experimental gates before a default switch.
 
+### Named-style boundary isolation
+
+The experimental named-style map is now private. Copying takes another document
+instead of exposing `CSTSStyleMap`; logging, unknown-style checks and SSA/ASS or
+sidecar export consume value/scalar accessors. The native map remains its sole
+canonical owner until the exact ATL ordering contract has been reproduced.
+No persistent Rust/native mirror is introduced by this step.
+
+Copy preserves clearing the destination before enumerating the source, including
+self replacement, and calls native AddStyle separately for each copied row.
+Missing and present-null lookups remain distinct. Value materialization adds
+allocation points, so allocation-failure/reentry timing remains unvalidated.
+The paired full-class probe adds nine named-style lifecycle stages and compares
+exact SSA/ASS/SRT export bytes and sidecar presence. It invokes the pinned private
+CopyStyles through the class's existing friend declaration, without copying its
+implementation or changing its access specifiers. Windows results for this
+increment are pending; local trace controls and native-source generation pass.
+
 ## Independent audit and unsafe boundary
 
 The user-requested independent audit is recorded in
