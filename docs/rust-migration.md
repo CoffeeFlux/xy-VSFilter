@@ -20,6 +20,20 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust recognizes the leading settings line removed by `WebVTTCueStrip`.
+  It retains the five exact lowercase prefixes, first-newline lookup stopping
+  at NUL, and refusal to strip an initial newline. The selected deletion ends
+  before the newline; native `Delete` and `TrimLeft` preserve their order and
+  actual Windows whitespace classification. There is no retained input borrow.
+  Fatal ASan/UBSan comparisons passed **83,200 cases** on arm64 and under x64
+  execution: **69,652 changed strings**, **139,334 native operations**, **60
+  injected interruptions** and **602 strings changed between deletion and
+  trimming**. Every post-newline UTF-16 code unit is compared. Windows uses
+  installed ATL strings; portable trimming uses the host whitespace classifier,
+  so comparisons are within each platform. Rust tests (61 core, 38 FFI), strict
+  Clippy and both default-branch syntax checks pass. Windows/Miri validation is
+  pending. This does not resolve the separately recorded WebVTT insertion
+  outcome or establish complete WebVTT host parity.
 * Safe Rust owns the UTF-16 text produced by `SubRipper2SSA`, applying the six
   original case-sensitive italic/bold/underline replacements in their original
   order. The native public string interface remains unchanged; the source is
@@ -34,7 +48,7 @@ unresolved reference outcomes requiring investigation, never matching results.
   case. Only stable tag-free NUL cases enter reference comparison; tag-bearing
   NUL cases are excluded. Windows uses installed ATL strings for the oracle.
   Rust tests (60 core, 37 FFI), strict Clippy and default-branch syntax checks
-  pass. The renderer corpus now has **370 cases / 4,430 scheduled frames**, with
+  pass. The renderer corpus now has **370 cases / 4,510 scheduled frames**, with
   eight new SRT files and visible italic/underline control pairs in file and
   memory modes. Windows/Miri and actual renderer validation are pending.
 * Safe Rust selects DVD polygon-to-ASS commands and formats their signed decimal
@@ -74,7 +88,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   operations are modeled; source/output aliasing and all-zero arbitrary run
   tables are excluded from reference parity. Rust tests (57 core, 35 FFI),
   strict Clippy and both default native branch syntax checks pass.
-  Windows/Miri validation is pending for this increment.
+  Candidate `6b0c9a75` passed all four CI platforms, Miri and both Windows DLL
+  jobs. Each DLL job matched **354 cases / 4,334 frames** and **32 mutations /
+  224 frames**, dialogs, visible controls, exports and dependencies. Both logs
+  confirm Rust-enabled `VobSubImage.cpp` compilation.
+  [DVD split evidence](vobsub-split-evidence.json) records verified source/DLL
+  hashes, stable local validation and extraction normalization.
 * Safe Rust selects circular outline segments for `GrabSegment`, preserving
   zero-direction skipping, the first repeated direction, wrapped midpoint
   indices, signed coordinate rounding and the returned previous-corner index.

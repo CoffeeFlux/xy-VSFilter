@@ -55,7 +55,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
               ROOT / "include/xy_rust_drawing.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
-              ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h",
+              ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h",
               ROOT / "include/xy_rust_segments.h",
               ROOT / "include/xy_rust_segment_insert.h",
               ROOT / "include/xy_rust_hdmv.h",
@@ -143,6 +143,14 @@ public:
         font += text[start:end] + '\n decoded.assign((BYTE*)pData, (BYTE*)pData + datalen);\n return true;\n}\n}\n'
         font += "#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_font.h").write_text(font, encoding="utf-8")
+    webvtt = '#include "webvtt_shell.h"\n'
+    for name, content in (("ReferenceWebVTT", font_source), ("CandidateWebVTT", candidate_font)):
+        webvtt += f"namespace {name} {{\n"
+        if name == "CandidateWebVTT":
+            webvtt += "#define XY_VSFILTER_RUST_TEXT\n"
+        webvtt += extract_definition(content.decode("utf-8-sig"), "static void WebVTTCueStrip(") + "\n"
+        webvtt += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_webvtt.h").write_text(webvtt, encoding="utf-8")
     subrip = '#include "subrip_shell.h"\n'
     for name, content in (("ReferenceSubRip", font_source), ("CandidateSubRip", candidate_font)):
         subrip += f"namespace {name} {{\n"
@@ -809,6 +817,14 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     subrip_result = run([str(subrip_executable)], capture_output=True, text=True)
     print(subrip_result.stdout, end="", flush=True)
     print(subrip_result.stderr, end="", file=sys.stderr)
+    webvtt_executable = destination / ("webvtt-oracle.exe" if os.name == "nt" else "webvtt-oracle")
+    webvtt_compile = [arg.replace("fill_oracle.cpp", "webvtt_oracle.cpp").replace("fill-oracle", "webvtt-oracle") for arg in fill_compile]
+    if os.name == "nt":
+        webvtt_compile += ["/D_UNICODE", "/DUNICODE"]
+    run(webvtt_compile)
+    webvtt_result = run([str(webvtt_executable)], capture_output=True, text=True)
+    print(webvtt_result.stdout, end="", flush=True)
+    print(webvtt_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -852,6 +868,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "vobsub_scale_result": vobsub_scale_result.stdout, "vobsub_scale_stderr": vobsub_scale_result.stderr,
         "vobsub_outline_compile_command": vobsub_outline_compile,
         "vobsub_outline_result": vobsub_outline_result.stdout, "vobsub_outline_stderr": vobsub_outline_result.stderr,
+        "webvtt_compile_command": webvtt_compile,
+        "webvtt_result": webvtt_result.stdout, "webvtt_stderr": webvtt_result.stderr,
+        "webvtt_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring model with host iswspace; Windows comparison required",
         "subrip_compile_command": subrip_compile,
         "subrip_result": subrip_result.stdout, "subrip_stderr": subrip_result.stderr,
         "subrip_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring replacement model; Windows comparison required",
