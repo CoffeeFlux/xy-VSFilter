@@ -21,6 +21,9 @@
 
 #include "stdafx.h"
 #include "VobSubImage.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "xy_rust_vobsub.h"
+#endif
 #include "RTS.h"
 #include <math.h>
 #include <algorithm>
@@ -158,6 +161,31 @@ bool CVobSubImage::Decode(BYTE* lpData, size_t packetSize, size_t dataSize, int 
 
 void CVobSubImage::GetPacketInfo(const BYTE* lpData, size_t packetSize, size_t dataSize, int t /*= INT_MAX*/)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    const uintptr_t packet_begin = reinterpret_cast<uintptr_t>(lpData);
+    const uintptr_t object_begin = reinterpret_cast<uintptr_t>(this);
+    const uintptr_t address_max = static_cast<uintptr_t>(-1);
+    if (packetSize <= address_max - packet_begin && sizeof(*this) <= address_max - object_begin
+            && (packet_begin + packetSize <= object_begin || object_begin + sizeof(*this) <= packet_begin)) {
+        XyVobSubPacketPatch patch;
+        if (xy_vsfilter_vobsub_packet(lpData, packetSize, dataSize, t, &patch)) {
+            tCurrent = patch.current;
+            if (patch.flags & 1) fForced = patch.forced != 0;
+            if (patch.flags & 2) delay = patch.delay;
+            if (patch.flags & 4) rect = CRect(patch.left, patch.top, patch.right, patch.bottom);
+            if (patch.flags & 8) {
+                nOffset[0] = patch.offsets[0];
+                nOffset[1] = patch.offsets[1];
+            }
+            for (size_t index = 0; index < 4; ++index) {
+                pal[index].pal = (patch.palette >> (index * 4)) & 15;
+                pal[index].tr = (patch.transparency >> (index * 4)) & 15;
+            }
+            fAnimated = patch.animated != 0;
+            return;
+        }
+    }
+#endif
     //  delay = 0;
 
     size_t i, nextctrlblk = dataSize;

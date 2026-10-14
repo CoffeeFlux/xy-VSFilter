@@ -32,3 +32,5 @@ pub mod transpose;
 pub mod byte_float;
 
 pub mod gauss_integer;
+
+pub mod vobsub_packet;
