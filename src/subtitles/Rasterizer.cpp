@@ -24,6 +24,7 @@
 #include "xy_rust_path_align.h"
 #include "xy_rust_path_buffer.h"
 #include "xy_rust_span_coverage.h"
+#include "xy_rust_plane.h"
 #include "xy_rust_spans.h"
 #endif
 #include <string.h>
@@ -411,21 +412,39 @@ bool Rasterizer::Rasterize(const ScanLineData2& scan_line_data2, int xsub, int y
     overlay->mOverlayHeight = ((height+7)>>3) + 1;
     overlay->mOverlayPitch = (overlay->mOverlayWidth+15)&~15;
 
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::PlaneAllocation rust_body(overlay->mOverlayPitch * overlay->mOverlayHeight);
+    BYTE* body = rust_body.Ready() ? rust_body.Data() : reinterpret_cast<BYTE*>(xy_malloc(overlay->mOverlayPitch * overlay->mOverlayHeight));
+#else
     BYTE* body = reinterpret_cast<BYTE*>(xy_malloc(overlay->mOverlayPitch * overlay->mOverlayHeight));
+#endif
     if( body==NULL )
     {
         return false;
     }
+#ifdef XY_VSFILTER_RUST_TEXT
+    if(rust_body.Ready()) rust_body.Attach(overlay->mBody);
+    else
+#endif
     overlay->mBody.reset(body, xy_free);
     memset(body, 0, overlay->mOverlayPitch * overlay->mOverlayHeight);
     BYTE* border = NULL;
     if (!overlay->mfWideOutlineEmpty)
     {
+#ifdef XY_VSFILTER_RUST_TEXT
+        XyRust::PlaneAllocation rust_border(overlay->mOverlayPitch * overlay->mOverlayHeight);
+        border = rust_border.Ready() ? rust_border.Data() : reinterpret_cast<BYTE*>(xy_malloc(overlay->mOverlayPitch * overlay->mOverlayHeight));
+#else
         border = reinterpret_cast<BYTE*>(xy_malloc(overlay->mOverlayPitch * overlay->mOverlayHeight));
+#endif
         if (border==NULL)
         {
             return false;
         }
+#ifdef XY_VSFILTER_RUST_TEXT
+        if(rust_border.Ready()) rust_border.Attach(overlay->mBorder);
+        else
+#endif
         overlay->mBorder.reset(border, xy_free);
         memset(border, 0, overlay->mOverlayPitch * overlay->mOverlayHeight);
     }

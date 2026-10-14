@@ -20,6 +20,28 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Rust owns the initial aligned body and border planes created by Rasterize.
+  The core allocates 16-byte-aligned blocks of output-only `MaybeUninit` bytes;
+  native memset initializes the logical plane before consumption. One mutable
+  loan remains live through native/FFI pixel operations, and the existing native
+  shared pointer carries the unique Rust deleter until its last reference ends.
+  Logical allocation counts preserve `g_xy_malloc_used_size` cache accounting.
+  Fatal ASan/UBSan comparisons pass on arm64 and under x64 execution: **51,668
+  whole-Rasterize calls / 17,891,892 plane bytes and metadata / 604,938 logical
+  allocation-cleanup observations**, including **74,478 Rust owners / loans /
+  releases** and **37,239 retained shared planes** surviving overlay cleanup.
+  Plane alignment, per-call byte-accounting deltas and final zero accounting
+  are checked. The focused oracle models allocation failure; native allocation
+  guards and Rust ownership checks have separate scopes. Rust 1.85 tests
+  (142 core, 92 FFI), strict Clippy, default syntax and Python checks pass.
+  The corpus remains **746 cases**; Windows/Miri and actual DLL checks are
+  pending. Blur/shift-created planes, native pixel consumers, actual OOM,
+  native shared-pointer control-block failures and host integration remain work.
+* Temporary GDI path-buffer ownership has completed all four portable CI targets,
+  Miri and both Windows renderer architectures. The **718-case / 7,530-frame**
+  corpus and **32 mutations / 224 frames** match on each architecture, alongside
+  exports and declared platform requirements. [Archived evidence](path-buffer-evidence.json)
+  keeps modeled breakpoint continuations separate from native parity.
 * Rust accumulates span coverage into the initialized body/border mask planes.
   It preserves endpoint fractions, wrapping byte additions, span order and valid
   linear backing addresses, including spans crossing logical row boundaries.

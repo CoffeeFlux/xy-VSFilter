@@ -110,5 +110,6 @@ pub mod ellipse_matrix;
 pub mod path_buffer;
 
 pub mod edge_storage;
+pub mod plane;
 pub mod scan_row;
 pub mod span_coverage;
