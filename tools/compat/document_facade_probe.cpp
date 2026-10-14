@@ -77,6 +77,19 @@ static void compare_queries(CSimpleTextSubtitle& doc) {
             check(snapshot.start==71 && snapshot.end==81 && snapshot.animated && snapshot.subs.GetCount()==1 && snapshot.subs[0]==917,"absent-output-untouched");
         }
         printf("containing %lld %d %d %d\n",t,index,count,containing);
+        int direct_shared=771,shared=772;
+        direct=reference.SearchSubs(t,24.0,&direct_shared,&direct_shared);
+        const bool alias_next=doc.FindNextSegment(t,24.0,&shared,&shared);
+        check(alias_next==(direct!=NULL)&&shared==direct_shared,"next-aliased-output-write-order");
+        printf("next-alias %lld %d %d\n",t,shared,alias_next);
+        direct_shared=771;shared=772;
+        direct=reference.SearchSubs2(t,24.0,&direct_shared,&direct_shared);
+        STSSegment alias_snapshot(71,81);alias_snapshot.animated=true;alias_snapshot.subs.Add(917);
+        const bool alias_containing=doc.SearchSubs2Snapshot(t,24.0,alias_snapshot,&shared,&shared);
+        check(alias_containing==(direct!=NULL)&&shared==direct_shared,"containing-aliased-output-write-order");
+        if(!direct)check(alias_snapshot.start==71&&alias_snapshot.end==81&&alias_snapshot.animated&&alias_snapshot.subs.GetCount()==1&&alias_snapshot.subs[0]==917,"aliased-miss-snapshot-untouched");
+        printf("containing-alias %lld %d %d\n",t,shared,alias_containing);
+
     }
     for(int i=-1;i<=static_cast<int>(doc.m_segments.GetCount());++i) {
         size_t count=987;

@@ -25,6 +25,13 @@
 #include <wxutil.h>
 #include "TextFile.h"
 #include "GFN.h"
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+#ifndef XY_VSFILTER_RUST_TEXT
+#error XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL requires XY_VSFILTER_RUST_TEXT
+#endif
+#include <memory>
+namespace XyRust { class DocumentOwner; }
+#endif
 
 typedef enum {TIME, FRAME} tmode; // the meaning of STSEntry::start/end
 
@@ -163,8 +170,12 @@ class CSimpleTextSubtitle
     friend class CSubtitleEditorDlg;
 
 protected:
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    std::unique_ptr<XyRust::DocumentOwner> m_document;
+#else
     CAtlArray<STSEntry>   m_entries;
     CAtlArray<STSSegment> m_segments;
+#endif
     virtual void OnChanged() {}
 
 public:
@@ -267,6 +278,7 @@ public:
     //@iSegment: return the index, 0 based, of the STSSegment found, return STSSegments count if all STSSegments' stop time are NOT bigger than @t
     //@nSegment: return the STSSegments count
     //@return: the ptr to the STSSegment found, return NULL if such STSSegment not exist
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     const STSSegment* SearchSubs(REFERENCE_TIME t, double fps, /*[out]*/ int* iSegment = NULL, int* nSegments = NULL);
 
     //find STSSegment with a duration containing @t, i.e. with a start time <= @t and a stop time > @t
@@ -276,10 +288,12 @@ public:
     STSSegment* SearchSubs2(REFERENCE_TIME t, double fps, /*[out]*/ int* iSegment=NULL, int* nSegments=NULL);
 
     const STSSegment* GetSegment(int iSegment) {return iSegment >= 0 && iSegment < (int)m_segments.GetCount() ? &m_segments[iSegment] : NULL;}
+#endif
 
     // Internal value/scalar access surface. Snapshots own their strings/members;
     // no caller retains a pointer into the document arrays through this surface.
     size_t GetEntryCount() const;
+    size_t GetSegmentCount() const;
     STSEntry GetEntrySnapshot(int i) const;
     REFERENCE_TIME GetEntryEnd(int i) const;
     int GetEntryLayer(int i) const;

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate/run Windows ATL/CRT primitives and native facade checks (no Rust parity).
+"""Generate/run Windows ATL/CRT primitives, facades and experimental Rust owner checks.
 
 Run from an x86 or x64 VS developer prompt with ATL installed. --generate-only
 works on macOS. No unsafe reference histories, network calls or production writes.
@@ -12,6 +12,7 @@ from pathlib import Path
 import platform
 import re
 import shutil
+import shlex
 import subprocess
 import sys
 
@@ -66,6 +67,7 @@ def run_facade(out, generate_only):
     segment = function(header, "class STSSegment") + ";"
     facade_signatures = [
         "size_t CSimpleTextSubtitle::GetEntryCount(",
+        "size_t CSimpleTextSubtitle::GetSegmentCount(",
         "STSEntry CSimpleTextSubtitle::GetEntrySnapshot(",
         "REFERENCE_TIME CSimpleTextSubtitle::GetEntryEnd(",
         "int CSimpleTextSubtitle::GetEntryLayer(",
@@ -195,6 +197,216 @@ def run_facade(out, generate_only):
     save()
 
 
+def run_owner(out, generate_only):
+    """Real ATL records + exact experimental wrapper versus pinned storage tails."""
+    out.mkdir(parents=True, exist_ok=True)
+    report_path = out / "report.json"
+    report = {"schema": 1, "complete": False, "reference_commit": PIN,
+              "kind": "experimental-actual-ATL-Rust-owner-isolation", "rust_parity": False}
+    def save():
+        report_path.write_text(json.dumps(report, indent=2) + "\n")
+    save()
+    runner = Path(__file__).resolve()
+    paths = ["src/subtitles/STS.h", "src/subtitles/STS.cpp", "src/subtitles/RustDocumentOwner.h",
+             "include/xy_rust_document.h", "tools/compat/document_owner_probe.cpp",
+             "Cargo.toml", "Cargo.lock", "rust/compat/Cargo.toml", "rust/ffi/Cargo.toml"]
+    paths += [str(p.relative_to(ROOT)) for parent in (ROOT / "rust/compat/src", ROOT / "rust/ffi/src")
+              for p in parent.rglob("*.rs")]
+    inputs = {path: (ROOT / path).read_bytes() for path in paths}
+    pinned_paths = ["src/subtitles/STS.h", "src/subtitles/STS.cpp", "src/subtitles/RTS.cpp"]
+    pinned_bytes = {path: source(path) for path in pinned_paths}
+    report.update(runner_sha256=sha(runner.read_bytes()),
+                  candidate_commit=subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, timeout=60).decode().strip(),
+                  candidate_source_sha256={p: sha(b) for p, b in inputs.items()},
+                  reference_source_sha256={p: sha(b) for p, b in pinned_bytes.items()})
+    def decode(value):
+        return value.decode("utf-8-sig").replace("\r\n", "\n")
+    pinned_header = decode(pinned_bytes[pinned_paths[0]])
+    pinned = decode(pinned_bytes[pinned_paths[1]])
+    current = decode(inputs["src/subtitles/STS.cpp"])
+    entry_pattern = r"typedef struct\s*\{[^}]+\} STSEntry;"
+    entry = re.search(entry_pattern, pinned_header).group(0)
+    if re.search(entry_pattern, decode(inputs["src/subtitles/STS.h"])).group(0) != entry:
+        raise RuntimeError("Experimental owner probe requires unchanged STSEntry value declaration")
+    segment = function(pinned_header, "class STSSegment") + ";"
+    if function(decode(inputs["src/subtitles/STS.h"]), "class STSSegment") + ";" != segment:
+        raise RuntimeError("Experimental owner probe requires unchanged STSSegment value declaration")
+    (out / "STS.h").write_bytes(("#pragma once\n" + entry + "\n" + segment + "\n").encode())
+    shutil.copyfile(ROOT / "src/subtitles/RustDocumentOwner.h", out / "RustDocumentOwner.h")
+    shutil.copyfile(ROOT / "tools/compat/document_owner_probe.cpp", out / "document_owner_probe.cpp")
+    reference = ["""class PinnedOwner { public:
+ enum {TIME,FRAME}; int m_mode=TIME,m_subtitleType=0; unsigned callbacks=0;
+ CAtlArray<STSEntry> m_entries; CAtlArray<STSSegment> m_segments;
+ void OnChanged(){++callbacks;} void LogSegments(const CAtlArray<STSSegment>&){}
+ void AddPrepared(STSEntry sub,uint32_t mode);void EntryOnly(STSEntry sub);
+ void CreateSegments();void RemoveAllEntries();void ClearStorage();void CopyStorage(PinnedOwner& sts);
+ void SetText(int i,const CStringW& str,int flag);void RenameStyle(const CString& name,const CString& name3);
+ void AnimationOr(int i,bool animated);void CorrectLastEnd(REFERENCE_TIME bound);
+ void ReplaceTimes(const std::vector<std::pair<int64_t,int64_t>>& times);void Sort(bool fRestoreReadorder);
+ int SearchSub(REFERENCE_TIME,double);const STSSegment* SearchSubs(REFERENCE_TIME,double,int*,int*);
+ STSSegment* SearchSubs2(REFERENCE_TIME,double,int*,int*);
+ REFERENCE_TIME TranslateStart(int,double);REFERENCE_TIME TranslateSegmentStart(int,double);REFERENCE_TIME TranslateSegmentEnd(int,double);
+};""", function(pinned, "static bool SegmentCompStart(")]
+    add = function(pinned, "void CSimpleTextSubtitle::Add(")
+    order_start = add.index("    sub.readorder  =")
+    reference += ["void PinnedOwner::AddPrepared(STSEntry sub,uint32_t mode){m_subtitleType=mode==2?EXTVTT:0;if(mode==1){EntryOnly(sub);return;}auto start=sub.start,end=sub.end;int readorder=sub.readorder;\n"
+                  + add[order_start:add.index(";", order_start)+1] + "\n"
+                  + add[add.index("    int n = (int)m_entries.GetCount();"):]]
+    append = function(pinned, "void CSimpleTextSubtitle::AddSTSEntryOnly(")
+    reference += ["void PinnedOwner::EntryOnly(STSEntry sub){int readorder=sub.readorder;\n" + append[append.index("    sub.readorder  ="):]]
+    complete_signatures = ["void CSimpleTextSubtitle::CreateSegments()", "void CSimpleTextSubtitle::RemoveAllEntries()",
+                          "int CSimpleTextSubtitle::SearchSub(", "const STSSegment* CSimpleTextSubtitle::SearchSubs(",
+                          "STSSegment* CSimpleTextSubtitle::SearchSubs2(", "REFERENCE_TIME CSimpleTextSubtitle::TranslateStart(",
+                          "REFERENCE_TIME CSimpleTextSubtitle::TranslateSegmentStart(", "REFERENCE_TIME CSimpleTextSubtitle::TranslateSegmentEnd(",
+                          "template <typename T> int SGN", "static int comp1(", "static int comp2(", "void CSimpleTextSubtitle::Sort("]
+    reference += [function(pinned, sig).replace("CSimpleTextSubtitle::", "PinnedOwner::") for sig in complete_signatures]
+    empty = function(pinned, "void CSimpleTextSubtitle::Empty()")
+    copy = function(pinned, "void CSimpleTextSubtitle::Copy(")
+    reference += ["void PinnedOwner::ClearStorage(){\n" + empty[empty.index("    m_segments.RemoveAll();"):],
+                  "void PinnedOwner::CopyStorage(PinnedOwner& sts){\n" + copy[copy.index("    m_segments.Copy(sts.m_segments);"):]]
+    prepared_assignment = "stse.str = str;"
+    flag_assignment = "stse.fUnicode = fUnicode;"
+    if prepared_assignment not in function(pinned, "void CSimpleTextSubtitle::SetStr(") or flag_assignment not in function(pinned, "void CSimpleTextSubtitle::ConvertUnicode("):
+        raise RuntimeError("Pinned prepared-text assignment extraction failed")
+    reference += ["void PinnedOwner::SetText(int i,const CStringW& str,int flag){STSEntry& stse=m_entries.GetAt(i);" + prepared_assignment
+                  + "if(flag>=0){bool fUnicode=flag!=0;" + flag_assignment + "}}"]
+    style = function(pinned, "void CSimpleTextSubtitle::AddStyle(")
+    rename_start = style.index("        for (size_t j = 0, count = m_entries.GetCount();")
+    reference += ["void PinnedOwner::RenameStyle(const CString& name,const CString& name3){\n" + function(style[rename_start:], "for (size_t j = 0, count = m_entries.GetCount();") + "\n}"]
+    animation = "stss->animated |= s->m_fAnimated2;"
+    correction = "stse.end = min(stse.end, MS2RT(start));"
+    if animation not in decode(pinned_bytes[pinned_paths[2]]) or correction not in pinned:
+        raise RuntimeError("Pinned animation/correction extraction failed")
+    reference += ["void PinnedOwner::AnimationOr(int i,bool animated){STSSegment* stss=&m_segments.GetAt(i);struct Value{bool m_fAnimated2;} value{animated};Value* s=&value;" + animation + "}",
+                  "void PinnedOwner::CorrectLastEnd(REFERENCE_TIME bound){if(m_entries.GetCount()){STSEntry& stse=m_entries[m_entries.GetCount()-1];" + correction.replace("MS2RT(start)", "bound") + "}}"]
+    converted = function(pinned, "void CSimpleTextSubtitle::ConvertToTimeBased(")
+    loop = function(converted, "for(int i = 0, j = m_entries.GetCount();")
+    loop = loop.replace("std::llround(stse.start * UNITS_FLOAT / fps)", "times[i].first").replace("std::llround(stse.end * UNITS_FLOAT / fps)", "times[i].second")
+    if "llround" in loop:
+        raise RuntimeError("Pinned conversion-assignment extraction failed")
+    reference += ["void PinnedOwner::ReplaceTimes(const std::vector<std::pair<int64_t,int64_t>>& times){if(times.size()!=m_entries.GetCount())throw std::runtime_error(\"time count\");" + loop + "CreateSegments();}"]
+    facade_signatures = ["size_t CSimpleTextSubtitle::GetSegmentCount(", "REFERENCE_TIME CSimpleTextSubtitle::TranslateSegmentStart(",
+                         "REFERENCE_TIME CSimpleTextSubtitle::TranslateSegmentEnd(", "bool CSimpleTextSubtitle::FindNextSegment(",
+                         "bool CSimpleTextSubtitle::SearchSubs2Snapshot("]
+    bodies = [function(current, sig).replace("CSimpleTextSubtitle::", "ExperimentalFacade::") for sig in facade_signatures]
+    declarations = [body[:body.index("{")].replace("ExperimentalFacade::", "").strip() + ";" for body in bodies]
+    reference += ["class ExperimentalFacade { public:enum{TIME,FRAME};int m_mode=TIME;XyRust::DocumentOwner* m_document;explicit ExperimentalFacade(XyRust::DocumentOwner& owner):m_document(&owner){}\n" + "\n".join(declarations) + "\n};\n" + "\n".join(bodies)]
+    generated = out / "document_owner_reference.inc"
+    generated.write_bytes(("\n\n".join(reference) + "\n").encode())
+    report.update(generated_sha256={p: sha((out / p).read_bytes()) for p in
+                                   ["STS.h", "RustDocumentOwner.h", "document_owner_probe.cpp", generated.name]},
+                  complete_reference_methods=complete_signatures,
+                  extracted_experimental_facade_methods=facade_signatures,
+                  seams=["Add/AddSTSEntryOnly from initialized record/readorder assignment; native preparation bypassed",
+                         "Copy storage tail and Empty arrays tail only; native style/metadata lifecycle excluded",
+                         "SetStr prepared assignment and optional ConvertUnicode flag assignment only",
+                         "Actual AddStyle entry-rename loop; style map/duplicate naming excluded",
+                         "RTS animation OR assignment and MicroDVD correction with precomputed bound",
+                         "Native conversion assignment loop with caller-precomputed times, then rebuild",
+                         "Full native Sort selects a permutation; owner applies indexes and rebuilds"],
+                  limits=["Actual wrapper and ATL values, minimal pinned-owner/current-facade shells; not whole class ABI or renderer integration",
+                          "TIME queries and bounded FRAME translation remain native CRT on both sides; no numeric port claim",
+                          "No callback/reentry/concurrency/allocation-failure parity; destructor failure remains experimental unresolved contract",
+                          "Known unresolved WebVTT end and stale-index Add histories are not executed"],
+                  adapter_constants={"UNITS_FLOAT": 10000000.0},
+                  toolchain_status="Recorded Windows headers/static CRT/compiler environment, not a frozen reference build")
+    save()
+    if generate_only:
+        report.update(generated=True, generation_only=True)
+        save()
+        return
+    if os.name != "nt":
+        raise SystemExit("Actual document owner execution requires Windows ATL")
+    target = {"x86": "i686-pc-windows-msvc", "x64": "x86_64-pc-windows-msvc"}.get(os.environ.get("VSCMD_ARG_TGT_ARCH"))
+    compiler = shutil.which("cl")
+    if not target or not compiler:
+        raise SystemExit("Owner probe requires an x86/x64 VS developer prompt")
+    environment = os.environ.copy()
+    environment.pop("CARGO_ENCODED_RUSTFLAGS", None)
+    environment["RUSTFLAGS"] = "-C target-feature=+crt-static"
+    cargo = ["rustup", "run", "1.85.0", "cargo", "rustc", "--locked", "--offline", "--release",
+             "-p", "xy-vsfilter-ffi", "--features", "native-runtime", "--target", target,
+             "--target-dir", str(ROOT / "target"), "--", "--print", "native-static-libs"]
+    report.update(rust_target=target, cargo_command=cargo, rustflags=environment["RUSTFLAGS"],
+                  compiler_sha256=sha(Path(compiler).read_bytes()),
+                  environment={k: os.environ.get(k) for k in ["VCToolsVersion", "VCToolsInstallDir", "WindowsSDKVersion", "WindowsSdkDir",
+                                                              "VSCMD_ARG_TGT_ARCH", "VSCMD_ARG_HOST_ARCH", "INCLUDE", "LIB"]})
+    save()
+    built_rust = subprocess.run(cargo, cwd=ROOT, env=environment, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=60)
+    (out / "rust-build.log").write_bytes(built_rust.stdout + built_rust.stderr)
+    match = re.search(r"native-static-libs: (.+)", built_rust.stderr.decode(errors="replace"))
+    if built_rust.returncode or not match:
+        report["unresolved_build"] = {"kind": "Rust static library", "exit_code": built_rust.returncode}
+        save()
+        raise SystemExit("Owner Rust build failed or link dependencies missing")
+    library = ROOT / "target" / target / "release/xy_vsfilter_ffi.lib"
+    report["static_library_sha256"] = sha(library.read_bytes())
+    exe = out / "document_owner_probe.exe"
+    command = [compiler, "/nologo", "/Bv", "/showIncludes", "/std:c++17", "/EHsc", "/O2", "/Oi", "/Ob2", "/MT", "/fp:precise",
+               "/DNDEBUG", "/DUNICODE", "/D_UNICODE", "/DNOMINMAX", "/DWINVER=0x0601", "/D_WIN32_WINNT=0x0601",
+               "/DXY_VSFILTER_RUST_TEXT", "/DXY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL", "/D_CRT_SECURE_NO_WARNINGS",
+               "/I" + str(ROOT / "include"), str(out / "document_owner_probe.cpp"), str(library), *shlex.split(match.group(1)),
+               "/Fe:" + str(exe), "/Fo:" + str(out / "document_owner_probe.obj"), "/link", "/VERBOSE:LIB"]
+    report["build_command"] = command
+    save()
+    compiled = subprocess.run(command, cwd=out, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=60)
+    (out / "build.log").write_bytes(compiled.stdout)
+    report["build_exit_code"] = compiled.returncode
+    headers, libraries = {}, {}
+    text = compiled.stdout.decode(errors="replace")
+    for line in text.splitlines():
+        match_header = re.search(r"([A-Za-z]:\\.+?)\s*$", line)
+        if match_header and Path(match_header.group(1)).is_file():
+            headers[match_header.group(1)] = sha(Path(match_header.group(1)).read_bytes())
+    for match_library in re.finditer(r"([A-Za-z]:\\[^\r\n]*?\.lib)(?=[:\s(]|$)", text, re.I):
+        if Path(match_library.group(1)).is_file():
+            libraries[match_library.group(1)] = sha(Path(match_library.group(1)).read_bytes())
+    report.update(included_header_sha256=headers, linker_observed_library_sha256=libraries,
+                  library_scope="Paths observed in /VERBOSE:LIB, including searched libraries; not proof all contributed code")
+    save()
+    if compiled.returncode:
+        raise SystemExit("Actual owner compile failed; see owner/build.log")
+    report["binary_sha256"] = sha(exe.read_bytes())
+    traces = []
+    for run in (1, 2):
+        try:
+            result = subprocess.run([str(exe)], cwd=out, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=30)
+        except subprocess.TimeoutExpired as error:
+            (out / f"trace-{run}.txt").write_bytes(error.stdout or b"")
+            (out / f"stderr-{run}.txt").write_bytes(error.stderr or b"")
+            report["unresolved_execution"] = {"run": run, "reason": "timeout", "seconds": 30}
+            save()
+            raise SystemExit("Actual owner probe timeout; unresolved")
+        (out / f"trace-{run}.txt").write_bytes(result.stdout)
+        (out / f"stderr-{run}.txt").write_bytes(result.stderr)
+        lines = result.stdout.splitlines()
+        expected_pointer = b"pointer=4" if target.startswith("i686") else b"pointer=8"
+        if (result.returncode or result.stderr or not lines or not lines[0].startswith(b"provenance ")
+                or expected_pointer not in lines[0] or lines[-1] != b"document-owner-v1 complete"
+                or b"owner-snapshot-isolation complete" not in lines
+                or not any(line.startswith(b"checks ") and b"negative-control=passed" in line for line in lines)
+                or any(not any(line.startswith(prefix) for line in lines) for prefix in
+                       (b"entry ", b"segment ", b"query ", b"facade-alias ", b"facade-frame-alias "))):
+            report["unresolved_execution"] = {"run": run, "exit_code": result.returncode, "reason": "assertion/stderr/incomplete/wrong architecture"}
+            save()
+            raise SystemExit("Actual owner observation failed; unresolved")
+        traces.append(result.stdout)
+    report.update(trace_sha256=[sha(t) for t in traces], repeat_equal=traces[0] == traces[1],
+                  trace_lines=len(traces[0].splitlines()), stderr_empty=True)
+    stable = (sha(runner.read_bytes()) == report["runner_sha256"]
+              and all(sha((ROOT / p).read_bytes()) == value for p, value in report["candidate_source_sha256"].items())
+              and all(sha((out / p).read_bytes()) == value for p, value in report["generated_sha256"].items())
+              and sha(exe.read_bytes()) == report["binary_sha256"]
+              and sha(library.read_bytes()) == report["static_library_sha256"]
+              and subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, timeout=60).decode().strip() == report["candidate_commit"])
+    report["candidate_stable"] = stable
+    if not stable or not report["repeat_equal"]:
+        save()
+        raise SystemExit("Owner source/binary changed or repeat differs; unresolved")
+    report.update(complete=True, rust_parity=True)
+    save()
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, required=True)
@@ -204,8 +416,9 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     # Invalidate any previous successful report before git/compiler execution.
     (out / "report.json").write_text(json.dumps({"schema": 1, "complete": False, "reference_commit": PIN}, indent=2) + "\n")
-    (out / "facade").mkdir(parents=True, exist_ok=True)
-    (out / "facade/report.json").write_text(json.dumps({"schema": 1, "complete": False, "reference_commit": PIN}, indent=2) + "\n")
+    for child in ("facade", "owner"):
+        (out / child).mkdir(parents=True, exist_ok=True)
+        (out / child / "report.json").write_text(json.dumps({"schema": 1, "complete": False, "reference_commit": PIN}, indent=2) + "\n")
     runner_path = Path(__file__).resolve()
     runner_hash = sha(runner_path.read_bytes())
     candidate_commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, timeout=60).decode().strip()
@@ -363,6 +576,7 @@ def main():
         report["generated"] = True
     (out / "report.json").write_text(json.dumps(report, indent=2) + "\n")
     run_facade(out / "facade", args.generate_only)
+    run_owner(out / "owner", args.generate_only)
     print(json.dumps({"output": str(out), "generation_only": args.generate_only,
                       "reference_commit": PIN, "rust_parity": False}))
 
