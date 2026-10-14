@@ -349,6 +349,14 @@ def drawing_storage_variants():
         yield "drawing-storage-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
 
 
+
+def path_alignment_variants():
+    for name, x in (("below-negative", "-1.015625"), ("negative-boundary", "-1"),
+                    ("above-negative", "-0.984375"), ("positive-fraction", "0.015625")):
+        path = f"m {x} -1.015625 l 64 -1.015625 64 64 {x} 64".encode("ascii")
+        yield "path-align-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", br"{\p1}" + path + br"{\p0}after")
+
+
 def layout_rect_variants():
     prefix = SEED[:SEED.index(b"Dialogue:")]
     for name, alignment, second_layer, border, collisions, multiline in (
@@ -650,6 +658,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in line_layout_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in drawing_preparation_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in drawing_storage_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in path_alignment_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in realtext_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_header_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_style_variants()]
