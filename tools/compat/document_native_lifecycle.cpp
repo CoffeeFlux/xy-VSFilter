@@ -504,13 +504,31 @@ static void named_add(TraceDocument& doc,const wchar_t* name,const STSStyle& val
 static void named_stage(TraceDocument& doc,const char* label) {
     printf("named-stage %s\n",label);doc.Dump(label);
 }
+static std::vector<STSSegment> segment_snapshot(const TraceDocument& doc) {
+    std::vector<STSSegment> result;for(size_t i=0;i<doc.Segments();++i)result.push_back(doc.Segment(int(i)));
+    check(!result.empty()&&result[0].animated,"style fixture has real animated segments");return result;
+}
+static void require_same_segments(const TraceDocument& doc,const std::vector<STSSegment>& before,const char* stage) {
+    check(doc.Segments()==before.size(),"style conflict segment count unchanged");unsigned animated=0;
+    for(size_t i=0;i<before.size();++i){const STSSegment actual=doc.Segment(int(i));const STSSegment& expected=before[i];
+        check(actual.start==expected.start&&actual.end==expected.end&&actual.animated==expected.animated&&actual.subs.GetCount()==expected.subs.GetCount(),"style conflict complete segment header unchanged");
+        for(size_t j=0;j<expected.subs.GetCount();++j)check(actual.subs[j]==expected.subs[j],"style conflict segment membership unchanged");
+        if(actual.animated)++animated;
+    }
+    check(animated>0,"style conflict animation retained");
+    printf("style-rename-segments %s count=%zu animated=%u\n",stage,before.size(),animated);
+}
+static void style_rename_stage(TraceDocument& doc,const char* stage) {
+    printf("style-rename-stage %s\n",stage);doc.Dump(stage);
+}
 static void named_style_lifecycle() {
     TraceDocument source(0),destination(1);
-    unsigned before0=change_events[0],before1=change_events[1];
     const STSStyle first=named_value(1),second=named_value(2),third=named_value(3);
     named_add(source,L"Named",first);named_add(source,L"Named2",second);named_add(source,L"Named3",third);
     source.AddSTSEntryOnly(CStringW(L"rename target"),true,0,10,CString(L"Named"));
     source.AddSTSEntryOnly(CStringW(L"collision stays"),true,10,20,CString(L"Named2"));
+    source.CreateSegments();source.Animate(0);const auto stableSegments=segment_snapshot(source);
+    unsigned before0=change_events[0],before1=change_events[1];
     named_stage(source,"named-initial");
     // Native CString font equality ignores the suffix, but retained storage must
     // keep the original full font units when the incoming equal value is freed.
@@ -527,6 +545,15 @@ static void named_style_lifecycle() {
     source.AddSTSEntryOnly(CStringW(L"numeric suffix"),true,30,40,CString(L"Named9"));
     named_add(source,L"Named9",third);check(source.Entry(3).style==L"Named11","numeric suffix collision");
     named_stage(source,"named-numeric-collision");
+    require_same_segments(source,stableSegments,"numeric-original");
+    source.AddSTSEntryOnly(CStringW(L"numeric repeat twelve"),true,40,50,CString(L"Named9"));
+    named_add(source,L"Named9",first);
+    check(source.Entry(4).style==L"Named12"&&source.Entry(3).style==L"Named11","repeated numeric conflict chooses twelve");
+    require_same_segments(source,stableSegments,"numeric-repeat-12");style_rename_stage(source,"numeric-repeat-12");
+    source.AddSTSEntryOnly(CStringW(L"numeric repeat thirteen"),true,50,60,CString(L"Named9"));
+    named_add(source,L"Named9",second);
+    check(source.Entry(5).style==L"Named13"&&source.Entry(4).style==L"Named12"&&source.Entry(3).style==L"Named11","repeated numeric conflict chooses thirteen");
+    require_same_segments(source,stableSegments,"numeric-repeat-13");style_rename_stage(source,"numeric-repeat-13");
     check(destination.CopyNames(source,false),"replace named copy");
     named_stage(destination,"named-copy-replace");source.Dump("named-copy-source");
     named_add(destination,L"Named",first);
@@ -541,6 +568,7 @@ static void named_style_lifecycle() {
     check(destination.CopyNames(source,false),"copy after self clear");
     destination.Empty();check(destination.NamedCount()==0,"Empty frees named styles");
     named_stage(destination,"named-empty");
+    require_same_segments(source,stableSegments,"named-final");
     check(change_events[0]==before0&&change_events[1]==before1,"named operations do not notify");
 }
 // CTextFile deliberately inherits CStdioFile64 protected in both checkouts.
@@ -817,6 +845,46 @@ static void copy_selected_lifecycle() {
         copy_state_stage(destination,"copy-empty-key-result");copy_state_stage(source,"copy-empty-key-source-after");
     }
 }
+static void prepared_style_conflicts() {
+    TraceDocument doc(0);const STSStyle first=named_value(1),second=named_value(2),third=named_value(3);
+    const wchar_t rawName[]={L'R',0,L'B',L'0',L'0',L'9'},alternate[]={L'R',0,L'Q',L'1'};
+    const wchar_t alias[]={L'R',0,L'X'},newAlias[]={L'R',0,L'Y'};
+    const CString name(rawName,6),other(alternate,4);
+    STSStyle* owned=new STSStyle;*owned=first;doc.AddStyle(name,owned);
+    named_add(doc,L"R10",second);named_add(doc,L"R11",third);
+    doc.AddSTSEntryOnly(CStringW(L"prefix equal alias"),true,0,20,CString(alias,3));
+    doc.AddSTSEntryOnly(CStringW(L"short prefix"),true,10,30,CString(L"R"));
+    doc.AddSTSEntryOnly(CStringW(L"unrelated collision"),true,20,40,CString(L"R10"));
+    doc.CreateSegments();doc.Animate(0);const auto stable=segment_snapshot(doc);const unsigned before=change_events[0];
+    check(doc.HasStoredName(CString(L"R"))&&!doc.HasStoredName(name),"raw name key conversion preserves only prefix");
+    require_same_segments(doc,stable,"raw-nul-before");style_rename_stage(doc,"raw-nul-before");
+    owned=new STSStyle;*owned=second;doc.AddStyle(name,owned);
+    check(same_identity(doc.Entry(0).style,CString(L"R12"))&&same_identity(doc.Entry(1).style,CString(L"R12"))&&same_identity(doc.Entry(2).style,CString(L"R10")),"full logical numeric suffix selects R12 and prefix aliases rename");
+    require_same_segments(doc,stable,"raw-nul-to12");style_rename_stage(doc,"raw-nul-to12");
+    doc.AddSTSEntryOnly(CStringW(L"new prefix alias"),true,40,50,CString(newAlias,3));
+    owned=new STSStyle;*owned=third;doc.AddStyle(other,owned);
+    check(same_identity(doc.Entry(3).style,CString(L"R2"))&&same_identity(doc.Entry(0).style,CString(L"R12"))&&same_identity(doc.Entry(1).style,CString(L"R12")),"caller suffix rather than stored key controls second generated name");
+    require_same_segments(doc,stable,"raw-nul-to2");style_rename_stage(doc,"raw-nul-to2");
+    check(change_events[0]==before,"prepared style conflicts do not notify");
+    {
+        TraceDocument shrink(0);
+        // 128 crosses the captured SDK's second growth threshold. Qualified
+        // base Empty preserves actual clearing/bin retention without dumping
+        // the large pre-clear map through this probe's tracing override.
+        for(int i=0;i<128;++i){CString key;key.Format(L"Grow%03d",i);STSStyle* value=new STSStyle;*value=named_value(i%3+1);shrink.AddStyle(key,value);}
+        shrink.CSimpleTextSubtitle::Empty();check(shrink.NamedCount()==0,"large map cleared");
+        style_rename_stage(shrink,"shrink-post-empty");
+        named_add(shrink,L"Old",first);named_add(shrink,L"Other",second);
+        shrink.AddSTSEntryOnly(CStringW(L"shrink rename"),true,0,10,CString(L"Old"));
+        shrink.AddSTSEntryOnly(CStringW(L"shrink unrelated"),true,10,20,CString(L"Other"));
+        shrink.CreateSegments();shrink.Animate(0);const auto unchanged=segment_snapshot(shrink);const unsigned callbacks=change_events[0];
+        require_same_segments(shrink,unchanged,"shrink-before");style_rename_stage(shrink,"shrink-before");
+        named_add(shrink,L"Old",third);
+        check(shrink.NamedCount()==3&&same_identity(shrink.Entry(0).style,CString(L"Old2"))&&same_identity(shrink.Entry(1).style,CString(L"Other")),"removal shrink precedes prepared old-style insertion/rename");
+        require_same_segments(shrink,unchanged,"shrink-after");style_rename_stage(shrink,"shrink-after");
+        check(change_events[0]==callbacks,"removal shrink conflict does not notify");
+    }
+}
 int main() {
     try {
         if(!AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0))throw std::runtime_error("AfxWinInit failed");
@@ -829,6 +897,7 @@ int main() {
         interpretation_lifecycle();
         identity_lifecycle();
         named_style_lifecycle();
+        prepared_style_conflicts();
         named_style_exports();
         {
             TraceDocument source(0),destination(1);populate(source);populate(destination);

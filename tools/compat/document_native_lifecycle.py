@@ -36,7 +36,7 @@ def git(root, *args):
     return subprocess.check_output(["git", "-C", str(root), *args], timeout=60).decode().strip()
 
 
-def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True):
+def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True):
     lines = data.splitlines()
     if not lines or lines[0] != f"provenance pointer_bits={pointer_bits}".encode():
         raise ValueError("missing or incorrect native architecture provenance")
@@ -128,6 +128,24 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
         if positions != sorted(positions):
             raise ValueError("selected Copy stage order differs")
 
+    if require_style_rename_stages:
+        stages = ("numeric-repeat-12", "numeric-repeat-13", "raw-nul-before", "raw-nul-to12",
+                  "raw-nul-to2", "shrink-post-empty", "shrink-before", "shrink-after")
+        positions = []
+        for stage in stages:
+            token = f"style-rename-stage {stage}".encode()
+            if lines.count(token) != 1:
+                raise ValueError(f"missing/duplicate style rename stage {stage}")
+            positions.append(lines.index(token))
+        if positions != sorted(positions):
+            raise ValueError("style rename stage order differs")
+        for stage in ("numeric-original", "numeric-repeat-12", "numeric-repeat-13", "named-final",
+                      "raw-nul-before", "raw-nul-to12", "raw-nul-to2", "shrink-before", "shrink-after"):
+            matches = [line for line in lines if line.startswith(f"style-rename-segments {stage} ".encode())]
+            match = re.fullmatch(rb"style-rename-segments [a-z0-9-]+ count=(\d+) animated=(\d+)", matches[0]) if len(matches) == 1 else None
+            if not match or not 1 <= int(match[2]) <= int(match[1]):
+                raise ValueError(f"missing/invalid style rename segment invariant {stage}")
+
     if require_named_stages:
         for stage in ("named-initial", "named-equal-duplicate", "named-conflict-collision",
                       "named-numeric-collision", "named-copy-replace", "named-copy-independent",
@@ -143,11 +161,11 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
 
 
 
-def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True):
+def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True):
     if len(traces) != 4:
         raise ValueError("two reference and two candidate executions required")
     for trace in traces:
-        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages, require_metadata_stages=require_metadata_stages, require_selected_copy_stages=require_selected_copy_stages)
+        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages, require_metadata_stages=require_metadata_stages, require_selected_copy_stages=require_selected_copy_stages, require_style_rename_stages=require_style_rename_stages)
     if any(trace != traces[0] for trace in traces[1:]):
         raise ValueError("native lifecycle traces differ or are nondeterministic")
 

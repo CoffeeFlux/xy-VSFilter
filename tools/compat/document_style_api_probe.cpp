@@ -27,6 +27,58 @@ using namespace DirectVobSubXyOptions;
 static void require(bool ok,const char* detail){if(!ok)throw std::runtime_error(detail);}
 static void status(const char* label,HRESULT value){std::cout<<label<<" hr="<<std::hex<<static_cast<uint32_t>(value)<<std::dec<<'\n';}
 static std::string units(const wchar_t* p,size_t n){std::ostringstream s;s<<n<<':';for(size_t i=0;i<n;++i)s<<static_cast<unsigned>(static_cast<uint16_t>(p[i]))<<',';return s.str();}
+// Failure-only diagnostics: bounded raw units, no replacement profile writes.
+static void diagnostic_units(const char* label,const wchar_t* value,size_t length,bool truncated=false) {
+    std::cerr<<"setup-diagnostic "<<label<<" units="<<length<<" truncated="<<truncated<<':';
+    const size_t shown=length<256?length:256;
+    for(size_t i=0;i<shown;++i)std::cerr<<static_cast<unsigned>(static_cast<uint16_t>(value[i]))<<',';
+    std::cerr<<'\n';
+}
+static CString diagnostic_profile_name(const char* label,const wchar_t* value,bool& bounded) {
+    if(!value){std::cerr<<"setup-diagnostic "<<label<<" null=1\n";bounded=false;return CString();}
+    size_t length=0;while(length<256&&value[length])++length;
+    const bool truncated=length==256;
+    diagnostic_units(label,value,length,truncated);bounded=bounded&&!truncated;
+    return CString(value,static_cast<int>(length));
+}
+static void path_setup_diagnostic(const CString& section,const CString& format,
+                                  const CString& key,const CString& readback) {
+    diagnostic_units("section",section,section.GetLength(),section.GetLength()>256);
+    diagnostic_units("format",format,format.GetLength(),format.GetLength()>256);
+    diagnostic_units("key",key,key.GetLength(),key.GetLength()>256);
+    diagnostic_units("readback",readback,readback.GetLength(),readback.GetLength()>256);
+    bool bounded=true;
+    const CString registry=diagnostic_profile_name("registry-name",theApp.m_pszRegistryKey,bounded);
+    const CString profile=diagnostic_profile_name("profile-name",theApp.m_pszProfileName,bounded);
+    HMODULE module=nullptr;
+    const BOOL located=GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS|GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+        reinterpret_cast<LPCWSTR>(&path_setup_diagnostic),&module);
+    std::cerr<<"setup-diagnostic resources module-located="<<(located!=FALSE)
+             <<" resource-is-instance="<<(AfxGetResourceHandle()==AfxGetInstanceHandle())
+             <<" resource-is-helper="<<(located&&AfxGetResourceHandle()==module)
+             <<" instance-is-helper="<<(located&&AfxGetInstanceHandle()==module)
+             <<" app-instance-is-helper="<<(located&&theApp.m_hInstance==module)
+             <<" app-is-theApp="<<(AfxGetApp()==&theApp)<<'\n';
+    HKEY app=nullptr;DWORD type=0,bytes=0;LONG opened=ERROR_INVALID_PARAMETER,queried=ERROR_INVALID_PARAMETER;
+    wchar_t value[256]={};
+    if(bounded&&section.GetLength()<=256&&key.GetLength()<=256&&!registry.IsEmpty()&&!profile.IsEmpty()) {
+        const CString path=CString(L"Software\\")+registry+L"\\"+profile+L"\\"+section;
+        opened=RegOpenKeyExW(HKEY_CURRENT_USER,path,0,KEY_QUERY_VALUE,&app);
+        if(opened==ERROR_SUCCESS) {
+            bytes=sizeof value;queried=RegQueryValueExW(app,key,nullptr,&type,reinterpret_cast<BYTE*>(value),&bytes);
+            RegCloseKey(app);
+        }
+    }
+    std::cerr<<"setup-diagnostic registry-query open="<<opened<<" query="<<queried<<" type="<<type<<" bytes="<<bytes<<'\n';
+    if(queried==ERROR_SUCCESS&&bytes<=sizeof value) {
+        std::cerr<<"setup-diagnostic registry-value-bytes "<<bytes<<':';
+        const BYTE* raw=reinterpret_cast<const BYTE*>(value);
+        for(DWORD i=0;i<bytes;++i)std::cerr<<static_cast<unsigned>(raw[i])<<',';
+        std::cerr<<'\n';
+        if((type==REG_SZ||type==REG_EXPAND_SZ||type==REG_MULTI_SZ)&&bytes%sizeof(wchar_t)==0)
+            diagnostic_units("registry-value",value,bytes/sizeof(wchar_t));
+    }
+}
 // Explicit initialized members only: neither padding nor STSStyle::operator==.
 static std::string style(const STSStyle& v){std::ostringstream s;s<<std::hexfloat;
 #define FIELD(x) s<<#x<<'='<<v.x<<';'
@@ -77,8 +129,10 @@ extern "C" __declspec(dllexport) uint32_t __cdecl xy_document_style_test_v1(
             status("create",h);require(h==S_OK&&api,"IXyOptions creation failed");
             // Fail explicitly if isolated profile writes were unavailable.
             CString path_key;path_key.Format(ResStr(IDS_RP_PATH),0);
-            require(theApp.GetProfileString(ResStr(IDS_R_DEFTEXTPATHES),path_key)==_T("."),
-                    "constructor subtitle search path was not persisted");
+            const CString path_readback=theApp.GetProfileString(ResStr(IDS_R_DEFTEXTPATHES),path_key);
+            if(path_readback!=_T("."))
+                path_setup_diagnostic(ResStr(IDS_R_DEFTEXTPATHES),ResStr(IDS_RP_PATH),path_key,path_readback);
+            require(path_readback==_T("."),"constructor subtitle search path was not persisted");
             require(GetFileAttributesW(fixture)!=INVALID_FILE_ATTRIBUTES,"fixture file missing");
 #ifndef XY_SUB_FILTER_DLL
             // The video filter selects an active subtitle only once its input
