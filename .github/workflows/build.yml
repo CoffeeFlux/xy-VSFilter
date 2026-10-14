@@ -26,6 +26,9 @@ jobs:
     env:
       YASM_VERSION: '1.3.0'
       YASM_SHA256: 'd160b1d97266f3f28a71b4420a0ad2cd088a7977c2dd3b25af155652d8d8d91f'
+      # yasm 1.3.0 links against MSVCR100.dll, which windows-2022 doesn't ship
+      VCREDIST2010_URL: 'https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x64.exe'
+      VCREDIST2010_SHA256: 'f3b7a76d84d23f91957aa18456a14b4e90609e4ce8194c5653384ed38dada6f3'
 
     steps:
       - name: Determine configuration
@@ -62,11 +65,23 @@ jobs:
 
       - name: install yasm
         run: |
+          redist="$(cygpath -u "$RUNNER_TEMP")/vcredist2010_x64.exe"
+          curl -fsSL --retry 3 -o "$redist" "$VCREDIST2010_URL"
+          echo "${VCREDIST2010_SHA256}  $redist" | sha256sum -c -
+          # 1638: a newer version is already installed; 3010: reboot required
+          rc=0
+          MSYS2_ARG_CONV_EXCL='*' "$redist" /q /norestart || rc=$?
+          if [ "$rc" != 0 ] && [ "$rc" != 1638 ] && [ "$rc" != 3010 ] ; then
+              echo "VC++ 2010 redistributable install failed: $rc" >&2
+              exit 1
+          fi
+
           yasm_dir="$(cygpath -u "$RUNNER_TEMP")/yasm"
           mkdir -p "$yasm_dir"
           curl -fsSL --retry 3 -o "$yasm_dir/yasm.exe" \
               "https://github.com/yasm/yasm/releases/download/v${YASM_VERSION}/yasm-${YASM_VERSION}-win64.exe"
           echo "${YASM_SHA256}  $yasm_dir/yasm.exe" | sha256sum -c -
+          "$yasm_dir/yasm.exe" --version
           cygpath -w "$yasm_dir" >> "$GITHUB_PATH"
 
       - name: Build xy-VSFilter and/or XySubFilter
