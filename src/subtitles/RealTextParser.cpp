@@ -534,6 +534,19 @@ std::wstring CRealTextParser::FormatTimecode(int iTimecode,
                                              const std::wstring& p_crszMillisecondSeparator/* = "."*/)
 {
     std::wostringstream ossTimecode;
+#ifdef XY_VSFILTER_RUST_TEXT
+    int32_t parts[4];
+    if (xy_vsfilter_realtext_format(iTimecode, iMillisecondPrecision, parts)) {
+        ossTimecode << parts[0];
+        ossTimecode << p_crszSeparator;
+        ossTimecode << parts[1];
+        ossTimecode << p_crszSeparator;
+        ossTimecode << parts[2];
+        ossTimecode << p_crszMillisecondSeparator;
+        ossTimecode << parts[3];
+        return ossTimecode.str();
+    }
+#endif
 
     int iHours = iTimecode / 1000 / 60 / 60;
 

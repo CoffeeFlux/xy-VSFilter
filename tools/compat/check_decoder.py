@@ -154,7 +154,8 @@ public:
                   "bool CRealTextParser::ExtractString(", "bool CRealTextParser::SkipSpaces(",
                   "bool CRealTextParser::GetString(", "bool CRealTextParser::GetAttributes(",
                   "int CRealTextParser::GetTimecode(", "std::wstring CRealTextParser::StringToLower(",
-                  "std::wstring CRealTextParser::RenderTags(", "void CRealTextParser::PopTag("]
+                  "std::wstring CRealTextParser::RenderTags(", "void CRealTextParser::PopTag(",
+                  "std::wstring CRealTextParser::FormatTimecode(", "bool CRealTextParser::OutputSRT("]
     for name, content in (("ReferenceRealText", realtext_source), ("CandidateRealText", (ROOT / "src/subtitles/RealTextParser.cpp").read_bytes())):
         realtext += f"namespace {name} {{\n#define private public\n" + realtext_class + ";\n#undef private\n"
         if name == "CandidateRealText":
@@ -899,6 +900,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     realtext_timeline_result = run([str(realtext_timeline_executable)], capture_output=True, text=True)
     print(realtext_timeline_result.stdout, end="", flush=True)
     print(realtext_timeline_result.stderr, end="", file=sys.stderr)
+    realtext_format_executable = destination / ("realtext-format-oracle.exe" if os.name == "nt" else "realtext-format-oracle")
+    realtext_format_compile = [arg.replace("fill_oracle.cpp", "realtext_format_oracle.cpp").replace("fill-oracle", "realtext-format-oracle") for arg in fill_compile]
+    run(realtext_format_compile)
+    realtext_format_result = run([str(realtext_format_executable)], capture_output=True, text=True)
+    print(realtext_format_result.stdout, end="", flush=True)
+    print(realtext_format_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -942,6 +949,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "vobsub_scale_result": vobsub_scale_result.stdout, "vobsub_scale_stderr": vobsub_scale_result.stderr,
         "vobsub_outline_compile_command": vobsub_outline_compile,
         "vobsub_outline_result": vobsub_outline_result.stdout, "vobsub_outline_stderr": vobsub_outline_result.stderr,
+        "realtext_format_compile_command": realtext_format_compile,
+        "realtext_format_result": realtext_format_result.stdout, "realtext_format_stderr": realtext_format_result.stderr,
+        "realtext_format_scope": "signed timestamp components and original linear precision divisor; native stream construction, locale, separators, insertion order and OutputSRT retained; unrepresentable precision arithmetic excluded from parity",
         "realtext_timeline_compile_command": realtext_timeline_compile,
         "realtext_timeline_result": realtext_timeline_result.stdout, "realtext_timeline_stderr": realtext_timeline_result.stderr,
         "realtext_timeline_scope": "owned start/end history and interval selection; native default-duration arithmetic and map writes retained; representable arithmetic fixtures only",

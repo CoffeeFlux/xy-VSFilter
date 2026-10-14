@@ -20,6 +20,21 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust computes the signed components used by RealText `FormatTimecode`.
+  It preserves truncation toward zero and the unusual divisor
+  `10 * (3 - precision)`; the padding argument remains ignored. Native stream
+  construction and insertion order preserve locale formatting, raw separators,
+  partial output and stream failure behavior. Precisions with unrepresentable
+  native intermediate arithmetic decline to the existing path and are excluded
+  from reference-parity counts.
+  Fatal ASan/UBSan comparisons passed **157,432 timestamps** and **2,992 complete
+  `OutputSRT` calls** on each local architecture, including **726,304 numeric
+  insertions**, **944 injected stream failures**, **636 live separator changes**
+  and **43,104 flushes**. Cases include both signed INT boundaries, embedded NUL
+  separators, custom locale grouping, caller stream flags and exception masks.
+  All 100,064 tag-output cases and 30,058 complete parser runs still pass.
+  Rust 1.85 tests (69 core, 46 FFI), strict Clippy and default syntax checks pass.
+  Windows/Miri validation is pending. Native stream and map ownership remains.
 * Safe Rust owns RealText's start/end timing history and interval selection.
   Missing ends, non-increasing next starts, first-line insertion only into an
   empty map, explicit reversed intervals and final flushing retain their native
