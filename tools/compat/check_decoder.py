@@ -164,6 +164,14 @@ public:
             if signature == "std::wstring CRealTextParser::StringToLower(":
                 brace = definition.index("{") + 1
                 definition = definition[:brace] + '\n    realTextAttributeHook(2, p_crszString);\n' + definition[brace:]
+            if signature == "bool CRealTextParser::ParseRealText(":
+                plain = "m_RealText.m_mapLines[pairTimecodes] = szLine;"
+                first = "m_RealText.m_mapLines[std::make_pair(0, iStartTimecode)] = szLine;"
+                expected = 4 if name == "ReferenceRealText" else 6
+                if definition.count(plain) != expected or definition.count(first) != 1:
+                    raise RuntimeError("RealText line insertion checkpoints changed")
+                definition = definition.replace(plain, "m_RealText.m_mapLines[realTextLineKey(m_RealText.m_mapLines, pairTimecodes, szLine)] = szLine;")
+                definition = definition.replace(first, "m_RealText.m_mapLines[realTextLineKey(m_RealText.m_mapLines, std::make_pair(0, iStartTimecode), szLine)] = szLine;")
             realtext += definition + "\n"
         realtext += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_realtext.h").write_text(realtext, encoding="utf-8")
@@ -885,6 +893,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     realtext_lower_result = run([str(realtext_lower_executable)], capture_output=True, text=True)
     print(realtext_lower_result.stdout, end="", flush=True)
     print(realtext_lower_result.stderr, end="", file=sys.stderr)
+    realtext_timeline_executable = destination / ("realtext-timeline-oracle.exe" if os.name == "nt" else "realtext-timeline-oracle")
+    realtext_timeline_compile = [arg.replace("fill_oracle.cpp", "realtext_timeline_oracle.cpp").replace("fill-oracle", "realtext-timeline-oracle") for arg in fill_compile]
+    run(realtext_timeline_compile)
+    realtext_timeline_result = run([str(realtext_timeline_executable)], capture_output=True, text=True)
+    print(realtext_timeline_result.stdout, end="", flush=True)
+    print(realtext_timeline_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -928,6 +942,10 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "vobsub_scale_result": vobsub_scale_result.stdout, "vobsub_scale_stderr": vobsub_scale_result.stderr,
         "vobsub_outline_compile_command": vobsub_outline_compile,
         "vobsub_outline_result": vobsub_outline_result.stdout, "vobsub_outline_stderr": vobsub_outline_result.stderr,
+        "realtext_timeline_compile_command": realtext_timeline_compile,
+        "realtext_timeline_result": realtext_timeline_result.stdout, "realtext_timeline_stderr": realtext_timeline_result.stderr,
+        "realtext_timeline_scope": "owned start/end history and interval selection; native default-duration arithmetic and map writes retained; representable arithmetic fixtures only",
+        "realtext_timeline_instrumentation": "all native ParseRealText line map keys wrapped before insertion to compare partial maps, ordering, injected exceptions and live duration/map changes",
         "realtext_lower_compile_command": realtext_lower_compile,
         "realtext_lower_result": realtext_lower_result.stdout, "realtext_lower_stderr": realtext_lower_result.stderr,
         "realtext_lower_scope": "owned lowercase output; native towlower per original code unit and live source length retained; comparisons within each available locale; allocation failure timing unverified",

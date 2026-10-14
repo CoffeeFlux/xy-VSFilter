@@ -10,6 +10,11 @@
 #define XY_REALTEXT_CDECL
 #endif
 extern "C" {
+void* XY_REALTEXT_CDECL xy_vsfilter_realtext_timeline_create();
+uint32_t XY_REALTEXT_CDECL xy_vsfilter_realtext_timeline_select(void*, int32_t, uint32_t, uint32_t);
+void XY_REALTEXT_CDECL xy_vsfilter_realtext_timeline_advance(void*, int32_t, int32_t);
+int32_t XY_REALTEXT_CDECL xy_vsfilter_realtext_timeline_field(const void*, uint32_t);
+void XY_REALTEXT_CDECL xy_vsfilter_realtext_timeline_release(void*);
 void* XY_REALTEXT_CDECL xy_vsfilter_realtext_lower_create();
 uint32_t XY_REALTEXT_CDECL xy_vsfilter_realtext_lower_next(void*, const uint16_t*, size_t, uint16_t);
 size_t XY_REALTEXT_CDECL xy_vsfilter_realtext_lower_field(const void*, uint32_t, size_t);
@@ -40,6 +45,18 @@ void XY_REALTEXT_CDECL xy_vsfilter_realtext_timecode_release(void*);
 }
 #undef XY_REALTEXT_CDECL
 namespace XyRust {
+class RealTextTimeline {
+    void* owner;
+    RealTextTimeline(const RealTextTimeline&);
+    RealTextTimeline& operator=(const RealTextTimeline&);
+public:
+    RealTextTimeline():owner(xy_vsfilter_realtext_timeline_create()){}
+    ~RealTextTimeline(){xy_vsfilter_realtext_timeline_release(owner);}
+    uint32_t Select(int next,bool finalLine,bool mapEmpty){return xy_vsfilter_realtext_timeline_select(owner,next,finalLine?1:0,mapEmpty?1:0);}
+    int First()const{return xy_vsfilter_realtext_timeline_field(owner,0);}
+    int Second()const{return xy_vsfilter_realtext_timeline_field(owner,1);}
+    void Advance(int start,int end){xy_vsfilter_realtext_timeline_advance(owner,start,end);}
+};
 class RealTextLower {
     void* owner;
     RealTextLower(const RealTextLower&);

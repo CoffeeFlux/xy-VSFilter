@@ -27,6 +27,7 @@ pub mod realtext_lower;
 pub mod realtext_tag;
 pub mod realtext_text;
 pub mod realtext_timecode;
+pub mod realtext_timeline;
 pub mod segment_insert;
 pub mod segments;
 pub mod subrip;
