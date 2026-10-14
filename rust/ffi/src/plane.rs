@@ -47,6 +47,29 @@ pub unsafe extern "C" fn xy_vsfilter_plane_release(owner: *mut Plane) {
 mod tests {
     use super::*;
     #[test]
+    fn shifted_output_loans_leave_alignment_slack_unwritten() {
+        let input = [
+            0u8, 1, 63, 64, 127, 128, 254, 255, 7, 9, 11, 13, 17, 19, 23, 29, 31,
+        ];
+        for shift in 0..16 {
+            let owner = xy_vsfilter_plane_create(input.len() + shift);
+            assert!(!owner.is_null());
+            // SAFETY: the allocation includes the offset and complete logical
+            // output. Only that output is initialized/read; prefix and rounded
+            // tail remain MaybeUninit. No owner borrow overlaps the byte loan.
+            unsafe {
+                let data = xy_vsfilter_plane_loan(owner).add(shift);
+                assert_eq!(data as usize % 16, shift);
+                assert_eq!(
+                    crate::mask::xy_vsfilter_clip_row(data, input.as_ptr(), input.len(), 0),
+                    1
+                );
+                assert_eq!(core::slice::from_raw_parts(data, input.len()), &input);
+                xy_vsfilter_plane_release(owner);
+            }
+        }
+    }
+    #[test]
     fn transpose_scratch_changes_from_output_to_input_without_reborrowing_owner() {
         let owner = xy_vsfilter_plane_create(7 * 4);
         assert!(!owner.is_null());
