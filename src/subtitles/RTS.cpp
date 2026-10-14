@@ -2035,11 +2035,15 @@ void CRenderedTextSubtitle::ParseEffect(CSubtitle* sub, const CStringW& str)
 void CRenderedTextSubtitle::ParseString(CSubtitle* sub, CStringW str, const FwSTSStyle& style)
 {
     if(!sub) return;
-    str.Replace(L"\\N", L"\n");
-    str.Replace(L"\\n", (sub->m_wrapStyle < 2 || sub->m_wrapStyle == 3) ? L" " : L"\n");
-    str.Replace(L"\\h", L"\x00A0");    
 #ifdef XY_VSFILTER_RUST_TEXT
     XyRust::TextRuns runs(str);
+    if(!runs.Prepare(sub->m_wrapStyle))
+    {
+        str.Replace(L"\\N", L"\n");
+        str.Replace(L"\\n", (sub->m_wrapStyle < 2 || sub->m_wrapStyle == 3) ? L" " : L"\n");
+        str.Replace(L"\\h", L"\x00A0");
+        runs.Reset(str);
+    }
     for(unsigned kind = runs.Next(); kind != 0; kind = runs.Next())
     {
         CStringW text = kind == 2 ? CStringW() : kind == 3 ? CStringW(L' ') : runs.Text<CStringW>();
@@ -2052,6 +2056,9 @@ void CRenderedTextSubtitle::ParseString(CSubtitle* sub, CStringW str, const FwST
         m_kstart = m_kend;
     }
 #else
+    str.Replace(L"\\N", L"\n");
+    str.Replace(L"\\n", (sub->m_wrapStyle < 2 || sub->m_wrapStyle == 3) ? L" " : L"\n");
+    str.Replace(L"\\h", L"\x00A0");
     for(int ite = 0, j = 0, len = str.GetLength(); j <= len; j++)
     {
         WCHAR c = str[j];

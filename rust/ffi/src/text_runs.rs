@@ -15,6 +15,33 @@ pub unsafe extern "C" fn xy_vsfilter_text_runs_create(input: *const u16, length:
     Box::into_raw(Box::new(Runs::new(input)))
 }
 /// # Safety
+/// owner is live and exclusively accessible throughout preparation.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_text_runs_prepare(owner: *mut Runs, wrap: i32) -> u32 {
+    // SAFETY: no native callback or input borrow overlaps this mutation.
+    let state = unsafe { &mut *owner };
+    u32::from(state.prepare(wrap))
+}
+/// # Safety
+/// owner is live and exclusive; nonempty input spans length initialized aligned
+/// u16 values, immutable and disjoint from owner; length*2 fits isize.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_text_runs_reset(
+    owner: *mut Runs,
+    input: *const u16,
+    length: u32,
+) {
+    let input = if length == 0 {
+        &[]
+    } else {
+        // SAFETY: a fresh native-prepared copy, borrowed only until return.
+        unsafe { core::slice::from_raw_parts(input, length as usize) }
+    };
+    // SAFETY: exclusive owner, disjoint from the copied input.
+    let state = unsafe { &mut *owner };
+    *state = Runs::new(input);
+}
+/// # Safety
 /// owner is live and exclusive throughout this call.
 #[no_mangle]
 pub unsafe extern "C" fn xy_vsfilter_text_runs_next(owner: *mut Runs) -> u32 {
@@ -64,6 +91,24 @@ mod tests {
             assert_eq!(xy_vsfilter_text_runs_field(owner, 1, 0), 0xd800);
             assert_eq!(xy_vsfilter_text_runs_next(owner), 0);
             assert_eq!(xy_vsfilter_text_runs_field(owner, 0, 0), 0);
+            xy_vsfilter_text_runs_release(owner);
+        }
+    }
+    #[test]
+    fn native_preparation_fallback_is_reimported_before_token_callbacks() {
+        let input = [65u16, 0, 92, 78];
+        let mut prepared = [65u16, 10, 66];
+        // SAFETY: initialized disjoint arrays, live unique owner, final release.
+        unsafe {
+            let owner = xy_vsfilter_text_runs_create(input.as_ptr(), 4);
+            assert_eq!(xy_vsfilter_text_runs_prepare(owner, 2), 0);
+            xy_vsfilter_text_runs_reset(owner, prepared.as_ptr(), 3);
+            prepared.fill(7);
+            assert_eq!(xy_vsfilter_text_runs_next(owner), 1);
+            assert_eq!(xy_vsfilter_text_runs_field(owner, 1, 0), 65);
+            assert_eq!(xy_vsfilter_text_runs_next(owner), 2);
+            assert_eq!(xy_vsfilter_text_runs_next(owner), 1);
+            assert_eq!(xy_vsfilter_text_runs_field(owner, 1, 0), 66);
             xy_vsfilter_text_runs_release(owner);
         }
     }
