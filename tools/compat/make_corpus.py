@@ -305,6 +305,20 @@ def wrap_width_variants():
         yield "wrap-width-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
 
 
+
+def line_layout_variants():
+    seed = SEED.replace(br"\pos(320,180)", b"").replace(b"Default,,0,0,0,,", b"Default,,17,31,23,,")
+    for alignment in range(1, 10):
+        payload = ("{\\an" + str(alignment) + "\\xbord7\\ybord3}wide first line\\N{\\fs24\\xbord2\\ybord8}short").encode("ascii")
+        yield "line-layout-align-" + str(alignment) + ".ass", seed.replace(b"COMPAT_TEXT", payload)
+    for name, payload in {
+        "empty-first": br"{\an5}\Nsecond\Nthird",
+        "repeated-empty": br"{\an8}first\N\N\Nlast",
+        "trailing-empty": br"{\an2}first\Nsecond\N",
+    }.items():
+        yield "line-layout-" + name + ".ass", seed.replace(b"COMPAT_TEXT", payload)
+
+
 def layout_rect_variants():
     prefix = SEED[:SEED.index(b"Dialogue:")]
     for name, alignment, second_layer, border, collisions, multiline in (
@@ -584,7 +598,8 @@ def make_cases(files):
                                                     ("vplayer-pipes", "vplayer-control"),
                                                     ("layout-rect-bottom", "layout-rect-split-layers"),
                                                     ("text-runs-soft-wrap-zero", "text-runs-soft-wrap-two"),
-                                                    ("wrap-width-style-0", "wrap-width-style-2"))
+                                                    ("wrap-width-style-0", "wrap-width-style-2"),
+                                                    ("line-layout-align-1", "line-layout-align-9"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -601,6 +616,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in layout_rect_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in text_run_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in wrap_width_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in line_layout_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in realtext_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_header_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_style_variants()]

@@ -20,6 +20,23 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust grows subtitle block dimensions and computes final alignment in
+  `CSubtitle::MakeLines`. Native line creation/insertion, top-border capture,
+  bottom-border rereading and partial results retain their exact order, including
+  a null line return after earlier insertions. Signed remainder, center rounding,
+  negative dimensions and margins preserve native integer behavior.
+  Fatal ASan/UBSan comparisons passed **34,532 complete calls** on arm64 and
+  under x64 execution: **118,879 retained lines / 2,824,459 callback observations /
+  33,650 changed rectangles**, **882 interruptions / 1,498 live mutations**, and
+  **119,257 Rust extent updates / 33,650 placements / zero fallbacks**. Separate
+  Rust/FFI tests cover unchanged outputs on checked-arithmetic declines; native
+  arithmetic comparisons use representable values only. Line construction and
+  insertion are controlled boundaries; Windows uses actual ATL geometry.
+  Rust 1.85 tests (118 core, 76 FFI), strict Clippy, default syntax and Python
+  checks pass. Twelve alignment/empty-line scripts and a visible alignment control
+  expand the renderer corpus to **626 cases**. Windows/Miri and full renderer
+  checks for this increment are pending; native line construction and actual-host
+  integration remain separate work.
 * Safe Rust performs `CSubtitle::GetWrapWidth` arithmetic with stack-owned state.
   Native font measurements, full-line accumulation and ordered word traversal
   remain. Strict width comparisons, skipped words, style 3's final adjustment,
@@ -78,7 +95,10 @@ unresolved reference outcomes requiring investigation, never matching results.
   or counted as compatibility evidence.
   Rust 1.85 tests (109 core, 72 FFI), strict Clippy, default syntax and Python
   harness checks pass. The **570-case** renderer corpus includes the collision
-  and reverse-seek controls. Windows/Miri and full renderer checks are pending.
+  and reverse-seek controls. All four platform reports, Miri and Windows x86/x64
+  renderer checks passed **570 cases / 6,050 frames**, plus **32 mutation cases /
+  224 frames**, with matching dialogs, controls, exports and dependencies; see
+  [verified layout-placement evidence](layout-placement-evidence.json).
 * Safe Rust owns the screen-layout allocator's ordered rectangle records, first
   matching segment/entry lookup, record removal and segment updates. Native
   rectangle geometry, collision traversal, border adjustment, segment-distance
