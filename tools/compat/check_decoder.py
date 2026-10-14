@@ -845,6 +845,16 @@ public:
             blur_planes_code += "#define XY_VSFILTER_RUST_TEXT\n"
         blur_planes_code += extract_definition(text, "bool Rasterizer::BeBlur(") + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_blur_planes.h").write_text(blur_planes_code, encoding="utf-8")
+    legacy_blur_code = '#include "legacy_blur_shell.h"\n'
+    for name, content in (("ReferenceLegacyBlur", raster_source), ("CandidateLegacyBlur", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+        text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        legacy_blur_code += f"namespace {name} {{\nLEGACY_BLUR_CLASS\n"
+        if name == "CandidateLegacyBlur":
+            legacy_blur_code += "#define XY_VSFILTER_RUST_TEXT\n"
+        legacy_blur_code += re.search(r"const float Rasterizer::GAUSSIAN_BLUR_THREHOLD = [^;]+;", text).group(0) + "\n"
+        legacy_blur_code += extract_definition(text, "bool Rasterizer::IsItReallyBlur(")
+        legacy_blur_code += extract_definition(text, "bool Rasterizer::OldFixedPointBlur(").replace("memcpy(", "checkedLegacyCopy(") + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_legacy_blur.h").write_text(legacy_blur_code, encoding="utf-8")
     filter_source = original("src/subtitles/xy_filter.cpp", reference["commit"])
     vobsub_source = original("src/subtitles/VobSubImage.cpp", reference["commit"])
     golomb = '#pragma once\n#include "golomb_shell.h"\n'
@@ -1376,6 +1386,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     blur_planes_result = run([str(blur_planes_executable)], capture_output=True, text=True)
     print(blur_planes_result.stdout, end="", flush=True)
     print(blur_planes_result.stderr, end="", file=sys.stderr)
+    legacy_blur_executable = destination / ("legacy-blur-oracle.exe" if os.name == "nt" else "legacy-blur-oracle")
+    legacy_blur_compile = [arg.replace("find_char_oracle.cpp", "legacy_blur_oracle.cpp").replace("find-char-oracle", "legacy-blur-oracle") for arg in find_char_compile]
+    run(legacy_blur_compile)
+    legacy_blur_result = run([str(legacy_blur_executable)], capture_output=True, text=True)
+    print(legacy_blur_result.stdout, end="", flush=True)
+    print(legacy_blur_result.stderr, end="", file=sys.stderr)
     pipe_line_executable = destination / ("pipe-line-oracle.exe" if os.name == "nt" else "pipe-line-oracle")
     pipe_line_compile = [arg.replace("find_char_oracle.cpp", "pipe_line_oracle.cpp").replace("find-char-oracle", "pipe-line-oracle") for arg in find_char_compile]
     run(pipe_line_compile)
@@ -1765,6 +1781,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "path_align_compile_command": path_align_compile,
         "path_align_result": path_align_result.stdout, "path_align_stderr": path_align_result.stderr,
         "path_align_scope": "Complete pinned PathData::AlignLeftTop over initialized point/type buffers; actual Windows POINT/ATL geometry; exact guarded buffers, origin/size, errno/FP/Windows error state; native cleanup modeled, outputs disjoint and representable arithmetic only",
+        "legacy_blur_compile_command": legacy_blur_compile,
+        "legacy_blur_result": legacy_blur_result.stdout, "legacy_blur_stderr": legacy_blur_result.stderr,
+        "legacy_blur_scope": "Complete pinned OldFixedPointBlur and blur predicate, native floating geometry/pass control and full-pitch source copies including padding. Preflight excludes layouts whose copy or final row cursor leaves the logical backing; an independent checked-copy interceptor rejects before memory access. These exclusions are not parity passes; production selects native fallback on decline. Coefficient factories and filter kernels are controlled callbacks. Both input planes present; object aliasing, invalid geometry, actual OOM and native scratch allocation failure excluded. Checks include source-plane aliases, retained shared references, logical cache accounting and modeled output-plane allocation failure. Production renderer entry into this legacy method is not asserted.",
         "blur_planes_compile_command": blur_planes_compile,
         "blur_planes_result": blur_planes_result.stdout, "blur_planes_stderr": blur_planes_result.stderr,
         "blur_planes_scope": "Whole pinned BeBlur with native floating geometry/pass control and controlled fixed/fractional filter callbacks; exact plane bytes/padding, allocation and cleanup, retained shared references, source-plane aliases and cache-byte accounting. Both input planes present; source/output object aliasing, invalid geometry, actual OOM and scratch allocation failure are excluded. Filter kernels have independent differential campaigns; native allocation guards and Rust ownership checks have distinct scopes.",

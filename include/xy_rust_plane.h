@@ -11,6 +11,7 @@ extern "C" {
 void* XY_PLANE_CDECL xy_vsfilter_plane_create(size_t);
 uint8_t* XY_PLANE_CDECL xy_vsfilter_plane_loan(void*);
 void XY_PLANE_CDECL xy_vsfilter_plane_release(void*);
+uint32_t XY_PLANE_CDECL xy_vsfilter_plane_copy_fits(int32_t,int32_t,int32_t,int32_t,int32_t,int32_t);
 }
 #undef XY_PLANE_CDECL
 extern size_t g_xy_malloc_used_size;

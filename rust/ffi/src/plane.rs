@@ -2,6 +2,24 @@
 use alloc::boxed::Box;
 use xy_vsfilter_compat::plane::Plane;
 #[no_mangle]
+pub extern "C" fn xy_vsfilter_plane_copy_fits(
+    source_pitch: i32,
+    source_height: i32,
+    pitch: i32,
+    height: i32,
+    inset_x: i32,
+    inset_y: i32,
+) -> u32 {
+    u32::from(xy_vsfilter_compat::plane::legacy_copy_fits(
+        source_pitch,
+        source_height,
+        pitch,
+        height,
+        inset_x,
+        inset_y,
+    ))
+}
+#[no_mangle]
 pub extern "C" fn xy_vsfilter_plane_create(count: usize) -> *mut Plane {
     Plane::new(count).map_or(core::ptr::null_mut(), |p| Box::into_raw(Box::new(p)))
 }

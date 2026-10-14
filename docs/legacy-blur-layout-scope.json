@@ -1,0 +1,21 @@
+{
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "candidate_base_commit": "59e1b1250ad6b60c0d33d0ac854bb7cf11c50c0c",
+  "initial_candidate_was_uncommitted": true,
+  "initial_validation": {
+    "status": "failed",
+    "architectures": [
+      "aarch64-apple-darwin",
+      "x86_64-apple-darwin"
+    ],
+    "description": "The initial full-pitch copy campaign admitted an unchecked horizontal-inset footprint. The candidate run terminated under fatal AddressSanitizer before a complete comparison. Neither initial run is a passing result; the exact dirty candidate source snapshot was not archived."
+  },
+  "corrected_boundary": "The scalar safe-Rust preflight requires the source extent, destination copy footprint and final row cursor to fit their logical backing and native int allocation size. Both source planes must be present before production selects Rust ownership. Decline retains the existing native path.",
+  "corrected_campaign": "Unsupported layouts are counted as exclusions before executing either method. An independent C++ copy interceptor validates actual source/destination ranges before memcpy. Admitted cases compare complete methods, bytes, callbacks, retained lifetimes and logical cache accounting.",
+  "remaining": [
+    "Excluded layout outcomes remain unresolved and are not compatibility passes.",
+    "Coefficient factories and filter kernels are controlled boundaries.",
+    "Body-only native pointer arithmetic, source/output object aliasing, actual allocator exhaustion and unrepresentable geometry remain outside this campaign.",
+    "Production renderer invocation of this legacy method has not been demonstrated."
+  ]
+}
