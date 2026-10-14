@@ -70,6 +70,22 @@ impl Storage {
             _ => None,
         }
     }
+    pub fn spans(&self, row: i32) -> Option<crate::scan_row::Row> {
+        let mut index = *self.heads.get(usize::try_from(row).ok()?)?;
+        let mut positions = Vec::new();
+        while index != 0 {
+            // A valid native row cannot visit more slots than the backing store.
+            // Decline an invalid link/cycle without exporting a partial result.
+            if positions.len() >= self.edges.len() {
+                return None;
+            }
+            let edge = self.edges.get(index as usize).copied().flatten()?;
+            positions.try_reserve(1).ok()?;
+            positions.push(edge.position);
+            index = edge.next;
+        }
+        crate::scan_row::Row::new(positions, row)
+    }
 }
 #[cfg(test)]
 mod tests {

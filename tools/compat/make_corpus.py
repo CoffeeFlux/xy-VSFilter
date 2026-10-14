@@ -384,6 +384,19 @@ def arc_queue_variants():
         yield "arc-queue-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
 
 
+def scan_row_variants():
+    for name, path in {
+        "single": b"m 0 0 l 80 0 80 60 0 60",
+        "double-same": b"m 0 0 l 80 0 80 60 0 60 m 0 0 l 80 0 80 60 0 60",
+        "opposite": b"m 0 0 l 80 0 80 60 0 60 m 0 0 l 0 60 80 60 80 0",
+        "hole": b"m 0 0 l 80 0 80 60 0 60 m 20 20 l 20 40 60 40 60 20",
+        "touching": b"m 0 0 l 40 0 40 60 0 60 m 40 0 l 80 0 80 60 40 60",
+        "crossing": b"m 0 0 l 80 60 0 60 80 0",
+    }.items():
+        payload = br"{\bord0\shad0\p1}" + path + br"{\p0} after"
+        yield "scan-row-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
+
+
 def ellipse_arc_variants():
     for name, payload in {
         "fraction-below": br"{\xbord2.124\ybord2.124}Rounded corners",
@@ -701,7 +714,8 @@ def make_cases(files):
                                                     ("drawing-storage-control", "drawing-storage-fractional-scale"),
                                                     ("span-merge-control", "span-merge-horizontal-border"),
                                                     ("arc-queue-control", "arc-queue-round"),
-                                                    ("path-buffer-control", "path-buffer-spaced"))
+                                                    ("path-buffer-control", "path-buffer-spaced"),
+                                                    ("scan-row-single", "scan-row-hole"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -724,6 +738,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in path_alignment_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in span_merge_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in arc_queue_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in scan_row_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ellipse_arc_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ellipse_storage_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in path_buffer_variants()]

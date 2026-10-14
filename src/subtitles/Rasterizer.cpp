@@ -3703,6 +3703,10 @@ bool ScanLineData::ScanConvert(const PathData& path_data, const CSize& size)
     __int64 y = 0;
     for(y=0; y<mHeight; ++y)
     {
+#ifdef XY_VSFILTER_RUST_TEXT
+        if (m_edges.Ready() && m_edges.AppendRow(static_cast<int>(y), mOutline))
+            continue;
+#endif
         int count = 0;
         // Detangle scanline into edge heap.
 #ifdef XY_VSFILTER_RUST_TEXT

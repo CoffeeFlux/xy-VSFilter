@@ -225,6 +225,14 @@
     [
       "path-buffer-control-memory",
       "path-buffer-spaced-memory"
+    ],
+    [
+      "scan-row-single-file",
+      "scan-row-hole-file"
+    ],
+    [
+      "scan-row-single-memory",
+      "scan-row-hole-memory"
     ]
   ],
   "cases": [
@@ -12806,6 +12814,270 @@
       "id": "arc-queue-animated-memory",
       "script": "test/compat/generated/arc-queue-animated.ass",
       "sha256": "10970619f3b28a254798607b2f6c0f0b8ca8a4d9f3bbaa175dc8561f65d980a7",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "scan-row-single-file",
+      "script": "test/compat/generated/scan-row-single.ass",
+      "sha256": "aaa244cfe4041bc024f58606276d8d100bb9b35810627b06cfffb15dd1a836aa",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "scan-row-single-memory",
+      "script": "test/compat/generated/scan-row-single.ass",
+      "sha256": "aaa244cfe4041bc024f58606276d8d100bb9b35810627b06cfffb15dd1a836aa",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "scan-row-double-same-file",
+      "script": "test/compat/generated/scan-row-double-same.ass",
+      "sha256": "6790b335ef5b9d58511deabd0d70f86415edab3f913f6d81fef871c3c486c835",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "scan-row-double-same-memory",
+      "script": "test/compat/generated/scan-row-double-same.ass",
+      "sha256": "6790b335ef5b9d58511deabd0d70f86415edab3f913f6d81fef871c3c486c835",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "scan-row-opposite-file",
+      "script": "test/compat/generated/scan-row-opposite.ass",
+      "sha256": "8ba2c1ec3d23caeb45897eaa3a0836b82d08937ddb1b5c66d846be83dc8b5f49",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "scan-row-opposite-memory",
+      "script": "test/compat/generated/scan-row-opposite.ass",
+      "sha256": "8ba2c1ec3d23caeb45897eaa3a0836b82d08937ddb1b5c66d846be83dc8b5f49",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "scan-row-hole-file",
+      "script": "test/compat/generated/scan-row-hole.ass",
+      "sha256": "ce8f5a70ee3766cc3a4036cb5bea490a3fa40a7bf195fb6730eb1add28abe249",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "scan-row-hole-memory",
+      "script": "test/compat/generated/scan-row-hole.ass",
+      "sha256": "ce8f5a70ee3766cc3a4036cb5bea490a3fa40a7bf195fb6730eb1add28abe249",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "scan-row-touching-file",
+      "script": "test/compat/generated/scan-row-touching.ass",
+      "sha256": "f299bb61340d86996393cb2ad4bcb971d1027db3450eb4281ee3e7d0b38cd395",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "scan-row-touching-memory",
+      "script": "test/compat/generated/scan-row-touching.ass",
+      "sha256": "f299bb61340d86996393cb2ad4bcb971d1027db3450eb4281ee3e7d0b38cd395",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "scan-row-crossing-file",
+      "script": "test/compat/generated/scan-row-crossing.ass",
+      "sha256": "1b090b32c98cc1dcf4334c836f74f6e58150dd11710f8f7f92fdc5d08899d26c",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "scan-row-crossing-memory",
+      "script": "test/compat/generated/scan-row-crossing.ass",
+      "sha256": "1b090b32c98cc1dcf4334c836f74f6e58150dd11710f8f7f92fdc5d08899d26c",
       "open": "memory",
       "width": 1280,
       "height": 720,
