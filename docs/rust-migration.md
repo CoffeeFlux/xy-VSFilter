@@ -20,6 +20,30 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* SSF quoted-string and brace-block parsing decisions now run in safe Rust.
+  A transient stack record requests native whitespace, peek/read, append,
+  definition-commit and exact error operations without retaining a Rust borrow
+  across those calls. Native CStringW storage and stream/definition side effects
+  remain in place. Escaped newlines are accepted, escaped block braces do not
+  affect depth, and the original error spellings and ordering are preserved.
+  Complete pinned ParseQuotedString/ParseBlock methods match locally in ordinary
+  and fatal ASan/UBSan builds on arm64 and x64: **424,182 histories / 34,525,384
+  fields / 398,959 successful calls / 441,161 parse errors / 8,244 before-or-after
+  callback interruptions / 4,547,757 Rust transitions**. Cases include every
+  UTF-16 value direct and escaped, both quotes, embedded NUL/surrogates, nested
+  blocks, raw provider values, different Peek/Get results, retries and partial
+  destination commits. The leaf harness controls stream/definition/error
+  callbacks; Windows uses actual CStringW append. Actual allocation failure,
+  callback reentry, depth beyond the native integer range, locale/comment
+  handling inside the controlled stream and actual IO remain outside this leaf
+  proof. Wider Rust depth has no parity claim for native integer overflow.
+  **149 core / 109 FFI tests**, formatting, Clippy, 35 Python checks (three local
+  skips), and native-default syntax pass. Windows/Miri are pending. Native SSF
+  coverage expands to **36 cases** with escaped quotes, escaped newlines and
+  nested/escaped braces in all four input modes; changed-dump controls require
+  the added definitions to be observed. Visible SSF rendering remains outside
+  that parser/dump proof.
+
 * SSF Split now performs separator searches in safe Rust using read-only UTF-16
   spans. Search stops at NUL from the requested offset while preserving the
   declared string length for native Mid/Trim and token selection. Native
@@ -35,7 +59,9 @@ unresolved reference outcomes requiring investigation, never matching results.
   arrays and unrepresentable lengths remain excluded. The FFI ownership test
   checks overlapping input/separator slices across NUL boundaries.
   **149 core / 108 FFI tests**, formatting, Clippy, 35 Python checks (three
-  local skips) and default native syntax pass; Windows/Miri are pending.
+  local skips) and default native syntax pass. Windows x86/x64 leaf checks,
+  Miri and native SSF pass on commit `372e8cfb`; the remaining portable/renderer
+  jobs are still running.
   Native SSF cases now add colon-separated clock times in all four input modes
   (**28 cases**) and enforce the expected start/stop/seek timeline. That timing
   control also agrees with all 192 saved captures from the prior 24-case run.

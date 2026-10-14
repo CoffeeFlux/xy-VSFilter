@@ -23,6 +23,9 @@ def cases():
                 'style.font {face: "Arial"; size: 20;}; @ { ' + text + ' }; };')
     plain = subtitle("SSF compatibility")
     return {"plain": plain,
+            "quoted-literals": ('#quoted: "double\\\"quote\\\\tail"; '
+                                "#single: 'single\\'quote\\\ncontinued'; " + plain),
+            "nested-block": r"@#literal { outer { inner } \{escaped\} \\tail }; " + plain,
             "clock-time": plain.replace("start: 0; stop: 2;", "start: 00:00:00.000; stop: 00:00:02.000;"),
             "comments": "/* before */ // line\r\n" + plain.replace("time {", "time /* middle */ {") + "/* after */",
             "arabic": subtitle("\u0628\u0627\u0628 \u0644\u0627 \u0626\u0628"),
@@ -148,6 +151,10 @@ def main():
             b = by_name["comments-" + mode]["captures"][side]["files"]
             c = by_name["arabic-" + mode]["captures"][side]["files"]
             report["controls"][side + "-" + mode] = a == b and a["dump-5.units"] != c["dump-5.units"]
+            for name in ("quoted-literals", "nested-block"):
+                literal = by_name[name + "-" + mode]["captures"][side]["files"]
+                report["controls"][side + "-" + mode + "-" + name] = (
+                    literal["dump-5.units"] != a["dump-5.units"])
         for name in cases():
             wide = by_name[name + "-wide"]["captures"][side]
             report["controls"][side + "-" + name + "-input-modes"] = all(
