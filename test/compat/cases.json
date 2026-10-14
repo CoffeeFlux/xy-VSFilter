@@ -249,6 +249,14 @@
     [
       "variance-control-memory",
       "variance-diagonal-memory"
+    ],
+    [
+      "blur-planes-control-file",
+      "blur-planes-body-file"
+    ],
+    [
+      "blur-planes-control-memory",
+      "blur-planes-body-memory"
     ]
   ],
   "cases": [
@@ -12830,6 +12838,182 @@
       "id": "arc-queue-animated-memory",
       "script": "test/compat/generated/arc-queue-animated.ass",
       "sha256": "10970619f3b28a254798607b2f6c0f0b8ca8a4d9f3bbaa175dc8561f65d980a7",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "blur-planes-control-file",
+      "script": "test/compat/generated/blur-planes-control.ass",
+      "sha256": "392119f1025a9c3b3ce8f94112715db02494775def19d9007388b0479040bbc0",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "blur-planes-control-memory",
+      "script": "test/compat/generated/blur-planes-control.ass",
+      "sha256": "392119f1025a9c3b3ce8f94112715db02494775def19d9007388b0479040bbc0",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "blur-planes-body-file",
+      "script": "test/compat/generated/blur-planes-body.ass",
+      "sha256": "95f827880cbe160c57708f6f7123ee043b4ae63e197a75d3fc8fa031c63adde4",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "blur-planes-body-memory",
+      "script": "test/compat/generated/blur-planes-body.ass",
+      "sha256": "95f827880cbe160c57708f6f7123ee043b4ae63e197a75d3fc8fa031c63adde4",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "blur-planes-border-file",
+      "script": "test/compat/generated/blur-planes-border.ass",
+      "sha256": "435ddce0892e175982d67fd64445b5b877d2365f53114a78f2d796b45d1c46c8",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "blur-planes-border-memory",
+      "script": "test/compat/generated/blur-planes-border.ass",
+      "sha256": "435ddce0892e175982d67fd64445b5b877d2365f53114a78f2d796b45d1c46c8",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "blur-planes-fractional-file",
+      "script": "test/compat/generated/blur-planes-fractional.ass",
+      "sha256": "09607f1e353a6821d75d8be451726356269d7c9b1c82be0ac4e3dacdcc9dcc7c",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "blur-planes-fractional-memory",
+      "script": "test/compat/generated/blur-planes-fractional.ass",
+      "sha256": "09607f1e353a6821d75d8be451726356269d7c9b1c82be0ac4e3dacdcc9dcc7c",
       "open": "memory",
       "width": 1280,
       "height": 720,

@@ -837,6 +837,14 @@ public:
         definition = definition.replace("xy_vsfilter_bilinear_row", "ObservedVarianceRow")
         variance_code += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_variance.h").write_text(variance_code, encoding="utf-8")
+    blur_planes_code = '#include "blur_planes_shell.h"\n'
+    for name, content in (("ReferenceBlurPlanes", raster_source), ("CandidateBlurPlanes", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+        text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        blur_planes_code += f"namespace {name} {{\nBLUR_PLANES_CLASS\n"
+        if name == "CandidateBlurPlanes":
+            blur_planes_code += "#define XY_VSFILTER_RUST_TEXT\n"
+        blur_planes_code += extract_definition(text, "bool Rasterizer::BeBlur(") + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_blur_planes.h").write_text(blur_planes_code, encoding="utf-8")
     filter_source = original("src/subtitles/xy_filter.cpp", reference["commit"])
     vobsub_source = original("src/subtitles/VobSubImage.cpp", reference["commit"])
     golomb = '#pragma once\n#include "golomb_shell.h"\n'
@@ -1362,6 +1370,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     variance_result = run([str(variance_executable)], capture_output=True, text=True)
     print(variance_result.stdout, end="", flush=True)
     print(variance_result.stderr, end="", file=sys.stderr)
+    blur_planes_executable = destination / ("blur-planes-oracle.exe" if os.name == "nt" else "blur-planes-oracle")
+    blur_planes_compile = [arg.replace("find_char_oracle.cpp", "blur_planes_oracle.cpp").replace("find-char-oracle", "blur-planes-oracle") for arg in find_char_compile]
+    run(blur_planes_compile)
+    blur_planes_result = run([str(blur_planes_executable)], capture_output=True, text=True)
+    print(blur_planes_result.stdout, end="", flush=True)
+    print(blur_planes_result.stderr, end="", file=sys.stderr)
     pipe_line_executable = destination / ("pipe-line-oracle.exe" if os.name == "nt" else "pipe-line-oracle")
     pipe_line_compile = [arg.replace("find_char_oracle.cpp", "pipe_line_oracle.cpp").replace("find-char-oracle", "pipe-line-oracle") for arg in find_char_compile]
     run(pipe_line_compile)
@@ -1751,6 +1765,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "path_align_compile_command": path_align_compile,
         "path_align_result": path_align_result.stdout, "path_align_stderr": path_align_result.stderr,
         "path_align_scope": "Complete pinned PathData::AlignLeftTop over initialized point/type buffers; actual Windows POINT/ATL geometry; exact guarded buffers, origin/size, errno/FP/Windows error state; native cleanup modeled, outputs disjoint and representable arithmetic only",
+        "blur_planes_compile_command": blur_planes_compile,
+        "blur_planes_result": blur_planes_result.stdout, "blur_planes_stderr": blur_planes_result.stderr,
+        "blur_planes_scope": "Whole pinned BeBlur with native floating geometry/pass control and controlled fixed/fractional filter callbacks; exact plane bytes/padding, allocation and cleanup, retained shared references, source-plane aliases and cache-byte accounting. Both input planes present; source/output object aliasing, invalid geometry, actual OOM and scratch allocation failure are excluded. Filter kernels have independent differential campaigns; native allocation guards and Rust ownership checks have distinct scopes.",
         "variance_compile_command": variance_compile,
         "variance_result": variance_result.stdout, "variance_stderr": variance_result.stderr,
         "variance_scope": "Complete pinned GetSubpixelVariance and Bilinear, initialized source planes including padding and aliases, exact bytes and copy-branch behavior, native shared-reference lifetimes and logical cache accounting. Native allocation guards and Rust lifetime tests have distinct scopes. Filter scratch allocation failure is modeled; object/plane allocation failures, inconsistent metadata, out-of-backing copies and arithmetic overflow are excluded.",
