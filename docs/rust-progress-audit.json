@@ -1,0 +1,2317 @@
+{
+  "schema": 1,
+  "audit_kind": "Independent source-and-existing-evidence progress audit; no new native execution",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "candidate_commit": "138ed9626b9c3f6e5e3dab907f6ca9da2628a49e",
+  "ledger_reviewed": {
+    "path": "docs/rust-migration.md",
+    "sha256": "96dc85b98d5df77e49256fe07509e6305abc6df8ab98c1bf997189e463a34baa",
+    "new_ledger_commit": "138ed9626b9c3f6e5e3dab907f6ca9da2628a49e"
+  },
+  "conclusion": {
+    "overall_completion_percent": null,
+    "reason": "No complete behavioral/ownership inventory or weighted closure denominator exists. Source lines, hook counts, tests and commits cannot supply it. The earlier roughly 10 percent estimate was not calibrated and cannot measure ten-hour progress.",
+    "domain_closure_count": 0,
+    "planning_domain_count": 11,
+    "domain_count_interpretation": "Zero of eleven broad planning domains can currently be certified closed; domains are unequal and this is not zero percent implementation. Substantial verified leaf work exists.",
+    "default_build": "Native implementation retained; Rust-enabled candidate selected with RustTextDecoder=true for supported Release Win32/x64 configurations."
+  },
+  "method": {
+    "tree_source": "git archive of both exact commits, read as tar archives; no working-tree or artifact/generated-source counts in source inventory.",
+    "physical_lines": "len(blob.splitlines()); includes blank/comment/test/retained preprocessor-branch lines. Extensions listed below.",
+    "changed": "Raw byte comparison of same baseline path; no baseline source files deleted. Byte equality includes line endings.",
+    "rust_hooks": "Lexical presence of XY_VSFILTER_RUST\\w* or xy_vsfilter_\\w* or xy_rust_\\w*. Indicates integration footprint only; does not prove reachability, replacement size, ownership closure or runtime coverage.",
+    "inventory_scope": "All 3737 baseline tracked files examined for source extensions. First-party application scale separated from BaseClasses, SDK/public headers, vendored libraries and tests. Project compile entry counts are configuration-unresolved and may overlap; not a runtime dependency closure.",
+    "evidence_review": "Read committed evidence summaries, scopes and checks at their exact candidate SHAs; archived reports are not asserted to validate later HEAD. This independent audit did not revalidate all raw capture hashes or query current CI.",
+    "production_review": "Source inspection of native build switch, document and renderer containers, SSF adapters, Plane/ByteStorage/PathBuffer adapters, experimental VobSub gate, and host project source lists.",
+    "reproduction": "For inventory use git ls-tree -r --name-only REV and git show REV:PATH (or git archive REV); select extensions, group paths as listed, count splitlines and compare raw blobs. For ten-hour activity use git diff --numstat START END and git rev-list --count START..END. All input commits and selection rules are included."
+  },
+  "source_extensions": [
+    ".asm",
+    ".c",
+    ".cc",
+    ".cpp",
+    ".cxx",
+    ".h",
+    ".hh",
+    ".hpp",
+    ".hxx",
+    ".inl",
+    ".s"
+  ],
+  "reference_tracked_files": 3737,
+  "application_source_scope_prefixes": [
+    "src/decss/",
+    "src/dsutil/",
+    "src/filters/transform/basevideofilter/",
+    "src/filters/transform/vsfilter/",
+    "src/subpic/",
+    "src/subtitles/"
+  ],
+  "application_source_summary": {
+    "baseline_files": 241,
+    "baseline_physical_lines": 83625,
+    "candidate_physical_lines_in_same_files": 86190,
+    "changed_files": 29,
+    "files_with_rust_hook_tokens": 29,
+    "unchanged_files": 212,
+    "deleted_files": 0
+  },
+  "full_repository_source_inventory": {
+    "include/SDK-and-public-headers": {
+      "baseline_files": 51,
+      "baseline_physical_lines": 17875,
+      "candidate_physical_lines_in_same_files": 17875,
+      "changed_files": 0,
+      "files_with_rust_hook_tokens": 0,
+      "rust_hook_tokens": 0,
+      "unchanged_files": 51,
+      "deleted_files": 0
+    },
+    "src/decss": {
+      "baseline_files": 15,
+      "baseline_physical_lines": 2570,
+      "candidate_physical_lines_in_same_files": 2570,
+      "changed_files": 0,
+      "files_with_rust_hook_tokens": 0,
+      "rust_hook_tokens": 0,
+      "unchanged_files": 15,
+      "deleted_files": 0
+    },
+    "src/dsutil": {
+      "baseline_files": 33,
+      "baseline_physical_lines": 10329,
+      "candidate_physical_lines_in_same_files": 10350,
+      "changed_files": 1,
+      "files_with_rust_hook_tokens": 1,
+      "rust_hook_tokens": 4,
+      "unchanged_files": 32,
+      "deleted_files": 0
+    },
+    "src/filters/BaseClasses": {
+      "baseline_files": 62,
+      "baseline_physical_lines": 36332,
+      "candidate_physical_lines_in_same_files": 36332,
+      "changed_files": 0,
+      "files_with_rust_hook_tokens": 0,
+      "rust_hook_tokens": 0,
+      "unchanged_files": 62,
+      "deleted_files": 0
+    },
+    "src/filters/transform/basevideofilter": {
+      "baseline_files": 4,
+      "baseline_physical_lines": 1299,
+      "candidate_physical_lines_in_same_files": 1299,
+      "changed_files": 0,
+      "files_with_rust_hook_tokens": 0,
+      "rust_hook_tokens": 0,
+      "unchanged_files": 4,
+      "deleted_files": 0
+    },
+    "src/filters/transform/vsfilter": {
+      "baseline_files": 51,
+      "baseline_physical_lines": 19397,
+      "candidate_physical_lines_in_same_files": 19419,
+      "changed_files": 2,
+      "files_with_rust_hook_tokens": 2,
+      "rust_hook_tokens": 6,
+      "unchanged_files": 49,
+      "deleted_files": 0
+    },
+    "src/subpic": {
+      "baseline_files": 40,
+      "baseline_physical_lines": 12173,
+      "candidate_physical_lines_in_same_files": 12173,
+      "changed_files": 0,
+      "files_with_rust_hook_tokens": 0,
+      "rust_hook_tokens": 0,
+      "unchanged_files": 40,
+      "deleted_files": 0
+    },
+    "src/subtitles": {
+      "baseline_files": 98,
+      "baseline_physical_lines": 37857,
+      "candidate_physical_lines_in_same_files": 40379,
+      "changed_files": 26,
+      "files_with_rust_hook_tokens": 26,
+      "rust_hook_tokens": 441,
+      "unchanged_files": 72,
+      "deleted_files": 0
+    },
+    "src/thirdparty/VirtualDub": {
+      "baseline_files": 208,
+      "baseline_physical_lines": 56879,
+      "candidate_physical_lines_in_same_files": 56879,
+      "changed_files": 0,
+      "files_with_rust_hook_tokens": 0,
+      "rust_hook_tokens": 0,
+      "unchanged_files": 208,
+      "deleted_files": 0
+    },
+    "src/thirdparty/boost_lib": {
+      "baseline_files": 2481,
+      "baseline_physical_lines": 350133,
+      "candidate_physical_lines_in_same_files": 350133,
+      "changed_files": 0,
+      "files_with_rust_hook_tokens": 0,
+      "rust_hook_tokens": 0,
+      "unchanged_files": 2481,
+      "deleted_files": 0
+    },
+    "src/thirdparty/gtest": {
+      "baseline_files": 102,
+      "baseline_physical_lines": 83620,
+      "candidate_physical_lines_in_same_files": 83620,
+      "changed_files": 0,
+      "files_with_rust_hook_tokens": 0,
+      "rust_hook_tokens": 0,
+      "unchanged_files": 102,
+      "deleted_files": 0
+    },
+    "src/thirdparty/log4cplus": {
+      "baseline_files": 107,
+      "baseline_physical_lines": 18412,
+      "candidate_physical_lines_in_same_files": 18412,
+      "changed_files": 0,
+      "files_with_rust_hook_tokens": 0,
+      "rust_hook_tokens": 0,
+      "unchanged_files": 107,
+      "deleted_files": 0
+    },
+    "src/thirdparty/mfc": {
+      "baseline_files": 4,
+      "baseline_physical_lines": 4298,
+      "candidate_physical_lines_in_same_files": 4298,
+      "changed_files": 0,
+      "files_with_rust_hook_tokens": 0,
+      "rust_hook_tokens": 0,
+      "unchanged_files": 4,
+      "deleted_files": 0
+    },
+    "src/thirdparty/unrar": {
+      "baseline_files": 147,
+      "baseline_physical_lines": 28659,
+      "candidate_physical_lines_in_same_files": 28659,
+      "changed_files": 0,
+      "files_with_rust_hook_tokens": 0,
+      "rust_hook_tokens": 0,
+      "unchanged_files": 147,
+      "deleted_files": 0
+    },
+    "test/unit_test": {
+      "baseline_files": 10,
+      "baseline_physical_lines": 3892,
+      "candidate_physical_lines_in_same_files": 3892,
+      "changed_files": 0,
+      "files_with_rust_hook_tokens": 0,
+      "rust_hook_tokens": 0,
+      "unchanged_files": 10,
+      "deleted_files": 0
+    }
+  },
+  "rust_source_scale": {
+    "rust/compat/src/": {
+      "files": 78,
+      "physical_lines_including_tests": 9278
+    },
+    "rust/ffi/src/": {
+      "files": 67,
+      "physical_lines_including_tests": 8400
+    }
+  },
+  "project_compile_entries": {
+    "src/dsutil/dsutil.vcxproj": {
+      "clcompile_entries": 14
+    },
+    "src/filters/BaseClasses/BaseClasses.vcxproj": {
+      "clcompile_entries": 29
+    },
+    "src/filters/transform/basevideofilter/basevideofilter.vcxproj": {
+      "clcompile_entries": 2
+    },
+    "src/filters/transform/vsfilter/VSFilter.vcxproj": {
+      "clcompile_entries": 20
+    },
+    "src/filters/transform/vsfilter/xy_sub_filter.vcxproj": {
+      "clcompile_entries": 17
+    },
+    "src/filters/transform/vsfilter/xy_sub_filter_consumer.vcxproj": {
+      "clcompile_entries": 15
+    },
+    "src/subpic/subpic.vcxproj": {
+      "clcompile_entries": 18
+    },
+    "src/subtitles/libssf/libssf.vcxproj": {
+      "clcompile_entries": 17
+    },
+    "src/subtitles/subtitles.vcxproj": {
+      "clcompile_entries": 30
+    },
+    "src/thirdparty/VirtualDub/Kasumi/Kasumi.vcxproj": {
+      "clcompile_entries": 39
+    },
+    "src/thirdparty/VirtualDub/system/system.vcxproj": {
+      "clcompile_entries": 49
+    },
+    "src/thirdparty/gtest/msvc/gtest.vcxproj": {
+      "clcompile_entries": 1
+    },
+    "src/thirdparty/log4cplus/msvc/log4cplus_static.vcxproj": {
+      "clcompile_entries": 39
+    },
+    "src/thirdparty/unrar/unrar.vcxproj": {
+      "clcompile_entries": 49
+    },
+    "test/unit_test/unit_test.vcxproj": {
+      "clcompile_entries": 2
+    }
+  },
+  "safety_progress_classes": [
+    {
+      "class": "Safe application decisions",
+      "examples": [
+        "rust/compat/src/ass_dialogue.rs",
+        "rust/compat/src/ssf_literal.rs",
+        "rust/compat/src/cc.rs"
+      ],
+      "credit": "Application logic implemented under forbid(unsafe_code), with bounded Rust collections/slices. FFI still relies on native input lifetime/validity contracts.",
+      "not_credit": "Does not close surrounding native document/renderer/host lifecycles."
+    },
+    {
+      "class": "Opaque owned collections with bounded access",
+      "examples": [
+        "rust/compat/src/ssf_stream.rs",
+        "include/xy_rust_ssf_stream.h",
+        "include/xy_rust_ssf_literal_text.h"
+      ],
+      "credit": "Lookahead and literal vectors plus immutable input snapshots move meaningful ownership and indexing into Rust.",
+      "not_credit": "CStringW fallback/alias anchors and final native definition/document ownership remain; input modes and decline paths differ."
+    },
+    {
+      "class": "Rust-owned allocation with native raw access",
+      "examples": [
+        "rust/compat/src/plane.rs",
+        "include/xy_rust_plane.h",
+        "include/xy_rust_byte_storage.h",
+        "include/xy_rust_path_buffer.h"
+      ],
+      "credit": "Allocation, size checks and release path moved into bounded owner abstractions.",
+      "not_credit": "Native writers still receive raw pointer loans. This is not equivalent to moving all accesses into safe Rust or memory-safety closure."
+    },
+    {
+      "class": "Unenabled or retained native paths",
+      "examples": [
+        "src/subtitles/VobSubImage.h",
+        "src/subtitles/VobSubImage.cpp",
+        "include/xy_rust_ssf_stream.h"
+      ],
+      "credit": "Experimental and fallback status is explicitly represented.",
+      "not_credit": "XY_VSFILTER_RUST_VOBSUB_STORAGE_EXPERIMENT does not receive production migration credit; native fallback execution remains part of scope."
+    }
+  ],
+  "domains": [
+    {
+      "id": "text_io",
+      "name": "Text input, encoding and attachments",
+      "state": "partial, not closed",
+      "source_checks": [
+        "src/subtitles/TextFile.cpp",
+        "src/subtitles/StdioFile64.cpp",
+        "src/dsutil/FontInstaller.cpp"
+      ],
+      "residual": "Reader, writer and font-record components migrated; file/CRT/codepage/native string ownership and platform adapters remain."
+    },
+    {
+      "id": "ass_document",
+      "name": "ASS/SSA document and timeline",
+      "state": "partial, not closed",
+      "source_checks": [
+        "src/subtitles/STS.h",
+        "src/subtitles/STS.cpp"
+      ],
+      "residual": "Field and timeline logic migrated in pieces; entries, segments, styles, copy/edit/sort/save lifecycles remain native."
+    },
+    {
+      "id": "other_text",
+      "name": "Other text formats",
+      "state": "partial, not closed",
+      "source_checks": [
+        "src/subtitles/RealTextParser.cpp",
+        "src/subtitles/USFSubtitles.cpp",
+        "src/subtitles/STS.cpp"
+      ],
+      "residual": "Many RealText/SubRip/MicroDVD/WebVTT/SAMI pieces exist; no complete supported-format lifecycle and recovery inventory."
+    },
+    {
+      "id": "ass_layout",
+      "name": "ASS tags, layout and text preparation",
+      "state": "partial, not closed",
+      "source_checks": [
+        "src/subtitles/RTS.cpp",
+        "src/subtitles/RTS.h"
+      ],
+      "residual": "Lexing/preparation/layout decisions exist; CWord/CLine/CSubtitle state and tag execution/cache orchestration remain native."
+    },
+    {
+      "id": "font_paths",
+      "name": "Fonts, shaping and glyph paths",
+      "state": "partial, not closed",
+      "source_checks": [
+        "src/subtitles/RTS.cpp",
+        "src/subtitles/Rasterizer.cpp",
+        "src/subtitles/libssf/FontWrapper.cpp"
+      ],
+      "residual": "Path staging and mathematical helpers migrated; GDI/font/kerning boundaries and persistent path copies/reallocations remain."
+    },
+    {
+      "id": "raster",
+      "name": "Rasterization and effects",
+      "state": "partial, not closed",
+      "source_checks": [
+        "src/subtitles/Rasterizer.cpp",
+        "src/subtitles/SeparableFilter.h"
+      ],
+      "residual": "Substantial leaf algorithms and scratch/storage moved; native orchestration and writable buffer loans remain."
+    },
+    {
+      "id": "surface_cache",
+      "name": "Surfaces, caches and final compositing",
+      "state": "partial, not closed",
+      "source_checks": [
+        "src/subpic/SubPicQueueImpl.cpp",
+        "src/subpic/MemSubPic.cpp",
+        "src/subtitles/cache_manager.h"
+      ],
+      "residual": "Selected subtitle bitmap/composite storage moved, but all 40 baseline subpic source/header files remain byte-identical."
+    },
+    {
+      "id": "bitmap_caption",
+      "name": "Bitmap subtitles and captions",
+      "state": "partial, not closed",
+      "source_checks": [
+        "src/subtitles/VobSubImage.cpp",
+        "src/subtitles/HdmvSub.cpp",
+        "src/subtitles/DVBSub.cpp",
+        "src/subtitles/CCDecoder.cpp"
+      ],
+      "residual": "Packet/bit/RLE/decoder components and some buffers migrated; full playback/state/host lifecycles are not closed; VobSub persistent storage is experimental only."
+    },
+    {
+      "id": "ssf",
+      "name": "SSF",
+      "state": "partial, not closed",
+      "source_checks": [
+        "src/subtitles/libssf/Stream.cpp",
+        "src/subtitles/libssf/File.cpp",
+        "src/subtitles/libssf/Node.h",
+        "src/subtitles/libssf/Renderer.cpp"
+      ],
+      "residual": "Streams, lookahead, literal decisions/text, Arabic and split search migrated; nodes, definitions, layout and rendering remain native."
+    },
+    {
+      "id": "hosts",
+      "name": "Public hosts and ABI",
+      "state": "partial, not closed",
+      "source_checks": [
+        "src/filters/transform/vsfilter/plugins.cpp",
+        "src/filters/transform/vsfilter/csriapi.cpp",
+        "src/filters/transform/vsfilter/DirectVobSubFilter.cpp",
+        "src/filters/transform/vsfilter/xy_sub_filter_consumer.cpp"
+      ],
+      "residual": "CSRI differential and export/disconnected COM evidence exists; complete real-host/graph/lifecycle validation absent and adapters largely native."
+    },
+    {
+      "id": "support",
+      "name": "Supporting code and dependencies",
+      "state": "partial, not closed",
+      "source_checks": [
+        "src/decss/VobFile.cpp",
+        "src/dsutil/DSUtil.cpp",
+        "src/filters/BaseClasses/amfilter.cpp"
+      ],
+      "residual": "Dependency reachability and retained-native adapter scope not closed; BaseClasses and vendored source remain unchanged."
+    }
+  ],
+  "reviewed_evidence": [
+    {
+      "path": "docs/ssf-integration-evidence.json",
+      "sha256": "24580a900c2c3ff25fffe43f4c114201c607195971e2edd17b52122f42312997",
+      "candidate_commit": "754674866ae5ed13169380a733a2415737667f91",
+      "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+      "scope": {
+        "integrated": "SSF queue ownership, safe comment/peek state transitions, output code-unit encoding and Arabic replacement.",
+        "validation": "All four portable jobs, Miri, both full Windows renderer jobs and exact-commit local sanitizer campaign passed. Each renderer matched 798 cases / 8426 frames plus 32 mutation cases / 224 frames and scoped COM controls.",
+        "limits": "CSRI does not exercise SSF rendering. Actual native SSF parser/dump checks were added later and have their own evidence. Later byte/UTF-16 input snapshots, BOM/UTF-16 assembly and Windows evidence-test newline repair are not included. Earlier failures remain failed."
+      },
+      "native_platforms": [
+        {
+          "platform": "Win32",
+          "job_passed": true,
+          "csri_cases": 798,
+          "csri_frames": 8426,
+          "exports_equal": true
+        },
+        {
+          "platform": "x64",
+          "job_passed": true,
+          "csri_cases": 798,
+          "csri_frames": 8426,
+          "exports_equal": true
+        }
+      ],
+      "miri_job_passed": true,
+      "limits": [
+        "Finite fixtures and mutation campaigns do not establish universal compatibility or memory safety.",
+        "CSRI BGRX rendering and format queries; real Aegisub/player and other host integration remains outstanding.",
+        "Comparisons pair reference and candidate on the same architecture and environment, not across architectures.",
+        "Most native parsing, font handling, rasterization, compositing and third-party code remains C++.",
+        "Drawing preprocessing, numeric conversion, scaling and final path storage remain native.",
+        "Native sanitizers cover extracted C++ tests, not the full renderer or Rust static library.",
+        "Native out-of-memory recovery, Windows 7 and older CPUs remain unverified.",
+        "WebVTT end-of-list insertion has candidate-only validation and is excluded from reference-parity counts."
+      ]
+    },
+    {
+      "path": "docs/ssf-literal-native-evidence.json",
+      "sha256": "e709d0e7bc916d25244867ca694daf9b94c8f41f1108a85cd85700aca9289cae",
+      "candidate_commit": "591f80c9b4965071b883a72e5ce809f243187d44",
+      "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+      "scope": "Actual separately linked SSF parser and six-encoding node dumps. Exact native start/stop/seek traces and blank-frame observations; zero visible SSF rendering parity frames. All captures, fixture inputs, binaries, library hashes and harness sources checked against pinned provenance. Leaf tests, Miri and whole-renderer validation are separate.",
+      "native_platforms": [
+        {
+          "platform": "Win32",
+          "job_passed": true,
+          "case_count": 36,
+          "blank_frame_observations": 216,
+          "visible_rendering_parity_frames": 0
+        },
+        {
+          "platform": "x64",
+          "job_passed": true,
+          "case_count": 36,
+          "blank_frame_observations": 216,
+          "visible_rendering_parity_frames": 0
+        }
+      ]
+    },
+    {
+      "path": "docs/ownership-integration-evidence.json",
+      "sha256": "a4fe26a80f968bbd6d86e71b76e3ec323f688769cae325362b0c8bf12b224a9c",
+      "candidate_commit": "f5c748a9b69eaa4a3f03ab2df177e4b34f8d0e05",
+      "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+      "scope": {
+        "integrated": "Gaussian output planes, common RLE storage, vector clip masks, HDMV segment storage, DVB packet growth and banner/scroll fades, with repaired initialization-mask and metadata fixtures.",
+        "disabled_experiment": "Persistent VobSub image ownership is tested only under XY_VSFILTER_RUST_VOBSUB_STORAGE_EXPERIMENT; production Rust builds retain native storage pending settings-copy and alias-lifetime coverage.",
+        "strict_fp": "Unix fade oracle uses Clang strict FP; Windows uses MSVC /fp:strict. GCC ambient-flag mismatches remain unresolved in clip-fade-fp-scope.json. Actual DLLs use production flags.",
+        "renderer": "Both architectures match 798 cases / 8426 frames and 32 mutation cases / 224 frames; scroll visibility controls now pass at corrected early sample times. Older failed jobs remain failed.",
+        "not_included": "Later scaler scratch, fractional blur scratch, shifted bitmaps, composite masks and COM probes require their own job results.",
+        "local": "No separate full local run at this exact repair commit. Earlier and later complete local sanitizer reports are archived separately and are not substituted for this commit."
+      },
+      "native_platforms": [
+        {
+          "platform": "Win32",
+          "job_passed": true,
+          "csri_cases": 798,
+          "csri_frames": 8426,
+          "exports_equal": true
+        },
+        {
+          "platform": "x64",
+          "job_passed": true,
+          "csri_cases": 798,
+          "csri_frames": 8426,
+          "exports_equal": true
+        }
+      ],
+      "miri_job_passed": true,
+      "limits": [
+        "Finite fixtures and mutation campaigns do not establish universal compatibility or memory safety.",
+        "CSRI BGRX rendering and format queries; real Aegisub/player and other host integration remains outstanding.",
+        "Comparisons pair reference and candidate on the same architecture and environment, not across architectures.",
+        "Most native parsing, font handling, rasterization, compositing and third-party code remains C++.",
+        "Drawing preprocessing, numeric conversion, scaling and final path storage remain native.",
+        "Native sanitizers cover extracted C++ tests, not the full renderer or Rust static library.",
+        "Native out-of-memory recovery, Windows 7 and older CPUs remain unverified.",
+        "WebVTT end-of-list insertion has candidate-only validation and is excluded from reference-parity counts."
+      ]
+    }
+  ],
+  "ten_hour_activity": {
+    "start": "d6ea50763ac5fbfa61838da7bbc4f191b622faa3",
+    "end": "641ec00e6c7c8620f391584ccd0cc6b3e054f1d2",
+    "start_commit_timestamp": "2026-10-14T00:01:50-07:00",
+    "end_commit_timestamp": "2026-10-14T10:01:31-07:00",
+    "commits": 75,
+    "diff_numstat": {
+      "rust/compat/": {
+        "added": 3437,
+        "deleted": 6,
+        "files": 34
+      },
+      "rust/ffi/": {
+        "added": 3542,
+        "deleted": 0,
+        "files": 34
+      },
+      "tools/compat/": {
+        "added": 8588,
+        "deleted": 48,
+        "files": 121
+      },
+      "src/": {
+        "added": 1401,
+        "deleted": 135,
+        "files": 26
+      },
+      "include/": {
+        "added": 1318,
+        "deleted": 0,
+        "files": 34
+      },
+      "docs/": {
+        "added": 170347,
+        "deleted": 9,
+        "files": 59
+      }
+    },
+    "interpretation": "Substantial implementation and compatibility scaffolding activity; increasingly small leaf and allocation increments rather than completed end-to-end components. Counts cannot infer useful-work hours, CI waiting time, remaining hours or percent completion."
+  },
+  "recommended_measurement": {
+    "unit": "A named public operation or owned lifetime, connected to complete production call paths and a specific closure contract; not one module file or test.",
+    "per_unit_fields": [
+      "pinned native entrypoints",
+      "owner and alias graph",
+      "create/copy/move/mutate/destroy operations",
+      "all call sites and host surfaces",
+      "native fallback conditions",
+      "bounded retained platform adapters",
+      "safe implementation status",
+      "Windows x86/x64 differential proof SHA",
+      "consumer/lifecycle proof",
+      "unresolved exclusions"
+    ],
+    "status_ladder": [
+      "inventoried",
+      "safe logic implemented",
+      "ownership and access closed",
+      "all production paths enabled or bounded adapters specified",
+      "Windows x86/x64 parity validated",
+      "applicable host lifecycle validated",
+      "closed"
+    ],
+    "next_concrete_package": {
+      "name": "CSimpleTextSubtitle entries/styles/segments lifecycle",
+      "source": "src/subtitles/STS.h and STS.cpp",
+      "required_operations": [
+        "construction/destruction/Empty/RemoveAllEntries",
+        "Copy/CopyStyles and aliases",
+        "Add/AddSTSEntryOnly/AddStyle/default-style changes",
+        "Sort/CreateSegments and entry-index stability",
+        "SearchSub/SearchSubs/SearchSubs2 plus forward/backward seek",
+        "ConvertToTimeBased/ConvertToFrameBased and Translate methods",
+        "GetStr/SetStr/ConvertUnicode",
+        "Open variants and SaveAs",
+        "render handoff and host references"
+      ],
+      "initial_state": "Field and timeline helper implementations exist; native owning arrays/styles and surrounding lifecycle still need explicit inventory and closure."
+    },
+    "reporting": "Report changed status counts within a frozen package inventory, plus owned lifetimes/accesses retired and exact validated commit. Keep inventory additions visible. Do not sum unequal domains or infer whole-product percentage until a defensible weighting/denominator is established."
+  },
+  "limitations": [
+    "No complete behavioral inventory exists, especially intentional malformed-input interactions.",
+    "No lexical source measure identifies native fallback reachability or equivalent replacement complexity.",
+    "No whole-repo preprocessor/call-graph extraction was attempted; unchanged files can call migrated functions through shared code, and changed files can remain mostly native.",
+    "Vendored source includes unused headers, tests, alternate platforms and SDK/interface declarations; its full line total must not be treated as required Rust rewrite scope. A runtime dependency inventory is required.",
+    "Finite matching differential fixtures support observed behavior and cannot prove all inputs.",
+    "This audit assesses migration progress rather than original-code safety findings or an overall memory-safety certification."
+  ],
+  "application_file_inventory": [
+    {
+      "path": "src/decss/CSSauth.cpp",
+      "reference_lines": 328,
+      "candidate_lines": 328,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/decss/CSSauth.h",
+      "reference_lines": 5,
+      "candidate_lines": 5,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/decss/CSSscramble.cpp",
+      "reference_lines": 247,
+      "candidate_lines": 247,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/decss/CSSscramble.h",
+      "reference_lines": 8,
+      "candidate_lines": 8,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/decss/DeCSSInputPin.cpp",
+      "reference_lines": 350,
+      "candidate_lines": 350,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/decss/DeCSSInputPin.h",
+      "reference_lines": 50,
+      "candidate_lines": 50,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/decss/VobDec.cpp",
+      "reference_lines": 184,
+      "candidate_lines": 184,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/decss/VobDec.h",
+      "reference_lines": 21,
+      "candidate_lines": 21,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/decss/VobFile.cpp",
+      "reference_lines": 639,
+      "candidate_lines": 639,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/decss/VobFile.h",
+      "reference_lines": 87,
+      "candidate_lines": 87,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/decss/decss.h",
+      "reference_lines": 5,
+      "candidate_lines": 5,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/decss/stdafx.cpp",
+      "reference_lines": 8,
+      "candidate_lines": 8,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/decss/stdafx.h",
+      "reference_lines": 18,
+      "candidate_lines": 18,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/decss/udf.cpp",
+      "reference_lines": 355,
+      "candidate_lines": 355,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/decss/udf.h",
+      "reference_lines": 265,
+      "candidate_lines": 265,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/DSMPropertyBag.cpp",
+      "reference_lines": 396,
+      "candidate_lines": 396,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/DSMPropertyBag.h",
+      "reference_lines": 173,
+      "candidate_lines": 173,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/DSUtil.cpp",
+      "reference_lines": 2392,
+      "candidate_lines": 2392,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/DSUtil.h",
+      "reference_lines": 227,
+      "candidate_lines": 227,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/FontInstaller.cpp",
+      "reference_lines": 94,
+      "candidate_lines": 94,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/FontInstaller.h",
+      "reference_lines": 25,
+      "candidate_lines": 25,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/GolombBuffer.cpp",
+      "reference_lines": 124,
+      "candidate_lines": 145,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/dsutil/GolombBuffer.h",
+      "reference_lines": 57,
+      "candidate_lines": 57,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/H264Nalu.cpp",
+      "reference_lines": 101,
+      "candidate_lines": 101,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/H264Nalu.h",
+      "reference_lines": 81,
+      "candidate_lines": 81,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/HdmvClipInfo.cpp",
+      "reference_lines": 468,
+      "candidate_lines": 468,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/HdmvClipInfo.h",
+      "reference_lines": 149,
+      "candidate_lines": 149,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/MediaTypeEx.cpp",
+      "reference_lines": 644,
+      "candidate_lines": 644,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/MediaTypeEx.h",
+      "reference_lines": 16,
+      "candidate_lines": 16,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/MediaTypes.cpp",
+      "reference_lines": 565,
+      "candidate_lines": 565,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/MediaTypes.h",
+      "reference_lines": 47,
+      "candidate_lines": 47,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/Mpeg2Def.h",
+      "reference_lines": 162,
+      "candidate_lines": 162,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/NullRenderers.cpp",
+      "reference_lines": 158,
+      "candidate_lines": 158,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/NullRenderers.h",
+      "reference_lines": 93,
+      "candidate_lines": 93,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/SharedInclude.h",
+      "reference_lines": 16,
+      "candidate_lines": 16,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/a_yuv2rgb.asm",
+      "reference_lines": 1910,
+      "candidate_lines": 1910,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/a_yuvtable.asm",
+      "reference_lines": 612,
+      "candidate_lines": 612,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/convert_a.asm",
+      "reference_lines": 263,
+      "candidate_lines": 263,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/stdafx.cpp",
+      "reference_lines": 29,
+      "candidate_lines": 29,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/stdafx.h",
+      "reference_lines": 36,
+      "candidate_lines": 36,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/text.cpp",
+      "reference_lines": 220,
+      "candidate_lines": 220,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/text.h",
+      "reference_lines": 181,
+      "candidate_lines": 181,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/vd.cpp",
+      "reference_lines": 411,
+      "candidate_lines": 411,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/vd.h",
+      "reference_lines": 48,
+      "candidate_lines": 48,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/vd_asm.cpp",
+      "reference_lines": 432,
+      "candidate_lines": 432,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/vd_asm.h",
+      "reference_lines": 34,
+      "candidate_lines": 34,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/xy_utils.cpp",
+      "reference_lines": 155,
+      "candidate_lines": 155,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/dsutil/xy_utils.h",
+      "reference_lines": 10,
+      "candidate_lines": 10,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/basevideofilter/BaseVideoFilter.cpp",
+      "reference_lines": 1102,
+      "candidate_lines": 1102,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/basevideofilter/BaseVideoFilter.h",
+      "reference_lines": 134,
+      "candidate_lines": 134,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/basevideofilter/stdafx.cpp",
+      "reference_lines": 29,
+      "candidate_lines": 29,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/basevideofilter/stdafx.h",
+      "reference_lines": 34,
+      "candidate_lines": 34,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/CAutoTiming.h",
+      "reference_lines": 33,
+      "candidate_lines": 33,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/Copy.cpp",
+      "reference_lines": 362,
+      "candidate_lines": 362,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/DirectVobSub.cpp",
+      "reference_lines": 1868,
+      "candidate_lines": 1868,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/DirectVobSub.h",
+      "reference_lines": 228,
+      "candidate_lines": 228,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/DirectVobSubFilter.cpp",
+      "reference_lines": 2566,
+      "candidate_lines": 2566,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/DirectVobSubFilter.h",
+      "reference_lines": 216,
+      "candidate_lines": 216,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/DirectVobSubFilterDll.cpp",
+      "reference_lines": 143,
+      "candidate_lines": 143,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/DirectVobSubPropPage.cpp",
+      "reference_lines": 2295,
+      "candidate_lines": 2295,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/DirectVobSubPropPage.h",
+      "reference_lines": 379,
+      "candidate_lines": 379,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/IDirectVobSub.h",
+      "reference_lines": 312,
+      "candidate_lines": 312,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/IDirectVobSubXy.h",
+      "reference_lines": 437,
+      "candidate_lines": 437,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/StdAfx.cpp",
+      "reference_lines": 26,
+      "candidate_lines": 26,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/StdAfx.h",
+      "reference_lines": 47,
+      "candidate_lines": 47,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/StyleEditorDialog.cpp",
+      "reference_lines": 315,
+      "candidate_lines": 315,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/StyleEditorDialog.h",
+      "reference_lines": 120,
+      "candidate_lines": 120,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/SubRenderOptionsImpl.cpp",
+      "reference_lines": 125,
+      "candidate_lines": 125,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/SubRenderOptionsImpl.h",
+      "reference_lines": 75,
+      "candidate_lines": 75,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/SubtitleInputPin2.cpp",
+      "reference_lines": 113,
+      "candidate_lines": 113,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/SubtitleInputPin2.h",
+      "reference_lines": 22,
+      "candidate_lines": 22,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/Systray.cpp",
+      "reference_lines": 453,
+      "candidate_lines": 453,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/Systray.h",
+      "reference_lines": 37,
+      "candidate_lines": 37,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/TextInputPin.cpp",
+      "reference_lines": 46,
+      "candidate_lines": 46,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/TextInputPin.h",
+      "reference_lines": 40,
+      "candidate_lines": 40,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/VSFilter.cpp",
+      "reference_lines": 119,
+      "candidate_lines": 119,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/VSFilter.h",
+      "reference_lines": 47,
+      "candidate_lines": 47,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/XyOptions.h",
+      "reference_lines": 44,
+      "candidate_lines": 44,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/XyOptionsImpl.cpp",
+      "reference_lines": 324,
+      "candidate_lines": 324,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/XyOptionsImpl.h",
+      "reference_lines": 137,
+      "candidate_lines": 137,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/XySubRenderIntf.h",
+      "reference_lines": 35,
+      "candidate_lines": 35,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/auto_load_helper.cpp",
+      "reference_lines": 381,
+      "candidate_lines": 386,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/filters/transform/vsfilter/auto_load_helper.h",
+      "reference_lines": 51,
+      "candidate_lines": 51,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/csri.h",
+      "reference_lines": 348,
+      "candidate_lines": 348,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/csriapi.cpp",
+      "reference_lines": 179,
+      "candidate_lines": 196,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/filters/transform/vsfilter/once_logger.cpp",
+      "reference_lines": 3,
+      "candidate_lines": 3,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/once_logger.h",
+      "reference_lines": 60,
+      "candidate_lines": 60,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/plugins.cpp",
+      "reference_lines": 1645,
+      "candidate_lines": 1645,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/resource.h",
+      "reference_lines": 256,
+      "candidate_lines": 256,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/timing_logger.h",
+      "reference_lines": 56,
+      "candidate_lines": 56,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/valami.cpp",
+      "reference_lines": 262,
+      "candidate_lines": 262,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/version.h",
+      "reference_lines": 14,
+      "candidate_lines": 14,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/version_in.h",
+      "reference_lines": 5,
+      "candidate_lines": 5,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/vfr.cpp",
+      "reference_lines": 186,
+      "candidate_lines": 186,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/vfr.h",
+      "reference_lines": 37,
+      "candidate_lines": 37,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/xy_logger.cpp",
+      "reference_lines": 290,
+      "candidate_lines": 290,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/xy_logger.h",
+      "reference_lines": 111,
+      "candidate_lines": 111,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/xy_sub_filter.cpp",
+      "reference_lines": 2595,
+      "candidate_lines": 2595,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/xy_sub_filter.h",
+      "reference_lines": 172,
+      "candidate_lines": 172,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/xy_sub_filter_consumer.cpp",
+      "reference_lines": 1439,
+      "candidate_lines": 1439,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/xy_sub_filter_consumer.h",
+      "reference_lines": 130,
+      "candidate_lines": 130,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/xy_sub_filter_consumer_dll.cpp",
+      "reference_lines": 107,
+      "candidate_lines": 107,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/filters/transform/vsfilter/xy_sub_filter_dll.cpp",
+      "reference_lines": 106,
+      "candidate_lines": 106,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/CRect2.cpp",
+      "reference_lines": 0,
+      "candidate_lines": 0,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/CRect2.h",
+      "reference_lines": 45,
+      "candidate_lines": 45,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/CoordGeom.cpp",
+      "reference_lines": 520,
+      "candidate_lines": 520,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/CoordGeom.h",
+      "reference_lines": 141,
+      "candidate_lines": 141,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/DX9SubPic.cpp",
+      "reference_lines": 467,
+      "candidate_lines": 467,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/DX9SubPic.h",
+      "reference_lines": 107,
+      "candidate_lines": 107,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/ISimpleSubPic.h",
+      "reference_lines": 63,
+      "candidate_lines": 63,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/ISubPic.h",
+      "reference_lines": 253,
+      "candidate_lines": 253,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/ISubRender.h",
+      "reference_lines": 54,
+      "candidate_lines": 54,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/MemSubPic.cpp",
+      "reference_lines": 2330,
+      "candidate_lines": 2330,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/MemSubPic.h",
+      "reference_lines": 131,
+      "candidate_lines": 131,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/PooledSubPic.cpp",
+      "reference_lines": 306,
+      "candidate_lines": 306,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/PooledSubPic.h",
+      "reference_lines": 46,
+      "candidate_lines": 46,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/SimpleSubPicProviderImpl.cpp",
+      "reference_lines": 468,
+      "candidate_lines": 468,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/SimpleSubPicProviderImpl.h",
+      "reference_lines": 108,
+      "candidate_lines": 108,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/SimpleSubPicWrapper.cpp",
+      "reference_lines": 53,
+      "candidate_lines": 53,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/SimpleSubPicWrapper.h",
+      "reference_lines": 23,
+      "candidate_lines": 23,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/SimpleSubpicImpl.cpp",
+      "reference_lines": 657,
+      "candidate_lines": 657,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/SimpleSubpicImpl.h",
+      "reference_lines": 45,
+      "candidate_lines": 45,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/SubPicAllocatorPresenterImpl.cpp",
+      "reference_lines": 206,
+      "candidate_lines": 206,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/SubPicAllocatorPresenterImpl.h",
+      "reference_lines": 106,
+      "candidate_lines": 106,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/SubPicImpl.cpp",
+      "reference_lines": 506,
+      "candidate_lines": 506,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/SubPicImpl.h",
+      "reference_lines": 347,
+      "candidate_lines": 347,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/SubPicProviderExWrapper.cpp",
+      "reference_lines": 107,
+      "candidate_lines": 107,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/SubPicProviderExWrapper.h",
+      "reference_lines": 47,
+      "candidate_lines": 47,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/SubPicProviderImpl.cpp",
+      "reference_lines": 83,
+      "candidate_lines": 83,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/SubPicProviderImpl.h",
+      "reference_lines": 64,
+      "candidate_lines": 64,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/SubPicQueueImpl.cpp",
+      "reference_lines": 808,
+      "candidate_lines": 808,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/SubPicQueueImpl.h",
+      "reference_lines": 147,
+      "candidate_lines": 147,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/XySubRenderFrameWrapper.cpp",
+      "reference_lines": 459,
+      "candidate_lines": 459,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/XySubRenderFrameWrapper.h",
+      "reference_lines": 56,
+      "candidate_lines": 56,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/XySubRenderProviderWrapper.cpp",
+      "reference_lines": 540,
+      "candidate_lines": 540,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/XySubRenderProviderWrapper.h",
+      "reference_lines": 69,
+      "candidate_lines": 69,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/alpha_blender.cpp",
+      "reference_lines": 212,
+      "candidate_lines": 212,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/alpha_blender.h",
+      "reference_lines": 78,
+      "candidate_lines": 78,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/color_conv_table.cpp",
+      "reference_lines": 1040,
+      "candidate_lines": 1040,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/color_conv_table.h",
+      "reference_lines": 74,
+      "candidate_lines": 74,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/stdafx.cpp",
+      "reference_lines": 29,
+      "candidate_lines": 29,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/stdafx.h",
+      "reference_lines": 54,
+      "candidate_lines": 54,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subpic/xy_intrinsics.h",
+      "reference_lines": 1324,
+      "candidate_lines": 1324,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/BaseSub.cpp",
+      "reference_lines": 33,
+      "candidate_lines": 33,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/BaseSub.h",
+      "reference_lines": 56,
+      "candidate_lines": 56,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/CCDecoder.cpp",
+      "reference_lines": 384,
+      "candidate_lines": 479,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/CCDecoder.h",
+      "reference_lines": 51,
+      "candidate_lines": 51,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/CompositionObject.cpp",
+      "reference_lines": 449,
+      "candidate_lines": 556,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/CompositionObject.h",
+      "reference_lines": 125,
+      "candidate_lines": 131,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/DVBSub.cpp",
+      "reference_lines": 677,
+      "candidate_lines": 693,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/DVBSub.h",
+      "reference_lines": 218,
+      "candidate_lines": 224,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/GFN.cpp",
+      "reference_lines": 207,
+      "candidate_lines": 207,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/GFN.h",
+      "reference_lines": 41,
+      "candidate_lines": 41,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/HdmvSub.cpp",
+      "reference_lines": 470,
+      "candidate_lines": 482,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/HdmvSub.h",
+      "reference_lines": 151,
+      "candidate_lines": 157,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/RTS.cpp",
+      "reference_lines": 3658,
+      "candidate_lines": 3869,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/RTS.h",
+      "reference_lines": 514,
+      "candidate_lines": 526,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/Rasterizer.cpp",
+      "reference_lines": 3389,
+      "candidate_lines": 3963,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/Rasterizer.h",
+      "reference_lines": 264,
+      "candidate_lines": 271,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/RealTextParser.cpp",
+      "reference_lines": 599,
+      "candidate_lines": 763,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/RealTextParser.h",
+      "reference_lines": 106,
+      "candidate_lines": 106,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/RenderedHdmvSubtitle.cpp",
+      "reference_lines": 199,
+      "candidate_lines": 199,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/RenderedHdmvSubtitle.h",
+      "reference_lines": 76,
+      "candidate_lines": 76,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/SSF.cpp",
+      "reference_lines": 239,
+      "candidate_lines": 239,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/SSF.h",
+      "reference_lines": 70,
+      "candidate_lines": 70,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/STS.cpp",
+      "reference_lines": 3788,
+      "candidate_lines": 4460,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/STS.h",
+      "reference_lines": 303,
+      "candidate_lines": 303,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/SeparableFilter.h",
+      "reference_lines": 121,
+      "candidate_lines": 121,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/StdioFile64.cpp",
+      "reference_lines": 82,
+      "candidate_lines": 82,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/StdioFile64.h",
+      "reference_lines": 42,
+      "candidate_lines": 42,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/SubtitleInputPin.cpp",
+      "reference_lines": 671,
+      "candidate_lines": 671,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/SubtitleInputPin.h",
+      "reference_lines": 85,
+      "candidate_lines": 85,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/TextFile.cpp",
+      "reference_lines": 377,
+      "candidate_lines": 458,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/TextFile.h",
+      "reference_lines": 87,
+      "candidate_lines": 94,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/USFSubtitles.cpp",
+      "reference_lines": 775,
+      "candidate_lines": 775,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/USFSubtitles.h",
+      "reference_lines": 68,
+      "candidate_lines": 68,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/VobSubFile.cpp",
+      "reference_lines": 2598,
+      "candidate_lines": 2598,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/VobSubFile.h",
+      "reference_lines": 210,
+      "candidate_lines": 210,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/VobSubFileRipper.cpp",
+      "reference_lines": 1187,
+      "candidate_lines": 1187,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/VobSubFileRipper.h",
+      "reference_lines": 189,
+      "candidate_lines": 189,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/VobSubImage.cpp",
+      "reference_lines": 1361,
+      "candidate_lines": 1557,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/VobSubImage.h",
+      "reference_lines": 96,
+      "candidate_lines": 103,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/cache_manager.cpp",
+      "reference_lines": 569,
+      "candidate_lines": 569,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/cache_manager.h",
+      "reference_lines": 333,
+      "candidate_lines": 333,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/draw_item.cpp",
+      "reference_lines": 598,
+      "candidate_lines": 598,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/draw_item.h",
+      "reference_lines": 82,
+      "candidate_lines": 82,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/flyweight_base_types.h",
+      "reference_lines": 140,
+      "candidate_lines": 140,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/hdmv_subtitle_provider.cpp",
+      "reference_lines": 594,
+      "candidate_lines": 594,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/hdmv_subtitle_provider.h",
+      "reference_lines": 110,
+      "candidate_lines": 110,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/Arabic.cpp",
+      "reference_lines": 327,
+      "candidate_lines": 349,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/libssf/Arabic.h",
+      "reference_lines": 34,
+      "candidate_lines": 34,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/Array.cpp",
+      "reference_lines": 28,
+      "candidate_lines": 28,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/Array.h",
+      "reference_lines": 108,
+      "candidate_lines": 108,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/Exception.cpp",
+      "reference_lines": 35,
+      "candidate_lines": 35,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/Exception.h",
+      "reference_lines": 35,
+      "candidate_lines": 35,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/File.cpp",
+      "reference_lines": 261,
+      "candidate_lines": 306,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/libssf/File.h",
+      "reference_lines": 45,
+      "candidate_lines": 45,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/FontWrapper.cpp",
+      "reference_lines": 57,
+      "candidate_lines": 57,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/FontWrapper.h",
+      "reference_lines": 41,
+      "candidate_lines": 41,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/Glyph.cpp",
+      "reference_lines": 306,
+      "candidate_lines": 306,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/Glyph.h",
+      "reference_lines": 63,
+      "candidate_lines": 63,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/GlyphPath.cpp",
+      "reference_lines": 164,
+      "candidate_lines": 164,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/GlyphPath.h",
+      "reference_lines": 45,
+      "candidate_lines": 45,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/Node.cpp",
+      "reference_lines": 551,
+      "candidate_lines": 551,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/Node.h",
+      "reference_lines": 122,
+      "candidate_lines": 122,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/NodeFactory.cpp",
+      "reference_lines": 182,
+      "candidate_lines": 182,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/NodeFactory.h",
+      "reference_lines": 58,
+      "candidate_lines": 58,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/Rasterizer.cpp",
+      "reference_lines": 699,
+      "candidate_lines": 699,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/Rasterizer.h",
+      "reference_lines": 82,
+      "candidate_lines": 82,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/Renderer.cpp",
+      "reference_lines": 819,
+      "candidate_lines": 819,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/Renderer.h",
+      "reference_lines": 160,
+      "candidate_lines": 160,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/Split.cpp",
+      "reference_lines": 74,
+      "candidate_lines": 81,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/libssf/Split.h",
+      "reference_lines": 38,
+      "candidate_lines": 38,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/Stream.cpp",
+      "reference_lines": 360,
+      "candidate_lines": 414,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/libssf/Stream.h",
+      "reference_lines": 143,
+      "candidate_lines": 157,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/libssf/StringMap.cpp",
+      "reference_lines": 28,
+      "candidate_lines": 28,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/StringMap.h",
+      "reference_lines": 46,
+      "candidate_lines": 46,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/Subtitle.cpp",
+      "reference_lines": 701,
+      "candidate_lines": 701,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/Subtitle.h",
+      "reference_lines": 138,
+      "candidate_lines": 138,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/SubtitleFile.cpp",
+      "reference_lines": 403,
+      "candidate_lines": 403,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/SubtitleFile.h",
+      "reference_lines": 73,
+      "candidate_lines": 73,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/stdafx.cpp",
+      "reference_lines": 29,
+      "candidate_lines": 29,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/libssf/stdafx.h",
+      "reference_lines": 70,
+      "candidate_lines": 70,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/mru_cache.h",
+      "reference_lines": 1243,
+      "candidate_lines": 1243,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/stdafx.cpp",
+      "reference_lines": 29,
+      "candidate_lines": 29,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/stdafx.h",
+      "reference_lines": 52,
+      "candidate_lines": 52,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/subpixel_position_controler.cpp",
+      "reference_lines": 35,
+      "candidate_lines": 35,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/subpixel_position_controler.h",
+      "reference_lines": 58,
+      "candidate_lines": 58,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/xy_bitmap.cpp",
+      "reference_lines": 525,
+      "candidate_lines": 539,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/xy_bitmap.h",
+      "reference_lines": 105,
+      "candidate_lines": 111,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/xy_circular_array_queue.h",
+      "reference_lines": 173,
+      "candidate_lines": 173,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/xy_clipper_paint_machine.cpp",
+      "reference_lines": 43,
+      "candidate_lines": 43,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/xy_clipper_paint_machine.h",
+      "reference_lines": 29,
+      "candidate_lines": 29,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/xy_filter.cpp",
+      "reference_lines": 1387,
+      "candidate_lines": 1483,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/xy_int_map.h",
+      "reference_lines": 243,
+      "candidate_lines": 243,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/xy_malloc.cpp",
+      "reference_lines": 68,
+      "candidate_lines": 68,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/xy_malloc.h",
+      "reference_lines": 19,
+      "candidate_lines": 19,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/xy_overlay_paint_machine.cpp",
+      "reference_lines": 241,
+      "candidate_lines": 241,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/xy_overlay_paint_machine.h",
+      "reference_lines": 74,
+      "candidate_lines": 74,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    },
+    {
+      "path": "src/subtitles/xy_widen_region.cpp",
+      "reference_lines": 745,
+      "candidate_lines": 830,
+      "byte_identical": false,
+      "rust_hook_token_present": true
+    },
+    {
+      "path": "src/subtitles/xy_widen_region.h",
+      "reference_lines": 21,
+      "candidate_lines": 21,
+      "byte_identical": true,
+      "rust_hook_token_present": false
+    }
+  ]
+}
