@@ -178,6 +178,48 @@ inline CSize::CSize() { second(); }
         with self.assertRaises(ValueError):
             contract.select_csize_definitions(text, 'atltypes.h')
 
+    def test_active_csize_uses_preprocessed_body_not_final_macro_guess(self):
+        sdk = 'class CSize : public SyntheticBase { public: CSize(); };\n#ifndef INTERNAL_LIBRARY_BUILD\ninline CSize::CSize() { first = 0; second = 0; }\n#endif'
+        rows = contract.select_csize_definitions(sdk, 'atltypes.h')
+        self.assertFalse(contract.csize_source_contract(rows)['complete'])
+        preprocessed = ('Note: including file: C:\\sdk\\atltypes.h\n'
+                        'class CSize : public SyntheticBase { public: CSize(); };\n'
+                        'inline CSize::CSize() { first=0; /* whitespace irrelevant */ second=0; }\n'
+                        'XY_DOCUMENT_CSIZE_ATL_STATIC_LIB_IMPL_DEFINED\n').encode()
+        active, log = contract.select_active_csize(preprocessed, 'synthetic-context', rows)
+        self.assertTrue(active['complete'])
+        self.assertEqual(active['macro_state_after_includes'], 'defined')
+        self.assertTrue(active['active_default_body_matches_selected_sdk_source'])
+        self.assertEqual(active['preprocessed_stream_sha256'], contract.sha(preprocessed))
+        self.assertFalse(active['full_preprocessed_stream_retained'])
+        self.assertNotIn(b'class CSize', log)
+        self.assertNotIn(b'first=0', log)
+        self.assertIn(b'Note: including file:', log)
+        self.assertIn(b'XY_DOCUMENT_CSIZE_ATL_STATIC_LIB_IMPL_DEFINED', log)
+        # An apparently favorable final macro state cannot rescue a different body.
+        wrong = preprocessed.replace(b'first=0', b'first=9').replace(b'_DEFINED', b'_UNDEFINED')
+        active, _ = contract.select_active_csize(wrong, 'synthetic-context', rows)
+        self.assertFalse(active['complete'])
+        self.assertFalse(active['active_default_body_matches_selected_sdk_source'])
+        active, _ = contract.select_active_csize(preprocessed.replace(b'XY_DOCUMENT_CSIZE_ATL_STATIC_LIB_IMPL_DEFINED', b''), 'synthetic-context', rows)
+        self.assertFalse(active['complete'])
+
+    def test_csize_context_is_preprocess_only_with_actual_subtitles_first(self):
+        for platform in ('Win32', 'x64'):
+            for experimental in (False, True):
+                command = contract.csize_context_command('cl', 'context.cpp', platform, experimental)
+                self.assertIn('/EP', command)
+                self.assertNotIn('/c', command)
+                self.assertNotIn('/link', command)
+                self.assertIn('/MT', command)
+                self.assertIn('/fp:precise', command)
+                self.assertIn('/DXY_VSFILTER_RUST_TEXT', command)
+                self.assertEqual('/DXY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL' in command, experimental)
+                self.assertTrue(next(item for item in command if item.startswith('/I')).replace('\\', '/').endswith('/src/subtitles'))
+        self.assertIn('#include <stdafx.h>', contract.CSIZE_CONTEXT_SOURCE)
+        self.assertIn('#include <STS.h>', contract.CSIZE_CONTEXT_SOURCE)
+        self.assertNotIn('CSize', contract.CSIZE_CONTEXT_SOURCE)
+
     def trace(self):
         rows = [{'event': 'provenance', 'pointer_bits': 64, 'cstring_type': 'ATL::CStringT<wchar_t, StrTraitMFC<wchar_t>>'}]
         seq = 0

@@ -4575,15 +4575,7 @@ STSStyle* CSimpleTextSubtitle::GetStyle(int i)
 bool CSimpleTextSubtitle::GetStyle(int i, STSStyle* const stss)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    NamedStyleLookup state = NamedStyleLookup::Missing;
-    if(!GetDocumentForcedDefaultStyle())
-    {
-        state = LookupNamedStyle(m_document->Entry(i).style, stss);
-        if(state == NamedStyleLookup::Missing) state = LookupNamedStyle(g_default_style, stss);
-    }
-    if(state == NamedStyleLookup::Missing) *stss = m_document->DefaultStyle();
-    else if(state == NamedStyleLookup::Null)
-        throw XyRust::DocumentStatusError(XY_DOCUMENT_V1_UNRESOLVED_REFERENCE);
+    *stss = m_document->ResolvedStyle(i);
 #else
     *stss = *GetStyle(i);
 #endif
@@ -4594,16 +4586,9 @@ bool CSimpleTextSubtitle::GetStyle(int i, STSStyle* const stss)
 int CSimpleTextSubtitle::GetCharSet(int i)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    STSStyle value;
-    NamedStyleLookup state = NamedStyleLookup::Missing;
-    if(!GetDocumentForcedDefaultStyle())
-    {
-        state = LookupNamedStyle(m_document->Entry(i).style, &value);
-        if(state == NamedStyleLookup::Missing) state = LookupNamedStyle(g_default_style, &value);
-    }
-    if(state == NamedStyleLookup::Missing) return m_document->DefaultStyle().charSet;
-    ASSERT(state != NamedStyleLookup::Null);
-    return state == NamedStyleLookup::Value ? value.charSet : -1;
+    const auto resolved = m_document->ResolvedCharSet(i);
+    ASSERT(resolved.has_style);
+    return resolved.value;
 #else
     STSStyle* style = GetStyle(i);
     return style!=NULL ? style->charSet : -1;

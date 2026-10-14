@@ -266,10 +266,13 @@ class DocumentOwner {
         const uint32_t status = DocumentDetail::Invoke([&]{return xy_vsfilter_document_segment_header_v1(id_,index,out.data(),out.size());});
         if(status == XY_DOCUMENT_V1_OUT_OF_RANGE) return false; DocumentDetail::Check(status); return true;
     }
-    DocumentReply Snapshot(uint32_t kind, int index) const {
-        std::array<uint8_t,8> out{}; const uint32_t i = DocumentDetail::Index(index);
-        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_snapshot_open_v1(id_,kind,i,out.data(),out.size());}));
+    DocumentReply SnapshotRaw(uint32_t kind, uint32_t index) const {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_snapshot_open_v1(id_,kind,index,out.data(),out.size());}));
         return DocumentReply(DocumentDetail::Load(out,0,8));
+    }
+    DocumentReply Snapshot(uint32_t kind, int index) const {
+        return SnapshotRaw(kind, DocumentDetail::Index(index));
     }
 public:
     DocumentOwner() {
@@ -350,6 +353,20 @@ public:
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_set_default_style_v1(id_,bytes.data(),bytes.size());}));
     }
     template<class Style = STSStyle> Style DefaultStyle() const { return DocumentDetail::StyleValue<Style>(Snapshot(2,0).Read()); }
+    // Forced default bypasses entry access, including negative native indices.
+    // The Rust resolver checks the raw index only in the unforced branch.
+    template<class Style = STSStyle> Style ResolvedStyle(int index) const {
+        return DocumentDetail::StyleValue<Style>(SnapshotRaw(8,static_cast<uint32_t>(index)).Read());
+    }
+    struct ResolvedCharset { bool has_style; int32_t value; };
+    ResolvedCharset ResolvedCharSet(int index) const {
+        const auto bytes = SnapshotRaw(9,static_cast<uint32_t>(index)).Read();
+        DocumentDetail::Shape(bytes.size() == 8);
+        const uint32_t state = static_cast<uint32_t>(DocumentDetail::Load(bytes,0,4));
+        const int32_t value = DocumentDetail::I32(DocumentDetail::Load(bytes,4,4));
+        DocumentDetail::Shape((state == 1 && value == -1) || state == 2);
+        return {state == 2,value};
+    }
     void CopySelectedState(const DocumentOwner& source) {
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_copy_selected_state_v1(id_,source.id_);}));
     }

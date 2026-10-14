@@ -3,6 +3,9 @@ import unittest
 from document_native_lifecycle import compare_traces
 
 
+STYLE_SCALARS = b" ".join(b"0000000000000000" if i in (0,11,12,13,14,23,24,25,26,27,28,29,30,31,32) else b"00000000" if i in (15,17,19,21) else b"0" for i in range(34))
+STYLE_VALUE = b"style 0 1 0041 " + STYLE_SCALARS
+
 TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
          b"segment 0 10 20\ncallback changed\ntext 0041\n"
          + b"".join(b"named-stage " + stage + b"\n" for stage in (
@@ -53,6 +56,10 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
          + b"".join(f"lcid-stage {stage} source={source} destination={destination}\n".encode() for stage,source,destination in (
              ("lcid-supplied",1031,0),("lcid-copy-retained",1031,0),("lcid-source-independent",1033,0),
              ("lcid-repeated-empty",1033,0),("lcid-reused-empty",1033,1031)))
+         + b"".join(b"resolution-stage " + stage + b"\nresolved-style " + stage + b" charset=0 " + STYLE_VALUE + b"\n" for stage in (
+             b"resolution-raw-prefix",b"resolution-lowercase",b"resolution-case-fallback",b"resolution-empty-prefix",
+             b"resolution-forced",b"resolution-forced-replaced",b"resolution-output-independent"))
+         + b"resolution-mutated-output style 0 raw-font-mutated\n"
          + b"saved-file ssa exists=1 bytes=1 41\nsaved-file ass exists=1 bytes=1 41\n"
          + b"saved-file srt exists=1 bytes=1 41\nsaved-file srt-sidecar exists=1 bytes=1 41\n"
          + b"saved-file ssa-sidecar exists=0\nsaved-file ass-sidecar exists=0\n"
@@ -207,6 +214,17 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
         for old,new in ((b"lcid-stage lcid-copy-retained source=1031 destination=0",b"lcid-stage lcid-copy-retained source=1031 destination=1031"),
                         (b"lcid-stage lcid-repeated-empty source=1033 destination=0\n",b"")):
             with self.assertRaises(ValueError): compare_traces([TRACE.replace(old,new)]*4,64)
+
+    def test_resolution_values_and_archival_optout(self):
+        legacy=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith((b"resolution-",b"resolved-style resolution-")))
+        with self.assertRaises(ValueError): compare_traces([legacy]*4,64)
+        compare_traces([legacy]*4,64,require_resolution_stages=False)
+        for token in (b"resolution-stage resolution-empty-prefix\n",b"resolved-style resolution-raw-prefix charset=0 " + STYLE_VALUE + b"\n",b"resolution-mutated-output style 0 raw-font-mutated\n"):
+            with self.assertRaises(ValueError): compare_traces([TRACE.replace(token,b"")]*4,64)
+        truncated=TRACE.replace(STYLE_VALUE, b"style 0 1 0041 0000000000000000")
+        with self.assertRaises(ValueError): compare_traces([truncated]*4,64)
+        changed=TRACE.replace(b"raw-font-mutated",b"raw-font-corrupted")
+        with self.assertRaises(ValueError): compare_traces([TRACE,TRACE,changed,changed],64)
 
     def test_rejects_repeat_nondeterminism(self):
         changed = TRACE.replace(b"callback changed", b"callback empty")
