@@ -20,6 +20,21 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns the UTF-16 text produced by caption `SaveDisp`, preserving
+  spaces between nonempty fragments, row newlines, and bounded strings spanning
+  row boundaries. Native timestamp truncation and subtitle insertion remain in
+  order. The display loan ends before the owned result is copied to `CStringW`
+  or any subtitle callback runs. Scans requiring data beyond the declared backing
+  decline and are excluded from native parity; allocation failure timing remains
+  unverified.
+  Fatal ASan/UBSan comparisons passed **74,280 direct display conversions /
+  6,715,023 UTF-16 units**, including **36 injected Add interruptions** and **36
+  callback mutations**, on arm64 and under x64 execution. The complete caption
+  oracle still passes **149,740 sequences / 170,720 DecodeCC calls**, with
+  **78,850 Rust text selections and zero native fallbacks** across bounded cases.
+  Rust 1.85 tests (75 core, 51 FFI), strict Clippy and default syntax checks pass.
+  Windows/Miri validation is pending. The native display backing, subtitle sink
+  and file/ripper interfaces remain separate migration/integration work.
 * Safe Rust owns the `DecodeCC` byte-loop state, character tables and command
   selection. Raw parity bytes are matched exactly; doubled controls consume both
   pairs and retain the second pair's timestamp index. Ignored controls, trailing
@@ -66,7 +81,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   at classification/conversion callbacks and after repeated parses, not only at
   successful completion. The separate 30,058 parser cases and 67,297 timing
   parses still pass. Rust 1.85 tests (72 core, 48 FFI), strict Clippy and both
-  default syntax checks pass. Windows/Miri validation is pending. Native numeric
+  default syntax checks pass. Candidate `cc8b3093` passed all four portable
+  platforms, Miri and both Windows DLL jobs, each matching **382 cases / 4,490
+  frames** and **32 mutations / 224 frames**, plus dialogs, visible controls,
+  exports and dependencies. Both logs confirm Rust-enabled `RealTextParser.cpp`
+  compilation. [Document-loop evidence](realtext-document-evidence.json) records
+  verified hashes and stable local validation. Native numeric
   overflow, allocation failure timing and full host integration remain outside
   this finite evidence.
 * Safe Rust owns RealText's current-line and carried-open tag lists, including
@@ -82,7 +102,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   passing with the new owner active. Every UTF-16 value, duplicate names,
   simultaneous open/close flags, map ordering and expired native input copies
   are covered. Rust 1.85 tests (70 core, 47 FFI), strict Clippy and default syntax
-  checks pass. Windows/Miri validation is pending. Allocation failure timing
+  checks pass. Candidate `a0bde58b` passed all four portable platforms, Miri and
+  both Windows DLL jobs, each matching **382 cases / 4,490 frames** and **32
+  mutations / 224 frames**, plus dialogs, visible controls, exports and
+  dependencies. Both logs confirm Rust-enabled `RealTextParser.cpp` compilation.
+  [Tag-list evidence](realtext-lists-evidence.json) records verified hashes and
+  stable local validation. Allocation failure timing
   and the remaining native public containers still require separate work.
 * Safe Rust computes the signed components used by RealText `FormatTimecode`.
   It preserves truncation toward zero and the unusual divisor

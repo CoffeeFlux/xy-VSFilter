@@ -2,6 +2,51 @@
 use alloc::boxed::Box;
 use xy_vsfilter_compat::cc::Decoder;
 
+pub struct CaptionText {
+    text: Option<alloc::vec::Vec<u16>>,
+}
+
+/// # Safety
+/// cells is an initialized aligned 528-unit native array, immutable during
+/// this call. The owned output keeps no borrowed native storage.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_cc_text_create(cells: *const u16) -> *mut CaptionText {
+    // SAFETY: native display has exactly 16 by 33 initialized units.
+    let input = unsafe { core::slice::from_raw_parts(cells, 528) };
+    Box::into_raw(Box::new(CaptionText {
+        text: xy_vsfilter_compat::cc::display(input),
+    }))
+}
+
+/// # Safety
+/// owner is live and immutable. Bounded scalar queries expose no references.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_cc_text_field(
+    owner: *const CaptionText,
+    field: u32,
+    index: usize,
+) -> usize {
+    // SAFETY: immutable access before owner release.
+    let state = unsafe { &*owner };
+    let text = state.text.as_deref().unwrap_or(&[]);
+    match field {
+        0 => usize::from(state.text.is_some()),
+        1 => text.len(),
+        2 => usize::from(text.get(index).copied().unwrap_or(0)),
+        _ => 0,
+    }
+}
+
+/// # Safety
+/// Release the uniquely owned text exactly once after all queries.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_cc_text_release(owner: *mut CaptionText) {
+    if !owner.is_null() {
+        // SAFETY: native RAII returns its uniquely owned allocation once.
+        drop(unsafe { Box::from_raw(owner) });
+    }
+}
+
 #[no_mangle]
 pub extern "C" fn xy_vsfilter_cc_decoder_create(length: i32) -> *mut Decoder {
     Box::into_raw(Box::new(Decoder::new(length)))
@@ -84,6 +129,25 @@ pub unsafe extern "C" fn xy_vsfilter_cc_put(buffer: *mut u16, x: i32, y: i32, va
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn displayed_text_outlives_the_native_cells() {
+        let mut cells = [0u16; 528];
+        cells[0] = 0xd800;
+        cells[2] = 0xffff;
+        // SAFETY: initialized display loaned only to creation; subsequent
+        // queries access owned text before the single release.
+        unsafe {
+            let owner = xy_vsfilter_cc_text_create(cells.as_ptr());
+            cells.fill(7);
+            assert_eq!(xy_vsfilter_cc_text_field(owner, 0, 0), 1);
+            assert_eq!(xy_vsfilter_cc_text_field(owner, 1, 0), 4);
+            assert_eq!(xy_vsfilter_cc_text_field(owner, 2, 0), 0xd800);
+            assert_eq!(xy_vsfilter_cc_text_field(owner, 2, 1), 32);
+            assert_eq!(xy_vsfilter_cc_text_field(owner, 2, usize::MAX), 0);
+            xy_vsfilter_cc_text_release(owner);
+        }
+    }
+
     #[test]
     fn decoder_reads_live_bytes_only_between_native_actions() {
         let owner = xy_vsfilter_cc_decoder_create(2);

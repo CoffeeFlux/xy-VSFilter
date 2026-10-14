@@ -1,6 +1,37 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 //! Closed-caption cursor and initialized cell updates.
 
+use alloc::vec::Vec;
+
+/// Build exactly the text consumed by native subtitle insertion. A native
+/// string scan may cross a row boundary; preserve it when its NUL terminator
+/// lies in the initialized backing. Otherwise decline without native changes.
+pub fn display(cells: &[u16]) -> Option<Vec<u16>> {
+    let cells = cells.get(..16 * 33)?;
+    let mut output = Vec::new();
+    for row in 0..16 {
+        let mut nonempty = false;
+        let mut column = 0;
+        while column < 32 {
+            let start = row * 33 + column;
+            if cells[start] != 0 {
+                let length = cells[start..].iter().position(|&unit| unit == 0)?;
+                if nonempty {
+                    output.push(32);
+                }
+                output.extend_from_slice(&cells[start..start + length]);
+                column += length;
+                nonempty = true;
+            }
+            column += 1;
+        }
+        if nonempty {
+            output.push(10);
+        }
+    }
+    Some(output)
+}
+
 pub fn move_cursor(mut x: i32, mut y: i32) -> Option<[i32; 2]> {
     x = x.max(0);
     y = y.max(0);
@@ -163,6 +194,24 @@ impl Decoder {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn display_preserves_row_gaps_and_bounded_cross_row_strings() {
+        let mut cells = [0u16; 528];
+        cells[0] = 65;
+        cells[2] = 66;
+        cells[33] = 67;
+        assert_eq!(display(&cells).unwrap(), [65, 32, 66, 10, 67, 10]);
+        cells.fill(65);
+        cells[527] = 0;
+        let text = display(&cells).unwrap();
+        assert_eq!(text.len(), 4488);
+        cells[527] = 65;
+        assert!(display(&cells).is_none());
+        cells.fill(0);
+        cells[527] = 65;
+        assert!(display(&cells).unwrap().is_empty());
+    }
+
     #[test]
     fn raw_parity_and_duplicate_consumption_are_not_normalized() {
         let mut decoder = Decoder::new(4);
