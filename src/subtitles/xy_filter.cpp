@@ -1108,12 +1108,22 @@ void xy_be_filter2_c(PUINT8 dst, int width, int height, int stride, PCUINT filte
         int x=0;
         for (x=0;x<width-1;x++)
         {
+#ifdef XY_VSFILTER_RUST_TEXT
+            const UINT8 output = xy_vsfilter_weighted_pixel(old_pix + dst2[x+1], dst2[x], filter[0], filter[1], ROUNDING_POLICY);
+            old_pix = dst2[x];
+            dst2[x] = output;
+#else
             tmp = (old_pix + dst2[x+1]) * filter[0] + dst2[x] * filter[1];
             old_pix = dst2[x];
             dst2[x] = (xy_rounding.round(tmp)>>VOLUME_BITS);
+#endif
         }
+#ifdef XY_VSFILTER_RUST_TEXT
+        dst2[x] = xy_vsfilter_weighted_pixel(old_pix, dst2[x], filter[0], filter[1], ROUNDING_POLICY);
+#else
         tmp = old_pix * filter[0] + dst2[x] * filter[1];
         dst2[x] = (xy_rounding.round(tmp)>>VOLUME_BITS);
+#endif
     }
 }
 
@@ -1196,6 +1206,30 @@ void xy_be_filter2_sse(PUINT8 dst, int width, int height, int stride, PCUINT fil
         return;
     }
     
+#ifdef XY_VSFILTER_RUST_TEXT
+    // SSE coefficients are captured once; scalar tail coefficients remain live.
+    const UINT side = filter[0], middle = filter[1];
+    const int width_mod8 = ((width-1)&~7);
+    PUINT8 end = dst + height*stride;
+    for (PUINT8 dst2 = dst; dst2 < end; dst2 += stride) {
+        UINT left = 0, center = dst2[0];
+        int x = 0;
+        for (; x < width_mod8; x += 8) {
+            uint64_t next;
+            memcpy(&next, dst2 + x + 1, sizeof(next));
+            const uint64_t output = xy_vsfilter_weighted_group(next, left | (center << 8), side, middle, ROUNDING_POLICY);
+            memcpy(dst2 + x, &output, sizeof(output));
+            left = static_cast<UINT>((next >> 48) & 255);
+            center = static_cast<UINT>(next >> 56);
+        }
+        for (; x < width-1; ++x) {
+            const UINT8 output = xy_vsfilter_weighted_pixel(left + dst2[x+1], dst2[x], filter[0], filter[1], ROUNDING_POLICY);
+            left = dst2[x];
+            dst2[x] = output;
+        }
+        dst2[x] = xy_vsfilter_weighted_pixel(left, dst2[x], filter[0], filter[1], ROUNDING_POLICY);
+    }
+#else
     XyRounding<ROUNDING_POLICY, VOLUME_BITS> xy_rounding;
     xy_rounding.init_sse();
     __m128i f3_1 = _mm_set1_epi16(filter[0]);
@@ -1251,6 +1285,7 @@ void xy_be_filter2_sse(PUINT8 dst, int width, int height, int stride, PCUINT fil
         tmp = old_pix1*filter[0] + dst2[x]*filter[1];
         dst2[x] = (xy_rounding.round(tmp)>>VOLUME_BITS);
     }
+#endif
 }
 
 /****

@@ -14,6 +14,28 @@ pub unsafe extern "C" fn xy_vsfilter_be_filter_row(bytes: *mut u8, width: i32, p
     );
 }
 
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_weighted_pixel(
+    neighbors: u32,
+    center: u32,
+    side: u32,
+    middle: u32,
+    policy: u32,
+) -> u8 {
+    xy_vsfilter_compat::be_filter::weighted_pixel(neighbors, center, side, middle, policy)
+}
+
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_weighted_group(
+    next: u64,
+    state: u32,
+    side: u32,
+    middle: u32,
+    policy: u32,
+) -> u64 {
+    xy_vsfilter_compat::be_filter::weighted_group(next, state, side, middle, policy)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
