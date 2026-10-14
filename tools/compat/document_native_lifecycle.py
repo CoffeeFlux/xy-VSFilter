@@ -36,7 +36,7 @@ def git(root, *args):
     return subprocess.check_output(["git", "-C", str(root), *args], timeout=60).decode().strip()
 
 
-def validate_trace(data, pointer_bits, *, require_named_stages=True):
+def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True):
     lines = data.splitlines()
     if not lines or lines[0] != f"provenance pointer_bits={pointer_bits}".encode():
         raise ValueError("missing or incorrect native architecture provenance")
@@ -45,6 +45,20 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True):
     for prefix in (b"state ", b"entry ", b"segment ", b"callback ", b"text "):
         if not any(line.startswith(prefix) for line in lines):
             raise ValueError(f"missing native lifecycle trace section {prefix!r}")
+
+    if require_identity_stages:
+        stages = ("identity-initial", "identity-read-independent", "identity-copy-asymmetric-path",
+                  "identity-copy-independent-source", "identity-callback", "identity-remove-entries",
+                  "identity-empty", "identity-self-copy", "identity-open-success")
+        positions = []
+        for stage in stages:
+            matches = [(index, line) for index, line in enumerate(lines)
+                       if line.startswith(f"identity-stage {stage} name ".encode())]
+            if len(matches) != 1 or b" path " not in matches[0][1]:
+                raise ValueError(f"missing/duplicate identity lifecycle stage {stage}")
+            positions.append(matches[0][0])
+        if positions != sorted(positions):
+            raise ValueError("identity lifecycle stage order differs")
 
     if require_named_stages:
         for stage in ("named-initial", "named-equal-duplicate", "named-conflict-collision",
@@ -61,11 +75,11 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True):
 
 
 
-def compare_traces(traces, pointer_bits, *, require_named_stages=True):
+def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True):
     if len(traces) != 4:
         raise ValueError("two reference and two candidate executions required")
     for trace in traces:
-        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages)
+        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages)
     if any(trace != traces[0] for trace in traces[1:]):
         raise ValueError("native lifecycle traces differ or are nondeterministic")
 

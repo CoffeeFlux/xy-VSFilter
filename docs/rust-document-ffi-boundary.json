@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "scope": "Experimental opt-in persistent entries/segments/default/named-style registry and C ABI; metadata/native preparation remain, default production unchanged",
-  "measured_base_commit": "8e2af103e23e4900ffa4df92eac692aea3b13d31",
+  "scope": "Experimental opt-in entries/segments/default/namedstyles/rawidentity registry and C ABI; defaultproductionunchanged",
+  "measured_base_commit": "e337fb0751b6fc5606299193549298da9aff27cc",
   "working_tree_source_hashes": true,
   "core_unsafe": {
     "production_block": 0,
@@ -16,8 +16,8 @@
     "test_other": 0
   },
   "ffi_total": {
-    "production_block": 352,
-    "production_function": 295,
+    "production_block": 353,
+    "production_function": 296,
     "production_impl": 2,
     "production_trait": 0,
     "production_other": 0,
@@ -30,12 +30,12 @@
   "new_boundary_files": [
     {
       "path": "rust/ffi/src/document.rs",
-      "sha256": "30b40ebcf2264b882ec09ef37ea753501011b2fe0afcfc4e8cea718e9fa77a30",
-      "physical_lines_including_tests": 1692,
-      "nonblank_code_lines_excluding_tests": 704,
+      "sha256": "c69f48dba031c0f2def19ce634d2ec32d96bc3831f263a6acb11502a01f871cb",
+      "physical_lines_including_tests": 1826,
+      "nonblank_code_lines_excluding_tests": 744,
       "counts": {
-        "production_block": 26,
-        "production_function": 22,
+        "production_block": 27,
+        "production_function": 23,
         "production_impl": 0,
         "production_trait": 0,
         "production_other": 0,
@@ -87,157 +87,147 @@
           "test": false
         },
         {
-          "line": 195,
+          "line": 196,
           "kind": "function",
           "test": false
         },
         {
-          "line": 213,
+          "line": 214,
           "kind": "block",
           "test": false
         },
         {
-          "line": 220,
+          "line": 241,
           "kind": "function",
           "test": false
         },
         {
-          "line": 234,
+          "line": 259,
           "kind": "block",
           "test": false
         },
         {
-          "line": 236,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 271,
+          "line": 266,
           "kind": "function",
           "test": false
         },
         {
-          "line": 283,
+          "line": 280,
           "kind": "block",
           "test": false
         },
         {
-          "line": 307,
+          "line": 282,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 317,
           "kind": "function",
           "test": false
         },
         {
-          "line": 323,
+          "line": 329,
           "kind": "block",
           "test": false
         },
         {
-          "line": 351,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 366,
+          "line": 353,
           "kind": "function",
           "test": false
         },
         {
-          "line": 381,
+          "line": 369,
           "kind": "block",
           "test": false
         },
         {
-          "line": 388,
+          "line": 397,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 412,
           "kind": "function",
           "test": false
         },
         {
-          "line": 406,
+          "line": 427,
           "kind": "block",
           "test": false
         },
         {
-          "line": 413,
+          "line": 434,
           "kind": "function",
           "test": false
         },
         {
-          "line": 435,
+          "line": 452,
           "kind": "block",
           "test": false
         },
         {
-          "line": 442,
+          "line": 459,
           "kind": "function",
           "test": false
         },
         {
-          "line": 465,
+          "line": 481,
           "kind": "block",
           "test": false
         },
         {
-          "line": 472,
+          "line": 488,
           "kind": "function",
           "test": false
         },
         {
-          "line": 531,
+          "line": 511,
           "kind": "block",
           "test": false
         },
         {
-          "line": 538,
+          "line": 518,
           "kind": "function",
           "test": false
         },
         {
-          "line": 548,
+          "line": 575,
           "kind": "block",
           "test": false
         },
         {
-          "line": 556,
+          "line": 582,
           "kind": "function",
           "test": false
         },
         {
-          "line": 574,
+          "line": 592,
           "kind": "block",
           "test": false
         },
         {
-          "line": 590,
+          "line": 600,
           "kind": "function",
           "test": false
         },
         {
-          "line": 606,
+          "line": 618,
           "kind": "block",
           "test": false
         },
         {
-          "line": 626,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 633,
+          "line": 634,
           "kind": "function",
           "test": false
         },
         {
-          "line": 648,
+          "line": 650,
           "kind": "block",
           "test": false
         },
         {
-          "line": 658,
-          "kind": "function",
-          "test": false
-        },
-        {
-          "line": 666,
+          "line": 670,
           "kind": "block",
           "test": false
         },
@@ -247,102 +237,122 @@
           "test": false
         },
         {
-          "line": 688,
+          "line": 692,
           "kind": "block",
           "test": false
         },
         {
-          "line": 689,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 718,
+          "line": 702,
           "kind": "function",
           "test": false
         },
         {
-          "line": 725,
+          "line": 710,
           "kind": "block",
           "test": false
         },
         {
-          "line": 736,
+          "line": 721,
           "kind": "function",
           "test": false
         },
         {
-          "line": 743,
+          "line": 732,
           "kind": "block",
           "test": false
         },
         {
-          "line": 796,
-          "kind": "function",
-          "test": false
-        },
-        {
-          "line": 813,
+          "line": 733,
           "kind": "block",
           "test": false
         },
         {
-          "line": 826,
+          "line": 762,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 769,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 780,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 787,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 840,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 857,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 870,
           "kind": "function",
           "test": true
         },
         {
-          "line": 830,
+          "line": 874,
           "kind": "block",
           "test": true
         },
         {
-          "line": 852,
+          "line": 896,
           "kind": "function",
           "test": true
         },
         {
-          "line": 855,
+          "line": 899,
           "kind": "block",
           "test": true
         },
         {
-          "line": 867,
+          "line": 911,
           "kind": "function",
           "test": true
         },
         {
-          "line": 871,
+          "line": 915,
           "kind": "block",
           "test": true
         },
         {
-          "line": 876,
+          "line": 920,
           "kind": "function",
           "test": true
         },
         {
-          "line": 880,
+          "line": 924,
           "kind": "block",
           "test": true
         },
         {
-          "line": 885,
+          "line": 929,
           "kind": "block",
           "test": true
         },
         {
-          "line": 909,
+          "line": 953,
           "kind": "block",
           "test": true
         },
         {
-          "line": 918,
+          "line": 962,
           "kind": "block",
           "test": true
         }
       ],
-      "production_extern_functions": 30,
+      "production_extern_functions": 31,
       "operations": {
         "raw_shared_slice_construction": 1,
         "raw_mutable_slice_construction": 0,
@@ -397,11 +407,11 @@
     }
   ],
   "prior_ffi_production_blocks": 325,
-  "added_production_blocks": 27,
+  "added_production_blocks": 28,
   "added_unsafe_impls": 1,
-  "retired_native_owners": 4,
+  "retired_native_owners": 6,
   "retired_ffi_crossings": 0,
-  "review": "Current frozen source-scoped named/default style and prepared-storage-only copy review with exact lexical remeasurement; original independent reviews retained historically. Bounded local map evidence does not establish Windows/native-host closure.",
+  "review": "Frozen identity extension and current lexical source measurement; original reviews retained historically. No current native Windows runtime claim.",
   "remaining_contracts": [
     "Changed-code Windows x86/x64 full-class named/default lifecycle, style API/value and renderer comparisons",
     "Native wrapper publication/destruction and real host lifetimes",
@@ -789,23 +799,53 @@
         "test_trait": 0,
         "test_other": 0
       }
+    },
+    {
+      "status": "superseded named-owner source measurement",
+      "measured_base_commit": "8e2af103e23e4900ffa4df92eac692aea3b13d31",
+      "source_hashes": {
+        "src/subtitles/STS.h": "02ea57e629d21006c917ba2274c7bece44c397b9a7c6fc290f7285f2063cbb53",
+        "src/subtitles/STS.cpp": "a247ba1024f29e54c2b3cd5314b6a023fa095e91df103161042d9bd3eebca329",
+        "src/subtitles/RustDocumentOwner.h": "bb37aee04cf2c3898a6bce5a690bd1a1fb6448678b7db3126bc815f756530ff5",
+        "include/xy_rust_document.h": "5b52b5fa52b8ae0a9781890ff23fad92f589b9d92cae6d727301d8060bb88d62",
+        "rust/compat/src/document.rs": "f6dfc6c5a9f5717dc2b319114645a97d23e44660d43014f528b01f71c13b91ea",
+        "rust/compat/src/document_style_map.rs": "a8c113e7ed5e0111507763b977eebf08f37ade03ae482076925239c0573508c7",
+        "rust/compat/src/document_style.rs": "bdfffedb13b7a46798cba530243f68f3b2e46247fac1cd5831fbd126389e5378",
+        "rust/ffi/src/document.rs": "30b40ebcf2264b882ec09ef37ea753501011b2fe0afcfc4e8cea718e9fa77a30",
+        "rust/ffi/src/document_registry.rs": "5236ff1cb388c233cb63c4c1d0850047bed3f5f4234d19bccd5c5a48b5a9f5cb",
+        "rust/compat/examples/document_style_map_trace.rs": "12912ab81b9b376a68c47d9c61e5e6663aeb13350778f5f14e8e1b73024f8295",
+        "tools/compat/document_style_map_check.py": "5362df8af7530725a077cce5c5c1cbae518ceaadd5d1ad0d39ba0b3c2e42e72e",
+        "tools/compat/document_native_lifecycle.cpp": "c54fe8cd9c75ad2d2618b901b5094396121dabbe1cd0bc203c4b0fcc1e3d971e"
+      },
+      "ffi_total": {
+        "production_block": 352,
+        "production_function": 295,
+        "production_impl": 2,
+        "production_trait": 0,
+        "production_other": 0,
+        "test_block": 119,
+        "test_function": 4,
+        "test_impl": 0,
+        "test_trait": 0,
+        "test_other": 0
+      }
     }
   ],
-  "retired_native_owners_scope": "Opt-in persistent entry/segment/default/named map owners only; default production retirement zero",
+  "retired_native_owners_scope": "Six persistent entry/segment/default/namedmap/name/path owners opt-in; defaultproductionretirementzero",
   "measurement_method": "Current audit_rust_boundary.inventory over actual Rust source, comments/literals masked and test items separated; counts overlap and do not establish soundness. Historical original snapshot retained.",
   "source_hashes": {
-    "src/subtitles/STS.h": "02ea57e629d21006c917ba2274c7bece44c397b9a7c6fc290f7285f2063cbb53",
-    "src/subtitles/STS.cpp": "a247ba1024f29e54c2b3cd5314b6a023fa095e91df103161042d9bd3eebca329",
-    "src/subtitles/RustDocumentOwner.h": "bb37aee04cf2c3898a6bce5a690bd1a1fb6448678b7db3126bc815f756530ff5",
-    "include/xy_rust_document.h": "5b52b5fa52b8ae0a9781890ff23fad92f589b9d92cae6d727301d8060bb88d62",
-    "rust/compat/src/document.rs": "f6dfc6c5a9f5717dc2b319114645a97d23e44660d43014f528b01f71c13b91ea",
-    "rust/compat/src/document_style_map.rs": "a8c113e7ed5e0111507763b977eebf08f37ade03ae482076925239c0573508c7",
-    "rust/compat/src/document_style.rs": "bdfffedb13b7a46798cba530243f68f3b2e46247fac1cd5831fbd126389e5378",
-    "rust/ffi/src/document.rs": "30b40ebcf2264b882ec09ef37ea753501011b2fe0afcfc4e8cea718e9fa77a30",
-    "rust/ffi/src/document_registry.rs": "5236ff1cb388c233cb63c4c1d0850047bed3f5f4234d19bccd5c5a48b5a9f5cb",
-    "rust/compat/examples/document_style_map_trace.rs": "12912ab81b9b376a68c47d9c61e5e6663aeb13350778f5f14e8e1b73024f8295",
-    "tools/compat/document_style_map_check.py": "5362df8af7530725a077cce5c5c1cbae518ceaadd5d1ad0d39ba0b3c2e42e72e",
-    "tools/compat/document_native_lifecycle.cpp": "c54fe8cd9c75ad2d2618b901b5094396121dabbe1cd0bc203c4b0fcc1e3d971e"
+    "src/subtitles/STS.h": "c92f26002177bc598e859f798c300348399fda28cddee9fb717a6aea3b3443e2",
+    "src/subtitles/STS.cpp": "0fcf0caa8c1432ee14b629559e3988e1f8b5e989e3f91781a4771b2d081ff98c",
+    "src/subtitles/RTS.cpp": "65623b4f887b3d7a24ff80a6dd2e562764db4453f5de29dca5696aa03b598b69",
+    "src/subtitles/USFSubtitles.cpp": "d8c90c1a2621a8ff4006562dd259d89323aa9bf70614d3ed868d668cfe733e9e",
+    "src/subtitles/SubtitleInputPin.cpp": "9475e7f7e1a1abf2ed9954ae1a889905f1073c6022491fdb8809eef3b12861bb",
+    "src/subtitles/RustDocumentOwner.h": "10316da7adab5582a9a1da051567a7e2d082cf31870736c9b4c62ca0894a641a",
+    "rust/compat/src/document.rs": "a24a547fc5275c4fb29f2e12f57bfede8e070e26742ee2d033b672af0cc4b130",
+    "rust/ffi/src/document.rs": "c69f48dba031c0f2def19ce634d2ec32d96bc3831f263a6acb11502a01f871cb",
+    "include/xy_rust_document.h": "d403beab47facfe066f9b2d1c19712f9c979731eda0e402057d7cb04ff705579",
+    "tools/compat/document_native_lifecycle.cpp": "d361feb991b146b807b4c0d6edfa341bcafaf31866df0e915ebb6c8488d1b0a6",
+    "tools/compat/document_native_lifecycle.py": "95858d06881f71f4157460c548777f245298c7edf494edff3649627520e2d516",
+    "tools/compat/audit_document_access.py": "eb4e0a8b7158d53e62701566087992638590c781b19fc812117ac69b1c559d9d"
   },
   "default_style_extension": {
     "set": "xy_vsfilter_document_set_default_style_v1 copies input and decodes before admission; validates handle before taking pending value; retired Option drops outside admission, including failure/Busy pending input.",
@@ -856,5 +896,14 @@
     "ownership": "Raw inputs copied/decoded before admission; pending values borrowed by closure and taken after typed owner validation. Retired values/maps drop outside admission. Registry copy_storage clones then swaps ONLY prepared entry/segment vectors; destination default/named/future metadata remain in place, retired storage drops outside admission.",
     "private_status": "Null duplicate AddStyle histories explicitly UNRESOLVED_REFERENCE in native orchestration; missing-key null insertion valid. No public fallback or reference safety claim.",
     "validation": "Current safe-map local native-capture differential only; Windows full-class default/named-style/ABI/renderer/host gates pending"
+  },
+  "identity_extension": {
+    "set": "set_identity_v1 field0name/1path; validated rawUTF16 bytes copied beforeadmission, pendinginput/retiredvalue dropoutside; one newunsafe input-copy call and overlappingunsafeexportdeclaration",
+    "snapshots": {
+      "5": "name rawUTF16,index0only",
+      "6": "path rawUTF16,index0only"
+    },
+    "copy": "Prepared-entry/segment-only swap leavesallidentity/default/named/futuremetadata in place; nativeCopy separatelysetsnameandretainspath",
+    "gate": "CurrentWindowslifecycle/style/API/render/host pending; core181/FFI117localtests notwholehostproof"
   }
 }

@@ -57,9 +57,9 @@ public:
     explicit TraceDocument(unsigned id) : id_(id) {
         // Assign every observed metadata scalar before the first observation;
         // constructor-indeterminate m_simple/m_lcid are never read.
-        m_simple = id != 0;m_name = id ? L"destination" : L"source";
+        m_simple = id != 0;Name(id ? CString(L"destination") : CString(L"source"));
         m_lcid = 1033+id;m_subtitleType=EXTSRT;m_mode=TIME;m_encoding=CTextFile::UTF8;
-        m_path = id ? L"destination-path" : L"source-path";
+        Path(id ? CString(L"destination-path") : CString(L"source-path"));
         m_dstScreenSize=CSize(640+id,480+id);m_defaultWrapStyle=int(id);m_collisions=int(id);
         m_fScaledBAS=id!=0;m_layout_size=CSize(800+id,600+id);
         STSStyle initialDefault;initialDefault.charSet=ANSI_CHARSET;initialDefault.fontSize=19+id;
@@ -72,6 +72,34 @@ public:
         m_dPARCompensation=1.25+id;m_eYCbCrMatrix=YCbCrMatrix_BT709;m_eYCbCrRange=YCbCrRange_PC;
     }
     ~TraceDocument() override {printf("event %u %u destructor-body\n",++sequence,id_);}
+    CString Name() const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        return GetDocumentName();
+#else
+        return m_name;
+#endif
+    }
+    void Name(const CString& value) {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        SetDocumentName(value);
+#else
+        m_name=value;
+#endif
+    }
+    CString Path() const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        return GetDocumentPath();
+#else
+        return m_path;
+#endif
+    }
+    void Path(const CString& value) {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        SetDocumentPath(value);
+#else
+        m_path=value;
+#endif
+    }
     size_t Entries() const {
 #ifdef XY_DOCUMENT_PINNED_REFERENCE
         return m_entries.GetCount();
@@ -123,8 +151,8 @@ public:
     }
     void Dump(const char* stage) const {
         printf("state %u %u %s %zu %zu\n",++sequence,id_,stage,Entries(),Segments());
-        printf("metadata %d",m_simple);units(m_name);
-        printf(" %lu %d %d %d",static_cast<unsigned long>(m_lcid),int(m_subtitleType),int(m_mode),int(m_encoding));units(m_path);
+        printf("metadata %d",m_simple);units(Name());
+        printf(" %lu %d %d %d",static_cast<unsigned long>(m_lcid),int(m_subtitleType),int(m_mode),int(m_encoding));units(Path());
         printf(" %ld %ld %d %d %d %ld %ld %d %d",m_dstScreenSize.cx,m_dstScreenSize.cy,
             m_defaultWrapStyle,m_collisions,m_fScaledBAS,m_layout_size.cx,m_layout_size.cy,
             m_fForcedDefaultStyle,int(m_ePARCompensationType));
@@ -344,12 +372,59 @@ static void named_style_exports() {
     check(document.SaveAs(absent.name,EXTSRT,25.0,CTextFile::UTF8),"no mapped style SaveAs");
     saved_bytes(absent.name,"srt-no-map",true);saved_bytes(absent.name+L".style","srt-no-map-sidecar",false);
 }
+static bool same_identity(const CString& a,const CString& b) {
+    if(a.GetLength()!=b.GetLength())return false;
+    for(int i=0;i<a.GetLength();++i)if(a[i]!=b[i])return false;
+    return true;
+}
+static void identity_stage(TraceDocument& doc,const char* stage,const CString& name,const CString& path) {
+    check(same_identity(doc.Name(),name)&&same_identity(doc.Path(),path),"complete raw identity values");
+    printf("identity-stage %s name",stage);units(doc.Name());printf(" path");units(doc.Path());printf("\n");
+    doc.Dump(stage);
+}
+static void identity_lifecycle() {
+    TraceDocument source(0),destination(1);
+    const wchar_t rawName[]={L'N',0,0xd800,L'X'},rawPath[]={L'P',0,0xdcff,L'Y'};
+    const CString name(rawName,4),path(rawPath,4),destinationPath(L"destination-retained-path");
+    source.Name(name);source.Path(path);destination.Path(destinationPath);
+    unsigned sourceChanges=change_events[0],destinationChanges=change_events[1];
+    identity_stage(source,"identity-initial",name,path);
+    CString isolatedName=source.Name(),isolatedPath=source.Path();
+    isolatedName.SetAt(3,L'Q');isolatedPath.SetAt(3,L'R');
+    identity_stage(source,"identity-read-independent",name,path);
+    destination.Copy(source);
+    identity_stage(destination,"identity-copy-asymmetric-path",name,destinationPath);
+    destination.Name(CString(L"edited destination"));destination.Path(CString(L"edited destination path"));
+    identity_stage(source,"identity-copy-independent-source",name,path);
+    source.AddSTSEntryOnly(CStringW(L"identity callback"),true,0,10000000);
+    source.CreateSegments(); // callback Dump and reads see the initialized identity
+    ++sourceChanges;
+    identity_stage(source,"identity-callback",name,path);
+    source.RemoveAllEntries();identity_stage(source,"identity-remove-entries",name,path);
+    source.Empty();identity_stage(source,"identity-empty",name,path);
+    source.Copy(source);identity_stage(source,"identity-self-copy",name,path);
+    check(change_events[0]==sourceChanges&&change_events[1]==destinationChanges,"identity operations add no notifications");
+    SavedFiles fixture(L"document-lifecycle-identity.srt");
+    {
+        const char bytes[]="1\r\n00:00:00,000 --> 00:00:01,000\r\nordinary identity open\r\n\r\n";
+        CFile output;check(output.Open(fixture.name,CFile::modeCreate|CFile::modeWrite|CFile::typeBinary)!=FALSE,"identity fixture create");
+        output.Write(bytes,sizeof(bytes)-1);
+    }
+    CTextFile input(CTextFile::UTF8);check(input.Open(fixture.name),"identity fixture input");
+    // CFile's public label setter avoids machine-specific absolute cwd in the
+    // paired trace; parsing and actual CSimpleTextSubtitle::Open remain native.
+    input.SetFilePath(fixture.name);
+    check(input.GetFilePath()==fixture.name,"deterministic opened file label");
+    check(source.Open(&input,ANSI_CHARSET,CString(L"opened identity")),"ordinary identity Open");
+    identity_stage(source,"identity-open-success",CString(L"opened identity"),fixture.name);
+}
 int main() {
     try {
         if(!AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0))throw std::runtime_error("AfxWinInit failed");
         printf("provenance pointer_bits=%zu\n",sizeof(void*)*8);
         printf("environment ansi=%u oem=%u\n",GetACP(),GetOEMCP());
         default_style_lifecycle();
+        identity_lifecycle();
         named_style_lifecycle();
         named_style_exports();
         {

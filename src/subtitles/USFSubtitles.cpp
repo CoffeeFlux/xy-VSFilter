@@ -261,7 +261,11 @@ bool CUSFSubtitles::Load(const VARIANT& source)
 
 bool CUSFSubtitles::ConvertToSTS(CSimpleTextSubtitle& sts)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+	sts.SetDocumentName(metadata.language.text);
+#else
 	sts.m_name = metadata.language.text;
+#endif
 	sts.m_encoding = CTextFile::UTF8;
 	sts.m_dstScreenSize = CSize(640, 480);
 	sts.m_fScaledBAS = true;

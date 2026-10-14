@@ -181,7 +181,11 @@ STDMETHODIMP CTextSubtitleInputPinHepler::Receive( IMediaSample* pSample )
 
                 if(tag == __GAB1_LANGUAGE__)
                 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                    m_pRTS->SetDocumentName(CString(ptr));
+#else
                     m_pRTS->m_name = CString(ptr);
+#endif
                 }
                 else if(tag == __GAB1_ENTRY__)
                 {
@@ -189,7 +193,11 @@ STDMETHODIMP CTextSubtitleInputPinHepler::Receive( IMediaSample* pSample )
                 }
                 else if(tag == __GAB1_LANGUAGE_UNICODE__)
                 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                    m_pRTS->SetDocumentName(CString((WCHAR*)ptr));
+#else
                     m_pRTS->m_name = (WCHAR*)ptr;
+#endif
                 }
                 else if(tag == __GAB1_ENTRY_UNICODE__)
                 {
@@ -211,11 +219,19 @@ STDMETHODIMP CTextSubtitleInputPinHepler::Receive( IMediaSample* pSample )
 
                 if(tag == __GAB1_LANGUAGE_UNICODE__)
                 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                    m_pRTS->SetDocumentName(CString((WCHAR*)ptr));
+#else
                     m_pRTS->m_name = (WCHAR*)ptr;
+#endif
                 }
                 else if(tag == __GAB1_RAWTEXTSUBTITLE__)
                 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                    m_pRTS->Open((BYTE*)ptr, size, DEFAULT_CHARSET, m_pRTS->GetDocumentName());
+#else
                     m_pRTS->Open((BYTE*)ptr, size, DEFAULT_CHARSET, m_pRTS->m_name);
+#endif
                 }
 
                 ptr += size;
@@ -465,7 +481,11 @@ STDMETHODIMP_(CSubtitleInputPinHelper*) CSubtitleInputPin::CreateHelper( const C
     {
         XY_LOG_INFO("Create CTextSubtitleInputPinHepler");
         CRenderedTextSubtitle* pRTS = DEBUG_NEW CRenderedTextSubtitle(m_pSubLock);
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        pRTS->SetDocumentName(CString(GetPinName(pReceivePin)) + _T(" (embeded)"));
+#else
         pRTS->m_name = CString(GetPinName(pReceivePin)) + _T(" (embeded)");
+#endif
         pRTS->m_dstScreenSize = CSize(384, 288);
         ret = DEBUG_NEW CTextSubtitleInputPinHepler(pRTS, m_mt);
     }
@@ -511,7 +531,11 @@ STDMETHODIMP_(CSubtitleInputPinHelper*) CSubtitleInputPin::CreateHelper( const C
         {
             XY_LOG_INFO("Create CTextSubtitleInputPinHepler");
             CRenderedTextSubtitle* pRTS = DEBUG_NEW CRenderedTextSubtitle(m_pSubLock);
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            pRTS->SetDocumentName(name);
+#else
             pRTS->m_name = name;
+#endif
             pRTS->m_lcid = lcid;
             pRTS->m_dstScreenSize = CSize(384, 288);
 
@@ -532,7 +556,11 @@ STDMETHODIMP_(CSubtitleInputPinHelper*) CSubtitleInputPin::CreateHelper( const C
                     mt1.pbFormat[dwOffset+2] = 0xbf;
                 }
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                pRTS->Open(mt1.pbFormat + dwOffset, mt1.cbFormat - dwOffset, DEFAULT_CHARSET, pRTS->GetDocumentName());
+#else
                 pRTS->Open(mt1.pbFormat + dwOffset, mt1.cbFormat - dwOffset, DEFAULT_CHARSET, pRTS->m_name);
+#endif
             }
             ret = DEBUG_NEW CTextSubtitleInputPinHepler(pRTS, m_mt);
         }

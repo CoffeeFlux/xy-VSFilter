@@ -63,6 +63,10 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_entry_header_v1(uint64_t, uint32
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_segment_header_v1(uint64_t, uint32_t index, uint8_t*, size_t);
 // Query modes: 0 entry, 1 next segment, 2 containing segment; integer TIME only.
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_query_time_v1(uint64_t, uint32_t mode, int64_t time, uint8_t*, size_t);
+// Identity fields: 0 name, 1 path. Initially empty; raw UTF16LE units retain
+// all embedded NULs/surrogates. Entry/segment copy/clear retain both identities.
+// Native full Copy/Open orchestration assigns fields explicitly at native points.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_set_identity_v1(uint64_t owner, uint32_t field, const uint8_t*, size_t);
 // Named table values are supplied initialized style wires; zero style bytes
 // mean a present null value. Raw UTF16LE keys use LPCWSTR first-NUL semantics
 // for lookup/hash/stored initial key. Count output is one u32LE (capacity >=4).
@@ -79,7 +83,8 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_named_style_lookup_v1(uint64_t o
 // Snapshot kinds: 0 full entry wire, 1 full segment wire, 2 initialized default
 // style (index zero; absent defaults return OUT_OF_RANGE), 3 ordinal named key
 // (raw UTF16LE), 4 ordinal named value wire (null => UNRESOLVED_REFERENCE).
-// Missing ordinals return OUT_OF_RANGE. Full entry wire is the
+// Kinds5 name/6 path are raw UTF16LE identity snapshots (index0 only).
+// Missing ordinals or nonzero identity indexes return OUT_OF_RANGE. Full entry wire is the
 // 64-byte header followed by text/style/actor/effect raw UTF-16LE arrays. Full
 // segment wire is the 32-byte header followed by u32LE member indexes.
 // Entry header offsets: start:i64@0, end:i64@8, margins:i32[4]@16

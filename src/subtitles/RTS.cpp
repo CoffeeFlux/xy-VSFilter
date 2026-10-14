@@ -3798,10 +3798,19 @@ STDMETHODIMP CRenderedTextSubtitle::GetStreamInfo(int iStream, WCHAR** ppName, L
     if(iStream != 0) return E_INVALIDARG;
     if(ppName)
     {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        const CString name = GetDocumentName();
+        *ppName = (WCHAR*)CoTaskMemAlloc((name.GetLength()+1)*sizeof(WCHAR));
+#else
         *ppName = (WCHAR*)CoTaskMemAlloc((m_name.GetLength()+1)*sizeof(WCHAR));
+#endif
         if(!(*ppName))
             return E_OUTOFMEMORY;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        wcscpy(*ppName, CStringW(name));
+#else
         wcscpy(*ppName, CStringW(m_name));
+#endif
     }
     if(pLCID)
     {
@@ -3823,8 +3832,14 @@ STDMETHODIMP CRenderedTextSubtitle::SetStream(int iStream)
 STDMETHODIMP CRenderedTextSubtitle::Reload()
 {
     CFileStatus s;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    const CString path = GetDocumentPath();
+    if(!CFile::GetStatus(path, s)) return E_FAIL;
+    return !path.IsEmpty() && Open(path, DEFAULT_CHARSET) ? S_OK : E_FAIL;
+#else
     if(!CFile::GetStatus(m_path, s)) return E_FAIL;
     return !m_path.IsEmpty() && Open(m_path, DEFAULT_CHARSET) ? S_OK : E_FAIL;
+#endif
 }
 
 STDMETHODIMP_(bool) CRenderedTextSubtitle::IsColorTypeSupported( int type )

@@ -2929,7 +2929,11 @@ void CSimpleTextSubtitle::Copy(CSimpleTextSubtitle& sts)
 {
     Empty();
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    SetDocumentName(sts.GetDocumentName());
+#else
     m_name                         = sts.m_name;
+#endif
     m_mode                         = sts.m_mode;
     m_subtitleType                 = sts.m_subtitleType;
     m_dstScreenSize                = sts.m_dstScreenSize;
@@ -3786,6 +3790,26 @@ void CSimpleTextSubtitle::OrSegmentAnimated(int iSegment, bool animated)
 }
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+CString CSimpleTextSubtitle::GetDocumentName() const
+{
+    return m_document->Identity(0);
+}
+
+CString CSimpleTextSubtitle::GetDocumentPath() const
+{
+    return m_document->Identity(1);
+}
+
+void CSimpleTextSubtitle::SetDocumentName(const CString& value)
+{
+    m_document->SetIdentity(0, value);
+}
+
+void CSimpleTextSubtitle::SetDocumentPath(const CString& value)
+{
+    m_document->SetIdentity(1, value);
+}
+
 size_t CSimpleTextSubtitle::GetStyleCount() const
 {
     return m_document->NamedStyleCount();
@@ -4086,11 +4110,19 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
         }
         XY_LOG_INFO("Open '"<<f->GetFilePath().GetString()<<"' with "<<func_name[i]<<" succeeded" );
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        SetDocumentName(name);
+#else
         m_name = name;
+#endif
         m_subtitleType = OpenFuncts[i].type;
         m_mode = OpenFuncts[i].mode;
         m_encoding = f->GetEncoding();
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        SetDocumentPath(f->GetFilePath());
+#else
         m_path = f->GetFilePath();
+#endif
         m_simple = i > 0;
 
         if(!m_path.IsEmpty())

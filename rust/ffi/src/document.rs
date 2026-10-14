@@ -8,7 +8,7 @@
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::ptr;
-use xy_vsfilter_compat::document::{AddMode, Document, Refusal};
+use xy_vsfilter_compat::document::{AddMode, Document, IdentityField, Refusal};
 use xy_vsfilter_compat::document_style as style_wire;
 use xy_vsfilter_compat::document_wire::{self as wire, Counts, EntryHeader, SegmentHeader};
 use xy_vsfilter_compat::timeline_search::Mode;
@@ -188,6 +188,52 @@ pub extern "C" fn xy_vsfilter_document_copy_default_style_v1(destination: u64, s
         .map_err(registry_error)));
     drop(retired);
     OK
+}
+/// # Safety
+/// Input follows the byte-buffer contract and is raw UTF16LE. Field 0 name,
+/// 1 path. No normalization or implicit copying of the other identity field.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_set_identity_v1(
+    owner: u64,
+    field: u32,
+    input: *const u8,
+    length: usize,
+) -> u32 {
+    let field = match field {
+        0 => IdentityField::Name,
+        1 => IdentityField::Path,
+        _ => return INVALID_INPUT,
+    };
+    if length % 2 != 0 {
+        return INVALID_INPUT;
+    }
+    if length / 2 > i32::MAX as usize {
+        return COUNT_OVERFLOW;
+    }
+    // SAFETY: caller supplies the documented live byte region.
+    let input = required!(unsafe { copy_input(input, length) });
+    let mut value = Some(units(&input));
+    let retired = required!(admitted(|registry| {
+        let document = registry.document_mut(owner).map_err(registry_error)?;
+        Ok(document.replace_identity(field, value.take().ok_or(INVALID_INPUT)?))
+    }));
+    drop(retired);
+    OK
+}
+fn raw_units_bytes(units: &[u16]) -> Result<Vec<u8>, u32> {
+    if units.len() > i32::MAX as usize {
+        return Err(COUNT_OVERFLOW);
+    }
+    let length = units
+        .len()
+        .checked_mul(2)
+        .filter(|&n| n <= isize::MAX as usize)
+        .ok_or(COUNT_OVERFLOW)?;
+    let mut bytes = Vec::with_capacity(length);
+    for unit in units {
+        bytes.extend_from_slice(&unit.to_le_bytes());
+    }
+    Ok(bytes)
 }
 /// # Safety
 /// Output follows the byte-buffer contract, capacity >=4.
@@ -477,7 +523,7 @@ pub unsafe extern "C" fn xy_vsfilter_document_snapshot_open_v1(
     capacity: usize,
 ) -> u32 {
     required!(output_capacity(output, capacity, 8));
-    if kind > 4 {
+    if kind > 6 {
         return INVALID_INPUT;
     }
     let bytes = required!(admitted(|registry| {
@@ -499,30 +545,28 @@ pub unsafe extern "C" fn xy_vsfilter_document_snapshot_open_v1(
                 style_wire::encode(document.default_style().ok_or(OUT_OF_RANGE)?)
                     .map_err(style_wire_error)
             }
-            _ => {
+            3 | 4 => {
                 let (key, value) = document
                     .named_styles()
                     .iter()
                     .nth(index as usize)
                     .ok_or(OUT_OF_RANGE)?;
                 if kind == 3 {
-                    if key.len() > i32::MAX as usize {
-                        return Err(COUNT_OVERFLOW);
-                    }
-                    let length = key
-                        .len()
-                        .checked_mul(2)
-                        .filter(|&n| n <= isize::MAX as usize)
-                        .ok_or(COUNT_OVERFLOW)?;
-                    let mut bytes = Vec::with_capacity(length);
-                    for unit in key {
-                        bytes.extend_from_slice(&unit.to_le_bytes());
-                    }
-                    Ok(bytes)
+                    raw_units_bytes(key)
                 } else {
                     style_wire::encode(value.as_ref().ok_or(UNRESOLVED_REFERENCE)?)
                         .map_err(style_wire_error)
                 }
+            }
+            _ => {
+                if index != 0 {
+                    return Err(OUT_OF_RANGE);
+                }
+                raw_units_bytes(document.identity(if kind == 5 {
+                    IdentityField::Name
+                } else {
+                    IdentityField::Path
+                }))
             }
         }
     }));
@@ -926,7 +970,7 @@ mod tests {
             );
             assert_eq!(output, [0xa5; 8]);
             assert_eq!(
-                xy_vsfilter_document_snapshot_open_v1(source, 5, 0, output.as_mut_ptr(), 8),
+                xy_vsfilter_document_snapshot_open_v1(source, 7, 0, output.as_mut_ptr(), 8),
                 INVALID_INPUT
             );
             assert_eq!(output, [0xa5; 8]);
@@ -983,6 +1027,96 @@ mod tests {
             assert_eq!(xy_vsfilter_document_destroy_v1(target), OK);
             assert_ne!(read_snapshot(snapshot), style);
             assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
+            // Identity snapshots own exact raw units and survive owner closure.
+            let owner = create();
+            let destination = create();
+            let empty_name = open_snapshot(owner, 5);
+            let empty_path = open_snapshot(owner, 6);
+            assert!(read_snapshot(empty_name).is_empty());
+            assert!(read_snapshot(empty_path).is_empty());
+            let raw = [65u8, 0, 0, 0, 0, 216, 255, 220, 255, 255];
+            let path = [80u8, 0, 0, 0, 66, 0];
+            assert_eq!(
+                xy_vsfilter_document_set_identity_v1(owner, 0, raw.as_ptr(), raw.len()),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_set_identity_v1(owner, 1, path.as_ptr(), path.len()),
+                OK
+            );
+            let name_reply = open_snapshot(owner, 5);
+            let path_reply = open_snapshot(owner, 6);
+            assert_eq!(read_snapshot(name_reply), raw);
+            assert_eq!(read_snapshot(path_reply), path);
+            let before = state(owner);
+            let mut output = [0xa5; 8];
+            assert_eq!(
+                xy_vsfilter_document_set_identity_v1(owner, 2, ptr::null(), 0),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_set_identity_v1(owner, 0, raw.as_ptr(), 1),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_set_identity_v1(name_reply, 0, raw.as_ptr(), raw.len()),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                xy_vsfilter_document_snapshot_open_v1(owner, 5, 1, output.as_mut_ptr(), 8),
+                OUT_OF_RANGE
+            );
+            assert_eq!(output, [0xa5; 8]);
+            assert_eq!(
+                xy_vsfilter_document_snapshot_open_v1(owner, 6, 0, output.as_mut_ptr(), 7),
+                INVALID_INPUT
+            );
+            assert_eq!(output, [0xa5; 8]);
+            assert_eq!(state(owner), before);
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_set_identity_v1(
+                        owner,
+                        0,
+                        path.as_ptr(),
+                        path.len()
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(state(owner), before);
+            assert_eq!(
+                xy_vsfilter_document_set_identity_v1(destination, 0, path.as_ptr(), path.len()),
+                OK
+            );
+            let retained = state(destination);
+            assert_eq!(xy_vsfilter_document_copy_storage_v1(destination, owner), OK);
+            assert_eq!(
+                state(destination).identity(IdentityField::Name),
+                retained.identity(IdentityField::Name)
+            );
+            assert!(state(destination).identity(IdentityField::Path).is_empty());
+            assert_eq!(xy_vsfilter_document_clear_storage_v1(owner), OK);
+            assert_eq!(xy_vsfilter_document_remove_entries_v1(owner), OK);
+            assert_eq!(state(owner), before);
+            assert_eq!(state(owner).clone(), before);
+            assert_eq!(
+                xy_vsfilter_document_set_identity_v1(owner, 0, ptr::null(), 0),
+                OK
+            );
+            assert!(state(owner).identity(IdentityField::Name).is_empty());
+            assert_eq!(
+                state(owner).identity(IdentityField::Path),
+                before.identity(IdentityField::Path)
+            );
+            assert_eq!(xy_vsfilter_document_destroy_v1(owner), OK);
+            assert_eq!(xy_vsfilter_document_destroy_v1(destination), OK);
+            assert_eq!(read_snapshot(name_reply), raw);
+            assert_eq!(read_snapshot(path_reply), path);
+            assert!(read_snapshot(empty_name).is_empty());
+            for id in [empty_name, empty_path, name_reply, path_reply] {
+                assert_eq!(xy_vsfilter_document_snapshot_drop_v1(id), OK);
+            }
             // Named values, raw keys, null presence and reply ownership.
             let owner = create();
             let destination = create();

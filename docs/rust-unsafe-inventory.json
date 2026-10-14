@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "candidate_commit": "8e2af103e23e4900ffa4df92eac692aea3b13d31",
+  "candidate_commit": "e337fb0751b6fc5606299193549298da9aff27cc",
   "method": "Lexical source inventory with comments/string/character literals masked and cfg(test) item bodies excluded from production. All platform and feature branches included, not one compiled target. Source hashes identify the measured files; the inventory script may be uncommitted. Block counts and unsafe-function declarations overlap and must not be added as independent operations. Operation categories can overlap and omit raw-pointer dereferences; they are examples, not an exhaustive soundness classification.",
   "limitations": "Not a proof of soundness or a migration completion percentage. Does not measure C/C++/assembly, native libraries, standard-library internals, borrow correctness at native callsites or dynamic path coverage.",
   "crates": {
@@ -18,8 +18,8 @@
         "test_trait": 0,
         "test_other": 0
       },
-      "physical_lines_including_tests": 11412,
-      "nonblank_code_lines_excluding_tests": 7276,
+      "physical_lines_including_tests": 11466,
+      "nonblank_code_lines_excluding_tests": 7298,
       "production_extern_functions": 0,
       "operations": {
         "raw_shared_slice_construction": 0,
@@ -364,9 +364,9 @@
         },
         {
           "path": "rust/compat/src/document.rs",
-          "sha256": "f6dfc6c5a9f5717dc2b319114645a97d23e44660d43014f528b01f71c13b91ea",
-          "physical_lines_including_tests": 848,
-          "nonblank_code_lines_excluding_tests": 348,
+          "sha256": "a24a547fc5275c4fb29f2e12f57bfede8e070e26742ee2d033b672af0cc4b130",
+          "physical_lines_including_tests": 902,
+          "nonblank_code_lines_excluding_tests": 370,
           "counts": {
             "production_block": 0,
             "production_function": 0,
@@ -2497,8 +2497,8 @@
     "ffi": {
       "file_count": 69,
       "totals": {
-        "production_block": 352,
-        "production_function": 295,
+        "production_block": 353,
+        "production_function": 296,
         "production_impl": 2,
         "production_trait": 0,
         "production_other": 0,
@@ -2508,9 +2508,9 @@
         "test_trait": 0,
         "test_other": 0
       },
-      "physical_lines_including_tests": 10482,
-      "nonblank_code_lines_excluding_tests": 4952,
-      "production_extern_functions": 357,
+      "physical_lines_including_tests": 10616,
+      "nonblank_code_lines_excluding_tests": 4992,
+      "production_extern_functions": 358,
       "operations": {
         "raw_shared_slice_construction": 62,
         "raw_mutable_slice_construction": 22,
@@ -3405,12 +3405,12 @@
         },
         {
           "path": "rust/ffi/src/document.rs",
-          "sha256": "30b40ebcf2264b882ec09ef37ea753501011b2fe0afcfc4e8cea718e9fa77a30",
-          "physical_lines_including_tests": 1692,
-          "nonblank_code_lines_excluding_tests": 704,
+          "sha256": "c69f48dba031c0f2def19ce634d2ec32d96bc3831f263a6acb11502a01f871cb",
+          "physical_lines_including_tests": 1826,
+          "nonblank_code_lines_excluding_tests": 744,
           "counts": {
-            "production_block": 26,
-            "production_function": 22,
+            "production_block": 27,
+            "production_function": 23,
             "production_impl": 0,
             "production_trait": 0,
             "production_other": 0,
@@ -3462,157 +3462,147 @@
               "test": false
             },
             {
-              "line": 195,
+              "line": 196,
               "kind": "function",
               "test": false
             },
             {
-              "line": 213,
+              "line": 214,
               "kind": "block",
               "test": false
             },
             {
-              "line": 220,
+              "line": 241,
               "kind": "function",
               "test": false
             },
             {
-              "line": 234,
+              "line": 259,
               "kind": "block",
               "test": false
             },
             {
-              "line": 236,
-              "kind": "block",
-              "test": false
-            },
-            {
-              "line": 271,
+              "line": 266,
               "kind": "function",
               "test": false
             },
             {
-              "line": 283,
+              "line": 280,
               "kind": "block",
               "test": false
             },
             {
-              "line": 307,
+              "line": 282,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 317,
               "kind": "function",
               "test": false
             },
             {
-              "line": 323,
+              "line": 329,
               "kind": "block",
               "test": false
             },
             {
-              "line": 351,
-              "kind": "block",
-              "test": false
-            },
-            {
-              "line": 366,
+              "line": 353,
               "kind": "function",
               "test": false
             },
             {
-              "line": 381,
+              "line": 369,
               "kind": "block",
               "test": false
             },
             {
-              "line": 388,
+              "line": 397,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 412,
               "kind": "function",
               "test": false
             },
             {
-              "line": 406,
+              "line": 427,
               "kind": "block",
               "test": false
             },
             {
-              "line": 413,
+              "line": 434,
               "kind": "function",
               "test": false
             },
             {
-              "line": 435,
+              "line": 452,
               "kind": "block",
               "test": false
             },
             {
-              "line": 442,
+              "line": 459,
               "kind": "function",
               "test": false
             },
             {
-              "line": 465,
+              "line": 481,
               "kind": "block",
               "test": false
             },
             {
-              "line": 472,
+              "line": 488,
               "kind": "function",
               "test": false
             },
             {
-              "line": 531,
+              "line": 511,
               "kind": "block",
               "test": false
             },
             {
-              "line": 538,
+              "line": 518,
               "kind": "function",
               "test": false
             },
             {
-              "line": 548,
+              "line": 575,
               "kind": "block",
               "test": false
             },
             {
-              "line": 556,
+              "line": 582,
               "kind": "function",
               "test": false
             },
             {
-              "line": 574,
+              "line": 592,
               "kind": "block",
               "test": false
             },
             {
-              "line": 590,
+              "line": 600,
               "kind": "function",
               "test": false
             },
             {
-              "line": 606,
+              "line": 618,
               "kind": "block",
               "test": false
             },
             {
-              "line": 626,
-              "kind": "block",
-              "test": false
-            },
-            {
-              "line": 633,
+              "line": 634,
               "kind": "function",
               "test": false
             },
             {
-              "line": 648,
+              "line": 650,
               "kind": "block",
               "test": false
             },
             {
-              "line": 658,
-              "kind": "function",
-              "test": false
-            },
-            {
-              "line": 666,
+              "line": 670,
               "kind": "block",
               "test": false
             },
@@ -3622,102 +3612,122 @@
               "test": false
             },
             {
-              "line": 688,
+              "line": 692,
               "kind": "block",
               "test": false
             },
             {
-              "line": 689,
-              "kind": "block",
-              "test": false
-            },
-            {
-              "line": 718,
+              "line": 702,
               "kind": "function",
               "test": false
             },
             {
-              "line": 725,
+              "line": 710,
               "kind": "block",
               "test": false
             },
             {
-              "line": 736,
+              "line": 721,
               "kind": "function",
               "test": false
             },
             {
-              "line": 743,
+              "line": 732,
               "kind": "block",
               "test": false
             },
             {
-              "line": 796,
-              "kind": "function",
-              "test": false
-            },
-            {
-              "line": 813,
+              "line": 733,
               "kind": "block",
               "test": false
             },
             {
-              "line": 826,
+              "line": 762,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 769,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 780,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 787,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 840,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 857,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 870,
               "kind": "function",
               "test": true
             },
             {
-              "line": 830,
+              "line": 874,
               "kind": "block",
               "test": true
             },
             {
-              "line": 852,
+              "line": 896,
               "kind": "function",
               "test": true
             },
             {
-              "line": 855,
+              "line": 899,
               "kind": "block",
               "test": true
             },
             {
-              "line": 867,
+              "line": 911,
               "kind": "function",
               "test": true
             },
             {
-              "line": 871,
+              "line": 915,
               "kind": "block",
               "test": true
             },
             {
-              "line": 876,
+              "line": 920,
               "kind": "function",
               "test": true
             },
             {
-              "line": 880,
+              "line": 924,
               "kind": "block",
               "test": true
             },
             {
-              "line": 885,
+              "line": 929,
               "kind": "block",
               "test": true
             },
             {
-              "line": 909,
+              "line": 953,
               "kind": "block",
               "test": true
             },
             {
-              "line": 918,
+              "line": 962,
               "kind": "block",
               "test": true
             }
           ],
-          "production_extern_functions": 30,
+          "production_extern_functions": 31,
           "operations": {
             "raw_shared_slice_construction": 1,
             "raw_mutable_slice_construction": 0,
@@ -8520,10 +8530,10 @@
       ]
     }
   },
-  "capture_scope": "Actual frozen working-tree source hashes; candidate_commit is base HEAD, not a claim uncommitted changes are in that commit.",
   "historical_capture": {
     "candidate_commit": "138ed9626b9c3f6e5e3dab907f6ca9da2628a49e",
     "sha256": "aae18efd3d4cb93ef4ff84b39d189855bdd36596b98279d35284e034c616161e",
     "scope": "Earlier historical audit measurement retained by identity; current counts regenerated, not extrapolated."
-  }
+  },
+  "capture_scope": "Actual frozen working-tree hashes; candidate_commit baseHEAD is not a claim uncommitted source is committed."
 }

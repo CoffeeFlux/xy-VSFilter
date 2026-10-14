@@ -10,6 +10,12 @@
 #include "filters/transform/vsfilter/IDirectVobSubXy.h"
 #include "filters/transform/vsfilter/VSFilter.h"
 #ifndef XY_SUB_FILTER_DLL
+// Match the concrete header prerequisites supplied by filter stdafx.h, while
+// retaining the subtitles/MFC context above and avoiding a second stdafx.
+#include <dvdmedia.h>
+#include "subpic/color_conv_table.h"
+#include "filters/transform/vsfilter/DirectVobSub.h"
+#include "filters/transform/vsfilter/Systray.h"
 #include "filters/transform/vsfilter/DirectVobSubFilter.h"
 #endif
 #include <iostream>
