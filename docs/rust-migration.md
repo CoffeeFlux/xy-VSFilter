@@ -455,6 +455,13 @@ check independence. Local generation passes; native compilation/execution and
 integrated DLL parity remain required. The small shell does not execute the
 full renderer, allocation failures or concurrent/reentrant mutation.
 
+At `39649c3c`, run `38616306506` reaches the new Windows facade probe but
+its standalone translation unit fails compilation: the range-based initializer
+list requires an explicit `<initializer_list>` include. The x86 build log is
+retained under `artifacts/ci-38616306506`; no facade execution is claimed for
+that failed run. Add the missing standard header and rerun. The preceding
+expanded owner comparison passes on both Windows architectures.
+
 ## Independent audit and unsafe boundary
 
 The user-requested independent audit is recorded in
