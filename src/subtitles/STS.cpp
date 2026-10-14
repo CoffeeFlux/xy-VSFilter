@@ -31,6 +31,7 @@
 #include "xy_rust_remove_tags.h"
 #include "xy_rust_case_replace.h"
 #include "xy_rust_sami.h"
+#include "xy_rust_sami_file.h"
 #include "xy_rust_encoding.h"
 #include "xy_rust_ass_dialogue.h"
 #include "xy_rust_ass_style.h"
@@ -1816,6 +1817,48 @@ static bool OpenSami(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 
     file->Seek(pos, CFile::begin);
 
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::SamiFile state;
+    while(file->ReadString(buff))
+    {
+        FastTrim(buff);
+        if(buff.IsEmpty()) continue;
+        CStringW ubuff = buff;
+        ubuff.MakeUpper();
+        const unsigned action = state.Begin(ubuff);
+        if(action != 0)
+        {
+            if(action == 2)
+            {
+                int time = 0;
+                for(int i = 12; i < ubuff.GetLength(); i++)
+                {
+                    if(ubuff[i] != '>' && ubuff[i] != 'M')
+                    {
+                        if(iswdigit(ubuff[i]))
+                        {
+                            time *= 10;
+                            time += ubuff[i] - 0x30;
+                        }
+                    }
+                    else break;
+                }
+                caption = state.Text<CStringW>();
+                const int start_time = state.Start();
+                ret.Add(SMI2SSA(caption, CharSet), file->IsUnicode(), MS2RT(start_time), MS2RT(time));
+                state.Flushed(time);
+            }
+            CStringW fragment;
+            fragment += buff;
+            state.Append(fragment);
+        }
+        state.End();
+    }
+    caption = state.Text<CStringW>();
+    const int start_time = state.Start();
+    ret.Add(SMI2SSA(caption, CharSet), file->IsUnicode(), MS2RT(start_time), LONGLONG_MAX);
+
+#else
     bool fComment = false;
 
     int start_time = 0;
@@ -1873,6 +1916,7 @@ static bool OpenSami(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
         file->IsUnicode(),
         MS2RT(start_time), LONGLONG_MAX);
 
+#endif
     return(true);
 }
 

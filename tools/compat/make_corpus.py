@@ -421,6 +421,20 @@ def sami_variants():
         yield "sami-format-" + name + ".smi", data
 
 
+def sami_file_variants():
+    for name, body in {
+        "control": "<SYNC START=0>Caption sample\r\n<SYNC START=4000>Tail",
+        "title-skips-sync": "<TITLE>title</TITLE><SYNC START=0>Skipped\r\n<SYNC START=1000>Caption sample\r\n<SYNC START=4000>Tail",
+        "comment-spans-sync": "<!--\r\n<SYNC START=0>Skipped\r\n-->\r\n<SYNC START=1000>Caption sample\r\n<SYNC START=4000>Tail",
+        "prefix-timestamp": "0000000000001<SYNC START=20>Caption sample\r\n<SYNC START=4000>Tail",
+        "timestamp-letters": "<SYNC START=1a0b0c0ms>Caption sample\r\n<SYNC START=4000>Tail",
+        "same-line-comment": "<SYNC START=0>Skipped<!--closed-->\r\n<SYNC START=1000>Caption sample\r\n<SYNC START=4000>Tail",
+        "blank-lines": " \t\r\n<SYNC START=0>Caption sample\r\n\r\n<SYNC START=4000>Tail",
+        "final-unclosed-caption": "<SYNC START=0>Caption sample",
+    }.items():
+        yield "sami-file-" + name + ".smi", ("<sami>\r\n" + body + "\r\n").encode("ascii")
+
+
 def timestamps(data):
     matches = re.findall(rb"Dialogue:[^,]*,(\d+):(\d+):(\d+(?:\.\d+)?),(\d+):(\d+):(\d+(?:\.\d+)?)", data)
     if not matches:
@@ -480,7 +494,8 @@ def make_cases(files):
                                                     ("encoding-western", "encoding-western-control"),
                                                     ("ass-style-v5-box", "ass-style-v5-outline"),
                                                     ("ass-header-scaled-substring", "ass-header-scaled-control"),
-                                                    ("microdvd-style-italic", "microdvd-style-control"))
+                                                    ("microdvd-style-italic", "microdvd-style-control"),
+                                                    ("sami-file-title-skips-sync", "sami-file-control"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -501,6 +516,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in microdvd_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in mpl2_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in sami_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in sami_file_variants()]
     manifest = json.dumps(make_cases(files + generated), indent=2) + "\n"
     expected = generated + [(DEST / "cases.json", manifest.encode("utf-8"))]
     for path, data in expected:

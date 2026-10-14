@@ -55,7 +55,7 @@ def capture_inputs():
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
               ROOT / "include/xy_rust_drawing.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
-              ROOT / "include/xy_rust_microdvd_style.h", ROOT / "include/xy_rust_font_records.h", ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
+              ROOT / "include/xy_rust_sami_file.h", ROOT / "include/xy_rust_microdvd_style.h", ROOT / "include/xy_rust_font_records.h", ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
               ROOT / "include/xy_rust_cc.h", ROOT / "src/subtitles/CCDecoder.cpp", ROOT / "src/subtitles/CCDecoder.h",
               ROOT / "include/xy_rust_segments.h",
@@ -335,6 +335,17 @@ public:
             definition = definition.replace("XyRust::SamiArguments arguments", "XyRust::ObservedSamiArguments arguments")
         sami += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_sami.h").write_text(sami, encoding="utf-8")
+    sami_file = '#include "sami_file_shell.h"\n#include "original_sami.h"\n'
+    for name, content in (("ReferenceSami", font_source), ("CandidateSami", candidate_font)):
+        sami_file += f"namespace {name} {{\n"
+        if name == "CandidateSami":
+            sami_file += "#define XY_VSFILTER_RUST_TEXT\n"
+        definition = extract_definition(content.decode("utf-8-sig"), "static bool OpenSami(")
+        if name == "CandidateSami":
+            assert definition.count("XyRust::SamiFile state") == 1
+            definition = definition.replace("XyRust::SamiFile state", "XyRust::ObservedSamiFile state")
+        sami_file += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_sami_file.h").write_text(sami_file, encoding="utf-8")
     microdvd = '#include "microdvd_shell.h"\n'
     for name, content in (("ReferenceMicroDVD", font_source), ("CandidateMicroDVD", candidate_font)):
         microdvd += f"namespace {name} {{\n"
@@ -927,6 +938,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     find_char_result = run([str(find_char_executable)], capture_output=True, text=True)
     print(find_char_result.stdout, end="", flush=True)
     print(find_char_result.stderr, end="", file=sys.stderr)
+    sami_file_executable = destination / ("sami-file-oracle.exe" if os.name == "nt" else "sami-file-oracle")
+    sami_file_compile = [arg.replace("find_char_oracle.cpp", "sami_file_oracle.cpp").replace("find-char-oracle", "sami-file-oracle") for arg in find_char_compile]
+    run(sami_file_compile)
+    sami_file_result = run([str(sami_file_executable)], capture_output=True, text=True)
+    print(sami_file_result.stdout, end="", flush=True)
+    print(sami_file_result.stderr, end="", file=sys.stderr)
     micro_style_executable = destination / ("microdvd-style-oracle.exe" if os.name == "nt" else "microdvd-style-oracle")
     micro_style_compile = [arg.replace("find_char_oracle.cpp", "microdvd_style_oracle.cpp").replace("find-char-oracle", "microdvd-style-oracle") for arg in find_char_compile]
     run(micro_style_compile)
@@ -1280,6 +1297,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "webvtt_compile_command": webvtt_compile,
         "webvtt_result": webvtt_result.stdout, "webvtt_stderr": webvtt_result.stderr,
         "webvtt_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring model with host iswspace; Windows comparison required",
+        "sami_file_compile_command": sami_file_compile,
+        "sami_file_result": sami_file_result.stdout, "sami_file_stderr": sami_file_result.stderr,
+        "sami_file_scope": "Complete pinned OpenSami and SMI2SSA; native ATL/case/CRT on Windows, portable strings elsewhere; controlled line I/O, FastTrim and Add sink; probe read-ahead, seek, caption/comment state, timestamp callback ordering, exact emitted records, errno and interruptions; representable timestamp arithmetic and replacement-free NUL fixtures",
         "microdvd_style_compile_command": micro_style_compile,
         "microdvd_style_result": micro_style_result.stdout, "microdvd_style_stderr": micro_style_result.stderr,
         "microdvd_style_scope": "Whole pinned GetMicroDVDStyle and native defaults; native ATL/CRT on Windows, portable strings elsewhere; all stored fields/float bits, native case/prefix/scan order, errno and floating flags; successful position scans and representable scanf values only; allocation failures and full file/style-map integration excluded",

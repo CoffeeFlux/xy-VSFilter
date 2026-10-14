@@ -162,6 +162,15 @@ public:
         text.erase(static_cast<size_t>(start),static_cast<size_t>(count));return GetLength();
 #endif
     }
+    MicroString& MakeUpper(){
+        microObserve(44,GetString());
+#ifdef _WIN32
+        text.MakeUpper();
+#else
+        for(auto& unit:text)unit=static_cast<wchar_t>(std::towupper(unit));
+#endif
+        return *this;
+    }
     void SetAt(int index,wchar_t unit){
 #ifdef _WIN32
         text.SetAt(index,unit);

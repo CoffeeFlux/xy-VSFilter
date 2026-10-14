@@ -129,6 +129,14 @@
     [
       "microdvd-style-italic-memory",
       "microdvd-style-control-memory"
+    ],
+    [
+      "sami-file-title-skips-sync-file",
+      "sami-file-control-file"
+    ],
+    [
+      "sami-file-title-skips-sync-memory",
+      "sami-file-control-memory"
     ]
   ],
   "cases": [
@@ -11674,6 +11682,294 @@
       "id": "sami-format-font-unclosed-memory",
       "script": "test/compat/generated/sami-format-font-unclosed.smi",
       "sha256": "7035e6bb9a98df1ca54abb9723fb7c49cefd99bdff347d0e320ea635ffd207c4",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-file-control-file",
+      "script": "test/compat/generated/sami-file-control.smi",
+      "sha256": "0764331a57f951127c2961e4e3a1692cf5b55085db9a560b8edd125977d6233d",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-file-control-memory",
+      "script": "test/compat/generated/sami-file-control.smi",
+      "sha256": "0764331a57f951127c2961e4e3a1692cf5b55085db9a560b8edd125977d6233d",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-file-title-skips-sync-file",
+      "script": "test/compat/generated/sami-file-title-skips-sync.smi",
+      "sha256": "947a66261391823efec2b7919b754cbf0330889caa892cd64fc8e3b5d691e669",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-file-title-skips-sync-memory",
+      "script": "test/compat/generated/sami-file-title-skips-sync.smi",
+      "sha256": "947a66261391823efec2b7919b754cbf0330889caa892cd64fc8e3b5d691e669",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-file-comment-spans-sync-file",
+      "script": "test/compat/generated/sami-file-comment-spans-sync.smi",
+      "sha256": "01c9cbd72cc9cce2e82c15c29708c52b4bdaebf002876091c578560d413e796b",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-file-comment-spans-sync-memory",
+      "script": "test/compat/generated/sami-file-comment-spans-sync.smi",
+      "sha256": "01c9cbd72cc9cce2e82c15c29708c52b4bdaebf002876091c578560d413e796b",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-file-prefix-timestamp-file",
+      "script": "test/compat/generated/sami-file-prefix-timestamp.smi",
+      "sha256": "53102ada58a5ee18f17537f2200013ef790f9e9a9278ee940106eef71e09a706",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-file-prefix-timestamp-memory",
+      "script": "test/compat/generated/sami-file-prefix-timestamp.smi",
+      "sha256": "53102ada58a5ee18f17537f2200013ef790f9e9a9278ee940106eef71e09a706",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-file-timestamp-letters-file",
+      "script": "test/compat/generated/sami-file-timestamp-letters.smi",
+      "sha256": "6aac575669c8bca0c6bc9ed5393397a8fe9de50b8b4bb1710a4ff8a1b3c49f60",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-file-timestamp-letters-memory",
+      "script": "test/compat/generated/sami-file-timestamp-letters.smi",
+      "sha256": "6aac575669c8bca0c6bc9ed5393397a8fe9de50b8b4bb1710a4ff8a1b3c49f60",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-file-same-line-comment-file",
+      "script": "test/compat/generated/sami-file-same-line-comment.smi",
+      "sha256": "9779b8cc52e940b7c6987279d41310f9913a79301a3b19363a63655bdc7cf2c2",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-file-same-line-comment-memory",
+      "script": "test/compat/generated/sami-file-same-line-comment.smi",
+      "sha256": "9779b8cc52e940b7c6987279d41310f9913a79301a3b19363a63655bdc7cf2c2",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-file-blank-lines-file",
+      "script": "test/compat/generated/sami-file-blank-lines.smi",
+      "sha256": "f32a56f12d45125ebfac1b456b37c6393fefb09ab23f8a5c6514bebc1ca80eaf",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-file-blank-lines-memory",
+      "script": "test/compat/generated/sami-file-blank-lines.smi",
+      "sha256": "f32a56f12d45125ebfac1b456b37c6393fefb09ab23f8a5c6514bebc1ca80eaf",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-file-final-unclosed-caption-file",
+      "script": "test/compat/generated/sami-file-final-unclosed-caption.smi",
+      "sha256": "2a4926a170a06cf82bc8f5dc715cd54b9a03e30768e747022d2f52888e48e532",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "sami-file-final-unclosed-caption-memory",
+      "script": "test/compat/generated/sami-file-final-unclosed-caption.smi",
+      "sha256": "2a4926a170a06cf82bc8f5dc715cd54b9a03e30768e747022d2f52888e48e532",
       "open": "memory",
       "width": 1280,
       "height": 720,
