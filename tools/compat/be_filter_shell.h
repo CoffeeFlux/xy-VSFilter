@@ -2,8 +2,11 @@
 #pragma once
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
 #include "xy_rust_be_filter.h"
 typedef uint8_t UINT8, *PUINT8;
+typedef unsigned UINT;
+typedef const UINT* PCUINT;
 #define ASSERT(condition) ((void)0)
 #ifndef _MSC_VER
 #define __forceinline inline

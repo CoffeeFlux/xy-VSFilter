@@ -20,6 +20,22 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust weighted horizontal filtering covers fractional blur arithmetic
+  behind the existing switch. Scalar full-width products and narrowing remain
+  distinct from SSE word products and saturating additions. The original
+  scalar zero/64 coefficient shortcuts, SSE coefficient snapshots, scalar-tail
+  live coefficient reads and differing row traversal remain in native adapters.
+  Inputs/results cross by value, including each eight-byte source snapshot, so
+  coefficient aliases retain their original read/write order.
+  Local fatal ASan/UBSan tests passed **34,371,920 scalar comparisons** on arm64
+  and **68,709,280 comparisons** under x64 execution, including **34,337,360
+  actual SSE comparisons** and **61,440 coefficient-alias cases**. For each
+  normalized filter, tests exhaust all neighboring-byte sums, center bytes and
+  rounding policies in full SIMD groups and scalar tails. Wider coefficients,
+  boundaries, padding/guards and repeated overlapping rows are also compared.
+  Nonterminating negative-height/negative-stride SSE states are excluded from
+  parity counts. Rust tests (44 core, 20 FFI), strict Clippy and default native
+  branch syntax checks pass. Windows validation is pending for this increment.
 * Safe Rust horizontal `[1, 2, 1]` filtering replaces the scalar and SSE
   arithmetic behind the existing switch. Each call lends one initialized row;
   later overlapping rows see earlier writes after the preceding borrow ends.
@@ -58,8 +74,13 @@ unresolved reference outcomes requiring investigation, never matching results.
   injected allocation failures**. It compares pixels, padding, guards, allocation
   events and final column history across all factor pairs, repeated shifts,
   negative/zero pitch and overlapping rows. Rust tests (41 core, 18 FFI), strict
-  Clippy and default native branch syntax checks pass. Windows validation is
-  pending for this increment.
+  Clippy and default native branch syntax checks pass. Candidate `e75c1bf2`
+  passed all four CI platforms, Miri and both Windows DLL jobs. Each DLL job
+  matched **322 corpus cases / 4,026 frames** and **32 mutations / 224 frames**,
+  plus dialogs, visible controls, exports and dependencies. Both build logs
+  confirm Rust-enabled `Rasterizer.cpp` compilation.
+  [Bilinear evidence](bilinear-evidence.json) records verified source/DLL hashes
+  and scope.
 * Safe Rust 32-bit MMX/SSE body/border mask arithmetic is prepared behind the
   same switch. Four-byte signed high-word mask products and sixteen-byte
   unsigned products remain distinct. Native adapters preserve the original

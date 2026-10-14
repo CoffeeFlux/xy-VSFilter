@@ -359,6 +359,8 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
             filters += "#define XY_VSFILTER_RUST_TEXT\n"
         filters += "template<int ROUNDING_POLICY>\n" + extract_definition(text_source, "void xy_be_filter_c(") + "\n"
         filters += "#if FILTER_NATIVE_SSE\ntemplate<int ROUNDING_POLICY>\n" + extract_definition(text_source, "void xy_be_filter_sse(") + "\n#endif\n"
+        filters += "template<int ROUNDING_POLICY>\n" + extract_definition(text_source, "void xy_be_filter2_c(") + "\n"
+        filters += "#if FILTER_NATIVE_SSE\ntemplate<int ROUNDING_POLICY>\n" + extract_definition(text_source, "void xy_be_filter2_sse(") + "\n#endif\n"
         filters += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_be_filter.h").write_text(filters, encoding="utf-8")
     blur = '#include "be_blur_shell.h"\n'
@@ -575,6 +577,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     filter_result = run([str(filter_executable)], capture_output=True, text=True)
     print(filter_result.stdout, end="", flush=True)
     print(filter_result.stderr, end="", file=sys.stderr)
+    weighted_executable = destination / ("weighted-filter-oracle.exe" if os.name == "nt" else "weighted-filter-oracle")
+    weighted_compile = [arg.replace("fill_oracle.cpp", "weighted_filter_oracle.cpp").replace("fill-oracle", "weighted-filter-oracle") for arg in fill_compile]
+    run(weighted_compile)
+    weighted_result = run([str(weighted_executable)], capture_output=True, text=True)
+    print(weighted_result.stdout, end="", flush=True)
+    print(weighted_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -605,6 +613,8 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "hdmv_golomb_header_sha256": hashlib.sha256(golomb_header).hexdigest(),
         "hdmv_raster_source_sha256": hashlib.sha256(raster_source).hexdigest(),
         "xy_filter_source_sha256": hashlib.sha256(filter_source).hexdigest(),
+        "weighted_filter_compile_command": weighted_compile,
+        "weighted_filter_result": weighted_result.stdout, "weighted_filter_stderr": weighted_result.stderr,
         "be_filter_compile_command": filter_compile,
         "be_filter_result": filter_result.stdout, "be_filter_stderr": filter_result.stderr,
         "be_blur_compile_command": blur_compile,
