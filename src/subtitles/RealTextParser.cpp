@@ -50,8 +50,12 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
     std::vector<int> vEndTimecodes;
     bool bPrevEndTimeMissing = false;
 #endif
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::RealTextLists lists;
+#else
     std::list<Tag> listTags;
     std::list<Tag> listPreviousOpenTags;
+#endif
 
     while (!p_szFile.empty()) {
         if (p_szFile.at(0) == '<') {
@@ -69,7 +73,11 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
                 int iEndTimecode = GetTimecode(oTag.m_mapAttributes[L"end"]);
 
                 //FilterReduntantTags(listTags);
+#ifdef XY_VSFILTER_RUST_TEXT
+                std::wstring szLine = RenderTags(lists.Export<Tag>());
+#else
                 std::wstring szLine = RenderTags(listTags);
+#endif
 
 #ifdef XY_VSFILTER_RUST_TEXT
                 const uint32_t interval = timeline.Select(iStartTimecode, false, m_RealText.m_mapLines.empty());
@@ -115,6 +123,12 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
                 }
 #endif
             } else if (oTag.m_szName == L"b" || oTag.m_szName == L"i" || oTag.m_szName == L"font") {
+#ifdef XY_VSFILTER_RUST_TEXT
+                lists.Set(oTag);
+                if (oTag.m_bOpen) lists.Open();
+                if (oTag.m_bClose) lists.Close();
+                lists.Append();
+#else
                 if (oTag.m_bOpen) {
                     listPreviousOpenTags.push_back(oTag);
                 }
@@ -124,11 +138,16 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
                 }
 
                 listTags.push_back(oTag);
+#endif
             } else if (oTag.m_szName == L"clear") {
+#ifdef XY_VSFILTER_RUST_TEXT
+                lists.Clear();
+#else
                 listTags.clear();
 
                 // set existing tags
                 listTags.insert(listTags.end(), listPreviousOpenTags.begin(), listPreviousOpenTags.end());
+#endif
             } else if (oTag.m_szName == L"window") {
                 if (oTag.m_bOpen) {
                     m_RealText.m_WindowTag = oTag;
@@ -143,7 +162,11 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
                 // Ignore
             } else {
                 // assume formating tag (handled later)
+#ifdef XY_VSFILTER_RUST_TEXT
+                lists.Append(oTag);
+#else
                 listTags.push_back(oTag);
+#endif
             }
         } else {
             Tag oTextTag;
@@ -151,13 +174,21 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
                 return false;
             }
 
+#ifdef XY_VSFILTER_RUST_TEXT
+            lists.Append(oTextTag);
+#else
             listTags.push_back(oTextTag);
+#endif
         }
     }
 
     // Handle final line
     //FilterReduntantTags(listTags);
+#ifdef XY_VSFILTER_RUST_TEXT
+    std::wstring szLine = RenderTags(lists.Export<Tag>());
+#else
     std::wstring szLine = RenderTags(listTags);
+#endif
 
 #ifdef XY_VSFILTER_RUST_TEXT
     const uint32_t interval = timeline.Select(0, true, m_RealText.m_mapLines.empty());

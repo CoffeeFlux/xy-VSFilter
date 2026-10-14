@@ -20,6 +20,21 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns RealText's current-line and carried-open tag lists, including
+  copied raw names, all four flags and ordered attribute keys/values. Closing
+  removes only the last matching opener. Clearing replaces the current list
+  with copies of the remaining open tags, in order. The native parser exports
+  temporary tags for rendering and retains its public subtitle/window/font maps.
+  Fatal ASan/UBSan comparisons passed **77,920 sequences / 575,478 list
+  operations** on arm64 and under x64 execution, comparing **44,457,293 field
+  observations** and **125,904 nonempty rendered snapshots**. The fixture shell
+  uses native list operations and the actual pinned `PopTag`; it is complemented
+  by **30,058 complete parser runs** and **67,297 timing-sequence parses**, all
+  passing with the new owner active. Every UTF-16 value, duplicate names,
+  simultaneous open/close flags, map ordering and expired native input copies
+  are covered. Rust 1.85 tests (70 core, 47 FFI), strict Clippy and default syntax
+  checks pass. Windows/Miri validation is pending. Allocation failure timing
+  and the remaining native public containers still require separate work.
 * Safe Rust computes the signed components used by RealText `FormatTimecode`.
   It preserves truncation toward zero and the unusual divisor
   `10 * (3 - precision)`; the padding argument remains ignored. Native stream
@@ -92,8 +107,13 @@ unresolved reference outcomes requiring investigation, never matching results.
   matching checked-string exceptions** and **3,018 callback mutations**. The
   100,064 tag-output comparisons and 58 complete parser cases still pass with
   all four RealText replacements. Rust 1.85 tests (65 core, 42 FFI), strict
-  Clippy, corpus freshness and default-branch syntax checks pass. Windows/Miri
-  validation is pending. Native allocation failure timing remains unverified.
+  Clippy, corpus freshness and default-branch syntax checks pass. Candidate
+  `41492b9e` passed all four portable platforms, Miri and both Windows DLL jobs,
+  each matching **382 cases / 4,490 frames** and **32 mutations / 224 frames**,
+  plus dialogs, visible controls, exports and dependencies. Both native logs
+  confirm Rust-enabled `RealTextParser.cpp` compilation.
+  [Tag-extraction evidence](realtext-tag-evidence.json) records verified hashes
+  and stable local validation. Native allocation failure timing remains unverified.
 * Safe Rust owns the reverse field extraction used by RealText `GetTimecode`.
   Empty components, embedded NULs, original unit order and the cached initial
   length are preserved; later numeric callbacks can still change unread input.

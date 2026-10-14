@@ -2,11 +2,123 @@
 use alloc::boxed::Box;
 use xy_vsfilter_compat::realtext::Tags;
 use xy_vsfilter_compat::realtext_attributes::Attributes;
+use xy_vsfilter_compat::realtext_lists::Lists;
 use xy_vsfilter_compat::realtext_lower::Lower;
 use xy_vsfilter_compat::realtext_tag::Tag;
 use xy_vsfilter_compat::realtext_text::Text;
 use xy_vsfilter_compat::realtext_timecode::Timecode;
 use xy_vsfilter_compat::realtext_timeline::Timeline;
+
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_realtext_lists_create() -> *mut Lists {
+    Box::into_raw(Box::new(Lists::default()))
+}
+
+/// # Safety
+/// owner is live and exclusive; name is an initialized u16 span disjoint from
+/// owner. Its borrow ends before returning to native code.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_lists_begin(
+    owner: *mut Lists,
+    name: *const u16,
+    length: usize,
+    flags: u32,
+) {
+    // SAFETY: unique owner and initialized disjoint native input.
+    unsafe {
+        let state = &mut *owner;
+        state.begin(units(name, length), flags);
+    }
+}
+
+/// # Safety
+/// owner is live and exclusive. Both input strings are initialized u16 spans,
+/// disjoint from owner, borrowed only for this call.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_lists_attribute(
+    owner: *mut Lists,
+    name: *const u16,
+    name_length: usize,
+    value: *const u16,
+    value_length: usize,
+) {
+    // SAFETY: short immutable native loans and disjoint exclusive owner.
+    unsafe {
+        let state = &mut *owner;
+        state.attribute(units(name, name_length), units(value, value_length));
+    }
+}
+
+/// # Safety
+/// owner is live and exclusively borrowed for the operation.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_lists_action(owner: *mut Lists, action: u32) {
+    // SAFETY: live uniquely owned state, without retained foreign borrows.
+    let state = unsafe { &mut *owner };
+    match action {
+        0 => state.append(),
+        1 => state.open(),
+        2 => state.close(),
+        3 => state.clear(),
+        _ => {}
+    }
+}
+
+/// # Safety
+/// owner is live and immutable. Queries are bounded and invalid fields return
+/// zero. No reference or pointer to owned tag storage is exposed.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_lists_field(
+    owner: *const Lists,
+    group: u32,
+    index: usize,
+    field: u32,
+    attribute: usize,
+    unit: usize,
+) -> usize {
+    // SAFETY: immutable bounded queries before owner release.
+    let state = unsafe { &*owner };
+    let tags = match group {
+        0 => &state.tags,
+        1 => &state.open,
+        _ => return 0,
+    };
+    if field == 0 {
+        return tags.len();
+    }
+    let Some(tag) = tags.get(index) else {
+        return 0;
+    };
+    match field {
+        1 => tag.flags as usize,
+        2 => tag.name.len(),
+        3 => usize::from(tag.name.get(unit).copied().unwrap_or(0)),
+        4 => tag.attributes.len(),
+        5..=8 => {
+            let Some((name, value)) = tag.attributes.get(attribute) else {
+                return 0;
+            };
+            match field {
+                5 => name.len(),
+                6 => usize::from(name.get(unit).copied().unwrap_or(0)),
+                7 => value.len(),
+                8 => usize::from(value.get(unit).copied().unwrap_or(0)),
+                _ => 0,
+            }
+        }
+        _ => 0,
+    }
+}
+
+/// # Safety
+/// Release the unique owner once after all other calls finish.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_lists_release(owner: *mut Lists) {
+    if !owner.is_null() {
+        // SAFETY: native RAII transfers back its uniquely owned allocation.
+        drop(unsafe { Box::from_raw(owner) });
+    }
+}
 
 /// # Safety
 /// For accepted precision, output provides four aligned writable i32 slots.
@@ -480,6 +592,43 @@ pub unsafe extern "C" fn xy_vsfilter_realtext_release(owner: *mut Tags) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn tag_lists_keep_only_owned_names_and_attributes() {
+        let owner = xy_vsfilter_realtext_lists_create();
+        // SAFETY: unique live owner and initialized temporary strings loaned
+        // only for each call. Scalar queries precede the single release.
+        unsafe {
+            {
+                let name = [105u16, 0, 0xd800];
+                xy_vsfilter_realtext_lists_begin(owner, name.as_ptr(), 3, 1);
+                let key = [97u16];
+                let value = [0xdfffu16, 0];
+                xy_vsfilter_realtext_lists_attribute(owner, key.as_ptr(), 1, value.as_ptr(), 2);
+            }
+            xy_vsfilter_realtext_lists_action(owner, 1);
+            xy_vsfilter_realtext_lists_action(owner, 0);
+            xy_vsfilter_realtext_lists_action(owner, 3);
+            assert_eq!(xy_vsfilter_realtext_lists_field(owner, 0, 0, 0, 0, 0), 1);
+            assert_eq!(
+                xy_vsfilter_realtext_lists_field(owner, 0, 0, 3, 0, 2),
+                0xd800
+            );
+            assert_eq!(
+                xy_vsfilter_realtext_lists_field(owner, 0, 0, 8, 0, 0),
+                0xdfff
+            );
+            assert_eq!(
+                xy_vsfilter_realtext_lists_field(owner, 0, usize::MAX, 3, 0, 0),
+                0
+            );
+            assert_eq!(
+                xy_vsfilter_realtext_lists_field(owner, 0, 0, 8, usize::MAX, 0),
+                0
+            );
+            xy_vsfilter_realtext_lists_release(owner);
+        }
+    }
+
     #[test]
     fn timestamp_components_initialize_all_output_without_reading_it() {
         let mut output = [core::mem::MaybeUninit::<i32>::uninit(); 4];
