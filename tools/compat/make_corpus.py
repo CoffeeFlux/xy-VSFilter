@@ -384,6 +384,16 @@ def arc_queue_variants():
         yield "arc-queue-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
 
 
+def variance_variants():
+    for name, payload in {
+        "control": br"{\an7\pos(280,140)\bord2.5\shad0}Shifted outline",
+        "diagonal": br"{\an7\move(280,140,280.875,140.875,0,3000)\bord2.5\shad0}Shifted outline",
+        "reverse": br"{\an7\move(280.875,140.875,280,140,0,3000)\bord2.5\shad0}Shifted outline",
+        "drawing": br"{\an7\move(280,140.875,280.875,140,0,3000)\bord0\shad0\p1}m 0 0 l 63.875 0 63.875 47.125 0 47.125{\p0}",
+    }.items():
+        yield "variance-" + name + ".ass", SEED.replace(br"{\pos(320,180)\bord2}COMPAT_TEXT", payload)
+
+
 def span_coverage_variants():
     for phase in range(8):
         tag = f"{{\\an7\\pos({280 + phase / 8},{140 + (7 - phase) / 8})\\bord2.5\\shad0\\p1}}".encode("ascii")
@@ -724,7 +734,8 @@ def make_cases(files):
                                                     ("arc-queue-control", "arc-queue-round"),
                                                     ("path-buffer-control", "path-buffer-spaced"),
                                                     ("scan-row-single", "scan-row-hole"),
-                                                    ("span-coverage-phase-0", "span-coverage-phase-7"))
+                                                    ("span-coverage-phase-0", "span-coverage-phase-7"),
+                                                    ("variance-control", "variance-diagonal"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -747,6 +758,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in path_alignment_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in span_merge_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in arc_queue_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in variance_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in span_coverage_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in scan_row_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ellipse_arc_variants()]

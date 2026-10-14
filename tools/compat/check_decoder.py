@@ -826,6 +826,17 @@ public:
         definition = definition.replace("XyRust::AccumulateSpan", "XyRust::ObservedAccumulateSpan")
         coverage_code += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_span_coverage.h").write_text(coverage_code, encoding="utf-8")
+    variance_code = '#include "variance_shell.h"\n'
+    for name, content in (("ReferenceVariance", raster_source), ("CandidateVariance", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+        text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        variance_code += f"namespace {name} {{\nVARIANCE_CLASS\n"
+        if name == "CandidateVariance":
+            variance_code += "#define XY_VSFILTER_RUST_TEXT\n"
+        definition = extract_definition(text, "static void Bilinear(")
+        definition += extract_definition(text, "Overlay* Overlay::GetSubpixelVariance(")
+        definition = definition.replace("xy_vsfilter_bilinear_row", "ObservedVarianceRow")
+        variance_code += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_variance.h").write_text(variance_code, encoding="utf-8")
     filter_source = original("src/subtitles/xy_filter.cpp", reference["commit"])
     vobsub_source = original("src/subtitles/VobSubImage.cpp", reference["commit"])
     golomb = '#pragma once\n#include "golomb_shell.h"\n'
@@ -1345,6 +1356,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     coverage_result = run([str(coverage_executable)], capture_output=True, text=True)
     print(coverage_result.stdout, end="", flush=True)
     print(coverage_result.stderr, end="", file=sys.stderr)
+    variance_executable = destination / ("variance-oracle.exe" if os.name == "nt" else "variance-oracle")
+    variance_compile = [arg.replace("find_char_oracle.cpp", "variance_oracle.cpp").replace("find-char-oracle", "variance-oracle") for arg in find_char_compile]
+    run(variance_compile)
+    variance_result = run([str(variance_executable)], capture_output=True, text=True)
+    print(variance_result.stdout, end="", flush=True)
+    print(variance_result.stderr, end="", file=sys.stderr)
     pipe_line_executable = destination / ("pipe-line-oracle.exe" if os.name == "nt" else "pipe-line-oracle")
     pipe_line_compile = [arg.replace("find_char_oracle.cpp", "pipe_line_oracle.cpp").replace("find-char-oracle", "pipe-line-oracle") for arg in find_char_compile]
     run(pipe_line_compile)
@@ -1734,6 +1751,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "path_align_compile_command": path_align_compile,
         "path_align_result": path_align_result.stdout, "path_align_stderr": path_align_result.stderr,
         "path_align_scope": "Complete pinned PathData::AlignLeftTop over initialized point/type buffers; actual Windows POINT/ATL geometry; exact guarded buffers, origin/size, errno/FP/Windows error state; native cleanup modeled, outputs disjoint and representable arithmetic only",
+        "variance_compile_command": variance_compile,
+        "variance_result": variance_result.stdout, "variance_stderr": variance_result.stderr,
+        "variance_scope": "Complete pinned GetSubpixelVariance and Bilinear, initialized source planes including padding and aliases, exact bytes and copy-branch behavior, native shared-reference lifetimes and logical cache accounting. Native allocation guards and Rust lifetime tests have distinct scopes. Filter scratch allocation failure is modeled; object/plane allocation failures, inconsistent metadata, out-of-backing copies and arithmetic overflow are excluded.",
         "span_coverage_compile_command": coverage_compile,
         "span_coverage_result": coverage_result.stdout, "span_coverage_stderr": coverage_result.stderr,
         "span_coverage_scope": "Whole pinned Rasterize, initialized planes, native allocation guards and controlled allocation/memset boundaries; Rust aligned storage loans, shared-reference retention and logical byte accounting; exact byte wrapping, endpoint phases, body/border order, metadata and cleanup across reuse/null/empty and modeled first/second allocation failure. Valid linear backing addresses are retained without row clipping. Native dimension overflow, out-of-backing spans, unsupported signed shifts and actual OOM excluded.",
