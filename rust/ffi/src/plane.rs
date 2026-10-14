@@ -51,7 +51,7 @@ mod tests {
         let input = [
             0u8, 1, 63, 64, 127, 128, 254, 255, 7, 9, 11, 13, 17, 19, 23, 29, 31,
         ];
-        for shift in 0..16 {
+        for shift in (0..16).chain([16, 32]) {
             let owner = xy_vsfilter_plane_create(input.len() + shift);
             assert!(!owner.is_null());
             // SAFETY: the allocation includes the offset and complete logical
@@ -59,7 +59,7 @@ mod tests {
             // tail remain MaybeUninit. No owner borrow overlaps the byte loan.
             unsafe {
                 let data = xy_vsfilter_plane_loan(owner).add(shift);
-                assert_eq!(data as usize % 16, shift);
+                assert_eq!(data as usize % 16, shift % 16);
                 assert_eq!(
                     crate::mask::xy_vsfilter_clip_row(data, input.as_ptr(), input.len(), 0),
                     1

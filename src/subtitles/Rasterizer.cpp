@@ -25,6 +25,7 @@
 #include "xy_rust_path_buffer.h"
 #include "xy_rust_span_coverage.h"
 #include "xy_rust_plane.h"
+#include "xy_rust_shifted_plane.h"
 #include "xy_rust_spans.h"
 #endif
 #include <string.h>
@@ -69,6 +70,9 @@ typedef const UINT8 CUINT8, *PCUINT8;
 
 class GaussianCoefficients
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::ShiftedPlaneStorage m_coefficients;
+#endif
 public:
     int g_r;
     int g_w;
@@ -93,7 +97,11 @@ public:
         ,g_w_ex(priv.g_w_ex)
     {
         if (this->g_w_ex > 0 && this != &priv) {
-            this->g_f = reinterpret_cast<float*>(xy_malloc(this->g_w_ex * sizeof(float)));
+            this->g_f = reinterpret_cast<float*>(
+#ifdef XY_VSFILTER_RUST_TEXT
+                m_coefficients.AllocateWithPrefix(this->g_w_ex * sizeof(float), 16) ? m_coefficients.Data() :
+#endif
+                xy_malloc(this->g_w_ex * sizeof(float)));
             ASSERT(this->g_f);
             memcpy(g_f, priv.g_f, this->g_w_ex * sizeof(g_f[0]));
         }
@@ -101,7 +109,12 @@ public:
 
     ~GaussianCoefficients()
     {
-        xy_free(g_f); g_f=NULL;
+#ifdef XY_VSFILTER_RUST_TEXT
+        if (m_coefficients.Ready()) m_coefficients.Reset();
+        else
+#endif
+        xy_free(g_f);
+        g_f=NULL;
     }
 
 private:
@@ -122,8 +135,16 @@ private:
         this->g_w_ex = (this->g_w + 3) & ~3;
 
         if (this->g_w_ex > 0) {
+#ifdef XY_VSFILTER_RUST_TEXT
+            if (m_coefficients.Ready()) m_coefficients.Reset();
+            else
+#endif
             xy_free(this->g_f);
-            this->g_f = reinterpret_cast<float*>(xy_malloc(this->g_w_ex * sizeof(float)));
+            this->g_f = reinterpret_cast<float*>(
+#ifdef XY_VSFILTER_RUST_TEXT
+                m_coefficients.AllocateWithPrefix(this->g_w_ex * sizeof(float), 16) ? m_coefficients.Data() :
+#endif
+                xy_malloc(this->g_w_ex * sizeof(float)));
             if (this->g_f == NULL) {
                 return -1;
             }

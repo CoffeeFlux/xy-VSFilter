@@ -72,6 +72,8 @@ def capture_inputs():
               ROOT / "src/subtitles/TextFile.h",
               ROOT / "src/subtitles/TextFile.cpp", ROOT / "src/subtitles/STS.cpp",
               ROOT / "src/subtitles/RTS.cpp", ROOT / "tools/compat/reference.json"]
+    inputs += [ROOT / "src/thirdparty/boost_lib/boost/flyweight.hpp"]
+    inputs += sorted((ROOT / "src/thirdparty/boost_lib/boost/flyweight").rglob("*.hpp"))
     inputs += sorted((ROOT / "tools/compat").glob("*oracle.cpp"))
     inputs += sorted((ROOT / "tools/compat").glob("*shell.h"))
     inputs += [ROOT / "tools/compat/check_decoder.py"]
@@ -948,6 +950,14 @@ public:
             bitmap_code += bitmap_method + "\n"
         bitmap_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_bitmap_storage.h").write_text(bitmap_code, encoding="utf-8")
+    coeff_storage_code = '#include "coeff_storage_shell.h"\n'
+    for name, content in (("ReferenceCoefficients", raster_source), ("CandidateCoefficients", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+        coeff_text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        coeff_storage_code += f"namespace {name} {{\n"
+        if name == "CandidateCoefficients":
+            coeff_storage_code += "#define XY_VSFILTER_RUST_TEXT\n"
+        coeff_storage_code += extract_definition(coeff_text, "class GaussianCoefficients").replace("private:", "public:").replace("XyRust::ShiftedPlaneStorage", "XyRust::ObservedCoefficientStorage").replace("memcpy(", "coeffCopy(") + ";\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_coeff_storage.h").write_text(coeff_storage_code, encoding="utf-8")
     filter_source = original("src/subtitles/xy_filter.cpp", reference["commit"])
     gauss_storage_code = '#include "gauss_storage_shell.h"\n'
     for name, content in (("ReferenceGaussStorage", filter_source), ("CandidateGaussStorage", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
@@ -1578,6 +1588,19 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
     legacy_blur_result = run([str(legacy_blur_executable)], capture_output=True, text=True)
     print(legacy_blur_result.stdout, end="", flush=True)
     print(legacy_blur_result.stderr, end="", file=sys.stderr)
+    coeff_storage_executable = destination / ("coeff-storage-oracle.exe" if os.name == "nt" else "coeff-storage-oracle")
+    coeff_storage_compile = [arg.replace("find_char_oracle.cpp", "coeff_storage_oracle.cpp").replace("find-char-oracle", "coeff-storage-oracle") for arg in find_char_compile]
+    coeff_storage_compile += ["-I", str(ROOT / "src/thirdparty/boost_lib")]
+    if os.name == "nt":
+        coeff_storage_compile += ["/fp:strict"]
+    else:
+        if sys.platform != "darwin":
+            coeff_storage_compile[0] = "clang++"
+        coeff_storage_compile += ["-ffp-model=strict"]
+    run(coeff_storage_compile)
+    coeff_storage_result = run([str(coeff_storage_executable)], capture_output=True, text=True)
+    print(coeff_storage_result.stdout, end="", flush=True)
+    print(coeff_storage_result.stderr, end="", file=sys.stderr)
     gauss_storage_executable = destination / ("gauss-storage-oracle.exe" if os.name == "nt" else "gauss-storage-oracle")
     gauss_storage_compile = [arg.replace("find_char_oracle.cpp", "gauss_storage_oracle.cpp").replace("find-char-oracle", "gauss-storage-oracle") for arg in find_char_compile]
     run(gauss_storage_compile)
@@ -2081,6 +2104,9 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
         "fraction_storage_compile_command": fraction_storage_compile,
         "fraction_storage_result": fraction_storage_result.stdout, "fraction_storage_stderr": fraction_storage_result.stderr,
         "fraction_storage_scope": "Whole pinned xy_be_blur and xy_calculate_filter with observed filter/transpose calls and scratch ownership under strict FP compilation. x86/x64 execute extracted native SSE kernels against Rust kernels; arm64 substitutes extracted scalar callbacks and does not establish SSE parity. Exact stage bytes/order, output/padding, initialized scratch, cache accounting, signed and fractional pass counts, reuse and native allocation fallback. Positive dimensions at least four avoid an unused native before-base cursor; zero/smaller/negative dimensions, overflowing/nonfinite pass counts, invalid backing and actual allocation failure excluded.",
+        "coeff_storage_compile_command": coeff_storage_compile,
+        "coeff_storage_result": coeff_storage_result.stdout, "coeff_storage_stderr": coeff_storage_result.stderr,
+        "coeff_storage_scope": "Whole pinned GaussianCoefficients constructor, copy, init and destructor under strict FP. Exact float bits, signed zero/tiny sigma and negative-width metadata, retained old table, deep-copy independence, same-key early return, allocation order and cache accounting. Native allocation failure and Rust decline are modeled; positive-count null-source copies are excluded before both, never passes. Physical prefix and padding remain unwritten and unread. Copy allocation failure, nonfinite/overflowing sigma and actual OOM excluded; Vendored Boost flyweight caching, alias identity, copy/assignment and final release are compared; actual renderer integration requires Windows.",
         "gauss_storage_compile_command": gauss_storage_compile,
         "gauss_storage_result": gauss_storage_result.stdout, "gauss_storage_stderr": gauss_storage_result.stderr,
         "gauss_storage_scope": "Complete pinned xy_gaussian_blur with controlled byte/float, filter and transpose callbacks; exact region offsets, callback arguments, initialized scratch handoff, output/padding bytes, logical cache accounting and successful native fallback after modeled Rust decline. Unwritten scratch bytes are never read or compared. Invalid kernel/dimension domains and actual allocation failure are excluded; underlying filter arithmetic has separate leaf comparisons.",
