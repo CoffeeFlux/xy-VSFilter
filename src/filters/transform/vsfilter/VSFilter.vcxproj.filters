@@ -43,9 +43,6 @@
     <ClInclude Include="VSFilter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CAutoTiming.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="xy_logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>

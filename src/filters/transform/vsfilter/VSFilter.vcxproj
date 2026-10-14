@@ -62,7 +62,6 @@
     <ClCompile Include="xy_logger.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CAutoTiming.h" />
     <ClInclude Include="csri.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="version.h" />

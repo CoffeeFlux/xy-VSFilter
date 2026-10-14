@@ -55,7 +55,6 @@
     <ClCompile Include="Rasterizer.cpp">
       <AssemblerOutput>AssemblyAndSourceCode</AssemblerOutput>
     </ClCompile>
-    <ClCompile Include="RealTextParser.cpp" />
     <ClCompile Include="RTS.cpp">
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AssemblyAndSourceCode</AssemblerOutput>
     </ClCompile>
@@ -66,7 +65,6 @@
     <ClCompile Include="STS.cpp" />
     <ClCompile Include="subpixel_position_controler.cpp" />
     <ClCompile Include="TextFile.cpp" />
-    <ClCompile Include="USFSubtitles.cpp" />
     <ClCompile Include="xy_clipper_paint_machine.cpp" />
     <ClCompile Include="xy_bitmap.cpp" />
     <ClCompile Include="xy_filter.cpp" />
@@ -82,14 +80,12 @@
     <ClInclude Include="flyweight_base_types.h" />
     <ClInclude Include="mru_cache.h" />
     <ClInclude Include="Rasterizer.h" />
-    <ClInclude Include="RealTextParser.h" />
     <ClInclude Include="RTS.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="StdioFile64.h" />
     <ClInclude Include="STS.h" />
     <ClInclude Include="subpixel_position_controler.h" />
     <ClInclude Include="TextFile.h" />
-    <ClInclude Include="USFSubtitles.h" />
     <ClInclude Include="xy_circular_array_queue.h" />
     <ClInclude Include="xy_clipper_paint_machine.h" />
     <ClInclude Include="xy_bitmap.h" />
