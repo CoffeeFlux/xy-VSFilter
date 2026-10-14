@@ -107,6 +107,10 @@ try {
             --candidate-root $candidateRoot --platform $Platform --owner-experimental `
             --output "$evidence\document-style-api"
         if ($LASTEXITCODE -ne 0) { throw "Style API comparison failed; inspect $evidence\document-style-api\report.json" }
+        & python "$PSScriptRoot\document_style_value_check.py" --reference-root $baselineRoot `
+            --candidate-root $candidateRoot --platform $Platform `
+            --output "$evidence\document-style-value"
+        if ($LASTEXITCODE -ne 0) { throw "Style value comparison failed; inspect $evidence\document-style-value\report.json" }
     }
 } finally {
     Pop-Location
