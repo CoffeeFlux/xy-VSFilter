@@ -7,9 +7,6 @@
 #ifdef _WIN32
 #define NOMINMAX
 #include <atltypes.h>
-using ATL::CPoint;
-using ATL::CSize;
-using ATL::CRect;
 #else
 typedef uint32_t DWORD;
 struct RGBQUAD { uint8_t rgbBlue,rgbGreen,rgbRed,rgbReserved; };
