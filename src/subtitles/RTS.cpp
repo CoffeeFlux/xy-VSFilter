@@ -30,6 +30,8 @@
 #include "xy_rust_text_runs.h"
 #include "xy_rust_wrap.h"
 #include "xy_rust_line_layout.h"
+#include "xy_rust_plane.h"
+#include "xy_rust_mask.h"
 #endif
 #include "draw_item.h"
 #include "cache_manager.h"
@@ -1086,6 +1088,11 @@ GrayImage2* CClipper::PaintBaseClipper()
         return result;
     }
 
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::PlaneAllocation rust_mask(alphaMaskSize);
+    if (rust_mask.Ready()) rust_mask.Attach(result->data);
+    else
+#endif
     result->data.reset( reinterpret_cast<BYTE*>(xy_malloc(alphaMaskSize)), xy_free );
     result->pitch = m_size.cx;
     result->size  = m_size;
@@ -1106,8 +1113,13 @@ GrayImage2* CClipper::PaintBaseClipper()
 
     if (m_inverse) {
           for (ptrdiff_t i = 0; i < h; ++i) {
-            for (ptrdiff_t wt = 0; wt < w; ++wt) {
-                dst[wt] = 0x40 - src[wt];
+#ifdef XY_VSFILTER_RUST_TEXT
+            if (!xy_vsfilter_clip_row(dst, src, w, 1))
+#endif
+            {
+                for (ptrdiff_t wt = 0; wt < w; ++wt) {
+                    dst[wt] = 0x40 - src[wt];
+                }
             }
 
             src += overlay->mOverlayPitch;
@@ -1115,6 +1127,9 @@ GrayImage2* CClipper::PaintBaseClipper()
           }
     } else {
        for (ptrdiff_t i = 0; i < h; ++i) {
+#ifdef XY_VSFILTER_RUST_TEXT
+            if (!xy_vsfilter_clip_row(dst, src, w, 0))
+#endif
             memcpy(dst, src, w * sizeof(BYTE));
             src += overlay->mOverlayPitch;
             dst += m_size.cx;

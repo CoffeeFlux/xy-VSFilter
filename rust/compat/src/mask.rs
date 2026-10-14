@@ -1,6 +1,28 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 //! Scalar body/border alpha-mask arithmetic. Keep byte narrowing after the
 //! signed shift, rather than saturating to the nominal opacity range.
+use core::mem::MaybeUninit;
+
+fn clip_byte(source: u8, inverse: bool) -> u8 {
+    if inverse {
+        64u8.wrapping_sub(source)
+    } else {
+        source
+    }
+}
+
+/// Vector clip bytes narrow after subtraction, even outside nominal 0..64
+/// coverage. Only active pixels are copied; callers retain row padding.
+pub fn clip_row(destination: &mut [MaybeUninit<u8>], source: &[u8], inverse: bool) -> bool {
+    if destination.len() != source.len() {
+        return false;
+    }
+    for (out, &input) in destination.iter_mut().zip(source) {
+        out.write(clip_byte(input, inverse));
+    }
+    true
+}
+
 pub fn scalar(source: u8, body: u8, mask: u8, color_alpha: i32, flags: u32) -> u8 {
     let coverage = if flags & 1 != 0 {
         source.saturating_sub(body)
@@ -53,6 +75,16 @@ pub fn block(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn clip_inversion_wraps_outside_nominal_coverage() {
+        assert_eq!(
+            [0, 64, 65, 255].map(|b| clip_byte(b, true)),
+            [64, 0, 255, 65]
+        );
+        let mut output = [MaybeUninit::new(19); 4];
+        assert!(!clip_row(&mut output, &[0, 64, 255], true));
+        assert!(clip_row(&mut output, &[0, 64, 65, 255], true));
+    }
     #[test]
     fn mmx_signed_mask_products_and_sse_unsigned_products_stay_distinct() {
         assert_eq!(block([16; 16], [0; 16], [255; 16], 64, 2, true), [255; 16]);

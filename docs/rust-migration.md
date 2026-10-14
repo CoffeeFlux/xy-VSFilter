@@ -20,6 +20,39 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Gaussian pass scratch (`e5355dce`) completed all four portable targets, Miri,
+  and both Windows renderer jobs: **762 cases / 7,970 frames**, **32 mutations /
+  224 frames**, exports and declared platform requirements matched on each
+  Windows architecture. [Archived evidence](gauss-storage-evidence.json) includes
+  the stable local sanitizer report and distinguishes controlled pass callbacks
+  from DLL rendering. This completed stage predates Gaussian output ownership.
+* Rust owns vector-clip mask allocations and copies/inverts each active row in
+  safe Rust. Inversion retains byte narrowing for all 256 input values; no
+  clamping to nominal coverage is added. Fatal ASan/UBSan comparisons pass on
+  arm64 and under x64 execution: **229,176 whole-PaintBaseClipper calls /
+  11,344,068 output bytes and metadata / 209,060 allocation-paint observations /
+  15,412 retained masks / 15,412 Rust owners, loans and releases / 100,088 Rust
+  active-row copies / zero row fallbacks**. **213,764 null results** include
+  offscreen/empty results and modeled mask-allocation failure. Native geometry,
+  normal/inverse behavior, reuse, shared lifetimes and cache accounting remain.
+  The polygon producer is controlled; **6,436 final-cursor footprint exclusions
+  are not parity passes**. Overflowing geometry, invalid backing, object OOM
+  and actual allocation failure remain excluded. FFI tests check active-only
+  borrowing with uninitialized padding and overlap rejection before writes.
+  Rust 1.85 tests (144 core, 97 FFI), strict Clippy, both default syntax checks
+  and Python checks pass. Six vector clipping fixtures expand the corpus to
+  **782 cases**. Windows/Miri and actual renderer comparisons are pending.
+* The first RLE portable workflow (`38563956769`, commit `a3cadb6a`) failed and is
+  not archived as passing. Its Miri job passed. Linux completed comparisons but
+  failed report hashing because the RLE extraction loop shadowed the original
+  UTF-8 header bytes; that variable is now distinct. Other platforms exposed a
+  Gaussian oracle bookkeeping bug: masks for retired allocations could shadow
+  recycled addresses. Ordinary local execution reproduced a mask-field mismatch
+  while returns, trace, effects, cache deltas and source state matched. The
+  fixture now removes retired masks, includes a deterministic overlapping-range
+  metadata regression, and passes both ordinary and sanitizer execution on both
+  local architectures. No Gaussian production change was needed for this fix.
+  The failed workflow still requires a complete successful replacement run.
 * Shifted-plane ownership, bilinear scratch, paired fixed-blur scratch plus
   BeBlur outputs, and bounded legacy-blur outputs have each completed all four
   portable targets, Miri and both Windows renderer jobs. The first two stages

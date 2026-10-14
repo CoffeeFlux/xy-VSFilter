@@ -19,6 +19,8 @@ static void compare(const Overlay& input,double strength,double sx,double sy,int
         coverageEvents.clear();allocationAttempt=factoryAxis=0;allocationFailure=fail;const size_t beforeB=g_xy_malloc_used_size;seed();bool rb=CandidateGaussPlanes::Rasterizer::GaussianBlur(input,strength,sx,sy,b);Effects eb;const auto tb=coverageEvents;const size_t db=g_xy_malloc_used_size-beforeB;
         const auto sa=gaussPlaneSnapshot(*a,true),sb=gaussPlaneSnapshot(*b);
         if(ra!=rb||!(ea==eb)||ta!=tb||da!=db||sa!=sb||original!=gaussPlaneSnapshot(input)){
+            fprintf(stderr,"return=%d/%d effects=%d trace=%d delta=%zu/%zu snapshot=%d source=%d\n",ra,rb,ea==eb,ta==tb,da,db,sa==sb,original==gaussPlaneSnapshot(input));
+            for(size_t i=0;i<std::min(sa.size(),sb.size());++i)if(sa[i]!=sb[i]){fprintf(stderr,"first different snapshot field %zu: %llu/%llu\n",i,(unsigned long long)sa[i],(unsigned long long)sb[i]);break;}
             fprintf(stderr,"Gaussian planes mismatch call=%llu strength=%g scale=%g,%g fail=%d flags=%d/%d\n",(unsigned long long)calls,strength,sx,sy,fail,ea.flags,eb.flags);std::abort();
         }
         ++calls;failures+=!ra;fields+=sa.size();observations+=ta.size();
@@ -41,6 +43,16 @@ static void history(int width,int height,int mode,double strength,double sx,doub
     compare(input,strength,sx,sy,fail);input.CleanUp();if(g_xy_malloc_used_size||!coverageAllocations.empty())std::abort();planeInitialization.clear();
 }
 int main(){
+    // Deterministic metadata regression: an old allocation range overlaps a
+    // new smaller one, as can happen without sanitizer allocator quarantine.
+    // The old range is represented only by a mask; no retired bytes are read.
+    BYTE* recycled=static_cast<BYTE*>(xy_malloc(32));
+    planeInitialization.push_back({recycled-8,64,std::vector<bool>(64,true)});
+    registerInitialization(recycled,32,false);
+    size_t recycledOffset=99;
+    const auto& recycledRegion=initializedRegion(recycled,1,recycledOffset);
+    if(planeInitialization.size()!=1||recycledOffset||recycledRegion.written[0])std::abort();
+    xy_free(recycled);planeInitialization.clear();coverageEvents.clear();
     for(int w:{0,1,7,8,9,111,112,113})for(int h:{0,1,7,8,17})for(int mode=0;mode<4;++mode)for(int rx:{0,1,3,7})for(int ry:{0,1,3,7})history(w,h,mode,0.5,1.25,0.5,rx,ry,-1);
     for(double strength:{0.125,0.333333,0.333334,1.,2.5})for(double sx:{0.25,1.,2.})for(double sy:{0.25,1.,2.})for(int mode=0;mode<4;++mode)history(113,17,mode,strength,sx,sy,3,1,-1);
     for(int mode:{1,2})for(int rx:{0,1,3,7})for(int ry:{0,1,3,7})history(113,17,mode,0.5,1.25,0.5,rx,ry,1);

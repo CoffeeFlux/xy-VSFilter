@@ -7,6 +7,14 @@ static uint64_t initializedComparisons=0,unwrittenComparisons=0,gaussPlaneFactor
 static unsigned factoryAxis=0;
 static int factoryRadii[2]={0,0};
 static void registerInitialization(BYTE* data,size_t count,bool initialized){
+    // Allocation addresses can be recycled during output reuse. Retired masks
+    // must not shadow a new, smaller allocation within the old address range.
+    planeInitialization.erase(std::remove_if(planeInitialization.begin(),planeInitialization.end(),
+        [](const PlaneInitialization& region){
+            for(const auto& allocation:coverageAllocations)
+                if(allocation.data()==region.data&&allocation.count==region.count)return false;
+            return true;
+        }),planeInitialization.end());
     for(size_t i=0;i<planeInitialization.size();++i)if(planeInitialization[i].data==data){planeInitialization.erase(planeInitialization.begin()+i);break;}
     planeInitialization.push_back({data,count,std::vector<bool>(count,initialized)});
 }

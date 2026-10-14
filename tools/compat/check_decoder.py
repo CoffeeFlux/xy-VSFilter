@@ -682,22 +682,33 @@ public:
         preparation_code += block + "result.emplace_back(c,s);\n}\nreturn result;\n}\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_drawing_preparation.h").write_text(preparation_code, encoding="utf-8")
 
+    clip_mask = '#include "clip_mask_shell.h"\n'
+    for name, content in (("ReferenceClip", original("src/subtitles/RTS.cpp", reference["commit"])), ("CandidateClip", (ROOT / "src/subtitles/RTS.cpp").read_bytes())):
+        text = content.decode("utf-8-sig").replace("\r\n", "\n")
+        clip_mask += f"namespace {name} {{\nCLIP_MASK_CLASS\n"
+        if name == "CandidateClip":
+            clip_mask += "#define XY_VSFILTER_RUST_TEXT\n"
+        method = extract_method(text, "GrayImage2* CClipper::PaintBaseClipper()")
+        method = method.replace("memcpy(", "clipCopy(").replace("memset(", "clipSet(").replace("xy_vsfilter_clip_row(", "observedClipRow(")
+        method = method.replace("dst[wt] = 0x40 - src[wt];", "clipWrite(dst + wt, static_cast<BYTE>(0x40 - clipRead(src + wt)));")
+        clip_mask += method + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_clip_mask.h").write_text(clip_mask, encoding="utf-8")
     hdmv_source = original("src/subtitles/CompositionObject.cpp", reference["commit"])
     candidate_hdmv = (ROOT / "src/subtitles/CompositionObject.cpp").read_bytes()
     rle_storage = '#include "rle_storage_shell.h"\n'
     reference_rle_header = original("src/subtitles/CompositionObject.h", reference["commit"])
-    for name, content, header in (("ReferenceRle", hdmv_source, reference_rle_header), ("CandidateRle", candidate_hdmv, (ROOT / "src/subtitles/CompositionObject.h").read_bytes())):
+    for name, content, rle_header in (("ReferenceRle", hdmv_source, reference_rle_header), ("CandidateRle", candidate_hdmv, (ROOT / "src/subtitles/CompositionObject.h").read_bytes())):
         text = content.decode("utf-8-sig").replace("\r\n", "\n")
-        header = header.decode("utf-8-sig").replace("\r\n", "\n")
+        rle_header = rle_header.decode("utf-8-sig").replace("\r\n", "\n")
         if name == "CandidateRle":
             rle_storage += "#define XY_VSFILTER_RUST_TEXT\n"
         rle_storage += f"namespace {name} {{\nclass CompositionObject {{public:\n"
-        start = header.index("private:", header.index("CompositionObject* Copy()")) + len("private:")
-        end = header.index("    CAtlArray<HDMV_PALETTE>", start)
-        rle_storage += header[start:end] + "RLE_OTHER_FIELDS\n"
+        start = rle_header.index("private:", rle_header.index("CompositionObject* Copy()")) + len("private:")
+        end = rle_header.index("    CAtlArray<HDMV_PALETTE>", start)
+        rle_storage += rle_header[start:end] + "RLE_OTHER_FIELDS\n"
         rle_storage += "CompositionObject();~CompositionObject();void SetRLEData(const BYTE*,int,int);void AppendRLEData(const BYTE*,int);\n"
         for signature in ("const BYTE* GetRLEData()", "int   GetRLEDataSize()", "bool  IsRLEComplete()", "CompositionObject* Copy()"):
-            rle_storage += extract_method(header, signature) + "\n"
+            rle_storage += extract_method(rle_header, signature) + "\n"
         rle_storage += "};\n"
         for signature in ("CompositionObject::CompositionObject()", "CompositionObject::~CompositionObject()", "void CompositionObject::SetRLEData(", "void CompositionObject::AppendRLEData("):
             method = extract_method(text, signature)
@@ -1445,6 +1456,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     gauss_planes_result = run([str(gauss_planes_executable)], capture_output=True, text=True)
     print(gauss_planes_result.stdout, end="", flush=True)
     print(gauss_planes_result.stderr, end="", file=sys.stderr)
+    clip_mask_executable = destination / ("clip-mask-oracle.exe" if os.name == "nt" else "clip-mask-oracle")
+    clip_mask_compile = [arg.replace("find_char_oracle.cpp", "clip_mask_oracle.cpp").replace("find-char-oracle", "clip-mask-oracle") for arg in find_char_compile]
+    run(clip_mask_compile)
+    clip_mask_result = run([str(clip_mask_executable)], capture_output=True, text=True)
+    print(clip_mask_result.stdout, end="", flush=True)
+    print(clip_mask_result.stderr, end="", file=sys.stderr)
     rle_storage_executable = destination / ("rle-storage-oracle.exe" if os.name == "nt" else "rle-storage-oracle")
     rle_storage_compile = [arg.replace("find_char_oracle.cpp", "rle_storage_oracle.cpp").replace("find-char-oracle", "rle-storage-oracle") for arg in find_char_compile]
     run(rle_storage_compile)
@@ -1840,6 +1857,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "path_align_compile_command": path_align_compile,
         "path_align_result": path_align_result.stdout, "path_align_stderr": path_align_result.stderr,
         "path_align_scope": "Complete pinned PathData::AlignLeftTop over initialized point/type buffers; actual Windows POINT/ATL geometry; exact guarded buffers, origin/size, errno/FP/Windows error state; native cleanup modeled, outputs disjoint and representable arithmetic only",
+        "clip_mask_compile_command": clip_mask_compile,
+        "clip_mask_result": clip_mask_result.stdout, "clip_mask_stderr": clip_mask_result.stderr,
+        "clip_mask_scope": "Whole pinned PaintBaseClipper with controlled polygon producer, exact native geometry, normal/inverse narrowing including all input byte values, offscreen/empty/reuse, modeled mask-allocation failure, retained shared owners and logical cache accounting. Both implementations are skipped before execution if final row cursors would exceed actual backing; these exclusions are not passes. Native overflowing geometry, invalid backings, object allocation failure and actual OOM excluded.",
         "rle_storage_compile_command": rle_storage_compile,
         "rle_storage_result": rle_storage_result.stdout, "rle_storage_stderr": rle_storage_result.stderr,
         "rle_storage_scope": "Whole pinned SetRLEData, AppendRLEData, destructor, Copy and accessors with controlled allocation and checked copy boundaries. Exact allocated/appended lengths, initialized masks and bytes, complete deep copies including palette state, zero-sized native allocation, bounded disjoint source aliases and modeled Rust decline to successful native allocation. Assertion diagnostics are modeled; only Release continuation behavior is compared. Incomplete tails are never read or copied; partial-tail consumers, source replacement aliasing, negative/overflowing lengths and actual OOM excluded.",
