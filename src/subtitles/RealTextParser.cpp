@@ -43,9 +43,13 @@ CRealTextParser::~CRealTextParser()
 
 bool CRealTextParser::ParseRealText(std::wstring p_szFile)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::RealTextTimeline timeline;
+#else
     std::vector<int> vStartTimecodes;
     std::vector<int> vEndTimecodes;
     bool bPrevEndTimeMissing = false;
+#endif
     std::list<Tag> listTags;
     std::list<Tag> listPreviousOpenTags;
 
@@ -67,6 +71,15 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
                 //FilterReduntantTags(listTags);
                 std::wstring szLine = RenderTags(listTags);
 
+#ifdef XY_VSFILTER_RUST_TEXT
+                const uint32_t interval = timeline.Select(iStartTimecode, false, m_RealText.m_mapLines.empty());
+                if (interval) {
+                    std::pair<int, int> pairTimecodes(timeline.First(), timeline.Second());
+                    if (interval == 2) pairTimecodes.second = pairTimecodes.first + m_iDefaultSubtitleDurationInMillisecs;
+                    if (!szLine.empty()) m_RealText.m_mapLines[pairTimecodes] = szLine;
+                }
+                timeline.Advance(iStartTimecode, iEndTimecode);
+#else
                 if (bPrevEndTimeMissing) {
                     std::pair<int, int> pairTimecodes(vStartTimecodes.back(), iStartTimecode);
 
@@ -100,6 +113,7 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
                 } else {
                     vEndTimecodes.push_back(iEndTimecode);
                 }
+#endif
             } else if (oTag.m_szName == L"b" || oTag.m_szName == L"i" || oTag.m_szName == L"font") {
                 if (oTag.m_bOpen) {
                     listPreviousOpenTags.push_back(oTag);
@@ -145,6 +159,14 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
     //FilterReduntantTags(listTags);
     std::wstring szLine = RenderTags(listTags);
 
+#ifdef XY_VSFILTER_RUST_TEXT
+    const uint32_t interval = timeline.Select(0, true, m_RealText.m_mapLines.empty());
+    if (interval) {
+        std::pair<int, int> pairTimecodes(timeline.First(), timeline.Second());
+        if (interval == 2) pairTimecodes.second = pairTimecodes.first + m_iDefaultSubtitleDurationInMillisecs;
+        if (!szLine.empty()) m_RealText.m_mapLines[pairTimecodes] = szLine;
+    }
+#else
     if (bPrevEndTimeMissing) {
         std::pair<int, int> pairTimecodes(vStartTimecodes.back(), vStartTimecodes.back() + m_iDefaultSubtitleDurationInMillisecs);
 
@@ -161,6 +183,7 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
 
     }
 
+#endif
     return true;
 }
 

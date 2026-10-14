@@ -6,6 +6,72 @@ use xy_vsfilter_compat::realtext_lower::Lower;
 use xy_vsfilter_compat::realtext_tag::Tag;
 use xy_vsfilter_compat::realtext_text::Text;
 use xy_vsfilter_compat::realtext_timecode::Timecode;
+use xy_vsfilter_compat::realtext_timeline::Timeline;
+
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_realtext_timeline_create() -> *mut Timeline {
+    Box::into_raw(Box::new(Timeline::default()))
+}
+
+/// # Safety
+/// owner is live and uniquely borrowed during this call.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_timeline_select(
+    owner: *mut Timeline,
+    next: i32,
+    final_line: u32,
+    map_empty: u32,
+) -> u32 {
+    // SAFETY: unique native RAII owner; no native storage is borrowed.
+    unsafe {
+        let state = &mut *owner;
+        state.select(
+            if final_line != 0 { None } else { Some(next) },
+            map_empty != 0,
+        )
+    }
+}
+
+/// # Safety
+/// owner is live and uniquely borrowed, after native map insertion completes.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_timeline_advance(
+    owner: *mut Timeline,
+    start: i32,
+    end: i32,
+) {
+    // SAFETY: exclusive live owner; scalar values are copied into owned history.
+    unsafe {
+        let state = &mut *owner;
+        state.advance(start, end);
+    }
+}
+
+/// # Safety
+/// owner is live and immutable. Invalid queries return zero.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_timeline_field(
+    owner: *const Timeline,
+    field: u32,
+) -> i32 {
+    // SAFETY: immutable scalar query before the unique release.
+    let state = unsafe { &*owner };
+    match field {
+        0 => state.first,
+        1 => state.second,
+        _ => 0,
+    }
+}
+
+/// # Safety
+/// Release the unique owner once after all other operations.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_timeline_release(owner: *mut Timeline) {
+    if !owner.is_null() {
+        // SAFETY: native RAII returns its uniquely owned allocation once.
+        drop(unsafe { Box::from_raw(owner) });
+    }
+}
 
 #[no_mangle]
 pub extern "C" fn xy_vsfilter_realtext_lower_create() -> *mut Lower {
@@ -391,6 +457,26 @@ pub unsafe extern "C" fn xy_vsfilter_realtext_release(owner: *mut Tags) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn timeline_owns_history_across_native_line_insertions() {
+        let owner = xy_vsfilter_realtext_timeline_create();
+        // SAFETY: unique live owner with only scalar calls and one release.
+        unsafe {
+            assert_eq!(xy_vsfilter_realtext_timeline_select(owner, 1000, 0, 1), 1);
+            assert_eq!(xy_vsfilter_realtext_timeline_field(owner, 0), 0);
+            assert_eq!(xy_vsfilter_realtext_timeline_field(owner, 1), 1000);
+            xy_vsfilter_realtext_timeline_advance(owner, 1000, 0);
+            assert_eq!(xy_vsfilter_realtext_timeline_select(owner, 500, 0, 0), 2);
+            assert_eq!(xy_vsfilter_realtext_timeline_field(owner, 0), 1000);
+            xy_vsfilter_realtext_timeline_advance(owner, 500, 2000);
+            assert_eq!(xy_vsfilter_realtext_timeline_select(owner, 0, 1, 0), 1);
+            assert_eq!(xy_vsfilter_realtext_timeline_field(owner, 0), 500);
+            assert_eq!(xy_vsfilter_realtext_timeline_field(owner, 1), 2000);
+            assert_eq!(xy_vsfilter_realtext_timeline_field(owner, u32::MAX), 0);
+            xy_vsfilter_realtext_timeline_release(owner);
+        }
+    }
+
     #[test]
     fn lowercase_input_can_change_between_native_conversions() {
         let owner = xy_vsfilter_realtext_lower_create();

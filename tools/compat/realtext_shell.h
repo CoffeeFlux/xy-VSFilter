@@ -16,6 +16,9 @@ static std::wstring* realTextTimecodeInput=nullptr;
 static int realTextTimecodeFailure=-1,realTextTimecodeAttempts=0,realTextTimecodeMutation=0;
 static bool realTextTimecodeMutated=false;
 struct RealTextInterrupted {};
+typedef std::map<std::pair<int,int>,std::wstring> RealTextLineMap;
+static void (*realTextLineHook)(RealTextLineMap&,const std::pair<int,int>&,const std::wstring&)=nullptr;
+static std::pair<int,int> realTextLineKey(RealTextLineMap& lines,const std::pair<int,int>& key,const std::wstring& value){if(realTextLineHook)realTextLineHook(lines,key,value);return key;}
 static std::wstring* realTextInput=nullptr;
 static unsigned* realTextPosition=nullptr;
 static std::map<std::wstring,std::wstring>* realTextAttributes=nullptr;

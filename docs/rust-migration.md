@@ -20,6 +20,20 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns RealText's start/end timing history and interval selection.
+  Missing ends, non-increasing next starts, first-line insertion only into an
+  empty map, explicit reversed intervals and final flushing retain their native
+  rules. Default-duration addition and line-map writes remain native and occur
+  before advancing the owned history. The outer parser and tag lists remain C++.
+  Fatal ASan/UBSan comparisons passed **22,433 sequences / 67,297 complete
+  parses** on arm64 and under x64 execution: **64,051 successful returns**, **3,070
+  malformed returns**, **78,414 native insertion attempts**, **176 injected
+  interruptions** and **1,610 live duration/map mutations**. The separate 30,058
+  parser cases and 100,064 tag-output cases also pass. Fixtures constrain native
+  arithmetic to representable values; overflow outcomes are not counted.
+  Rust 1.85 tests (68 core, 45 FFI), strict Clippy and both default syntax checks
+  pass. Windows/Miri validation is pending. Allocation failure timing for the
+  owned history and native map still needs separate validation.
 * Safe Rust owns `StringToLower` output and iteration state. Each raw UTF-16
   unit still passes through native `towlower`; neither Rust Unicode decoding nor
   a replacement case table is used. Source length is re-read after each native
@@ -79,8 +93,13 @@ unresolved reference outcomes requiring investigation, never matching results.
   representable native arithmetic** are excluded, not passing comparisons.
   The tag-output oracle and 58 complete native parses also pass with all three
   RealText replacements active. Rust 1.85 tests (64 core, 41 FFI), strict Clippy,
-  corpus freshness and both default-branch syntax checks pass. Windows/Miri
-  validation is pending. Native numeric arithmetic and allocation/OOM behavior
+  corpus freshness and both default-branch syntax checks pass. Candidate
+  `af1c5e1f` passed all four portable platforms, Miri and both Windows DLL jobs,
+  each matching **382 cases / 4,490 frames** and **32 mutations / 224 frames**,
+  plus dialogs, visible controls, exports and dependencies. Both native logs
+  confirm Rust-enabled `RealTextParser.cpp` compilation.
+  [Timecode evidence](realtext-timecode-evidence.json) records verified hashes
+  and stable local validation. Native numeric arithmetic and allocation/OOM behavior
   remain outside this replacement.
 * Safe Rust now owns the RealText attribute parser's names, values and cursor
   state. It retains missing-equals recovery, whitespace skipping even inside
