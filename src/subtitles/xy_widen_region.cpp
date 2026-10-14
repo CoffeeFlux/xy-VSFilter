@@ -6,6 +6,7 @@
 #include <math.h>
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_arc_queue.h"
+#include "xy_rust_ellipse.h"
 #endif
 
 //terminology
@@ -479,6 +480,9 @@ int gen_left_arc(int left_arc[], int rx, int ry)
 {
     if (left_arc==NULL)
         return 0;
+#ifdef XY_VSFILTER_RUST_TEXT
+    if (XyRust::GenerateEllipseArc(left_arc, rx, ry)) return 0;
+#endif
     
     int *left_arc2 = left_arc + ry;
     if (rx==0)

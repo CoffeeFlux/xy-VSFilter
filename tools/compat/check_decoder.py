@@ -54,7 +54,7 @@ def capture_inputs():
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h", ROOT / "include/xy_rust_writer.h", ROOT / "include/xy_rust_seek.h",
               ROOT / "include/xy_rust_drawing.h", ROOT / "include/xy_rust_layout.h", ROOT / "include/xy_rust_text_runs.h", ROOT / "include/xy_rust_wrap.h", ROOT / "include/xy_rust_line_layout.h", ROOT / "src/subtitles/RTS.h",
-              ROOT / "include/xy_rust_drawing_tokens.h", ROOT / "include/xy_rust_path_align.h", ROOT / "include/xy_rust_spans.h", ROOT / "include/xy_rust_arc_queue.h",
+              ROOT / "include/xy_rust_drawing_tokens.h", ROOT / "include/xy_rust_path_align.h", ROOT / "include/xy_rust_spans.h", ROOT / "include/xy_rust_arc_queue.h", ROOT / "include/xy_rust_ellipse.h",
               ROOT / "src/subtitles/xy_widen_region.cpp", ROOT / "src/subtitles/xy_circular_array_queue.h",
               ROOT / "include/xy_rust_pipe_line.h", ROOT / "include/xy_rust_subrip_cue.h", ROOT / "include/xy_rust_sami_file.h", ROOT / "include/xy_rust_microdvd_style.h", ROOT / "include/xy_rust_font_records.h", ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
               ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
@@ -735,6 +735,20 @@ public:
             arc_code += extract_definition(text, signature) + "\n"
         arc_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_arc_updates.h").write_text(arc_code, encoding="utf-8")
+    ellipse_code = '#include "ellipse_arc_shell.h"\n'
+    for name, content in (("ReferenceEllipse", widen_source), ("CandidateEllipse", (ROOT / "src/subtitles/xy_widen_region.cpp").read_bytes())):
+        text = content.decode("utf-8-sig")
+        ellipse_code += f"namespace {name} {{\n"
+        if name == "CandidateEllipse":
+            ellipse_code += "#define XY_VSFILTER_RUST_TEXT\n"
+        definition = extract_definition(text, "int gen_left_arc(")
+        if name == "CandidateEllipse":
+            assert definition.count("XyRust::GenerateEllipseArc") == 1
+            definition = definition.replace("XyRust::GenerateEllipseArc", "XyRust::ObservedEllipseArc")
+        if os.name != "nt":
+            definition = definition.replace("__int64", "int64_t")
+        ellipse_code += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_ellipse_arc.h").write_text(ellipse_code, encoding="utf-8")
     filter_source = original("src/subtitles/xy_filter.cpp", reference["commit"])
     vobsub_source = original("src/subtitles/VobSubImage.cpp", reference["commit"])
     golomb = '#pragma once\n#include "golomb_shell.h"\n'
@@ -1213,6 +1227,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     arc_result = run([str(arc_executable)], capture_output=True, text=True)
     print(arc_result.stdout, end="", flush=True)
     print(arc_result.stderr, end="", file=sys.stderr)
+    ellipse_executable = destination / ("ellipse-arc-oracle.exe" if os.name == "nt" else "ellipse-arc-oracle")
+    ellipse_compile = [arg.replace("find_char_oracle.cpp", "ellipse_arc_oracle.cpp").replace("find-char-oracle", "ellipse-arc-oracle") for arg in find_char_compile]
+    run(ellipse_compile)
+    ellipse_result = run([str(ellipse_executable)], capture_output=True, text=True)
+    print(ellipse_result.stdout, end="", flush=True)
+    print(ellipse_result.stderr, end="", file=sys.stderr)
     pipe_line_executable = destination / ("pipe-line-oracle.exe" if os.name == "nt" else "pipe-line-oracle")
     pipe_line_compile = [arg.replace("find_char_oracle.cpp", "pipe_line_oracle.cpp").replace("find-char-oracle", "pipe-line-oracle") for arg in find_char_compile]
     run(pipe_line_compile)
@@ -1602,6 +1622,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "path_align_compile_command": path_align_compile,
         "path_align_result": path_align_result.stdout, "path_align_stderr": path_align_result.stderr,
         "path_align_scope": "Complete pinned PathData::AlignLeftTop over initialized point/type buffers; actual Windows POINT/ATL geometry; exact guarded buffers, origin/size, errno/FP/Windows error state; native cleanup modeled, outputs disjoint and representable arithmetic only",
+        "ellipse_arc_compile_command": ellipse_compile,
+        "ellipse_arc_result": ellipse_result.stdout, "ellipse_arc_stderr": ellipse_result.stderr,
+        "ellipse_arc_scope": "Complete pinned integer gen_left_arc with initialized guarded buffers; degenerate axes, exhaustive bounded radii, large aspect ratios and repeated generation, untouched padding, native return/errno/FP/Windows error state. Nonnegative radii and representable native arithmetic; original fallback retained on decline. Native floating-point intersection tables unchanged.",
         "arc_queue_compile_command": arc_compile,
         "arc_queue_result": arc_result.stdout, "arc_queue_stderr": arc_result.stderr,
         "arc_queue_scope": "Pinned circular queue and complete add_left/add_right/cross_left methods with controlled native ellipse callbacks; initialized positive capacities and nonnegative representable indices/counts, successful allocation; every physical slot including removed slots, callback order, errno/FP/Windows error state. Ellipse math and outer span/list algorithm remain native and require renderer comparisons.",

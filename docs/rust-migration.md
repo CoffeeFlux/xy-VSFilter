@@ -20,6 +20,21 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Rust generates integer ellipse arcs using the pinned two-phase update order,
+  including the unusual base-relative fill read. It exports only written cells
+  into native storage; untouched cells and padding remain untouched. Negative
+  radii and checked-arithmetic declines retain the original native fallback.
+  Fatal ASan/UBSan comparisons pass on arm64 and under x64 execution: **102,506
+  complete calls / 56,928,078 guarded buffer fields / 102,481 changed outputs /
+  12,144 repeated generation histories / 102,481 Rust generators / zero fallbacks**.
+  The campaign exhausts all nonnegative radius pairs 0..256, tests large aspect
+  ratios through 8192, degenerate axes and null outputs, and compares return values,
+  errno, FP flags and Windows error state. Native comparisons use representable
+  arithmetic and successful allocation; floating-point intersections stay native.
+  Rust 1.85 tests (131 core, 83 FFI), strict Clippy, default syntax and Python
+  checks pass. Four fractional/thin-ellipse scripts expand the renderer corpus
+  to **698 cases**. Windows/Miri and renderer checks are pending. Ellipse storage,
+  float calculations, outer span lists and actual-host integration remain.
 * Rust owns the fixed slots and indices of outline arc queues. Removed slots,
   tail wrap, the capacity-minus-one full rule and writes to individual fields
   are preserved; C++ receives copied records rather than storage pointers. Native
@@ -101,8 +116,10 @@ unresolved reference outcomes requiring investigation, never matching results.
   replacement-bearing NUL outcomes and allocation failures remain excluded.
   Rust 1.85 tests (122 core, 78 FFI), strict Clippy, default syntax and Python
   checks pass. Eight drawing scripts expand the renderer corpus to **642 cases**.
-  Windows/Miri and renderer validation for this increment are pending. Native
-  numeric conversion, scaling, final path storage and NUL preparation remain.
+  Windows x86/x64, Linux, macOS and Miri passed; paired Windows DLLs match
+  **642 cases / 6,770 frames**, plus **32 mutations / 224 frames**, on each
+  architecture. See [drawing-preparation evidence](drawing-preparation-evidence.json).
+  Numeric conversion, scaling and NUL preparation remain native.
 * Safe Rust computes `CTextFile::Seek` targets while native position/length/seek
   calls and successful-seek buffer invalidation retain their order. Unsigned
   wrapping, reinterpretation before the zero clamp, unknown origins, BOM offsets,

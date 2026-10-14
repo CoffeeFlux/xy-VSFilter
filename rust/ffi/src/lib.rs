@@ -155,3 +155,5 @@ mod path_align;
 mod span_merge;
 
 mod arc_queue;
+
+mod ellipse_arc;
