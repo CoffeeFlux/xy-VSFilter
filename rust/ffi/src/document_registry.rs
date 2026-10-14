@@ -115,19 +115,24 @@ impl Registry {
         Ok(Resource::Document(copy))
     }
 
-    /// Explicit default assignment, independent of entry/segment storage copy.
-    pub(crate) fn copy_default_style(
+    /// Selected native Copy header only, after the caller's virtual Empty.
+    /// Both typed handles are validated before cloning; retired payloads leave
+    /// this acquisition. Self-copy observes current state and needs no clone.
+    pub(crate) fn copy_selected_state(
         &mut self,
         destination: Handle,
         source: Handle,
-    ) -> Result<Option<xy_vsfilter_compat::document_style::StyleValue>, Error> {
+    ) -> Result<Option<xy_vsfilter_compat::document::RetiredSelectedState>, Error> {
         self.document(destination)?;
         let source_document = self.document(source)?;
         if destination == source {
             return Ok(None);
         }
-        let value = source_document.default_style().cloned();
-        Ok(self.document_mut(destination)?.replace_default_style(value))
+        let state = source_document.selected_state();
+        Ok(Some(
+            self.document_mut(destination)?
+                .replace_selected_state(state),
+        ))
     }
 
     /// Removal transfers ownership; callers perform destruction after unlocking.

@@ -1008,6 +1008,43 @@ constructor-default evidence. Native parsing, CRT, callbacks, dialogs, file I/O
 and host orchestration also remain in scope. This is not whole-document closure
 or authorization to switch default production.
 
+### Coarse selected-state Copy boundary
+
+Native Copy still invokes virtual Empty first, then reads the source. The opt-in
+path now copies its selected metadata through one safe `CopySelectedState`
+operation: name, interpretation, script layout, default style and forced-default
+state. Destination path, PAR/color values, other metadata, named-map history and
+prepared records remain outside this operation. Retired name/default-style values
+are destroyed after registry admission ends; no new unsafe crossing is added.
+The old default-only copy export and native helper are retired.
+
+The native adapter then calls CopyNamedStylesFrom(false), followed by the Rust
+prepared entry/segment storage copy. Selected copying does not clone the named
+map or prefetch source state across Empty. Allocation/partial-failure behavior
+remains an explicit gate; the coarse commit is not certified as native exception
+parity.
+
+Seven new required full-class stages exercise two bounded histories. A derived
+destination calls base Empty, then deliberately mutates a distinct live source's
+selected metadata and path/PAR/colors. Copy must observe the selected changes
+while retaining destination nonselected values. Full source/destination traces
+record those callback mutations and subsequent state. The second history inserts
+a logically nonempty leading-NUL style name, producing a stored empty key beside
+Default. Native AddStyle normalizes that key during copy and creates a conflict;
+the destination must contain Default and two keys total, with no empty key. Full
+value/order traces and raw entry styles distinguish the native map stage from a
+bulk clone or a reordered storage tail. No null styles, iterator invalidation or
+self-copy variant retaining native arrays is executed.
+
+Rust 1.85 passes 185 core and 117 FFI tests, formatting and Clippy. Ninety-two
+Python tests pass with four Windows-only skips; native source generation passes.
+Eight native files preprocess identically to `4f1264a4` with the experiment off.
+The scanner now includes CopySelectedState and removes the retired actual
+CopyDefaultStyle token, preserving its historical evidence in earlier records.
+Current exact-commit Windows full-class/style/API/renderer and real-host gates
+remain pending. The canonical ownership count remains eighteen fields/containers;
+this increment consolidates a boundary rather than retiring another owner.
+
 ## Independent audit and unsafe boundary
 
 The user-requested independent audit is recorded in
@@ -1021,13 +1058,13 @@ Neither count measures the amount of application behavior replaced.
 The reproducible [Rust unsafe inventory](rust-unsafe-inventory.json) uses
 `python3 tools/compat/audit_rust_boundary.py OUTPUT.json`. It masks comments and
 literals, separates cfg(test) items, and includes all platform/feature branches.
-At the current frozen working-tree sources based on `dc11cd69` (exact file
+At the current frozen working-tree sources based on `4f1264a4` (exact file
 hashes recorded by the regenerated inventory):
 
 | Layer | Production source inventory | Meaning |
 | --- | --- | --- |
-| `rust/compat` | 0 unsafe blocks/functions/impls; 7,398 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
-| `rust/ffi` | 358 explicit unsafe blocks, 301 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,188 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
+| `rust/compat` | 0 unsafe blocks/functions/impls; 7,436 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
+| `rust/ffi` | 358 explicit unsafe blocks, 301 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,194 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
 | Tests | 119 unsafe blocks in FFI tests | Exercise valid and deliberately bounded ownership/alias/initialization contracts; not production code |
 
 Unsafe-function declarations and blocks overlap and must not be added as

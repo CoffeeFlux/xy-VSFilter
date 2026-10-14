@@ -36,6 +36,9 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
              b"metadata-color-none", b"metadata-color-tv601", b"metadata-color-tv709", b"metadata-color-tv2020",
              b"metadata-color-pc601", b"metadata-color-pc709", b"metadata-color-pc2020", b"metadata-color-unrecognized",
              b"metadata-color-repeated", b"metadata-fallback-srt", b"metadata-fallback-microdvd"))
+         + b"".join(b"copy-state-stage " + stage + b"\n" for stage in (
+             b"copy-source-before", b"copy-source-mutated", b"copy-destination-after", b"copy-source-after",
+             b"copy-empty-key-source", b"copy-empty-key-result", b"copy-empty-key-source-after"))
          + b"saved-file ssa exists=1 bytes=1 41\nsaved-file ass exists=1 bytes=1 41\n"
          + b"saved-file srt exists=1 bytes=1 41\nsaved-file srt-sidecar exists=1 bytes=1 41\n"
          + b"saved-file ssa-sidecar exists=0\nsaved-file ass-sidecar exists=0\n"
@@ -137,6 +140,17 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
         changed=TRACE.replace(b"metadata-stage metadata-copy-forced-only forced=0",b"metadata-stage metadata-copy-forced-only forced=1")
         with self.assertRaises(ValueError):compare_traces([TRACE,TRACE,changed,changed],64)
         changed=TRACE.replace(b"metadata-callback metadata-color-pc709 forced=0 par-type=0 par-bits 3ff0000000000000 matrix=3",b"metadata-callback metadata-color-pc709 forced=0 par-type=0 par-bits 3ff0000000000000 matrix=1")
+        with self.assertRaises(ValueError):compare_traces([TRACE,TRACE,changed,changed],64)
+
+    def test_selected_copy_stages_order_and_archival_opt_out(self):
+        legacy=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith(b"copy-state-stage "))
+        with self.assertRaises(ValueError):compare_traces([legacy]*4,64)
+        compare_traces([legacy]*4,64,require_selected_copy_stages=False)
+        missing=TRACE.replace(b"copy-state-stage copy-source-mutated\n",b"")
+        with self.assertRaises(ValueError):compare_traces([missing]*4,64)
+        reordered=TRACE.replace(b"copy-state-stage copy-source-mutated",b"copy-state-stage temporary").replace(b"copy-state-stage copy-destination-after",b"copy-state-stage copy-source-mutated").replace(b"copy-state-stage temporary",b"copy-state-stage copy-destination-after")
+        with self.assertRaises(ValueError):compare_traces([reordered]*4,64)
+        changed=TRACE.replace(b"copy-state-stage copy-empty-key-result\n",b"copy-state-stage copy-empty-key-result\nname Default2\n")
         with self.assertRaises(ValueError):compare_traces([TRACE,TRACE,changed,changed],64)
 
     def test_rejects_repeat_nondeterminism(self):

@@ -184,9 +184,12 @@ pub unsafe extern "C" fn xy_vsfilter_document_set_default_style_v1(
     OK
 }
 #[no_mangle]
-pub extern "C" fn xy_vsfilter_document_copy_default_style_v1(destination: u64, source: u64) -> u32 {
+pub extern "C" fn xy_vsfilter_document_copy_selected_state_v1(
+    destination: u64,
+    source: u64,
+) -> u32 {
     let retired = required!(admitted(|registry| registry
-        .copy_default_style(destination, source)
+        .copy_selected_state(destination, source)
         .map_err(registry_error)));
     drop(retired);
     OK
@@ -1209,15 +1212,15 @@ mod tests {
                 INVALID_INPUT
             );
             assert_eq!(
-                xy_vsfilter_document_copy_default_style_v1(target, snapshot),
+                xy_vsfilter_document_copy_selected_state_v1(target, snapshot),
                 BAD_HANDLE
             );
             assert_eq!(
-                xy_vsfilter_document_copy_default_style_v1(target, source),
+                xy_vsfilter_document_copy_selected_state_v1(target, source),
                 OK
             );
             assert_eq!(
-                xy_vsfilter_document_copy_default_style_v1(source, source),
+                xy_vsfilter_document_copy_selected_state_v1(source, source),
                 OK
             );
             assert_eq!(state(source).default_style(), state(target).default_style());
@@ -1239,6 +1242,127 @@ mod tests {
             assert_eq!(xy_vsfilter_document_destroy_v1(target), OK);
             assert_ne!(read_snapshot(snapshot), style);
             assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
+            // Copy's selected header tail preserves every excluded owner field.
+            let source = create();
+            let destination = create();
+            let raw = [65u8, 0, 0, 0, 0, 216, 255, 220];
+            assert_eq!(
+                xy_vsfilter_document_set_identity_v1(source, 0, raw.as_ptr(), raw.len()),
+                OK
+            );
+            for field in 0..3 {
+                assert_eq!(
+                    xy_vsfilter_document_set_interpretation_v1(source, field, i32::MIN),
+                    OK
+                );
+            }
+            for field in 0..5 {
+                assert_eq!(
+                    xy_vsfilter_document_set_script_field_v1(
+                        source,
+                        field,
+                        if field == 4 { 1 } else { -5 }
+                    ),
+                    OK
+                );
+            }
+            assert_eq!(xy_vsfilter_document_set_metadata_v1(source, 3, 1), OK);
+            let mut bytes = [0u8; style_wire::HEADER_BYTES];
+            bytes[72..80].copy_from_slice(&0x7ff0000000000042u64.to_le_bytes());
+            assert_eq!(
+                xy_vsfilter_document_set_default_style_v1(source, bytes.as_ptr(), bytes.len()),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_set_identity_v1(destination, 1, raw.as_ptr(), raw.len()),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_set_par_bits_v1(destination, 0x8000000000000000),
+                OK
+            );
+            for field in 0..3 {
+                assert_eq!(
+                    xy_vsfilter_document_set_metadata_v1(destination, field, i32::MAX),
+                    OK
+                );
+            }
+            assert_eq!(
+                xy_vsfilter_document_named_style_put_v1(
+                    destination,
+                    raw.as_ptr(),
+                    raw.len(),
+                    bytes.as_ptr(),
+                    bytes.len()
+                ),
+                OK
+            );
+            admitted(|registry| {
+                registry
+                    .document_mut(destination)
+                    .map_err(registry_error)?
+                    .add_prepared(wire::decode_entry(&entry(0, 10)).unwrap(), AddMode::Add)
+                    .unwrap();
+                Ok(())
+            })
+            .unwrap();
+            let before = state(destination);
+            let source_before = state(source);
+            let reply = open_snapshot(source, 5);
+            assert_eq!(
+                xy_vsfilter_document_copy_selected_state_v1(reply, source),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                xy_vsfilter_document_copy_selected_state_v1(destination, reply),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_copy_selected_state_v1(destination, source))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(state(destination), before);
+            assert_eq!(state(source), source_before);
+            assert_eq!(
+                xy_vsfilter_document_copy_selected_state_v1(destination, source),
+                OK
+            );
+            let after = state(destination);
+            assert_eq!(after.selected_state(), source_before.selected_state());
+            assert_eq!(
+                after.identity(IdentityField::Path),
+                before.identity(IdentityField::Path)
+            );
+            assert_eq!(after.par_bits(), before.par_bits());
+            for field in [
+                MetadataField::PARType,
+                MetadataField::ColorMatrix,
+                MetadataField::ColorRange,
+            ] {
+                assert_eq!(after.metadata(field), before.metadata(field));
+            }
+            assert_eq!(after.named_styles(), before.named_styles());
+            assert_eq!(after.entries(), before.entries());
+            assert_eq!(after.segments(), before.segments());
+            assert_eq!(
+                xy_vsfilter_document_copy_selected_state_v1(destination, destination),
+                OK
+            );
+            assert_eq!(state(destination), after);
+            assert_eq!(
+                xy_vsfilter_document_set_identity_v1(source, 0, ptr::null(), 0),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_set_default_style_v1(source, bytes.as_ptr(), bytes.len()),
+                OK
+            );
+            assert_eq!(state(destination), after);
+            assert_eq!(xy_vsfilter_document_destroy_v1(source), OK);
+            assert_eq!(xy_vsfilter_document_destroy_v1(destination), OK);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(reply), OK);
             // Render metadata transports opaque integer and floating-point bits.
             let owner = create();
             let destination = create();

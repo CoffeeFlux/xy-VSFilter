@@ -334,6 +334,18 @@ public:
         return m_styles.GetCount();
 #endif
     }
+    bool HasStoredName(const CString& expected) const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        for(size_t i=0;i<NamedCount();++i){CString actual;check(GetStyleNameAt(i,actual),"stored key ordinal");
+#else
+        POSITION pos=m_styles.GetStartPosition();while(pos){CString actual;STSStyle* ignored=NULL;m_styles.GetNextAssoc(pos,actual,ignored);
+#endif
+            if(actual.GetLength()!=expected.GetLength())continue;
+            bool equal=true;for(int i=0;i<actual.GetLength();++i)if(actual[i]!=expected[i])equal=false;
+            if(equal)return true;
+        }
+        return false;
+    }
     bool CopyNames(TraceDocument& source, bool append) {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
         return CopyNamedStylesFrom(source,append);
@@ -745,12 +757,73 @@ static void metadata_lifecycle() {
     metadata_open("metadata-fallback-srt","",false,false,Doc::YCbCrMatrix_BT601,Doc::YCbCrRange_TV);
     metadata_open("metadata-fallback-microdvd","",false,true,Doc::YCbCrMatrix_BT601,Doc::YCbCrRange_TV);
 }
+static void copy_state_stage(TraceDocument& doc,const char* stage) {
+    printf("copy-state-stage %s\n",stage);doc.Dump(stage);
+}
+static STSStyle callback_default_style() {
+    STSStyle value;const wchar_t font[]={L'F',0,0xd800,L'C'};
+    value.fontName=CString(font,4);value.fontSize=27;value.charSet=SHIFTJIS_CHARSET;return value;
+}
+class CopyMutationDocument : public TraceDocument {
+    TraceDocument* source_=nullptr;
+public:
+    CopyMutationDocument():TraceDocument(1){}
+    void Arm(TraceDocument& source){source_=&source;}
+    void Empty() override {
+        TraceDocument::Empty();
+        if(!source_)return;
+        TraceDocument& source=*source_;source_=nullptr;
+        const wchar_t name[]={L'A',0,0xd800,L'C'};source.Name(CString(name,4));
+        source.Mode(FRAME);source.Type(EXTASS);source.Encoding(CTextFile::LE16);
+        source.Screen(CSize(320,240));source.Wrap(7);source.Collisions(1);source.Scaled(true);
+        STSStyle value=callback_default_style();check(source.SetDefaultStyle(value),"callback default assignment");
+        source.SetForceDefaultStyle(true);
+        source.Path(CString(L"source path after callback"));source.PARType(EPCTAccurateSize);source.PAR(1.5);
+        source.Matrix(YCbCrMatrix_BT2020);source.Range(YCbCrRange_TV);
+        copy_state_stage(source,"copy-source-mutated");
+    }
+};
+static void copy_selected_lifecycle() {
+    {
+        TraceDocument source(0);CopyMutationDocument destination;
+        source.AddSTSEntryOnly(CStringW(L"callback copy source"),true,0,10);
+        STSStyle* named=new STSStyle;named->fontSize=18;source.AddStyle(CString(L"Default"),named);
+        destination.AddSTSEntryOnly(CStringW(L"old destination"),true,0,20);
+        destination.Path(CString(L"destination retained path"));destination.PARType(CSimpleTextSubtitle::EPCTUpscale);destination.PAR(2.5);
+        const CString retainedPath=destination.Path();MetadataValue retained=destination.Metadata();retained.forced=true;
+        const unsigned sourceChanges=change_events[0],destinationChanges=change_events[1];
+        copy_state_stage(source,"copy-source-before");destination.Arm(source);destination.Copy(source);
+        const wchar_t name[]={L'A',0,0xd800,L'C'};
+        check(same_identity(destination.Name(),CString(name,4)),"Copy reads source name after virtual Empty");
+        check(destination.Mode()==FRAME&&destination.Type()==EXTASS&&destination.Encoding()==CTextFile::LE16,"Copy reads source interpretation after virtual Empty");
+        check(destination.Screen()==CSize(320,240)&&destination.Wrap()==7&&destination.Collisions()==1&&destination.Scaled(),"Copy reads source layout after virtual Empty");
+        check(same_identity(destination.Path(),retainedPath)&&same_metadata(destination.Metadata(),retained),"Copy retains destination path/PAR/colors");
+        check(destination.Entries()==1&&destination.Entry(0).str==L"callback copy source"&&destination.NamedCount()==1,"Copy map and storage tail remain native orchestration");
+        check_default(destination,callback_default_style(),"copy-callback-default");
+        copy_state_stage(destination,"copy-destination-after");copy_state_stage(source,"copy-source-after");
+        check(change_events[0]==sourceChanges&&change_events[1]==destinationChanges,"Copy callback fixture has no OnChanged");
+    }
+    {
+        TraceDocument source(0),destination(1);const wchar_t raw[]={0,L'K'};const CString leadingNul(raw,2);
+        STSStyle* first=new STSStyle;first->fontSize=18;source.AddStyle(CString(L"Default"),first);
+        STSStyle* second=new STSStyle;second->fontSize=19;source.AddStyle(leadingNul,second);
+        source.AddSTSEntryOnly(CStringW(L"empty stored key"),true,0,10,leadingNul);
+        source.AddSTSEntryOnly(CStringW(L"mapped default key"),true,20,30,CString(L"Default"));
+        check(leadingNul.GetLength()==2&&source.NamedCount()==2&&source.HasStoredName(CString())&&source.HasStoredName(CString(L"Default")),"leading NUL inserts empty stored key alongside Default");
+        copy_state_stage(source,"copy-empty-key-source");destination.Copy(source);
+        check(destination.NamedCount()==2&&destination.HasStoredName(CString(L"Default"))&&!destination.HasStoredName(CString()),"Native Copy AddStyle normalizes empty key and conflicts");
+        check(destination.Entries()==2&&destination.Entry(1).style==L"Default","native map stage precedes storage tail entry copy");
+        check(destination.Entry(0).style.GetLength()==2&&destination.Entry(0).style[0]==0&&destination.Entry(0).style[1]==L'K',"storage tail keeps raw entry style");
+        copy_state_stage(destination,"copy-empty-key-result");copy_state_stage(source,"copy-empty-key-source-after");
+    }
+}
 int main() {
     try {
         if(!AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0))throw std::runtime_error("AfxWinInit failed");
         printf("provenance pointer_bits=%zu\n",sizeof(void*)*8);
         printf("environment ansi=%u oem=%u\n",GetACP(),GetOEMCP());
         default_style_lifecycle();
+        copy_selected_lifecycle();
         metadata_lifecycle();
         layout_lifecycle();
         interpretation_lifecycle();
