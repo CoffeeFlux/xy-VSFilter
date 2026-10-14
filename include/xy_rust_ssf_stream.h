@@ -9,6 +9,7 @@
 #endif
 struct XYRustSsfPeek {uint32_t phase;int32_t previous,result;};
 extern "C" {
+uint64_t XY_SSF_CDECL xy_vsfilter_ssf_output(uint16_t,uint32_t);
 uint32_t XY_SSF_CDECL xy_vsfilter_ssf_peek_step(XYRustSsfPeek*,size_t,int32_t,int32_t,int32_t);
 void* XY_SSF_CDECL xy_vsfilter_ssf_queue_create();
 void XY_SSF_CDECL xy_vsfilter_ssf_queue_push(void*,int32_t);

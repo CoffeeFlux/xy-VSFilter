@@ -43,3 +43,7 @@ static uint64_t ssfOwners=0,ssfReleases=0,ssfPushes=0,ssfPops=0;
 namespace XyRust {
 class ObservedSsfLookahead:public SsfLookahead {public:ObservedSsfLookahead(){++ssfOwners;}~ObservedSsfLookahead(){++ssfReleases;}void AddTail(int value){++ssfPushes;SsfLookahead::AddTail(value);}int RemoveHead(){++ssfPops;return SsfLookahead::RemoveHead();}};
 }
+
+static uint64_t ssfOutputPlans=0;
+static uint64_t ssfObservedOutput(uint16_t character,uint32_t encoding){++ssfOutputPlans;return xy_vsfilter_ssf_output(character,encoding);}
+#define xy_vsfilter_ssf_output ssfObservedOutput

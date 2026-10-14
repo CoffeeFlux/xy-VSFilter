@@ -63,6 +63,12 @@ pub unsafe extern "C" fn xy_vsfilter_ssf_peek_step(
     unsafe { &mut *state }.step(count, head, tail, last) as u32
 }
 
+/// Copied scalars only. All output callbacks occur after this function returns.
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_ssf_output(character: u16, encoding: u32) -> u64 {
+    xy_vsfilter_compat::ssf_stream::output(character, encoding)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

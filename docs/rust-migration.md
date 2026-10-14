@@ -20,6 +20,22 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* SSF `OutputStream::PutChar` now uses safe Rust to calculate its exact callback
+  values. Native first-character/BOM handling and virtual callbacks retain
+  their order; Rust returns copied scalars before any callback begins. The
+  historical left shifts, raw surrogate handling, `0xffff` substitution and
+  both UTF-16 byte orders are preserved. Whole pinned constructors and PutChar
+  match on local arm64 and x64 in ordinary and fatal ASan/UBSan builds:
+  **907,392 histories / 3,629,568 PutChar calls / 99,398,064 observed fields /
+  4,671,956 byte callbacks / 55,128 interrupted calls / 46,944 reentrant calls /
+  46,944 callback encoding changes / 3,890,740 Rust output plans**. All 65,536
+  code units run in all six encoding modes both with and without initial BOM
+  state. Callback exceptions before/after output, resumed calls and encoding
+  mutation during BOM emission are compared. PutString formatting, actual I/O
+  and SSF rendering remain outside these controlled callback checks.
+  **149 core / 105 FFI tests**, formatting, Clippy, 29 Python checks (three
+  local skips) and default native syntax pass. Windows and Miri are pending.
+
 * SSF input lookahead and comment/peek decisions now run in safe Rust. A
   transient state machine requests native character reads and pops; each Rust
   borrow ends before the callback, and exceptions discard only transient state.
@@ -37,8 +53,9 @@ unresolved reference outcomes requiring investigation, never matching results.
   comment runs remain excluded. CSRI opens the RTS parser and cannot establish
   SSF renderer coverage. **149 core / 105 FFI tests**, formatting, Clippy,
   29 Python checks (three local skips), both local sanitizer builds and default
-  native syntax pass. Windows build/integration and Miri are pending for this
-  increment. The preceding queue-only increment is `209402aa`.
+  native syntax pass. Miri passes at `154a1120` (`115943572360`); Windows build/integration
+  remains pending. Both Windows portable jobs passed for the preceding
+  queue-only increment `209402aa` (`115936712952`, `115936713551`).
 
 * Safe Rust now scans caption packet headers and owns snapshots of both fields
   before native decoding begins. The native path remains when the declared

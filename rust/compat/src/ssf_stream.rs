@@ -122,6 +122,31 @@ impl Peek {
     }
 }
 
+/// Preserve SSF's code-unit encoding, including its historical left shifts.
+/// Three 16-bit callback values occupy bits 0..48; bits 48..64 hold the count.
+/// The caller handles BOM state separately because callbacks can reenter it.
+pub fn output(character: u16, encoding: u32) -> u64 {
+    let c = u64::from(character);
+    let (units, count) = match encoding {
+        2 if c < 0x80 => ([c, 0, 0], 1),
+        2 if c < 0x800 => ([0xc0 | ((c << 2) & 0x1f), 0x80 | (c & 0x3f), 0], 2),
+        2 if c < 0xffff => (
+            [
+                0xe0 | ((c << 4) & 0x0f),
+                0x80 | ((c << 2) & 0x3f),
+                0x80 | (c & 0x3f),
+            ],
+            3,
+        ),
+        2 => ([63, 0, 0], 1),
+        3 => ([c & 0xff, c >> 8, 0], 2),
+        4 => ([c >> 8, c & 0xff, 0], 2),
+        5 => ([c, 0, 0], 1),
+        _ => ([0, 0, 0], 0),
+    };
+    (count << 48) | (units[2] << 32) | (units[1] << 16) | units[0]
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
