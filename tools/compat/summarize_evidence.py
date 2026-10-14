@@ -142,8 +142,21 @@ def summarize_native(run, platform, candidate, reference):
                 assert capture["stdout_sha256"] == sha(path)
                 traces.append(path.read_bytes())
             assert len(traces) == 4 and all(trace == traces[0] for trace in traces)
+        assert len(com["candidate_only_controls"]) == 2
+        for control in com["candidate_only_controls"]:
+            assert control["passed"] is True
+            traces = []
+            for side, capture in control["captures"].items():
+                assert capture["status"] == "complete" and capture["returncode"] == 0
+                path = com_path.parent / control["id"] / side / "stdout.txt"
+                assert capture["stdout_sha256"] == sha(path)
+                traces.append(path.read_bytes())
+            assert len(traces) == 2 and traces[0] == traces[1]
+            assert all(line in traces[0].splitlines() for line in (b"pin.0.id hr 0", b"pin.0.id utf16", b"pin.0.find hr 0", b"pin.0.find.identity value 1"))
         entry["checks"]["com-contracts"] = {"report_sha256": sha(com_path), "cases": len(com["cases"]),
-                                                "passed": True, "scope": com["scope"], "headers": com["headers"]}
+                                                "passed": True, "scope": com["scope"], "headers": com["headers"],
+                                                "reference_exclusions": com["reference_exclusions"], "candidate_only_controls": 2,
+                                                "settings_environment": com["settings_environment"]}
     log = (base / "candidate.log").read_text(errors="replace")
     assert "XY_VSFILTER_RUST_TEXT" in log and "xy_vsfilter_ffi.lib" in log
     entry["candidate_log_sha256"] = sha(base / "candidate.log")

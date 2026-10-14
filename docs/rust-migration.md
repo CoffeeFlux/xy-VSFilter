@@ -20,6 +20,22 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* The initial x64 COM probe matched eight scoped cases; the two autoloader
+  apartment cases have an unresolved reference pin-ID outcome, recorded in
+  `autoloader-pin-id-scope.json`. These are not parity passes and are no longer
+  re-executed against the reference. The Rust-enabled autoloader now preserves
+  its observed empty pin name using an owned empty identifier. QueryId and
+  FindPin for that identifier have separate candidate-only controls, explicitly
+  outside reference parity; all other autoloader observations remain paired.
+  Each worker now redirects HKCU to a private volatile key before loading the
+  DLL, keeps that view through process-detach callbacks, and the parent removes
+  it after exit. This isolates default writes performed by native constructors.
+  Nine driver tests cover repeated traces, failures, partial output, timeouts,
+  candidate-only ID checks and private-key cleanup (**29 Python tests total**).
+  Corrected Windows execution is pending. The first failed COM jobs remain
+  failed; redundant native run `38576708233` was cancelled to avoid repeating
+  the known unresolved operation, while its portability jobs continue.
+
 * The repaired ownership integration stage at `f5c748a9` is now fully archived
   in `ownership-integration-evidence.json`: all four portable jobs, Miri, and
   both renderer jobs passed. Each architecture matched **798 cases / 8,426
@@ -39,11 +55,11 @@ unresolved reference outcomes requiring investigation, never matching results.
   class factories, IUnknown identity, interface availability, initial state,
   filter name/class/clock, property-page UUIDs, stream count, pin names, IDs,
   directions and parent identity, FindPin, and enumerator reset/clone/skip.
-  No registration or persistent setting writes occur. The driver retains raw
+  No registration occurs; constructor default writes are isolated in a private volatile HKCU view. The driver retains raw
   traces and DLL/probe/header hashes; instability, crashes, timeouts, incomplete
   traces and mismatches fail the gate. The evidence summarizer requires this
-  report for candidates containing the probe. Seven harness checks pass locally
-  (**27 Python tests total, three platform skips**); native compilation and
+  report for candidates containing the probe. Nine harness checks pass locally
+  (**29 Python tests total, three platform skips**); native compilation and
   execution await Windows CI. This adds interface characterization, not a Rust
   COM implementation. Custom interface methods, media negotiation, graph
   playback, UI and real-player integration remain outstanding.

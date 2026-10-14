@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import uuid
 
 ROOT = Path(__file__).resolve().parents[2]
 CLASSES = [
@@ -79,6 +80,48 @@ def capture(command, directory, timeout):
             "stderr_sha256": digest(stderr), "line_count": len(lines)}
 
 
+def isolated_capture(probe, dll, clsid, apartment, profile, directory, timeout):
+    import winreg
+    prefix = r"Software\xyVSFilterCompatibility"
+    key_name = prefix + "\\" + str(uuid.uuid4())
+
+    def remove_tree(path):
+        try:
+            key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, path, 0, winreg.KEY_READ | winreg.KEY_WRITE)
+        except FileNotFoundError:
+            return
+        with key:
+            while True:
+                try:
+                    child = winreg.EnumKey(key, 0)
+                except OSError as error:
+                    if error.winerror == 259:  # ERROR_NO_MORE_ITEMS
+                        break
+                    raise
+                remove_tree(path + "\\" + child)
+        winreg.DeleteKey(winreg.HKEY_CURRENT_USER, path)
+
+    try:
+        return capture([str(probe.resolve()), str(dll), clsid, apartment, profile, key_name], directory, timeout)
+    finally:
+        remove_tree(key_name)
+        try:
+            winreg.DeleteKey(winreg.HKEY_CURRENT_USER, prefix)
+        except (FileNotFoundError, PermissionError):
+            pass  # Another worker may still own a private child under this key.
+
+
+def candidate_pin_id_control(captures, directories):
+    if any(result["status"] != "complete" for result in captures.values()):
+        return False
+    traces = [(directory / "stdout.txt").read_bytes() for directory in directories.values()]
+    if len(traces) != 2 or traces[0] != traces[1]:
+        return False
+    lines = traces[0].splitlines()
+    return all(line in lines for line in (b"pin.0.id hr 0", b"pin.0.id utf16",
+                                         b"pin.0.find hr 0", b"pin.0.find.identity value 1"))
+
+
 def compare(captures, directories):
     for name, result in captures.items():
         if result["status"] != "complete":
@@ -129,10 +172,13 @@ def main():
     report = {"schema": 1, "complete": False, "passed": False, "reference_commit": reference,
               "candidate_commit": git(args.candidate_root, "rev-parse", "HEAD").decode().strip(),
               "platform": args.platform, "probe_sha256": probe_hash, "binaries": hashes,
+              "settings_environment": "Private volatile HKCU per worker, removed by parent after termination; native constructor writes are isolated.",
+              "reference_exclusions": ["XySubFilterAutoLoader QueryId/FindPin; see docs/autoloader-pin-id-scope.json"],
+              "candidate_only_controls": [],
               "harness_sources": {name: digest((ROOT / name).read_bytes()) for name in
                                   ("tools/compat/com_contract_probe.cpp", "tools/compat/com_contract_compare.py")},
               "headers": headers, "cases": [],
-              "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, persistent setting writes, custom interface methods, media negotiation, graph playback or UI. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures."}
+              "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures."}
     report_path = args.output / "report.json"
     def save():
         report_path.write_text(json.dumps(report, indent=2) + "\n")
@@ -146,14 +192,26 @@ def main():
             for side in ("reference-a", "reference-b", "candidate-a", "candidate-b"):
                 directories[side] = directory / side
                 dll = binaries[item["dll"]][side.split("-")[0]]
-                observations[side] = capture([str(args.probe.resolve()), str(dll), item["clsid"], apartment], directories[side], args.timeout)
-            report["cases"].append({**item, "id": name, "apartment": apartment, "captures": observations, "verdict": compare(observations, directories)})
+                profile = "autoload_without_ids" if item["class"] == "XySubFilterAutoLoader" else "full"
+                observations[side] = isolated_capture(args.probe, dll, item["clsid"], apartment, profile, directories[side], args.timeout)
+            exclusions = ["QueryId", "FindPin"] if item["class"] == "XySubFilterAutoLoader" else []
+            report["cases"].append({**item, "id": name, "apartment": apartment, "scope_exclusions": exclusions,
+                                    "captures": observations, "verdict": compare(observations, directories)})
             save()
+            if exclusions:
+                controls, control_directories = {}, {}
+                for side in ("candidate-id-a", "candidate-id-b"):
+                    control_directories[side] = directory / side
+                    controls[side] = isolated_capture(args.probe, binaries[item["dll"]]["candidate"], item["clsid"], apartment, "full", control_directories[side], args.timeout)
+                report["candidate_only_controls"].append({"id": name, "captures": controls,
+                    "passed": candidate_pin_id_control(controls, control_directories),
+                    "scope": "Owned empty pin ID and FindPin identity, stable across two candidate processes; NOT reference parity."})
+                save()
     report["inputs_unchanged"] = probe_hash == digest(args.probe.read_bytes()) and all(hashes[name][side] == digest(path.read_bytes()) for name, paths in binaries.items() for side, path in paths.items())
     report["complete"] = True
-    report["passed"] = report["inputs_unchanged"] and all(case["verdict"]["kind"] == "equal" for case in report["cases"])
+    report["passed"] = report["inputs_unchanged"] and all(case["verdict"]["kind"] == "equal" for case in report["cases"]) and all(control["passed"] for control in report["candidate_only_controls"])
     save()
-    print(f"COM contracts: {sum(case['verdict']['kind'] == 'equal' for case in report['cases'])}/{len(report['cases'])} exact stable cases")
+    print(f"COM contracts: {sum(case['verdict']['kind'] == 'equal' for case in report['cases'])}/{len(report['cases'])} exact stable scoped cases; {len(report['candidate_only_controls'])} candidate-only pin-ID controls")
     return 0 if report["passed"] else 1
 
 

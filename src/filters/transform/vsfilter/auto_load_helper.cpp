@@ -37,7 +37,12 @@ XySubFilterAutoLoader::XySubFilterAutoLoader( LPUNKNOWN punk, HRESULT* phr
     , const GUID& clsid /*= __uuidof(XySubFilterAutoLoader)*/ )
     : CBaseFilter(NAME("XySubFilterAutoLoader"), punk, &m_pLock, clsid)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    // Preserve the published empty name with an owned empty pin identifier.
+    m_pin = DEBUG_NEW XyAutoLoaderDummyInputPin(this, &m_pLock, phr, L"");
+#else
     m_pin = DEBUG_NEW XyAutoLoaderDummyInputPin(this, &m_pLock, phr, NULL);
+#endif
 
     CString tmp;
     tmp.Format(ResStr(IDS_RP_PATH), 0);

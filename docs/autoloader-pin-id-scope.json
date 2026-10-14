@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "candidate_commit": "d1edd80a1cac3bd7280d92cc968726c2f08ead0e",
+  "status": "unresolved reference pin-ID outcome; never parity evidence",
+  "job_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38576139019/job/115893625781",
+  "report_sha256": "793e065066a9633412892d1816f2cb6dfe23f5d59cfd40d68ae4e7c8cc1a1dae",
+  "completed_equal_cases": [
+    "CDirectVobSubFilter-sta",
+    "CDirectVobSubFilter-mta",
+    "CDirectVobSubFilter2-sta",
+    "CDirectVobSubFilter2-mta",
+    "XySubFilter-sta",
+    "XySubFilter-mta",
+    "XySubFilterConsumer-sta",
+    "XySubFilterConsumer-mta"
+  ],
+  "unresolved_cases": [
+    {
+      "dll": "XySubFilter.dll",
+      "class": "XySubFilterAutoLoader",
+      "clsid": "{6b237877-902b-4c6c-92f6-e63169a5166c}",
+      "id": "XySubFilterAutoLoader-sta",
+      "apartment": "sta",
+      "captures": {
+        "reference-a": {
+          "status": "process_failure",
+          "returncode": 3221225477,
+          "stdout_sha256": "31241e24442720e302d4fe76b9a5186ba883b60619ef2b4c7bfef55f3debbcf3",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "line_count": 49
+        },
+        "reference-b": {
+          "status": "process_failure",
+          "returncode": 3221225477,
+          "stdout_sha256": "31241e24442720e302d4fe76b9a5186ba883b60619ef2b4c7bfef55f3debbcf3",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "line_count": 49
+        },
+        "candidate-a": {
+          "status": "process_failure",
+          "returncode": 3221225477,
+          "stdout_sha256": "31241e24442720e302d4fe76b9a5186ba883b60619ef2b4c7bfef55f3debbcf3",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "line_count": 49
+        },
+        "candidate-b": {
+          "status": "process_failure",
+          "returncode": 3221225477,
+          "stdout_sha256": "31241e24442720e302d4fe76b9a5186ba883b60619ef2b4c7bfef55f3debbcf3",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "line_count": 49
+        }
+      },
+      "verdict": {
+        "kind": "process_failure",
+        "capture": "reference-a"
+      }
+    },
+    {
+      "dll": "XySubFilter.dll",
+      "class": "XySubFilterAutoLoader",
+      "clsid": "{6b237877-902b-4c6c-92f6-e63169a5166c}",
+      "id": "XySubFilterAutoLoader-mta",
+      "apartment": "mta",
+      "captures": {
+        "reference-a": {
+          "status": "process_failure",
+          "returncode": 3221225477,
+          "stdout_sha256": "31241e24442720e302d4fe76b9a5186ba883b60619ef2b4c7bfef55f3debbcf3",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "line_count": 49
+        },
+        "reference-b": {
+          "status": "process_failure",
+          "returncode": 3221225477,
+          "stdout_sha256": "31241e24442720e302d4fe76b9a5186ba883b60619ef2b4c7bfef55f3debbcf3",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "line_count": 49
+        },
+        "candidate-a": {
+          "status": "process_failure",
+          "returncode": 3221225477,
+          "stdout_sha256": "31241e24442720e302d4fe76b9a5186ba883b60619ef2b4c7bfef55f3debbcf3",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "line_count": 49
+        },
+        "candidate-b": {
+          "status": "process_failure",
+          "returncode": 3221225477,
+          "stdout_sha256": "31241e24442720e302d4fe76b9a5186ba883b60619ef2b4c7bfef55f3debbcf3",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "line_count": 49
+        }
+      },
+      "verdict": {
+        "kind": "process_failure",
+        "capture": "reference-a"
+      }
+    }
+  ],
+  "decision": "Do not repeat the unresolved reference QueryId/FindPin operation for XySubFilterAutoLoader. Compare its other disconnected contracts with explicit exclusions. The Rust-enabled candidate gives the already-empty pin name an owned empty identifier; validate QueryId/FindPin separately as candidate-only behavior, not reference parity. Original failed jobs remain failed.",
+  "environment_followup": "Each worker now overrides HKCU to a private volatile key before loading any DLL, and the parent removes the key after worker termination. Native constructor default writes must not affect other workers or user settings."
+}
