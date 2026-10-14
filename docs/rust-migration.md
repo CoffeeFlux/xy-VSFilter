@@ -20,6 +20,23 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust creates DVD outline masks from alpha, finds the original zero-to-one
+  starting transitions, and advances the integer outline walker. It preserves
+  equality-to-one neighbor tests, marked-byte wrapping, point locations and turn
+  order. Native outline allocation, append operations, top-left updates and
+  diagnostics remain in place; declined steps leave the mask untouched before
+  executing the original assertion path.
+  Fatal ASan/UBSan tests passed **70,240 complete outline cases** and **131,220
+  direct walk steps** on arm64 and under x64 execution. The full-loop fixtures
+  cover every bordered 4x4 occupancy mask and compare **1,759,474 allocation,
+  append and mask observations**, including **19 allocation refusals** and
+  exact partial list/top-left results. Direct step fixtures cover **38,316
+  matching native assertion paths**. There were **70,207 Rust mask fills**,
+  **180,248 Rust start searches**, **1,421,618 Rust walk steps** and **38,316
+  native fallback calls**. Container operations are modeled; this is not a
+  proof of ATL container allocation behavior or polygon smoothing.
+  Rust tests (55 core, 33 FFI), strict Clippy and both default native branch syntax
+  checks pass. Windows/Miri validation is pending for this increment.
 * Safe Rust implements the DVD `Scale2x` edge-filter arithmetic and traversal.
   The original method keeps the image dimensions unchanged. The Rust path
   preserves its five-neighbor equality tests, center-pixel substitution at
@@ -33,8 +50,13 @@ unresolved reference outcomes requiring investigation, never matching results.
   and **143,731 Rust-filled images**. Tests compare two complete image/guard
   checkpoints, every equality assignment among five neighbors, channel pairs,
   rectangle/pointer state and allocation order. Rust tests (54 core, 32 FFI),
-  strict Clippy and both default native branch syntax checks pass. Windows/Miri
-  validation is pending for this increment.
+  strict Clippy and both default native branch syntax checks pass. Candidate
+  `f1262add` passed all four CI platforms, Miri and both Windows DLL jobs. Each
+  DLL job matched **354 cases / 4,334 frames** and **32 mutations / 224 frames**,
+  plus dialogs, visible controls, exports and dependencies. Both logs confirm
+  Rust-enabled `VobSubImage.cpp` compilation.
+  [DVD trim/filter evidence](vobsub-trim-scale-evidence.json) records verified
+  source/DLL hashes and scope for this increment and trimming below.
 * Safe Rust DVD trimming scans only alpha bytes and builds bordered crops in
   owned storage. RGB bytes retain the native copy semantics without requiring
   initialization; the new border is zero-filled. Native rectangle inflation,
@@ -53,7 +75,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   **85,168 comparisons / 3,500,216 full state/pixel boundary observations** pass
   on both local architectures. Windows component tests use actual ATL rectangle
   operations for both oracles. Rust tests (53 core, 30 FFI), strict Clippy and
-  default native branch syntax checks pass. Windows/Miri validation is pending.
+  default native branch syntax checks pass. Candidate `f1262add` passed Windows
+  x86/x64 component and DLL tests, the other two CI platforms and Miri; see the
+  [shared trim/filter evidence](vobsub-trim-scale-evidence.json). An earlier
+  Windows oracle compile failure was corrected by using the rectangle types
+  exposed globally by the installed ATL header; that failed run is not counted
+  as passing evidence.
   Native image allocation, retained-buffer ownership and host playback remain.
 * Safe Rust DVD nibble extraction and variable-length run-code decoding preserve
   each of the four stopping thresholds and the separate fill-to-end case. Values

@@ -33,6 +33,7 @@ pub mod byte_float;
 
 pub mod gauss_integer;
 
+pub mod vobsub_outline;
 pub mod vobsub_packet;
 pub mod vobsub_pixels;
 pub mod vobsub_rle;
