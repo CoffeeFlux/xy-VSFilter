@@ -20,6 +20,26 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* `CCDecoder::ExtractCC` now owns both temporary caption-field buffers through
+  Rust while retaining the native packet loop, decoder calls and release order.
+  The complete pinned extractor matches in ordinary and fatal ASan/UBSan local
+  runs on arm64 and x64: **46,256 histories / 368,181,656 observations /
+  102,480 controlled decoder callbacks / 118,348 Rust owners, loans and releases /
+  2,816 modeled Rust declines**. Across both sides, **2,232,432 initialized bytes**
+  and **5,742,496 unwritten cells** are tracked without reading unwritten data.
+  Checks cover every count byte, odd rounding, both fields, first-marker stop,
+  the `0x800` cursor cutoff, shorter logical lengths backed by initialized bytes,
+  callback byte mutations, repeated calls and ambient error state. One short
+  physical backing history is excluded before either call, never a pass.
+  Native unaligned DWORD loads use checked memcpy in the portable fixture;
+  allocation and DecodeCC are controlled. Actual allocation failure, callback
+  exceptions and caption-ripper integration remain outstanding. Existing full
+  DecodeCC comparisons remain separate. A new Miri-capable ownership test feeds
+  only each field's initialized prefix to the real Rust decoder and releases
+  the two owners independently: **146 core / 102 FFI tests** pass, along with
+  formatting, Clippy, 29 Python checks (three local skips) and default native
+  syntax. Windows compilation, integration and Miri for this increment are pending.
+
 * Gaussian floating-point coefficient tables now use a Rust byte owner with a
   reserved 16-byte physical prefix, preserving native alignment and cursor
   formation while counting only logical table bytes. Native floating-point
@@ -54,8 +74,10 @@ unresolved reference outcomes requiring investigation, never matching results.
   it after exit. This isolates default writes performed by native constructors.
   Nine driver tests cover repeated traces, failures, partial output, timeouts,
   candidate-only ID checks and private-key cleanup (**29 Python tests total**).
-  Corrected x64 execution passed in job `115900682982`: all ten scoped pairs
-  and both candidate-only ID controls completed. Win32 is pending. The first
+  Corrected execution passed in x64 job `115900682982` and Win32 job
+  `115900683971`: all ten scoped pairs and both candidate-only ID controls
+  completed on each architecture. `com-contract-evidence.json` verifies the
+  actual DLLs, trace hashes, repeat stability and subsequent rendering checks. The first
   failed COM jobs remain failed; superseded workflows were cancelled after
   their build failures were retained.
 
@@ -90,7 +112,7 @@ unresolved reference outcomes requiring investigation, never matching results.
   traces and mismatches fail the gate. The evidence summarizer requires this
   report for candidates containing the probe. Nine harness checks pass locally
   (**29 Python tests total, three platform skips**); native compilation and
-  execution now pass on x64; Win32 remains pending. This adds interface characterization, not a Rust
+  execution now pass on both Windows architectures. This adds interface characterization, not a Rust
   COM implementation. Custom interface methods, media negotiation, graph
   playback, UI and real-player integration remain outstanding.
 
@@ -124,7 +146,9 @@ unresolved reference outcomes requiring investigation, never matching results.
   bytes on Win32; native xy_malloc guarantees sixteen and mask dispatch depends
   on this. The guarded fixture now aligns explicitly and asserts the output
   alignment. Detailed field/event diagnostics remain enabled. A corrected
-  Win32 comparison is pending; the original failure is not a pass.
+  Win32 comparison now passes in job `115912080915` at `fe6928d4`; the
+  original failure remains failed. Both actual renderer jobs at `e99481b4`
+  also passed, archived separately in `com-contract-evidence.json`.
 
 * Output `XyBitmap` buffers now use Rust ownership while preserving the native
   address modulo 16, public frame-accessor pointers and logical cache accounting.

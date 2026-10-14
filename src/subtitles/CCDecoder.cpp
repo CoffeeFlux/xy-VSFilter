@@ -23,6 +23,7 @@
 #include "ccdecoder.h"
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_cc.h"
+#include "xy_rust_byte_storage.h"
 #endif
 
 CCDecoder::CCDecoder(CString fn, CString rawfn) : m_fn(fn), m_rawfn(rawfn)
@@ -396,8 +397,18 @@ void CCDecoder::ExtractCC(BYTE *buff, int len, __int64 time)
             {
                 nBytes = (nBytes + 1)&~1;
 
+#ifdef XY_VSFILTER_RUST_TEXT
+                XyRust::ByteStorage rust_data1;
+                BYTE *pData1 = rust_data1.Allocate(nBytes) ? rust_data1.Data() : new BYTE[nBytes];
+#else
                 BYTE *pData1 = new BYTE[nBytes];
+#endif
+#ifdef XY_VSFILTER_RUST_TEXT
+                XyRust::ByteStorage rust_data2;
+                BYTE *pData2 = rust_data2.Allocate(nBytes) ? rust_data2.Data() : new BYTE[nBytes];
+#else
                 BYTE *pData2 = new BYTE[nBytes];
+#endif
 
                 if (pData1 && pData2)
                 {
@@ -433,7 +444,15 @@ void CCDecoder::ExtractCC(BYTE *buff, int len, __int64 time)
                         DecodeCC(pData2, nBytes2, time);
                 }
 
+#ifdef XY_VSFILTER_RUST_TEXT
+                if (rust_data1.Ready()) rust_data1.Reset();
+                else
+#endif
                 if (pData1) delete [] pData1;
+#ifdef XY_VSFILTER_RUST_TEXT
+                if (rust_data2.Ready()) rust_data2.Reset();
+                else
+#endif
                 if (pData2) delete [] pData2;
             }
 
