@@ -1056,6 +1056,50 @@ static void resolution_lifecycle() {
     check(bits==UINT64_C(0x8000000000000000),"resolved default signedzero retained");
     check(change_events[0]==notifications,"resolution queries/default replacement do not notify");
 }
+static void unknown_rows(TraceDocument& doc,const char* stage) {
+    printf("unknown-stage %s entries=%zu\n",stage,doc.Entries());
+    for(size_t i=0;i<doc.Entries();++i){printf("unknown-row %s %zu",stage,i);units(doc.Entry(int(i)).style);printf("\n");}
+    doc.Dump(stage);
+}
+class UnknownOpenDocument : public TraceDocument {
+public:
+    bool observing=false;
+    unsigned notifications=0;
+    UnknownOpenDocument():TraceDocument(0){}
+protected:
+    void OnChanged() override {
+        TraceDocument::OnChanged();
+        if(observing){++notifications;
+            check(Entries()==1&&Segments()==1&&Mode()==TIME,"Open callback sees committed segments/mode");
+            check(same_identity(Entry(0).style,CString(L"UnknownOpen")),"Open callback precedes unknown style rewrite");
+            printf("unknown-open-callback mode=%d entries=%zu segments=%zu style",Mode(),Entries(),Segments());units(Entry(0).style);printf("\n");}
+    }
+};
+static void unknown_style_lifecycle() {
+    TraceDocument doc(0);STSStyle* known=new STSStyle;known->charSet=ANSI_CHARSET;doc.AddStyle(CString(L"Known"),known);
+    const wchar_t* names[]={L"!@dkdfjlakfkjjklezdv^5132ae",L"UnknownA",L"UnknownA",L"Known",L"UnknownA",L"Default",L"UnknownB",L"UnknownC"};
+    std::vector<STSEntry> before;
+    for(int i=0;i<8;++i){doc.AddSTSEntryOnly(CStringW(L"ordinary unknown style"),true,i*10000000,(i+1)*10000000,CString(names[i]),CString(L"actor"),CString(L"effect"),CRect(1,2,3,4),i,i);before.push_back(doc.Entry(i));}
+    doc.CreateSegments();doc.Animate(0);const auto segments=segment_snapshot(doc);
+    unknown_rows(doc,"unknown-before");const unsigned callbacks=change_events[0];
+    doc.ChangeUnknownStylesToDefault();
+    check(change_events[0]==callbacks,"unknown style pass does not notify");
+    const wchar_t* expected[]={names[0],L"Default",L"Default",L"Known",L"Default",L"Default",L"Default",L"Default"};
+    for(int i=0;i<8;++i){const STSEntry actual=doc.Entry(i),old=before[size_t(i)];
+        check(same_identity(actual.style,CString(expected[i])),"unknown style exact resulting name");
+        check(same_identity(actual.str,old.str)&&same_identity(actual.actor,old.actor)&&same_identity(actual.effect,old.effect)&&actual.fUnicode==old.fUnicode
+            &&actual.marginRect==old.marginRect&&actual.layer==old.layer&&actual.start==old.start&&actual.end==old.end&&actual.readorder==old.readorder,"unknown style preserves other initialized fields");}
+    require_same_segments(doc,segments,"unknown-after");unknown_rows(doc,"unknown-after");
+    UnknownOpenDocument opened;SavedFiles fixture(L"document-lifecycle-unknown.ass");
+    CStringA text=ass_fixture("PlayResX: 640\r\nPlayResY: 360\r\n");
+    check(text.Replace(",Default,,",",UnknownOpen,,")==1,"ordinary ASS unknown style fixture");
+    {CFile file;check(file.Open(fixture.name,CFile::modeCreate|CFile::modeWrite|CFile::typeBinary)!=FALSE,"write unknown ASS fixture");file.Write(text.GetString(),text.GetLength());}
+    FixtureTextFile input(CTextFile::UTF8);check(input.Open(fixture.name),"unknown ASS input");input.SetFixturePath(fixture.name);
+    opened.observing=true;check(opened.Open(&input,ANSI_CHARSET,CString(L"unknown ASS")),"ordinary unknown ASS Open");opened.observing=false;
+    check(opened.notifications==1,"Open has one OnChanged before warning pass");
+    check(same_identity(opened.Entry(0).style,CString(L"Default")),"Open final fallback");unknown_rows(opened,"unknown-open-after");
+}
+
 // Finite, representable llround histories only; no frame/time arithmetic on
 // no-op fps0 calls. Native callbacks read the fully committed state.
 class ConversionDocument : public TraceDocument {
@@ -1171,6 +1215,7 @@ int main() {
         resolution_lifecycle();
         layout_size_lifecycle();
         conversion_lifecycle();
+        unknown_style_lifecycle();
         named_style_exports();
         {
             TraceDocument source(0),destination(1);populate(source);populate(destination);

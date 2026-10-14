@@ -25,17 +25,23 @@ pub(crate) enum Error {
 pub(crate) enum Kind {
     Document,
     Snapshot,
+    UnknownRun,
 }
 
 pub(crate) enum Resource {
     Document(Box<Document>),
     Snapshot(Vec<u8>),
+    UnknownRun {
+        owner: Handle,
+        run: xy_vsfilter_compat::document_unknown::Run,
+    },
 }
 impl Resource {
     fn kind(&self) -> Kind {
         match self {
             Self::Document(_) => Kind::Document,
             Self::Snapshot(_) => Kind::Snapshot,
+            Self::UnknownRun { .. } => Kind::UnknownRun,
         }
     }
 }
@@ -77,7 +83,7 @@ impl Registry {
     pub(crate) fn document(&self, id: Handle) -> Result<&Document, Error> {
         match &self.slots[self.position(id)?].1 {
             Resource::Document(document) => Ok(document),
-            Resource::Snapshot(_) => Err(Error::TypeMismatch),
+            _ => Err(Error::TypeMismatch),
         }
     }
 
@@ -85,7 +91,7 @@ impl Registry {
         let index = self.position(id)?;
         match &mut self.slots[index].1 {
             Resource::Document(document) => Ok(document),
-            Resource::Snapshot(_) => Err(Error::TypeMismatch),
+            _ => Err(Error::TypeMismatch),
         }
     }
 
@@ -93,7 +99,53 @@ impl Registry {
     pub(crate) fn snapshot(&self, id: Handle) -> Result<&[u8], Error> {
         match &self.slots[self.position(id)?].1 {
             Resource::Snapshot(bytes) => Ok(bytes),
-            Resource::Document(_) => Err(Error::TypeMismatch),
+            _ => Err(Error::TypeMismatch),
+        }
+    }
+
+    /// Reserve before session mutation; no status-returning work follows commit.
+    pub(crate) fn reserve_insert(&mut self) -> Result<Handle, Error> {
+        let id = self.next.ok_or(Error::Exhausted)?;
+        self.slots.reserve(1);
+        Ok(id)
+    }
+    pub(crate) fn insert_reserved(&mut self, id: Handle, resource: Resource) {
+        assert_eq!(self.next, Some(id));
+        self.slots.push((id, resource));
+        self.next = id.checked_add(1);
+    }
+    pub(crate) fn unknown_owner(&self, id: Handle) -> Result<Handle, Error> {
+        match &self.slots[self.position(id)?].1 {
+            Resource::UnknownRun { owner, .. } => Ok(*owner),
+            _ => Err(Error::TypeMismatch),
+        }
+    }
+    pub(crate) fn unknown_pair(
+        &mut self,
+        id: Handle,
+    ) -> Result<
+        (
+            &mut Document,
+            &mut xy_vsfilter_compat::document_unknown::Run,
+        ),
+        Error,
+    > {
+        let run_index = self.position(id)?;
+        let owner = self.unknown_owner(id)?;
+        let owner_index = self.position(owner)?;
+        if run_index == owner_index {
+            return Err(Error::TypeMismatch);
+        }
+        let (owner_resource, run_resource) = if owner_index < run_index {
+            let (before, after) = self.slots.split_at_mut(run_index);
+            (&mut before[owner_index].1, &mut after[0].1)
+        } else {
+            let (before, after) = self.slots.split_at_mut(owner_index);
+            (&mut after[0].1, &mut before[run_index].1)
+        };
+        match (owner_resource, run_resource) {
+            (Resource::Document(document), Resource::UnknownRun { run, .. }) => Ok((document, run)),
+            _ => Err(Error::TypeMismatch),
         }
     }
 
@@ -223,6 +275,34 @@ mod tests {
             .try_with(|registry| registry.insert(resource).map_err(|(error, _)| error))
             .unwrap()
             .unwrap()
+    }
+
+    #[test]
+    fn unknown_typed_owner_and_exhaustion_preflight() {
+        let mut registry = Registry::new();
+        let owner = registry
+            .insert(Resource::Document(Box::default()))
+            .ok()
+            .unwrap();
+        let run = registry
+            .insert(Resource::UnknownRun {
+                owner,
+                run: xy_vsfilter_compat::document_unknown::Run::new(),
+            })
+            .ok()
+            .unwrap();
+        assert_eq!(registry.document(run).unwrap_err(), Error::TypeMismatch);
+        assert_eq!(registry.unknown_owner(owner), Err(Error::TypeMismatch));
+        let before = registry.unknown_pair(run).unwrap().1.clone();
+        registry.next = None;
+        assert_eq!(registry.reserve_insert(), Err(Error::Exhausted));
+        assert_eq!(*registry.unknown_pair(run).unwrap().1, before);
+        registry.remove(owner, Kind::Document).unwrap();
+        assert!(matches!(
+            registry.unknown_pair(run),
+            Err(Error::InvalidHandle)
+        ));
+        assert!(registry.remove(run, Kind::UnknownRun).is_ok());
     }
 
     #[test]

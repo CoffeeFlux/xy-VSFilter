@@ -208,7 +208,7 @@ inline CSize::CSize() { second(); }
         for platform in ('Win32', 'x64'):
             for experimental in (False, True):
                 command = contract.csize_context_command('cl', 'context.cpp', platform, experimental)
-                self.assertIn('/EP', command)
+                self.assertIn('/E', command)
                 self.assertNotIn('/c', command)
                 self.assertNotIn('/link', command)
                 self.assertIn('/MT', command)
@@ -225,7 +225,8 @@ inline CSize::CSize() { second(); }
 class ChTraitsCRT<wchar_t> {
  static LPWSTR CharNext(LPWSTR p) { return p+1; }
  static LPCWSTR StringFindString(LPCWSTR p, LPCWSTR q) { return wcsstr(p,q); }
- static int StringLength(LPCWSTR p) { return wcslen(p); }
+ static int SafeStringLen(LPCWSTR p) { return p ? wcslen(p) : 0; }
+ static LPWSTR StringFindString(LPWSTR p, LPCWSTR q) { return 0; }
  static int StringLength(wchar_t c) { return 1; }
 };
 template<> class ChTraitsBase<wchar_t> { typedef wchar_t XCHAR; typedef const wchar_t* PCXSTR; };
@@ -240,6 +241,29 @@ template<class BaseType, class StringTraits = StrTraitATL<BaseType, ChTraitsCRT<
         rows = contract.select_cstring_helpers(text, 'cstringt.h')
         status = contract.cstring_helper_contract(rows)
         self.assertTrue(status['complete'])
+        for row in rows: row['header_sha256'] = 'actual-header-hash'
+        headers = {'cstringt.h':'actual-header-hash'}
+        stream = b'#line 1 "cstringt.h"\n' + text.encode()
+        active = contract.select_active_cstring_helpers(stream, 'synthetic', rows, headers)
+        self.assertTrue(active['complete'])
+        self.assertFalse(active['full_preprocessed_stream_retained'])
+        self.assertFalse(contract.select_active_cstring_helpers(stream, 'synthetic', [], headers)['complete'])
+        self.assertTrue(contract.select_active_cstring_helpers(stream, 'synthetic', rows + rows, headers)['complete'])
+        self.assertFalse(contract.select_active_cstring_helpers(b'#line 1 "wrong.h"\n'+text.encode(), 'synthetic', rows, headers)['complete'])
+        self.assertFalse(contract.select_active_cstring_helpers(b'#line 900 "cstringt.h"\n'+text.encode(), 'synthetic', rows, headers)['complete'])
+        raw = text.replace('p ? wcslen(p) : 0', '(p != NULL) ? wcslen(p) : 0')
+        raw_rows = contract.select_cstring_helpers(raw, 'cstringt.h')
+        for row in raw_rows: row['header_sha256'] = 'actual-header-hash'
+        for expansion in ('0', 'nullptr'):
+            expanded = raw.replace('NULL', expansion)
+            captured = contract.select_active_cstring_helpers(b'#line 1 "cstringt.h"\n'+expanded.encode(), 'synthetic', raw_rows, headers)
+            self.assertTrue(captured['complete'])
+            safe = next(r for r in captured['body_matches'] if r['symbol'].endswith('::SafeStringLen'))
+            self.assertFalse(safe['source_matches'][0]['exact_body_tokens'])
+            self.assertNotEqual(safe['active_body_sha256'], safe['source_matches'][0]['raw_body_sha256'])
+        override = text.replace('class StrTraitMFC : public StrTraitATL<XCHAR, ChTraits> {};',
+                                'class StrTraitMFC : public StrTraitATL<XCHAR, ChTraits> { static LPWSTR CharNext(LPCWSTR p) { return 0; } };')
+        self.assertFalse(contract.cstring_helper_contract(contract.select_cstring_helpers(override, 'afxstr.h'))['complete'])
         self.assertEqual(status['definition_counts']['ChTraitsCRT::CharNext'], 1)
         self.assertFalse(any('return 1;' in r['excerpt'] for r in rows))
         self.assertFalse(any('char* p' in r['excerpt'] for r in rows))
@@ -250,6 +274,17 @@ template<class BaseType, class StringTraits = StrTraitATL<BaseType, ChTraitsCRT<
         self.assertTrue(any('ChTraitsBase<BaseType>::PCXSTR' in r['excerpt'] for r in rows))
         ansi = contract.select_cstring_helpers('template<> class ChTraitsBase<char> { typedef char XCHAR; };', 'atlsimpstr.h')
         self.assertEqual(ansi, [])
+
+    def test_preprocessed_origin_markers_and_csize_filter(self):
+        text = '#line 12 "C:\\sdk\\x.h"\nalpha\n# 40 "other.h"\nbeta\n'
+        code, origins = contract.preprocessed_origins(text)
+        self.assertEqual(code, 'alpha\nbeta\n')
+        self.assertEqual(origins, [('C:\\sdk\\x.h', 12), ('other.h', 40)])
+        source = 'class CSize { CSize() throw(); };\ninline CSize::CSize() throw() { cx = cy = 0; }\n'
+        rows = contract.select_csize_definitions(source, 'atltypes.h')
+        stream = ('#line 1 "atltypes.h"\n' + source + 'XY_DOCUMENT_CSIZE_ATL_STATIC_LIB_IMPL_UNDEFINED\n').encode()
+        selected, _ = contract.select_active_csize(stream, 'test', rows)
+        self.assertTrue(selected['complete'])
 
     def test_wide_helpers_conditions_missing_and_bounds(self):
         text = """class ChTraitsCRT<wchar_t> {

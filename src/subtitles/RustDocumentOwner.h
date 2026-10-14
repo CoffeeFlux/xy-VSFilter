@@ -228,10 +228,12 @@ template<class Style = STSStyle> inline Style StyleValue(const Bytes& bytes) {
 } // namespace DocumentDetail
 
 class DocumentOwner;
+class UnknownStylesPass;
 class DocumentReply {
     uint64_t id_ = 0;
     explicit DocumentReply(uint64_t id) : id_(id) {}
     friend class DocumentOwner;
+    friend class UnknownStylesPass;
 public:
     DocumentReply(const DocumentReply&) = delete;
     DocumentReply& operator=(const DocumentReply&) = delete;
@@ -256,6 +258,7 @@ public:
 };
 struct DocumentQuery { int index; bool found; size_t count; };
 class DocumentOwner {
+    friend class UnknownStylesPass;
     uint64_t id_ = 0;
     template<size_t N> std::array<uint8_t,N> EntryFields(int index) const {
         static_assert(N == XY_DOCUMENT_V1_ENTRY_HEADER_BYTES, "entry header size");
@@ -577,6 +580,41 @@ public:
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_query_time_v1(id_,mode,time,out.data(),out.size());}));
         DocumentDetail::Shape(DocumentDetail::Load(out,4,4) <= 1 && DocumentDetail::Load(out,12,4) == 0);
         return {DocumentDetail::I32(DocumentDetail::Load(out,0,4)),DocumentDetail::Load(out,4,4) != 0,DocumentDetail::Count(static_cast<size_t>(DocumentDetail::Load(out,8,4)))};
+    }
+};
+// Scoped policy state; the only native work between Step and Resume is the
+// existing message formatting/dialog. No borrowed owner data crosses that call.
+class UnknownStylesPass {
+    uint64_t id_ = 0;
+public:
+    explicit UnknownStylesPass(const DocumentOwner& owner) {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_unknown_open_v1(
+            owner.id_,out.data(),out.size());}));
+        id_ = DocumentDetail::Load(out,0,8);
+    }
+    UnknownStylesPass(const UnknownStylesPass&) = delete;
+    UnknownStylesPass& operator=(const UnknownStylesPass&) = delete;
+    ~UnknownStylesPass() noexcept {
+        if(id_) { const uint64_t id = id_; id_ = 0;
+            DocumentDetail::Release(DocumentDetail::Invoke([&]{return xy_vsfilter_document_unknown_drop_v1(id);})); }
+    }
+    uint32_t Next(CString& warning_name) {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_unknown_step_v1(
+            id_,out.data(),out.size());}));
+        DocumentReply reply(DocumentDetail::Load(out,0,8));
+        const auto bytes = reply.Read();
+        DocumentDetail::Shape(bytes.size() >= 16);
+        const uint32_t action = static_cast<uint32_t>(DocumentDetail::Load(bytes,0,4));
+        const uint32_t units = DocumentDetail::Count(DocumentDetail::Size(DocumentDetail::Load(bytes,8,8)));
+        DocumentDetail::Shape(action <= 2 && DocumentDetail::Load(bytes,4,4) == 0 &&
+            (action == 2 || units == 0) && bytes.size() == DocumentDetail::AddSize(16,DocumentDetail::MulSize(units,2)));
+        if(action == 2) { size_t offset = 16; warning_name = DocumentDetail::String(bytes,offset,units); }
+        return action;
+    }
+    void Resume(bool accepted) {
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_unknown_resume_v1(id_,accepted ? 1 : 0);}));
     }
 };
 } // namespace XyRust

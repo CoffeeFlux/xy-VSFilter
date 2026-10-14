@@ -1,0 +1,157 @@
+{
+  "schema": "rust-document-x64-validated-increment-v1",
+  "candidate_commit": "7f3e5c9cede1c6e44bf45d4331d1e806e17c4bdc",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "workflow_run": 38650419987,
+  "job_id": 116147536646,
+  "job_conclusion": "success",
+  "platform": "x64",
+  "document_storage": "rust-experimental",
+  "build_info_sha256": "3480c324a40816f848fb73220e6e33fc6b50915042d71730a8da70e220d59a95",
+  "checks": {
+    "smoke": {
+      "report_sha256": "4c330fa9c8cce30fcc86bc9fe08afa254d0b1557c6467a631223a0882a363669",
+      "case_count": 1,
+      "rendered_frames": 10,
+      "changed_frames": 6,
+      "case_verdicts": {
+        "equal": 1
+      },
+      "candidate_statuses": {
+        "ok": 1
+      },
+      "manifest_sha256": "aff943a1c633c5a1aca2d2f504b0b17c5a7f19b3d3bbffaa215d1889fff2da25",
+      "retained_frame_hash_observations_verified": 30
+    },
+    "csri": {
+      "report_sha256": "de10a8b2f70daf251242ec6980b60ce30ece8bbc373090ede618b6386fa21136",
+      "case_count": 798,
+      "rendered_frames": 8426,
+      "changed_frames": 5624,
+      "case_verdicts": {
+        "equal": 798
+      },
+      "candidate_statuses": {
+        "ok": 780,
+        "open_rejected": 18
+      },
+      "manifest_sha256": "9a83e1dddc8b734cad7a6a76a7abc00dfba9cc6d8f4190a57cf41a2ee916a0eb",
+      "retained_frame_hash_observations_verified": 25278
+    },
+    "mutation-results": {
+      "report_sha256": "bae7f71febf1d347e1972b3ee7b4e77726a42f04a8beed5bd4be67e2b643a0d6",
+      "case_count": 32,
+      "rendered_frames": 224,
+      "changed_frames": 160,
+      "case_verdicts": {
+        "equal": 32
+      },
+      "candidate_statuses": {
+        "ok": 32
+      },
+      "manifest_sha256": "90e89279db719c739c6a1363611c04225b3486f03fee6ad9ceaca20e084ce43c",
+      "retained_frame_hash_observations_verified": 672
+    },
+    "com-contracts": {
+      "report_sha256": "ebbb3dc7c96c7518565df3eff074eecb2d18729eb71e58ebc76dfca2c65b1bef",
+      "cases": 10,
+      "passed": true,
+      "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+      "headers": {
+        "src/filters/transform/vsfilter/DirectVobSubFilter.h": {
+          "reference_sha256": "d0ad74ce5efb68be080cd77c75f9288489cc2c79499941c83e2c238a9e8ddaf9",
+          "candidate_sha256": "d0ad74ce5efb68be080cd77c75f9288489cc2c79499941c83e2c238a9e8ddaf9"
+        },
+        "src/filters/transform/vsfilter/xy_sub_filter.h": {
+          "reference_sha256": "61b2cb40e906d4147255400be2142ff912c58628feb1da03d1fd68bea29d6a4d",
+          "candidate_sha256": "61b2cb40e906d4147255400be2142ff912c58628feb1da03d1fd68bea29d6a4d"
+        },
+        "src/filters/transform/vsfilter/auto_load_helper.h": {
+          "reference_sha256": "b280254485e02444630a996804e14ef10a97cbcd1f8ee707f919f03e5b59c488",
+          "candidate_sha256": "d37e2ed8ac0142ea7862b1d475a0ae74d1018e0f29ee802c4edf40a76069a102"
+        },
+        "src/filters/transform/vsfilter/xy_sub_filter_consumer.h": {
+          "reference_sha256": "67f5cb83a9c83df388069feea50b7db5f7200971b0b50ae11abd39de1c5294a0",
+          "candidate_sha256": "67f5cb83a9c83df388069feea50b7db5f7200971b0b50ae11abd39de1c5294a0"
+        },
+        "src/filters/transform/vsfilter/IDirectVobSub.h": {
+          "reference_sha256": "c0d693a5c0fc3d91c68f41f539ad8c0f13e6dfe0b19941c99b7ad6d5b15f165f",
+          "candidate_sha256": "c0d693a5c0fc3d91c68f41f539ad8c0f13e6dfe0b19941c99b7ad6d5b15f165f"
+        },
+        "src/filters/transform/vsfilter/XyOptions.h": {
+          "reference_sha256": "9efa9e222e74a84fcdac202be5ddfd13b32ee49b837b9b2649f7bbcc6cf4618c",
+          "candidate_sha256": "9efa9e222e74a84fcdac202be5ddfd13b32ee49b837b9b2649f7bbcc6cf4618c"
+        }
+      },
+      "reference_exclusions": [
+        "XySubFilterAutoLoader QueryId/FindPin; see docs/autoloader-pin-id-scope.json"
+      ],
+      "candidate_only_controls": 2,
+      "settings_environment": "Private volatile HKCU per worker, removed by parent after termination; native constructor writes are isolated."
+    },
+    "document-lifecycle": {
+      "report_sha256": "07d5cbb9758801b37928333569448963fca97de163cb4592416560cb95457aab",
+      "equal": true,
+      "trace_lines": 2917,
+      "limits": [
+        "Bounded normal lifecycles and initialized metadata only",
+        "No allocator-failure, concurrent close, or dialog-reentry parity",
+        "Not a real Aegisub/player host test"
+      ],
+      "library_hash_scope": "Build-library hashes are runner-reported; executables, source headers and traces rehashed"
+    },
+    "document-style-api": {
+      "report_sha256": "caa3aa6c125abb894d46f51713870d98ea5cd34809b71cc91692c40ce08facd1",
+      "equal": true,
+      "class_mode_pairs": 4,
+      "executions": 16,
+      "scope": "Test-instrumented copies of actual DLLs; native style values remain in-module; production DLL hashes unchanged. Build-library hashes are runner-reported. No graph/real-host/callback-count coverage.",
+      "retained_artifacts_verified": 43,
+      "repository_source_artifacts_verified": 14,
+      "interface_header_pairs_verified": 6,
+      "pe_machine": "0x8664"
+    },
+    "document-style-value": {
+      "report_sha256": "dec20a674216352041e92f022fab65aa1c8e25f375c7d18d7bd560a8512cf2fb",
+      "equal": true,
+      "values": 209,
+      "equality_cells": 43681,
+      "scope": "Fixed initialized pinned-native fixtures only; no native arbitrary-input injection or style owner routing",
+      "provenance_scope": "Retained sources, headers, executables, input and traces rehashed; external toolchain and native library hashes runner-reported."
+    }
+  },
+  "production_dlls": {
+    "VSFilter.dll": {
+      "exports_equal": true,
+      "no_added_imports_or_changed_platform_headers": true,
+      "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+      "dependencies_report_sha256": "84a27c3f09cb0d719d9eda44878694f94595dada4c14ceb22a2e4e614f9ec4ff",
+      "baseline_sha256": "9a2f373f935edc5fdf14d9dbc12189d60e003adb65caf4da6cb150c898ff2f67",
+      "candidate_sha256": "e14db8de4070572cc589eb7f34cf94470407f42391194e34fb5ad71282b7025c"
+    },
+    "XySubFilter.dll": {
+      "exports_equal": true,
+      "no_added_imports_or_changed_platform_headers": true,
+      "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+      "dependencies_report_sha256": "70a7daaf1cbd89db83662b6014439fe736474ef9fe6ad152a955d625901c74b2",
+      "baseline_sha256": "b9f9cab398903992eed3f9ff5509b01fd522bd92c8f152d51e39009843a291ff",
+      "candidate_sha256": "581a448354186216aeb26154307ca96ea116f7df541445a4a07771d33d3c1755"
+    },
+    "xy_sub_filter_consumer.dll": {
+      "exports_equal": true,
+      "no_added_imports_or_changed_platform_headers": true,
+      "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+      "dependencies_report_sha256": "d0b61ec5540588c5f5e14949472e20c26b17713b3700e75d9fc088d2bcc176b9",
+      "baseline_sha256": "b2fce4e43222f7652343ec2b70c9f27a24f89f99c2206f26c907c8eae0c89cc7",
+      "candidate_sha256": "f034b1ae91632523f5f4dd0f922712f84af81eebdc082ba850e1dc4f5fe6d4bd"
+    }
+  },
+  "candidate_log_sha256": "6e1ec523aec079d47d79a0d79fd6fba433eda141ef2d787271e86433ff373600",
+  "limitations": [
+    "Exact 7f3e5c9c x64 only; predates layout-size ownership, coarse time conversion and safe unknown-style policy. No newer candidate validation credit.",
+    "Style API uses instrumented copies of actual DLLs and isolated registry setup; no real Aegisub/player graph, callback-count or arbitrary host lifecycle claim.",
+    "Renderer result/frame-hash/guard metadata verified across two reference and one candidate captures. Frame binary files not retained: exact pixel-byte comparison remains runner-reported.",
+    "Lifecycle repository headers, executables and traces independently rehashed; external SDK/compiler/build-library hashes remain runner-reported.",
+    "No full subsystem closure or finite-corpus universal malformed-input parity claim."
+  ]
+}

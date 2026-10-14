@@ -205,6 +205,14 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_remove_entries_v1(uint64_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_animation_or_v1(uint64_t, uint32_t segment, uint32_t animated);
 // No rebuild. Result: applied:u32, reserved-zero:u32, end:i64 (zero if absent).
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_correct_last_end_v1(uint64_t, int64_t bound, uint8_t*, size_t);
+// Typed unknown-style pass bound to a live owner. Each step returns an immutable
+// snapshot: kind:u32(0 Done/1 Advanced/2 Warning), reserved-zero:u32, units:u64,
+// then full raw UTF-16LE warning name. Release registry admission before dialogs.
+// Resume accepts only 0/1, reacquires owner and rereads current row style.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_unknown_open_v1(uint64_t owner, uint8_t*, size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_unknown_step_v1(uint64_t run, uint8_t*, size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_unknown_resume_v1(uint64_t run, uint32_t accepted);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_unknown_drop_v1(uint64_t run);
 #ifdef __cplusplus
 }
 #endif

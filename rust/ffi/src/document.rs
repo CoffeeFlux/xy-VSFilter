@@ -93,6 +93,121 @@ fn insert(resource: Resource) -> Result<u64, u32> {
     }
 }
 
+fn unknown_error(error: xy_vsfilter_compat::document_unknown::Error) -> u32 {
+    use xy_vsfilter_compat::document_unknown::Error;
+    match error {
+        Error::PendingResponse | Error::NoPendingWarning => INVALID_INPUT,
+        Error::UnresolvedPendingRow => UNRESOLVED_REFERENCE,
+    }
+}
+
+/// # Safety
+/// Output is a writable byte buffer of at least eight bytes.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_unknown_open_v1(
+    owner: u64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let run = xy_vsfilter_compat::document_unknown::Run::new();
+    let resource = Resource::UnknownRun { owner, run };
+    // Return rejected resource out of admission for destruction.
+    let result = DOCUMENTS.try_with(|registry| {
+        if let Err(error) = registry.document(owner) {
+            return Err((error, resource));
+        }
+        registry.insert(resource)
+    });
+    let id = match result {
+        Ok(Ok(id)) => id,
+        Ok(Err((error, resource))) => {
+            drop(resource);
+            return registry_error(error);
+        }
+        Err(error) => return registry_error(error),
+    };
+    // SAFETY: output validated before insertion; admission has ended.
+    unsafe {
+        write_output(output, &id.to_le_bytes());
+    }
+    OK
+}
+
+/// # Safety
+/// Output receives a snapshot ID in eight writable bytes. Packet is kind:u32,
+/// reserved-zero:u32, unit-count:u64, then full raw UTF-16LE warning units.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_unknown_step_v1(
+    id: u64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let (reply, retired) = required!(admitted(|registry| {
+        // Validate owner and calculate the maximum packet before any Run mutation.
+        let size = {
+            let (document, run) = registry.unknown_pair(id).map_err(registry_error)?;
+            let count = document
+                .entries()
+                .get(run.next_index())
+                .map_or(0, |entry| entry.style.len());
+            if count > i32::MAX as usize {
+                return Err(COUNT_OVERFLOW);
+            }
+            count
+                .checked_mul(2)
+                .and_then(|n| n.checked_add(16))
+                .filter(|n| *n <= isize::MAX as usize)
+                .ok_or(COUNT_OVERFLOW)?
+        };
+        let reserved = registry.reserve_insert().map_err(registry_error)?;
+        let mut bytes = Vec::with_capacity(size);
+        let (document, run) = registry.unknown_pair(id).map_err(registry_error)?;
+        let outcome = run.step(document).map_err(unknown_error)?;
+        use xy_vsfilter_compat::document_unknown::Step;
+        let (kind, name) = match outcome.event {
+            Step::Finished => (0u32, Vec::new()),
+            Step::Advanced => (1u32, Vec::new()),
+            Step::Warning(name) => (2u32, name),
+        };
+        bytes.extend_from_slice(&kind.to_le_bytes());
+        bytes.extend_from_slice(&0u32.to_le_bytes());
+        bytes.extend_from_slice(&(name.len() as u64).to_le_bytes());
+        for unit in &name {
+            bytes.extend_from_slice(&unit.to_le_bytes());
+        }
+        registry.insert_reserved(reserved, Resource::Snapshot(bytes));
+        Ok((reserved, (outcome.retired, name)))
+    }));
+    drop(retired);
+    // SAFETY: preflighted output; no registry reference remains.
+    unsafe {
+        write_output(output, &reply.to_le_bytes());
+    }
+    OK
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_unknown_resume_v1(id: u64, accepted: u32) -> u32 {
+    if accepted > 1 {
+        return INVALID_INPUT;
+    }
+    let retired = required!(admitted(|registry| {
+        let (document, run) = registry.unknown_pair(id).map_err(registry_error)?;
+        run.resume(document, accepted != 0).map_err(unknown_error)
+    }));
+    drop(retired);
+    OK
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_unknown_drop_v1(id: u64) -> u32 {
+    status(
+        DOCUMENTS
+            .destroy(id, Kind::UnknownRun)
+            .map_err(registry_error),
+    )
+}
+
 // These four helpers are the only raw-buffer boundary. Address/length checks
 // cannot prove accessibility or lifetime; those remain the caller's contract.
 fn byte_range(pointer: *const u8, length: usize) -> Result<(), u32> {
@@ -1346,6 +1461,57 @@ mod tests {
         // SAFETY: allocated byte ranges below are valid for each supplied size;
         // explicit null/oversized checks are rejected before raw accesses.
         unsafe {
+            let unknown_owner = create();
+            assert_eq!(add(unknown_owner, 0, &entry(0, 10)).0, OK);
+            let mut result = [0xa5; 8];
+            assert_eq!(
+                xy_vsfilter_document_unknown_open_v1(unknown_owner, result.as_mut_ptr(), 7),
+                INVALID_INPUT
+            );
+            assert_eq!(result, [0xa5; 8]);
+            assert_eq!(
+                xy_vsfilter_document_unknown_open_v1(unknown_owner, result.as_mut_ptr(), 8),
+                OK
+            );
+            let run = u64::from_le_bytes(result);
+            assert_eq!(
+                xy_vsfilter_document_unknown_step_v1(run, result.as_mut_ptr(), 7),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_unknown_resume_v1(run, 2),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_unknown_step_v1(unknown_owner, result.as_mut_ptr(), 8),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                xy_vsfilter_document_unknown_step_v1(run, result.as_mut_ptr(), 8),
+                OK
+            );
+            let reply = u64::from_le_bytes(result);
+            let packet = read_snapshot(reply);
+            assert_eq!(u32::from_le_bytes(packet[..4].try_into().unwrap()), 2);
+            assert_eq!(
+                xy_vsfilter_document_unknown_step_v1(run, result.as_mut_ptr(), 8),
+                INVALID_INPUT
+            );
+            assert_eq!(xy_vsfilter_document_unknown_resume_v1(run, 1), OK);
+            assert_eq!(
+                xy_vsfilter_document_unknown_resume_v1(run, 1),
+                INVALID_INPUT
+            );
+            assert_eq!(xy_vsfilter_document_destroy_v1(unknown_owner), OK);
+            assert_eq!(
+                xy_vsfilter_document_unknown_step_v1(run, result.as_mut_ptr(), 8),
+                BAD_HANDLE
+            );
+            assert_eq!(read_snapshot(reply), packet);
+            assert_eq!(xy_vsfilter_document_unknown_drop_v1(run), OK);
+            assert_eq!(xy_vsfilter_document_unknown_drop_v1(run), BAD_HANDLE);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(reply), OK);
+
             // Coarse time commit and immutable scalar snapshots, serialized with
             // every other global registry export check in this single test.
             let conversion_owner = create();

@@ -21,8 +21,11 @@ def validate_actions(actions):
 
 
 class DialogCapture:
-    def __init__(self, actions, destination):
+    def __init__(self, actions, destination, process_id=None):
         validate_actions(actions)
+        if process_id is not None and (type(process_id) is not int or not 0 < process_id <= 0xffffffff):
+            raise ValueError("process_id must be a positive Windows DWORD")
+        self.process_id = process_id
         self.actions, self.destination = actions, destination
         self.events, self.error = [], None
         self.stop = threading.Event()
@@ -37,6 +40,8 @@ class DialogCapture:
         self.api = C.WinDLL("user32", use_last_error=True)
         self.callback = C.WINFUNCTYPE(C.c_int, C.c_void_p, C.c_ssize_t)
         for name, args, result in (
+            ("EnumWindows", [self.callback, C.c_ssize_t], C.c_int),
+            ("GetWindowThreadProcessId", [C.c_void_p, C.POINTER(C.c_uint32)], C.c_uint32),
             ("EnumThreadWindows", [C.c_uint32, self.callback, C.c_ssize_t], C.c_int),
             ("EnumChildWindows", [C.c_void_p, self.callback, C.c_ssize_t], C.c_int),
             ("GetWindowTextLengthW", [C.c_void_p], C.c_int),
@@ -83,10 +88,18 @@ class DialogCapture:
         windows = []
         @self.callback
         def collect(window, _):
+            if parent is None and self.process_id is not None:
+                owner = C.c_uint32()
+                self.api.GetWindowThreadProcessId(window, C.byref(owner))
+                if owner.value != self.process_id:
+                    return 1
             windows.append(window)
             return 1
         if parent is None:
-            self.api.EnumThreadWindows(self.thread_id, collect, 0)
+            if self.process_id is None:
+                self.api.EnumThreadWindows(self.thread_id, collect, 0)
+            else:
+                self.api.EnumWindows(collect, 0)
         else:
             self.api.EnumChildWindows(parent, collect, 0)
         return windows
@@ -116,14 +129,14 @@ class DialogCapture:
             raise RuntimeError("could not queue scripted dialog button response")
 
     def watch(self):
-        seen = set()
+        seen = {}
         pending = {}
         try:
             while not self.stop.is_set():
                 current = set(self.windows())
-                seen.intersection_update(current)
+                seen = {window: identity for window, identity in seen.items() if window in current}
                 pending = {window: event for window, event in pending.items() if window in current}
-                for window in sorted(current - seen):
+                for window in sorted(current):
                     if self.class_name(window) != "#32770" or not self.api.IsWindowVisible(window):
                         continue
                     children = self.windows(window)
@@ -141,6 +154,17 @@ class DialogCapture:
                     if not any(c["class"] == "Button" for c in controls):
                         continue
                     title = self.text(window)
+                    # HWNDs can be recycled between polls. Distinct warning text
+                    # identifies a new bounded observation even when the handle
+                    # never disappears from an observed enumeration. Unchanged
+                    # title/text receives exactly one response. Same-identity
+                    # rapid reuse cannot be distinguished and remains unresolved.
+                    identity = (title, tuple(c["text"] for c in controls
+                                             if c["class"] == "Static" and c["text"] is not None))
+                    if window in seen and seen[window] == identity:
+                        continue
+                    if window in seen:
+                        pending.pop(window, None)
                     action = self.actions[self.consumed] if self.consumed < len(self.actions) else None
                     matches = (action is not None and title == action["title"] and
                                any(c["class"] == "Static" and isinstance(c["text"], str) and c["text"].startswith(action["text_prefix"])
@@ -159,7 +183,7 @@ class DialogCapture:
                     button = self.scripted_button(window, action) if matches else None
                     if matches and button is None:
                         continue
-                    seen.add(window)
+                    seen[window] = identity
                     if matches:
                         self.post_response(window, button, action)
                         # Response records the accepted queued command. Only a

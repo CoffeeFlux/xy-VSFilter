@@ -1,6 +1,11 @@
 import unittest
+from unittest.mock import patch
+from tempfile import TemporaryDirectory
+from pathlib import Path
+import subprocess
+import document_native_lifecycle as lifecycle
 
-from document_native_lifecycle import compare_traces, conversion_rows
+from document_native_lifecycle import compare_traces, conversion_rows, unknown_rows
 
 
 STYLE_SCALARS = b" ".join(b"0000000000000000" if i in (0,11,12,13,14,23,24,25,26,27,28,29,30,31,32) else b"00000000" if i in (15,17,19,21) else b"0" for i in range(34))
@@ -67,6 +72,8 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
              ("layout-size-parser-y",352,288,640,360),("layout-size-parser-repeated",352,288,720,600),
              ("layout-size-parser-nonpositive",352,288,-2,0)))
          + b"".join((b"conversion-callback " + row + b"\n" if row.split(b" ",1)[0] in (b"conversion-frame-half",b"conversion-time-half",b"conversion-empty-frame",b"conversion-empty-time") else b"") + b"conversion-stage " + row + b"\n" for row in conversion_rows())
+         + b"unknown-open-callback mode=0 entries=1 segments=1 style 11 0055 006e 006b 006e 006f 0077 006e 004f 0070 0065 006e\n"
+         + b"\n".join(unknown_rows()) + b"\n"
          + b"saved-file ssa exists=1 bytes=1 41\nsaved-file ass exists=1 bytes=1 41\n"
          + b"saved-file srt exists=1 bytes=1 41\nsaved-file srt-sidecar exists=1 bytes=1 41\n"
          + b"saved-file ssa-sidecar exists=0\nsaved-file ass-sidecar exists=0\n"
@@ -75,6 +82,53 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
 
 
 class NativeLifecycleEvidenceTests(unittest.TestCase):
+    def test_unknown_rows_and_prefallback_callback_are_required(self):
+        for prefix in (b"unknown-row unknown-after 0 ",b"unknown-open-callback "):
+            truncated=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith(prefix))
+            with self.assertRaises(ValueError):compare_traces([truncated]*4,64)
+        changed=TRACE.replace(b"unknown-row unknown-after 3 5 004b 006e 006f 0077 006e",b"unknown-row unknown-after 3 7 0044 0065 0066 0061 0075 006c 0074")
+        with self.assertRaises(ValueError):compare_traces([changed]*4,64)
+        legacy=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith((b"unknown-stage ",b"unknown-row ",b"unknown-open-callback ")))
+        with self.assertRaises(ValueError):compare_traces([legacy]*4,64)
+        compare_traces([legacy]*4,64,require_unknown_stages=False)
+
+    def test_dialogs_require_order_full_text_buttons_and_responses(self):
+        def events():
+            return [{"title":"Warning","class":"#32770","response":a["button"],"controls":[
+                {"class":"Button","id":1,"text":"OK","style":0},
+                {"class":"Button","id":2,"text":"Cancel","style":0},
+                {"class":"Static","id":65535,"text":a["text_prefix"],"style":0}]} for a in lifecycle.unknown_dialog_actions()]
+        lifecycle.validate_dialogs(events())
+        for mutation in (lambda rows:rows.reverse(),lambda rows:rows.pop(),
+                         lambda rows:rows[0].update(response="cancel"),
+                         lambda rows:rows[0]["controls"].pop(),
+                         lambda rows:rows[0]["controls"][1].update(id=3),
+                         lambda rows:rows[0]["controls"][2].update(text=lifecycle.warning_text("UnknownA")+"suffix")):
+            rows=events();mutation(rows)
+            with self.assertRaises(ValueError):lifecycle.validate_dialogs(rows)
+
+    def test_timed_out_dialog_child_is_killed_reaped_and_output_recorded(self):
+        class Process:
+            pid=42
+            def __init__(self):self.killed=False;self.calls=0
+            def communicate(self,timeout=None):
+                self.calls+=1
+                if timeout is not None:raise subprocess.TimeoutExpired("fixture",timeout)
+                return b"partial trace",b""
+            def kill(self):self.killed=True
+            def poll(self):return -9 if self.killed else None
+        class Capture:
+            def __init__(self,actions,destination,process_id=None):self.process_id=process_id
+            def __enter__(self):return self
+            def __exit__(self,*args):pass
+        process=Process()
+        with TemporaryDirectory() as temp,patch.object(lifecycle.subprocess,"Popen",return_value=process),patch.object(lifecycle,"DialogCapture",Capture):
+            stem=Path(temp)/"fixture"
+            with self.assertRaisesRegex(RuntimeError,"timed out"):
+                lifecycle.run_dialog_process(["fixture"],Path(temp),stem,20)
+            self.assertTrue(process.killed);self.assertEqual(process.calls,2)
+            self.assertEqual(Path(str(stem)+".stdout").read_bytes(),b"partial trace")
+
     def test_conversion_requires_complete_callbacks_and_exact_states(self):
         for marker in (b"conversion-stage conversion-time-half ",b"conversion-callback conversion-frame-half "):
             missing=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith(marker))

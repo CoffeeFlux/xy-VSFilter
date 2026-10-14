@@ -3469,17 +3469,26 @@ void CSimpleTextSubtitle::AddSTSEntryOnly( CStringW str, bool fUnicode, REFERENC
 
 void CSimpleTextSubtitle::ChangeUnknownStylesToDefault()
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    XyRust::UnknownStylesPass pass(*m_document);
+    for(;;) {
+        CString name;
+        const uint32_t action = pass.Next(name);
+        if(action == 0) break;
+        if(action == 2) {
+            CString msg;
+            msg.Format(_T("Unknown style found: \"%s\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."), name);
+            pass.Resume(MessageBox(NULL, msg, _T("Warning"), MB_OKCANCEL|MB_ICONWARNING) == IDOK);
+        }
+    }
+#else
     CAtlMap<CString, STSStyle*, CStringElementTraits<CString> > unknown;
     bool fReport = true;
     CString last_style = _T("!@dkdfjlakfkjjklezdv^5132ae");
     bool last_style_changed_to_unknow = false;
     for(size_t i = 0; i < GetEntryCount(); i++)
     {
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-        STSEntry stse = m_document->Entry((int)i);
-#else
         STSEntry& stse = m_entries.GetAt(i);
-#endif
 
         STSStyle* val;
         if (last_style == stse.style)
@@ -3489,19 +3498,12 @@ void CSimpleTextSubtitle::ChangeUnknownStylesToDefault()
             if (last_style_changed_to_unknow)
             {
                 stse.style = g_default_style;
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-                m_document->SetStyle((int)i, stse.style);
-#endif
             }
         }
         else
         {
             last_style = stse.style;
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-            last_style_changed_to_unknow = !HasNamedStyle(stse.style);
-#else
             last_style_changed_to_unknow = !m_styles.Lookup(stse.style, val);
-#endif
             if (last_style_changed_to_unknow)
             {
                 if(!unknown.Lookup(stse.style, val))
@@ -3517,12 +3519,10 @@ void CSimpleTextSubtitle::ChangeUnknownStylesToDefault()
                 }
 
                 stse.style = g_default_style;
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-                m_document->SetStyle((int)i, stse.style);
-#endif
             }
         }
     }
+#endif
 }
 
 void CSimpleTextSubtitle::AddStyle(CString name, STSStyle* style)

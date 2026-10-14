@@ -599,11 +599,18 @@ impl Document {
     /// Stores already-prepared style code units, without normalization or a
     /// segment rebuild. Native style-map decisions remain with the caller.
     pub fn set_prepared_style(&mut self, index: usize, style: Vec<u16>) -> Result<(), Refusal> {
-        self.entries
-            .get_mut(index)
-            .ok_or(Refusal::EntryIndex)?
-            .style = style;
-        Ok(())
+        self.replace_prepared_style(index, style).map(drop)
+    }
+
+    /// Replaces one style name without normalization/rebuild and transfers the
+    /// previous allocation to the caller for destruction after admission.
+    pub fn replace_prepared_style(
+        &mut self,
+        index: usize,
+        style: Vec<u16>,
+    ) -> Result<Vec<u16>, Refusal> {
+        let entry = self.entries.get_mut(index).ok_or(Refusal::EntryIndex)?;
+        Ok(core::mem::replace(&mut entry.style, style))
     }
 
     /// Publishes one already-evaluated endpoint without rebuilding segments.
