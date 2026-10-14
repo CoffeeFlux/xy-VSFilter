@@ -13,6 +13,7 @@
 #include <exception>
 #include <stdexcept>
 #include <vector>
+#include <utility>
 
 static unsigned sequence = 0, empty_events[2] = {}, change_events[2] = {};
 static void check(bool value, const char* message) {
@@ -1055,6 +1056,74 @@ static void resolution_lifecycle() {
     check(bits==UINT64_C(0x8000000000000000),"resolved default signedzero retained");
     check(change_events[0]==notifications,"resolution queries/default replacement do not notify");
 }
+// Finite, representable llround histories only; no frame/time arithmetic on
+// no-op fps0 calls. Native callbacks read the fully committed state.
+class ConversionDocument : public TraceDocument {
+public:
+    const char* expected=NULL;
+    int expectedMode=TIME;
+    std::vector<std::pair<REFERENCE_TIME,REFERENCE_TIME> > expectedTimes;
+    unsigned notifications=0;
+    ConversionDocument():TraceDocument(0){}
+    void Observe(const char* prefix,const char* stage,bool animated) {
+        check(Mode()==expectedMode&&Entries()==expectedTimes.size(),"conversion mode/count");
+        for(size_t i=0;i<Entries();++i){const STSEntry e=Entry(int(i));
+            check(e.start==expectedTimes[i].first&&e.end==expectedTimes[i].second,"conversion rounded endpoints");}
+        bool any=false;for(size_t i=0;i<Segments();++i)any=any||Segment(int(i)).animated;
+        check(any==animated,"conversion animation transition");
+        printf("%s %s mode=%d entries=%zu segments=%zu animated=%d times=",prefix,stage,Mode(),Entries(),Segments(),any);
+        if(expectedTimes.empty())printf("-");
+        for(size_t i=0;i<expectedTimes.size();++i)printf("%s%lld,%lld",i?";":"",expectedTimes[i].first,expectedTimes[i].second);
+        printf("\n");
+    }
+protected:
+    void OnChanged() override {
+        TraceDocument::OnChanged();
+        if(expected){++notifications;Observe("conversion-callback",expected,false);}
+    }
+};
+static void conversion_lifecycle() {
+    ConversionDocument doc;
+    const wchar_t raw[]={L'C',0,0xd800,L'X'};
+    doc.AddSTSEntryOnly(CStringW(raw,4),true,-1200000,-400000,CString(L"Default"),CString(L"actor"),CString(L"effect"),CRect(1,2,3,4),3,7);
+    doc.AddSTSEntryOnly(CStringW(L"positive"),true,400000,1200000,CString(L"Default"),CString(L"actor2"),CString(L"effect2"),CRect(5,6,7,8),4,8);
+    std::vector<STSEntry> payloads;for(int i=0;i<2;++i)payloads.push_back(doc.Entry(i));
+    doc.expectedTimes={{-1200000,-400000},{400000,1200000}};
+    doc.CreateSegments();doc.Animate(0);doc.Observe("conversion-stage","conversion-time-input",true);doc.Dump("conversion-time-input");
+    auto transition=[&](const char* stage,bool frame,double fps,const std::vector<std::pair<REFERENCE_TIME,REFERENCE_TIME> >& times,bool real){
+        doc.expected=stage;doc.expectedMode=frame?FRAME:TIME;doc.expectedTimes=times;
+        const unsigned before=doc.notifications;
+        std::vector<STSSegment> oldSegments;
+        if(!real)for(size_t i=0;i<doc.Segments();++i)oldSegments.push_back(doc.Segment(int(i)));
+        if(frame)doc.ConvertToFrameBased(fps);else doc.ConvertToTimeBased(fps);
+        if(!real){check(doc.Segments()==oldSegments.size(),"no-op conversion segment count retained");
+            for(size_t i=0;i<oldSegments.size();++i){const STSSegment actual=doc.Segment(int(i)),old=oldSegments[i];
+                check(actual.start==old.start&&actual.end==old.end&&actual.animated==old.animated&&actual.subs.GetCount()==old.subs.GetCount(),"no-op conversion complete segment retained");
+                for(size_t j=0;j<old.subs.GetCount();++j)check(actual.subs[j]==old.subs[j],"no-op conversion members retained");}}
+
+        check(doc.notifications==before+(real?1:0),"conversion exactly one callback only on transition");
+        doc.Observe("conversion-stage",stage,!real);doc.Dump(stage);
+        for(int i=0;i<2;++i){const STSEntry e=doc.Entry(i),old=payloads[size_t(i)];
+            check(same_identity(e.str,old.str)&&same_identity(e.style,old.style)&&same_identity(e.actor,old.actor)&&same_identity(e.effect,old.effect)
+                &&e.fUnicode==old.fUnicode&&e.marginRect==old.marginRect&&e.layer==old.layer&&e.readorder==old.readorder,"conversion preserves full non-time entry payload");}
+        doc.expected=NULL;
+    };
+    transition("conversion-frame-half",true,12.5,{{-2,-1},{1,2}},true);
+    doc.Animate(0);transition("conversion-frame-noop-zero",true,0.0,{{-2,-1},{1,2}},false);
+    transition("conversion-time-half",false,256.0,{{-78125,-39063},{39063,78125}},true);
+    doc.Animate(0);transition("conversion-time-noop-zero",false,0.0,{{-78125,-39063},{39063,78125}},false);
+    ConversionDocument empty;
+    auto emptyTransition=[&](const char* stage,bool frame,double fps,bool real){
+        empty.expected=stage;empty.expectedMode=frame?FRAME:TIME;const unsigned before=empty.notifications;
+        if(frame)empty.ConvertToFrameBased(fps);else empty.ConvertToTimeBased(fps);
+        check(empty.notifications==before+(real?1:0),"empty conversion callback count");
+        empty.Observe("conversion-stage",stage,false);empty.Dump(stage);empty.expected=NULL;
+    };
+    emptyTransition("conversion-empty-frame",true,12.5,true);
+    emptyTransition("conversion-empty-frame-noop",true,0.0,false);
+    emptyTransition("conversion-empty-time",false,256.0,true);
+}
+
 static void layout_size_lifecycle() {
     TraceDocument source(0),destination(1);
     source.LayoutSize(CSize(320,240));destination.LayoutSize(CSize(800,600));
@@ -1101,6 +1170,7 @@ int main() {
         lcid_lifecycle();
         resolution_lifecycle();
         layout_size_lifecycle();
+        conversion_lifecycle();
         named_style_exports();
         {
             TraceDocument source(0),destination(1);populate(source);populate(destination);

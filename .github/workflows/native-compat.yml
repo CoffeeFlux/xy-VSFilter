@@ -88,8 +88,10 @@ jobs:
         include:
           - platform: x64
             arch: x64
+            target: x86_64-pc-windows-msvc
           - platform: Win32
             arch: amd64_x86
+            target: i686-pc-windows-msvc
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
@@ -107,11 +109,30 @@ jobs:
         run: |
           & python tools\compat\document_prepare_check.py --reference-root "$pwd\baseline-preparation" --platform ${{ matrix.platform }} --output "artifacts\document-preparation\${{ matrix.platform }}"
           if ($LASTEXITCODE -ne 0) { throw "Document preparation capture incomplete; inspect report.json" }
+      - name: Install pinned Rust for preparation comparison
+        run: |
+          rustup toolchain install 1.85.0 --profile minimal --target ${{ matrix.target }}
+          rustup default 1.85.0
+      - name: Compare safe Rust preparation with captured MFC outputs
+        shell: pwsh
+        run: |
+          & python tools\compat\document_prepare_rust_check.py --native-capture "artifacts\document-preparation\${{ matrix.platform }}" --target ${{ matrix.target }} --output "artifacts\document-preparation-rust\${{ matrix.platform }}"
+          if ($LASTEXITCODE -ne 0) { throw "Rust preparation comparison incomplete; inspect report.json" }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: document-preparation-${{ matrix.platform }}
           path: artifacts/document-preparation/${{ matrix.platform }}/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: document-preparation-rust-${{ matrix.platform }}
+          path: |
+            artifacts/document-preparation-rust/${{ matrix.platform }}/report.json
+            artifacts/document-preparation-rust/${{ matrix.platform }}/*.stdout
+            artifacts/document-preparation-rust/${{ matrix.platform }}/*.stderr
+            artifacts/document-preparation-rust/${{ matrix.platform }}/inputs.txt
+            artifacts/document-preparation-rust/${{ matrix.platform }}/cargo-target/${{ matrix.target }}/release/examples/document_prepare_trace.exe
   atl_contract:
     runs-on: windows-2022
     timeout-minutes: 10

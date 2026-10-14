@@ -3825,58 +3825,52 @@ void CSimpleTextSubtitle::ConvertToTimeBased(double fps)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     if(GetDocumentMode() == TIME) return;
+    auto times = m_document->EntryTimes();
+    for(auto& time : times) {
+        time.first = std::llround(time.first * UNITS_FLOAT / fps);
+        time.second = std::llround(time.second * UNITS_FLOAT / fps);
+    }
+    if(m_document->CommitTimeConversion(TIME, times)) NotifySegmentsRebuilt();
 #else
     if(m_mode == TIME) return;
-#endif
 
     for(int i = 0, j = GetEntryCount(); i < j; i++)
     {
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-        m_document->SetTime(i, true, std::llround(m_document->EntryStart(i) * UNITS_FLOAT / fps));
-        m_document->SetTime(i, false, std::llround(m_document->EntryEnd(i) * UNITS_FLOAT / fps));
-#else
         STSEntry& stse = m_entries[i];
         stse.start = std::llround(stse.start * UNITS_FLOAT / fps);
         stse.end = std::llround(stse.end * UNITS_FLOAT / fps);
-#endif
     }
 
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    SetDocumentMode(TIME);
-#else
     m_mode = TIME;
-#endif
 
     CreateSegments();
+#endif
 }
 
 void CSimpleTextSubtitle::ConvertToFrameBased(double fps)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     if(GetDocumentMode() == FRAME) return;
+    auto times = m_document->EntryTimes();
+    for(auto& time : times) {
+        time.first = std::llround(time.first * fps / UNITS);
+        time.second = std::llround(time.second * fps / UNITS);
+    }
+    if(m_document->CommitTimeConversion(FRAME, times)) NotifySegmentsRebuilt();
 #else
     if(m_mode == FRAME) return;
-#endif
 
     for(int i = 0, j = GetEntryCount(); i < j; i++)
     {
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-        m_document->SetTime(i, true, std::llround(m_document->EntryStart(i) * fps / UNITS));
-        m_document->SetTime(i, false, std::llround(m_document->EntryEnd(i) * fps / UNITS));
-#else
         STSEntry& stse = m_entries[i];
         stse.start = std::llround(stse.start * fps / UNITS);
         stse.end = std::llround(stse.end * fps / UNITS);
-#endif
     }
 
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    SetDocumentMode(FRAME);
-#else
     m_mode = FRAME;
-#endif
 
     CreateSegments();
+#endif
 }
 
 int CSimpleTextSubtitle::SearchSub(REFERENCE_TIME t, double fps) 
@@ -4743,16 +4737,7 @@ void CSimpleTextSubtitle::Sort(bool fRestoreReadorder)
     order.reserve(records.GetCount());
     for(size_t i = 0; i < records.GetCount(); i++) order.push_back((uint32_t)records[i].marginRect.left);
     m_document->Reorder(order); // owner rebuilds, preserving native Sort semantics
-    OnChanged();
-#if ENABLE_XY_LOG_TEXT_SUBTITLE
-    CAtlArray<STSSegment> segments;
-    for(size_t i = 0, count = GetSegmentCount(); i < count; i++) {
-        STSSegment segment;
-        m_document->Segment((int)i, segment);
-        segments.Add(segment);
-    }
-    LogSegments(segments);
-#endif
+    NotifySegmentsRebuilt();
 #else
     qsort(m_entries.GetData(), GetEntryCount(), sizeof(STSEntry), !fRestoreReadorder ? comp1 : comp2);
     CreateSegments();
@@ -4764,10 +4749,9 @@ static int intcomp(const void* i1, const void* i2)
     return(*((int*)i1) - *((int*)i2));
 }
 
-void CSimpleTextSubtitle::CreateSegments()
-{
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    m_document->Rebuild();
+void CSimpleTextSubtitle::NotifySegmentsRebuilt()
+{
     OnChanged();
 #if ENABLE_XY_LOG_TEXT_SUBTITLE
     CAtlArray<STSSegment> segments;
@@ -4778,6 +4762,14 @@ void CSimpleTextSubtitle::CreateSegments()
     }
     LogSegments(segments);
 #endif
+}
+#endif
+
+void CSimpleTextSubtitle::CreateSegments()
+{
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    m_document->Rebuild();
+    NotifySegmentsRebuilt();
 #else
     m_segments.RemoveAll();
 

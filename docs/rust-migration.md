@@ -1190,9 +1190,10 @@ original video size pair. Cache/scaling arithmetic remains native.
 A separate short x86/x64 CI job captures the exact pinned Add/entry-only
 preparation suffix and SetStr LF-only replacement with actual MFC CStringW. Its
 620 bounded observations include embedded NULs, raw surrogates and stars, with
-complete trace/provenance/repeat checks. Local validation is generation-only;
-native execution and Rust preparation/routing parity remain pending. Private
-CString source selectors are separate; the runtime map PROBE is unchanged.
+complete trace/provenance/repeat checks. The first Win32 capture and local safe
+Rust comparison now pass as described below; x64 preparation runtime and native
+routing remain pending. Private CString source selectors are separate; the
+runtime map PROBE is unchanged.
 
 Local checks pass 194 core and 117 FFI tests, 115 Python tests with four
 Windows-only skips, pinned formatting and all-target Clippy. Generated-probe
@@ -1209,6 +1210,52 @@ executed. Current layout-size lifecycle, rendering and host Windows gates remain
 pending. The opt-in retired field/container count is 20; m_simple remains native
 with its unresolved pre-Open source contract.
 
+
+### Coarse frame/time conversion and final text preparation
+
+The experimental frame/time conversion path now snapshots only scalar time
+pairs, evaluates the existing native `std::llround` expressions in row order
+(start before end), and commits all pairs plus the target mode through one safe
+owner operation. The owner publishes mode before rebuilding segments. The
+adapter then invokes the existing OnChanged and optional logging sequence with
+no Rust loan held. Same-mode calls return before snapshotting or arithmetic, so
+they retain animation and emit no callback. Empty conversions still rebuild
+and notify. Sort and explicit CreateSegments share the same notification helper.
+Allocation failure, partial native mutation and allocator reentry remain existing
+unresolved integration domains; this does not certify those histories.
+
+The new scalar snapshot contains no strings or native entry objects. The private
+conversion ABI stages its input before admission and returns an applied flag
+outside admission. One unsafe export and two explicit unsafe blocks reuse the
+existing input-copy and output-write helpers; no new raw-pointer mechanism or
+unsafe core code is introduced. The canonical retired owner count remains 20.
+
+[Native preparation evidence](rust-document-preparation-evidence.json) records
+620 repeated actual-MFC observations from the pinned Add/entry-only final suffix
+and SetStr LF-only operation in Win32 job 116150470220 of run 38651297490.
+Retained source, binary, PE architecture, trace and runner hashes were verified.
+The companion x64 build timed out before execution; its build deadline is now
+180 seconds with retained timeout diagnostics. That failed capture is not a
+runtime comparison result.
+
+The pure safe helper agrees with all 620 outputs when run locally on macOS arm64
+([local evidence](rust-document-preparation-local-evidence.json)). It preserves
+full raw UTF16, logical-empty style substitution, leading-star trimming, and
+CString's fixed-original-end newline expansion behavior across embedded NULs.
+It distinguishes the initialized terminator from unresolved tail content and
+refuses the latter. The helper is not yet routed into the native renderer:
+actual wide-character helper dispatch source and x64 execution remain gates.
+New short CI comparisons build the same Rust oracle for each Windows target and
+compare every raw output against that target's retained native capture. No
+finite corpus establishes all malformed-input behavior.
+
+Local validation for this increment passes 199 core and 117 FFI tests, formatting,
+all-target Clippy, and 123 Python tests with four Windows-only skips. The eight
+new full-class conversion stages include four callback observations, fractional
+FPS and signed half rounding, payload retention, real-transition animation reset,
+zero-FPS same-mode calls and empty documents. Their Windows compile/runtime
+results remain pending. Default/native and Rust-text preprocessing remains
+unchanged across eight native files, and the 814-case rendering corpus is stable.
 
 ### Coarse selected-state Copy boundary
 
@@ -1260,13 +1307,13 @@ Neither count measures the amount of application behavior replaced.
 The reproducible [Rust unsafe inventory](rust-unsafe-inventory.json) uses
 `python3 tools/compat/audit_rust_boundary.py OUTPUT.json`. It masks comments and
 literals, separates cfg(test) items, and includes all platform/feature branches.
-At the current frozen working-tree sources based on `7f3e5c9c` (exact file
+At the current frozen working-tree sources based on `66638ab9` (exact file
 hashes recorded by the regenerated inventory):
 
 | Layer | Production source inventory | Meaning |
 | --- | --- | --- |
-| `rust/compat` | 0 unsafe blocks/functions/impls; 7,706 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
-| `rust/ffi` | 359 explicit unsafe blocks, 302 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,308 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
+| `rust/compat` | 0 unsafe blocks/functions/impls; 7,886 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
+| `rust/ffi` | 361 explicit unsafe blocks, 303 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,352 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
 | Tests | 119 unsafe blocks in FFI tests | Exercise valid and deliberately bounded ownership/alias/initialization contracts; not production code |
 
 Unsafe-function declarations and blocks overlap and must not be added as

@@ -25,7 +25,8 @@ enum {
     XY_DOCUMENT_V1_QUERY_BYTES = 16,
     XY_DOCUMENT_V1_COUNTS_BYTES = 8,
     XY_DOCUMENT_V1_STYLE_RENAME_HEADER_BYTES = 16,
-    XY_DOCUMENT_V1_SORT_HEADER_BYTES = 8, XY_DOCUMENT_V1_SORT_RECORD_BYTES = 16
+    XY_DOCUMENT_V1_SORT_HEADER_BYTES = 8, XY_DOCUMENT_V1_SORT_RECORD_BYTES = 16,
+    XY_DOCUMENT_V1_TIME_HEADER_BYTES = 8, XY_DOCUMENT_V1_TIME_RECORD_BYTES = 16
 };
 // Buffer contract: nonzero input length/output capacity requires a live readable/
 // writable range for that entire size, at most PTRDIFF_MAX. Bytes need no extra
@@ -155,7 +156,9 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_named_style_lookup_v1(uint64_t o
 // forced selection bypasses entry bounds. Replies are immutable owned snapshots.
 // Kind10 layout snapshot(index0): width:i32@0/height:i32@4; either absent
 // axis => UNRESOLVED_REFERENCE. Native constructor supplies CSize() explicitly.
-// Missing ordinals or nonzero identity/Sort/layout indexes return OUT_OF_RANGE. Full entry wire is the
+// Kind11 scalar time snapshot(index0): count:u32/reserved-zero:u32 then
+//16-byte start:i64/end:i64 rows, no text cloning.
+// Missing ordinals or nonzero identity/Sort/layout/time indexes return OUT_OF_RANGE. Full entry wire is the
 // 64-byte header followed by text/style/actor/effect raw UTF-16LE arrays. Full
 // segment wire is the 32-byte header followed by u32LE member indexes.
 // Entry header offsets: start:i64@0, end:i64@8, margins:i32[4]@16
@@ -190,6 +193,12 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_set_entry_time_v1(uint64_t, uint
 // pairs (i64LE). Exact entry count is required. Success rebuilds even identity.
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_reorder_entries_v1(uint64_t, const uint8_t*, size_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_replace_entry_times_v1(uint64_t, const uint8_t*, size_t);
+// Native adapter guards same mode before CRT arithmetic. Target0TIME/1FRAME;
+// complete start/end pairs are staged before admission. Output u64LE applied:
+//0 same-mode(no rebuild/animation changes),1 installed pairs+mode then rebuilt.
+// Current mode must be supplied. Count mismatch leaves owner/output unchanged.
+// Callback and optional logging belong after successful applied reply/unlock.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_commit_time_conversion_v1(uint64_t owner, uint32_t target, const uint8_t* pairs, size_t bytes, uint8_t* applied, size_t capacity);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_rebuild_segments_v1(uint64_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_clear_storage_v1(uint64_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_remove_entries_v1(uint64_t);

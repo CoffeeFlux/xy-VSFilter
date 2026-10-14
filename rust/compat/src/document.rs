@@ -52,6 +52,14 @@ pub enum AddMode {
     WebVtt,
 }
 
+/// Pinned native tmode discriminants; arithmetic remains in the native adapter.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[repr(i32)]
+pub enum ConversionMode {
+    Time = 0,
+    Frame = 1,
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Refusal {
     /// Retained segments refer beyond the entry array. Native access is unsafe.
@@ -64,6 +72,8 @@ pub enum Refusal {
     EntryIndex,
     InvalidPermutation,
     TimeCountMismatch,
+    /// Native interpretation mode has not been explicitly supplied.
+    UnsuppliedMode,
     /// Selected timeline count exceeds the native signed-midpoint domain.
     TimelineCountOverflow,
 }
@@ -672,6 +682,35 @@ impl Document {
         }
         self.rebuild_segments();
         Ok(())
+    }
+
+    /// Commits native-evaluated pairs, publishes mode, then rebuilds segments.
+    /// The native adapter checks the mode before evaluating CRT arithmetic and
+    /// calls OnChanged/optional logging only after admission ends. Same-mode
+    /// calls do not inspect pair count or rebuild retained/stale animation.
+    /// Allocation failure, native partial mutation and allocator reentry remain
+    /// outside the comparison domain, as for the existing rebuild operation.
+    pub fn commit_time_conversion(
+        &mut self,
+        target: ConversionMode,
+        times: &[(i64, i64)],
+    ) -> Result<bool, Refusal> {
+        let mode = self
+            .interpretation(InterpretationField::Mode)
+            .ok_or(Refusal::UnsuppliedMode)?;
+        if mode == target as i32 {
+            return Ok(false);
+        }
+        if times.len() != self.entries.len() {
+            return Err(Refusal::TimeCountMismatch);
+        }
+        for (entry, &(start, end)) in self.entries.iter_mut().zip(times) {
+            entry.start = start;
+            entry.end = end;
+        }
+        self.replace_interpretation(InterpretationField::Mode, target as i32);
+        self.rebuild_segments();
+        Ok(true)
     }
 
     /// Rebuild uses storage order rather than readorder; animation resets.
@@ -1691,5 +1730,56 @@ mod tests {
             assert_eq!(destination.lcid(), Some(bits));
             assert_eq!(source.lcid(), Some(!bits));
         }
+    }
+    #[test]
+    fn conversion_commit_preserves_payload_and_noop_stale_animation() {
+        let mut d = Document::default();
+        assert_eq!(
+            d.commit_time_conversion(ConversionMode::Time, &[]),
+            Err(Refusal::UnsuppliedMode)
+        );
+        d.replace_interpretation(InterpretationField::Mode, 1);
+        d.replace_interpretation(InterpretationField::SubtitleType, 7);
+        d.replace_interpretation(InterpretationField::Encoding, -2);
+        d.replace_identity(IdentityField::Name, alloc::vec![65, 0, 0xd800]);
+        d.replace_identity(IdentityField::Path, alloc::vec![0xdcff, 0, 66]);
+        d.set_script_size(640, 360);
+        d.set_layout_size(960, 480);
+        d.replace_lcid(1031);
+        d.replace_default_style(Some(rename_value(1)));
+        d.named_styles_mut()
+            .insert(alloc::vec![78], Some(rename_value(2)));
+        d.add_prepared(entry(0, 10, -1), AddMode::Add).unwrap();
+        d.feedback_animation(0, true).unwrap();
+        let before = d.clone();
+        assert_eq!(
+            d.commit_time_conversion(ConversionMode::Time, &[]),
+            Err(Refusal::TimeCountMismatch)
+        );
+        assert_eq!(d, before);
+        assert_eq!(
+            d.commit_time_conversion(ConversionMode::Time, &[(2, 8)]),
+            Ok(true)
+        );
+        let mut expected = before;
+        expected.entries[0].start = 2;
+        expected.entries[0].end = 8;
+        expected.replace_interpretation(InterpretationField::Mode, 0);
+        expected.rebuild_segments();
+        assert_eq!(d, expected);
+        d.feedback_animation(0, true).unwrap();
+        d.remove_all_entries();
+        let stale = d.clone();
+        assert_eq!(
+            d.commit_time_conversion(ConversionMode::Time, &[(99, -99)]),
+            Ok(false)
+        );
+        assert_eq!(d, stale);
+        assert_eq!(
+            d.commit_time_conversion(ConversionMode::Frame, &[]),
+            Ok(true)
+        );
+        assert!(d.segments().is_empty());
+        assert_eq!(d.interpretation(InterpretationField::Mode), Some(1));
     }
 }

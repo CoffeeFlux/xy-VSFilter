@@ -351,6 +351,40 @@ pub fn decode_sort_snapshot(bytes: &[u8]) -> Result<Vec<SortScalar>, Error> {
     Ok(records)
 }
 
+/// Immutable scalar time pairs in storage order. No payload string cloning.
+pub const TIME_HEADER_BYTES: usize = 8;
+pub const TIME_RECORD_BYTES: usize = 16;
+pub fn encode_time_snapshot(entries: &[PreparedEntry]) -> Result<Vec<u8>, Error> {
+    let count = count(entries.len())?;
+    let mut bytes = Vec::with_capacity(total(TIME_HEADER_BYTES, &[count], TIME_RECORD_BYTES)?);
+    bytes.extend_from_slice(&count.to_le_bytes());
+    bytes.extend_from_slice(&0u32.to_le_bytes());
+    for entry in entries {
+        bytes.extend_from_slice(&entry.start.to_le_bytes());
+        bytes.extend_from_slice(&entry.end.to_le_bytes());
+    }
+    Ok(bytes)
+}
+pub fn decode_time_snapshot(bytes: &[u8]) -> Result<Vec<(i64, i64)>, Error> {
+    let count = u32_at(bytes, 0)?;
+    if u32_at(bytes, 4)? != 0 {
+        return Err(Error::NonzeroReserved);
+    }
+    exact(
+        bytes,
+        total(TIME_HEADER_BYTES, &[count], TIME_RECORD_BYTES)?,
+    )?;
+    bytes[TIME_HEADER_BYTES..]
+        .chunks_exact(TIME_RECORD_BYTES)
+        .map(|row| {
+            Ok((
+                i64::from_le_bytes(read(row, 0)?),
+                i64::from_le_bytes(read(row, 8)?),
+            ))
+        })
+        .collect()
+}
+
 /// Conflict relocation packet, not a complete AddStyle request. Names remain
 /// full raw units; map-key truncation and entry-name comparison are core choices.
 /// Header16: old units:u32@0, new units:u32@4, style bytes:u64@8, then both
@@ -755,5 +789,40 @@ mod tests {
             total(SORT_HEADER_BYTES, &[i32::MAX as u32], SORT_RECORD_BYTES),
             Ok(34_359_738_360)
         );
+    }
+    #[test]
+    fn scalar_time_snapshot_bounds_and_raw_endpoints() {
+        let empty = encode_time_snapshot(&[]).unwrap();
+        assert_eq!(empty, [0; 8]);
+        let mut bytes = vec![2, 0, 0, 0, 0, 0, 0, 0];
+        for pair in [(i64::MIN, i64::MAX), (8, -2)] {
+            bytes.extend_from_slice(&pair.0.to_le_bytes());
+            bytes.extend_from_slice(&pair.1.to_le_bytes());
+        }
+        assert_eq!(
+            decode_time_snapshot(&bytes).unwrap(),
+            [(i64::MIN, i64::MAX), (8, -2)]
+        );
+        let entries: Vec<_> = [(i64::MIN, i64::MAX), (8, -2)]
+            .into_iter()
+            .map(|(start, end)| {
+                let mut value = entry();
+                value.start = start;
+                value.end = end;
+                value
+            })
+            .collect();
+        assert_eq!(encode_time_snapshot(&entries).unwrap(), bytes);
+        for end in 0..bytes.len() {
+            assert!(decode_time_snapshot(&bytes[..end]).is_err());
+        }
+        let mut bad = bytes.clone();
+        bad[4] = 1;
+        assert_eq!(decode_time_snapshot(&bad), Err(Error::NonzeroReserved));
+        bad = bytes.clone();
+        bad.push(0);
+        assert_eq!(decode_time_snapshot(&bad), Err(Error::InvalidShape));
+        bad[..4].copy_from_slice(&u32::MAX.to_le_bytes());
+        assert_eq!(decode_time_snapshot(&bad), Err(Error::CountOverflow));
     }
 }

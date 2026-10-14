@@ -36,7 +36,21 @@ def git(root, *args):
     return subprocess.check_output(["git", "-C", str(root), *args], timeout=60).decode().strip()
 
 
-def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True):
+def conversion_rows():
+    """Finite native llround outputs and actual/no-op rebuild observations."""
+    return [row.encode() for row in (
+        "conversion-time-input mode=0 entries=2 segments=2 animated=1 times=-1200000,-400000;400000,1200000",
+        "conversion-frame-half mode=1 entries=2 segments=2 animated=0 times=-2,-1;1,2",
+        "conversion-frame-noop-zero mode=1 entries=2 segments=2 animated=1 times=-2,-1;1,2",
+        "conversion-time-half mode=0 entries=2 segments=2 animated=0 times=-78125,-39063;39063,78125",
+        "conversion-time-noop-zero mode=0 entries=2 segments=2 animated=1 times=-78125,-39063;39063,78125",
+        "conversion-empty-frame mode=1 entries=0 segments=0 animated=0 times=-",
+        "conversion-empty-frame-noop mode=1 entries=0 segments=0 animated=0 times=-",
+        "conversion-empty-time mode=0 entries=0 segments=0 animated=0 times=-",
+    )]
+
+
+def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True):
     lines = data.splitlines()
     if not lines or lines[0] != f"provenance pointer_bits={pointer_bits}".encode():
         raise ValueError("missing or incorrect native architecture provenance")
@@ -45,6 +59,20 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
     for prefix in (b"state ", b"entry ", b"segment ", b"callback ", b"text "):
         if not any(line.startswith(prefix) for line in lines):
             raise ValueError(f"missing native lifecycle trace section {prefix!r}")
+
+    if require_conversion_stages:
+        expected = conversion_rows()
+        observed = [line for line in lines if line.startswith(b"conversion-stage ")]
+        if observed != [b"conversion-stage " + row for row in expected]:
+            raise ValueError("missing or incorrect conversion stage/state")
+        real = {"conversion-frame-half", "conversion-time-half", "conversion-empty-frame", "conversion-empty-time"}
+        callbacks = [b"conversion-callback " + row for row in expected if row.split(b" ",1)[0].decode() in real]
+        if [line for line in lines if line.startswith(b"conversion-callback ")] != callbacks:
+            raise ValueError("missing or incorrect conversion callback state/count")
+        for callback in callbacks:
+            stage = callback.replace(b"conversion-callback ", b"conversion-stage ",1)
+            if lines.index(callback) >= lines.index(stage):
+                raise ValueError("conversion callback must observe committed state before return")
 
     if require_identity_stages:
         stages = ("identity-initial", "identity-read-independent", "identity-copy-asymmetric-path",
@@ -257,11 +285,11 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
 
 
 
-def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True):
+def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True):
     if len(traces) != 4:
         raise ValueError("two reference and two candidate executions required")
     for trace in traces:
-        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages, require_metadata_stages=require_metadata_stages, require_selected_copy_stages=require_selected_copy_stages, require_style_rename_stages=require_style_rename_stages, require_sort_stages=require_sort_stages, require_base_empty_stages=require_base_empty_stages, require_lcid_stages=require_lcid_stages, require_resolution_stages=require_resolution_stages, require_layout_size_stages=require_layout_size_stages)
+        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages, require_metadata_stages=require_metadata_stages, require_selected_copy_stages=require_selected_copy_stages, require_style_rename_stages=require_style_rename_stages, require_sort_stages=require_sort_stages, require_base_empty_stages=require_base_empty_stages, require_lcid_stages=require_lcid_stages, require_resolution_stages=require_resolution_stages, require_layout_size_stages=require_layout_size_stages, require_conversion_stages=require_conversion_stages)
     if any(trace != traces[0] for trace in traces[1:]):
         raise ValueError("native lifecycle traces differ or are nondeterministic")
 

@@ -532,6 +532,37 @@ public:
         for(const auto& time : times) {DocumentDetail::Append(bytes,static_cast<uint64_t>(time.first),8);DocumentDetail::Append(bytes,static_cast<uint64_t>(time.second),8);}
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_replace_entry_times_v1(id_,bytes.data(),bytes.size());}));
     }
+    // Immutable scalar-only copy; no raw CString payload is materialized.
+    std::vector<std::pair<int64_t,int64_t>> EntryTimes() const {
+        const auto bytes = Snapshot(11,0).Read();
+        DocumentDetail::Shape(bytes.size() >= XY_DOCUMENT_V1_TIME_HEADER_BYTES);
+        const uint32_t count = DocumentDetail::Count(static_cast<size_t>(DocumentDetail::Load(bytes,0,4)));
+        DocumentDetail::Shape(DocumentDetail::Load(bytes,4,4) == 0 &&
+            bytes.size() == DocumentDetail::AddSize(XY_DOCUMENT_V1_TIME_HEADER_BYTES,
+                DocumentDetail::MulSize(count,XY_DOCUMENT_V1_TIME_RECORD_BYTES)));
+        std::vector<std::pair<int64_t,int64_t>> times;
+        times.reserve(count);
+        for(uint32_t i = 0; i < count; ++i) {
+            const size_t offset = XY_DOCUMENT_V1_TIME_HEADER_BYTES + size_t(i) * XY_DOCUMENT_V1_TIME_RECORD_BYTES;
+            times.emplace_back(DocumentDetail::I64(DocumentDetail::Load(bytes,offset,8)),
+                DocumentDetail::I64(DocumentDetail::Load(bytes,offset+8,8)));
+        }
+        return times;
+    }
+    bool CommitTimeConversion(uint32_t target_mode, const std::vector<std::pair<int64_t,int64_t>>& times) {
+        DocumentDetail::Count(times.size()); DocumentDetail::Bytes bytes;
+        bytes.reserve(DocumentDetail::MulSize(times.size(),XY_DOCUMENT_V1_TIME_RECORD_BYTES));
+        for(const auto& time : times) {
+            DocumentDetail::Append(bytes,static_cast<uint64_t>(time.first),8);
+            DocumentDetail::Append(bytes,static_cast<uint64_t>(time.second),8);
+        }
+        std::array<uint8_t,8> applied{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_commit_time_conversion_v1(
+            id_,target_mode,bytes.data(),bytes.size(),applied.data(),applied.size());}));
+        const uint64_t value = DocumentDetail::Load(applied,0,8);
+        DocumentDetail::Shape(value <= 1);
+        return value != 0;
+    }
     void AnimationOr(int i, bool animated) {
         const uint32_t index = DocumentDetail::Index(i);
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_animation_or_v1(id_,index,animated ? 1 : 0);}));
