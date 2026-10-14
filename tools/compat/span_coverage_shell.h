@@ -25,28 +25,65 @@ struct ScanLineData2 {
     std::shared_ptr<ScanLineData> m_scan_line_data;
     int mWideBorder,mPathOffsetX,mPathOffsetY;tSpanBuffer mWideOutline;
 };
+size_t g_xy_malloc_used_size=0;
 static std::vector<int64_t> coverageEvents;
 static int allocationAttempt=0,allocationFailure=-1;
-struct CoverageAllocation {BYTE* base;size_t count;};
+struct CoverageAllocation {BYTE* base;size_t count;bool rust=false;void* owner=NULL;BYTE* data()const{return rust?base:base+32;}};
 static std::vector<CoverageAllocation> coverageAllocations;
 static void checkCoverageGuards(const CoverageAllocation& a){
+    if(a.rust)return;
     for(size_t i=0;i<32;++i)if(a.base[i]!=0xcc||a.base[a.count+32+i]!=0xcc)std::abort();
 }
 static void* xy_malloc(size_t count){
     coverageEvents.insert(coverageEvents.end(),{1,static_cast<int64_t>(count)});
     if(allocationAttempt++==allocationFailure)return NULL;
     BYTE* base=static_cast<BYTE*>(std::malloc(count+64));if(!base)std::abort();
-    std::memset(base,0xcc,count+64);coverageAllocations.push_back({base,count});return base+32;
+    std::memset(base,0xcc,count+64);CoverageAllocation a;a.base=base;a.count=count;coverageAllocations.push_back(a);g_xy_malloc_used_size+=count;return base+32;
 }
 static void xy_free(void* value){
     if(!value)return;
-    for(size_t i=0;i<coverageAllocations.size();++i)if(coverageAllocations[i].base+32==value){
+    for(size_t i=0;i<coverageAllocations.size();++i)if(coverageAllocations[i].data()==value){
         const CoverageAllocation a=coverageAllocations[i];checkCoverageGuards(a);
         coverageEvents.insert(coverageEvents.end(),{2,static_cast<int64_t>(a.count)});
-        std::free(a.base);coverageAllocations.erase(coverageAllocations.begin()+i);return;
+        if(a.rust)std::abort();g_xy_malloc_used_size-=a.count;std::free(a.base);coverageAllocations.erase(coverageAllocations.begin()+i);return;
     }
     std::abort();
 }
+extern "C" {
+void* xy_vsfilter_plane_create(size_t);
+uint8_t* xy_vsfilter_plane_loan(void*);
+void xy_vsfilter_plane_release(void*);
+}
+static uint64_t planeOwners=0,planeLoans=0,planeReleases=0;
+extern "C" inline void* coveragePlaneCreate(size_t count){
+    if(allocationAttempt==allocationFailure)return NULL;
+    void* owner=xy_vsfilter_plane_create(count);
+    if(owner){
+        ++planeOwners;++allocationAttempt;
+        coverageEvents.insert(coverageEvents.end(),{1,static_cast<int64_t>(count)});
+        CoverageAllocation a;a.base=NULL;a.count=count;a.rust=true;a.owner=owner;coverageAllocations.push_back(a);
+    }
+    return owner;
+}
+extern "C" inline uint8_t* coveragePlaneLoan(void* owner){
+    uint8_t* data=xy_vsfilter_plane_loan(owner);if(reinterpret_cast<uintptr_t>(data)%16)std::abort();
+    for(auto& a:coverageAllocations)if(a.rust&&a.owner==owner){a.base=data;++planeLoans;return data;}
+    std::abort();
+}
+extern "C" inline void coveragePlaneRelease(void* owner){
+    for(size_t i=0;i<coverageAllocations.size();++i)if(coverageAllocations[i].rust&&coverageAllocations[i].owner==owner){
+        coverageEvents.insert(coverageEvents.end(),{2,static_cast<int64_t>(coverageAllocations[i].count)});
+        coverageAllocations.erase(coverageAllocations.begin()+i);++planeReleases;xy_vsfilter_plane_release(owner);return;
+    }
+    std::abort();
+}
+#define xy_vsfilter_plane_create coveragePlaneCreate
+#define xy_vsfilter_plane_loan coveragePlaneLoan
+#define xy_vsfilter_plane_release coveragePlaneRelease
+#include "xy_rust_plane.h"
+#undef xy_vsfilter_plane_create
+#undef xy_vsfilter_plane_loan
+#undef xy_vsfilter_plane_release
 extern "C" inline void* memsetSSE2(void* destination,int value,size_t count){
     coverageEvents.insert(coverageEvents.end(),{3,value,static_cast<int64_t>(count)});
     return std::memset(destination,value,count);
@@ -65,7 +102,7 @@ struct Overlay {
         for(const auto& plane:{mBody,mBorder}){
             if(!plane){result.push_back(0);continue;}
             bool found=false;
-            for(const auto& a:coverageAllocations)if(a.base+32==plane.get()){
+            for(const auto& a:coverageAllocations)if(a.data()==plane.get()){
                 checkCoverageGuards(a);result.push_back(a.count);result.insert(result.end(),plane.get(),plane.get()+a.count);found=true;break;
             }
             if(!found)std::abort();

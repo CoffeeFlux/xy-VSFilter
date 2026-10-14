@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "original_span_coverage.h"
-static uint64_t calls=0,fields=0,observations=0,failures=0,changed=0;
+static uint64_t calls=0,fields=0,observations=0,failures=0,changed=0,retained=0;
 static void seed(){errno=EDOM;std::feclearexcept(FE_ALL_EXCEPT);std::feraiseexcept(FE_DIVBYZERO);
 #ifdef _WIN32
 SetLastError(0x12345678);
@@ -18,13 +18,20 @@ static void compare(const ScanLineData2& input,int xsub,int ysub,int fail=-1,boo
     SharedPtrOverlay a=nullOverlay?SharedPtrOverlay():std::make_shared<Overlay>(),b=nullOverlay?SharedPtrOverlay():std::make_shared<Overlay>();
     if(a){a->mBody.reset(static_cast<BYTE*>(xy_malloc(7)),xy_free);a->mBorder.reset(static_cast<BYTE*>(xy_malloc(9)),xy_free);b->mBody.reset(static_cast<BYTE*>(xy_malloc(7)),xy_free);b->mBorder.reset(static_cast<BYTE*>(xy_malloc(9)),xy_free);}
     for(unsigned round=0;round<2;++round){
-        coverageEvents.clear();allocationAttempt=0;allocationFailure=fail;seed();bool ra=ReferenceCoverage::Rasterizer::Rasterize(input,xsub,ysub,a);Effects ea;const auto ta=coverageEvents;const auto sa=a?a->Snapshot():std::vector<uint64_t>();
-        coverageEvents.clear();allocationAttempt=0;allocationFailure=fail;seed();bool rb=CandidateCoverage::Rasterizer::Rasterize(input,xsub,ysub,b);Effects eb;const auto tb=coverageEvents;const auto sb=b?b->Snapshot():std::vector<uint64_t>();
-        if(ra!=rb||!(ea==eb)||ta!=tb||sa!=sb){fprintf(stderr,"Coverage mismatch call=%llu xsub=%d ysub=%d failure=%d\n",(unsigned long long)calls,xsub,ysub,fail);std::abort();}
+        coverageEvents.clear();allocationAttempt=0;allocationFailure=fail;const size_t beforeA=g_xy_malloc_used_size;seed();bool ra=ReferenceCoverage::Rasterizer::Rasterize(input,xsub,ysub,a);Effects ea;const size_t deltaA=g_xy_malloc_used_size-beforeA;const auto ta=coverageEvents;const auto sa=a?a->Snapshot():std::vector<uint64_t>();
+        coverageEvents.clear();allocationAttempt=0;allocationFailure=fail;const size_t beforeB=g_xy_malloc_used_size;seed();bool rb=CandidateCoverage::Rasterizer::Rasterize(input,xsub,ysub,b);Effects eb;const size_t deltaB=g_xy_malloc_used_size-beforeB;const auto tb=coverageEvents;const auto sb=b?b->Snapshot():std::vector<uint64_t>();
+        if(deltaA!=deltaB||ra!=rb||!(ea==eb)||ta!=tb||sa!=sb){fprintf(stderr,"Coverage mismatch call=%llu xsub=%d ysub=%d failure=%d\n",(unsigned long long)calls,xsub,ysub,fail);std::abort();}
         ++calls;failures+=!ra;fields+=sa.size();observations+=ta.size();
-        if(a&&a->mBody){for(const auto& slot:coverageAllocations)if(slot.base+32==a->mBody.get()){changed+=std::any_of(slot.base+32,slot.base+32+slot.count,[](BYTE v){return v!=0;});break;}}
+        if(a&&a->mBody){for(const auto& slot:coverageAllocations)if(slot.data()==a->mBody.get()){changed+=std::any_of(slot.data(),slot.data()+slot.count,[](BYTE v){return v!=0;});break;}}
     }
-    coverageEvents.clear();if(a)a->CleanUp();auto ta=coverageEvents;coverageEvents.clear();if(b)b->CleanUp();if(ta!=coverageEvents||!coverageAllocations.empty())std::abort();
+    // Native copies of the shared plane must outlive the overlay that made it.
+    std::shared_ptr<BYTE> aBody=a?a->mBody:std::shared_ptr<BYTE>(),aBorder=a?a->mBorder:std::shared_ptr<BYTE>();
+    std::shared_ptr<BYTE> bBody=b?b->mBody:std::shared_ptr<BYTE>(),bBorder=b?b->mBorder:std::shared_ptr<BYTE>();
+    const size_t held=g_xy_malloc_used_size;
+    coverageEvents.clear();if(a)a->CleanUp();auto ta=coverageEvents;coverageEvents.clear();if(b)b->CleanUp();if(ta!=coverageEvents||g_xy_malloc_used_size!=held)std::abort();
+    if(aBody){if(*aBody!=*bBody)std::abort();++retained;}
+    if(aBorder){if(*aBorder!=*bBorder)std::abort();++retained;}
+    coverageEvents.clear();aBody.reset();aBorder.reset();ta=coverageEvents;coverageEvents.clear();bBody.reset();bBorder.reset();if(ta!=coverageEvents||!coverageAllocations.empty()||g_xy_malloc_used_size)std::abort();
 }
 int main(){
     ScanLineData2 input;input.m_scan_line_data=std::make_shared<ScanLineData>();input.m_scan_line_data->mWidth=64;input.m_scan_line_data->mHeight=64;input.mWideBorder=3;input.mPathOffsetX=-7;input.mPathOffsetY=11;
@@ -51,6 +58,6 @@ int main(){
     }
     input.m_scan_line_data->mOutline.clear();input.mWideOutline.clear();compare(input,0,0,-1,true);
     for(int zero:{0,1}){input.m_scan_line_data->mWidth=zero?0:64;input.m_scan_line_data->mHeight=zero?64:0;compare(input,0,0);}
-    if(!calls||!changed||!failures||!coverageRustSpans||coverageFallbacks)std::abort();
-    printf("%llu exact whole-Rasterize calls passed (%llu guarded plane bytes and metadata / %llu allocation-cleanup observations / %llu changed body calls / %llu false returns / %llu Rust span accumulations / %llu fallbacks; endpoint phases, repeated byte wrapping, body/border order, ignored end-row bits, valid linear cross-row addressing, null/empty/reuse state, modeled first/second allocation failure and errno/FP/Windows error state; native dimension overflow, out-of-backing spans, unsupported signed shifts and actual allocator failure excluded)\n",(unsigned long long)calls,(unsigned long long)fields,(unsigned long long)observations,(unsigned long long)changed,(unsigned long long)failures,(unsigned long long)coverageRustSpans,(unsigned long long)coverageFallbacks);
+    if(!calls||!changed||!failures||!coverageRustSpans||coverageFallbacks||!planeOwners||planeOwners!=planeLoans||planeOwners!=planeReleases||!retained)std::abort();
+    printf("%llu exact whole-Rasterize calls passed (%llu plane bytes and metadata / %llu logical allocation-cleanup observations / %llu changed body calls / %llu false returns / %llu Rust span accumulations / %llu fallbacks / %llu Rust plane owners, loans and releases / %llu retained shared planes; endpoint phases, repeated byte wrapping, body/border order, ignored end-row bits, valid linear cross-row addressing, null/empty/reuse state, modeled first/second allocation failure and errno/FP/Windows error state; native dimension overflow, out-of-backing spans, unsupported signed shifts and actual allocator failure excluded; native guards and Rust ownership tests have distinct scopes)\n",(unsigned long long)calls,(unsigned long long)fields,(unsigned long long)observations,(unsigned long long)changed,(unsigned long long)failures,(unsigned long long)coverageRustSpans,(unsigned long long)coverageFallbacks,(unsigned long long)planeOwners,(unsigned long long)retained);
 }
