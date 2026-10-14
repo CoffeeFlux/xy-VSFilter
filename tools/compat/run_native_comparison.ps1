@@ -64,7 +64,7 @@ try {
     }
     & cl /nologo /O2 /EHsc /std:c++14 /MD "$PSScriptRoot\com_contract_probe.cpp" `
         "/Fe:$evidence\com-contract-probe.exe" "/Fo:$evidence\com-contract-probe.obj" `
-        /link ole32.lib strmiids.lib uuid.lib
+        /link ole32.lib strmiids.lib uuid.lib advapi32.lib
     if ($LASTEXITCODE -ne 0) { throw "COM contract probe build failed" }
     & python "$PSScriptRoot\com_contract_compare.py" --reference-root $baselineRoot `
         --candidate-root $candidateRoot --probe "$evidence\com-contract-probe.exe" `

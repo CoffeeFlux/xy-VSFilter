@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Read-only, disconnected filter contracts. Never register a DLL or save settings.
+// Disconnected contracts in a private volatile HKCU view. No DLL registration.
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
@@ -11,6 +11,7 @@
 #include <string>
 #include <stdexcept>
 
+static bool observePinIds=true;
 static void require(bool value,const char* what){if(!value)throw std::runtime_error(what);}
 static void hr(const std::string& name,HRESULT value){std::cout<<name<<" hr "<<static_cast<uint32_t>(value)<<"\n";}
 static void number(const std::string& name,uint64_t value){std::cout<<name<<" value "<<value<<"\n";}
@@ -43,9 +44,11 @@ static void pin(IPin* value,IBaseFilter* filter,const std::string& label){
     PIN_INFO info={};const HRESULT status=value->QueryPinInfo(&info);hr(label+".info",status);
     if(SUCCEEDED(status)){string(label+".name",info.achName,sizeof(info.achName)/sizeof(info.achName[0]));number(label+".info.direction",info.dir);number(label+".parent",info.pFilter&&identity(info.pFilter,filter));}
     if(info.pFilter)info.pFilter->Release();
+    if(observePinIds){
     LPWSTR id=nullptr;const HRESULT idStatus=value->QueryId(&id);hr(label+".id",idStatus);number(label+".id.pointer",id!=nullptr);
     if(SUCCEEDED(idStatus)&&id){string(label+".id",id,4096);ComPtr<IPin> found;hr(label+".find",filter->FindPin(id,found.out()));number(label+".find.identity",found&&identity(value,found.get()));}
     CoTaskMemFree(id);
+    }else std::cout<<label<<".id excluded_unresolved_reference\n";
     ComPtr<IPin> connected;hr(label+".connected",value->ConnectedTo(connected.out()));number(label+".connected.pointer",bool(connected));
     query(value,IID_IUnknown,label+".unknown");query(value,IID_IPin,label+".pin");
 }
@@ -78,7 +81,22 @@ static void inspect(IUnknown* object){
     hr("pins.clone.reset",clone->Reset());hr("pins.clone.skip",clone->Skip(count));ComPtr<IPin> end;ULONG endCount=0;hr("pins.clone.end",clone->Next(1,end.out(),&endCount));number("pins.clone.end.count",endCount);number("pins.clone.end.pointer",bool(end));
 }
 int wmain(int argc,wchar_t** argv){
-    if(argc!=4){std::cerr<<"usage: com-contract-probe DLL CLSID sta|mta\n";return 2;}
+    if(argc!=6){std::cerr<<"usage: com-contract-probe DLL CLSID sta|mta full|autoload_without_ids REGISTRY_KEY\n";return 2;}
+    const std::wstring profile=argv[4],registry=argv[5];
+    if(profile!=L"full"&&profile!=L"autoload_without_ids")return 2;
+    if(profile==L"autoload_without_ids"){
+        CLSID actual={},expected={};
+        if(FAILED(CLSIDFromString(argv[2],&actual))||FAILED(CLSIDFromString(L"{6b237877-902b-4c6c-92f6-e63169a5166c}",&expected))||actual!=expected)return 2;
+        observePinIds=false;
+    }
+    const std::wstring prefix=L"Software\\xyVSFilterCompatibility\\";
+    if(registry.compare(0,prefix.size(),prefix)!=0||registry.size()!=prefix.size()+36)return 2;
+    for(size_t i=prefix.size();i<registry.size();++i)if(!((registry[i]>=L'0'&&registry[i]<=L'9')||(registry[i]>=L'a'&&registry[i]<=L'f')||registry[i]==L'-'))return 2;
+    HKEY settings=nullptr;
+    if(RegCreateKeyExW(HKEY_CURRENT_USER,registry.c_str(),0,nullptr,REG_OPTION_VOLATILE,KEY_ALL_ACCESS,nullptr,&settings,nullptr)!=ERROR_SUCCESS)return 5;
+    // Keep this override and handle alive through DLL process-detach callbacks.
+    // The parent deletes the private key only after this process has terminated.
+    if(RegOverridePredefKey(HKEY_CURRENT_USER,settings)!=ERROR_SUCCESS)return 5;
     std::cout<<std::unitbuf;
     SetErrorMode(SEM_FAILCRITICALERRORS|SEM_NOGPFAULTERRORBOX|SEM_NOOPENFILEERRORBOX);
     const DWORD mode=std::wstring(argv[3])==L"sta"?COINIT_APARTMENTTHREADED:COINIT_MULTITHREADED;
