@@ -171,6 +171,27 @@ const CRealTextParser::Subtitles& CRealTextParser::GetParsedSubtitles()
 
 bool CRealTextParser::ExtractTag(std::wstring& p_rszLine, Tag& p_rTag)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::RealTextTag parser;
+    bool response = false;
+    unsigned int position = 0;
+    for (;;) {
+        const uint32_t action = parser.Next(p_rszLine, m_bTryToIgnoreErrors, response, position);
+        position = static_cast<unsigned int>(parser.Field(0));
+        const uint32_t patch = static_cast<uint32_t>(parser.Field(1));
+        if (patch & 1) p_rTag.m_bComment = (patch & 0x100) != 0;
+        if (patch & 2) p_rTag.m_bOpen = (patch & 0x200) != 0;
+        if (patch & 4) p_rTag.m_bClose = (patch & 0x400) != 0;
+        if (action <= 1) return action != 0;
+        if (action == 2) response = ::iswspace(static_cast<wchar_t>(parser.Field(2))) != 0;
+        else if (action == 3) p_rTag.m_szName = StringToLower(p_rTag.m_szName);
+        else if (action == 4) response = GetAttributes(p_rszLine, position, p_rTag.m_mapAttributes);
+        else if (action == 5) p_rTag.m_szName += parser.Text();
+        else if (action == 6) p_rTag.m_szName = parser.Text();
+        else if (action == 7) p_rszLine = p_rszLine.substr(parser.Field(3));
+        else { (void)p_rszLine.at(position); return false; }
+    }
+#else
     if (p_rszLine.length() < 2 || p_rszLine.at(0) != '<') {
         if (m_bTryToIgnoreErrors) {
             size_t iTempPos = p_rszLine.find_first_of('<');
@@ -263,6 +284,7 @@ bool CRealTextParser::ExtractTag(std::wstring& p_rszLine, Tag& p_rTag)
             return false;
         }
     }
+#endif
 }
 
 bool CRealTextParser::ExtractTextTag(std::wstring& p_rszLine, Tag& p_rTag)

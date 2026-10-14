@@ -2,7 +2,63 @@
 use alloc::boxed::Box;
 use xy_vsfilter_compat::realtext::Tags;
 use xy_vsfilter_compat::realtext_attributes::Attributes;
+use xy_vsfilter_compat::realtext_tag::Tag;
 use xy_vsfilter_compat::realtext_timecode::Timecode;
+
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_realtext_tag_create() -> *mut Tag {
+    Box::into_raw(Box::new(Tag::new()))
+}
+
+/// # Safety
+/// owner is live and uniquely borrowed; input is a disjoint initialized u16
+/// span, borrowed only for this call. Native callbacks run after it returns.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_tag_next(
+    owner: *mut Tag,
+    input: *const u16,
+    length: usize,
+    ignore: u32,
+    response: u32,
+    position: u32,
+) -> u32 {
+    // SAFETY: exclusive owner and disjoint initialized native input.
+    unsafe {
+        let state = &mut *owner;
+        state.next(units(input, length), ignore != 0, response != 0, position)
+    }
+}
+
+/// # Safety
+/// owner is live and immutable. Invalid scalar queries return zero.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_tag_field(
+    owner: *const Tag,
+    field: u32,
+    index: usize,
+) -> usize {
+    // SAFETY: immutable query before release of the live owner.
+    let state = unsafe { &*owner };
+    match field {
+        0 => state.position as usize,
+        1 => state.patch as usize,
+        2 => usize::from(state.character),
+        3 => state.consume,
+        4 => state.text.len(),
+        5 => usize::from(state.text.get(index).copied().unwrap_or(0)),
+        _ => 0,
+    }
+}
+
+/// # Safety
+/// Release the unique owner once, after all other operations.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_tag_release(owner: *mut Tag) {
+    if !owner.is_null() {
+        // SAFETY: native RAII returns its uniquely owned allocation once.
+        drop(unsafe { Box::from_raw(owner) });
+    }
+}
 
 #[no_mangle]
 pub extern "C" fn xy_vsfilter_realtext_timecode_create(length: usize) -> *mut Timecode {
@@ -231,6 +287,29 @@ pub unsafe extern "C" fn xy_vsfilter_realtext_release(owner: *mut Tags) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn tag_name_storage_survives_native_input_changes() {
+        let owner = xy_vsfilter_realtext_tag_create();
+        let mut input = [60u16, 33, 0xd800, 0, 62, 120];
+        // SAFETY: unique live owner, initialized input for each short loan,
+        // bounded scalar queries, and a single release after all operations.
+        unsafe {
+            assert_eq!(
+                xy_vsfilter_realtext_tag_next(owner, input.as_ptr(), 6, 1, 0, 0),
+                6
+            );
+            input.fill(7);
+            assert_eq!(xy_vsfilter_realtext_tag_field(owner, 4, 0), 3);
+            assert_eq!(xy_vsfilter_realtext_tag_field(owner, 5, 1), 0xd800);
+            assert_eq!(xy_vsfilter_realtext_tag_field(owner, 5, usize::MAX), 0);
+            assert_eq!(
+                xy_vsfilter_realtext_tag_next(owner, core::ptr::null(), 0, 1, 0, 0),
+                0
+            );
+            xy_vsfilter_realtext_tag_release(owner);
+        }
+    }
+
     #[test]
     fn names_and_attributes_are_owned_after_each_call() {
         let owner = xy_vsfilter_realtext_create(0, 14, 25);

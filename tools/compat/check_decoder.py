@@ -867,6 +867,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     realtext_timecode_result = run([str(realtext_timecode_executable)], capture_output=True, text=True)
     print(realtext_timecode_result.stdout, end="", flush=True)
     print(realtext_timecode_result.stderr, end="", file=sys.stderr)
+    realtext_tag_executable = destination / ("realtext-tag-oracle.exe" if os.name == "nt" else "realtext-tag-oracle")
+    realtext_tag_compile = [arg.replace("fill_oracle.cpp", "realtext_tag_oracle.cpp").replace("fill-oracle", "realtext-tag-oracle") for arg in fill_compile]
+    run(realtext_tag_compile)
+    realtext_tag_result = run([str(realtext_tag_executable)], capture_output=True, text=True)
+    print(realtext_tag_result.stdout, end="", flush=True)
+    print(realtext_tag_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -910,6 +916,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "vobsub_scale_result": vobsub_scale_result.stdout, "vobsub_scale_stderr": vobsub_scale_result.stderr,
         "vobsub_outline_compile_command": vobsub_outline_compile,
         "vobsub_outline_result": vobsub_outline_result.stdout, "vobsub_outline_stderr": vobsub_outline_result.stderr,
+        "realtext_tag_compile_command": realtext_tag_compile,
+        "realtext_tag_result": realtext_tag_result.stdout, "realtext_tag_stderr": realtext_tag_result.stderr,
+        "realtext_tag_scope": "owned tag extraction state; native whitespace/lowercase, attribute map updates, checked string exceptions and source consumption retained; allocation failure timing unverified",
         "realtext_timecode_compile_command": realtext_timecode_compile,
         "realtext_timecode_result": realtext_timecode_result.stdout, "realtext_timecode_stderr": realtext_timecode_result.stderr,
         "realtext_timecode_scope": "owned reverse fields; native separator detection, padding, numeric conversion and arithmetic retained; nonrepresentable native arithmetic excluded from parity",
