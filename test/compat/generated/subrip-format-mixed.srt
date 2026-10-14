@@ -1,0 +1,5 @@
+1
+00:00:00,000 --> 00:00:04,000
+<i><b>Formatting</b> <u>sample</u></i>
+second line
+

@@ -21,6 +21,7 @@ mod mask;
 mod runtime;
 mod segment_insert;
 mod segments;
+mod subrip;
 mod text_reader;
 mod timeline_search;
 #[cfg(all(feature = "native-runtime", not(windows)))]

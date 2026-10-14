@@ -23,6 +23,7 @@
 #include "stdafx.h"
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_text.h"
+#include "xy_rust_subrip.h"
 #include "xy_rust_fields.h"
 #include "xy_rust_segments.h"
 #include "xy_rust_segment_insert.h"
@@ -648,6 +649,11 @@ static CStringW RemoveSSATags(CStringW str, bool fUnicode, int CharSet)
 
 static CStringW SubRipper2SSA(CStringW str, int CharSet)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::SubRip converter;
+    CStringW converted;
+    if (converter.Convert(str, converted)) return converted;
+#endif
     str.Replace(L"<i>", L"{\\i1}");
     str.Replace(L"</i>", L"{\\i}");
     str.Replace(L"<b>", L"{\\b1}");
