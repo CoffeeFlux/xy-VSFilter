@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <vector>
 #include <deque>
+#include <memory>
 #include <string>
 #include <cwctype>
 #include <cwchar>
@@ -17,6 +18,7 @@
 #include <windows.h>
 #include <atlbase.h>
 #include <atlcoll.h>
+#include <atlstr.h>
 #include <tchar.h>
 #else
 typedef char16_t WCHAR;
@@ -37,6 +39,20 @@ struct SsfContext {std::vector<int> input;size_t position=0;int attempts=0,fail=
 static SsfContext* ssfContext=NULL;
 static int ssfNextChar(){auto& c=*ssfContext;c.events.insert(c.events.end(),{1,c.attempts,static_cast<int64_t>(c.position)});if(c.attempts++==c.fail)throw SsfInterrupted{2};int value=c.position<c.input.size()?c.input[c.position++]:-1;c.events.push_back(value);return value;}
 static void ssfThrow(int line,int column,const wchar_t* message){ssfContext->events.insert(ssfContext->events.end(),{2,line,column});for(const wchar_t* p=message;*p;++p)ssfContext->events.push_back(*p);throw SsfInterrupted{1};}
+
+#ifndef _WIN32
+class CStringW {
+    std::shared_ptr<std::u16string> units;
+public:
+    CStringW():units(std::make_shared<std::u16string>()){}
+    CStringW(const WCHAR* data,int length):units(std::make_shared<std::u16string>(data,data+length)){}
+    int GetLength()const{return static_cast<int>(units->size());}
+    const WCHAR* GetString()const{return units->c_str();}
+    WCHAR operator[](int position)const{return units->at(position);}
+    void SetAt(int position,WCHAR value){if(!units.unique())units=std::make_shared<std::u16string>(*units);units->at(position)=value;}
+    void Empty(){units=std::make_shared<std::u16string>();}
+};
+#endif
 
 #include "xy_rust_ssf_stream.h"
 static uint64_t ssfOwners=0,ssfReleases=0,ssfPushes=0,ssfPops=0;

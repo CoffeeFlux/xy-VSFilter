@@ -101,7 +101,11 @@ namespace ssf
 
 	class WCharInputStream : public InputStream
 	{
+#ifdef XY_VSFILTER_RUST_TEXT
+        XyRust::SsfWide m_str;
+#else
 		CStringW m_str;
+#endif
 		int m_pos;
 
 	protected:

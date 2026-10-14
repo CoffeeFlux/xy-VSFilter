@@ -118,9 +118,68 @@ pub unsafe extern "C" fn xy_vsfilter_ssf_memory_release(
     }
 }
 
+/// # Safety
+/// Positive length requires that many initialized UTF-16 code units. Only
+/// copied raw units are retained; no Unicode decoding or normalization occurs.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_ssf_wide_create(
+    input: *const u16,
+    length: i32,
+) -> *mut xy_vsfilter_compat::ssf_stream::Memory<u16> {
+    if length <= 0 || length as usize > isize::MAX as usize / 2 {
+        return core::ptr::null_mut();
+    }
+    // SAFETY: native CStringW supplies the initialized, aligned unit span.
+    let units = unsafe { core::slice::from_raw_parts(input, length as usize) };
+    xy_vsfilter_compat::ssf_stream::Memory::copy(units).map_or(core::ptr::null_mut(), |memory| {
+        Box::into_raw(Box::new(memory))
+    })
+}
+/// # Safety
+/// owner is a live immutable UTF-16 snapshot; only a scalar is returned.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_ssf_wide_read(
+    owner: *const xy_vsfilter_compat::ssf_stream::Memory<u16>,
+    position: i32,
+) -> i32 {
+    // SAFETY: shared query ends here; bounds are checked by safe Rust.
+    unsafe { &*owner }.read(position)
+}
+/// # Safety
+/// owner is null or the unique create result, released after all reads end.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_ssf_wide_release(
+    owner: *mut xy_vsfilter_compat::ssf_stream::Memory<u16>,
+) {
+    if !owner.is_null() {
+        // SAFETY: native RAII returns sole ownership after its last query.
+        drop(unsafe { Box::from_raw(owner) });
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn wide_snapshot_preserves_nul_and_surrogates_after_source_mutation() {
+        let mut input = [0, 0xd800, 0xdc00, 0xffff, 65];
+        // SAFETY: five initialized aligned code units, copied into an owner
+        // used only for sequential scalar reads and then released once.
+        unsafe {
+            let owner = xy_vsfilter_ssf_wide_create(input.as_ptr(), input.len() as i32);
+            assert!(!owner.is_null());
+            input.fill(0x1234);
+            assert_eq!(input, [0x1234; 5]);
+            for (i, expected) in [0, 0xd800, 0xdc00, 0xffff, 65].into_iter().enumerate() {
+                assert_eq!(xy_vsfilter_ssf_wide_read(owner, i as i32), expected);
+            }
+            assert_eq!(xy_vsfilter_ssf_wide_read(owner, 5), -1);
+            xy_vsfilter_ssf_wide_release(owner);
+            assert!(xy_vsfilter_ssf_wide_create(core::ptr::null(), 0).is_null());
+            xy_vsfilter_ssf_wide_release(core::ptr::null_mut());
+        }
+    }
+
     #[test]
     fn copied_memory_is_independent_and_shared_queries_preserve_the_read_loan() {
         let mut input = [0, 255, 128, 65];

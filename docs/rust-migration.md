@@ -20,6 +20,32 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* SSF `WCharInputStream` now reads from an immutable Rust snapshot of raw UTF-16
+  units. Its original CString reference is deliberately retained alongside the
+  snapshot: callers can hold pointers into that string while later source
+  mutations detach through copy-on-write. Removing that reference would change
+  those pointer lifetimes. The native string also supplies the fallback when
+  Rust declines; complete CString ownership migration remains outstanding.
+  Whole pinned construction and NextByte plus the production adapter match in
+  ordinary and fatal ASan/UBSan local builds on arm64 and x64:
+  **131,096 histories / 1,313,738 reads / 14,844,406 observed fields / 789,354
+  retained source-alias units / 65,547 Rust owners and releases / 394,677 Rust
+  reads / 65,547 modeled declines**. Every UTF-16 value, embedded NUL, unpaired
+  surrogate, complete long input, source mutation, empty strings and repeated
+  EOF are covered. Windows uses actual CStringW; portable checks model its COW
+  behavior. Allocation failure and invalid strings/indices remain excluded.
+  **149 core / 107 FFI tests**, formatting, Clippy, 34 Python checks (three
+  local skips), default native syntax and the prior byte-input sanitizer
+  comparisons pass. Windows/Miri validation for this increment is pending.
+
+* Complete caption packet parsing and CSRI filename evidence is now archived
+  at `5f586dac` in `cc-packet-parser-evidence.json`: four portable jobs, Miri,
+  both native renderer jobs and the exact-commit local sanitizer campaign.
+  `ssf-queue-evidence.json` separately archives all CI jobs at `209402aa`.
+  Each renderer stage matched 798 cases / 8,426 frames and 32 mutation cases /
+  224 frames per architecture, with scoped COM, export and dependency checks.
+  Later SSF changes require their own evidence.
+
 * SSF `MemoryInputStream` now keeps positive-length copied input in an immutable
   Rust owner and reads it through bounds-checked Rust access. Borrowed buffers,
   adopted native arrays, zero-length native allocations and the native fallback
@@ -35,10 +61,16 @@ unresolved reference outcomes requiring investigation, never matching results.
   The ownership test retains a read-only byte loan across shared Rust queries
   and source mutation. **149 core / 106 FFI tests**, formatting, Clippy,
   34 Python checks (three local skips) and default native syntax pass locally.
-  Windows and Miri validation for this ownership increment are pending.
+  The native SSF input-mode integration passes on both Windows architectures
+  at `1124c9c3` (run `38594513974`); portable/Miri and full DLL checks for that
+  ownership increment remain separate.
   The SSF native probe now expands its six documents across WCHAR and UTF-16LE
   byte input in borrowed, adopted and copied modes, checking the copied source
-  after deliberate source mutation. The 24-case extension awaits Windows.
+  after deliberate source mutation. `ssf-memory-native-evidence.json` verifies
+  all 24 cases, 40 cross-document/input-mode controls, repeated processes,
+  source and binary hashes, dumps and blank-frame files on both architectures.
+  Its **144 blank-frame observations per architecture** establish no visible
+  rendering parity and exclude the subsequent WCharInputStream snapshots.
 
 * A separate Windows SSF workflow builds the pinned and Rust `libssf`
   libraries and links identical probes against each. Initial native builds
@@ -132,7 +164,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   local skips) and default native syntax pass. Both Windows portable jobs
   (`115931349086`, `115931349176`) and Miri (`115931349190`) now pass; complete
   renderer integration now passes on both architectures in run `38586944662`.
-  Full evidence archival awaits completion of the portable sanitizer jobs.
+  All portable jobs also passed; `cc-packet-parser-evidence.json` now archives
+  the complete verified stage.
 
 * `composite-integration-evidence.json` now archives the complete passing stage
   at `fe6928d4`: all four portable jobs, Miri, both Windows renderer jobs and the

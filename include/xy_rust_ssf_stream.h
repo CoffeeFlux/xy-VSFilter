@@ -9,6 +9,9 @@
 #endif
 struct XYRustSsfPeek {uint32_t phase;int32_t previous,result;};
 extern "C" {
+void* XY_SSF_CDECL xy_vsfilter_ssf_wide_create(const uint16_t*,int32_t);
+int32_t XY_SSF_CDECL xy_vsfilter_ssf_wide_read(const void*,int32_t);
+void XY_SSF_CDECL xy_vsfilter_ssf_wide_release(void*);
 void* XY_SSF_CDECL xy_vsfilter_ssf_memory_create(const uint8_t*,int32_t);
 const uint8_t* XY_SSF_CDECL xy_vsfilter_ssf_memory_data(const void*);
 int32_t XY_SSF_CDECL xy_vsfilter_ssf_memory_read(const void*,int32_t);
@@ -24,6 +27,22 @@ void XY_SSF_CDECL xy_vsfilter_ssf_queue_release(void*);
 }
 #undef XY_SSF_CDECL
 namespace XyRust {
+// Retain the CStringW reference so caller-held pointers keep the original COW
+// lifetime. Rust owns the snapshot used for reads; CStringW is also fallback.
+class SsfWide {
+    void* owner;
+    int length;
+    CStringW fallback;
+    SsfWide(const SsfWide&);
+    SsfWide& operator=(const SsfWide&);
+public:
+    SsfWide(const CStringW& input):owner(NULL),length(input.GetLength()),fallback(input){
+        owner=xy_vsfilter_ssf_wide_create(reinterpret_cast<const uint16_t*>(input.GetString()),length);
+    }
+    ~SsfWide(){xy_vsfilter_ssf_wide_release(owner);}
+    int GetLength()const{return length;}
+    WCHAR operator[](int position)const{return owner?static_cast<WCHAR>(xy_vsfilter_ssf_wide_read(owner,position)):fallback[position];}
+};
 class SsfMemory {
     void* owner;
     SsfMemory(const SsfMemory&);
