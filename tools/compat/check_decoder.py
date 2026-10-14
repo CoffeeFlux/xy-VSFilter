@@ -55,7 +55,8 @@ def capture_inputs():
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h",
               ROOT / "include/xy_rust_drawing.h",
               ROOT / "include/xy_rust_drawing_tokens.h",
-              ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h",
+              ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
+              ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
               ROOT / "include/xy_rust_segments.h",
               ROOT / "include/xy_rust_segment_insert.h",
               ROOT / "include/xy_rust_hdmv.h",
@@ -143,6 +144,25 @@ public:
         font += text[start:end] + '\n decoded.assign((BYTE*)pData, (BYTE*)pData + datalen);\n return true;\n}\n}\n'
         font += "#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_font.h").write_text(font, encoding="utf-8")
+    realtext_source = original("src/subtitles/RealTextParser.cpp", reference["commit"])
+    realtext_header = original("src/subtitles/RealTextParser.h", reference["commit"])
+    realtext_class = extract_method(realtext_header.decode("utf-8-sig"), "class CRealTextParser")
+    realtext = '#include "realtext_shell.h"\n'
+    signatures = ["CRealTextParser::CRealTextParser()", "CRealTextParser::~CRealTextParser()",
+                  "bool CRealTextParser::ParseRealText(", "const CRealTextParser::Subtitles& CRealTextParser::GetParsedSubtitles(",
+                  "bool CRealTextParser::ExtractTag(", "bool CRealTextParser::ExtractTextTag(",
+                  "bool CRealTextParser::ExtractString(", "bool CRealTextParser::SkipSpaces(",
+                  "bool CRealTextParser::GetString(", "bool CRealTextParser::GetAttributes(",
+                  "int CRealTextParser::GetTimecode(", "std::wstring CRealTextParser::StringToLower(",
+                  "std::wstring CRealTextParser::RenderTags(", "void CRealTextParser::PopTag("]
+    for name, content in (("ReferenceRealText", realtext_source), ("CandidateRealText", (ROOT / "src/subtitles/RealTextParser.cpp").read_bytes())):
+        realtext += f"namespace {name} {{\n#define private public\n" + realtext_class + ";\n#undef private\n"
+        if name == "CandidateRealText":
+            realtext += "#define XY_VSFILTER_RUST_TEXT\n"
+        for signature in signatures:
+            realtext += extract_definition(content.decode("utf-8-sig"), signature) + "\n"
+        realtext += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_realtext.h").write_text(realtext, encoding="utf-8")
     webvtt = '#include "webvtt_shell.h"\n'
     for name, content in (("ReferenceWebVTT", font_source), ("CandidateWebVTT", candidate_font)):
         webvtt += f"namespace {name} {{\n"
@@ -825,6 +845,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     webvtt_result = run([str(webvtt_executable)], capture_output=True, text=True)
     print(webvtt_result.stdout, end="", flush=True)
     print(webvtt_result.stderr, end="", file=sys.stderr)
+    realtext_executable = destination / ("realtext-oracle.exe" if os.name == "nt" else "realtext-oracle")
+    realtext_compile = [arg.replace("fill_oracle.cpp", "realtext_oracle.cpp").replace("fill-oracle", "realtext-oracle") for arg in fill_compile]
+    run(realtext_compile)
+    realtext_result = run([str(realtext_executable)], capture_output=True, text=True)
+    print(realtext_result.stdout, end="", flush=True)
+    print(realtext_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -868,6 +894,11 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "vobsub_scale_result": vobsub_scale_result.stdout, "vobsub_scale_stderr": vobsub_scale_result.stderr,
         "vobsub_outline_compile_command": vobsub_outline_compile,
         "vobsub_outline_result": vobsub_outline_result.stdout, "vobsub_outline_stderr": vobsub_outline_result.stderr,
+        "realtext_compile_command": realtext_compile,
+        "realtext_result": realtext_result.stdout, "realtext_stderr": realtext_result.stderr,
+        "realtext_source_sha256": hashlib.sha256(realtext_source).hexdigest(),
+        "realtext_header_sha256": hashlib.sha256(realtext_header).hexdigest(),
+        "realtext_numeric_backend": "native Windows iswdigit/_wtoi" if os.name == "nt" else "host iswdigit/wcstol model; conversion remains native",
         "webvtt_compile_command": webvtt_compile,
         "webvtt_result": webvtt_result.stdout, "webvtt_stderr": webvtt_result.stderr,
         "webvtt_string_backend": "installed ATL CStringW" if os.name == "nt" else "wstring model with host iswspace; Windows comparison required",

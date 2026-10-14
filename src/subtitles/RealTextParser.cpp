@@ -20,6 +20,9 @@
 
 #include "stdafx.h"
 #include "RealTextParser.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "xy_rust_realtext.h"
+#endif
 
 CRealTextParser::CRealTextParser()
     : m_bIgnoreFont(false)
@@ -436,6 +439,26 @@ std::wstring CRealTextParser::StringToLower(const std::wstring& p_crszString)
 
 std::wstring CRealTextParser::RenderTags(const std::list<Tag>& p_crlTags)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    const uint32_t ignore = (m_bIgnoreFont ? 1u : 0u) | (m_bIgnoreFontSize ? 2u : 0u)
+        | (m_bIgnoreFontColor ? 4u : 0u) | (m_bIgnoreFontWeight ? 8u : 0u) | (m_bIgnoreFontFace ? 16u : 0u);
+    XyRust::RealTextTags renderer(ignore, m_iMinFontSize, m_iMaxFontSize);
+    for (auto iter = p_crlTags.cbegin(); iter != p_crlTags.cend(); ++iter) {
+        Tag oTag(*iter);
+        const uint32_t flags = (oTag.m_bOpen ? 1u : 0u) | (oTag.m_bClose ? 2u : 0u) | (oTag.m_bText ? 4u : 0u);
+        if (renderer.Begin(oTag.m_szName, flags)) {
+            for (auto i = oTag.m_mapAttributes.begin(); i != oTag.m_mapAttributes.end(); ++i) {
+                const uint32_t kind = renderer.AttributeKind(i->first);
+                if (!kind) continue;
+                const bool numeric = kind == 2 && !i->second.empty() && ::iswdigit(i->second.at(0));
+                const int size = numeric ? ::_wtoi(i->second.c_str()) : 0;
+                renderer.Attribute(i->first, i->second, numeric, size);
+            }
+            renderer.End();
+        }
+    }
+    return renderer.Result();
+#else
     bool bEmpty = true;
     std::wstring szString;
 
@@ -518,6 +541,7 @@ std::wstring CRealTextParser::RenderTags(const std::list<Tag>& p_crlTags)
     } else {
         return szString;
     }
+#endif
 }
 
 void CRealTextParser::PopTag(std::list<Tag>& p_rlistTags, const std::wstring& p_crszTagName)

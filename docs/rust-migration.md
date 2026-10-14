@@ -20,6 +20,25 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns RealText `RenderTags` output as raw UTF-16. It preserves tag
+  precedence, the shared bold/italic ignore flag, both font open/close emissions,
+  ordered unescaped attributes and suppression of formatting-only output.
+  Native tag copies and map traversal remain in order. Windows `iswdigit` and
+  `_wtoi` still classify/convert size attributes only when the original would;
+  Rust applies the original range checks to their results. A noncopyable bridge
+  releases the owned output after bounded scalar queries, including on native
+  exceptions. No native string borrow survives a call.
+  Fatal ASan/UBSan comparisons passed **100,064 tag-output cases / 2,280,955
+  UTF-16 units** and **58 complete native parser runs** on arm64 and under x64
+  execution. The oracle compares **205,389 classification/conversion observation
+  values**, all ignore flags, unusual open/close/text combinations, size bounds
+  and every UTF-16 code unit. Portable numeric conversion is a host model;
+  Windows uses its actual CRT. Rust tests (62 core, 39 FFI), strict Clippy and
+  both default-branch syntax checks pass. The renderer corpus now has **382
+  cases / 4,582 scheduled frames**, including six RealText files and visible
+  italic controls in file/memory modes. Windows/Miri validation is pending.
+  Parsing control flow, numeric conversion and native allocation/OOM behavior
+  remain outside this replacement.
 * Safe Rust recognizes the leading settings line removed by `WebVTTCueStrip`.
   It retains the five exact lowercase prefixes, first-newline lookup stopping
   at NUL, and refusal to strip an initial newline. The selected deletion ends
@@ -69,7 +88,12 @@ unresolved reference outcomes requiring investigation, never matching results.
   Polygon generation is a fixture boundary, not an end-to-end fitting oracle.
   Native allocation sizes/OOM behavior remain unverified. Rust tests (59 core,
   36 FFI), strict Clippy and both default branch syntax checks pass.
-  Windows/Miri validation is pending for this increment.
+  Candidate `9302624e` passed all four CI platforms, Miri and both Windows DLL
+  jobs, each matching **354 cases / 4,334 frames** and **32 mutations / 224
+  frames**, dialogs, visible controls, exports and dependencies. Both logs
+  confirm Rust-enabled `VobSubImage.cpp` compilation.
+  [DVD path evidence](vobsub-path-evidence.json) records verified source/DLL
+  hashes, stable local validation and the formatting/backend boundaries.
 * Safe Rust selects the split indices for DVD `SplitOutline`. It preserves the
   first strict maximum, preference for the first interior maximum on a tie,
   and 32-bit unsigned midpoint-index addition on both Windows architectures.

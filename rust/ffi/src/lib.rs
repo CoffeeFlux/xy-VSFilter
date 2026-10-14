@@ -17,6 +17,7 @@ mod fill;
 mod golomb;
 mod hdmv;
 mod mask;
+mod realtext;
 #[cfg(all(windows, any(feature = "native-runtime", test)))]
 mod runtime;
 mod segment_insert;

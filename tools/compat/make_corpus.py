@@ -261,6 +261,19 @@ def subrip_variants():
         yield "subrip-format-" + name + ".srt", data
 
 
+def realtext_variants():
+    for name, payload in {
+        "control": "Formatting sample<br/>second line",
+        "italic": "<i>Formatting sample</i><br/>second line",
+        "uppercase": "<I>Formatting sample</I><br/>second line",
+        "font-bounds": '<font size="13">small</font><font size="20">normal</font><font size="26">large</font>',
+        "formatting-only": "<i></i><b></b><br/>",
+        "clear-carry": '<i>first<time begin="2" end="4"/><clear/>second</i>',
+    }.items():
+        text = '<window><time begin="0" end="4"/>' + payload + '</window>\r\n'
+        yield "realtext-format-" + name + ".rt", text.encode("ascii")
+
+
 def timestamps(data):
     matches = re.findall(rb"Dialogue:[^,]*,(\d+):(\d+):(\d+(?:\.\d+)?),(\d+):(\d+):(\d+(?:\.\d+)?)", data)
     if not matches:
@@ -311,7 +324,8 @@ def make_cases(files):
                                                     ("raster-be-fraction-high", "raster-control"),
                                                     ("raster-gaussian-medium", "raster-control"),
                                                     ("subrip-format-italic", "subrip-format-control"),
-                                                    ("subrip-format-underline", "subrip-format-control"))
+                                                    ("subrip-format-underline", "subrip-format-control"),
+                                                    ("realtext-format-italic", "realtext-format-control"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -323,6 +337,7 @@ def main():
     generated = [(DEST / "generated" / (name + ".ass"), data) for name, data in variants()]
     generated += [(DEST / "generated" / name, data) for name, data in incremental_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in subrip_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in realtext_variants()]
     manifest = json.dumps(make_cases(files + generated), indent=2) + "\n"
     expected = generated + [(DEST / "cases.json", manifest.encode("utf-8"))]
     for path, data in expected:
