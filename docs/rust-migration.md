@@ -20,6 +20,25 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust selects the split indices for DVD `SplitOutline`. It preserves the
+  first strict maximum, preference for the first interior maximum on a tie,
+  and 32-bit unsigned midpoint-index addition on both Windows architectures.
+  Missing interior maxima retain the native assertion and continuation path.
+  Native temporary-array construction, clearing of both outputs, paired
+  appends and live midpoint-coordinate reads retain their original order.
+  Fatal ASan/UBSan comparisons passed **72,408 complete calls** and **16,320
+  table selections** on arm64 and under x64 execution, including **1,113
+  matching assertions**, **490 append interruptions**, **3,286,335 temporary
+  and output append attempts**, **13,468 input mutations during output appends**
+  and **32,604 aliased-output cases**. There were **86,377 Rust selections**
+  and **2,073 native fallbacks**. Short inputs leave existing outputs intact.
+  Windows extracts the original Microsoft functional-cast spelling unchanged;
+  portable extraction normalizes exactly three `unsigned int(...)` casts per
+  method to `static_cast<unsigned int>(...)`, recorded in the report. Array
+  operations are modeled; source/output aliasing and all-zero arbitrary run
+  tables are excluded from reference parity. Rust tests (57 core, 35 FFI),
+  strict Clippy and both default native branch syntax checks pass.
+  Windows/Miri validation is pending for this increment.
 * Safe Rust selects circular outline segments for `GrabSegment`, preserving
   zero-direction skipping, the first repeated direction, wrapped midpoint
   indices, signed coordinate rounding and the returned previous-corner index.
@@ -52,7 +71,13 @@ unresolved reference outcomes requiring investigation, never matching results.
   native fallback calls**. Container operations are modeled; this is not a
   proof of ATL container allocation behavior or polygon smoothing.
   Rust tests (55 core, 33 FFI), strict Clippy and both default native branch syntax
-  checks pass. Windows/Miri validation is pending for this increment.
+  checks pass. Candidate `f257e6d4` passed all four CI platforms, Miri and both
+  Windows DLL jobs. Each DLL job matched **354 cases / 4,334 frames** and
+  **32 mutations / 224 frames**, dialogs, visible controls, exports and
+  dependencies. Both logs confirm Rust-enabled `VobSubImage.cpp` compilation.
+  [DVD outline evidence](vobsub-outline-evidence.json) records the source and DLL
+  hashes, stable local report and remaining scope. CSRI text rendering does not
+  establish DVD host playback parity.
 * Safe Rust implements the DVD `Scale2x` edge-filter arithmetic and traversal.
   The original method keeps the image dimensions unchanged. The Rust path
   preserves its five-neighbor equality tests, center-pixel substitution at

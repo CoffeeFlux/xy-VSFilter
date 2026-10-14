@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+use core::{ptr, slice};
 use xy_vsfilter_compat::vobsub_segment::{select, Segment};
 
 /// # Safety
@@ -46,6 +47,40 @@ pub unsafe extern "C" fn xy_vsfilter_vobsub_segment(
     1
 }
 
+/// # Safety
+/// Each table contains count initialized aligned u32 entries. output is writable
+/// for two usize values and disjoint from the tables. Native table construction,
+/// allocation, diagnostics and output appends stay outside this call; zero
+/// leaves output untouched and requests the original selection/diagnostic path.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_vobsub_split(
+    lengths: *const u32,
+    starts: *const u32,
+    ends: *const u32,
+    count: usize,
+    output: *mut usize,
+) -> u32 {
+    if count == 0 || count > isize::MAX as usize / 4 {
+        return 0;
+    }
+    // SAFETY: all three initialized native table spans follow the contract.
+    let (lengths, starts, ends) = unsafe {
+        (
+            slice::from_raw_parts(lengths, count),
+            slice::from_raw_parts(starts, count),
+            slice::from_raw_parts(ends, count),
+        )
+    };
+    let Some(result) = xy_vsfilter_compat::vobsub_segment::split(lengths, starts, ends) else {
+        return 0;
+    };
+    // SAFETY: disjoint writable output after the read-only loans' final use.
+    unsafe {
+        ptr::copy_nonoverlapping(result.as_ptr(), output, 2);
+    }
+    1
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -81,5 +116,26 @@ mod tests {
                 (-2, 2, 1, -1)
             );
         }
+    }
+    #[test]
+    fn missing_split_maximum_does_not_publish_partial_output() {
+        let lengths = [1u32, 0, 1];
+        let starts = [0u32, 1, 1];
+        let ends = [1u32, 1, 2];
+        let mut output = [88usize, 99];
+        // SAFETY: initialized tables and disjoint writable output.
+        unsafe {
+            assert_eq!(
+                xy_vsfilter_vobsub_split(
+                    lengths.as_ptr(),
+                    starts.as_ptr(),
+                    ends.as_ptr(),
+                    3,
+                    output.as_mut_ptr()
+                ),
+                0
+            );
+        }
+        assert_eq!(output, [88, 99]);
     }
 }

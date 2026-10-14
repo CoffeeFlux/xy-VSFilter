@@ -74,6 +74,38 @@ pub fn select(
     None
 }
 
+/// Select the longest outline section, preferring an interior section on ties.
+/// Missing maxima decline so native assertion ordering is preserved. Midpoints
+/// use the original UINT addition width, even on 64-bit Windows.
+pub fn split(lengths: &[u32], starts: &[u32], ends: &[u32]) -> Option<[usize; 2]> {
+    if lengths.len() != starts.len() || lengths.len() != ends.len() {
+        return None;
+    }
+    let mut longest = 0;
+    let mut longest_inner = 0;
+    let mut index = None;
+    let mut inner_index = None;
+    for (i, &length) in lengths.iter().enumerate() {
+        if longest < length {
+            longest = length;
+            index = Some(i);
+        }
+        if longest_inner < length && i > 0 && i < lengths.len() - 1 {
+            longest_inner = length;
+            inner_index = Some(i);
+        }
+    }
+    let index = index?;
+    let inner_index = inner_index?;
+    let selected = if longest == longest_inner {
+        inner_index
+    } else {
+        index
+    };
+    let sum = starts[selected].wrapping_add(ends[selected]);
+    Some([(sum >> 1) as usize, (sum.wrapping_add(1) >> 1) as usize])
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -100,5 +132,17 @@ mod tests {
             |_| panic!("no point access")
         )
         .is_none());
+    }
+    #[test]
+    fn split_prefers_the_first_tied_inner_run_and_keeps_uint_wrapping() {
+        assert_eq!(
+            split(&[5, 5, 5, 2], &[0, 5, 10, 15], &[5, 10, 15, 17]),
+            Some([7, 8])
+        );
+        assert_eq!(
+            split(&[1, 9, 2], &[0, u32::MAX, 7], &[1, 0, 9]),
+            Some([0x7fffffff, 0])
+        );
+        assert_eq!(split(&[1, 0, 1], &[0, 1, 1], &[1, 1, 2]), None);
     }
 }
