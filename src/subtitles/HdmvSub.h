@@ -21,6 +21,9 @@
 #pragma once
 
 #include "BaseSub.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "xy_rust_byte_storage.h"
+#endif
 
 class CGolombBuffer;
 
@@ -122,6 +125,9 @@ public:
 private:
 
     HDMV_SEGMENT_TYPE            m_nCurSegment;
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::ByteStorage           m_segmentStorage;
+#endif
     BYTE*                        m_pSegBuffer;
     int                          m_nTotalSegBuffer;
     int                          m_nSegBufferPos;

@@ -26,6 +26,7 @@ struct RleRegion {
 static std::vector<RleRegion> rleRegions;
 static std::vector<int64_t> rleEvents;
 static bool rleDecline=false;
+static size_t rleAllocationLimit=8192;
 static uint64_t rleOwners=0,rleLoans=0,rleReleases=0,rleDeclines=0,rleAssertions=0;
 static void requireRle(bool value){if(!value){fprintf(stderr,"Invalid RLE storage fixture or ownership\n");std::abort();}}
 static RleRegion& rleRegion(const void* p,size_t count,size_t& offset){
@@ -41,7 +42,7 @@ static void rleGuards(const RleRegion& region){
     if(region.allocation)for(size_t i=0;i<16;++i){requireRle(region.allocation[i]==0xab);requireRle(region.data[region.count+i]==0xab);}
 }
 static BYTE* rleAllocate(size_t count){
-    requireRle(count<=8192);BYTE* raw=new BYTE[count+32];std::memset(raw,0xab,count+32);
+    requireRle(count<=rleAllocationLimit);BYTE* raw=new BYTE[count+32];std::memset(raw,0xab,count+32);
     rleRegions.push_back({raw+16,count,raw,NULL,std::vector<bool>(count,false)});
     rleEvents.insert(rleEvents.end(),{1,static_cast<int64_t>(count)});return raw+16;
 }
