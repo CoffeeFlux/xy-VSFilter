@@ -20,6 +20,24 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Rust owns the temporary type/point arrays filled by GDI in
+  `PathData::PartialEndPath`. A single FFI call lends both disjoint output buffers;
+  native GDI and the append loop finish all accesses before the owner is released.
+  Only complete output is consumed. Native realloc order, partial destination
+  metadata, coordinate addition, point/type write order and cleanup timing remain.
+  Fatal ASan/UBSan comparisons pass on arm64 and under x64 execution: **21,705
+  non-break calls / 5,094,516 buffer fields / 188,862 callback observations /
+  312,196 appended points**. Another **5,815 modeled DebugBreak continuations**
+  check cleanup only and are **not native compatibility passes**; actual traps
+  are not executed. Across both categories there are **19,018 Rust temporary
+  owners / paired loans / releases**, with zero fallbacks. GDI is an output-only
+  controlled boundary in the oracle; native OS allocation failures, negative
+  counts and unrepresentable geometry are excluded. The FFI test covers the
+  actual paired mutable-loan protocol; Miri validation is pending.
+  Rust 1.85 tests (135 core, 87 FFI), strict Clippy, default syntax and Python
+  checks pass. Six spacing/UTF-16 rendering scripts and a visible spacing control
+  expand the corpus to **718 cases**. Windows/Miri and actual renderer checks are
+  pending. Persistent rasterizer path buffers and native GDI/font work remain.
 * Rust owns the temporary centered coordinates used to build ellipse intersection
   tables. It preserves the native vector's zero initialization, sentinel cell,
   values retained between rows, write-before-clamp order and scalar reads. Native
@@ -100,8 +118,10 @@ unresolved reference outcomes requiring investigation, never matching results.
   counts, successful allocation; native OOM and debug assertions are separate.
   Rust 1.85 tests (128 core, 82 FFI), strict Clippy and Python checks pass.
   Eight ellipse-outline scripts and a visible outline control expand the renderer
-  corpus to **690 cases**. Windows/Miri and renderer checks are pending. Native
-  ellipse storage, geometry, outer lists and real-host integration remain.
+  corpus to **690 cases**. Windows x86/x64, Linux, macOS and Miri passed; paired
+  Windows DLLs match **690 cases / 7,250 frames**, plus **32 mutations / 224 frames**,
+  on each architecture. See [arc-queue evidence](arc-queue-evidence.json). Native
+  geometry, outer lists and real-host integration remain.
 * Safe Rust owns ordered outline-span merge results before native export. Native
   reserve/swap, offset construction and destination growth stay in order; ties,
   touching/reversed spans, unsigned coordinate wrap and vector capacity match.

@@ -159,3 +159,5 @@ mod arc_queue;
 mod ellipse_arc;
 
 mod ellipse_matrix;
+
+mod path_buffer;

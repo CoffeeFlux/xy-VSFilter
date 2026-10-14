@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_path_align.h"
+#include "xy_rust_path_buffer.h"
 #include "xy_rust_spans.h"
 #endif
 #include <string.h>
@@ -2158,8 +2159,17 @@ bool PathData::PartialEndPath(HDC hdc, long dx, long dy)
             mpPathTypes = pNewTypes;
         if(pNewPoints)
             mpPathPoints = pNewPoints;
-        BYTE* pTypes = DEBUG_NEW BYTE[nPoints];
-        POINT* pPoints = DEBUG_NEW POINT[nPoints];
+        BYTE* pTypes;
+        POINT* pPoints;
+#ifdef XY_VSFILTER_RUST_TEXT
+        XyRust::PathBuffer temporary(nPoints);
+        if (temporary.Ready()) temporary.Loan(pPoints, pTypes);
+        else
+#endif
+        {
+            pTypes = DEBUG_NEW BYTE[nPoints];
+            pPoints = DEBUG_NEW POINT[nPoints];
+        }
         if(pNewTypes && pNewPoints && nPoints == GetPath(hdc, pPoints, pTypes, nPoints))
         {
             for(int i = 0; i < nPoints; ++i)
@@ -2169,14 +2179,26 @@ bool PathData::PartialEndPath(HDC hdc, long dx, long dy)
                 mpPathTypes[mPathPoints + i] = pTypes[i];
             }
             mPathPoints += nPoints;
-            delete[] pTypes;
-            delete[] pPoints;
+#ifdef XY_VSFILTER_RUST_TEXT
+            if (temporary.Ready()) temporary.Release();
+            else
+#endif
+            {
+                delete[] pTypes;
+                delete[] pPoints;
+            }
             return true;
         }
         else
             DebugBreak();
-        delete[] pTypes;
-        delete[] pPoints;
+#ifdef XY_VSFILTER_RUST_TEXT
+        if (temporary.Ready()) temporary.Release();
+        else
+#endif
+        {
+            delete[] pTypes;
+            delete[] pPoints;
+        }
     }
     ::AbortPath(hdc);
     return false;
