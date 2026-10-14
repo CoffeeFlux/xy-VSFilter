@@ -879,6 +879,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     realtext_text_result = run([str(realtext_text_executable)], capture_output=True, text=True)
     print(realtext_text_result.stdout, end="", flush=True)
     print(realtext_text_result.stderr, end="", file=sys.stderr)
+    realtext_lower_executable = destination / ("realtext-lower-oracle.exe" if os.name == "nt" else "realtext-lower-oracle")
+    realtext_lower_compile = [arg.replace("fill_oracle.cpp", "realtext_lower_oracle.cpp").replace("fill-oracle", "realtext-lower-oracle") for arg in fill_compile]
+    run(realtext_lower_compile)
+    realtext_lower_result = run([str(realtext_lower_executable)], capture_output=True, text=True)
+    print(realtext_lower_result.stdout, end="", flush=True)
+    print(realtext_lower_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -922,6 +928,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "vobsub_scale_result": vobsub_scale_result.stdout, "vobsub_scale_stderr": vobsub_scale_result.stderr,
         "vobsub_outline_compile_command": vobsub_outline_compile,
         "vobsub_outline_result": vobsub_outline_result.stdout, "vobsub_outline_stderr": vobsub_outline_result.stderr,
+        "realtext_lower_compile_command": realtext_lower_compile,
+        "realtext_lower_result": realtext_lower_result.stdout, "realtext_lower_stderr": realtext_lower_result.stderr,
+        "realtext_lower_scope": "owned lowercase output; native towlower per original code unit and live source length retained; comparisons within each available locale; allocation failure timing unverified",
         "realtext_text_compile_command": realtext_text_compile,
         "realtext_text_result": realtext_text_result.stdout, "realtext_text_stderr": realtext_text_result.stderr,
         "realtext_text_scope": "owned text scanning; native whitespace, output append and source consumption retained; identical source/output uses native fallback; allocation timing and unterminated self-append excluded",

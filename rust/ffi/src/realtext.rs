@@ -2,9 +2,60 @@
 use alloc::boxed::Box;
 use xy_vsfilter_compat::realtext::Tags;
 use xy_vsfilter_compat::realtext_attributes::Attributes;
+use xy_vsfilter_compat::realtext_lower::Lower;
 use xy_vsfilter_compat::realtext_tag::Tag;
 use xy_vsfilter_compat::realtext_text::Text;
 use xy_vsfilter_compat::realtext_timecode::Timecode;
+
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_realtext_lower_create() -> *mut Lower {
+    Box::into_raw(Box::new(Lower::default()))
+}
+
+/// # Safety
+/// owner is live and exclusive; input is a disjoint initialized u16 span.
+/// No input loan survives the call or reaches native case conversion.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_lower_next(
+    owner: *mut Lower,
+    input: *const u16,
+    length: usize,
+    response: u16,
+) -> u32 {
+    // SAFETY: live unique owner and disjoint initialized native input.
+    unsafe {
+        let state = &mut *owner;
+        u32::from(state.next(units(input, length), response))
+    }
+}
+
+/// # Safety
+/// owner is live and immutable. Invalid scalar queries return zero.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_lower_field(
+    owner: *const Lower,
+    field: u32,
+    index: usize,
+) -> usize {
+    // SAFETY: immutable bounded query before release.
+    let state = unsafe { &*owner };
+    match field {
+        0 => usize::from(state.character),
+        1 => state.text.len(),
+        2 => usize::from(state.text.get(index).copied().unwrap_or(0)),
+        _ => 0,
+    }
+}
+
+/// # Safety
+/// Release the uniquely owned state once, after all operations.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_lower_release(owner: *mut Lower) {
+    if !owner.is_null() {
+        // SAFETY: native RAII returns its uniquely owned allocation once.
+        drop(unsafe { Box::from_raw(owner) });
+    }
+}
 
 #[no_mangle]
 pub extern "C" fn xy_vsfilter_realtext_text_create() -> *mut Text {
@@ -340,6 +391,34 @@ pub unsafe extern "C" fn xy_vsfilter_realtext_release(owner: *mut Tags) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn lowercase_input_can_change_between_native_conversions() {
+        let owner = xy_vsfilter_realtext_lower_create();
+        let mut input = [65u16, 66];
+        // SAFETY: unique live owner, initialized short-lived input loans,
+        // bounded queries, and exactly one release.
+        unsafe {
+            assert_eq!(
+                xy_vsfilter_realtext_lower_next(owner, input.as_ptr(), 2, 0),
+                1
+            );
+            input[1] = 90;
+            assert_eq!(
+                xy_vsfilter_realtext_lower_next(owner, input.as_ptr(), 2, 97),
+                1
+            );
+            assert_eq!(xy_vsfilter_realtext_lower_field(owner, 0, 0), 90);
+            assert_eq!(
+                xy_vsfilter_realtext_lower_next(owner, core::ptr::null(), 0, 122),
+                0
+            );
+            assert_eq!(xy_vsfilter_realtext_lower_field(owner, 1, 0), 2);
+            assert_eq!(xy_vsfilter_realtext_lower_field(owner, 2, 1), 122);
+            assert_eq!(xy_vsfilter_realtext_lower_field(owner, 2, usize::MAX), 0);
+            xy_vsfilter_realtext_lower_release(owner);
+        }
+    }
+
     #[test]
     fn text_scanning_does_not_keep_native_input_borrows() {
         let owner = xy_vsfilter_realtext_text_create();

@@ -540,11 +540,20 @@ std::wstring CRealTextParser::FormatTimecode(int iTimecode,
 
 std::wstring CRealTextParser::StringToLower(const std::wstring& p_crszString)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::RealTextLower lower;
+    wchar_t response = 0;
+    while (lower.Next(p_crszString, response)) {
+        response = static_cast<wchar_t>(towlower(lower.Character()));
+    }
+    return lower.Value();
+#else
     std::wstring szLowercaseString;
     for (unsigned int i = 0; i < p_crszString.length(); ++i) {
         szLowercaseString += towlower(p_crszString.at(i));
     }
     return szLowercaseString;
+#endif
 }
 
 std::wstring CRealTextParser::RenderTags(const std::list<Tag>& p_crlTags)
