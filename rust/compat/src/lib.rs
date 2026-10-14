@@ -74,3 +74,5 @@ pub mod ass_dialogue;
 pub mod ass_style;
 
 pub mod ass_headers;
+
+pub mod font_records;

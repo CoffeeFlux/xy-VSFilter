@@ -27,6 +27,18 @@ public:
     void ScriptVersion(int version){++headerVersions;AssHeaders::ScriptVersion(version);}
 };
 }
+#include "xy_rust_font_records.h"
+static uint64_t recordOwners=0,recordLines=0,recordAppends=0,recordClears=0;
+static unsigned fontReplyMode=0;
+namespace XyRust {
+class ObservedFontRecords : public FontRecords {
+public:
+    ObservedFontRecords(){++recordOwners;}
+    template<class String> uint32_t Classify(const String& input)const{++recordLines;return FontRecords::Classify(input);}
+    template<class String> void Append(const String& input){++recordAppends;FontRecords::Append(input);}
+    void Clear(){++recordClears;FontRecords::Clear();}
+};
+}
 struct DocumentSize {
     int32_t cx,cy;
     DocumentSize(int x=0,int y=0):cx(x),cy(y){}
@@ -72,7 +84,8 @@ static bool LoadFont(MicroString& font){
     ++documentFonts;microObserve(39,font.GetString());
     // Record the counted font data; OS font registration is outside this shell.
     searchEvents.push_back(font.GetLength());for(int i=0;i<font.GetLength();++i)searchEvents.push_back(static_cast<uint16_t>(font[i]));
-    return true;
+    if(fontReplyMode==2)font=MicroString(L"changed");
+    return fontReplyMode==0;
 }
 #define CSimpleTextSubtitle DocumentSubtitle
 #define CTextFile DocumentFile

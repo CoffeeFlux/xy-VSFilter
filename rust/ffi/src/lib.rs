@@ -127,3 +127,5 @@ mod ass_dialogue;
 mod ass_style;
 
 mod ass_headers;
+
+mod font_records;

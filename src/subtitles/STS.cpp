@@ -34,6 +34,7 @@
 #include "xy_rust_ass_dialogue.h"
 #include "xy_rust_ass_style.h"
 #include "xy_rust_ass_headers.h"
+#include "xy_rust_font_records.h"
 #include "xy_rust_webvtt.h"
 #include "xy_rust_fields.h"
 #include "xy_rust_segments.h"
@@ -2039,6 +2040,34 @@ static bool LoadFont(CString& font)
 
 static bool LoadUUEFont(CTextFile* file)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    CString s;
+    XyRust::FontRecords records;
+    while(file->ReadString(s))
+    {
+        FastTrim(s);
+        const unsigned action = records.Classify(s);
+        if(action == 0) break;
+        if(action == 1)
+        {
+            CString font = records.Text<CString>();
+            LoadFont(font);
+            records.Clear();
+        }
+        else
+        {
+            CString fragment;
+            fragment += s;
+            records.Append(fragment);
+        }
+    }
+    if(!records.Empty())
+    {
+        CString font = records.Text<CString>();
+        LoadFont(font);
+    }
+    return(true);
+#else
     CString s, font;
     while(file->ReadString(s))
     {
@@ -2062,6 +2091,7 @@ static bool LoadUUEFont(CTextFile* file)
         LoadFont(font);
 
     return(true);
+#endif
 }
 
 static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)

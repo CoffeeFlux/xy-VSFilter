@@ -20,6 +20,23 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns embedded-font record buffering and `LoadUUEFont` line decisions.
+  Exact section prefixes still terminate after consuming their header; lowercase
+  variants and `[V4++ Styles]` are still treated as record data. `fontname:` flushes
+  even an empty record, native loader return values are ignored, and a failed
+  final read does not append its returned text. Native line reading/trimming,
+  CString fragment concatenation, decoding and OS font loading remain in order.
+  Fatal ASan/UBSan comparisons passed **132,464 complete font-record reads** on
+  arm64 and under x64 execution: **5,616,147 callback observation values**, **24
+  interruptions**, **329,639 classified lines / 197,367 appended fragments /
+  65,821 cleared records**. Tests include every UTF-16 value, NULs, repeated and
+  empty records, case-sensitive headers, loader failures and loader mutations.
+  The **146,811 complete ASS document comparisons** continue to match. Font
+  registration is modeled in the extracted harness; the existing attached-font
+  rendering fixtures remain the DLL integration check.
+  Rust 1.85 tests (98 core, 65 FFI), strict Clippy, default syntax and corpus
+  freshness pass. Windows/Miri and full renderer validation are pending. Native
+  file/trim behavior, OS font resources and real host integration remain separate.
 * Safe Rust owns ASS header classification, acceptance/version state, collision
   and scaled-border substring decisions, and YCbCr matrix/range prefix selection.
   Native trimming, lowercase, suffix comparisons, numeric conversion, resolution
@@ -85,8 +102,13 @@ unresolved reference outcomes requiring investigation, never matching results.
   entry arguments. Unrepresentable timestamp arithmetic is excluded.
   Eight ASS scripts expand renderer validation to **462 cases**. Rust 1.85 tests
   (92 core, 62 FFI), strict Clippy, default syntax and Python harness checks pass.
-  Windows/Miri and full renderer validation are pending. Whole file/style parsing,
-  numeric conversion, native cleanup and real host integration remain separate.
+  Candidate `24860019` passed all four portable platforms, Miri and both Windows
+  DLL jobs, each matching **462 cases / 5,070 frames** and **32 mutations / 224
+  frames**, plus dialogs, visible controls, exports and dependencies. Both logs
+  confirm Rust-enabled `STS.cpp` compilation. [Dialogue evidence](ass-dialogue-evidence.json)
+  records verified hashes and stable local validation. Whole file/style parsing
+  follows in later increments; native numeric conversion, cleanup and real host
+  integration remain separate.
 * Safe Rust also owns the remaining source, output and conversion sequence in
   `UnicodeSSAToMBCS` and `MBCSSSAToUnicode`. The wrappers still convert an empty
   prefix before an opening brace, parse only the first qualifying `\fe`, use
