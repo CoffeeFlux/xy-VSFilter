@@ -21,6 +21,9 @@
 #pragma once
 
 #include "BaseSub.h"
+#ifdef XY_VSFILTER_RUST_TEXT
+#include "xy_rust_byte_storage.h"
+#endif
 
 #define MAX_REGIONS     10
 #define MAX_OBJECTS     10          // Max number of objects per region
@@ -194,6 +197,9 @@ private:
     int                 m_nBufferSize;
     int                 m_nBufferReadPos;
     int                 m_nBufferWritePos;
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::ByteStorage m_bufferStorage;
+#endif
     BYTE*               m_pBuffer;
     CAtlList<DVB_PAGE*> m_Pages;
     CAutoPtr<DVB_PAGE>  m_pCurrentPage;

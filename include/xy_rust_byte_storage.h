@@ -14,6 +14,11 @@ public:
     ~ByteStorage(){Reset();}
     bool Ready()const{return owner!=NULL;}
     uint8_t* Data()const{return data;}
+    void Swap(ByteStorage& other){
+        // Transfer native handles only; existing byte loans remain valid.
+        void* old_owner=owner;owner=other.owner;other.owner=old_owner;
+        uint8_t* old_data=data;data=other.data;other.data=old_data;
+    }
     bool Allocate(size_t count){
         Reset();
         owner=xy_vsfilter_plane_create(count);
