@@ -23,6 +23,7 @@ pub mod hdmv;
 pub mod mask;
 pub mod realtext;
 pub mod realtext_attributes;
+pub mod realtext_document;
 pub mod realtext_format;
 pub mod realtext_lists;
 pub mod realtext_lower;

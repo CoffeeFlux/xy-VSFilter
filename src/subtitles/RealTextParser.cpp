@@ -44,18 +44,51 @@ CRealTextParser::~CRealTextParser()
 bool CRealTextParser::ParseRealText(std::wstring p_szFile)
 {
 #ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::RealTextDocument document;
     XyRust::RealTextTimeline timeline;
+    XyRust::RealTextLists lists;
+    Tag tag;
+    int start = 0, end = 0;
+    std::wstring line;
+    bool response = false;
+    for (;;) {
+        const uint32_t action = document.Next(p_szFile, response, tag);
+        if (action <= 1) return action != 0;
+        switch (action) {
+            case 2: tag = Tag(); response = ExtractTag(p_szFile, tag); break;
+            case 3: tag = Tag(); response = ExtractTextTag(p_szFile, tag); break;
+            case 4: lists.Append(tag); break;
+            case 5: start = GetTimecode(tag.m_mapAttributes[L"begin"]); break;
+            case 6: end = GetTimecode(tag.m_mapAttributes[L"end"]); break;
+            case 7:
+            case 17: line = RenderTags(lists.Export<Tag>()); break;
+            case 8:
+            case 18: {
+                const uint32_t interval = timeline.Select(start, action == 18, m_RealText.m_mapLines.empty());
+                if (interval) {
+                    std::pair<int, int> pairTimecodes(timeline.First(), timeline.Second());
+                    if (interval == 2) pairTimecodes.second = pairTimecodes.first + m_iDefaultSubtitleDurationInMillisecs;
+                    if (!line.empty()) m_RealText.m_mapLines[pairTimecodes] = line;
+                }
+                break;
+            }
+            case 9: timeline.Advance(start, end); break;
+            case 10: lists.Set(tag); break;
+            case 11: lists.Open(); break;
+            case 12: lists.Close(); break;
+            case 13: lists.Append(); break;
+            case 14: lists.Clear(); break;
+            case 15: m_RealText.m_WindowTag = tag; break;
+            case 16: m_RealText.m_bCenter = true; break;
+            default: return false;
+        }
+    }
 #else
     std::vector<int> vStartTimecodes;
     std::vector<int> vEndTimecodes;
     bool bPrevEndTimeMissing = false;
-#endif
-#ifdef XY_VSFILTER_RUST_TEXT
-    XyRust::RealTextLists lists;
-#else
     std::list<Tag> listTags;
     std::list<Tag> listPreviousOpenTags;
-#endif
 
     while (!p_szFile.empty()) {
         if (p_szFile.at(0) == '<') {
@@ -73,21 +106,8 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
                 int iEndTimecode = GetTimecode(oTag.m_mapAttributes[L"end"]);
 
                 //FilterReduntantTags(listTags);
-#ifdef XY_VSFILTER_RUST_TEXT
-                std::wstring szLine = RenderTags(lists.Export<Tag>());
-#else
                 std::wstring szLine = RenderTags(listTags);
-#endif
 
-#ifdef XY_VSFILTER_RUST_TEXT
-                const uint32_t interval = timeline.Select(iStartTimecode, false, m_RealText.m_mapLines.empty());
-                if (interval) {
-                    std::pair<int, int> pairTimecodes(timeline.First(), timeline.Second());
-                    if (interval == 2) pairTimecodes.second = pairTimecodes.first + m_iDefaultSubtitleDurationInMillisecs;
-                    if (!szLine.empty()) m_RealText.m_mapLines[pairTimecodes] = szLine;
-                }
-                timeline.Advance(iStartTimecode, iEndTimecode);
-#else
                 if (bPrevEndTimeMissing) {
                     std::pair<int, int> pairTimecodes(vStartTimecodes.back(), iStartTimecode);
 
@@ -121,14 +141,7 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
                 } else {
                     vEndTimecodes.push_back(iEndTimecode);
                 }
-#endif
             } else if (oTag.m_szName == L"b" || oTag.m_szName == L"i" || oTag.m_szName == L"font") {
-#ifdef XY_VSFILTER_RUST_TEXT
-                lists.Set(oTag);
-                if (oTag.m_bOpen) lists.Open();
-                if (oTag.m_bClose) lists.Close();
-                lists.Append();
-#else
                 if (oTag.m_bOpen) {
                     listPreviousOpenTags.push_back(oTag);
                 }
@@ -138,16 +151,11 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
                 }
 
                 listTags.push_back(oTag);
-#endif
             } else if (oTag.m_szName == L"clear") {
-#ifdef XY_VSFILTER_RUST_TEXT
-                lists.Clear();
-#else
                 listTags.clear();
 
                 // set existing tags
                 listTags.insert(listTags.end(), listPreviousOpenTags.begin(), listPreviousOpenTags.end());
-#endif
             } else if (oTag.m_szName == L"window") {
                 if (oTag.m_bOpen) {
                     m_RealText.m_WindowTag = oTag;
@@ -162,11 +170,7 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
                 // Ignore
             } else {
                 // assume formating tag (handled later)
-#ifdef XY_VSFILTER_RUST_TEXT
-                lists.Append(oTag);
-#else
                 listTags.push_back(oTag);
-#endif
             }
         } else {
             Tag oTextTag;
@@ -174,30 +178,14 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
                 return false;
             }
 
-#ifdef XY_VSFILTER_RUST_TEXT
-            lists.Append(oTextTag);
-#else
             listTags.push_back(oTextTag);
-#endif
         }
     }
 
     // Handle final line
     //FilterReduntantTags(listTags);
-#ifdef XY_VSFILTER_RUST_TEXT
-    std::wstring szLine = RenderTags(lists.Export<Tag>());
-#else
     std::wstring szLine = RenderTags(listTags);
-#endif
 
-#ifdef XY_VSFILTER_RUST_TEXT
-    const uint32_t interval = timeline.Select(0, true, m_RealText.m_mapLines.empty());
-    if (interval) {
-        std::pair<int, int> pairTimecodes(timeline.First(), timeline.Second());
-        if (interval == 2) pairTimecodes.second = pairTimecodes.first + m_iDefaultSubtitleDurationInMillisecs;
-        if (!szLine.empty()) m_RealText.m_mapLines[pairTimecodes] = szLine;
-    }
-#else
     if (bPrevEndTimeMissing) {
         std::pair<int, int> pairTimecodes(vStartTimecodes.back(), vStartTimecodes.back() + m_iDefaultSubtitleDurationInMillisecs);
 
@@ -214,8 +202,8 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
 
     }
 
-#endif
     return true;
+#endif
 }
 
 const CRealTextParser::Subtitles& CRealTextParser::GetParsedSubtitles()

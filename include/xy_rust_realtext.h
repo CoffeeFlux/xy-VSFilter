@@ -12,6 +12,9 @@
 #define XY_REALTEXT_CDECL
 #endif
 extern "C" {
+void* XY_REALTEXT_CDECL xy_vsfilter_realtext_document_create();
+uint32_t XY_REALTEXT_CDECL xy_vsfilter_realtext_document_next(void*, uint32_t, uint16_t, uint32_t, const uint16_t*, size_t, uint32_t);
+void XY_REALTEXT_CDECL xy_vsfilter_realtext_document_release(void*);
 void* XY_REALTEXT_CDECL xy_vsfilter_realtext_lists_create();
 void XY_REALTEXT_CDECL xy_vsfilter_realtext_lists_begin(void*, const uint16_t*, size_t, uint32_t);
 void XY_REALTEXT_CDECL xy_vsfilter_realtext_lists_attribute(void*, const uint16_t*, size_t, const uint16_t*, size_t);
@@ -54,6 +57,25 @@ void XY_REALTEXT_CDECL xy_vsfilter_realtext_timecode_release(void*);
 }
 #undef XY_REALTEXT_CDECL
 namespace XyRust {
+class RealTextDocument {
+    void* owner;
+    RealTextDocument(const RealTextDocument&);
+    RealTextDocument& operator=(const RealTextDocument&);
+public:
+    RealTextDocument():owner(xy_vsfilter_realtext_document_create()){}
+    ~RealTextDocument(){xy_vsfilter_realtext_document_release(owner);}
+    template<class Tag> uint32_t Next(const std::wstring& input,bool response,const Tag& tag){
+        const bool empty=input.empty();const uint16_t first=empty?0:static_cast<uint16_t>(input.at(0));
+        const uint32_t flags=(tag.m_bOpen?1u:0u)|(tag.m_bClose?2u:0u)|(tag.m_bComment?4u:0u)|(tag.m_bText?8u:0u);
+#ifdef _WIN32
+        static_assert(sizeof(wchar_t)==sizeof(uint16_t),"native strings must contain UTF-16 units");
+        return xy_vsfilter_realtext_document_next(owner,empty?1:0,first,response?1:0,reinterpret_cast<const uint16_t*>(tag.m_szName.data()),tag.m_szName.size(),flags);
+#else
+        const std::vector<uint16_t> name(tag.m_szName.begin(),tag.m_szName.end());
+        return xy_vsfilter_realtext_document_next(owner,empty?1:0,first,response?1:0,name.data(),name.size(),flags);
+#endif
+    }
+};
 class RealTextLists {
     void* owner;
     RealTextLists(const RealTextLists&);

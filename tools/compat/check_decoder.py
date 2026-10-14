@@ -168,11 +168,16 @@ public:
             if signature == "bool CRealTextParser::ParseRealText(":
                 plain = "m_RealText.m_mapLines[pairTimecodes] = szLine;"
                 first = "m_RealText.m_mapLines[std::make_pair(0, iStartTimecode)] = szLine;"
-                expected = 4 if name == "ReferenceRealText" else 6
+                expected = 4
                 if definition.count(plain) != expected or definition.count(first) != 1:
                     raise RuntimeError("RealText line insertion checkpoints changed")
                 definition = definition.replace(plain, "m_RealText.m_mapLines[realTextLineKey(m_RealText.m_mapLines, pairTimecodes, szLine)] = szLine;")
                 definition = definition.replace(first, "m_RealText.m_mapLines[realTextLineKey(m_RealText.m_mapLines, std::make_pair(0, iStartTimecode), szLine)] = szLine;")
+                if name == "CandidateRealText":
+                    bridge = "m_RealText.m_mapLines[pairTimecodes] = line;"
+                    if definition.count(bridge) != 1:
+                        raise RuntimeError("RealText document bridge insertion changed")
+                    definition = definition.replace(bridge, "m_RealText.m_mapLines[realTextLineKey(m_RealText.m_mapLines, pairTimecodes, line)] = line;")
             realtext += definition + "\n"
         realtext += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_realtext.h").write_text(realtext, encoding="utf-8")
@@ -912,6 +917,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     realtext_lists_result = run([str(realtext_lists_executable)], capture_output=True, text=True)
     print(realtext_lists_result.stdout, end="", flush=True)
     print(realtext_lists_result.stderr, end="", file=sys.stderr)
+    realtext_document_executable = destination / ("realtext-document-oracle.exe" if os.name == "nt" else "realtext-document-oracle")
+    realtext_document_compile = [arg.replace("fill_oracle.cpp", "realtext_document_oracle.cpp").replace("fill-oracle", "realtext-document-oracle") for arg in fill_compile]
+    run(realtext_document_compile)
+    realtext_document_result = run([str(realtext_document_executable)], capture_output=True, text=True)
+    print(realtext_document_result.stdout, end="", flush=True)
+    print(realtext_document_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -955,6 +966,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "vobsub_scale_result": vobsub_scale_result.stdout, "vobsub_scale_stderr": vobsub_scale_result.stderr,
         "vobsub_outline_compile_command": vobsub_outline_compile,
         "vobsub_outline_result": vobsub_outline_result.stdout, "vobsub_outline_stderr": vobsub_outline_result.stderr,
+        "realtext_document_compile_command": realtext_document_compile,
+        "realtext_document_result": realtext_document_result.stdout, "realtext_document_stderr": realtext_document_result.stderr,
+        "realtext_document_scope": "owned document control flow; native extraction/conversion/render/public-state actions retain order; callbacks observe partial public state and injected interruptions across repeated parses; representable numeric fixtures only",
         "realtext_lists_compile_command": realtext_lists_compile,
         "realtext_lists_result": realtext_lists_result.stdout, "realtext_lists_stderr": realtext_lists_result.stderr,
         "realtext_lists_scope": "owned current/open tag lists with copied raw names, flags and ordered attributes; native list-operation fixture shell calls pinned PopTag, plus complete ParseRealText composition; allocation failure timing unverified",

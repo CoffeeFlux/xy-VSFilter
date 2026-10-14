@@ -2,12 +2,48 @@
 use alloc::boxed::Box;
 use xy_vsfilter_compat::realtext::Tags;
 use xy_vsfilter_compat::realtext_attributes::Attributes;
+use xy_vsfilter_compat::realtext_document::Document;
 use xy_vsfilter_compat::realtext_lists::Lists;
 use xy_vsfilter_compat::realtext_lower::Lower;
 use xy_vsfilter_compat::realtext_tag::Tag;
 use xy_vsfilter_compat::realtext_text::Text;
 use xy_vsfilter_compat::realtext_timecode::Timecode;
 use xy_vsfilter_compat::realtext_timeline::Timeline;
+
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_realtext_document_create() -> *mut Document {
+    Box::into_raw(Box::new(Document::default()))
+}
+
+/// # Safety
+/// owner is live and exclusively borrowed. Name is a disjoint initialized u16
+/// span borrowed only for this call; no borrow reaches native callbacks.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_document_next(
+    owner: *mut Document,
+    empty: u32,
+    first: u16,
+    response: u32,
+    name: *const u16,
+    length: usize,
+    flags: u32,
+) -> u32 {
+    // SAFETY: uniquely owned state and disjoint short-lived native name loan.
+    unsafe {
+        let state = &mut *owner;
+        state.next(empty != 0, first, response != 0, units(name, length), flags)
+    }
+}
+
+/// # Safety
+/// Release the uniquely owned state once after all other operations.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_realtext_document_release(owner: *mut Document) {
+    if !owner.is_null() {
+        // SAFETY: native RAII returns the uniquely owned allocation once.
+        drop(unsafe { Box::from_raw(owner) });
+    }
+}
 
 #[no_mangle]
 pub extern "C" fn xy_vsfilter_realtext_lists_create() -> *mut Lists {
@@ -592,6 +628,33 @@ pub unsafe extern "C" fn xy_vsfilter_realtext_release(owner: *mut Tags) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn document_actions_do_not_retain_the_native_tag_name() {
+        let owner = xy_vsfilter_realtext_document_create();
+        // SAFETY: unique live owner; initialized name loan expires before the
+        // next action, followed by empty loans and one final release.
+        unsafe {
+            assert_eq!(
+                xy_vsfilter_realtext_document_next(owner, 0, 60, 0, core::ptr::null(), 0, 0),
+                2
+            );
+            {
+                let name = [116u16, 105, 109, 101];
+                assert_eq!(
+                    xy_vsfilter_realtext_document_next(owner, 1, 0, 1, name.as_ptr(), 4, 3),
+                    5
+                );
+            }
+            for action in [6, 7, 8, 9, 17, 18, 1] {
+                assert_eq!(
+                    xy_vsfilter_realtext_document_next(owner, 1, 0, 1, core::ptr::null(), 0, 0),
+                    action
+                );
+            }
+            xy_vsfilter_realtext_document_release(owner);
+        }
+    }
+
     #[test]
     fn tag_lists_keep_only_owned_names_and_attributes() {
         let owner = xy_vsfilter_realtext_lists_create();
