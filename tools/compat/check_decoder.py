@@ -400,6 +400,14 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         vobsub_outline += walk_body + "\ncompleted=true;\n}while(false);return {x,y,dir,pp.x,pp.y,completed ? 1 : 0};\n}\n"
         vobsub_outline += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_vobsub_outline.h").write_text(vobsub_outline, encoding="utf-8")
+    vobsub_segment = '#include "vobsub_segment_shell.h"\n'
+    for name, content in (("ReferenceVobSegment", vobsub_source), ("CandidateVobSegment", (ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
+        vobsub_segment += f"VOBSUB_SEGMENT_SHELL({name})\n#define CVobSubImage {name}\n"
+        if name == "CandidateVobSegment":
+            vobsub_segment += "#define XY_VSFILTER_RUST_TEXT\n"
+        vobsub_segment += extract_definition(content.decode("utf-8-sig"), "int CVobSubImage::GrabSegment(") + "\n"
+        vobsub_segment += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_vobsub_segment.h").write_text(vobsub_segment, encoding="utf-8")
     byte_float = '#include "byte_float_shell.h"\n'
     for name, content in (("ReferenceByteFloat", filter_source), ("CandidateByteFloat", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
         byte_float += f"namespace {name} {{\n"
@@ -741,6 +749,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     vobsub_outline_result = run([str(vobsub_outline_executable)], capture_output=True, text=True)
     print(vobsub_outline_result.stdout, end="", flush=True)
     print(vobsub_outline_result.stderr, end="", file=sys.stderr)
+    vobsub_segment_executable = destination / ("vobsub-segment-oracle.exe" if os.name == "nt" else "vobsub-segment-oracle")
+    vobsub_segment_compile = [arg.replace("fill_oracle.cpp", "vobsub_segment_oracle.cpp").replace("fill-oracle", "vobsub-segment-oracle") for arg in fill_compile]
+    run(vobsub_segment_compile)
+    vobsub_segment_result = run([str(vobsub_segment_executable)], capture_output=True, text=True)
+    print(vobsub_segment_result.stdout, end="", flush=True)
+    print(vobsub_segment_result.stderr, end="", file=sys.stderr)
     fill_debug_compile = []
     fill_debug_output = "Not run: MSVC Release is covered by fill_result\n"
     fill_debug_stderr = ""
@@ -784,6 +798,8 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "vobsub_scale_result": vobsub_scale_result.stdout, "vobsub_scale_stderr": vobsub_scale_result.stderr,
         "vobsub_outline_compile_command": vobsub_outline_compile,
         "vobsub_outline_result": vobsub_outline_result.stdout, "vobsub_outline_stderr": vobsub_outline_result.stderr,
+        "vobsub_segment_compile_command": vobsub_segment_compile,
+        "vobsub_segment_result": vobsub_segment_result.stdout, "vobsub_segment_stderr": vobsub_segment_result.stderr,
         "weighted_filter_compile_command": weighted_compile,
         "weighted_filter_result": weighted_result.stdout, "weighted_filter_stderr": weighted_result.stderr,
         "gauss_integer_compile_command": integer_gauss_compile,

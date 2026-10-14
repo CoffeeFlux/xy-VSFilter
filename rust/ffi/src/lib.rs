@@ -100,4 +100,5 @@ mod vobsub_packet;
 mod vobsub_pixels;
 mod vobsub_rle;
 mod vobsub_scale;
+mod vobsub_segment;
 mod vobsub_trim;

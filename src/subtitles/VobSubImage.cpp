@@ -1019,6 +1019,22 @@ int CVobSubImage::GrabSegment(int start, const COutline& o, COutline& ret)
 {
     ret.RemoveAll();
 
+#ifdef XY_VSFILTER_RUST_TEXT
+    static_assert(sizeof(CPoint) == 2 * sizeof(int32_t), "outline point layout");
+    XyVobSubSegment segment;
+    if (&o != &ret && xy_vsfilter_vobsub_segment(reinterpret_cast<const int32_t*>(o.pa.GetData()), o.pa.GetCount(),
+            o.da.GetData(), o.da.GetCount(), start, &segment)) {
+        const int count = static_cast<int>(o.pa.GetCount());
+        ret.Add(CPoint(segment.start_x, segment.start_y), 0);
+        for (int index = segment.begin; index != segment.end;) {
+            ret.Add(o.pa[index], o.da[index]);
+            if (++index >= count) index -= count;
+        }
+        ret.Add(CPoint(segment.end_x, segment.end_y), 0);
+        return segment.last;
+    }
+#endif
+
     int len = int(o.pa.GetCount());
 
     int cur = (start) % len, first = -1, last = -1;

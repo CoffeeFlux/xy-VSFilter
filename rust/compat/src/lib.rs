@@ -38,4 +38,5 @@ pub mod vobsub_packet;
 pub mod vobsub_pixels;
 pub mod vobsub_rle;
 pub mod vobsub_scale;
+pub mod vobsub_segment;
 pub mod vobsub_trim;

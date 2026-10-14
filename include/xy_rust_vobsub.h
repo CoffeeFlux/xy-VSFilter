@@ -28,4 +28,6 @@ struct XyVobSubOutlineStep { int32_t x,y,direction,point_x,point_y; };
 extern "C" uint32_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_outline_mask(const uint8_t* source, uint8_t* output, size_t count);
 extern "C" uint32_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_outline_find(const uint8_t* grid, int32_t width, int32_t height, int32_t* point);
 extern "C" uint32_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_outline_walk(uint8_t* grid, int32_t width, int32_t height, int32_t x, int32_t y, int32_t direction, XyVobSubOutlineStep* output);
+struct XyVobSubSegment { int32_t begin,end,last,start_x,start_y,end_x,end_y; };
+extern "C" uint32_t XY_VOBSUB_CDECL xy_vsfilter_vobsub_segment(const int32_t* points, size_t point_count, const int32_t* directions, size_t direction_count, int32_t start, XyVobSubSegment* output);
 #undef XY_VOBSUB_CDECL
