@@ -20,6 +20,25 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* The native SSF driver now distinguishes declared graceful parser errors from
+  incomplete runs. Five bounded malformed literal documents run through all four
+  input modes (**20 expected-error cases**, in addition to 36 valid cases).
+  A rejection passes only with exit 2, the complete SSF exception-handler marker,
+  the declared exact error category, matching UTF-16 text including line/column,
+  empty stderr, no rendering/dump artifacts, and four equal fresh captures.
+  Cross-input-mode controls also compare error traces. Other exits, timeouts,
+  unexpected exceptions and missing completion remain failures. **36 Python
+  tests pass (three local skips)**; Windows execution of the new error fixtures
+  is pending. This adds harness coverage, with no production behavior change.
+  Native success-case evidence is now reverified and archived for both
+  architectures in [ssf-split-native-evidence.json](ssf-split-native-evidence.json)
+  (commit `372e8cfb`, 28 cases / 168 blank-frame observations per architecture)
+  and [ssf-literal-native-evidence.json](ssf-literal-native-evidence.json)
+  (commit `591f80c9`, 36 cases / 216 blank-frame observations per architecture).
+  Binary/library hashes, pinned harness sources, fixture bytes, every raw trace,
+  six encodings of dumps, frames, timing and cross-mode controls were checked.
+  Neither archive claims visible SSF rendering parity.
+
 * SSF quoted-string and brace-block parsing decisions now run in safe Rust.
   A transient stack record requests native whitespace, peek/read, append,
   definition-commit and exact error operations without retaining a Rust borrow
@@ -38,7 +57,8 @@ unresolved reference outcomes requiring investigation, never matching results.
   handling inside the controlled stream and actual IO remain outside this leaf
   proof. Wider Rust depth has no parity claim for native integer overflow.
   **149 core / 109 FFI tests**, formatting, Clippy, 35 Python checks (three local
-  skips), and native-default syntax pass. Windows/Miri are pending. Native SSF
+  skips), and native-default syntax pass. Miri and native SSF pass on both
+  architectures at `591f80c9`; remaining leaf/renderer jobs are pending. Native SSF
   coverage expands to **36 cases** with escaped quotes, escaped newlines and
   nested/escaped braces in all four input modes; changed-dump controls require
   the added definitions to be observed. Visible SSF rendering remains outside

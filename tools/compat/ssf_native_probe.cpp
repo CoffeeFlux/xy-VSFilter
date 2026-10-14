@@ -95,6 +95,6 @@ int wmain(int argc,wchar_t** argv){
     }catch(ssf::Exception& error){
         const CString message=error.ToString();printf("ssf exception utf16");
         for(int i=0;i<message.GetLength();++i)printf(" %04x",static_cast<unsigned>(message[i]));
-        printf("\n");return 2;
+        printf("\nssf-native-v1 exception complete\n");return 2;
     }catch(...){printf("ssf probe failed\n");return 3;}
 }
