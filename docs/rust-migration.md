@@ -20,6 +20,23 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* Safe Rust owns the outer `ParseRealText` document state machine. It preserves
+  comment precedence, separate text/tag paths, start-before-end conversion,
+  rendering before line insertion, history advancement afterward, open-before-
+  close formatting actions, clear carry, window/center updates and final flush.
+  A native adapter performs each requested action after the Rust input loan ends;
+  the default build retains the pinned original method. Public result containers,
+  CRT conversion, default-duration arithmetic and output streams remain native.
+  Fatal ASan/UBSan comparisons passed **72,364 sequences / 86,020 complete
+  parses** on arm64 and under x64 execution: **81,239 successful returns**,
+  **1,981 malformed returns**, **4,825,097 native callbacks**, **2,800 injected
+  interruptions** and **143,709,005 public-state observations**. State is checked
+  at classification/conversion callbacks and after repeated parses, not only at
+  successful completion. The separate 30,058 parser cases and 67,297 timing
+  parses still pass. Rust 1.85 tests (72 core, 48 FFI), strict Clippy and both
+  default syntax checks pass. Windows/Miri validation is pending. Native numeric
+  overflow, allocation failure timing and full host integration remain outside
+  this finite evidence.
 * Safe Rust owns RealText's current-line and carried-open tag lists, including
   copied raw names, all four flags and ordered attribute keys/values. Closing
   removes only the last matching opener. Clearing replaces the current list
@@ -92,8 +109,13 @@ unresolved reference outcomes requiring investigation, never matching results.
   reusing parser objects through successful and malformed documents. It checks
   persisted line maps and all window/font tag fields and center state.
   Rust 1.85 tests (66 core, 43 FFI), strict Clippy, corpus freshness and default
-  syntax checks pass. Windows/Miri validation is pending; allocation failure
-  timing remains unverified, and the outer document parser still uses C++.
+  syntax checks pass. Candidate `786752dd` passed all four portable platforms,
+  Miri and both Windows DLL jobs, each matching **382 cases / 4,490 frames** and
+  **32 mutations / 224 frames**, plus dialogs, visible controls, exports and
+  dependencies. Both native logs confirm Rust-enabled `RealTextParser.cpp`
+  compilation. [Text-extraction evidence](realtext-text-evidence.json) records
+  verified hashes and stable local validation. Allocation failure timing remains
+  unverified; this increment itself retained the native outer document parser.
 * Safe Rust owns the `ExtractTag` state machine, including comments, prefix
   recovery, partial name/flag changes and source consumption. Comment names keep
   the leading `!`; a comment delimiter at EOF still returns false without

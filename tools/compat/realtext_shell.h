@@ -25,9 +25,11 @@ static std::map<std::wstring,std::wstring>* realTextAttributes=nullptr;
 static std::vector<int64_t> realTextAttributeEvents;
 static int realTextFailure=-1,realTextAttempts=0,realTextMutation=0;
 static bool realTextMutated=false;
+static void (*realTextDocumentHook)(int,int64_t,int64_t)=nullptr;
+static void realTextDocumentEvent(int action,int64_t input,int64_t output){if(realTextDocumentHook)realTextDocumentHook(action,input,output);}
 static void (*realTextTagHook)(int,const std::wstring&)=nullptr;
 static void (*realTextLowerHook)(wint_t,wint_t)=nullptr;
-static wint_t realTextLower(wint_t c){const wint_t result=::towlower(c);if(realTextLowerHook)realTextLowerHook(c,result);return result;}
+static wint_t realTextLower(wint_t c){const wint_t result=::towlower(c);realTextDocumentEvent(4,c,result);if(realTextLowerHook)realTextLowerHook(c,result);return result;}
 static void realTextStringEvent(const std::wstring& text){realTextAttributeEvents.push_back(text.size());for(wchar_t c:text)realTextAttributeEvents.push_back(c);}
 static void realTextAttributeHook(int action,const std::wstring& name){
     if(realTextTagHook)realTextTagHook(action,name);
@@ -38,8 +40,8 @@ static void realTextAttributeHook(int action,const std::wstring& name){
     if(!realTextMutated && realTextMutation==1 && action==2){realTextInput->replace(*realTextPosition,std::wstring::npos,L" b='changed'/>");realTextMutated=true;}
     if(!realTextMutated && realTextMutation==2 && action==1){realTextInput->clear();realTextMutated=true;}
 }
-static int realTextSpace(wint_t c){const int result=::iswspace(c);realTextConversions.insert(realTextConversions.end(),{3,int64_t(c),result});realTextAttributeHook(1,std::wstring(1,wchar_t(c)));return result;}
-static int realTextDigit(wint_t c){const int result=::iswdigit(c);realTextConversions.insert(realTextConversions.end(),{1,int64_t(c),result});return result;}
+static int realTextSpace(wint_t c){const int result=::iswspace(c);realTextConversions.insert(realTextConversions.end(),{3,int64_t(c),result});realTextDocumentEvent(1,c,result);realTextAttributeHook(1,std::wstring(1,wchar_t(c)));return result;}
+static int realTextDigit(wint_t c){const int result=::iswdigit(c);realTextConversions.insert(realTextConversions.end(),{1,int64_t(c),result});realTextDocumentEvent(2,c,result);return result;}
 static int realTextToInt(const wchar_t* text){
 #ifdef _WIN32
     const int result=::_wtoi(text);
@@ -48,6 +50,7 @@ static int realTextToInt(const wchar_t* text){
 #endif
     realTextConversions.push_back(2);realTextConversions.push_back(result);
     while(*text)realTextConversions.push_back(*text++);realTextConversions.push_back(0);
+    realTextDocumentEvent(3,0,result);
     if(realTextTimecodeInput){
         if(realTextTimecodeAttempts++==realTextTimecodeFailure)throw RealTextInterrupted();
         if(!realTextTimecodeMutated && realTextTimecodeMutation){
