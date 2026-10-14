@@ -750,8 +750,12 @@ CPolygon::CPolygon(CPolygon& src) : CWord(src)
     m_width            = src.m_width;
     m_ascent           = src.m_ascent;
     m_descent          = src.m_descent;
+#ifdef XY_VSFILTER_RUST_TEXT
+    m_pathOrg.Copy(src.m_pathOrg);
+#else
     m_pathTypesOrg.Copy (src.m_pathTypesOrg );
     m_pathPointsOrg.Copy(src.m_pathPointsOrg);
+#endif
 }
 
 CPolygon::~CPolygon()
@@ -786,7 +790,11 @@ bool CPolygon::GetPOINT(CStringW& str, POINT& ret)
 
 bool CPolygon::ParseStr()
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    if(m_pathOrg.Count() > 0) return(true);
+#else
     if(m_pathTypesOrg.GetCount() > 0) return(true);
+#endif
     CPoint p;
 #ifdef XY_VSFILTER_RUST_TEXT
     static_assert(PT_MOVETO == 6 && PT_MOVETONC == 0xfe && PT_LINETO == 2 &&
@@ -925,14 +933,10 @@ bool CPolygon::ParseStr()
     }
 #ifdef XY_VSFILTER_RUST_TEXT
     if (!path.Finish()) {
-        m_pathTypesOrg.RemoveAll();
-        m_pathPointsOrg.RemoveAll();
+        m_pathOrg.Clear();
         return false;
     }
-    for (size_t i = 0; i < path.Count(); ++i) {
-        m_pathTypesOrg.Add(path.Type(i));
-        m_pathPointsOrg.Add(path.GetPoint<CPoint>(i));
-    }
+    m_pathOrg.Swap(path);
 #else
     if(lastmoveto == -1 || firstmoveto > 0)
     {
@@ -942,6 +946,20 @@ bool CPolygon::ParseStr()
     }
 #endif
     int minx = INT_MAX, miny = INT_MAX, maxx = -INT_MAX, maxy = -INT_MAX;
+#ifdef XY_VSFILTER_RUST_TEXT
+    for(size_t i = 0; i < m_pathOrg.Count(); i++)
+    {
+        CPoint point = m_pathOrg.GetPoint<CPoint>(i);
+        point.x = (int)(m_scalex * point.x);
+        m_pathOrg.SetPoint(i, point.x, point.y);
+        point.y = (int)(m_scaley * point.y);
+        m_pathOrg.SetPoint(i, point.x, point.y);
+        if(minx > point.x) minx = point.x;
+        if(miny > point.y) miny = point.y;
+        if(maxx < point.x) maxx = point.x;
+        if(maxy < point.y) maxy = point.y;
+    }
+#else
     for(size_t i = 0; i < m_pathTypesOrg.GetCount(); i++)
     {
         m_pathPointsOrg[i].x = (int)(m_scalex * m_pathPointsOrg[i].x);
@@ -951,6 +969,7 @@ bool CPolygon::ParseStr()
         if(maxx < m_pathPointsOrg[i].x) maxx = m_pathPointsOrg[i].x;
         if(maxy < m_pathPointsOrg[i].y) maxy = m_pathPointsOrg[i].y;
     }
+#endif
     m_width      = max(maxx - minx, 0);
     m_ascent     = max(maxy - miny, 0);
     int baseline = (int)(64 * m_scaley * m_baseline);
@@ -964,7 +983,11 @@ bool CPolygon::ParseStr()
 
 bool CPolygon::CreatePath(PathData* path_data)
 {
+#ifdef XY_VSFILTER_RUST_TEXT
+    int len = m_pathOrg.Count();
+#else
     int len = m_pathTypesOrg.GetCount();
+#endif
     if(len == 0) return(false);
     if(path_data->mPathPoints != len)
     {
@@ -985,8 +1008,13 @@ bool CPolygon::CreatePath(PathData* path_data)
         path_data->mpPathPoints = pNewPathPoints;
         path_data->mPathPoints  = len;
     }
+#ifdef XY_VSFILTER_RUST_TEXT
+    for(int i = 0; i < len; ++i) path_data->mpPathTypes[i] = m_pathOrg.Type(i);
+    for(int i = 0; i < len; ++i) path_data->mpPathPoints[i] = m_pathOrg.GetPoint<CPoint>(i);
+#else
     memcpy(path_data->mpPathTypes, m_pathTypesOrg.GetData(), len*sizeof(BYTE));
     memcpy(path_data->mpPathPoints, m_pathPointsOrg.GetData(), len*sizeof(POINT));
+#endif
     return(true);
 }
 

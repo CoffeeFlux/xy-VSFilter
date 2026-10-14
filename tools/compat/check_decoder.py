@@ -633,6 +633,25 @@ public:
             block = block[:a] + original_token_input + block[b:]
         drawing += block + "return true;\n}\n#undef CPolygon\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_drawing.h").write_text(drawing, encoding="utf-8")
+    stored_drawing = '#include "drawing_storage_shell.h"\n'
+    for name, content in (("OriginalStoredDrawing", lexer_source), ("CandidateStoredDrawing", candidate_lexer)):
+        text = content.decode("utf-8-sig")
+        stored_drawing += f"STORED_DRAWING_SHELL({name})\n#define CPolygon {name}\n"
+        if name == "CandidateStoredDrawing":
+            stored_drawing += "#define XY_VSFILTER_RUST_TEXT\n"
+        a = text.index("bool CPolygon::ParseStr()")
+        definition = text[a:text.index("bool CPolygon::CreatePath(", a)].rstrip()
+        assert definition.endswith("}")
+        if name == "CandidateStoredDrawing":
+            a = definition.index("    CStringW str = m_str.Get();")
+            b = definition.index("        // Drawing command state.", a)
+            definition = definition[:a] + original_token_input + definition[b:]
+        stored_drawing += definition + "\n"
+        stored_drawing += extract_definition(text, "CPolygon::CPolygon(CPolygon& src)") + "\n"
+        definition = extract_definition(text, "bool CPolygon::CreatePath(")
+        assert definition.count("realloc(") == 2
+        stored_drawing += definition.replace("realloc(", "drawingRealloc(") + "\n#undef CPolygon\n#undef XY_VSFILTER_RUST_TEXT\n"
+    (destination / "original_drawing_storage.h").write_text(stored_drawing, encoding="utf-8")
     token_code = lexer_source.decode("utf-8-sig").split("#include", 1)[0]
     token_code += '#include "drawing_tokens_shell.h"\n'
     for name, content in (("OriginalDrawingTokens", lexer_source), ("CandidateDrawingTokens", candidate_lexer)):
@@ -1013,6 +1032,12 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     drawing_result = run([str(drawing_executable)], capture_output=True, text=True)
     print(drawing_result.stdout, end="", flush=True)
     print(drawing_result.stderr, end="", file=sys.stderr)
+    stored_drawing_executable = destination / ("drawing-storage-oracle.exe" if os.name == "nt" else "drawing-storage-oracle")
+    stored_drawing_compile = [arg.replace("decoder_oracle.cpp", "drawing_storage_oracle.cpp").replace("decoder-oracle", "drawing-storage-oracle") for arg in compile_command]
+    run(stored_drawing_compile)
+    stored_drawing_result = run([str(stored_drawing_executable)], capture_output=True, text=True)
+    print(stored_drawing_result.stdout, end="", flush=True)
+    print(stored_drawing_result.stderr, end="", file=sys.stderr)
     token_executable = destination / ("drawing-tokens-oracle.exe" if os.name == "nt" else "drawing-tokens-oracle")
     token_compile = [arg.replace("decoder_oracle.cpp", "drawing_tokens_oracle.cpp")
                      .replace("decoder-oracle", "drawing-tokens-oracle") for arg in compile_command]
@@ -1610,6 +1635,9 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         "lexer_result": lexer_result.stdout, "lexer_stderr": lexer_result.stderr,
         "drawing_compile_command": drawing_compile,
         "drawing_result": drawing_result.stdout, "drawing_stderr": drawing_result.stderr,
+        "drawing_storage_compile_command": stored_drawing_compile,
+        "drawing_storage_result": stored_drawing_result.stdout, "drawing_storage_stderr": stored_drawing_result.stderr,
+        "drawing_storage_scope": "Pinned complete ParseStr with synthetic token/point delivery, copy constructor and CreatePath; native finite representable scaling and metrics, exact path records and copies, cache bypass, errno/FP flags, guarded modeled allocation/reallocation failures and retry; native OS allocation failure and empty valid paths excluded",
         "drawing_tokens_compile_command": token_compile,
         "drawing_tokens_result": token_result.stdout, "drawing_tokens_stderr": token_result.stderr,
         "fields_compile_command": fields_compile,

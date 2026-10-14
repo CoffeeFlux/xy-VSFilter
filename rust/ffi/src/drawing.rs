@@ -9,6 +9,45 @@ pub extern "C" fn xy_vsfilter_drawing_create() -> *mut Drawing {
 }
 
 /// # Safety
+/// destination is live and exclusive; source is live and immutable during call.
+/// The same owner is accepted as a no-op, with no simultaneous Rust borrows.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_drawing_copy(
+    destination: *mut Drawing,
+    source: *const Drawing,
+) {
+    if core::ptr::eq(destination, source) {
+        return;
+    }
+    // SAFETY: immutable source is live and distinct from destination.
+    let copy = unsafe { &*source }.clone();
+    // SAFETY: source borrow has ended; destination is exclusively owned.
+    unsafe { *destination = copy };
+}
+
+/// # Safety
+/// owner is live and exclusive. op 0 clears; op 1 updates an existing point.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_drawing_edit(
+    owner: *mut Drawing,
+    op: u32,
+    index: usize,
+    x: i32,
+    y: i32,
+) -> u32 {
+    // SAFETY: no native pointer to storage escapes and no callback spans borrow.
+    let state = unsafe { &mut *owner };
+    match op {
+        0 => {
+            state.clear();
+            1
+        }
+        1 => u32::from(state.set_point(index, Point { x, y })),
+        _ => 0,
+    }
+}
+
+/// # Safety
 /// owner is the live unique pointer from create, with no concurrent operations.
 /// Start a command (op 0, x=raw command unit); supply successful points (op 1)
 /// or failure (op 2) until the return is zero, before the next command. Op 3
@@ -86,6 +125,36 @@ mod tests {
             );
             assert_eq!(xy_vsfilter_drawing_field(owner, 2, usize::MAX), 0);
             xy_vsfilter_drawing_release(owner);
+        }
+    }
+
+    #[test]
+    fn persistent_copy_and_native_coordinate_edits_are_independent() {
+        let source = xy_vsfilter_drawing_create();
+        let copy = xy_vsfilter_drawing_create();
+        // SAFETY: two distinct live owners, sequential operations, final releases.
+        unsafe {
+            xy_vsfilter_drawing_step(source, 0, 109, 0);
+            xy_vsfilter_drawing_step(source, 1, 7, -9);
+            xy_vsfilter_drawing_step(source, 2, 0, 0);
+            xy_vsfilter_drawing_step(source, 3, 0, 0);
+            xy_vsfilter_drawing_copy(copy, source);
+            xy_vsfilter_drawing_copy(copy, copy);
+            assert_eq!(xy_vsfilter_drawing_edit(copy, 1, 0, -19, 23), 1);
+            assert_eq!(xy_vsfilter_drawing_edit(copy, 1, usize::MAX, 0, 0), 0);
+            assert_eq!(
+                xy_vsfilter_drawing_field(source, 2, 0),
+                u64::from(7u32) | (u64::from((-9i32) as u32) << 32)
+            );
+            xy_vsfilter_drawing_edit(source, 0, 0, 0, 0);
+            assert_eq!(xy_vsfilter_drawing_field(source, 0, 0), 0);
+            assert_eq!(xy_vsfilter_drawing_field(copy, 0, 0), 1);
+            assert_eq!(
+                xy_vsfilter_drawing_field(copy, 2, 0),
+                u64::from((-19i32) as u32) | (23u64 << 32)
+            );
+            xy_vsfilter_drawing_release(source);
+            xy_vsfilter_drawing_release(copy);
         }
     }
 }

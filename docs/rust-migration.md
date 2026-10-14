@@ -20,6 +20,27 @@ unresolved reference outcomes requiring investigation, never matching results.
 
 ## What has been implemented
 
+* CPolygon now retains its drawing types/points in a Rust owner through native
+  scaling, independent polygon copies, cache reuse and rasterizer handoff. The
+  temporary parsed path transfers ownership instead of copying into native arrays;
+  no pointer into Rust path storage escapes. Native coordinate conversion and
+  metric arithmetic stay in order, including each coordinate's stored update.
+  Native rasterizer allocation order is retained before copying types and points.
+  Fatal ASan/UBSan comparisons passed **6,520 persistent histories** on arm64 and
+  under x64 execution: **81,129 vertices / 6,520 independent copies / 156,480
+  handoffs / 42,054 modeled allocation failures / 14,439,252 output byte-and-metadata
+  observations**. Rust performed **6,520 copies / 5,800 ownership transfers /
+  168,058 coordinate updates / 720 clears**. Exact records, metrics, errno, FP flags,
+  guarded outputs, partial allocation state and retry match. The **343,183 drawing
+  state comparisons** also pass on both architectures. Token/point delivery,
+  array containers and allocation sinks are controlled models in this oracle;
+  native OS allocation failures, empty valid paths and unrepresentable geometry
+  are excluded. FP observations include seeded flags.
+  Rust 1.85 tests (122 core, 79 FFI), strict Clippy, default syntax and Python
+  checks pass. Six scale/baseline/clip scripts and a visible scale control expand
+  the renderer corpus to **654 cases**. Windows/Miri and renderer checks for this
+  increment are pending. Numeric conversion, geometry arithmetic, rasterizer
+  buffers and actual-host integration remain native/separate work.
 * Safe Rust prepares drawing command separators before the existing raw-token
   traversal. Each lowercase command gets the same preceding `*`, including
   command letters inside arbitrary text. Existing separators and raw UTF-16 are
@@ -108,8 +129,9 @@ unresolved reference outcomes requiring investigation, never matching results.
   Eight whitespace/karaoke scripts and a soft-break visible control expand
   renderer validation to **586 cases**. Rust 1.85 tests (112 core, 74 FFI), strict
   Clippy, default syntax and Python harness checks pass. Windows/Miri and full
-  renderer checks for escape preparation are pending. The preceding run-storage
-  increment passed all four platforms, Miri and both Windows renderers with
+  escape-preparation checks now pass on all four platforms, Miri and both Windows
+  renderers; see [verified escape evidence](text-preparation-evidence.json).
+  The preceding run-storage increment also passed all four platforms, Miri and both Windows renderers with
   **586 cases / 6,210 frames**, plus **32 mutation cases / 224 frames**, matching
   dialogs, controls, exports and dependencies; see [verified run-storage evidence](text-runs-evidence.json).
   NUL escape replacement, font metrics, word objects and full host integration

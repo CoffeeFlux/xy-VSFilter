@@ -335,6 +335,20 @@ def drawing_preparation_variants():
         yield "drawing-prepare-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
 
 
+
+def drawing_storage_variants():
+    square = br"m 0 0 l 80 0 80 50 0 50"
+    for name, payload in {
+        "control": br"{\p1}" + square + br"{\p0}after",
+        "fractional-scale": br"{\p1\fscx123.25\fscy77.5\pbo-3}" + square + br"{\p0}after",
+        "drawing-scale-two": br"{\p2\pbo4}" + square + br"{\p0}after",
+        "spline-copy": br"{\p2\fscx150}m 0 0 s 0 100 100 100 100 0 c{\p0}after",
+        "vector-clip": br"{\clip(1,m 200 100 l 440 100 440 260 200 260)}Clipped sample",
+        "inverse-clip": br"{\iclip(2,m 500 250 l 780 250 780 430 500 430)}Clipped sample",
+    }.items():
+        yield "drawing-storage-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
+
+
 def layout_rect_variants():
     prefix = SEED[:SEED.index(b"Dialogue:")]
     for name, alignment, second_layer, border, collisions, multiline in (
@@ -615,7 +629,8 @@ def make_cases(files):
                                                     ("layout-rect-bottom", "layout-rect-split-layers"),
                                                     ("text-runs-soft-wrap-zero", "text-runs-soft-wrap-two"),
                                                     ("wrap-width-style-0", "wrap-width-style-2"),
-                                                    ("line-layout-align-1", "line-layout-align-9"))
+                                                    ("line-layout-align-1", "line-layout-align-9"),
+                                                    ("drawing-storage-control", "drawing-storage-fractional-scale"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -634,6 +649,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in wrap_width_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in line_layout_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in drawing_preparation_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in drawing_storage_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in realtext_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_header_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_style_variants()]
