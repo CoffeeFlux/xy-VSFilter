@@ -16,5 +16,11 @@
     "candidate_fp_flags": 4
   },
   "observation": "The base-mask producer returns null, so both methods return before any Rust fade call. Ordinary optimization can change whether the preceding native float-to-int conversion is evaluated before that return. This observation does not establish ordinary optimized ambient-flag parity.",
-  "followup": "The full caller oracle now requests FP-observable compilation, matching the existing ellipse-oracle approach. New CI results are required; no flags are masked and the failed job remains failed. Actual Windows DLL rendering uses production build flags."
+  "followup": "Unix extracted fade comparisons now use Clang -ffp-model=strict; Windows uses MSVC /fp:strict. GCC ambient effects remain unresolved. No flags are masked. Actual Windows DLL flags are unchanged; new CI required.",
+  "strict_gcc_followup": {
+    "candidate_commit": "18f48f446708a76b8016ed5c662b14499a837a4b",
+    "job_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38569532488/job/115870772201",
+    "job_log_sha256": "069fa683863e7fb6f9321509d6e4f9e61b7f1b8e08451ca1d14d5d841a5fb976",
+    "outcome": "Same 36/4 mismatch despite GCC trapping/rounding flags and disabled vectorization; not a pass."
+  }
 }

@@ -1,5 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "original_vobsub_storage.h"
+#include <type_traits>
+// CVobSubFile::Copy assigns the containing CVobSubSettings. Until its alias
+// histories are covered, production keeps the native image assignment surface.
+struct ProductionSettingsCopy { ProductionVobStorage::CVobSubImage image; };
+static_assert(std::is_copy_assignable<ProductionSettingsCopy>::value,
+              "Production VobSub settings assignment must remain available");
+static_assert(!std::is_copy_assignable<CandidateVobStorage::CVobSubImage>::value,
+              "The staged exclusive-owner image must not shallow-copy owners");
 static uint64_t calls=0,fields=0,observations=0,initialized=0,unwritten=0,failures=0,reuses=0,negativeReuses=0,excluded=0;
 static void seed(){errno=EDOM;std::feclearexcept(FE_ALL_EXCEPT);std::feraiseexcept(FE_DIVBYZERO);
 #ifdef _WIN32
