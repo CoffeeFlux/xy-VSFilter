@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "scope": "Experimental persistent document containers/styles/identity/interpretation/scriptlayout/initializedmetadata; defaultproduction unchanged",
-  "measured_base_commit": "61e91fa3ce6ab54cbf7a6222d47bc910e87baa1d",
+  "measured_base_commit": "0976ec8a960e9a39ddca3781de4b3d38965bb6be",
   "working_tree_source_hashes": true,
   "core_unsafe": {
     "production_block": 0,
@@ -16,8 +16,8 @@
     "test_other": 0
   },
   "ffi_total": {
-    "production_block": 363,
-    "production_function": 305,
+    "production_block": 368,
+    "production_function": 307,
     "production_impl": 2,
     "production_trait": 0,
     "production_other": 0,
@@ -30,12 +30,12 @@
   "new_boundary_files": [
     {
       "path": "rust/ffi/src/document.rs",
-      "sha256": "4ef3bb19c453014d332463763854c87cb8291a7838152d12764c90c0acfe71ee",
-      "physical_lines_including_tests": 3661,
-      "nonblank_code_lines_excluding_tests": 1204,
+      "sha256": "c825ea9e3013935e8b17d7afa17932385a8346038fd3aadb5ed9d00de573ee2c",
+      "physical_lines_including_tests": 3917,
+      "nonblank_code_lines_excluding_tests": 1311,
       "counts": {
-        "production_block": 37,
-        "production_function": 32,
+        "production_block": 42,
+        "production_function": 34,
         "production_impl": 0,
         "production_trait": 0,
         "production_other": 0,
@@ -47,178 +47,183 @@
       },
       "sites": [
         {
-          "line": 107,
+          "line": 108,
           "kind": "function",
           "test": false
         },
         {
-          "line": 131,
+          "line": 120,
           "kind": "block",
           "test": false
         },
         {
-          "line": 141,
+          "line": 121,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 172,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 180,
           "kind": "function",
           "test": false
         },
         {
-          "line": 185,
+          "line": 190,
           "kind": "block",
           "test": false
         },
         {
-          "line": 223,
+          "line": 199,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 224,
           "kind": "function",
           "test": false
         },
         {
-          "line": 230,
+          "line": 248,
           "kind": "block",
           "test": false
         },
         {
-          "line": 240,
+          "line": 258,
           "kind": "function",
           "test": false
         },
         {
-          "line": 244,
+          "line": 302,
           "kind": "block",
           "test": false
         },
         {
-          "line": 266,
+          "line": 340,
           "kind": "function",
           "test": false
         },
         {
-          "line": 270,
+          "line": 347,
           "kind": "block",
           "test": false
         },
         {
-          "line": 287,
+          "line": 357,
           "kind": "function",
           "test": false
         },
         {
-          "line": 293,
+          "line": 361,
           "kind": "block",
           "test": false
         },
         {
-          "line": 338,
+          "line": 383,
           "kind": "function",
-          "test": false
-        },
-        {
-          "line": 344,
-          "kind": "block",
           "test": false
         },
         {
           "line": 387,
-          "kind": "function",
-          "test": false
-        },
-        {
-          "line": 409,
           "kind": "block",
           "test": false
         },
         {
-          "line": 425,
+          "line": 404,
           "kind": "function",
           "test": false
         },
         {
-          "line": 437,
+          "line": 410,
           "kind": "block",
           "test": false
         },
         {
-          "line": 480,
+          "line": 455,
           "kind": "function",
           "test": false
         },
         {
-          "line": 506,
+          "line": 461,
           "kind": "block",
+          "test": false
+        },
+        {
+          "line": 504,
+          "kind": "function",
           "test": false
         },
         {
           "line": 526,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 542,
           "kind": "function",
           "test": false
         },
         {
-          "line": 541,
+          "line": 554,
           "kind": "block",
           "test": false
         },
         {
-          "line": 571,
+          "line": 597,
           "kind": "function",
           "test": false
         },
         {
-          "line": 585,
+          "line": 623,
           "kind": "block",
           "test": false
         },
         {
-          "line": 592,
+          "line": 643,
           "kind": "function",
           "test": false
         },
         {
-          "line": 610,
+          "line": 658,
           "kind": "block",
           "test": false
         },
         {
-          "line": 637,
+          "line": 688,
           "kind": "function",
           "test": false
         },
         {
-          "line": 655,
+          "line": 702,
           "kind": "block",
           "test": false
         },
         {
-          "line": 662,
+          "line": 709,
           "kind": "function",
           "test": false
         },
         {
-          "line": 676,
+          "line": 727,
           "kind": "block",
           "test": false
         },
         {
-          "line": 678,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 713,
+          "line": 754,
           "kind": "function",
           "test": false
         },
         {
-          "line": 725,
+          "line": 772,
           "kind": "block",
           "test": false
         },
         {
-          "line": 749,
+          "line": 779,
           "kind": "function",
-          "test": false
-        },
-        {
-          "line": 765,
-          "kind": "block",
           "test": false
         },
         {
@@ -227,12 +232,7 @@
           "test": false
         },
         {
-          "line": 808,
-          "kind": "function",
-          "test": false
-        },
-        {
-          "line": 823,
+          "line": 795,
           "kind": "block",
           "test": false
         },
@@ -242,77 +242,67 @@
           "test": false
         },
         {
-          "line": 848,
+          "line": 842,
           "kind": "block",
           "test": false
         },
         {
-          "line": 855,
+          "line": 866,
           "kind": "function",
           "test": false
         },
         {
-          "line": 877,
+          "line": 882,
           "kind": "block",
           "test": false
         },
         {
-          "line": 884,
+          "line": 910,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 925,
           "kind": "function",
           "test": false
         },
         {
-          "line": 907,
+          "line": 940,
           "kind": "block",
           "test": false
         },
         {
-          "line": 929,
+          "line": 947,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1035,
+          "line": 965,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1042,
+          "line": 972,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1052,
+          "line": 994,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1060,
+          "line": 1001,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1078,
+          "line": 1024,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1094,
-          "kind": "function",
-          "test": false
-        },
-        {
-          "line": 1110,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1130,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1137,
+          "line": 1046,
           "kind": "function",
           "test": false
         },
@@ -322,43 +312,33 @@
           "test": false
         },
         {
-          "line": 1162,
+          "line": 1159,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1170,
+          "line": 1169,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1181,
+          "line": 1177,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1192,
+          "line": 1195,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1193,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1222,
+          "line": 1211,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1229,
+          "line": 1227,
           "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1240,
-          "kind": "function",
           "test": false
         },
         {
@@ -367,87 +347,142 @@
           "test": false
         },
         {
-          "line": 1265,
+          "line": 1254,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1281,
+          "line": 1269,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1279,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 1287,
           "kind": "block",
           "test": false
         },
         {
           "line": 1298,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1341,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1358,
+          "line": 1309,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1371,
+          "line": 1310,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1339,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 1346,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1357,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 1364,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1382,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 1398,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1415,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1458,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 1475,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1488,
           "kind": "function",
           "test": true
         },
         {
-          "line": 1375,
+          "line": 1492,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1397,
+          "line": 1514,
           "kind": "function",
           "test": true
         },
         {
-          "line": 1400,
+          "line": 1517,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1412,
+          "line": 1529,
           "kind": "function",
           "test": true
         },
         {
-          "line": 1416,
+          "line": 1533,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1421,
+          "line": 1538,
           "kind": "function",
           "test": true
         },
         {
-          "line": 1425,
+          "line": 1542,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1430,
+          "line": 1547,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1454,
+          "line": 1571,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1463,
+          "line": 1580,
           "kind": "block",
           "test": true
         }
       ],
-      "production_extern_functions": 49,
+      "production_extern_functions": 52,
       "operations": {
         "raw_shared_slice_construction": 1,
         "raw_mutable_slice_construction": 0,
@@ -461,9 +496,9 @@
     },
     {
       "path": "rust/ffi/src/document_registry.rs",
-      "sha256": "8b8f16bf14c44133bd09814c26c4044ef8630701dd38dd8f3241a2aa73769e12",
-      "physical_lines_including_tests": 473,
-      "nonblank_code_lines_excluding_tests": 208,
+      "sha256": "46458dc604894d83e23c262c0f532275b35ea2b569b22729522b3fbe775427fb",
+      "physical_lines_including_tests": 542,
+      "nonblank_code_lines_excluding_tests": 255,
       "counts": {
         "production_block": 1,
         "production_function": 0,
@@ -478,12 +513,12 @@
       },
       "sites": [
         {
-          "line": 208,
+          "line": 261,
           "kind": "impl",
           "test": false
         },
         {
-          "line": 252,
+          "line": 305,
           "kind": "block",
           "test": false
         }
@@ -502,17 +537,17 @@
     }
   ],
   "prior_ffi_production_blocks": 325,
-  "added_production_blocks": 38,
+  "added_production_blocks": 43,
   "added_unsafe_impls": 1,
   "retired_native_owners": 18,
   "retired_ffi_crossings": 0,
-  "review": "Frozen unknown-style protocol measurement; typed owner/run/reply lifetime and status-atomic preflight reviewed. Allocation/reentry/native invalidating callback histories and full Windows owner parity remain unresolved.",
+  "review": "Frozen AddStyle session working-tree measurement; input staging, typed owner/run/reply lifetimes, two-slot preflight and native exception cleanup reviewed. Changed-source Windows gates and allocation/reentry/native unresolved histories remain pending.",
   "remaining_contracts": [
     "Changed-code Windows x86/x64 full-class named/default lifecycle, style API/value and renderer comparisons",
     "Native wrapper publication/destruction and real host lifetimes",
     "Allocator/new-handler reentry/privateBusy and Rust abort versus native allocation/partial-failure behavior",
     "Native duplicate naming/CopyStyles/serializer choreography and malformed/reference-null outcomes",
-    "Document metadata and temporary dialog bookkeeping remain native"
+    "Native CRT duplicate naming and warning display remain adapters; m_simple supply contract remains unresolved"
   ],
   "historical_measurements": [
     {
@@ -1339,30 +1374,544 @@
         "test_trait": 0,
         "test_other": 0
       }
+    },
+    {
+      "status": "superseded unknown-style session source measurement; original counts preserved",
+      "measured_base_commit": "61e91fa3ce6ab54cbf7a6222d47bc910e87baa1d",
+      "working_tree_source_hashes": true,
+      "source_hashes": {
+        "src/subtitles/STS.h": "969cd4ba558665f1c7b64a6dca66ba9d3befe21d4a60d36076750d70af028ee4",
+        "src/subtitles/STS.cpp": "169e03df07f99429bbeb628b121ae08cdd1a9fbed28cdca6e2d175a4474e4ffd",
+        "src/subtitles/RTS.cpp": "17acfde7157426a0a7e3ace4c71b37e3de16ba15300636d39d40de8a4e82f631",
+        "src/subtitles/USFSubtitles.cpp": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
+        "src/subtitles/SubtitleInputPin.cpp": "210276fdf0da5108dd3135b5934dc83015512604d0e8c12fde4d1f9a02ad105d",
+        "src/filters/transform/vsfilter/DirectVobSubFilter.cpp": "d6e056e9357234b9935fe3a8760655df8e1c3c0a5fa6a9954d343ea0234033af",
+        "src/filters/transform/vsfilter/xy_sub_filter.cpp": "680a96edc424c3a4324b514c5f74fded15857d3525b78d114c5394205dac8f9d",
+        "src/filters/transform/vsfilter/plugins.cpp": "38526740c55b4bc51642925d1ded688ebdd0ff26a01b5a5dd7f587add31df3da",
+        "src/subtitles/RustDocumentOwner.h": "4e87f09b3f7e9cd9bc4cd103fd28b7237df6ed8999f6e0ce92bb99c176d334db",
+        "rust/compat/src/document.rs": "e9333360e3683a88c4c6f556b83a7e5b9555c26e1295880959d83c2ffe4955d6",
+        "rust/ffi/src/document.rs": "4ef3bb19c453014d332463763854c87cb8291a7838152d12764c90c0acfe71ee",
+        "rust/ffi/src/document_registry.rs": "8b8f16bf14c44133bd09814c26c4044ef8630701dd38dd8f3241a2aa73769e12",
+        "include/xy_rust_document.h": "204d13d8c568929d547c21e482c03ac71718ef293545d1716ab60503d5f3e4ec",
+        "tools/compat/document_native_lifecycle.cpp": "87401bf3805ec9aa3a46a40db4541d4fab95841b2959a6685240d433fb6a16df",
+        "tools/compat/document_native_lifecycle.py": "56408e372b5a0020fdd611acc66b3c257b57eab52c59d43950dcc9ffabdafa97",
+        "tools/compat/summarize_evidence.py": "65d379bbe93f277fdd15fbf953468c74c846a6b2e8c7356439311a674b602483",
+        "tools/compat/audit_document_access.py": "87c06682b25d879bb0fc654e59e54dd0cfc2c24e2ca3621f5dc58ac4c8e86a7b",
+        "rust/compat/src/document_unknown.rs": "e9d0af429f752cc4ee0d9c31077b37304e0124b3fc9fa0974250e84612c84360",
+        "rust/compat/src/lib.rs": "059947ad6c8187ed83b98a6144bd703780d94310bddd6d235fd022684858f000"
+      },
+      "ffi_total": {
+        "production_block": 363,
+        "production_function": 305,
+        "production_impl": 2,
+        "production_trait": 0,
+        "production_other": 0,
+        "test_block": 119,
+        "test_function": 4,
+        "test_impl": 0,
+        "test_trait": 0,
+        "test_other": 0
+      },
+      "new_boundary_files": [
+        {
+          "path": "rust/ffi/src/document.rs",
+          "sha256": "4ef3bb19c453014d332463763854c87cb8291a7838152d12764c90c0acfe71ee",
+          "physical_lines_including_tests": 3661,
+          "nonblank_code_lines_excluding_tests": 1204,
+          "counts": {
+            "production_block": 37,
+            "production_function": 32,
+            "production_impl": 0,
+            "production_trait": 0,
+            "production_other": 0,
+            "test_block": 7,
+            "test_function": 4,
+            "test_impl": 0,
+            "test_trait": 0,
+            "test_other": 0
+          },
+          "sites": [
+            {
+              "line": 107,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 131,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 141,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 185,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 223,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 230,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 240,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 244,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 266,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 270,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 287,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 293,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 338,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 344,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 387,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 409,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 425,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 437,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 480,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 506,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 526,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 541,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 571,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 585,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 592,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 610,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 637,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 655,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 662,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 676,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 678,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 713,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 725,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 749,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 765,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 793,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 808,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 823,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 830,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 848,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 855,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 877,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 884,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 907,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 929,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1035,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1042,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1052,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1060,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1078,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1094,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1110,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1130,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1137,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1152,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1162,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1170,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1181,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1192,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1193,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1222,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1229,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1240,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1247,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1265,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1281,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1298,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1341,
+              "kind": "function",
+              "test": false
+            },
+            {
+              "line": 1358,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1371,
+              "kind": "function",
+              "test": true
+            },
+            {
+              "line": 1375,
+              "kind": "block",
+              "test": true
+            },
+            {
+              "line": 1397,
+              "kind": "function",
+              "test": true
+            },
+            {
+              "line": 1400,
+              "kind": "block",
+              "test": true
+            },
+            {
+              "line": 1412,
+              "kind": "function",
+              "test": true
+            },
+            {
+              "line": 1416,
+              "kind": "block",
+              "test": true
+            },
+            {
+              "line": 1421,
+              "kind": "function",
+              "test": true
+            },
+            {
+              "line": 1425,
+              "kind": "block",
+              "test": true
+            },
+            {
+              "line": 1430,
+              "kind": "block",
+              "test": true
+            },
+            {
+              "line": 1454,
+              "kind": "block",
+              "test": true
+            },
+            {
+              "line": 1463,
+              "kind": "block",
+              "test": true
+            }
+          ],
+          "production_extern_functions": 49,
+          "operations": {
+            "raw_shared_slice_construction": 1,
+            "raw_mutable_slice_construction": 0,
+            "box_from_raw": 0,
+            "raw_nonoverlapping_copy": 1,
+            "unchecked_index_calls": 0,
+            "transmute_calls": 0,
+            "inline_assembly": 0,
+            "mutable_statics": 0
+          }
+        },
+        {
+          "path": "rust/ffi/src/document_registry.rs",
+          "sha256": "8b8f16bf14c44133bd09814c26c4044ef8630701dd38dd8f3241a2aa73769e12",
+          "physical_lines_including_tests": 473,
+          "nonblank_code_lines_excluding_tests": 208,
+          "counts": {
+            "production_block": 1,
+            "production_function": 0,
+            "production_impl": 1,
+            "production_trait": 0,
+            "production_other": 0,
+            "test_block": 0,
+            "test_function": 0,
+            "test_impl": 0,
+            "test_trait": 0,
+            "test_other": 0
+          },
+          "sites": [
+            {
+              "line": 208,
+              "kind": "impl",
+              "test": false
+            },
+            {
+              "line": 252,
+              "kind": "block",
+              "test": false
+            }
+          ],
+          "production_extern_functions": 0,
+          "operations": {
+            "raw_shared_slice_construction": 0,
+            "raw_mutable_slice_construction": 0,
+            "box_from_raw": 0,
+            "raw_nonoverlapping_copy": 0,
+            "unchecked_index_calls": 0,
+            "transmute_calls": 0,
+            "inline_assembly": 0,
+            "mutable_statics": 0
+          }
+        }
+      ],
+      "review": "Frozen unknown-style protocol measurement; typed owner/run/reply lifetime and status-atomic preflight reviewed. Allocation/reentry/native invalidating callback histories and full Windows owner parity remain unresolved."
     }
   ],
   "retired_native_owners_scope": "Eighteen native fields/containers opt-in only; defaultproduction retirementzero",
   "measurement_method": "Current audit_rust_boundary.inventory over actual Rust source, comments/literals masked and test items separated; counts overlap and do not establish soundness. Historical original snapshot retained.",
   "source_hashes": {
     "src/subtitles/STS.h": "969cd4ba558665f1c7b64a6dca66ba9d3befe21d4a60d36076750d70af028ee4",
-    "src/subtitles/STS.cpp": "169e03df07f99429bbeb628b121ae08cdd1a9fbed28cdca6e2d175a4474e4ffd",
+    "src/subtitles/STS.cpp": "0306f0848ad7fe43f16e1794fec2c566c23b25f22677f809ad3e714fc5430145",
     "src/subtitles/RTS.cpp": "17acfde7157426a0a7e3ace4c71b37e3de16ba15300636d39d40de8a4e82f631",
     "src/subtitles/USFSubtitles.cpp": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
     "src/subtitles/SubtitleInputPin.cpp": "210276fdf0da5108dd3135b5934dc83015512604d0e8c12fde4d1f9a02ad105d",
     "src/filters/transform/vsfilter/DirectVobSubFilter.cpp": "d6e056e9357234b9935fe3a8760655df8e1c3c0a5fa6a9954d343ea0234033af",
     "src/filters/transform/vsfilter/xy_sub_filter.cpp": "680a96edc424c3a4324b514c5f74fded15857d3525b78d114c5394205dac8f9d",
     "src/filters/transform/vsfilter/plugins.cpp": "38526740c55b4bc51642925d1ded688ebdd0ff26a01b5a5dd7f587add31df3da",
-    "src/subtitles/RustDocumentOwner.h": "4e87f09b3f7e9cd9bc4cd103fd28b7237df6ed8999f6e0ce92bb99c176d334db",
-    "rust/compat/src/document.rs": "e9333360e3683a88c4c6f556b83a7e5b9555c26e1295880959d83c2ffe4955d6",
-    "rust/ffi/src/document.rs": "4ef3bb19c453014d332463763854c87cb8291a7838152d12764c90c0acfe71ee",
-    "rust/ffi/src/document_registry.rs": "8b8f16bf14c44133bd09814c26c4044ef8630701dd38dd8f3241a2aa73769e12",
-    "include/xy_rust_document.h": "204d13d8c568929d547c21e482c03ac71718ef293545d1716ab60503d5f3e4ec",
-    "tools/compat/document_native_lifecycle.cpp": "87401bf3805ec9aa3a46a40db4541d4fab95841b2959a6685240d433fb6a16df",
-    "tools/compat/document_native_lifecycle.py": "56408e372b5a0020fdd611acc66b3c257b57eab52c59d43950dcc9ffabdafa97",
-    "tools/compat/summarize_evidence.py": "65d379bbe93f277fdd15fbf953468c74c846a6b2e8c7356439311a674b602483",
-    "tools/compat/audit_document_access.py": "87c06682b25d879bb0fc654e59e54dd0cfc2c24e2ca3621f5dc58ac4c8e86a7b",
+    "src/subtitles/RustDocumentOwner.h": "15e04a3bdc4061a1a84eba9ffa02b22dafaad71ca0403b5782c6ce354f4952ff",
+    "rust/compat/src/document.rs": "a0d821932ee9d1c04e6c4d980de24879d9fa07693adf2cc4842b18058ee37f53",
+    "rust/ffi/src/document.rs": "c825ea9e3013935e8b17d7afa17932385a8346038fd3aadb5ed9d00de573ee2c",
+    "rust/ffi/src/document_registry.rs": "46458dc604894d83e23c262c0f532275b35ea2b569b22729522b3fbe775427fb",
+    "include/xy_rust_document.h": "d646b3b8d552cc626f56e54fbb8e7b730486e40964a9bc37e9351c51116684e4",
+    "tools/compat/document_native_lifecycle.cpp": "28163b86d6c302bbf709308550244a551b170af2b39e3693af9aaf5b85b2bf0b",
+    "tools/compat/document_native_lifecycle.py": "e14babfe567ad44492ad7c907a2f22ceb86133cb626d45174eebf9bf43145142",
+    "tools/compat/summarize_evidence.py": "9ca6127b06109b14737af8bf4fa18561c980932571363d2b8c74926af1b3f6a2",
+    "tools/compat/audit_document_access.py": "e89014e73a2d72c966f0c5506e3cf0822e24c0b4c8338a6461abf2585076262f",
     "rust/compat/src/document_unknown.rs": "e9d0af429f752cc4ee0d9c31077b37304e0124b3fc9fa0974250e84612c84360",
-    "rust/compat/src/lib.rs": "059947ad6c8187ed83b98a6144bd703780d94310bddd6d235fd022684858f000"
+    "rust/compat/src/lib.rs": "c95c33bc159f6e7e5b5d56055a115e35e592252e6b83a77c8f3776373269b69e",
+    "rust/compat/src/document_style_add.rs": "1a9948d942dd3cd56a3d3d8c0c897762101859944def56a4b81ce6ae122e27a6"
   },
   "default_style_extension": {
     "set": "xy_vsfilter_document_set_default_style_v1 copies input and decodes before admission; validates handle before taking pending value; retired Option drops outside admission, including failure/Busy pending input.",
@@ -2963,6 +3512,33 @@
       "production_blocks": 2,
       "unsafe_function_declarations": 2,
       "explanation": "New open/step unsafe exports use existing validated output-write helper; no raw input buffer or new unsafe impl."
+    }
+  },
+  "add_style_session_extension": {
+    "scope": "Experimental coarse AddStyle classification and conflict commit; native CRT suffix naming and original incoming temporary deletion retained",
+    "capture_scope": "Hashes describe this working-tree capture over measured_base_commit, not a published or Windows-validated build",
+    "exports": [
+      "xy_vsfilter_document_add_style_begin_v1",
+      "xy_vsfilter_document_add_style_submit_v1",
+      "xy_vsfilter_document_add_style_drop_v1"
+    ],
+    "contracts": [
+      "Begin copies raw UTF16LE name and decodes nullable Style192 wire before admission. Logical empty name normalizes Default; full nonempty raw name is retained. Zero style bytes denote null. Missing inserts and equal values discard incoming; null comparisons remain unresolved.",
+      "Begin validates 16-byte output, packet length, two monotonic IDs and two registry slots before core mutation. Output is snapshotID:u64/runID:u64. Immutable snapshot packet24 is action:u32(0Done/1Conflict),reserved-zero:u32,runID:u64(0Done),nameUnits:u64 plus normalized raw UTF16LE, also for Done. Snapshot is inserted before conflict run using reserved IDs; unused second ID on Done remains available.",
+      "StyleAddRun stores integer owner ID and captured previous/incoming owned values. Submit stages candidate and preflights output8; occupied candidates including null return applied0 without mutation. Free candidate commits relocation, entry rename and incoming installation within one admission, marks session finished and returns applied1. No generations or callback-driven reclassification are invented.",
+      "Owner destruction makes submit fail typed lookup; session remains droppable. Finished sessions reject another submit. Sessions and retired values are destroyed after admission. Map key/node and temporary allocation/destruction timing remain qualified.",
+      "Native StyleAddition installs direct runID before reading reply or materializing CString. Constructor catch closes run after snapshot RAII cleanup; destructor closes successful session. Native incoming pointer deletion occurs only after Done or committed candidate. Destructor contract failure terminates under existing experimental policy."
+    ],
+    "validation": {
+      "local": "119 FFI tests and pinned Rust 1.85 all-target Clippy pass. Cases cover missing/equal/conflict, normalized packet/run ID consistency, output refusal, occupied candidate no-op, overlap staging, wrong types, stale owner, finished session, cleanup and two-ID exhaustion preflight.",
+      "windows": "Changed-source actual headers/lifecycle/modal/renderer gates pending; no full Windows parity claim."
+    },
+    "unsafe_delta": {
+      "production_blocks": 5,
+      "unsafe_function_declarations": 2,
+      "new_raw_helpers": 0,
+      "new_unsafe_impls": 0,
+      "explanation": "Begin/submit use existing copy-input/output helpers; drop has no unsafe body. No new raw pointer mechanism."
     }
   }
 }

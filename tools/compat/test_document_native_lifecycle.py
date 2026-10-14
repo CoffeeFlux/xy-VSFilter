@@ -74,6 +74,11 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
          + b"".join((b"conversion-callback " + row + b"\n" if row.split(b" ",1)[0] in (b"conversion-frame-half",b"conversion-time-half",b"conversion-empty-frame",b"conversion-empty-time") else b"") + b"conversion-stage " + row + b"\n" for row in conversion_rows())
          + b"unknown-open-callback mode=0 entries=1 segments=1 style 11 0055 006e 006b 006e 006f 0077 006e 004f 0070 0065 006e\n"
          + b"\n".join(unknown_rows()) + b"\n"
+         + b"add-style-stage add-style-equal-before\n"
+         + b"add-style-retained ZeroNeg bits=8000000000000000 font 4 004e 0000 d801 005a\n"
+         + b"add-style-retained ZeroPos bits=0000000000000000 font 4 004e 0000 d802 005a\n"
+         + b"add-style-stage add-style-equal-after\nadd-style-stage add-style-name-classes\n"
+         + b"add-style-name-classes count=2 default=1 empty=1 default-size=21 empty-size=22 entry 2 0000 004b\n"
          + b"saved-file ssa exists=1 bytes=1 41\nsaved-file ass exists=1 bytes=1 41\n"
          + b"saved-file srt exists=1 bytes=1 41\nsaved-file srt-sidecar exists=1 bytes=1 41\n"
          + b"saved-file ssa-sidecar exists=0\nsaved-file ass-sidecar exists=0\n"
@@ -82,6 +87,16 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
 
 
 class NativeLifecycleEvidenceTests(unittest.TestCase):
+    def test_add_style_retains_signedzero_fullfont_and_name_classes(self):
+        for old,new in ((b"bits=8000000000000000",b"bits=0000000000000000"),
+                        (b"font 4 004e 0000 d801 005a",b"font 4 004e 0000 dcff 005a"),
+                        (b"default=1 empty=1",b"default=1 empty=0")):
+            changed=TRACE.replace(old,new)
+            with self.assertRaises(ValueError):compare_traces([changed]*4,64)
+        legacy=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith((b"add-style-stage ",b"add-style-retained ",b"add-style-name-classes ")))
+        with self.assertRaises(ValueError):compare_traces([legacy]*4,64)
+        compare_traces([legacy]*4,64,require_add_style_stages=False)
+
     def test_unknown_rows_and_prefallback_callback_are_required(self):
         for prefix in (b"unknown-row unknown-after 0 ",b"unknown-open-callback "):
             truncated=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith(prefix))

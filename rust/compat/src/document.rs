@@ -221,6 +221,26 @@ fn style_rename_count(
         Ok(())
     }
 }
+/// Count after removal, relocation insertion, then original-name insertion.
+/// Key aliasing uses the same first-NUL conversion as the native map.
+pub(crate) fn style_conflict_count(
+    count: usize,
+    old_present: bool,
+    new_present_after_remove: bool,
+    alias: bool,
+) -> Result<(), StyleRenameError> {
+    let final_count = count
+        .checked_sub(usize::from(old_present))
+        .and_then(|n| n.checked_add(usize::from(!new_present_after_remove)))
+        .and_then(|n| n.checked_add(usize::from(!alias)))
+        .ok_or(StyleRenameError::CountOverflow)?;
+    if count > i32::MAX as usize || final_count > i32::MAX as usize {
+        Err(StyleRenameError::CountOverflow)
+    } else {
+        Ok(())
+    }
+}
+
 /// Base Empty retirement order is named values, segments, then entries.
 /// Map keys/node storage are still dropped while clearing the map; allocator
 /// reentry and native allocation/deletion timing remain outside the contract.
@@ -817,6 +837,69 @@ impl Document {
         }
         Ok(retired)
     }
+    /// Atomic prepared unequal AddStyle tail. Native CRT chooses the candidate;
+    /// this includes final incoming insertion, unlike commit_style_rename.
+    /// Preflight all recoverable errors before mutation. Returned originals are
+    /// destroyed after admission; map key/node and allocation timing qualified.
+    pub fn commit_style_conflict(
+        &mut self,
+        old: &[u16],
+        new: &[u16],
+        previous: &mut Option<crate::document_style::StyleValue>,
+        incoming: &mut Option<crate::document_style::StyleValue>,
+    ) -> Result<RetiredStyleRename, StyleRenameError> {
+        if previous.is_none() || incoming.is_none() {
+            return Err(StyleRenameError::InvalidPreparedValue);
+        }
+        if old.len() > i32::MAX as usize || new.len() > i32::MAX as usize {
+            return Err(StyleRenameError::CountOverflow);
+        }
+        let old_present = self.named_styles.get(old).is_some();
+        let alias = cstring_prefix(old) == cstring_prefix(new);
+        let new_present_after_remove =
+            self.named_styles.get(new).is_some() && !(alias && old_present);
+        style_conflict_count(
+            self.named_styles.count(),
+            old_present,
+            new_present_after_remove,
+            alias,
+        )?;
+        let matches = self
+            .entries
+            .iter()
+            .filter(|entry| cstring_prefix(&entry.style) == cstring_prefix(old))
+            .count();
+        let old_key = old.to_vec();
+        let new_key = new.to_vec();
+        let mut retired = RetiredStyleRename {
+            map_values: Vec::with_capacity(3),
+            entry_names: Vec::with_capacity(matches),
+        };
+        let previous = previous
+            .take()
+            .ok_or(StyleRenameError::InvalidPreparedValue)?;
+        let incoming = incoming
+            .take()
+            .ok_or(StyleRenameError::InvalidPreparedValue)?;
+        if let Some(value) = self.named_styles.remove(old) {
+            retired.map_values.push(value);
+        }
+        if let Some(value) = self.named_styles.insert(new_key, Some(previous)) {
+            retired.map_values.push(value);
+        }
+        for entry in &mut self.entries {
+            if cstring_prefix(&entry.style) == cstring_prefix(old) {
+                retired
+                    .entry_names
+                    .push(core::mem::replace(&mut entry.style, new.to_vec()));
+            }
+        }
+        if let Some(value) = self.named_styles.insert(old_key, Some(incoming)) {
+            retired.map_values.push(value);
+        }
+        Ok(retired)
+    }
+
     /// The prepared entry-rename suffix of pinned native AddStyle uses Unicode
     /// CString equality: compare raw u16 units only through the first NUL on
     /// each side, without case folding or surrogate interpretation. The entire

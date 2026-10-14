@@ -26,14 +26,23 @@ pub(crate) enum Kind {
     Document,
     Snapshot,
     UnknownRun,
+    StyleAddRun,
 }
 
+// Inline sessions avoid a new fallible box allocation after core ownership transfer.
+// Registry slot growth is reserved before Begin; compact boxing can be revisited
+// only with an explicit preallocated ownership envelope.
+#[allow(clippy::large_enum_variant)]
 pub(crate) enum Resource {
     Document(Box<Document>),
     Snapshot(Vec<u8>),
     UnknownRun {
         owner: Handle,
         run: xy_vsfilter_compat::document_unknown::Run,
+    },
+    StyleAddRun {
+        owner: Handle,
+        run: xy_vsfilter_compat::document_style_add::Session,
     },
 }
 impl Resource {
@@ -42,6 +51,7 @@ impl Resource {
             Self::Document(_) => Kind::Document,
             Self::Snapshot(_) => Kind::Snapshot,
             Self::UnknownRun { .. } => Kind::UnknownRun,
+            Self::StyleAddRun { .. } => Kind::StyleAddRun,
         }
     }
 }
@@ -61,6 +71,9 @@ impl Registry {
 
     /// On exhaustion ownership is returned, allowing the caller to drop outside
     /// admission. Allocation failure is still governed by the existing allocator.
+    // Return owned rejected storage directly for destruction after admission,
+    // without introducing an allocation on the error path.
+    #[allow(clippy::result_large_err)]
     pub(crate) fn insert(&mut self, resource: Resource) -> Result<Handle, (Error, Resource)> {
         let Some(id) = self.next else {
             return Err((Error::Exhausted, resource));
@@ -109,6 +122,12 @@ impl Registry {
         self.slots.reserve(1);
         Ok(id)
     }
+    pub(crate) fn reserve_two(&mut self) -> Result<(Handle, Handle), Error> {
+        let first = self.next.ok_or(Error::Exhausted)?;
+        let second = first.checked_add(1).ok_or(Error::Exhausted)?;
+        self.slots.reserve(2);
+        Ok((first, second))
+    }
     pub(crate) fn insert_reserved(&mut self, id: Handle, resource: Resource) {
         assert_eq!(self.next, Some(id));
         self.slots.push((id, resource));
@@ -145,6 +164,40 @@ impl Registry {
         };
         match (owner_resource, run_resource) {
             (Resource::Document(document), Resource::UnknownRun { run, .. }) => Ok((document, run)),
+            _ => Err(Error::TypeMismatch),
+        }
+    }
+
+    pub(crate) fn style_add_pair(
+        &mut self,
+        id: Handle,
+    ) -> Result<
+        (
+            &mut Document,
+            &mut xy_vsfilter_compat::document_style_add::Session,
+        ),
+        Error,
+    > {
+        let run_index = self.position(id)?;
+        let owner = match &self.slots[run_index].1 {
+            Resource::StyleAddRun { owner, .. } => *owner,
+            _ => return Err(Error::TypeMismatch),
+        };
+        let owner_index = self.position(owner)?;
+        if run_index == owner_index {
+            return Err(Error::TypeMismatch);
+        }
+        let (owner_resource, run_resource) = if owner_index < run_index {
+            let (before, after) = self.slots.split_at_mut(run_index);
+            (&mut before[owner_index].1, &mut after[0].1)
+        } else {
+            let (before, after) = self.slots.split_at_mut(owner_index);
+            (&mut after[0].1, &mut before[run_index].1)
+        };
+        match (owner_resource, run_resource) {
+            (Resource::Document(document), Resource::StyleAddRun { run, .. }) => {
+                Ok((document, run))
+            }
             _ => Err(Error::TypeMismatch),
         }
     }
@@ -275,6 +328,22 @@ mod tests {
             .try_with(|registry| registry.insert(resource).map_err(|(error, _)| error))
             .unwrap()
             .unwrap()
+    }
+
+    #[test]
+    fn two_slot_preflight_checks_exhaustion_before_commit() {
+        let mut registry = Registry::new();
+        registry.next = Some(u64::MAX);
+        assert_eq!(registry.reserve_two(), Err(Error::Exhausted));
+        assert_eq!(registry.next, Some(u64::MAX));
+        assert!(registry.slots.is_empty());
+        registry.next = Some(u64::MAX - 1);
+        let (first, second) = registry.reserve_two().unwrap();
+        registry.insert_reserved(first, Resource::Snapshot(alloc::vec![1]));
+        registry.insert_reserved(second, Resource::Snapshot(alloc::vec![2]));
+        assert_eq!(registry.next, None);
+        assert_eq!(registry.snapshot(first).unwrap(), [1]);
+        assert_eq!(registry.snapshot(second).unwrap(), [2]);
     }
 
     #[test]

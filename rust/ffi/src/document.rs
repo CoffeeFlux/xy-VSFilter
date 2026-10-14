@@ -93,6 +93,123 @@ fn insert(resource: Resource) -> Result<u64, u32> {
     }
 }
 
+fn style_add_error(error: xy_vsfilter_compat::document_style_add::Error) -> u32 {
+    use xy_vsfilter_compat::document_style_add::Error;
+    match error {
+        Error::InvalidPreparedValue | Error::Finished => INVALID_INPUT,
+        Error::UnresolvedNull => UNRESOLVED_REFERENCE,
+        Error::CountOverflow => COUNT_OVERFLOW,
+    }
+}
+/// # Safety
+/// Name and nullable style follow the existing raw byte-buffer contract. Output
+/// receives snapshot ID and run ID in16bytes; packet24 holds action:u32,reserved:u32,run:u64,units:u64.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_add_style_begin_v1(
+    owner: u64,
+    name: *const u8,
+    name_length: usize,
+    style: *const u8,
+    style_length: usize,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 16));
+    required!(element_shape(name_length, 2));
+    // SAFETY: both complete inputs are copied before admission/output writes.
+    let name = required!(unsafe { copy_input(name, name_length) });
+    let style = required!(unsafe { copy_input(style, style_length) });
+    let name = units(&name);
+    let mut incoming = Some(if style.is_empty() {
+        None
+    } else {
+        Some(required!(
+            style_wire::decode(&style).map_err(style_wire_error)
+        ))
+    });
+    let packet_length = required!(name
+        .len()
+        .max(7)
+        .checked_mul(2)
+        .and_then(|n| n.checked_add(24))
+        .filter(|n| *n <= isize::MAX as usize)
+        .ok_or(COUNT_OVERFLOW));
+    let (reply, run_id, retired) = required!(admitted(|registry| {
+        registry.document(owner).map_err(registry_error)?;
+        let (reply, run_id) = registry.reserve_two().map_err(registry_error)?;
+        let mut bytes = Vec::with_capacity(packet_length);
+        let result = xy_vsfilter_compat::document_style_add::begin(
+            registry.document_mut(owner).map_err(registry_error)?,
+            &name,
+            &mut incoming,
+        )
+        .map_err(style_add_error)?;
+        use xy_vsfilter_compat::document_style_add::Action;
+        let (action, session) = match result.action {
+            Action::Done => (0u32, None),
+            Action::Conflict(run) => (1u32, Some(run)),
+        };
+        let session_id = if session.is_some() { run_id } else { 0 };
+        bytes.extend_from_slice(&action.to_le_bytes());
+        bytes.extend_from_slice(&0u32.to_le_bytes());
+        bytes.extend_from_slice(&session_id.to_le_bytes());
+        bytes.extend_from_slice(&(result.normalized_name.len() as u64).to_le_bytes());
+        for unit in &result.normalized_name {
+            bytes.extend_from_slice(&unit.to_le_bytes());
+        }
+        registry.insert_reserved(reply, Resource::Snapshot(bytes));
+        if let Some(run) = session {
+            registry.insert_reserved(run_id, Resource::StyleAddRun { owner, run });
+        }
+        Ok((reply, session_id, (result.retired, result.normalized_name)))
+    }));
+    drop(retired);
+    drop(incoming);
+    // SAFETY: capacity preflighted and no registry reference remains.
+    let mut handles = [0u8; 16];
+    handles[..8].copy_from_slice(&reply.to_le_bytes());
+    handles[8..].copy_from_slice(&run_id.to_le_bytes());
+    unsafe {
+        write_output(output, &handles);
+    }
+    OK
+}
+/// # Safety
+/// Candidate is raw UTF-16LE; output receives one u64LE applied boolean.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_add_style_submit_v1(
+    id: u64,
+    candidate: *const u8,
+    length: usize,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    required!(element_shape(length, 2));
+    // SAFETY: complete input copied before admission and overlapping output.
+    let candidate = required!(unsafe { copy_input(candidate, length) });
+    let candidate = units(&candidate);
+    let result = required!(admitted(|registry| {
+        let (document, run) = registry.style_add_pair(id).map_err(registry_error)?;
+        run.submit(document, &candidate).map_err(style_add_error)
+    }));
+    let applied = u64::from(result.applied);
+    drop(result.retired);
+    // SAFETY: validated output, registry admission ended.
+    unsafe {
+        write_output(output, &applied.to_le_bytes());
+    }
+    OK
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_add_style_drop_v1(id: u64) -> u32 {
+    status(
+        DOCUMENTS
+            .destroy(id, Kind::StyleAddRun)
+            .map_err(registry_error),
+    )
+}
+
 fn unknown_error(error: xy_vsfilter_compat::document_unknown::Error) -> u32 {
     use xy_vsfilter_compat::document_unknown::Error;
     match error {
@@ -1461,6 +1578,145 @@ mod tests {
         // SAFETY: allocated byte ranges below are valid for each supplied size;
         // explicit null/oversized checks are rejected before raw accesses.
         unsafe {
+            let style_owner = create();
+            let name = [83u8, 0];
+            let mut style = alloc::vec![0u8; style_wire::HEADER_BYTES];
+            let mut result = [0xa5; 16];
+            let before = state(style_owner);
+            assert_eq!(
+                xy_vsfilter_document_add_style_begin_v1(
+                    style_owner,
+                    name.as_ptr(),
+                    2,
+                    style.as_ptr(),
+                    style.len(),
+                    result.as_mut_ptr(),
+                    15
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(state(style_owner), before);
+            assert_eq!(result, [0xa5; 16]);
+            for (iteration, expected) in [0u32, 0, 1].into_iter().enumerate() {
+                assert_eq!(
+                    xy_vsfilter_document_add_style_begin_v1(
+                        style_owner,
+                        name.as_ptr(),
+                        2,
+                        style.as_ptr(),
+                        style.len(),
+                        result.as_mut_ptr(),
+                        16
+                    ),
+                    OK
+                );
+                let snapshot = u64::from_le_bytes(result[..8].try_into().unwrap());
+                let packet = read_snapshot(snapshot);
+                assert_eq!(
+                    u32::from_le_bytes(packet[..4].try_into().unwrap()),
+                    expected
+                );
+                assert_eq!(&packet[24..], &name);
+                let run = u64::from_le_bytes(packet[8..16].try_into().unwrap());
+                assert_eq!(&result[8..], &run.to_le_bytes());
+                assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
+                if expected == 1 {
+                    let before = state(style_owner);
+                    assert_eq!(
+                        xy_vsfilter_document_add_style_submit_v1(
+                            run,
+                            name.as_ptr(),
+                            2,
+                            result.as_mut_ptr(),
+                            7
+                        ),
+                        INVALID_INPUT
+                    );
+                    assert_eq!(state(style_owner), before);
+                    assert_eq!(
+                        xy_vsfilter_document_add_style_submit_v1(
+                            run,
+                            name.as_ptr(),
+                            2,
+                            result.as_mut_ptr(),
+                            8
+                        ),
+                        OK
+                    );
+                    assert_eq!(&result[..8], &0u64.to_le_bytes());
+                    assert_eq!(state(style_owner), before);
+                    let mut overlapping = [88u8, 0, 0, 0, 0, 0, 0, 0];
+                    assert_eq!(
+                        xy_vsfilter_document_add_style_submit_v1(
+                            run,
+                            overlapping.as_ptr(),
+                            8,
+                            overlapping.as_mut_ptr(),
+                            8
+                        ),
+                        OK
+                    );
+                    assert_eq!(overlapping, 1u64.to_le_bytes());
+                    assert_eq!(
+                        xy_vsfilter_document_add_style_submit_v1(
+                            run,
+                            name.as_ptr(),
+                            2,
+                            result.as_mut_ptr(),
+                            8
+                        ),
+                        INVALID_INPUT
+                    );
+                    assert_eq!(xy_vsfilter_document_add_style_drop_v1(run), OK);
+                }
+                if iteration == 1 {
+                    style[0] = 1;
+                }
+            }
+            style[0] = 0;
+            assert_eq!(
+                xy_vsfilter_document_add_style_begin_v1(
+                    style_owner,
+                    name.as_ptr(),
+                    2,
+                    style.as_ptr(),
+                    style.len(),
+                    result.as_mut_ptr(),
+                    16
+                ),
+                OK
+            );
+            let reply = u64::from_le_bytes(result[..8].try_into().unwrap());
+            let stale_run = u64::from_le_bytes(result[8..].try_into().unwrap());
+            assert_ne!(stale_run, 0);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(reply), OK);
+            assert_eq!(
+                xy_vsfilter_document_add_style_submit_v1(
+                    style_owner,
+                    name.as_ptr(),
+                    2,
+                    result.as_mut_ptr(),
+                    8
+                ),
+                BAD_HANDLE
+            );
+            assert_eq!(xy_vsfilter_document_destroy_v1(style_owner), OK);
+            assert_eq!(
+                xy_vsfilter_document_add_style_submit_v1(
+                    stale_run,
+                    name.as_ptr(),
+                    2,
+                    result.as_mut_ptr(),
+                    8
+                ),
+                BAD_HANDLE
+            );
+            assert_eq!(xy_vsfilter_document_add_style_drop_v1(stale_run), OK);
+            assert_eq!(
+                xy_vsfilter_document_add_style_drop_v1(stale_run),
+                BAD_HANDLE
+            );
+
             let unknown_owner = create();
             assert_eq!(add(unknown_owner, 0, &entry(0, 10)).0, OK);
             let mut result = [0xa5; 8];

@@ -3527,24 +3527,47 @@ void CSimpleTextSubtitle::ChangeUnknownStylesToDefault()
 
 void CSimpleTextSubtitle::AddStyle(CString name, STSStyle* style)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    XyRust::StyleAddition addition(*m_document, name, style);
+    if(addition.NeedsSuffix()) {
+        int i;
+        const CString& name_str = addition.Name();
+
+        int len = name_str.GetLength();
+
+        for(i = len; i > 0 && _istdigit(name_str[i-1]); i--);
+
+        int idx = 1;
+
+        CString name2 = name_str;
+
+        if(i < len && _stscanf_s(name_str.Right(len-i), _T("%d"), &idx) == 1)
+        {
+            name2 = name_str.Left(i);
+        }
+
+        idx++;
+
+        CString name3;
+        CString name3_str;
+        do
+        {
+            name3_str.Format(_T("%s%d"), name2, idx);
+            name3 = name3_str;
+            idx++;
+        }
+        while(!addition.Submit(name3));
+    }
+    delete style;
+#else
     int i, j;
 
     if(name.IsEmpty()) name = g_default_style;
 
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    STSStyle previous;
-    const NamedStyleLookup existing = LookupNamedStyle(name, &previous);
-    if(existing != NamedStyleLookup::Missing)
-    {
-        if(existing == NamedStyleLookup::Null || !style)
-            throw XyRust::DocumentStatusError(XY_DOCUMENT_V1_UNRESOLVED_REFERENCE);
-        if(previous == *style)
-#else
     STSStyle* val;
     if(m_styles.Lookup(name, val))
     {
         if(*val == *style)
-#endif
         {
             delete style;
             return;
@@ -3574,10 +3597,6 @@ void CSimpleTextSubtitle::AddStyle(CString name, STSStyle* style)
             name3 = name3_str;
             idx++;
         }
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-        while(HasNamedStyle(name3));
-        m_document->CommitStyleRename(name, name3, previous);
-#else
         while(m_styles.Lookup(name3));
 
         m_styles.RemoveKey(name);
@@ -3588,15 +3607,8 @@ void CSimpleTextSubtitle::AddStyle(CString name, STSStyle* style)
             STSEntry& stse = m_entries.GetAt(j);
             if(stse.style == name) stse.style = name3;
         }
-#endif
     }
 
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    // The caller transfers this temporary only once the Rust value is stored.
-    if(style) m_document->PutNamedStyle(name, *style);
-    else m_document->PutNullNamedStyle(name);
-    delete style;
-#else
     m_styles[name] = style;
 #endif
 }

@@ -14542,7 +14542,7 @@
     }
   ],
   "generated": {
-    "candidate_commit": "61e91fa3ce6ab54cbf7a6222d47bc910e87baa1d",
+    "candidate_commit": "0976ec8a960e9a39ddca3781de4b3d38965bb6be",
     "capture_scope": "Working-tree source hashes; candidate_commit is capture base HEAD, not a claim that uncommitted source is in that commit.",
     "source_files": [
       {
@@ -14775,7 +14775,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "sha256": "4e87f09b3f7e9cd9bc4cd103fd28b7237df6ed8999f6e0ce92bb99c176d334db"
+        "sha256": "15e04a3bdc4061a1a84eba9ffa02b22dafaad71ca0403b5782c6ce354f4952ff"
       },
       {
         "path": "src/subtitles/SSF.cpp",
@@ -14787,7 +14787,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "sha256": "169e03df07f99429bbeb628b121ae08cdd1a9fbed28cdca6e2d175a4474e4ffd"
+        "sha256": "0306f0848ad7fe43f16e1794fec2c566c23b25f22677f809ad3e714fc5430145"
       },
       {
         "path": "src/subtitles/STS.h",
@@ -21759,6 +21759,18 @@
         "path": "src/subtitles/RustDocumentOwner.h",
         "line": 232,
         "tokens": [
+          "StyleAddition"
+        ],
+        "source": "class StyleAddition;",
+        "reviewed_scope_ids": [
+          "experimental-native-document-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/RustDocumentOwner.h",
+        "line": 233,
+        "tokens": [
           "DocumentReply"
         ],
         "source": "class DocumentReply {",
@@ -21769,7 +21781,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 234,
+        "line": 235,
         "tokens": [
           "DocumentReply"
         ],
@@ -21781,7 +21793,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 235,
+        "line": 236,
         "tokens": [
           "DocumentOwner"
         ],
@@ -21793,7 +21805,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 236,
+        "line": 237,
         "tokens": [
           "UnknownStylesPass"
         ],
@@ -21807,21 +21819,9 @@
         "path": "src/subtitles/RustDocumentOwner.h",
         "line": 238,
         "tokens": [
-          "DocumentReply"
+          "StyleAddition"
         ],
-        "source": "DocumentReply(const DocumentReply&) = delete;",
-        "reviewed_scope_ids": [
-          "experimental-native-document-owner"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 239,
-        "tokens": [
-          "DocumentReply"
-        ],
-        "source": "DocumentReply& operator=(const DocumentReply&) = delete;",
+        "source": "friend class StyleAddition;",
         "reviewed_scope_ids": [
           "experimental-native-document-owner"
         ],
@@ -21833,7 +21833,7 @@
         "tokens": [
           "DocumentReply"
         ],
-        "source": "DocumentReply(DocumentReply&& other) noexcept : id_(other.id_) { other.id_ = 0; }",
+        "source": "DocumentReply(const DocumentReply&) = delete;",
         "reviewed_scope_ids": [
           "experimental-native-document-owner"
         ],
@@ -21845,6 +21845,30 @@
         "tokens": [
           "DocumentReply"
         ],
+        "source": "DocumentReply& operator=(const DocumentReply&) = delete;",
+        "reviewed_scope_ids": [
+          "experimental-native-document-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/RustDocumentOwner.h",
+        "line": 242,
+        "tokens": [
+          "DocumentReply"
+        ],
+        "source": "DocumentReply(DocumentReply&& other) noexcept : id_(other.id_) { other.id_ = 0; }",
+        "reviewed_scope_ids": [
+          "experimental-native-document-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/RustDocumentOwner.h",
+        "line": 243,
+        "tokens": [
+          "DocumentReply"
+        ],
         "source": "DocumentReply& operator=(DocumentReply&& other) noexcept {",
         "reviewed_scope_ids": [
           "experimental-native-document-owner"
@@ -21853,7 +21877,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 244,
+        "line": 246,
         "tokens": [
           "DocumentReply"
         ],
@@ -21865,7 +21889,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 260,
+        "line": 262,
         "tokens": [
           "DocumentOwner"
         ],
@@ -21877,7 +21901,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 261,
+        "line": 263,
         "tokens": [
           "UnknownStylesPass"
         ],
@@ -21889,11 +21913,11 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 272,
+        "line": 264,
         "tokens": [
-          "DocumentReply"
+          "StyleAddition"
         ],
-        "source": "DocumentReply SnapshotRaw(uint32_t kind, uint32_t index) const {",
+        "source": "friend class StyleAddition;",
         "reviewed_scope_ids": [
           "experimental-native-document-owner"
         ],
@@ -21905,6 +21929,18 @@
         "tokens": [
           "DocumentReply"
         ],
+        "source": "DocumentReply SnapshotRaw(uint32_t kind, uint32_t index) const {",
+        "reviewed_scope_ids": [
+          "experimental-native-document-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/RustDocumentOwner.h",
+        "line": 278,
+        "tokens": [
+          "DocumentReply"
+        ],
         "source": "return DocumentReply(DocumentDetail::Load(out,0,8));",
         "reviewed_scope_ids": [
           "experimental-native-document-owner"
@@ -21913,7 +21949,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 277,
+        "line": 280,
         "tokens": [
           "DocumentReply"
         ],
@@ -21925,7 +21961,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 281,
+        "line": 284,
         "tokens": [
           "DocumentOwner"
         ],
@@ -21937,7 +21973,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 285,
+        "line": 288,
         "tokens": [
           "DocumentOwner"
         ],
@@ -21949,7 +21985,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 286,
+        "line": 289,
         "tokens": [
           "DocumentOwner"
         ],
@@ -21961,7 +21997,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 287,
+        "line": 290,
         "tokens": [
           "DocumentOwner"
         ],
@@ -21973,7 +22009,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 296,
+        "line": 299,
         "tokens": [
           "DocumentReply"
         ],
@@ -21985,7 +22021,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 297,
+        "line": 300,
         "tokens": [
           "DocumentReply"
         ],
@@ -21997,19 +22033,20 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 298,
+        "line": 301,
         "tokens": [
           "STSEntry"
         ],
         "source": "STSEntry Entry(int index) const { return DocumentDetail::EntryValue(SnapshotEntry(index).Read()); }",
         "reviewed_scope_ids": [
-          "experimental-native-document-owner"
+          "experimental-native-document-owner",
+          "experimental-scalar-sort-snapshot-boundary"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 300,
+        "line": 303,
         "tokens": [
           "STSEntry"
         ],
@@ -22021,21 +22058,20 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 301,
+        "line": 304,
         "tokens": [
           "MaterializeSortRecords",
           "STSEntry"
         ],
         "source": "void MaterializeSortRecords(CAtlArray<STSEntry>& records) const {",
         "reviewed_scope_ids": [
-          "experimental-native-document-owner",
-          "experimental-scalar-sort-snapshot-boundary"
+          "experimental-native-document-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 310,
+        "line": 313,
         "tokens": [
           "STSEntry"
         ],
@@ -22047,7 +22083,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 317,
+        "line": 320,
         "tokens": [
           "Add"
         ],
@@ -22059,7 +22095,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 320,
+        "line": 323,
         "tokens": [
           "STSSegment"
         ],
@@ -22071,7 +22107,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 325,
+        "line": 328,
         "tokens": [
           "DocumentReply"
         ],
@@ -22083,7 +22119,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 347,
+        "line": 350,
         "tokens": [
           "STSEntry"
         ],
@@ -22095,7 +22131,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 354,
+        "line": 357,
         "tokens": [
           "SetDefaultStyle"
         ],
@@ -22108,11 +22144,25 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 358,
+        "line": 361,
         "tokens": [
           "DefaultStyle"
         ],
         "source": "template<class Style = STSStyle> Style DefaultStyle() const { return DocumentDetail::StyleValue<Style>(Snapshot(2,0).Read()); }",
+        "reviewed_scope_ids": [
+          "experimental-native-document-owner",
+          "experimental-default-style-owner",
+          "experimental-resolved-style-boundary"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/RustDocumentOwner.h",
+        "line": 364,
+        "tokens": [
+          "ResolvedStyle"
+        ],
+        "source": "template<class Style = STSStyle> Style ResolvedStyle(int index) const {",
         "reviewed_scope_ids": [
           "experimental-native-document-owner",
           "experimental-default-style-owner"
@@ -22121,50 +22171,33 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 361,
-        "tokens": [
-          "ResolvedStyle"
-        ],
-        "source": "template<class Style = STSStyle> Style ResolvedStyle(int index) const {",
-        "reviewed_scope_ids": [
-          "experimental-native-document-owner",
-          "experimental-default-style-owner",
-          "experimental-resolved-style-boundary"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 365,
+        "line": 368,
         "tokens": [
           "ResolvedCharSet"
         ],
         "source": "ResolvedCharset ResolvedCharSet(int index) const {",
         "reviewed_scope_ids": [
           "experimental-native-document-owner",
-          "experimental-default-style-owner",
-          "experimental-resolved-style-boundary"
+          "experimental-default-style-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 373,
+        "line": 376,
         "tokens": [
           "CopySelectedState",
           "DocumentOwner"
         ],
         "source": "void CopySelectedState(const DocumentOwner& source) {",
         "reviewed_scope_ids": [
-          "experimental-native-document-owner",
-          "experimental-default-style-owner",
-          "experimental-selected-state-copy-boundary"
+          "experimental-native-document-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 436,
+        "line": 439,
         "tokens": [
           "DocumentReply"
         ],
@@ -22176,7 +22209,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 451,
+        "line": 454,
         "tokens": [
           "LookupNamedStyle"
         ],
@@ -22189,7 +22222,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 458,
+        "line": 461,
         "tokens": [
           "DocumentReply"
         ],
@@ -22202,21 +22235,20 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 471,
+        "line": 474,
         "tokens": [
           "CommitStyleRename"
         ],
         "source": "template<class Style> void CommitStyleRename(const CString& old, const CString& replacement, const Style& previous) {",
         "reviewed_scope_ids": [
           "experimental-native-document-owner",
-          "experimental-canonical-named-style-owner",
-          "experimental-prepared-style-rename-boundary"
+          "experimental-canonical-named-style-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 496,
+        "line": 499,
         "tokens": [
           "DocumentReply"
         ],
@@ -22229,19 +22261,20 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 504,
+        "line": 507,
         "tokens": [
           "DocumentReply"
         ],
         "source": "DocumentReply reply(DocumentDetail::Load(out,0,8)); value = DocumentDetail::StyleValue<Style>(reply.Read()); return true;",
         "reviewed_scope_ids": [
-          "experimental-native-document-owner"
+          "experimental-native-document-owner",
+          "experimental-base-empty-boundary"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 506,
+        "line": 509,
         "tokens": [
           "DocumentOwner"
         ],
@@ -22253,59 +22286,55 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 507,
+        "line": 510,
         "tokens": [
           "Empty"
         ],
         "source": "// Base document Empty only: renderer Deinit/virtual dispatch stay native.",
         "reviewed_scope_ids": [
-          "experimental-native-document-owner",
-          "experimental-base-empty-boundary"
+          "experimental-native-document-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 508,
+        "line": 511,
         "tokens": [
           "Empty"
         ],
         "source": "void Empty() {DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_empty_v1(id_);}));}",
         "reviewed_scope_ids": [
-          "experimental-native-document-owner",
-          "experimental-base-empty-boundary"
+          "experimental-native-document-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 539,
+        "line": 542,
         "tokens": [
           "EntryTimes"
         ],
         "source": "std::vector<std::pair<int64_t,int64_t>> EntryTimes() const {",
         "reviewed_scope_ids": [
-          "experimental-native-document-owner",
-          "experimental-coarse-time-conversion-boundary"
+          "experimental-native-document-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 555,
+        "line": 558,
         "tokens": [
           "CommitTimeConversion"
         ],
         "source": "bool CommitTimeConversion(uint32_t target_mode, const std::vector<std::pair<int64_t,int64_t>>& times) {",
         "reviewed_scope_ids": [
-          "experimental-native-document-owner",
-          "experimental-coarse-time-conversion-boundary"
+          "experimental-native-document-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 587,
+        "line": 590,
         "tokens": [
           "UnknownStylesPass"
         ],
@@ -22318,7 +22347,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 590,
+        "line": 593,
         "tokens": [
           "DocumentOwner",
           "UnknownStylesPass"
@@ -22332,7 +22361,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 596,
+        "line": 599,
         "tokens": [
           "UnknownStylesPass"
         ],
@@ -22345,7 +22374,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 597,
+        "line": 600,
         "tokens": [
           "UnknownStylesPass"
         ],
@@ -22358,7 +22387,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 598,
+        "line": 601,
         "tokens": [
           "UnknownStylesPass"
         ],
@@ -22371,7 +22400,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 606,
+        "line": 609,
         "tokens": [
           "DocumentReply"
         ],
@@ -22381,6 +22410,77 @@
           "experimental-unknown-style-step-resume"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/RustDocumentOwner.h",
+        "line": 624,
+        "tokens": [
+          "AddStyle"
+        ],
+        "source": "// CString digit parsing/formatting remains in the native AddStyle adapter.",
+        "reviewed_scope_ids": [],
+        "evidence_status": "lexical-candidate-only"
+      },
+      {
+        "path": "src/subtitles/RustDocumentOwner.h",
+        "line": 625,
+        "tokens": [
+          "StyleAddition"
+        ],
+        "source": "class StyleAddition {",
+        "reviewed_scope_ids": [],
+        "evidence_status": "lexical-candidate-only"
+      },
+      {
+        "path": "src/subtitles/RustDocumentOwner.h",
+        "line": 629,
+        "tokens": [
+          "DocumentOwner",
+          "StyleAddition"
+        ],
+        "source": "StyleAddition(const DocumentOwner& owner, const CString& name, const STSStyle* value) {",
+        "reviewed_scope_ids": [],
+        "evidence_status": "lexical-candidate-only"
+      },
+      {
+        "path": "src/subtitles/RustDocumentOwner.h",
+        "line": 637,
+        "tokens": [
+          "DocumentReply"
+        ],
+        "source": "DocumentReply reply(DocumentDetail::Load(out,0,8));",
+        "reviewed_scope_ids": [],
+        "evidence_status": "lexical-candidate-only"
+      },
+      {
+        "path": "src/subtitles/RustDocumentOwner.h",
+        "line": 653,
+        "tokens": [
+          "StyleAddition"
+        ],
+        "source": "StyleAddition(const StyleAddition&) = delete;",
+        "reviewed_scope_ids": [],
+        "evidence_status": "lexical-candidate-only"
+      },
+      {
+        "path": "src/subtitles/RustDocumentOwner.h",
+        "line": 654,
+        "tokens": [
+          "StyleAddition"
+        ],
+        "source": "StyleAddition& operator=(const StyleAddition&) = delete;",
+        "reviewed_scope_ids": [],
+        "evidence_status": "lexical-candidate-only"
+      },
+      {
+        "path": "src/subtitles/RustDocumentOwner.h",
+        "line": 655,
+        "tokens": [
+          "StyleAddition"
+        ],
+        "source": "~StyleAddition() noexcept {",
+        "reviewed_scope_ids": [],
+        "evidence_status": "lexical-candidate-only"
       },
       {
         "path": "src/subtitles/SSF.cpp",
@@ -27760,30 +27860,12 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3717,
+        "line": 3716,
         "tokens": [
-          "IsEmpty"
+          "StyleAddition",
+          "m_document"
         ],
-        "source": "if(name.IsEmpty()) name = g_default_style;",
-        "reviewed_scope_ids": [
-          "style-renaming",
-          "experimental-default-style-owner",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner",
-          "experimental-base-empty-boundary"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 3721,
-        "tokens": [
-          "LookupNamedStyle"
-        ],
-        "source": "const NamedStyleLookup existing = LookupNamedStyle(name, &previous);",
+        "source": "XyRust::StyleAddition addition(*m_document, name, style);",
         "reviewed_scope_ids": [
           "style-renaming",
           "experimental-default-style-owner",
@@ -27797,7 +27879,25 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3729,
+        "line": 3750,
+        "tokens": [
+          "IsEmpty"
+        ],
+        "source": "if(name.IsEmpty()) name = g_default_style;",
+        "reviewed_scope_ids": [
+          "style-renaming",
+          "experimental-default-style-owner",
+          "experimental-canonical-named-style-owner",
+          "experimental-document-identity-owner",
+          "experimental-document-interpretation-owner",
+          "experimental-document-script-layout-owner",
+          "experimental-document-initialized-metadata-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3753,
         "tokens": [
           "m_styles"
         ],
@@ -27815,45 +27915,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3763,
-        "tokens": [
-          "HasNamedStyle"
-        ],
-        "source": "while(HasNamedStyle(name3));",
-        "reviewed_scope_ids": [
-          "style-renaming",
-          "experimental-default-style-owner",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 3764,
-        "tokens": [
-          "CommitStyleRename",
-          "m_document"
-        ],
-        "source": "m_document->CommitStyleRename(name, name3, previous);",
-        "reviewed_scope_ids": [
-          "style-renaming",
-          "experimental-default-style-owner",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner",
-          "experimental-prepared-style-rename-boundary"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 3766,
+        "line": 3785,
         "tokens": [
           "m_styles"
         ],
@@ -27871,7 +27933,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3768,
+        "line": 3787,
         "tokens": [
           "m_styles"
         ],
@@ -27889,7 +27951,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3769,
+        "line": 3788,
         "tokens": [
           "m_styles"
         ],
@@ -27907,13 +27969,13 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3771,
+        "line": 3790,
         "tokens": [
           "GetEntryCount"
         ],
         "source": "for (size_t j = 0, count = GetEntryCount(); j < count; j++)",
         "reviewed_scope_ids": [
-          "style-renaming",
+          "default-style",
           "experimental-default-style-owner",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
@@ -27925,102 +27987,12 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3773,
+        "line": 3792,
         "tokens": [
           "STSEntry",
           "m_entries"
         ],
         "source": "STSEntry& stse = m_entries.GetAt(j);",
-        "reviewed_scope_ids": [
-          "style-renaming",
-          "experimental-default-style-owner",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 3781,
-        "tokens": [
-          "m_document"
-        ],
-        "source": "if(style) m_document->PutNamedStyle(name, *style);",
-        "reviewed_scope_ids": [
-          "style-renaming",
-          "experimental-default-style-owner",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 3782,
-        "tokens": [
-          "m_document"
-        ],
-        "source": "else m_document->PutNullNamedStyle(name);",
-        "reviewed_scope_ids": [
-          "style-renaming",
-          "experimental-default-style-owner",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 3785,
-        "tokens": [
-          "m_styles"
-        ],
-        "source": "m_styles[name] = style;",
-        "reviewed_scope_ids": [
-          "style-renaming",
-          "experimental-default-style-owner",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 3789,
-        "tokens": [
-          "CSimpleTextSubtitle",
-          "SetDefaultStyle"
-        ],
-        "source": "bool CSimpleTextSubtitle::SetDefaultStyle(STSStyle& s)",
-        "reviewed_scope_ids": [
-          "experimental-default-style-owner",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 3794,
-        "tokens": [
-          "m_styles"
-        ],
-        "source": "LogStyles(m_styles);",
         "reviewed_scope_ids": [
           "default-style",
           "experimental-default-style-owner",
@@ -28035,7 +28007,62 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3798,
+        "line": 3797,
+        "tokens": [
+          "m_styles"
+        ],
+        "source": "m_styles[name] = style;",
+        "reviewed_scope_ids": [
+          "default-style",
+          "experimental-default-style-owner",
+          "experimental-canonical-named-style-owner",
+          "experimental-document-identity-owner",
+          "experimental-document-interpretation-owner",
+          "experimental-document-script-layout-owner",
+          "experimental-document-initialized-metadata-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3801,
+        "tokens": [
+          "CSimpleTextSubtitle",
+          "SetDefaultStyle"
+        ],
+        "source": "bool CSimpleTextSubtitle::SetDefaultStyle(STSStyle& s)",
+        "reviewed_scope_ids": [
+          "default-style",
+          "experimental-default-style-owner",
+          "experimental-canonical-named-style-owner",
+          "experimental-document-identity-owner",
+          "experimental-document-interpretation-owner",
+          "experimental-document-script-layout-owner",
+          "experimental-document-initialized-metadata-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3806,
+        "tokens": [
+          "m_styles"
+        ],
+        "source": "LogStyles(m_styles);",
+        "reviewed_scope_ids": [
+          "default-style",
+          "experimental-default-style-owner",
+          "experimental-canonical-named-style-owner",
+          "experimental-document-identity-owner",
+          "experimental-document-interpretation-owner",
+          "experimental-document-script-layout-owner",
+          "experimental-document-initialized-metadata-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3810,
         "tokens": [
           "SetDefaultStyle",
           "m_document"
@@ -28054,7 +28081,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3800,
+        "line": 3812,
         "tokens": [
           "m_defaultStyle"
         ],
@@ -28072,7 +28099,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3805,
+        "line": 3817,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetDefaultStyle"
@@ -28091,7 +28118,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3808,
+        "line": 3820,
         "tokens": [
           "DefaultStyle",
           "m_document"
@@ -28110,7 +28137,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3810,
+        "line": 3822,
         "tokens": [
           "m_defaultStyle"
         ],
@@ -28128,14 +28155,14 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3815,
+        "line": 3827,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetForceDefaultStyle"
         ],
         "source": "void CSimpleTextSubtitle::SetForceDefaultStyle( bool value )",
         "reviewed_scope_ids": [
-          "default-style",
+          "sort-convert",
           "experimental-default-style-owner",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
@@ -28147,13 +28174,13 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3818,
+        "line": 3830,
         "tokens": [
           "SetDocumentForcedDefaultStyle"
         ],
         "source": "SetDocumentForcedDefaultStyle(value);",
         "reviewed_scope_ids": [
-          "default-style",
+          "sort-convert",
           "experimental-default-style-owner",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
@@ -28165,13 +28192,13 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3820,
+        "line": 3832,
         "tokens": [
           "m_fForcedDefaultStyle"
         ],
         "source": "m_fForcedDefaultStyle = value;",
         "reviewed_scope_ids": [
-          "default-style",
+          "sort-convert",
           "experimental-default-style-owner",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
@@ -28183,7 +28210,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3824,
+        "line": 3836,
         "tokens": [
           "CSimpleTextSubtitle",
           "ConvertToTimeBased"
@@ -28202,7 +28229,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3827,
+        "line": 3839,
         "tokens": [
           "GetDocumentMode"
         ],
@@ -28220,7 +28247,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3828,
+        "line": 3840,
         "tokens": [
           "EntryTimes",
           "m_document"
@@ -28233,14 +28260,13 @@
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
           "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner",
-          "experimental-coarse-time-conversion-boundary"
+          "experimental-document-initialized-metadata-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3833,
+        "line": 3845,
         "tokens": [
           "CommitTimeConversion",
           "NotifySegmentsRebuilt",
@@ -28254,14 +28280,13 @@
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
           "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner",
-          "experimental-coarse-time-conversion-boundary"
+          "experimental-document-initialized-metadata-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3835,
+        "line": 3847,
         "tokens": [
           "m_mode"
         ],
@@ -28279,7 +28304,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3837,
+        "line": 3849,
         "tokens": [
           "GetEntryCount"
         ],
@@ -28297,7 +28322,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3839,
+        "line": 3851,
         "tokens": [
           "STSEntry",
           "m_entries"
@@ -28316,7 +28341,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3844,
+        "line": 3856,
         "tokens": [
           "m_mode"
         ],
@@ -28334,7 +28359,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3846,
+        "line": 3858,
         "tokens": [
           "CreateSegments"
         ],
@@ -28352,7 +28377,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3850,
+        "line": 3862,
         "tokens": [
           "CSimpleTextSubtitle",
           "ConvertToFrameBased"
@@ -28371,7 +28396,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3853,
+        "line": 3865,
         "tokens": [
           "GetDocumentMode"
         ],
@@ -28389,7 +28414,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3854,
+        "line": 3866,
         "tokens": [
           "EntryTimes",
           "m_document"
@@ -28402,14 +28427,13 @@
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
           "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner",
-          "experimental-coarse-time-conversion-boundary"
+          "experimental-document-initialized-metadata-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3859,
+        "line": 3871,
         "tokens": [
           "CommitTimeConversion",
           "NotifySegmentsRebuilt",
@@ -28417,26 +28441,24 @@
         ],
         "source": "if(m_document->CommitTimeConversion(FRAME, times)) NotifySegmentsRebuilt();",
         "reviewed_scope_ids": [
-          "sort-convert",
           "experimental-default-style-owner",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
           "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner",
-          "experimental-coarse-time-conversion-boundary"
+          "experimental-document-initialized-metadata-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3861,
+        "line": 3873,
         "tokens": [
           "m_mode"
         ],
         "source": "if(m_mode == FRAME) return;",
         "reviewed_scope_ids": [
-          "sort-convert",
+          "search-translate",
           "experimental-default-style-owner",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
@@ -28448,13 +28470,13 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3863,
+        "line": 3875,
         "tokens": [
           "GetEntryCount"
         ],
         "source": "for(int i = 0, j = GetEntryCount(); i < j; i++)",
         "reviewed_scope_ids": [
-          "sort-convert",
+          "search-translate",
           "experimental-default-style-owner",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
@@ -28466,14 +28488,14 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3865,
+        "line": 3877,
         "tokens": [
           "STSEntry",
           "m_entries"
         ],
         "source": "STSEntry& stse = m_entries[i];",
         "reviewed_scope_ids": [
-          "sort-convert",
+          "search-translate",
           "experimental-default-style-owner",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
@@ -28485,12 +28507,13 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3870,
+        "line": 3882,
         "tokens": [
           "m_mode"
         ],
         "source": "m_mode = FRAME;",
         "reviewed_scope_ids": [
+          "search-translate",
           "experimental-default-style-owner",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
@@ -28502,7 +28525,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3872,
+        "line": 3884,
         "tokens": [
           "CreateSegments"
         ],
@@ -28520,7 +28543,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3876,
+        "line": 3888,
         "tokens": [
           "CSimpleTextSubtitle",
           "SearchSub"
@@ -28539,7 +28562,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3879,
+        "line": 3891,
         "tokens": [
           "GetDocumentMode",
           "m_document"
@@ -28558,7 +28581,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3882,
+        "line": 3894,
         "tokens": [
           "GetEntryCount"
         ],
@@ -28576,7 +28599,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3883,
+        "line": 3895,
         "tokens": [
           "TranslateStart"
         ],
@@ -28594,7 +28617,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3886,
+        "line": 3898,
         "tokens": [
           "GetEntryCount"
         ],
@@ -28612,7 +28635,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3888,
+        "line": 3900,
         "tokens": [
           "TranslateStart"
         ],
@@ -28630,7 +28653,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3897,
+        "line": 3909,
         "tokens": [
           "TranslateStart"
         ],
@@ -28648,7 +28671,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3901,
+        "line": 3913,
         "tokens": [
           "TranslateStart"
         ],
@@ -28666,7 +28689,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3924,
+        "line": 3936,
         "tokens": [
           "CSimpleTextSubtitle",
           "STSSegment",
@@ -28686,7 +28709,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3927,
+        "line": 3939,
         "tokens": [
           "GetSegmentCount"
         ],
@@ -28704,7 +28727,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3930,
+        "line": 3942,
         "tokens": [
           "TranslateSegmentEnd"
         ],
@@ -28722,7 +28745,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3932,
+        "line": 3944,
         "tokens": [
           "m_segments"
         ],
@@ -28740,7 +28763,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3940,
+        "line": 3952,
         "tokens": [
           "GetSegmentCount"
         ],
@@ -28758,7 +28781,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3952,
+        "line": 3964,
         "tokens": [
           "TranslateSegmentEnd"
         ],
@@ -28776,7 +28799,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3957,
+        "line": 3969,
         "tokens": [
           "TranslateSegmentEnd"
         ],
@@ -28794,7 +28817,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3967,
+        "line": 3979,
         "tokens": [
           "TranslateSegmentEnd"
         ],
@@ -28812,7 +28835,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3978,
+        "line": 3990,
         "tokens": [
           "m_segments"
         ],
@@ -28830,7 +28853,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3985,
+        "line": 3997,
         "tokens": [
           "CSimpleTextSubtitle",
           "STSSegment",
@@ -28850,7 +28873,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3988,
+        "line": 4000,
         "tokens": [
           "GetSegmentCount"
         ],
@@ -28868,7 +28891,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3994,
+        "line": 4006,
         "tokens": [
           "TranslateSegmentEnd",
           "TranslateSegmentStart"
@@ -28887,7 +28910,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 3999,
+        "line": 4011,
         "tokens": [
           "m_segments"
         ],
@@ -28905,7 +28928,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4001,
+        "line": 4013,
         "tokens": [
           "GetSegmentCount"
         ],
@@ -28923,7 +28946,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4013,
+        "line": 4025,
         "tokens": [
           "TranslateSegmentEnd"
         ],
@@ -28941,7 +28964,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4018,
+        "line": 4030,
         "tokens": [
           "TranslateSegmentEnd"
         ],
@@ -28959,7 +28982,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4028,
+        "line": 4040,
         "tokens": [
           "TranslateSegmentEnd"
         ],
@@ -28977,7 +29000,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4035,
+        "line": 4047,
         "tokens": [
           "TranslateSegmentStart"
         ],
@@ -28995,7 +29018,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4038,
+        "line": 4050,
         "tokens": [
           "m_segments"
         ],
@@ -29013,7 +29036,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4046,
+        "line": 4058,
         "tokens": [
           "CSimpleTextSubtitle",
           "TranslateStart"
@@ -29032,7 +29055,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4049,
+        "line": 4061,
         "tokens": [
           "GetEntryCount"
         ],
@@ -29050,7 +29073,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4051,
+        "line": 4063,
         "tokens": [
           "GetDocumentMode",
           "m_document"
@@ -29069,7 +29092,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4052,
+        "line": 4064,
         "tokens": [
           "GetDocumentMode",
           "m_document"
@@ -29088,7 +29111,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4055,
+        "line": 4067,
         "tokens": [
           "GetEntryCount"
         ],
@@ -29106,7 +29129,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4057,
+        "line": 4069,
         "tokens": [
           "m_entries",
           "m_mode"
@@ -29125,7 +29148,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4058,
+        "line": 4070,
         "tokens": [
           "m_entries",
           "m_mode"
@@ -29144,7 +29167,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4063,
+        "line": 4075,
         "tokens": [
           "CSimpleTextSubtitle",
           "TranslateEnd"
@@ -29163,7 +29186,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4066,
+        "line": 4078,
         "tokens": [
           "GetEntryCount"
         ],
@@ -29181,7 +29204,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4068,
+        "line": 4080,
         "tokens": [
           "GetDocumentMode",
           "m_document"
@@ -29200,7 +29223,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4069,
+        "line": 4081,
         "tokens": [
           "GetDocumentMode",
           "m_document"
@@ -29219,7 +29242,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4072,
+        "line": 4084,
         "tokens": [
           "GetEntryCount"
         ],
@@ -29237,7 +29260,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4074,
+        "line": 4086,
         "tokens": [
           "m_entries",
           "m_mode"
@@ -29256,7 +29279,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4075,
+        "line": 4087,
         "tokens": [
           "m_entries",
           "m_mode"
@@ -29275,7 +29298,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4080,
+        "line": 4092,
         "tokens": [
           "CSimpleTextSubtitle",
           "TranslateSegmentStart"
@@ -29294,7 +29317,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4083,
+        "line": 4095,
         "tokens": [
           "GetSegmentCount"
         ],
@@ -29312,7 +29335,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4085,
+        "line": 4097,
         "tokens": [
           "GetDocumentMode",
           "m_document"
@@ -29331,7 +29354,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4086,
+        "line": 4098,
         "tokens": [
           "GetDocumentMode",
           "m_document"
@@ -29350,7 +29373,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4089,
+        "line": 4101,
         "tokens": [
           "GetSegmentCount"
         ],
@@ -29368,7 +29391,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4091,
+        "line": 4103,
         "tokens": [
           "m_mode",
           "m_segments"
@@ -29387,7 +29410,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4092,
+        "line": 4104,
         "tokens": [
           "m_mode",
           "m_segments"
@@ -29406,7 +29429,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4097,
+        "line": 4109,
         "tokens": [
           "CSimpleTextSubtitle",
           "TranslateSegmentEnd"
@@ -29425,7 +29448,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4100,
+        "line": 4112,
         "tokens": [
           "GetSegmentCount"
         ],
@@ -29443,7 +29466,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4102,
+        "line": 4114,
         "tokens": [
           "GetDocumentMode",
           "m_document"
@@ -29462,7 +29485,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4103,
+        "line": 4115,
         "tokens": [
           "GetDocumentMode",
           "m_document"
@@ -29481,7 +29504,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4106,
+        "line": 4118,
         "tokens": [
           "GetSegmentCount"
         ],
@@ -29499,7 +29522,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4108,
+        "line": 4120,
         "tokens": [
           "m_mode",
           "m_segments"
@@ -29518,7 +29541,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4109,
+        "line": 4121,
         "tokens": [
           "m_mode",
           "m_segments"
@@ -29537,7 +29560,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4114,
+        "line": 4126,
         "tokens": [
           "CSimpleTextSubtitle",
           "TranslateSegmentStartEnd"
@@ -29556,7 +29579,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4117,
+        "line": 4129,
         "tokens": [
           "GetSegmentCount"
         ],
@@ -29574,7 +29597,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4125,
+        "line": 4137,
         "tokens": [
           "GetDocumentMode"
         ],
@@ -29592,7 +29615,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4127,
+        "line": 4139,
         "tokens": [
           "m_document"
         ],
@@ -29610,7 +29633,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4128,
+        "line": 4140,
         "tokens": [
           "m_document"
         ],
@@ -29628,7 +29651,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4130,
+        "line": 4142,
         "tokens": [
           "GetDocumentMode"
         ],
@@ -29646,7 +29669,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4132,
+        "line": 4144,
         "tokens": [
           "m_document"
         ],
@@ -29664,7 +29687,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4133,
+        "line": 4145,
         "tokens": [
           "m_document"
         ],
@@ -29682,7 +29705,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4137,
+        "line": 4149,
         "tokens": [
           "GetSegmentCount"
         ],
@@ -29700,7 +29723,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4145,
+        "line": 4157,
         "tokens": [
           "m_mode"
         ],
@@ -29718,13 +29741,13 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4147,
+        "line": 4159,
         "tokens": [
           "m_segments"
         ],
         "source": "start = m_segments[i].start;",
         "reviewed_scope_ids": [
-          "search-translate",
+          "native-entry-segment-facade",
           "experimental-default-style-owner",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
@@ -29736,13 +29759,13 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4148,
+        "line": 4160,
         "tokens": [
           "m_segments"
         ],
         "source": "end = m_segments[i].end;",
         "reviewed_scope_ids": [
-          "search-translate",
+          "native-entry-segment-facade",
           "experimental-default-style-owner",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
@@ -29754,13 +29777,13 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4150,
+        "line": 4162,
         "tokens": [
           "m_mode"
         ],
         "source": "else //m_mode == FRAME",
         "reviewed_scope_ids": [
-          "search-translate",
+          "native-entry-segment-facade",
           "experimental-default-style-owner",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
@@ -29772,13 +29795,13 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4152,
+        "line": 4164,
         "tokens": [
           "m_segments"
         ],
         "source": "start = std::llround(m_segments[i].start * UNITS_FLOAT / fps);",
         "reviewed_scope_ids": [
-          "search-translate",
+          "native-entry-segment-facade",
           "experimental-default-style-owner",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
@@ -29790,13 +29813,13 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4153,
+        "line": 4165,
         "tokens": [
           "m_segments"
         ],
         "source": "end = std::llround(m_segments[i].end * UNITS_FLOAT / fps);",
         "reviewed_scope_ids": [
-          "search-translate",
+          "native-entry-segment-facade",
           "experimental-default-style-owner",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
@@ -29808,7 +29831,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4161,
+        "line": 4173,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetEntryCount"
@@ -29827,7 +29850,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4164,
+        "line": 4176,
         "tokens": [
           "m_document"
         ],
@@ -29845,7 +29868,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4166,
+        "line": 4178,
         "tokens": [
           "m_entries"
         ],
@@ -29863,7 +29886,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4170,
+        "line": 4182,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetSegmentCount"
@@ -29882,7 +29905,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4173,
+        "line": 4185,
         "tokens": [
           "m_document"
         ],
@@ -29900,7 +29923,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4175,
+        "line": 4187,
         "tokens": [
           "m_segments"
         ],
@@ -29918,7 +29941,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4179,
+        "line": 4191,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetEntrySnapshot",
@@ -29938,7 +29961,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4182,
+        "line": 4194,
         "tokens": [
           "m_document"
         ],
@@ -29956,7 +29979,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4184,
+        "line": 4196,
         "tokens": [
           "m_entries"
         ],
@@ -29974,7 +29997,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4188,
+        "line": 4200,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetEntryEnd"
@@ -29993,7 +30016,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4191,
+        "line": 4203,
         "tokens": [
           "m_document"
         ],
@@ -30011,7 +30034,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4193,
+        "line": 4205,
         "tokens": [
           "m_entries"
         ],
@@ -30029,7 +30052,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4197,
+        "line": 4209,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetEntryLayer"
@@ -30048,7 +30071,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4200,
+        "line": 4212,
         "tokens": [
           "m_document"
         ],
@@ -30066,7 +30089,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4202,
+        "line": 4214,
         "tokens": [
           "m_entries"
         ],
@@ -30084,7 +30107,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4206,
+        "line": 4218,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetEntryReadOrder"
@@ -30103,7 +30126,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4209,
+        "line": 4221,
         "tokens": [
           "m_document"
         ],
@@ -30121,7 +30144,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4211,
+        "line": 4223,
         "tokens": [
           "m_entries"
         ],
@@ -30139,7 +30162,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4215,
+        "line": 4227,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetEntryEffect"
@@ -30158,7 +30181,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4218,
+        "line": 4230,
         "tokens": [
           "m_document"
         ],
@@ -30176,7 +30199,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4220,
+        "line": 4232,
         "tokens": [
           "m_entries"
         ],
@@ -30194,7 +30217,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4224,
+        "line": 4236,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetSegmentEntryCount"
@@ -30213,7 +30236,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4227,
+        "line": 4239,
         "tokens": [
           "m_document"
         ],
@@ -30231,7 +30254,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4229,
+        "line": 4241,
         "tokens": [
           "GetSegmentCount"
         ],
@@ -30249,7 +30272,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4230,
+        "line": 4242,
         "tokens": [
           "m_segments"
         ],
@@ -30267,7 +30290,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4235,
+        "line": 4247,
         "tokens": [
           "CSimpleTextSubtitle",
           "FindNextSegment"
@@ -30286,7 +30309,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4239,
+        "line": 4251,
         "tokens": [
           "GetDocumentMode"
         ],
@@ -30304,7 +30327,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4240,
+        "line": 4252,
         "tokens": [
           "m_document"
         ],
@@ -30322,7 +30345,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4249,
+        "line": 4261,
         "tokens": [
           "GetSegmentCount"
         ],
@@ -30340,7 +30363,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4257,
+        "line": 4269,
         "tokens": [
           "TranslateSegmentEnd"
         ],
@@ -30358,7 +30381,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4258,
+        "line": 4270,
         "tokens": [
           "TranslateSegmentEnd"
         ],
@@ -30376,7 +30399,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4261,
+        "line": 4273,
         "tokens": [
           "TranslateSegmentEnd"
         ],
@@ -30394,7 +30417,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4269,
+        "line": 4281,
         "tokens": [
           "SearchSubs"
         ],
@@ -30412,7 +30435,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4273,
+        "line": 4285,
         "tokens": [
           "CSimpleTextSubtitle",
           "SearchSubs2Snapshot"
@@ -30431,7 +30454,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4274,
+        "line": 4286,
         "tokens": [
           "STSSegment"
         ],
@@ -30449,7 +30472,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4277,
+        "line": 4289,
         "tokens": [
           "GetDocumentMode"
         ],
@@ -30467,7 +30490,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4278,
+        "line": 4290,
         "tokens": [
           "m_document"
         ],
@@ -30485,7 +30508,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4281,
+        "line": 4293,
         "tokens": [
           "SearchSubs2"
         ],
@@ -30503,7 +30526,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4287,
+        "line": 4299,
         "tokens": [
           "m_document"
         ],
@@ -30521,7 +30544,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4289,
+        "line": 4301,
         "tokens": [
           "GetSegmentCount"
         ],
@@ -30539,7 +30562,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4294,
+        "line": 4306,
         "tokens": [
           "TranslateSegmentEnd"
         ],
@@ -30557,7 +30580,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4295,
+        "line": 4307,
         "tokens": [
           "TranslateSegmentEnd"
         ],
@@ -30575,7 +30598,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4298,
+        "line": 4310,
         "tokens": [
           "TranslateSegmentEnd"
         ],
@@ -30593,7 +30616,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4301,
+        "line": 4313,
         "tokens": [
           "TranslateSegmentStart"
         ],
@@ -30611,7 +30634,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4303,
+        "line": 4315,
         "tokens": [
           "m_document"
         ],
@@ -30629,7 +30652,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4307,
+        "line": 4319,
         "tokens": [
           "STSSegment",
           "SearchSubs2"
@@ -30648,7 +30671,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4314,
+        "line": 4326,
         "tokens": [
           "CSimpleTextSubtitle",
           "IsSegmentAnimated"
@@ -30667,7 +30690,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4317,
+        "line": 4329,
         "tokens": [
           "m_document"
         ],
@@ -30685,7 +30708,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4319,
+        "line": 4331,
         "tokens": [
           "GetSegmentCount",
           "m_segments"
@@ -30704,67 +30727,12 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4323,
+        "line": 4335,
         "tokens": [
           "CSimpleTextSubtitle",
           "OrSegmentAnimated"
         ],
         "source": "void CSimpleTextSubtitle::OrSegmentAnimated(int iSegment, bool animated)",
-        "reviewed_scope_ids": [
-          "native-entry-segment-facade",
-          "experimental-default-style-owner",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 4326,
-        "tokens": [
-          "m_document"
-        ],
-        "source": "m_document->AnimationOr(iSegment, animated);",
-        "reviewed_scope_ids": [
-          "native-entry-segment-facade",
-          "experimental-default-style-owner",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 4330,
-        "tokens": [
-          "m_segments"
-        ],
-        "source": "m_segments.GetAt(iSegment).animated |= animated;",
-        "reviewed_scope_ids": [
-          "native-entry-segment-facade",
-          "experimental-default-style-owner",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 4335,
-        "tokens": [
-          "CSimpleTextSubtitle",
-          "GetDocumentLCID"
-        ],
-        "source": "LCID CSimpleTextSubtitle::GetDocumentLCID() const",
         "reviewed_scope_ids": [
           "native-style-value-facade",
           "experimental-default-style-owner",
@@ -30780,7 +30748,65 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4337,
+        "line": 4338,
+        "tokens": [
+          "m_document"
+        ],
+        "source": "m_document->AnimationOr(iSegment, animated);",
+        "reviewed_scope_ids": [
+          "native-style-value-facade",
+          "experimental-default-style-owner",
+          "experimental-named-style-boundary-isolation",
+          "experimental-canonical-named-style-owner",
+          "experimental-document-identity-owner",
+          "experimental-document-interpretation-owner",
+          "experimental-document-script-layout-owner",
+          "experimental-document-initialized-metadata-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 4342,
+        "tokens": [
+          "m_segments"
+        ],
+        "source": "m_segments.GetAt(iSegment).animated |= animated;",
+        "reviewed_scope_ids": [
+          "native-style-value-facade",
+          "experimental-default-style-owner",
+          "experimental-named-style-boundary-isolation",
+          "experimental-canonical-named-style-owner",
+          "experimental-document-identity-owner",
+          "experimental-document-interpretation-owner",
+          "experimental-document-script-layout-owner",
+          "experimental-document-initialized-metadata-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 4347,
+        "tokens": [
+          "CSimpleTextSubtitle",
+          "GetDocumentLCID"
+        ],
+        "source": "LCID CSimpleTextSubtitle::GetDocumentLCID() const",
+        "reviewed_scope_ids": [
+          "native-style-value-facade",
+          "experimental-default-style-owner",
+          "experimental-named-style-boundary-isolation",
+          "experimental-canonical-named-style-owner",
+          "experimental-document-identity-owner",
+          "experimental-document-interpretation-owner",
+          "experimental-document-script-layout-owner",
+          "experimental-document-initialized-metadata-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 4349,
         "tokens": [
           "m_document"
         ],
@@ -30799,7 +30825,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4340,
+        "line": 4352,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetDocumentLCID"
@@ -30813,14 +30839,13 @@
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
           "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner",
-          "experimental-supplied-lcid-boundary"
+          "experimental-document-initialized-metadata-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4343,
+        "line": 4355,
         "tokens": [
           "m_document"
         ],
@@ -30839,7 +30864,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4346,
+        "line": 4358,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetDocumentForcedDefaultStyle"
@@ -30859,7 +30884,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4348,
+        "line": 4360,
         "tokens": [
           "m_document"
         ],
@@ -30878,7 +30903,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4351,
+        "line": 4363,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetDocumentForcedDefaultStyle"
@@ -30898,7 +30923,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4353,
+        "line": 4365,
         "tokens": [
           "m_document"
         ],
@@ -30917,7 +30942,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4356,
+        "line": 4368,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetDocumentPARType"
@@ -30937,7 +30962,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4358,
+        "line": 4370,
         "tokens": [
           "m_document"
         ],
@@ -30956,7 +30981,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4361,
+        "line": 4373,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetDocumentPARType"
@@ -30976,7 +31001,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4363,
+        "line": 4375,
         "tokens": [
           "m_document"
         ],
@@ -30995,7 +31020,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4366,
+        "line": 4378,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetDocumentPARCompensation"
@@ -31015,7 +31040,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4368,
+        "line": 4380,
         "tokens": [
           "m_document"
         ],
@@ -31034,7 +31059,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4371,
+        "line": 4383,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetDocumentPARCompensation"
@@ -31054,7 +31079,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4373,
+        "line": 4385,
         "tokens": [
           "m_document"
         ],
@@ -31073,7 +31098,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4376,
+        "line": 4388,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetDocumentColorMatrix"
@@ -31093,7 +31118,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4378,
+        "line": 4390,
         "tokens": [
           "m_document"
         ],
@@ -31112,7 +31137,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4381,
+        "line": 4393,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetDocumentColorMatrix"
@@ -31132,7 +31157,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4383,
+        "line": 4395,
         "tokens": [
           "m_document"
         ],
@@ -31151,7 +31176,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4386,
+        "line": 4398,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetDocumentColorRange"
@@ -31171,7 +31196,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4388,
+        "line": 4400,
         "tokens": [
           "m_document"
         ],
@@ -31190,7 +31215,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4391,
+        "line": 4403,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetDocumentColorRange"
@@ -31210,7 +31235,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4393,
+        "line": 4405,
         "tokens": [
           "m_document"
         ],
@@ -31229,7 +31254,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4396,
+        "line": 4408,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetDocumentLayoutSize"
@@ -31243,14 +31268,13 @@
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
           "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner",
-          "experimental-layout-size-boundary"
+          "experimental-document-initialized-metadata-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4398,
+        "line": 4410,
         "tokens": [
           "m_document"
         ],
@@ -31269,7 +31293,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4401,
+        "line": 4413,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetDocumentLayoutSize"
@@ -31283,14 +31307,13 @@
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
           "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner",
-          "experimental-layout-size-boundary"
+          "experimental-document-initialized-metadata-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4403,
+        "line": 4415,
         "tokens": [
           "m_document"
         ],
@@ -31309,7 +31332,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4406,
+        "line": 4418,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetDocumentLayoutWidth"
@@ -31323,14 +31346,13 @@
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
           "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner",
-          "experimental-layout-size-boundary"
+          "experimental-document-initialized-metadata-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4408,
+        "line": 4420,
         "tokens": [
           "m_document"
         ],
@@ -31349,7 +31371,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4411,
+        "line": 4423,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetDocumentLayoutHeight"
@@ -31363,14 +31385,13 @@
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
           "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner",
-          "experimental-layout-size-boundary"
+          "experimental-document-initialized-metadata-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4413,
+        "line": 4425,
         "tokens": [
           "m_document"
         ],
@@ -31389,7 +31410,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4416,
+        "line": 4428,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetDocumentScreenSize"
@@ -31409,7 +31430,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4418,
+        "line": 4430,
         "tokens": [
           "m_document"
         ],
@@ -31428,7 +31449,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4421,
+        "line": 4433,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetDocumentScreenSize"
@@ -31448,7 +31469,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4423,
+        "line": 4435,
         "tokens": [
           "m_document"
         ],
@@ -31467,7 +31488,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4426,
+        "line": 4438,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetDocumentScreenWidth"
@@ -31487,7 +31508,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4428,
+        "line": 4440,
         "tokens": [
           "m_document"
         ],
@@ -31506,7 +31527,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4431,
+        "line": 4443,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetDocumentScreenHeight"
@@ -31526,7 +31547,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4433,
+        "line": 4445,
         "tokens": [
           "m_document"
         ],
@@ -31545,7 +31566,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4436,
+        "line": 4448,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetDocumentWrapStyle"
@@ -31565,7 +31586,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4438,
+        "line": 4450,
         "tokens": [
           "m_document"
         ],
@@ -31584,7 +31605,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4441,
+        "line": 4453,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetDocumentWrapStyle"
@@ -31604,7 +31625,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4443,
+        "line": 4455,
         "tokens": [
           "m_document"
         ],
@@ -31623,7 +31644,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4446,
+        "line": 4458,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetDocumentCollisions"
@@ -31643,7 +31664,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4448,
+        "line": 4460,
         "tokens": [
           "m_document"
         ],
@@ -31662,7 +31683,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4451,
+        "line": 4463,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetDocumentCollisions"
@@ -31682,7 +31703,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4453,
+        "line": 4465,
         "tokens": [
           "m_document"
         ],
@@ -31701,7 +31722,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4456,
+        "line": 4468,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetDocumentScaledBAS"
@@ -31721,7 +31742,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4458,
+        "line": 4470,
         "tokens": [
           "m_document"
         ],
@@ -31740,7 +31761,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4461,
+        "line": 4473,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetDocumentScaledBAS"
@@ -31760,7 +31781,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4463,
+        "line": 4475,
         "tokens": [
           "m_document"
         ],
@@ -31779,7 +31800,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4466,
+        "line": 4478,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetDocumentMode"
@@ -31799,7 +31820,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4468,
+        "line": 4480,
         "tokens": [
           "m_document"
         ],
@@ -31818,7 +31839,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4471,
+        "line": 4483,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetDocumentType"
@@ -31838,7 +31859,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4473,
+        "line": 4485,
         "tokens": [
           "m_document"
         ],
@@ -31857,7 +31878,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4476,
+        "line": 4488,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetDocumentEncoding"
@@ -31877,7 +31898,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4478,
+        "line": 4490,
         "tokens": [
           "m_document"
         ],
@@ -31896,7 +31917,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4481,
+        "line": 4493,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetDocumentMode"
@@ -31916,7 +31937,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4483,
+        "line": 4495,
         "tokens": [
           "m_document"
         ],
@@ -31935,7 +31956,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4486,
+        "line": 4498,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetDocumentType"
@@ -31955,7 +31976,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4488,
+        "line": 4500,
         "tokens": [
           "m_document"
         ],
@@ -31974,7 +31995,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4491,
+        "line": 4503,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetDocumentEncoding"
@@ -31994,7 +32015,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4493,
+        "line": 4505,
         "tokens": [
           "m_document"
         ],
@@ -32013,7 +32034,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4496,
+        "line": 4508,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetDocumentName"
@@ -32033,7 +32054,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4498,
+        "line": 4510,
         "tokens": [
           "m_document"
         ],
@@ -32052,7 +32073,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4501,
+        "line": 4513,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetDocumentPath"
@@ -32072,7 +32093,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4503,
+        "line": 4515,
         "tokens": [
           "m_document"
         ],
@@ -32091,7 +32112,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4506,
+        "line": 4518,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetDocumentName"
@@ -32111,7 +32132,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4508,
+        "line": 4520,
         "tokens": [
           "m_document"
         ],
@@ -32130,7 +32151,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4511,
+        "line": 4523,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetDocumentPath"
@@ -32150,7 +32171,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4513,
+        "line": 4525,
         "tokens": [
           "m_document"
         ],
@@ -32169,7 +32190,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4516,
+        "line": 4528,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetStyleCount"
@@ -32189,7 +32210,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4518,
+        "line": 4530,
         "tokens": [
           "m_document"
         ],
@@ -32208,7 +32229,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4521,
+        "line": 4533,
         "tokens": [
           "CSimpleTextSubtitle",
           "HasNamedStyle"
@@ -32228,7 +32249,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4523,
+        "line": 4535,
         "tokens": [
           "LookupNamedStyle"
         ],
@@ -32247,7 +32268,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4526,
+        "line": 4538,
         "tokens": [
           "CSimpleTextSubtitle",
           "LookupNamedStyle"
@@ -32267,7 +32288,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4529,
+        "line": 4541,
         "tokens": [
           "LookupNamedStyle",
           "m_document"
@@ -32287,7 +32308,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4533,
+        "line": 4545,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetNamedStyleCopy"
@@ -32307,7 +32328,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4536,
+        "line": 4548,
         "tokens": [
           "LookupNamedStyle"
         ],
@@ -32326,7 +32347,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4539,
+        "line": 4551,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetEntryStyleCopy"
@@ -32346,7 +32367,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4541,
+        "line": 4553,
         "tokens": [
           "GetStyle"
         ],
@@ -32365,7 +32386,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4544,
+        "line": 4556,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetExistingStyleValue"
@@ -32385,7 +32406,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4546,
+        "line": 4558,
         "tokens": [
           "LookupNamedStyle"
         ],
@@ -32404,7 +32425,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4554,
+        "line": 4566,
         "tokens": [
           "m_document"
         ],
@@ -32423,7 +32444,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4559,
+        "line": 4571,
         "tokens": [
           "CSimpleTextSubtitle",
           "ResetDefaultStyle"
@@ -32443,94 +32464,14 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4563,
+        "line": 4575,
         "tokens": [
           "SetDefaultStyle",
           "m_document"
         ],
         "source": "m_document->SetDefaultStyle(value);",
         "reviewed_scope_ids": [
-          "native-style-value-facade",
           "experimental-default-style-owner",
-          "experimental-named-style-boundary-isolation",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 4566,
-        "tokens": [
-          "CSimpleTextSubtitle",
-          "GetStyleNameAt"
-        ],
-        "source": "bool CSimpleTextSubtitle::GetStyleNameAt(size_t ordinal, CString& name) const",
-        "reviewed_scope_ids": [
-          "native-style-value-facade",
-          "experimental-default-style-owner",
-          "experimental-named-style-boundary-isolation",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 4568,
-        "tokens": [
-          "m_document"
-        ],
-        "source": "return m_document->NamedStyleNameAt(ordinal, name);",
-        "reviewed_scope_ids": [
-          "native-style-value-facade",
-          "experimental-default-style-owner",
-          "experimental-named-style-boundary-isolation",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 4571,
-        "tokens": [
-          "CSimpleTextSubtitle",
-          "GetStyleValueAt"
-        ],
-        "source": "bool CSimpleTextSubtitle::GetStyleValueAt(size_t ordinal, STSStyle& value) const",
-        "reviewed_scope_ids": [
-          "native-style-value-facade",
-          "experimental-default-style-owner",
-          "experimental-named-style-boundary-isolation",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 4573,
-        "tokens": [
-          "m_document"
-        ],
-        "source": "return m_document->NamedStyleValueAt(ordinal, value);",
-        "reviewed_scope_ids": [
-          "native-style-value-facade",
-          "experimental-default-style-owner",
-          "experimental-named-style-boundary-isolation",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
@@ -32542,6 +32483,80 @@
       {
         "path": "src/subtitles/STS.cpp",
         "line": 4578,
+        "tokens": [
+          "CSimpleTextSubtitle",
+          "GetStyleNameAt"
+        ],
+        "source": "bool CSimpleTextSubtitle::GetStyleNameAt(size_t ordinal, CString& name) const",
+        "reviewed_scope_ids": [
+          "default-style",
+          "experimental-default-style-owner",
+          "experimental-canonical-named-style-owner",
+          "experimental-document-identity-owner",
+          "experimental-document-interpretation-owner",
+          "experimental-document-script-layout-owner",
+          "experimental-document-initialized-metadata-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 4580,
+        "tokens": [
+          "m_document"
+        ],
+        "source": "return m_document->NamedStyleNameAt(ordinal, name);",
+        "reviewed_scope_ids": [
+          "default-style",
+          "experimental-default-style-owner",
+          "experimental-canonical-named-style-owner",
+          "experimental-document-identity-owner",
+          "experimental-document-interpretation-owner",
+          "experimental-document-script-layout-owner",
+          "experimental-document-initialized-metadata-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 4583,
+        "tokens": [
+          "CSimpleTextSubtitle",
+          "GetStyleValueAt"
+        ],
+        "source": "bool CSimpleTextSubtitle::GetStyleValueAt(size_t ordinal, STSStyle& value) const",
+        "reviewed_scope_ids": [
+          "default-style",
+          "experimental-default-style-owner",
+          "experimental-canonical-named-style-owner",
+          "experimental-document-identity-owner",
+          "experimental-document-interpretation-owner",
+          "experimental-document-script-layout-owner",
+          "experimental-document-initialized-metadata-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 4585,
+        "tokens": [
+          "m_document"
+        ],
+        "source": "return m_document->NamedStyleValueAt(ordinal, value);",
+        "reviewed_scope_ids": [
+          "default-style",
+          "experimental-default-style-owner",
+          "experimental-canonical-named-style-owner",
+          "experimental-document-identity-owner",
+          "experimental-document-interpretation-owner",
+          "experimental-document-script-layout-owner",
+          "experimental-document-initialized-metadata-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 4590,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetStyle"
@@ -32560,7 +32575,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4581,
+        "line": 4593,
         "tokens": [
           "m_fForcedDefaultStyle"
         ],
@@ -32578,7 +32593,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4583,
+        "line": 4595,
         "tokens": [
           "m_entries",
           "m_styles"
@@ -32597,7 +32612,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4584,
+        "line": 4596,
         "tokens": [
           "m_styles"
         ],
@@ -32615,7 +32630,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4586,
+        "line": 4598,
         "tokens": [
           "m_defaultStyle"
         ],
@@ -32633,7 +32648,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4591,
+        "line": 4603,
         "tokens": [
           "m_defaultStyle"
         ],
@@ -32645,13 +32660,14 @@
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
           "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner"
+          "experimental-document-initialized-metadata-owner",
+          "experimental-resolved-style-boundary"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4600,
+        "line": 4612,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetStyle"
@@ -32670,7 +32686,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4603,
+        "line": 4615,
         "tokens": [
           "ResolvedStyle",
           "m_document"
@@ -32683,75 +32699,17 @@
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
           "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner",
-          "experimental-resolved-style-boundary"
+          "experimental-document-initialized-metadata-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4605,
+        "line": 4617,
         "tokens": [
           "GetStyle"
         ],
         "source": "*stss = *GetStyle(i);",
-        "reviewed_scope_ids": [
-          "default-style",
-          "experimental-default-style-owner",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 4611,
-        "tokens": [
-          "CSimpleTextSubtitle",
-          "GetCharSet"
-        ],
-        "source": "int CSimpleTextSubtitle::GetCharSet(int i)",
-        "reviewed_scope_ids": [
-          "default-style",
-          "experimental-default-style-owner",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 4614,
-        "tokens": [
-          "ResolvedCharSet",
-          "m_document"
-        ],
-        "source": "const auto resolved = m_document->ResolvedCharSet(i);",
-        "reviewed_scope_ids": [
-          "default-style",
-          "experimental-default-style-owner",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-document-initialized-metadata-owner",
-          "experimental-resolved-style-boundary"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 4618,
-        "tokens": [
-          "GetStyle"
-        ],
-        "source": "STSStyle* style = GetStyle(i);",
         "reviewed_scope_ids": [
           "default-style",
           "experimental-canonical-named-style-owner",
@@ -32764,6 +32722,56 @@
       {
         "path": "src/subtitles/STS.cpp",
         "line": 4623,
+        "tokens": [
+          "CSimpleTextSubtitle",
+          "GetCharSet"
+        ],
+        "source": "int CSimpleTextSubtitle::GetCharSet(int i)",
+        "reviewed_scope_ids": [
+          "text",
+          "experimental-canonical-named-style-owner",
+          "experimental-document-identity-owner",
+          "experimental-document-interpretation-owner",
+          "experimental-document-script-layout-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 4626,
+        "tokens": [
+          "ResolvedCharSet",
+          "m_document"
+        ],
+        "source": "const auto resolved = m_document->ResolvedCharSet(i);",
+        "reviewed_scope_ids": [
+          "text",
+          "experimental-canonical-named-style-owner",
+          "experimental-document-identity-owner",
+          "experimental-document-interpretation-owner",
+          "experimental-document-script-layout-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 4630,
+        "tokens": [
+          "GetStyle"
+        ],
+        "source": "STSStyle* style = GetStyle(i);",
+        "reviewed_scope_ids": [
+          "text",
+          "experimental-canonical-named-style-owner",
+          "experimental-document-identity-owner",
+          "experimental-document-interpretation-owner",
+          "experimental-document-script-layout-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 4635,
         "tokens": [
           "CSimpleTextSubtitle",
           "IsEntryUnicode"
@@ -32780,7 +32788,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4626,
+        "line": 4638,
         "tokens": [
           "m_document"
         ],
@@ -32796,7 +32804,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4628,
+        "line": 4640,
         "tokens": [
           "m_entries"
         ],
@@ -32812,7 +32820,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4632,
+        "line": 4644,
         "tokens": [
           "CSimpleTextSubtitle",
           "ConvertUnicode"
@@ -32829,7 +32837,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4635,
+        "line": 4647,
         "tokens": [
           "STSEntry",
           "m_document"
@@ -32846,7 +32854,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4637,
+        "line": 4649,
         "tokens": [
           "STSEntry",
           "m_entries"
@@ -32863,7 +32871,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4642,
+        "line": 4654,
         "tokens": [
           "GetCharSet"
         ],
@@ -32879,7 +32887,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4650,
+        "line": 4662,
         "tokens": [
           "m_document"
         ],
@@ -32895,7 +32903,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4655,
+        "line": 4667,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetStrW"
@@ -32912,7 +32920,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4658,
+        "line": 4670,
         "tokens": [
           "STSEntry",
           "m_document"
@@ -32929,7 +32937,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4660,
+        "line": 4672,
         "tokens": [
           "STSEntry",
           "m_entries"
@@ -32946,7 +32954,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4662,
+        "line": 4674,
         "tokens": [
           "GetCharSet"
         ],
@@ -32962,7 +32970,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4675,
+        "line": 4687,
         "tokens": [
           "CSimpleTextSubtitle",
           "GetStrWA"
@@ -32979,7 +32987,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4678,
+        "line": 4690,
         "tokens": [
           "STSEntry",
           "m_document"
@@ -32996,7 +33004,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4680,
+        "line": 4692,
         "tokens": [
           "STSEntry",
           "m_entries"
@@ -33013,7 +33021,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4682,
+        "line": 4694,
         "tokens": [
           "GetCharSet"
         ],
@@ -33029,7 +33037,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4695,
+        "line": 4707,
         "tokens": [
           "CSimpleTextSubtitle",
           "SetStr"
@@ -33046,7 +33054,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4698,
+        "line": 4710,
         "tokens": [
           "STSEntry",
           "m_document"
@@ -33063,7 +33071,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4700,
+        "line": 4712,
         "tokens": [
           "STSEntry",
           "m_entries"
@@ -33080,13 +33088,13 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4705,
+        "line": 4717,
         "tokens": [
           "GetCharSet"
         ],
         "source": "if(stse.fUnicode && !fUnicode) stse.str = MBCSSSAToUnicode(str, GetCharSet(i));",
         "reviewed_scope_ids": [
-          "text",
+          "sort-convert",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
@@ -33096,13 +33104,13 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4706,
+        "line": 4718,
         "tokens": [
           "GetCharSet"
         ],
         "source": "else if(!stse.fUnicode && fUnicode) stse.str = UnicodeSSAToMBCS(str, GetCharSet(i));",
         "reviewed_scope_ids": [
-          "text",
+          "sort-convert",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
@@ -33112,13 +33120,13 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4709,
+        "line": 4721,
         "tokens": [
           "m_document"
         ],
         "source": "m_document->SetText(i, stse.str);",
         "reviewed_scope_ids": [
-          "text",
+          "sort-convert",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
@@ -33128,7 +33136,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4719,
+        "line": 4731,
         "tokens": [
           "STSEntry"
         ],
@@ -33144,7 +33152,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4720,
+        "line": 4732,
         "tokens": [
           "STSEntry"
         ],
@@ -33160,7 +33168,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4721,
+        "line": 4733,
         "tokens": [
           "STSEntry"
         ],
@@ -33176,7 +33184,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4727,
+        "line": 4739,
         "tokens": [
           "STSEntry"
         ],
@@ -33192,7 +33200,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4730,
+        "line": 4742,
         "tokens": [
           "CSimpleTextSubtitle",
           "Sort"
@@ -33209,7 +33217,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4733,
+        "line": 4745,
         "tokens": [
           "STSEntry"
         ],
@@ -33225,7 +33233,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4734,
+        "line": 4746,
         "tokens": [
           "MaterializeSortRecords",
           "m_document"
@@ -33236,14 +33244,13 @@
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-scalar-sort-snapshot-boundary"
+          "experimental-document-script-layout-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4735,
+        "line": 4747,
         "tokens": [
           "STSEntry"
         ],
@@ -33259,14 +33266,13 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4739,
+        "line": 4751,
         "tokens": [
           "Sort",
           "m_document"
         ],
         "source": "m_document->Reorder(order); // owner rebuilds, preserving native Sort semantics",
         "reviewed_scope_ids": [
-          "sort-convert",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
@@ -33276,24 +33282,23 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4740,
+        "line": 4752,
         "tokens": [
           "NotifySegmentsRebuilt"
         ],
         "source": "NotifySegmentsRebuilt();",
         "reviewed_scope_ids": [
-          "sort-convert",
+          "rebuild",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-coarse-time-conversion-boundary"
+          "experimental-document-script-layout-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4742,
+        "line": 4754,
         "tokens": [
           "GetEntryCount",
           "STSEntry",
@@ -33301,7 +33306,7 @@
         ],
         "source": "qsort(m_entries.GetData(), GetEntryCount(), sizeof(STSEntry), !fRestoreReadorder ? comp1 : comp2);",
         "reviewed_scope_ids": [
-          "sort-convert",
+          "rebuild",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
@@ -33311,13 +33316,13 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4743,
+        "line": 4755,
         "tokens": [
           "CreateSegments"
         ],
         "source": "CreateSegments();",
         "reviewed_scope_ids": [
-          "sort-convert",
+          "rebuild",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
@@ -33327,7 +33332,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4753,
+        "line": 4765,
         "tokens": [
           "CSimpleTextSubtitle",
           "NotifySegmentsRebuilt"
@@ -33338,14 +33343,13 @@
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-coarse-time-conversion-boundary"
+          "experimental-document-script-layout-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4755,
+        "line": 4767,
         "tokens": [
           "OnChanged"
         ],
@@ -33361,7 +33365,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4757,
+        "line": 4769,
         "tokens": [
           "STSSegment"
         ],
@@ -33377,7 +33381,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4758,
+        "line": 4770,
         "tokens": [
           "GetSegmentCount"
         ],
@@ -33393,7 +33397,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4759,
+        "line": 4771,
         "tokens": [
           "STSSegment"
         ],
@@ -33409,7 +33413,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4760,
+        "line": 4772,
         "tokens": [
           "m_document"
         ],
@@ -33419,13 +33423,14 @@
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner"
+          "experimental-document-script-layout-owner",
+          "experimental-coarse-time-conversion-boundary"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4761,
+        "line": 4773,
         "tokens": [
           "Add"
         ],
@@ -33441,7 +33446,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4768,
+        "line": 4780,
         "tokens": [
           "CSimpleTextSubtitle",
           "CreateSegments"
@@ -33458,7 +33463,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4771,
+        "line": 4783,
         "tokens": [
           "m_document"
         ],
@@ -33474,7 +33479,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4772,
+        "line": 4784,
         "tokens": [
           "NotifySegmentsRebuilt"
         ],
@@ -33484,14 +33489,13 @@
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-coarse-time-conversion-boundary"
+          "experimental-document-script-layout-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4774,
+        "line": 4786,
         "tokens": [
           "m_segments"
         ],
@@ -33507,7 +33511,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4779,
+        "line": 4791,
         "tokens": [
           "GetEntryCount"
         ],
@@ -33523,7 +33527,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4780,
+        "line": 4792,
         "tokens": [
           "STSEntry",
           "m_entries"
@@ -33540,7 +33544,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4781,
+        "line": 4793,
         "tokens": [
           "Add"
         ],
@@ -33556,7 +33560,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4785,
+        "line": 4797,
         "tokens": [
           "STSSegment"
         ],
@@ -33572,7 +33576,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4787,
+        "line": 4799,
         "tokens": [
           "Add"
         ],
@@ -33588,7 +33592,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4788,
+        "line": 4800,
         "tokens": [
           "Add",
           "m_segments"
@@ -33605,7 +33609,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4792,
+        "line": 4804,
         "tokens": [
           "GetEntryCount"
         ],
@@ -33621,7 +33625,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4795,
+        "line": 4807,
         "tokens": [
           "STSSegment",
           "m_segments"
@@ -33638,7 +33642,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4797,
+        "line": 4809,
         "tokens": [
           "GetEntryCount"
         ],
@@ -33654,7 +33658,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4798,
+        "line": 4810,
         "tokens": [
           "GetEntryCount"
         ],
@@ -33670,7 +33674,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4800,
+        "line": 4812,
         "tokens": [
           "STSEntry",
           "m_entries"
@@ -33687,7 +33691,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4813,
+        "line": 4825,
         "tokens": [
           "Add",
           "STSSegment"
@@ -33704,7 +33708,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4820,
+        "line": 4832,
         "tokens": [
           "GetEntryCount"
         ],
@@ -33720,7 +33724,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4822,
+        "line": 4834,
         "tokens": [
           "STSEntry",
           "m_entries"
@@ -33737,13 +33741,13 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4838,
+        "line": 4850,
         "tokens": [
           "Add"
         ],
         "source": "tempSegments[start].subs.Add(i);",
         "reviewed_scope_ids": [
-          "rebuild",
+          "open",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
@@ -33753,14 +33757,14 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4842,
+        "line": 4854,
         "tokens": [
           "Add",
           "m_segments"
         ],
         "source": "m_segments.Add(tempSegments[i]);",
         "reviewed_scope_ids": [
-          "rebuild",
+          "open",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
@@ -33770,13 +33774,13 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4845,
+        "line": 4857,
         "tokens": [
           "OnChanged"
         ],
         "source": "OnChanged();",
         "reviewed_scope_ids": [
-          "rebuild",
+          "open",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
@@ -33786,23 +33790,24 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4846,
+        "line": 4858,
         "tokens": [
           "m_segments"
         ],
         "source": "LogSegments(m_segments);",
         "reviewed_scope_ids": [
-          "rebuild",
+          "open",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner"
+          "experimental-document-script-layout-owner",
+          "experimental-base-empty-boundary"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4850,
+        "line": 4862,
         "tokens": [
           "CSimpleTextSubtitle",
           "Open"
@@ -33819,7 +33824,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4852,
+        "line": 4864,
         "tokens": [
           "Empty"
         ],
@@ -33829,14 +33834,13 @@
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-base-empty-boundary"
+          "experimental-document-script-layout-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4855,
+        "line": 4867,
         "tokens": [
           "Open"
         ],
@@ -33852,7 +33856,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4858,
+        "line": 4870,
         "tokens": [
           "IsEmpty"
         ],
@@ -33862,14 +33866,13 @@
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-base-empty-boundary"
+          "experimental-document-script-layout-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4865,
+        "line": 4877,
         "tokens": [
           "Open"
         ],
@@ -33885,7 +33888,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4876,
+        "line": 4888,
         "tokens": [
           "CSimpleTextSubtitle",
           "Open"
@@ -33902,7 +33905,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4878,
+        "line": 4890,
         "tokens": [
           "Empty"
         ],
@@ -33912,14 +33915,13 @@
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-base-empty-boundary"
+          "experimental-document-script-layout-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4897,
+        "line": 4909,
         "tokens": [
           "Open"
         ],
@@ -33935,11 +33937,28 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4900,
+        "line": 4912,
         "tokens": [
           "GetEntryCount"
         ],
         "source": "if(GetEntryCount() > 0)",
+        "reviewed_scope_ids": [
+          "open",
+          "experimental-canonical-named-style-owner",
+          "experimental-document-identity-owner",
+          "experimental-document-interpretation-owner",
+          "experimental-document-script-layout-owner",
+          "experimental-base-empty-boundary"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 4919,
+        "tokens": [
+          "Empty"
+        ],
+        "source": "Empty();",
         "reviewed_scope_ids": [
           "open",
           "experimental-canonical-named-style-owner",
@@ -33951,7 +33970,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4907,
+        "line": 4924,
         "tokens": [
           "Empty"
         ],
@@ -33961,31 +33980,13 @@
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
           "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-base-empty-boundary"
+          "experimental-document-script-layout-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4912,
-        "tokens": [
-          "Empty"
-        ],
-        "source": "Empty();",
-        "reviewed_scope_ids": [
-          "open",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner",
-          "experimental-base-empty-boundary"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 4915,
+        "line": 4927,
         "tokens": [
           "Open"
         ],
@@ -34001,7 +34002,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4918,
+        "line": 4930,
         "tokens": [
           "SetDocumentName"
         ],
@@ -34017,7 +34018,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4920,
+        "line": 4932,
         "tokens": [
           "m_name"
         ],
@@ -34033,7 +34034,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4923,
+        "line": 4935,
         "tokens": [
           "SetDocumentType"
         ],
@@ -34042,97 +34043,17 @@
           "open",
           "experimental-canonical-named-style-owner",
           "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
           "experimental-document-script-layout-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4925,
+        "line": 4937,
         "tokens": [
           "m_subtitleType"
         ],
         "source": "m_subtitleType = OpenFuncts[i].type;",
-        "reviewed_scope_ids": [
-          "open",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 4928,
-        "tokens": [
-          "SetDocumentMode"
-        ],
-        "source": "SetDocumentMode(OpenFuncts[i].mode);",
-        "reviewed_scope_ids": [
-          "open",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 4930,
-        "tokens": [
-          "m_mode"
-        ],
-        "source": "m_mode = OpenFuncts[i].mode;",
-        "reviewed_scope_ids": [
-          "open",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 4933,
-        "tokens": [
-          "SetDocumentEncoding"
-        ],
-        "source": "SetDocumentEncoding(f->GetEncoding());",
-        "reviewed_scope_ids": [
-          "open",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-interpretation-owner",
-          "experimental-document-script-layout-owner"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 4935,
-        "tokens": [
-          "m_encoding"
-        ],
-        "source": "m_encoding = f->GetEncoding();",
-        "reviewed_scope_ids": [
-          "open",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-identity-owner",
-          "experimental-document-script-layout-owner"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
-      },
-      {
-        "path": "src/subtitles/STS.cpp",
-        "line": 4938,
-        "tokens": [
-          "SetDocumentPath"
-        ],
-        "source": "SetDocumentPath(f->GetFilePath());",
         "reviewed_scope_ids": [
           "open",
           "experimental-canonical-named-style-owner",
@@ -34144,6 +34065,76 @@
       {
         "path": "src/subtitles/STS.cpp",
         "line": 4940,
+        "tokens": [
+          "SetDocumentMode"
+        ],
+        "source": "SetDocumentMode(OpenFuncts[i].mode);",
+        "reviewed_scope_ids": [
+          "open",
+          "experimental-canonical-named-style-owner",
+          "experimental-document-script-layout-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 4942,
+        "tokens": [
+          "m_mode"
+        ],
+        "source": "m_mode = OpenFuncts[i].mode;",
+        "reviewed_scope_ids": [
+          "open",
+          "experimental-canonical-named-style-owner",
+          "experimental-document-script-layout-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 4945,
+        "tokens": [
+          "SetDocumentEncoding"
+        ],
+        "source": "SetDocumentEncoding(f->GetEncoding());",
+        "reviewed_scope_ids": [
+          "open",
+          "experimental-canonical-named-style-owner",
+          "experimental-document-script-layout-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 4947,
+        "tokens": [
+          "m_encoding"
+        ],
+        "source": "m_encoding = f->GetEncoding();",
+        "reviewed_scope_ids": [
+          "open",
+          "experimental-canonical-named-style-owner",
+          "experimental-document-script-layout-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 4950,
+        "tokens": [
+          "SetDocumentPath"
+        ],
+        "source": "SetDocumentPath(f->GetFilePath());",
+        "reviewed_scope_ids": [
+          "open",
+          "experimental-canonical-named-style-owner",
+          "experimental-document-script-layout-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 4952,
         "tokens": [
           "m_path"
         ],
@@ -34157,7 +34148,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4942,
+        "line": 4954,
         "tokens": [
           "m_simple"
         ],
@@ -34171,7 +34162,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4945,
+        "line": 4957,
         "tokens": [
           "Open"
         ],
@@ -34185,7 +34176,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4948,
+        "line": 4960,
         "tokens": [
           "Sort"
         ],
@@ -34199,7 +34190,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4949,
+        "line": 4961,
         "tokens": [
           "CreateSegments"
         ],
@@ -34213,7 +34204,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4951,
+        "line": 4963,
         "tokens": [
           "ChangeUnknownStylesToDefault"
         ],
@@ -34227,7 +34218,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4954,
+        "line": 4966,
         "tokens": [
           "GetDocumentScreenSize",
           "SetDocumentScreenSize"
@@ -34242,7 +34233,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4956,
+        "line": 4968,
         "tokens": [
           "m_dstScreenSize"
         ],
@@ -34256,7 +34247,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4965,
+        "line": 4977,
         "tokens": [
           "CSimpleTextSubtitle",
           "Open"
@@ -34271,13 +34262,13 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4982,
+        "line": 4994,
         "tokens": [
           "Open"
         ],
         "source": "bool fRet = Open(fn, CharSet, name);",
         "reviewed_scope_ids": [
-          "open",
+          "serialize",
           "experimental-canonical-named-style-owner",
           "experimental-document-script-layout-owner"
         ],
@@ -34285,7 +34276,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 4989,
+        "line": 5001,
         "tokens": [
           "CSimpleTextSubtitle",
           "SaveAs"
@@ -34300,7 +34291,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5042,
+        "line": 5054,
         "tokens": [
           "GetDocumentCollisions"
         ],
@@ -34314,7 +34305,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5044,
+        "line": 5056,
         "tokens": [
           "m_collisions"
         ],
@@ -34328,7 +34319,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5047,
+        "line": 5059,
         "tokens": [
           "GetDocumentScaledBAS"
         ],
@@ -34342,7 +34333,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5049,
+        "line": 5061,
         "tokens": [
           "m_fScaledBAS"
         ],
@@ -34356,13 +34347,14 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5061,
+        "line": 5073,
         "tokens": [
           "GetDocumentScreenSize"
         ],
         "source": "str2.Format(str, GetDocumentScreenSize().cx, GetDocumentScreenSize().cy);",
         "reviewed_scope_ids": [
           "serialize",
+          "experimental-named-style-boundary-isolation",
           "experimental-canonical-named-style-owner",
           "experimental-document-script-layout-owner"
         ],
@@ -34370,13 +34362,14 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5063,
+        "line": 5075,
         "tokens": [
           "m_dstScreenSize"
         ],
         "source": "str2.Format(str, m_dstScreenSize.cx, m_dstScreenSize.cy);",
         "reviewed_scope_ids": [
           "serialize",
+          "experimental-named-style-boundary-isolation",
           "experimental-canonical-named-style-owner",
           "experimental-document-script-layout-owner"
         ],
@@ -34384,7 +34377,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5072,
+        "line": 5084,
         "tokens": [
           "GetStyleCount"
         ],
@@ -34399,7 +34392,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5075,
+        "line": 5087,
         "tokens": [
           "GetStyleNameAt"
         ],
@@ -34414,14 +34407,13 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5077,
+        "line": 5089,
         "tokens": [
           "GetStyleValueAt"
         ],
         "source": "if(!GetStyleValueAt(ordinal, value)) return false;",
         "reviewed_scope_ids": [
           "serialize",
-          "experimental-named-style-boundary-isolation",
           "experimental-canonical-named-style-owner",
           "experimental-document-script-layout-owner"
         ],
@@ -34429,14 +34421,13 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5080,
+        "line": 5092,
         "tokens": [
           "m_styles"
         ],
         "source": "POSITION pos = m_styles.GetStartPosition();",
         "reviewed_scope_ids": [
           "serialize",
-          "experimental-named-style-boundary-isolation",
           "experimental-canonical-named-style-owner",
           "experimental-document-script-layout-owner"
         ],
@@ -34444,14 +34435,13 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5085,
+        "line": 5097,
         "tokens": [
           "m_styles"
         ],
         "source": "m_styles.GetNextAssoc(pos, key, s);",
         "reviewed_scope_ids": [
           "serialize",
-          "experimental-named-style-boundary-isolation",
           "experimental-canonical-named-style-owner",
           "experimental-document-script-layout-owner"
         ],
@@ -34459,7 +34449,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5128,
+        "line": 5140,
         "tokens": [
           "GetEntryCount"
         ],
@@ -34473,7 +34463,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5147,
+        "line": 5159,
         "tokens": [
           "Sort"
         ],
@@ -34487,7 +34477,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5149,
+        "line": 5161,
         "tokens": [
           "GetEntryCount"
         ],
@@ -34501,7 +34491,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5152,
+        "line": 5164,
         "tokens": [
           "STSEntry",
           "m_document"
@@ -34516,7 +34506,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5154,
+        "line": 5166,
         "tokens": [
           "STSEntry",
           "m_entries"
@@ -34531,7 +34521,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5159,
+        "line": 5171,
         "tokens": [
           "TranslateStart"
         ],
@@ -34545,7 +34535,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5162,
+        "line": 5174,
         "tokens": [
           "TranslateEnd"
         ],
@@ -34559,7 +34549,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5174,
+        "line": 5186,
         "tokens": [
           "GetStrW"
         ],
@@ -34573,7 +34563,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5175,
+        "line": 5187,
         "tokens": [
           "GetStrWA"
         ],
@@ -34587,13 +34577,14 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5223,
+        "line": 5235,
         "tokens": [
           "Sort"
         ],
         "source": "//  Sort();",
         "reviewed_scope_ids": [
           "serialize",
+          "experimental-named-style-boundary-isolation",
           "experimental-canonical-named-style-owner",
           "experimental-document-script-layout-owner"
         ],
@@ -34601,7 +34592,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5233,
+        "line": 5245,
         "tokens": [
           "LookupNamedStyle"
         ],
@@ -34616,7 +34607,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5237,
+        "line": 5249,
         "tokens": [
           "m_styles"
         ],
@@ -34631,7 +34622,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5252,
+        "line": 5264,
         "tokens": [
           "GetDocumentScreenSize"
         ],
@@ -34639,56 +34630,51 @@
         "reviewed_scope_ids": [
           "serialize",
           "experimental-named-style-boundary-isolation",
-          "experimental-canonical-named-style-owner",
-          "experimental-document-script-layout-owner"
+          "experimental-canonical-named-style-owner"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5254,
+        "line": 5266,
         "tokens": [
           "m_dstScreenSize"
         ],
         "source": "str2.Format(str, m_dstScreenSize.cx, m_dstScreenSize.cy);",
         "reviewed_scope_ids": [
           "serialize",
-          "experimental-named-style-boundary-isolation",
-          "experimental-canonical-named-style-owner"
+          "experimental-named-style-boundary-isolation"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5264,
+        "line": 5276,
         "tokens": [
           "LookupNamedStyle"
         ],
         "source": "LookupNamedStyle(g_default_style, &sidecar_style) != NamedStyleLookup::Value)",
         "reviewed_scope_ids": [
-          "serialize",
-          "experimental-named-style-boundary-isolation",
-          "experimental-canonical-named-style-owner"
+          "serialize"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5289,
+        "line": 5301,
         "tokens": [
           "CSimpleTextSubtitle",
           "IsEmpty"
         ],
         "source": "bool CSimpleTextSubtitle::IsEmpty()",
         "reviewed_scope_ids": [
-          "clear",
-          "experimental-base-empty-boundary"
+          "clear"
         ],
         "evidence_status": "lexical-candidate-in-reviewed-scope"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5292,
+        "line": 5304,
         "tokens": [
           "m_document"
         ],
@@ -34700,54 +34686,45 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5294,
+        "line": 5306,
         "tokens": [
           "IsEmpty",
           "m_entries"
         ],
         "source": "return m_entries.IsEmpty();",
-        "reviewed_scope_ids": [
-          "clear",
-          "experimental-base-empty-boundary"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
+        "reviewed_scope_ids": [],
+        "evidence_status": "lexical-candidate-only"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5298,
+        "line": 5310,
         "tokens": [
           "CSimpleTextSubtitle",
           "RemoveAllEntries"
         ],
         "source": "void CSimpleTextSubtitle::RemoveAllEntries()",
-        "reviewed_scope_ids": [
-          "clear"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
+        "reviewed_scope_ids": [],
+        "evidence_status": "lexical-candidate-only"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5301,
+        "line": 5313,
         "tokens": [
           "m_document"
         ],
         "source": "m_document->RemoveEntries();",
-        "reviewed_scope_ids": [
-          "clear"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
+        "reviewed_scope_ids": [],
+        "evidence_status": "lexical-candidate-only"
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5303,
+        "line": 5315,
         "tokens": [
           "m_entries"
         ],
         "source": "m_entries.RemoveAll();",
-        "reviewed_scope_ids": [
-          "clear"
-        ],
-        "evidence_status": "lexical-candidate-in-reviewed-scope"
+        "reviewed_scope_ids": [],
+        "evidence_status": "lexical-candidate-only"
       },
       {
         "path": "src/subtitles/STS.h",

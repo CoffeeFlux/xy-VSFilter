@@ -109,7 +109,7 @@ def conversion_rows():
     )]
 
 
-def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True, require_unknown_stages=True):
+def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True, require_unknown_stages=True, require_add_style_stages=True):
     lines = data.splitlines()
     if not lines or lines[0] != f"provenance pointer_bits={pointer_bits}".encode():
         raise ValueError("missing or incorrect native architecture provenance")
@@ -118,6 +118,21 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
     for prefix in (b"state ", b"entry ", b"segment ", b"callback ", b"text "):
         if not any(line.startswith(prefix) for line in lines):
             raise ValueError(f"missing native lifecycle trace section {prefix!r}")
+
+    if require_add_style_stages:
+        stages = [b"add-style-stage " + name for name in (
+            b"add-style-equal-before", b"add-style-equal-after", b"add-style-name-classes")]
+        if [line for line in lines if line.startswith(b"add-style-stage ")] != stages:
+            raise ValueError("missing or incorrect AddStyle lifecycle stages")
+        retained = [b"add-style-retained ZeroNeg bits=8000000000000000 font 4 004e 0000 d801 005a",
+                    b"add-style-retained ZeroPos bits=0000000000000000 font 4 004e 0000 d802 005a"]
+        if [line for line in lines if line.startswith(b"add-style-retained ")] != retained:
+            raise ValueError("AddStyle duplicate did not retain original signedzero/full font")
+        if not all(lines.index(stages[0]) < lines.index(row) < lines.index(stages[1]) for row in retained):
+            raise ValueError("AddStyle retention observation order differs")
+        name_class=b"add-style-name-classes count=2 default=1 empty=1 default-size=21 empty-size=22 entry 2 0000 004b"
+        if lines.count(name_class)!=1 or lines.index(name_class)<lines.index(stages[2]):
+            raise ValueError("AddStyle logical-empty/leading-NUL contrast missing")
 
     if require_unknown_stages:
         if [line for line in lines if line.startswith((b"unknown-stage ",b"unknown-row "))] != unknown_rows():
@@ -351,11 +366,11 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
 
 
 
-def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True, require_unknown_stages=True):
+def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True, require_unknown_stages=True, require_add_style_stages=True):
     if len(traces) != 4:
         raise ValueError("two reference and two candidate executions required")
     for trace in traces:
-        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages, require_metadata_stages=require_metadata_stages, require_selected_copy_stages=require_selected_copy_stages, require_style_rename_stages=require_style_rename_stages, require_sort_stages=require_sort_stages, require_base_empty_stages=require_base_empty_stages, require_lcid_stages=require_lcid_stages, require_resolution_stages=require_resolution_stages, require_layout_size_stages=require_layout_size_stages, require_conversion_stages=require_conversion_stages, require_unknown_stages=require_unknown_stages)
+        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages, require_metadata_stages=require_metadata_stages, require_selected_copy_stages=require_selected_copy_stages, require_style_rename_stages=require_style_rename_stages, require_sort_stages=require_sort_stages, require_base_empty_stages=require_base_empty_stages, require_lcid_stages=require_lcid_stages, require_resolution_stages=require_resolution_stages, require_layout_size_stages=require_layout_size_stages, require_conversion_stages=require_conversion_stages, require_unknown_stages=require_unknown_stages, require_add_style_stages=require_add_style_stages)
     if any(trace != traces[0] for trace in traces[1:]):
         raise ValueError("native lifecycle traces differ or are nondeterministic")
 
