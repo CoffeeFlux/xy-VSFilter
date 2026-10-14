@@ -462,6 +462,52 @@ retained under `artifacts/ci-38616306506`; no facade execution is claimed for
 that failed run. Add the missing standard header and rerun. The preceding
 expanded owner comparison passes on both Windows architectures.
 
+At `9232313b`, run `38616770331` passes both focused steps on Windows x86
+and x64. [Verified facade and owner evidence](rust-document-facade-windows-evidence.json)
+records 97,461 matching owner snapshots per architecture and 226 actual-ATL
+facade assertions with repeatable traces. The retained facade executable,
+generated header, probe source, original/candidate sources and traces were
+independently rehashed. Miri and the Python suites also pass. Integrated renderer
+campaigns remain separate; these focused checks do not establish full rendering
+parity or production Rust ownership.
+
+### Experimental persistent-owner C boundary
+
+The next increment adds 22 private versioned document exports using typed integer
+handles, immutable snapshot replies and explicit little-endian byte values. The
+safe core now also supports per-entry style and endpoint edits without rebuilding,
+and independent storage copying. Wire encoding preserves raw code units and
+rejects malformed shapes, invalid booleans/reserved bytes and overflowing lengths.
+There is no generic command bus or native persistent mirror.
+
+The registry serializes access before deriving Rust references, never reuses
+removed IDs, checks resource types, and removes payloads before dropping them
+outside admission. Input buffers are copied before admission; output values are
+staged until canonical loans end. Capacity errors precede mutations. Private Busy
+returns immediately; native waiting/reentry/public-error behavior is not decided
+and this interface is **not wired to production document storage**. The current
+C++ facade still uses native arrays, with zero new owners retired here.
+
+[Exact-source local evidence](rust-document-ffi-local-evidence.json) compares all
+97,461 snapshots directly to the pinned native outcomes through both the safe
+Rust example and an independent C++ caller of the C ABI. This covers all 142
+histories and 27 retained native sort/conversion controls. C++ fixture ASan/UBSan
+and mismatch controls pass; Rust static-library internals are not instrumented by
+those native sanitizers. The workspace passes 165 core tests and 117 FFI tests,
+Clippy and formatting; the Python suite passes 49 tests with four Windows skips.
+Windows C ABI compilation and Miri for this new boundary are pending. Windows
+fixture builds explicitly match production `/MT` with Rust `+crt-static`.
+
+[The boundary inventory](rust-document-ffi-boundary.json) makes the unsafe cost
+explicit: the core remains at zero; the new FFI adds 18 production unsafe blocks,
+16 unsafe function declarations and one unsafe Sync implementation. These counts
+overlap. Seventeen blocks are buffer-helper implementation/calls; one grants
+exclusive registry access. Raw buffer operations are centralized in one shared
+slice construction and one copy primitive; no raw Document pointer is a handle.
+Compile-time Send assertions constrain future resource changes. Total FFI blocks
+rise from 325 to 343 until superseded native crossings can be retired. This is
+review surface, not a soundness percentage or a memory-safe dependency claim.
+
 ## Independent audit and unsafe boundary
 
 The user-requested independent audit is recorded in
