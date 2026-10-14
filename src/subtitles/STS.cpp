@@ -1762,8 +1762,14 @@ static bool OpenMicroDVD(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
                     style = buff.Mid(1, i-1);
                     style.MakeUpper();
                     if(style.GetLength()) {CString str = style.Mid(1); str.MakeLower(); style = style.Left(1) + str;}
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                    const int nextCharSet = s->charSet;
+                    ret.AddStyle(style, s);
+                    CharSet = nextCharSet;
+#else
                     ret.AddStyle(style, s);
                     CharSet = s->charSet;
+#endif
                     continue;
                 }
             }
@@ -3145,7 +3151,7 @@ bool CSimpleTextSubtitle::CopyNamedStylesFrom(const CSimpleTextSubtitle& source,
 {
     // Empty the destination before reading source state: self replacement must
     // enumerate the now-empty map, not a previously captured snapshot.
-    if(!fAppend) m_styles.Free();
+    if(!fAppend) m_document->ClearNamedStyles();
     for(size_t ordinal = 0; ; ordinal++)
     {
         CString key;
@@ -3191,10 +3197,11 @@ bool CSimpleTextSubtitle::CopyStyles(const CSTSStyleMap& styles, bool fAppend)
 void CSimpleTextSubtitle::Empty()
 {
     m_dstScreenSize = CSize(0, 0);
-    m_styles.Free();
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    m_document->ClearNamedStyles();
     m_document->Clear();
 #else
+    m_styles.Free();
     m_segments.RemoveAll();
     m_entries.RemoveAll();
 #endif
@@ -3459,10 +3466,20 @@ void CSimpleTextSubtitle::AddStyle(CString name, STSStyle* style)
 
     if(name.IsEmpty()) name = g_default_style;
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    STSStyle previous;
+    const NamedStyleLookup existing = LookupNamedStyle(name, &previous);
+    if(existing != NamedStyleLookup::Missing)
+    {
+        if(existing == NamedStyleLookup::Null || !style)
+            throw XyRust::DocumentStatusError(XY_DOCUMENT_V1_UNRESOLVED_REFERENCE);
+        if(previous == *style)
+#else
     STSStyle* val;
     if(m_styles.Lookup(name, val))
     {
         if(*val == *style)
+#endif
         {
             delete style;
             return;
@@ -3492,14 +3509,17 @@ void CSimpleTextSubtitle::AddStyle(CString name, STSStyle* style)
             name3 = name3_str;
             idx++;
         }
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        while(HasNamedStyle(name3));
+        m_document->RemoveNamedStyle(name);
+        m_document->PutNamedStyle(name3, previous);
+        m_document->RenameStyle(name, name3);
+#else
         while(m_styles.Lookup(name3));
 
         m_styles.RemoveKey(name);
         m_styles[name3] = val;
 
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-        m_document->RenameStyle(name, name3);
-#else
         for (size_t j = 0, count = GetEntryCount(); j < count; j++)
         {
             STSEntry& stse = m_entries.GetAt(j);
@@ -3508,7 +3528,14 @@ void CSimpleTextSubtitle::AddStyle(CString name, STSStyle* style)
 #endif
     }
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    // The caller transfers this temporary only once the Rust value is stored.
+    if(style) m_document->PutNamedStyle(name, *style);
+    else m_document->PutNullNamedStyle(name);
+    delete style;
+#else
     m_styles[name] = style;
+#endif
 }
 
 bool CSimpleTextSubtitle::SetDefaultStyle(STSStyle& s)
@@ -4045,21 +4072,19 @@ void CSimpleTextSubtitle::OrSegmentAnimated(int iSegment, bool animated)
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 size_t CSimpleTextSubtitle::GetStyleCount() const
 {
-    return m_styles.GetCount();
+    return m_document->NamedStyleCount();
 }
 
 bool CSimpleTextSubtitle::HasNamedStyle(LPCWSTR name) const
 {
-    return m_styles.Lookup(name) != NULL;
+    return LookupNamedStyle(name) != NamedStyleLookup::Missing;
 }
 
 CSimpleTextSubtitle::NamedStyleLookup CSimpleTextSubtitle::LookupNamedStyle(LPCWSTR name, STSStyle* output) const
 {
-    STSStyle* value = NULL;
-    if(!m_styles.Lookup(name, value)) return NamedStyleLookup::Missing;
-    if(!value) return NamedStyleLookup::Null;
-    if(output) *output = *value;
-    return NamedStyleLookup::Value;
+    if(!name) throw XyRust::DocumentStatusError(XY_DOCUMENT_V1_INVALID_INPUT);
+    const uint32_t state = m_document->LookupNamedStyle(CString(name), output);
+    return state == 0 ? NamedStyleLookup::Missing : state == 1 ? NamedStyleLookup::Null : NamedStyleLookup::Value;
 }
 
 bool CSimpleTextSubtitle::GetNamedStyleCopy(const CString& name, STSStyle& value) const
@@ -4075,11 +4100,16 @@ bool CSimpleTextSubtitle::GetEntryStyleCopy(int i, STSStyle& value)
 
 bool CSimpleTextSubtitle::SetExistingStyleValue(LPCWSTR name, const STSStyle* value)
 {
-    STSStyle* style = NULL;
-    if(!m_styles.Lookup(name, style)) return false;
-    ASSERT(style);
+    const NamedStyleLookup existing = LookupNamedStyle(name);
+    if(existing == NamedStyleLookup::Missing) return false;
+    ASSERT(existing != NamedStyleLookup::Null);
     // Preserve the second lookup/assert even when the caller skips this row.
-    if(value) *style = *value;
+    if(value)
+    {
+        if(existing == NamedStyleLookup::Null)
+            throw XyRust::DocumentStatusError(XY_DOCUMENT_V1_UNRESOLVED_REFERENCE);
+        m_document->PutNamedStyle(CString(name), *value);
+    }
     return true;
 }
 
@@ -4092,35 +4122,12 @@ void CSimpleTextSubtitle::ResetDefaultStyle(int CharSet)
 
 bool CSimpleTextSubtitle::GetStyleNameAt(size_t ordinal, CString& name) const
 {
-    POSITION pos = m_styles.GetStartPosition();
-    while(pos)
-    {
-        const CSTSStyleMap::CPair* pair = m_styles.GetNext(pos);
-        if(!pair) return false;
-        if(ordinal == 0) { name = pair->m_key; return true; }
-        ordinal--;
-    }
-    return false;
+    return m_document->NamedStyleNameAt(ordinal, name);
 }
 
 bool CSimpleTextSubtitle::GetStyleValueAt(size_t ordinal, STSStyle& value) const
 {
-    POSITION pos = m_styles.GetStartPosition();
-    while(pos)
-    {
-        const CSTSStyleMap::CPair* pair = m_styles.GetNext(pos);
-        if(!pair) return false;
-        if(ordinal == 0)
-        {
-            // A present null pointee is an unresolved native dereference, never
-            // an absent row or a passing empty value comparison.
-            if(!pair->m_value) throw XyRust::DocumentStatusError(XY_DOCUMENT_V1_UNRESOLVED_REFERENCE);
-            value = *pair->m_value;
-            return true;
-        }
-        ordinal--;
-    }
-    return false;
+    return m_document->NamedStyleValueAt(ordinal, value);
 }
 #endif
 
@@ -4150,17 +4157,15 @@ STSStyle* CSimpleTextSubtitle::GetStyle(int i)
 bool CSimpleTextSubtitle::GetStyle(int i, STSStyle* const stss)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    STSStyle* style = NULL;
-    if(!m_fForcedDefaultStyle &&
-       (m_styles.Lookup(m_document->Entry(i).style, style) || m_styles.Lookup(g_default_style, style)))
+    NamedStyleLookup state = NamedStyleLookup::Missing;
+    if(!m_fForcedDefaultStyle)
     {
-        ASSERT(style);
-        *stss = *style;
+        state = LookupNamedStyle(m_document->Entry(i).style, stss);
+        if(state == NamedStyleLookup::Missing) state = LookupNamedStyle(g_default_style, stss);
     }
-    else
-    {
-        *stss = m_document->DefaultStyle();
-    }
+    if(state == NamedStyleLookup::Missing) *stss = m_document->DefaultStyle();
+    else if(state == NamedStyleLookup::Null)
+        throw XyRust::DocumentStatusError(XY_DOCUMENT_V1_UNRESOLVED_REFERENCE);
 #else
     *stss = *GetStyle(i);
 #endif
@@ -4171,17 +4176,20 @@ bool CSimpleTextSubtitle::GetStyle(int i, STSStyle* const stss)
 int CSimpleTextSubtitle::GetCharSet(int i)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    STSStyle* style = NULL;
-    if(m_fForcedDefaultStyle ||
-       (!m_styles.Lookup(m_document->Entry(i).style, style) && !m_styles.Lookup(g_default_style, style)))
+    STSStyle value;
+    NamedStyleLookup state = NamedStyleLookup::Missing;
+    if(!m_fForcedDefaultStyle)
     {
-        return m_document->DefaultStyle().charSet;
+        state = LookupNamedStyle(m_document->Entry(i).style, &value);
+        if(state == NamedStyleLookup::Missing) state = LookupNamedStyle(g_default_style, &value);
     }
-    ASSERT(style);
+    if(state == NamedStyleLookup::Missing) return m_document->DefaultStyle().charSet;
+    ASSERT(state != NamedStyleLookup::Null);
+    return state == NamedStyleLookup::Value ? value.charSet : -1;
 #else
     STSStyle* style = GetStyle(i);
-#endif
     return style!=NULL ? style->charSet : -1;
+#endif
 }
 
 bool CSimpleTextSubtitle::IsEntryUnicode(int i)

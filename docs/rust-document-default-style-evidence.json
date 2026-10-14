@@ -1,0 +1,307 @@
+{
+  "schema": 1,
+  "kind": "partial-experimental-default-style-evidence",
+  "candidate_commit": "d6bd058cd504a6f59fc0165f6f024989bb6251f5",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "run_url": "https://github.com/CoffeeFlux/xy-VSFilter/actions/runs/38631363171",
+  "overall_workflow_passed": false,
+  "style_api_passed": false,
+  "style_value_passed": false,
+  "production_switch_authorized": false,
+  "architectures": {
+    "Win32": {
+      "lifecycle": {
+        "report_sha256": "2636cfa98c5259dea0ef9dcf211ff20e80b1cf14d2847c3ee1219b4721f19bb9",
+        "flags": {
+          "complete": true,
+          "equal": true,
+          "repeat_equal": true,
+          "stderr_empty": true,
+          "inputs_unchanged": true
+        },
+        "trace_lines": 792,
+        "observed_default_stage_labels": {
+          "default-value": [
+            "default-supplied",
+            "default-read-independent",
+            "default-retained-empty",
+            "default-copied",
+            "default-copy-source-independent",
+            "default-self-copy-retained",
+            "default-reset"
+          ],
+          "resolved-style": [
+            "default-fallback",
+            "mapped-default-fallback",
+            "mapped-named",
+            "forced-missing",
+            "forced-named",
+            "unforced-named",
+            "forced-reset"
+          ]
+        },
+        "probe_git_sha256": {
+          "tools/compat/document_native_lifecycle.cpp": "8ee83523ba7a73f821bf16386c3e922ec88ca5ab82a0754c7485cd2b49a2060e",
+          "tools/compat/document_native_lifecycle.py": "2c3d18b6587ff431ef4520ceeaae5647745fd019945adb9ab333e88b2acb6326"
+        },
+        "builds": {
+          "reference": {
+            "binary_sha256": "b88f652bac0fc30940e73934f53883923389d6a41bb1fde2e7d70d55914b8676",
+            "trace_sha256": [
+              "859b8ccc4f2c43f7e4ed5511df309ac6b5b540d14a2765e60c0f09ba28cc1e80",
+              "859b8ccc4f2c43f7e4ed5511df309ac6b5b540d14a2765e60c0f09ba28cc1e80"
+            ],
+            "tracked_header_count": 850,
+            "tracked_header_git_bytes_manifest_sha256": "6a613f5a9cd817ef0ebf4f10ad6ada1a8987111f33e9750cb5642ec291fa6934",
+            "style_source_headers": {
+              "src/subtitles/STS.h": "ea2bd73a5875d5271292cd03a0741c73b8d20617943bf802102bf6de87a29ff4"
+            }
+          },
+          "candidate": {
+            "binary_sha256": "d5858ded5008f6c33f0e7fb7e4b5a5cffb34e50b1f0964dc22f130555418229b",
+            "trace_sha256": [
+              "859b8ccc4f2c43f7e4ed5511df309ac6b5b540d14a2765e60c0f09ba28cc1e80",
+              "859b8ccc4f2c43f7e4ed5511df309ac6b5b540d14a2765e60c0f09ba28cc1e80"
+            ],
+            "tracked_header_count": 856,
+            "tracked_header_git_bytes_manifest_sha256": "bde30ec84b38fa48ef6a7b601c7b8df680e92f77ca54543af08e1ac2509bb96c",
+            "style_source_headers": {
+              "src/subtitles/STS.h": "180cdbabb9e035415bcc0b61098a6008950114ef00a5c61f0e3b3463c23e61bb",
+              "src/subtitles/RustDocumentOwner.h": "cb6c0197f31d5e37a6b9e70e41249c5c9008490ff1c2688ef0593473c6527987",
+              "include/xy_rust_document.h": "9e3725a0b56e15e1dce5e614c7fd674d403769112388b7376f023ebcea037649"
+            }
+          }
+        },
+        "toolchain_environment": {
+          "VCToolsVersion": "14.44.35207",
+          "WindowsSDKVersion": "10.0.26100.0\\",
+          "VSCMD_ARG_TGT_ARCH": "x86"
+        },
+        "limits": [
+          "Bounded normal lifecycles and initialized metadata only",
+          "No allocator-failure, concurrent close, or dialog-reentry parity",
+          "Not a real Aegisub/player host test"
+        ]
+      },
+      "renderer_checks": {
+        "smoke": {
+          "report_sha256": "a31afecf82c39647f438ef56f1dbd5217c8da2f3fcb45a4f3537b93dea7bc292",
+          "case_count": 1,
+          "rendered_frames": 10,
+          "changed_frames": 6,
+          "case_verdicts": {
+            "equal": 1
+          },
+          "candidate_statuses": {
+            "ok": 1
+          },
+          "manifest_sha256": "b3091fe31459e8e5cbde58c9bac57749c0374ed063964c45f600d6693d62c9dd",
+          "dialog_case_count": 0,
+          "timeline_case_count": 0,
+          "distinct_frame_controls_count": 0,
+          "distinct_frame_controls_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "csri": {
+          "report_sha256": "c93f1db4cb7c1bff492bcd137e86c1c9f9db9557899bf6b1213a7e6c39c3864c",
+          "case_count": 798,
+          "rendered_frames": 8426,
+          "changed_frames": 5624,
+          "case_verdicts": {
+            "equal": 798
+          },
+          "candidate_statuses": {
+            "ok": 780,
+            "open_rejected": 18
+          },
+          "manifest_sha256": "9a83e1dddc8b734cad7a6a76a7abc00dfba9cc6d8f4190a57cf41a2ee916a0eb",
+          "dialog_case_count": 4,
+          "timeline_case_count": 32,
+          "distinct_frame_controls_count": 72,
+          "distinct_frame_controls_sha256": "f269ce14d771f91de09f3b39a2e3139c0d497d8472e0d242ce7152e902a75312"
+        },
+        "mutation-results": {
+          "report_sha256": "bf531900009a1256498456467938b73ef6890325c1e33c3a6d1b19071a34095f",
+          "case_count": 32,
+          "rendered_frames": 224,
+          "changed_frames": 160,
+          "case_verdicts": {
+            "equal": 32
+          },
+          "candidate_statuses": {
+            "ok": 32
+          },
+          "manifest_sha256": "692b4dcb930f2117e85805fead2e88d7a3e21f3894da6b3b27f6313f2afeef40",
+          "dialog_case_count": 0,
+          "timeline_case_count": 0,
+          "distinct_frame_controls_count": 0,
+          "distinct_frame_controls_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        }
+      },
+      "production_dll_sha256": {
+        "reference": "4bb385de06f672e221cb489996e5a4ef8929af8fdbdd49a50e960c9f60b298e1",
+        "candidate": "6da4df546d573400440fb964bcfda7232c29df0a9190fc4a5adc8e6e45e1b44b"
+      },
+      "failed_style_api": {
+        "report_sha256": "5be3dfe69b89d6dde98b8872799d26c04459c3889d86ab2ba921828729a65f73",
+        "status": "incomplete",
+        "failed_step": "reference-CDirectVobSubFilter-normal-0 failed",
+        "stdout_sha256": "5ca76989c2fb1a45d84b092c16f637ecaabc31411175f92b6d8e593dcc7b08a4",
+        "stderr_sha256": "9603bda590fc94bc27fec88a320eaa3e126380b6716704a71bac4996e447692a",
+        "observed_load_hresult": "80004005"
+      }
+    },
+    "x64": {
+      "lifecycle": {
+        "report_sha256": "18ecf796ff3b84043705d4e960e1344c5dabc3ccdb2a327d6901ad0ab5646f2c",
+        "flags": {
+          "complete": true,
+          "equal": true,
+          "repeat_equal": true,
+          "stderr_empty": true,
+          "inputs_unchanged": true
+        },
+        "trace_lines": 792,
+        "observed_default_stage_labels": {
+          "default-value": [
+            "default-supplied",
+            "default-read-independent",
+            "default-retained-empty",
+            "default-copied",
+            "default-copy-source-independent",
+            "default-self-copy-retained",
+            "default-reset"
+          ],
+          "resolved-style": [
+            "default-fallback",
+            "mapped-default-fallback",
+            "mapped-named",
+            "forced-missing",
+            "forced-named",
+            "unforced-named",
+            "forced-reset"
+          ]
+        },
+        "probe_git_sha256": {
+          "tools/compat/document_native_lifecycle.cpp": "8ee83523ba7a73f821bf16386c3e922ec88ca5ab82a0754c7485cd2b49a2060e",
+          "tools/compat/document_native_lifecycle.py": "2c3d18b6587ff431ef4520ceeaae5647745fd019945adb9ab333e88b2acb6326"
+        },
+        "builds": {
+          "reference": {
+            "binary_sha256": "4c7fb322df7f981b37b55e5877c2b6260c43f83ed0f84839107457f8251b6430",
+            "trace_sha256": [
+              "a1b04d928e9fa869355ac87e62fdc4d705e45813905cc37b1659c69aee4c1036",
+              "a1b04d928e9fa869355ac87e62fdc4d705e45813905cc37b1659c69aee4c1036"
+            ],
+            "tracked_header_count": 850,
+            "tracked_header_git_bytes_manifest_sha256": "6a613f5a9cd817ef0ebf4f10ad6ada1a8987111f33e9750cb5642ec291fa6934",
+            "style_source_headers": {
+              "src/subtitles/STS.h": "ea2bd73a5875d5271292cd03a0741c73b8d20617943bf802102bf6de87a29ff4"
+            }
+          },
+          "candidate": {
+            "binary_sha256": "bebaacdf139a0157ba6f9eca9b6c9e3a8b41a9dbf0562c4e0d2d9adbaf19b914",
+            "trace_sha256": [
+              "a1b04d928e9fa869355ac87e62fdc4d705e45813905cc37b1659c69aee4c1036",
+              "a1b04d928e9fa869355ac87e62fdc4d705e45813905cc37b1659c69aee4c1036"
+            ],
+            "tracked_header_count": 856,
+            "tracked_header_git_bytes_manifest_sha256": "bde30ec84b38fa48ef6a7b601c7b8df680e92f77ca54543af08e1ac2509bb96c",
+            "style_source_headers": {
+              "src/subtitles/STS.h": "180cdbabb9e035415bcc0b61098a6008950114ef00a5c61f0e3b3463c23e61bb",
+              "src/subtitles/RustDocumentOwner.h": "cb6c0197f31d5e37a6b9e70e41249c5c9008490ff1c2688ef0593473c6527987",
+              "include/xy_rust_document.h": "9e3725a0b56e15e1dce5e614c7fd674d403769112388b7376f023ebcea037649"
+            }
+          }
+        },
+        "toolchain_environment": {
+          "VCToolsVersion": "14.44.35207",
+          "WindowsSDKVersion": "10.0.26100.0\\",
+          "VSCMD_ARG_TGT_ARCH": "x64"
+        },
+        "limits": [
+          "Bounded normal lifecycles and initialized metadata only",
+          "No allocator-failure, concurrent close, or dialog-reentry parity",
+          "Not a real Aegisub/player host test"
+        ]
+      },
+      "renderer_checks": {
+        "smoke": {
+          "report_sha256": "fbe1edc9b46b022ab0c1f93930d20cc19e93446e911fd3379e9a75f41cc8c351",
+          "case_count": 1,
+          "rendered_frames": 10,
+          "changed_frames": 6,
+          "case_verdicts": {
+            "equal": 1
+          },
+          "candidate_statuses": {
+            "ok": 1
+          },
+          "manifest_sha256": "b3091fe31459e8e5cbde58c9bac57749c0374ed063964c45f600d6693d62c9dd",
+          "dialog_case_count": 0,
+          "timeline_case_count": 0,
+          "distinct_frame_controls_count": 0,
+          "distinct_frame_controls_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "csri": {
+          "report_sha256": "cdf625b285250dcae626cc9a9940c6a1b52ed03967fe2b32c9a21e661330e644",
+          "case_count": 798,
+          "rendered_frames": 8426,
+          "changed_frames": 5624,
+          "case_verdicts": {
+            "equal": 798
+          },
+          "candidate_statuses": {
+            "ok": 780,
+            "open_rejected": 18
+          },
+          "manifest_sha256": "9a83e1dddc8b734cad7a6a76a7abc00dfba9cc6d8f4190a57cf41a2ee916a0eb",
+          "dialog_case_count": 4,
+          "timeline_case_count": 32,
+          "distinct_frame_controls_count": 72,
+          "distinct_frame_controls_sha256": "f269ce14d771f91de09f3b39a2e3139c0d497d8472e0d242ce7152e902a75312"
+        },
+        "mutation-results": {
+          "report_sha256": "0ea2be377bc896a1233790225d057bcab9d491b13bc2d4cc325c7dbbab3bd54c",
+          "case_count": 32,
+          "rendered_frames": 224,
+          "changed_frames": 160,
+          "case_verdicts": {
+            "equal": 32
+          },
+          "candidate_statuses": {
+            "ok": 32
+          },
+          "manifest_sha256": "90e89279db719c739c6a1363611c04225b3486f03fee6ad9ceaca20e084ce43c",
+          "dialog_case_count": 0,
+          "timeline_case_count": 0,
+          "distinct_frame_controls_count": 0,
+          "distinct_frame_controls_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        }
+      },
+      "production_dll_sha256": {
+        "reference": "211c2ef4f9f9c3cbddd0be94bb34398fa7cae969902d3f04a391009f415b71a5",
+        "candidate": "a6d04260464699ca101605c010d9810f38a33997ed6555e6db005272bd2822f5"
+      },
+      "failed_style_api": {
+        "report_sha256": "416b146f78ded7dffd2d020e2e55e5ec97c46cf2a0558a779713ac8a12920dcc",
+        "status": "incomplete",
+        "failed_step": "reference-CDirectVobSubFilter-normal-0 failed",
+        "stdout_sha256": "725fe169ac664acb50f7382100d7d6a9f8e93f396addde75a652a992c581bdc7",
+        "stderr_sha256": "9603bda590fc94bc27fec88a320eaa3e126380b6716704a71bac4996e447692a",
+        "observed_load_hresult": "80004005"
+      }
+    }
+  },
+  "limits": [
+    "Partial gates only; workflow failed at reference style API filename setup (E_FAIL).",
+    "Bounded initialized default/record lifecycles; no allocator-failure, concurrent-close, dialog-reentry, real-player or full-format compatibility claim.",
+    "Named map remains native. Later named-stage and SaveAs histories are absent from this commit.",
+    "Build-library and SDK/ATL header hashes are runner-reported; tracked source headers, executable/DLL bytes and traces independently rehashed."
+  ],
+  "verification": {
+    "script": "artifacts/document-default-style-verification/verify.py",
+    "script_sha256": "6e33dc3815583b6d1e5f213a3b0b90c8cb7abf9bf6468d4f2e09f61325a49167",
+    "summarize_evidence_sha256": "0fcf081285d0a0cce07cacf577352243d13dbe9888b92d29bb0c6fe350b82657",
+    "document_native_lifecycle_sha256": "49fa7b5b018522545542a2cc8f460f64a80e344e6a9cdd7eb3aaa4db0a501737"
+  }
+}

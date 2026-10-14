@@ -108,17 +108,11 @@ impl Registry {
         self.document(destination)?;
         let mut copy: Box<Document> = Box::default();
         copy.copy_storage_from(self.document(source)?);
-        let index = self.position(destination)?;
-        let default = self.document_mut(destination)?.replace_default_style(None);
-        let empty = copy.replace_default_style(default);
-        debug_assert!(empty.is_none());
-        // Both handles are validated before default ownership moves. Retire the
-        // original box itself; its payload is destroyed only after admission.
-        let retired = match &mut self.slots[index].1 {
-            Resource::Document(document) => core::mem::replace(document, copy),
-            Resource::Snapshot(_) => unreachable!("validated document kind"),
-        };
-        Ok(Resource::Document(retired))
+        // Clone before the swap, including self-copy. Only the prepared vectors
+        // move; all current/future destination metadata stays in place.
+        self.document_mut(destination)?
+            .swap_prepared_storage(&mut copy);
+        Ok(Resource::Document(copy))
     }
 
     /// Explicit default assignment, independent of entry/segment storage copy.

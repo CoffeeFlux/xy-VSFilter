@@ -234,10 +234,10 @@ still requires D4/D5 below and all remaining ownership/fallback accounting.
 | Milestone | Deliverable | Required evidence before advancing |
 | --- | --- | --- |
 | D0 — Freeze the contract | Exact operation/callsite inventory, owner/alias graph and retained-adapter list for DOC-01 through DOC-11 | Source review across STS, RTS, format importers and both style APIs; explicitly track unresolved behavior. Status: in progress. |
-| D1 — Capture complete lifecycles | A pinned-reference document harness for create → add → edit/style-change → copy → sort → seek → clear/reopen → destroy | Compare full initialized document/segment state, observable callback/error order and caller snapshots; use real ATL/CRT on Windows. Include failed operations and repeated calls, with failures never counted as parity. Status: bounded full native-class lifecycle passes on x86/x64 at `04673672`; expanded default-style coverage and broader host/failure lifecycles remain open. |
-| D2 — Implement the Rust owner | Safe Rust entries, styles, metadata and segments; coherent document operations reuse existing helpers | Owner/copy/edit/drop tests, raw UTF-16 preservation, bounded access, no native mutable views; native field/type/alias compatibility reviewed. Status: canonical entry/segment ownership integrated experimentally and validated on x86/x64; default-style ownership implemented with Windows validation pending; named styles and metadata remain native. |
-| D3 — Route every caller | Importers, renderer, style interfaces and export paths use document operations or bounded snapshots | Enumerate and eliminate direct authoritative CAtlArray/CAtlMap entry/style/segment accesses in the Rust-enabled build; preserve callback/lock order and public ABI. Retire superseded fine-grained FFI crossings. Status: entries/segments routed and validated in the opt-in experimental build; external style callers use value operations, default-style routing awaits Windows validation, named styles/metadata remain native. |
-| D4 — Establish parity | Document lifecycle and integrated DLL comparisons on Windows x86/x64 at one exact candidate commit | Exact records, ordering, times, errors, rendering output and style API behavior; existing corpus/mutations, targeted lifecycle/malformed fixtures, Miri and relevant native checks. Resolve mismatches; no undocumented native document fallback. Status: experimental entry/segment owner passes the full DLL corpus and bounded native-class lifecycle on x86/x64 at `04673672`; subsequent style API/default-style changes await validation. No whole-document closure. |
+| D1 — Capture complete lifecycles | A pinned-reference document harness for create → add → edit/style-change → copy → sort → seek → clear/reopen → destroy | Compare full initialized document/segment state, observable callback/error order and caller snapshots; use real ATL/CRT on Windows. Include failed operations and repeated calls, with failures never counted as parity. Status: bounded full native-class lifecycle passes on x86/x64 at `04673672`; expanded default-style lifecycle also passes at `d6bd058c` with partial workflow evidence; named-style lifecycles and broader host/failure gates remain open. |
+| D2 — Implement the Rust owner | Safe Rust entries, styles, metadata and segments; coherent document operations reuse existing helpers | Owner/copy/edit/drop tests, raw UTF-16 preservation, bounded access, no native mutable views; native field/type/alias compatibility reviewed. Status: canonical entry/segment ownership integrated experimentally and validated on x86/x64; default and named-style ownership implemented opt-in; bounded default Windows evidence and local safe-map evidence recorded; current full Windows style gates pending, metadata native. |
+| D3 — Route every caller | Importers, renderer, style interfaces and export paths use document operations or bounded snapshots | Enumerate and eliminate direct authoritative CAtlArray/CAtlMap entry/style/segment accesses in the Rust-enabled build; preserve callback/lock order and public ABI. Retire superseded fine-grained FFI crossings. Status: entries/segments routed and validated in the opt-in experimental build; style callers use value operations and canonical default/named styles are routed opt-in; changed-code Windows gates pending, metadata native. |
+| D4 — Establish parity | Document lifecycle and integrated DLL comparisons on Windows x86/x64 at one exact candidate commit | Exact records, ordering, times, errors, rendering output and style API behavior; existing corpus/mutations, targeted lifecycle/malformed fixtures, Miri and relevant native checks. Resolve mismatches; no undocumented native document fallback. Status: experimental entry/segment owner passes the full DLL corpus and bounded native-class lifecycle on x86/x64 at `04673672`; subsequent canonical named-style changes await full Windows validation; partial default-style results do not close style API/value or workflow gates. No whole-document closure. |
 | D5 — Close and hand off | Written ownership/access review and applicable consumer validation | Aegisub load/render/seek/reload/close, relevant player/style-edit lifecycles and architecture results. Record finite corpus scope and bounded retained adapters. Until the real-host check is complete, report core-complete/host-validation-pending, never closed. Status: planned. |
 
 Important compatibility cases already visible in source include self-copy after
@@ -747,8 +747,10 @@ field independently, full names after NUL, signed zero, quiet NaNs, infinities
 and subnormals. It compares both full wire bytes and the equality matrix, with
 two executions per side, checked source provenance and retained inputs/binaries.
 The probe never receives arbitrary native input; all native objects stay in its
-own module. Windows results are pending. Default-style ownership and the named
-map's ordering/rename/copy semantics remain the next integration work.
+own module. The earlier default-style workflow did not pass the style-value
+gate; corrected independent Windows jobs remain pending. Canonical default and
+named-style ownership now use this codec experimentally, with integration gates
+separate from the supplied-value comparison.
 
 ### Experimental default-style ownership
 
@@ -757,8 +759,9 @@ Its canonical `m_defaultStyle` member and native pointer-returning default/style
 getters compile out alongside the entry and segment arrays. Native construction
 still supplies the exact STSStyle defaults; the adapter stores explicit values,
 then materializes temporary native CString/FwRect objects only after Rust access
-ends. Named-map style values, the forced-default flag and document metadata
-remain native. The production-default configuration is unchanged.
+ends. The forced-default flag and document metadata remain native. Named-map
+values were native at this stage; the subsequent opt-in named owner is described
+below. The production-default configuration is unchanged.
 
 Set/get/reset, fallback and forced-style resolution, charset lookup and Copy
 use the owned value. Default assignment occurs at its previous point in native
@@ -776,15 +779,21 @@ declaration, reusing the existing bounded byte-buffer helper. The actual full
 class probe now checks default set/get/reset, copy independence, self-copy and
 Empty retention, plus missing/named/map-default/forced resolution and charset
 results. Raw names and signed zero are serialized without rendering them.
-Windows validation of this changed ownership is pending.
+The [partial Windows evidence](rust-document-default-style-evidence.json) at
+`d6bd058c` records matching bounded default lifecycles and renderer results on
+x86/x64. That workflow failed overall, including style API/value gates. These
+results neither authorize a production switch nor validate subsequent named-map
+changes; the new full Windows gates remain pending.
 
 Named-style map contract capture now has a separate short Windows x86/x64 job,
 so it can return evidence while renderer checks run. It records the installed
 ATL implementation's selected definitions and hashes, actual MFC CString type,
 key hashes/conversions, bucket counts and enumeration through bounded insert,
 remove, reinsert, ordered-copy and clear/reuse histories. Generated SDK excerpts
-are review artifacts, not checked-in implementation. This establishes inputs
-for the future safe map port; it does not yet establish Rust map parity.
+are review artifacts, not checked-in implementation. The [captured contract](rust-document-style-map-contract.json) verifies both
+architectures and indexes the relevant definitions without checking in SDK
+excerpts. This captures the implementation contract; safe-map comparisons are
+recorded separately below.
 The complete style-value comparison also runs independently after the DLL build,
 so an unrelated style-API setup failure cannot suppress that evidence.
 
@@ -796,23 +805,48 @@ Rust-text-only STS code against `b49b367a`; this is source evidence, not native
 compilation. Allocation/failure timing, allocator reentry and real-host lifetime
 remain explicit experimental gates before a default switch.
 
-### Named-style boundary isolation
+### Experimental canonical named-style ownership
 
-The experimental named-style map is now private. Copying takes another document
-instead of exposing `CSTSStyleMap`; logging, unknown-style checks and SSA/ASS or
-sidecar export consume value/scalar accessors. The native map remains its sole
-canonical owner until the exact ATL ordering contract has been reproduced.
-No persistent Rust/native mirror is introduced by this step.
+The opt-in document now owns its named styles in safe Rust as
+`StyleMap<Option<StyleValue>>`; canonical native `m_styles` compiles out. Entries,
+segments, default style and named styles are four retired persistent native
+owners in this configuration. Default production still uses its native storage.
+Document metadata and native parsing, duplicate-name generation, callbacks and
+serialization orchestration remain in place.
 
-Copy preserves clearing the destination before enumerating the source, including
-self replacement, and calls native AddStyle separately for each copied row.
-Missing and present-null lookups remain distinct. Value materialization adds
-allocation points, so allocation-failure/reentry timing remains unvalidated.
-The paired full-class probe adds nine named-style lifecycle stages and compares
-exact SSA/ASS/SRT export bytes and sidecar presence. It invokes the pinned private
-CopyStyles through the class's existing friend declaration, without copying its
-implementation or changing its access specifiers. Windows results for this
-increment are pending; local trace controls and native-source generation pass.
+The safe map follows the captured installed ATL implementation: first-NUL
+32-bit CString hashing and pointer-based stored key construction, f32 load
+thresholds, the captured prime table, bucket/chain enumeration and clear/reuse
+history. Missing keys, present-null values and initialized styles remain distinct.
+The [local map comparison](rust-document-style-map-local-evidence.json) records
+398 state events and ten key/hash cases per retained Windows architecture, with
+two identical Rust executions each on the local aarch64 host. It does not execute
+Windows Rust or establish full AddStyle/CopyStyles behavior. The installed SDK
+contract is identified by hashes; future toolchain drift is not silently accepted.
+
+Native AddStyle still decides value equality, scans the full logical name for a
+numeric suffix, generates names through the CRT, and performs remove/insert and
+entry renames in its original order through value operations. A missing-key null
+insertion remains permitted. Duplicate AddStyle calls involving a null old/new
+style have an unresolved reference outcome: the experiment returns an explicit
+unresolved status instead of executing an unsafe history or claiming parity.
+
+Copying takes another document, clears the destination before source enumeration
+and invokes AddStyle separately for each copied row, including native self-copy
+semantics. The separate registry storage-copy operation replaces only prepared
+entry/segment vectors and retains default style, named-map shape/history and
+other document state in place. Public style loops retain their name-length,
+partial-output, duplicate/null-slot and notification choreography. Immutable
+snapshot kinds 3 and 4 carry ordered raw keys and initialized values; no canonical
+map pointer or writable Rust loan escapes.
+
+Local Rust 1.85 validation passes 180 core and 117 FFI tests, formatting and
+Clippy with warnings denied. Native-source generation and unchanged default
+branch preprocessing pass. The paired full-class probe exercises named-style
+copy/rename and exact SSA/ASS/SRT export bytes/sidecar presence, but its changed-code
+Windows results remain pending. Allocation/failure timing, allocator reentry,
+wrapper destruction and real host behavior remain experimental gates. Earlier
+partial default-style evidence does not pass these new gates.
 
 ## Independent audit and unsafe boundary
 
@@ -827,13 +861,14 @@ Neither count measures the amount of application behavior replaced.
 The reproducible [Rust unsafe inventory](rust-unsafe-inventory.json) uses
 `python3 tools/compat/audit_rust_boundary.py OUTPUT.json`. It masks comments and
 literals, separates cfg(test) items, and includes all platform/feature branches.
-At the measured Rust sources (unchanged between `641ec00e` and `138ed962`):
+At the current frozen working-tree sources based on `8e2af103` (exact file
+hashes recorded by the regenerated inventory):
 
 | Layer | Production source inventory | Meaning |
 | --- | --- | --- |
-| `rust/compat` | 0 unsafe blocks/functions/impls; 6,203 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
-| `rust/ffi` | 325 explicit unsafe blocks, 273 unsafe function declarations, one unsafe allocator impl; 4,091 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
-| Tests | 112 unsafe blocks in FFI tests | Exercise valid and deliberately bounded ownership/alias/initialization contracts; not production code |
+| `rust/compat` | 0 unsafe blocks/functions/impls; 7,276 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
+| `rust/ffi` | 352 explicit unsafe blocks, 295 unsafe function declarations, two unsafe impls (allocator and registry admission); 4,952 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
+| Tests | 119 unsafe blocks in FFI tests | Exercise valid and deliberately bounded ownership/alias/initialization contracts; not production code |
 
 Unsafe-function declarations and blocks overlap and must not be added as
 independent operations. Counts describe review surface, not soundness or a

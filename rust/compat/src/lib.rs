@@ -14,6 +14,7 @@ pub mod be_filter;
 pub mod bilinear;
 pub mod document;
 pub mod document_style;
+pub mod document_style_map;
 pub mod document_wire;
 pub mod drawing;
 pub mod drawing_tokens;

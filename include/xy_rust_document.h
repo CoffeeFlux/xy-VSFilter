@@ -63,8 +63,23 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_entry_header_v1(uint64_t, uint32
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_segment_header_v1(uint64_t, uint32_t index, uint8_t*, size_t);
 // Query modes: 0 entry, 1 next segment, 2 containing segment; integer TIME only.
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_query_time_v1(uint64_t, uint32_t mode, int64_t time, uint8_t*, size_t);
+// Named table values are supplied initialized style wires; zero style bytes
+// mean a present null value. Raw UTF16LE keys use LPCWSTR first-NUL semantics
+// for lookup/hash/stored initial key. Count output is one u32LE (capacity >=4).
+// Entry/segment copy/clear retain destination named storage; explicit clear
+// returns no values and destroys retired style payloads after admission.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_named_style_count_v1(uint64_t owner, uint8_t*, size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_named_style_put_v1(uint64_t owner, const uint8_t* key, size_t key_bytes, const uint8_t* style_wire, size_t style_bytes);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_named_style_remove_v1(uint64_t owner, const uint8_t* key, size_t key_bytes);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_named_style_clear_v1(uint64_t owner);
+// Lookup output16: state:u32@0 (0 missing/1 null/2 value), reserved-zero:u32@4,
+// snapshot-id:u64@8. Request exactly0/1; ID nonzero only for Value+request1.
+// Output capacity is checked before snapshot creation; errors leave output intact.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_named_style_lookup_v1(uint64_t owner, const uint8_t* key, size_t key_bytes, uint32_t snapshot_requested, uint8_t*, size_t);
 // Snapshot kinds: 0 full entry wire, 1 full segment wire, 2 initialized default
-// style (index must be zero; absent defaults return OUT_OF_RANGE). Full entry wire is the
+// style (index zero; absent defaults return OUT_OF_RANGE), 3 ordinal named key
+// (raw UTF16LE), 4 ordinal named value wire (null => UNRESOLVED_REFERENCE).
+// Missing ordinals return OUT_OF_RANGE. Full entry wire is the
 // 64-byte header followed by text/style/actor/effect raw UTF-16LE arrays. Full
 // segment wire is the 32-byte header followed by u32LE member indexes.
 // Entry header offsets: start:i64@0, end:i64@8, margins:i32[4]@16
