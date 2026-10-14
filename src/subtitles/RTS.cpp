@@ -27,6 +27,7 @@
 #include "xy_rust_ass.h"
 #include "xy_rust_drawing.h"
 #include "xy_rust_drawing_tokens.h"
+#include "xy_rust_text_runs.h"
 #endif
 #include "draw_item.h"
 #include "cache_manager.h"
@@ -2037,6 +2038,20 @@ void CRenderedTextSubtitle::ParseString(CSubtitle* sub, CStringW str, const FwST
     str.Replace(L"\\N", L"\n");
     str.Replace(L"\\n", (sub->m_wrapStyle < 2 || sub->m_wrapStyle == 3) ? L" " : L"\n");
     str.Replace(L"\\h", L"\x00A0");    
+#ifdef XY_VSFILTER_RUST_TEXT
+    XyRust::TextRuns runs(str);
+    for(unsigned kind = runs.Next(); kind != 0; kind = runs.Next())
+    {
+        CStringW text = kind == 2 ? CStringW() : kind == 3 ? CStringW(L' ') : runs.Text<CStringW>();
+        if(PCWord tmp_ptr = DEBUG_NEW CText(style, text, m_ktype, m_kstart, m_kend
+            , m_target_scale_x, m_target_scale_y))
+        {
+            SharedPtrCWord w(tmp_ptr);
+            sub->m_words.AddTail(w);
+        }
+        m_kstart = m_kend;
+    }
+#else
     for(int ite = 0, j = 0, len = str.GetLength(); j <= len; j++)
     {
         WCHAR c = str[j];
@@ -2086,6 +2101,7 @@ void CRenderedTextSubtitle::ParseString(CSubtitle* sub, CStringW str, const FwST
         }
         ite = j+1;
     }
+#endif
     return;
 }
 

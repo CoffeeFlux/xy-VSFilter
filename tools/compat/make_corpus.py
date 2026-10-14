@@ -276,6 +276,20 @@ def subrip_cue_variants():
         yield "subrip-cue-" + name + ".srt", ("1\r\n" + timing + body).encode("ascii")
 
 
+def text_run_variants():
+    for name, payload in {
+        "control": br"one two three",
+        "repeated-spaces": br"one  two   three",
+        "hard-breaks": br"one\Ntwo\Nthree",
+        "soft-wrap-zero": br"{\q0}one\ntwo\nthree",
+        "soft-wrap-two": br"{\q2}one\ntwo\nthree",
+        "hard-space": br"one\htwo three",
+        "tab": b"one	two three",
+        "karaoke": br"{\k20}one two{\k30}three four\Nfive",
+    }.items():
+        yield "text-runs-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
+
+
 def layout_rect_variants():
     prefix = SEED[:SEED.index(b"Dialogue:")]
     for name, alignment, second_layer, border, collisions, multiline in (
@@ -553,7 +567,8 @@ def make_cases(files):
                                                     ("subrip-cue-number-in-caption", "subrip-cue-control"),
                                                     ("old-subrip-pipes", "old-subrip-control"),
                                                     ("vplayer-pipes", "vplayer-control"),
-                                                    ("layout-rect-bottom", "layout-rect-split-layers"))
+                                                    ("layout-rect-bottom", "layout-rect-split-layers"),
+                                                    ("text-runs-soft-wrap-zero", "text-runs-soft-wrap-two"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -568,6 +583,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in subrip_cue_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in legacy_pipe_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in layout_rect_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in text_run_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in realtext_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_header_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_style_variants()]

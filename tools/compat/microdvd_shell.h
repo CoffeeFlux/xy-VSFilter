@@ -51,6 +51,12 @@ public:
     typedef const wchar_t* PCXSTR;
     typedef wchar_t* PXSTR;
     MicroString(){}
+    explicit MicroString(wchar_t unit)
+#ifdef _WIN32
+        :text(unit,1){}
+#else
+        :text(1,unit){}
+#endif
     MicroString(const wchar_t* p):text(p){}
     MicroString(const wchar_t* p,int n)
 #ifdef _WIN32
