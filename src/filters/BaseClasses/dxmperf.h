@@ -10,6 +10,7 @@
 #ifndef _DXMPERF_H_
 #define _DXMPERF_H_
 
+#include <intrin.h>
 #include "perfstruct.h"
 #include "perflog.h"
 
@@ -21,14 +22,7 @@ extern "C" unsigned __int64 __getReg( int whichReg );
 
 inline ULONGLONG _RDTSC( void ) {
 #ifdef _X86_
-    LARGE_INTEGER   li;
-    __asm {
-        _emit   0x0F
-        _emit   0x31
-        mov li.LowPart,eax
-        mov li.HighPart,edx
-    }
-    return li.QuadPart;
+    return __rdtsc();
 
 #if 0 // This isn't tested yet
 

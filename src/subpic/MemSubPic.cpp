@@ -113,55 +113,6 @@ static void SaveNvxx2File(SubPicDesc& spd, const CRect& cRect, const char * file
 // 
 #include "xy_intrinsics.h"
 
-#ifndef _WIN64
-static void AlphaBlt_YUY2_MMX(int w, int h, BYTE* d, int dstpitch, PCUINT8 s, int srcpitch)
-{
-    for(int j = 0; j < h; j++, s += srcpitch, d += dstpitch)
-    {
-        unsigned int ia, c;
-        PCUINT8 s2 = s;
-        PCUINT8 s2end = s2 + w*4;
-        DWORD* d2 = (DWORD*)d;
-        ASSERT(w>0);
-        int last_a = w>0?s2[3]:0;
-        for(; s2 < s2end; s2 += 8, d2++)
-        {
-            ia = (last_a + 2*s2[3] + s2[7])>>2;
-            last_a = s2[7];
-            if(ia < 0xff)
-            {
-                //int y1 = (BYTE)(((((*d2&0xff))*s2[3])>>8) + s2[1]); // + y1;
-                //int u = (BYTE)((((((*d2>>8)&0xff))*ia)>>8) + s2[0]); // + u;
-                //int y2 = (BYTE)((((((*d2>>16)&0xff))*s2[7])>>8) + s2[5]); // + y2;                    
-                //int v = (BYTE)((((((*d2>>24)&0xff))*ia)>>8) + s2[4]); // + v;
-                //*d2 = (v<<24)|(y2<<16)|(u<<8)|y1;
-                    
-                ia = (ia<<24)|(s2[7]<<16)|(ia<<8)|s2[3];
-                c = (s2[4]<<24)|(s2[5]<<16)|(s2[0]<<8)|s2[1]; // (v<<24)|(y2<<16)|(u<<8)|y1;
-                __asm
-                {
-                        mov			edi, d2
-                        pxor		mm0, mm0
-                        movd		mm2, c
-                        punpcklbw	mm2, mm0
-                        movd		mm3, [edi]
-                        punpcklbw	mm3, mm0
-                        movd		mm4, ia
-                        punpcklbw	mm4, mm0
-                        psraw		mm4, 1          //or else, overflow because psraw shift in sign bit
-                        pmullw		mm3, mm4
-                        psraw		mm3, 7
-                        paddsw		mm3, mm2
-                        packuswb	mm3, mm3
-                        movd		[edi], mm3
-                };
-            }
-        }
-    }
-    _mm_empty();
-}
-#endif
-
 void AlphaBlt_YUY2_C(int w, int h, BYTE* d, int dstpitch, PCUINT8 s, int srcpitch)
 {
     for(int j = 0; j < h; j++, s += srcpitch, d += dstpitch)
@@ -266,19 +217,7 @@ STDMETHODIMP CMemSubPic::ClearDirtyRect(DWORD color)
         {
             for(int j = 0, h = dirtyRect.Height(); j < h; j++, p += m_spd.pitch)
             {
-#ifdef _WIN64
-				memsetd(p, color, w*4); // nya
-#else
-                __asm
-                {
-                        mov eax, color
-                        mov ecx, w
-                        mov edi, p
-                        cld
-                        rep stosd
-                }
-				
-#endif
+                memsetd(p, color, w*4);
             }
         }
         else
@@ -839,10 +778,6 @@ HRESULT CMemSubPic::AlphaBltOther(const RECT* pSrc, const RECT* pDst, SubPicDesc
 
             AlphaBltYv12Chroma( dd[0], dst.pitchUV, w, h2, ss[0], src_origin, src.pitch);
             AlphaBltYv12Chroma( dd[1], dst.pitchUV, w, h2, ss[1], src_origin, src.pitch);
-#ifndef _WIN64
-            // TODOX64 : fixme!
-            _mm_empty();
-#endif
         }
         break;
         case MSP_YV16:
@@ -878,10 +813,6 @@ HRESULT CMemSubPic::AlphaBltOther(const RECT* pSrc, const RECT* pDst, SubPicDesc
 
             AlphaBltYv16Chroma(dd[0], dst.pitchUV, w, h2, ss[0], src_origin, src.pitch);
             AlphaBltYv16Chroma(dd[1], dst.pitchUV, w, h2, ss[1], src_origin, src.pitch);
-    #ifndef _WIN64
-            // TODOX64 : fixme!
-            _mm_empty();
-    #endif
         }
         break;
         case MSP_YV24:
@@ -917,10 +848,6 @@ HRESULT CMemSubPic::AlphaBltOther(const RECT* pSrc, const RECT* pDst, SubPicDesc
 
             AlphaBltYv12Luma(dd[0], dst.pitchUV, w, h2, ss[0], src_origin, src.pitch); // good for YV24 luma
             AlphaBltYv12Luma(dd[1], dst.pitchUV, w, h2, ss[1], src_origin, src.pitch);
-    #ifndef _WIN64
-            // TODOX64 : fixme!
-            _mm_empty();
-    #endif
         }
         break;
 
@@ -929,8 +856,6 @@ HRESULT CMemSubPic::AlphaBltOther(const RECT* pSrc, const RECT* pDst, SubPicDesc
         break;
     }
 
-    //emmsҪ40��cpu����
-    //__asm emms;
     return S_OK;
 }
 
@@ -1927,10 +1852,6 @@ HRESULT CMemSubPic::AlphaBltAnv12_P010( const BYTE* src_a, const BYTE* src_y, co
             hleft_vmid_mix_uv_p010_c(d, w, src_uv, src_a, src_pitch);
         }
     }
-#ifndef _WIN64
-    // TODOX64 : fixme!
-    _mm_empty();
-#endif
     return S_OK;
 }
 
@@ -2076,10 +1997,6 @@ HRESULT CMemSubPic::AlphaBltAnv12_P210(const BYTE* src_a, const BYTE* src_y, con
             mix_uv_p210_c(d, w, src_uv, src_a, src_pitch);
         }
     }
-#ifndef _WIN64
-    // TODOX64 : fixme!
-    _mm_empty();
-#endif
     return S_OK;
 }
 
@@ -2163,10 +2080,6 @@ HRESULT CMemSubPic::AlphaBltAnv12_Nv12( const BYTE* src_a, const BYTE* src_y, co
             hleft_vmid_mix_uv_nv12_sse2(d+head, w00, src_uv+head, src_a+head, src_pitch, head>0 ? -1 : 0);
             hleft_vmid_mix_uv_nv12_c2(d+head+w00, tail, src_uv+head+w00, src_a+head+w00, src_pitch, (w00+head)>0 ? -1 : 0);
         }
-#ifndef _WIN64
-        // TODOX64 : fixme!
-        _mm_empty();
-#endif
     }
     else
     {
@@ -2237,11 +2150,7 @@ void CMemSubPic::SubsampleAndInterlace_422_C(BYTE* dst, const BYTE* u, const BYT
 
 void CMemSubPic::AlphaBlt_YUY2(int w, int h, BYTE* d, int dstpitch, PCUINT8 s, int srcpitch)
 {
-#ifdef _WIN64
     AlphaBlt_YUY2_C(w, h, d, dstpitch, s, srcpitch);
-#else
-    AlphaBlt_YUY2_MMX(w, h, d, dstpitch, s, srcpitch);
-#endif
 }
 
 HRESULT CMemSubPic::FlipAlphaValue( const CRect& dirtyRect )

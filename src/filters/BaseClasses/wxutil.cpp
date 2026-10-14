@@ -382,50 +382,7 @@ void * __stdcall memmoveInternal(void * dst, const void * src, size_t count)
 {
     void * ret = dst;
 
-#ifdef _X86_
-    if (dst <= src || (char *)dst >= ((char *)src + count)) {
-
-        /*
-         * Non-Overlapping Buffers
-         * copy from lower addresses to higher addresses
-         */
-        _asm {
-            mov     esi,src
-            mov     edi,dst
-            mov     ecx,count
-            cld
-            mov     edx,ecx
-            and     edx,MEMORY_ALIGNMENT_MASK
-            shr     ecx,MEMORY_ALIGNMENT_LOG2
-            rep     movsd
-            or      ecx,edx
-            jz      memmove_done
-            rep     movsb
-memmove_done:
-        }
-    }
-    else {
-
-        /*
-         * Overlapping Buffers
-         * copy from higher addresses to lower addresses
-         */
-        _asm {
-            mov     esi,src
-            mov     edi,dst
-            mov     ecx,count
-            std
-            add     esi,ecx
-            add     edi,ecx
-            dec     esi
-            dec     edi
-            rep     movsb
-            cld
-        }
-    }
-#else
     MoveMemory(dst, src, count);
-#endif
 
     return ret;
 }

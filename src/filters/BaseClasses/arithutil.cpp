@@ -17,8 +17,6 @@
 // Enlarged integer divide - 64-bits / 32-bits > 32-bits
 //
 
-#ifndef _X86_
-
 #define LLtoU64(x) (*(unsigned __int64*)(void*)(&(x)))
 
 __inline
@@ -36,31 +34,6 @@ EnlargedUnsignedDivide (
         return (ULONG)(LLtoU64(Dividend) / Divisor);
 }
 
-#else
-__inline
-ULONG
-WINAPI
-EnlargedUnsignedDivide (
-    IN ULARGE_INTEGER Dividend,
-    IN ULONG Divisor,
-    IN PULONG Remainder
-    )
-{
-    ULONG ulResult;
-    _asm {
-        mov eax,Dividend.LowPart
-        mov edx,Dividend.HighPart
-        mov ecx,Remainder
-        div Divisor
-        or  ecx,ecx
-        jz  short label
-        mov [ecx],edx
-label:
-        mov ulResult,eax
-    }
-    return ulResult;
-}
-#endif
 
 
 /*  Arithmetic functions to help with time format conversions

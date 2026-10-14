@@ -364,31 +364,12 @@ void * __stdcall memmoveInternal(void *, const void *, size_t);
 
 inline void * __cdecl memchrInternal(const void *buf, int chr, size_t cnt)
 {
-#ifdef _X86_
-    void *pRet = NULL;
-
-    _asm {
-        cld                 // make sure we get the direction right
-        mov     ecx, cnt    // num of bytes to scan
-        mov     edi, buf    // pointer byte stream
-        mov     eax, chr    // byte to scan for
-        repne   scasb       // look for the byte in the byte stream
-        jnz     exit_memchr // Z flag set if byte found
-        dec     edi         // scasb always increments edi even when it
-                            // finds the required byte
-        mov     pRet, edi
-exit_memchr:
-    }
-    return pRet;
-
-#else
     while ( cnt && (*(unsigned char *)buf != (unsigned char)chr) ) {
         buf = (unsigned char *)buf + 1;
         cnt--;
     }
 
     return(cnt ? (void *)buf : NULL);
-#endif
 }
 
 void WINAPI IntToWstr(int i, __out_ecount(12) LPWSTR wstr);

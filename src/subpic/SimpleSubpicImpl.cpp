@@ -341,10 +341,6 @@ HRESULT SimpleSubpic::AlphaBlt( SubPicDesc* target, const Bitmap& src )
             CMemSubPic::AlphaBltYv12Luma( d, dst.pitch, w, h, sy, sa, src.pitch );
             CMemSubPic::AlphaBltYv12Chroma( dd[0], dst.pitchUV, w, h2, su, sa, src.pitch);
             CMemSubPic::AlphaBltYv12Chroma( dd[1], dst.pitchUV, w, h2, sv, sa, src.pitch);
-#ifndef _WIN64
-            // TODOX64 : fixme!
-            _mm_empty();
-#endif
         }
         break;
     case MSP_YV16:
@@ -378,10 +374,6 @@ HRESULT SimpleSubpic::AlphaBlt( SubPicDesc* target, const Bitmap& src )
         CMemSubPic::AlphaBltYv12Luma(d, dst.pitch, w, h, sy, sa, src.pitch); // good for YV16
         CMemSubPic::AlphaBltYv16Chroma(dd[0], dst.pitchUV, w, h2, su, sa, src.pitch);
         CMemSubPic::AlphaBltYv16Chroma(dd[1], dst.pitchUV, w, h2, sv, sa, src.pitch);
-#ifndef _WIN64
-        // TODOX64 : fixme!
-        _mm_empty();
-#endif
     }
     break;
     case MSP_YV24:
@@ -415,10 +407,6 @@ HRESULT SimpleSubpic::AlphaBlt( SubPicDesc* target, const Bitmap& src )
         CMemSubPic::AlphaBltYv12Luma(d, dst.pitch, w, h, sy, sa, src.pitch); // good for YV16,YV24
         CMemSubPic::AlphaBltYv12Luma(dd[0], dst.pitchUV, w, h2, su, sa, src.pitch);// good for YV24 luma
         CMemSubPic::AlphaBltYv12Luma(dd[1], dst.pitchUV, w, h2, sv, sa, src.pitch);
-#ifndef _WIN64
-        // TODOX64 : fixme!
-        _mm_empty();
-#endif
     }
     break;
     default:
@@ -426,8 +414,6 @@ HRESULT SimpleSubpic::AlphaBlt( SubPicDesc* target, const Bitmap& src )
         break;
     }
 
-    //emmsҪ40��cpu����
-    //__asm emms;
     return S_OK;
 }
 
