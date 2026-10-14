@@ -384,6 +384,14 @@ def arc_queue_variants():
         yield "arc-queue-" + name + ".ass", SEED.replace(b"COMPAT_TEXT", payload)
 
 
+def span_coverage_variants():
+    for phase in range(8):
+        tag = f"{{\\an7\\pos({280 + phase / 8},{140 + (7 - phase) / 8})\\bord2.5\\shad0\\p1}}".encode("ascii")
+        path = b"m 0 0 l 63.875 0 63.875 47.125 0 47.125 m 12.125 12 l 12.125 35 52 35 52 12"
+        payload = tag + path + br"{\p0} Phase"
+        yield f"span-coverage-phase-{phase}.ass", SEED.replace(br"{\pos(320,180)\bord2}COMPAT_TEXT", payload)
+
+
 def scan_row_variants():
     for name, path in {
         "single": b"m 0 0 l 80 0 80 60 0 60",
@@ -715,7 +723,8 @@ def make_cases(files):
                                                     ("span-merge-control", "span-merge-horizontal-border"),
                                                     ("arc-queue-control", "arc-queue-round"),
                                                     ("path-buffer-control", "path-buffer-spaced"),
-                                                    ("scan-row-single", "scan-row-hole"))
+                                                    ("scan-row-single", "scan-row-hole"),
+                                                    ("span-coverage-phase-0", "span-coverage-phase-7"))
                                        for mode in ("file", "memory")], "cases": cases}
 
 
@@ -738,6 +747,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in path_alignment_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in span_merge_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in arc_queue_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in span_coverage_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in scan_row_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ellipse_arc_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ellipse_storage_variants()]
