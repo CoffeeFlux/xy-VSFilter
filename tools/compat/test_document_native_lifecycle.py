@@ -1,6 +1,6 @@
 import unittest
 
-from document_native_lifecycle import compare_traces
+from document_native_lifecycle import compare_traces, conversion_rows
 
 
 STYLE_SCALARS = b" ".join(b"0000000000000000" if i in (0,11,12,13,14,23,24,25,26,27,28,29,30,31,32) else b"00000000" if i in (15,17,19,21) else b"0" for i in range(34))
@@ -66,6 +66,7 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
              ("layout-size-self-copy-retained",352,288,800,600),("layout-size-parser-x",352,288,640,600),
              ("layout-size-parser-y",352,288,640,360),("layout-size-parser-repeated",352,288,720,600),
              ("layout-size-parser-nonpositive",352,288,-2,0)))
+         + b"".join((b"conversion-callback " + row + b"\n" if row.split(b" ",1)[0] in (b"conversion-frame-half",b"conversion-time-half",b"conversion-empty-frame",b"conversion-empty-time") else b"") + b"conversion-stage " + row + b"\n" for row in conversion_rows())
          + b"saved-file ssa exists=1 bytes=1 41\nsaved-file ass exists=1 bytes=1 41\n"
          + b"saved-file srt exists=1 bytes=1 41\nsaved-file srt-sidecar exists=1 bytes=1 41\n"
          + b"saved-file ssa-sidecar exists=0\nsaved-file ass-sidecar exists=0\n"
@@ -74,6 +75,24 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
 
 
 class NativeLifecycleEvidenceTests(unittest.TestCase):
+    def test_conversion_requires_complete_callbacks_and_exact_states(self):
+        for marker in (b"conversion-stage conversion-time-half ",b"conversion-callback conversion-frame-half "):
+            missing=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith(marker))
+            with self.assertRaises(ValueError): compare_traces([missing]*4,64)
+        for before,after in [(b"times=-2,-1;1,2",b"times=-1,-1;1,2"),
+                             (b"conversion-frame-noop-zero mode=1 entries=2 segments=2 animated=1",b"conversion-frame-noop-zero mode=1 entries=2 segments=2 animated=0")]:
+            changed=TRACE.replace(before,after)
+            with self.assertRaises(ValueError): compare_traces([changed]*4,64)
+        callback=b"conversion-callback " + conversion_rows()[1] + b"\n"
+        duplicate=TRACE.replace(callback,callback+callback)
+        with self.assertRaises(ValueError): compare_traces([duplicate]*4,64)
+        stage=b"conversion-stage " + conversion_rows()[1] + b"\n"
+        late=TRACE.replace(callback,b"").replace(stage,stage+callback)
+        with self.assertRaises(ValueError): compare_traces([late]*4,64)
+        legacy=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith((b"conversion-stage ",b"conversion-callback ")))
+        with self.assertRaises(ValueError): compare_traces([legacy]*4,64)
+        compare_traces([legacy]*4,64,require_conversion_stages=False)
+
     def test_requires_two_complete_equal_executions_per_side(self):
         compare_traces([TRACE] * 4, 64)
         with self.assertRaises(ValueError):

@@ -4346,10 +4346,9 @@ CStringW CSimpleTextSubtitle::GetStrW(int i, bool fSSA)
     return str;
 }
 
-void CSimpleTextSubtitle::CreateSegments()
-{
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    m_document->Rebuild();
+void CSimpleTextSubtitle::NotifySegmentsRebuilt()
+{
     OnChanged();
 #if ENABLE_XY_LOG_TEXT_SUBTITLE
     CAtlArray<STSSegment> segments;
@@ -4360,6 +4359,14 @@ void CSimpleTextSubtitle::CreateSegments()
     }
     LogSegments(segments);
 #endif
+}
+#endif
+
+void CSimpleTextSubtitle::CreateSegments()
+{
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    m_document->Rebuild();
+    NotifySegmentsRebuilt();
 #else
     m_segments.RemoveAll();
 

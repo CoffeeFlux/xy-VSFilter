@@ -172,6 +172,7 @@ class CSimpleTextSubtitle
 protected:
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     std::unique_ptr<XyRust::DocumentOwner> m_document;
+    void NotifySegmentsRebuilt();
 #else
     CAtlArray<STSEntry>   m_entries;
     CAtlArray<STSSegment> m_segments;

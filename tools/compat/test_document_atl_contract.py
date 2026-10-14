@@ -220,6 +220,57 @@ inline CSize::CSize() { second(); }
         self.assertIn('#include <STS.h>', contract.CSIZE_CONTEXT_SOURCE)
         self.assertNotIn('CSize', contract.CSIZE_CONTEXT_SOURCE)
 
+    def test_wide_helpers_dispatch_and_narrow_exclusion(self):
+        text = """class ChTraitsCRT<char> { static char* CharNext(char* p) { return p+1; } };
+class ChTraitsCRT<wchar_t> {
+ static LPWSTR CharNext(LPWSTR p) { return p+1; }
+ static LPCWSTR StringFindString(LPCWSTR p, LPCWSTR q) { return wcsstr(p,q); }
+ static int StringLength(LPCWSTR p) { return wcslen(p); }
+ static int StringLength(wchar_t c) { return 1; }
+};
+template<> class ChTraitsBase<wchar_t> { typedef wchar_t XCHAR; typedef const wchar_t* PCXSTR; };
+template<class XCHAR, class ChTraits> class StrTraitATL : public ChTraits {};
+template<class XCHAR, class ChTraits = ChTraitsCRT<XCHAR>> class StrTraitMFC : public StrTraitATL<XCHAR, ChTraits> {};
+template<class BaseType> class CSimpleStringT { typedef typename ChTraitsBase<BaseType>::XCHAR XCHAR; typedef typename ChTraitsBase<BaseType>::PCXSTR PCXSTR; };
+template<class BaseType, class StringTraits = StrTraitATL<BaseType, ChTraitsCRT<BaseType>>> class CStringT : public CSimpleStringT<BaseType> {
+ typedef typename CSimpleStringT<BaseType>::XCHAR XCHAR;
+ typedef typename CSimpleStringT<BaseType>::PCXSTR PCXSTR;
+ static int SafeStringLen(PCXSTR p) { return p ? StringTraits::StringLength(p) : 0; }
+};"""
+        rows = contract.select_cstring_helpers(text, 'cstringt.h')
+        status = contract.cstring_helper_contract(rows)
+        self.assertTrue(status['complete'])
+        self.assertEqual(status['definition_counts']['ChTraitsCRT::CharNext'], 1)
+        self.assertFalse(any('return 1;' in r['excerpt'] for r in rows))
+        self.assertFalse(any('char* p' in r['excerpt'] for r in rows))
+        self.assertFalse(contract.cstring_helper_contract(rows + rows)['complete'])
+        self.assertFalse(contract.cstring_helper_contract([r for r in rows if r['owner'] != 'ChTraitsBase'])['complete'])
+        self.assertFalse(contract.cstring_helper_contract([r for r in rows if r['symbol'] != 'CStringT helper template'])['complete'])
+        self.assertTrue(any('StringTraits = StrTraitATL' in r['excerpt'] for r in rows))
+        self.assertTrue(any('ChTraitsBase<BaseType>::PCXSTR' in r['excerpt'] for r in rows))
+        ansi = contract.select_cstring_helpers('template<> class ChTraitsBase<char> { typedef char XCHAR; };', 'atlsimpstr.h')
+        self.assertEqual(ansi, [])
+
+    def test_wide_helpers_conditions_missing_and_bounds(self):
+        text = """class ChTraitsCRT<wchar_t> {
+ static LPWSTR CharNext(LPWSTR p) {
+#ifdef DIFFERENT
+ return p+2;
+#else
+ return p+1;
+#endif
+ }
+};"""
+        rows = contract.select_cstring_helpers(text, 'atlstr.h')
+        status = contract.cstring_helper_contract(rows)
+        self.assertFalse(status['complete'])
+        self.assertFalse(status['active_conditions_resolved'])
+        self.assertTrue(rows[-1]['internal_conditions'])
+        oversized = 'class ChTraitsCRT<wchar_t> { static LPWSTR CharNext(LPWSTR p) {' + 'x;' * 7000 + '} };'
+        with self.assertRaises(ValueError):
+            contract.select_cstring_helpers(oversized, 'atlstr.h')
+        self.assertFalse(contract.cstring_helper_contract([])['source_capture_complete'])
+
     def test_cstring_preparation_exact_overloads_and_inherited_empty(self):
         text = """#pragma once
 class CSimpleStringT {

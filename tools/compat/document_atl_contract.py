@@ -384,6 +384,112 @@ def cstring_preparation_contract(records):
             'unresolved': (([] if unique else ['Missing or ambiguous required CString preparation definitions'])
                            + (['Selected CString conditional directives are not evaluated'] if unknown else []))}
 
+CSTRING_HELPER_HEADERS = ('cstringt.h', 'atlsimpstr.h', 'atlstr.h', 'afxstr.h')
+
+
+def select_cstring_helpers(source, header):
+    """Narrow source evidence, not a preprocessor or inferred trait dispatch."""
+    code = masked(source)
+    records = []
+
+    def add(start, end, owner, symbol, kind):
+        start = code.rfind('\n', 0, start) + 1
+        excerpt = source[start:end]
+        if len(excerpt.encode('utf-8')) > 12000 or excerpt.count('\n') > 250:
+            raise ValueError('CString helper excerpt exceeds bound')
+        internal = [line.strip() for line in masked(excerpt).splitlines()
+                    if re.match(r'\s*#\s*(?:if|ifdef|ifndef|elif|else|endif)\b', line)]
+        records.append({'header': str(header), 'owner': owner, 'symbol': symbol, 'kind': kind,
+                        'first_line': source.count('\n', 0, start) + 1,
+                        'last_line': source.count('\n', 0, end) + 1,
+                        'source_utf8_sha256': sha(source.encode('utf-8')),
+                        'sha256_utf8': sha(excerpt.encode('utf-8')), 'excerpt': excerpt,
+                        'conditional_context': conditional_context(source, start),
+                        'internal_conditions': internal})
+
+    for owner in ('ChTraitsBase', 'ChTraitsCRT', 'StrTraitATL', 'StrTraitMFC', 'CStringT', 'CSimpleStringT'):
+        for first, last in class_ranges(code, owner):
+            opening = code.find('{', first, last)
+            declaration = code[first:opening]
+            # Explicit narrow specializations never establish the wide dispatch.
+            specialization = re.search(r'\b' + owner + r'\s*<([^>]*)>', declaration)
+            if specialization and not re.search(r'\bwchar_t\b', specialization[1]):
+                continue
+            if owner == 'ChTraitsBase' and not specialization:
+                # Generic/ANSI declarations do not establish the wchar_t aliases.
+                continue
+            template_prefix = code[max(0, first - 2000):first]
+            template_match = re.search(r'\btemplate\s*<[^;{}]*>\s*$', template_prefix)
+            if template_match:
+                add(max(0, first - 2000) + template_match.start(), first, owner,
+                    owner + ' helper template', 'declaration')
+            add(first, opening, owner, owner + ' helper class/base', 'declaration')
+            for alias in re.finditer(r'\b(?:typedef|using)\b[^;{}]*;', code[opening:last]):
+                start = opening + alias.start()
+                prefix = code[opening:start]
+                if prefix.count('{') - prefix.count('}') != 1:
+                    continue
+                declaration_text = alias[0]
+                # Keep only dispatch/string argument aliases, never data members.
+                names = re.findall(r'\b(XCHAR|PXSTR|PCXSTR|StringTraits|CThisSimpleString)\b', declaration_text)
+                if names:
+                    add(start, opening + alias.end(), owner,
+                        owner + ' helper alias', 'declaration')
+            for match in re.finditer(r'\b(CharNext|StringFindString|StringLength|SafeStringLen)\s*\(', code[opening:last]):
+                start = opening + match.start()
+                prefix = code[opening:start]
+                if prefix.count('{') - prefix.count('}') != 1:
+                    continue
+                paren = code.find('(', start)
+                after = closing(code, paren, '(', ')')
+                params = code[paren + 1:after - 1]
+                # Capture only pointer string overloads, never character overloads.
+                if not re.search(r'\b(?:LPCWSTR|LPWSTR|PCXSTR|PXSTR)\b|\bwchar_t\s*\*', params):
+                    continue
+                if match[1] == 'StringFindString' and params.count(',') != 1:
+                    continue
+                if match[1] != 'StringFindString' and ',' in params:
+                    continue
+                body, semi = code.find('{', after), code.find(';', after)
+                is_body = body >= 0 and (semi < 0 or body < semi)
+                if body < 0 and semi < 0:
+                    raise ValueError('Unterminated CString helper signature')
+                end = closing(code, body) if is_body else semi + 1
+                add(start, end, owner, owner + '::' + match[1],
+                    'definition' if is_body else 'declaration')
+    if len(records) > 40 or sum(len(r['excerpt'].encode('utf-8')) for r in records) > 80000:
+        raise ValueError('CString helper selections exceed total bound')
+    return records
+
+
+def cstring_helper_contract(records):
+    required = ('ChTraitsCRT::CharNext', 'ChTraitsCRT::StringFindString',
+                'ChTraitsCRT::StringLength', 'SafeStringLen')
+    counts = {symbol: sum((r['symbol'] == symbol if symbol != 'SafeStringLen' else
+                           r['symbol'].endswith('::SafeStringLen')) and r['kind'] == 'definition' for r in records)
+              for symbol in required}
+    bases = {owner: sum(r['symbol'] == owner + ' helper class/base' for r in records)
+             for owner in ('ChTraitsBase', 'ChTraitsCRT', 'StrTraitATL', 'StrTraitMFC', 'CStringT', 'CSimpleStringT')}
+    unknown = [dict(header=r['header'], first_line=r['first_line'], symbol=r['symbol'],
+                    conditional_context=[c for c in r['conditional_context'] if not c['include_guard']],
+                    internal_conditions=r['internal_conditions']) for r in records
+               if r['internal_conditions'] or any(not c['include_guard'] for c in r['conditional_context'])]
+    aliases = {owner + '::' + name: sum(r['owner'] == owner and r['symbol'] == owner + ' helper alias'
+                and re.search(r'\b' + name + r'\b', r['excerpt']) is not None for r in records)
+               for owner in ('ChTraitsBase', 'CSimpleStringT', 'CStringT') for name in ('XCHAR', 'PCXSTR')}
+    templates = {owner: sum(r['symbol'] == owner + ' helper template' for r in records)
+                 for owner in ('StrTraitATL', 'StrTraitMFC', 'CStringT', 'CSimpleStringT')}
+    unique = (all(n == 1 for n in counts.values()) and all(n == 1 for n in bases.values())
+              and all(n >= 1 for n in aliases.values()) and all(n == 1 for n in templates.values()))
+    return {'scope': 'Selected wide helper definitions and trait class dispatch declarations; source only, no runtime parity',
+            'definition_counts': counts, 'dispatch_declaration_counts': bases,
+            'dispatch_alias_counts': aliases, 'dispatch_template_counts': templates,
+            'source_capture_complete': unique, 'complete': unique and not unknown,
+            'active_conditions_resolved': not unknown, 'active_conditions_unresolved': unknown,
+            'unresolved': ([] if unique else ['Missing or ambiguous wide helper/dispatch source']) +
+                          (['Selected helper conditions are not evaluated'] if unknown else [])}
+
+
 CSIZE_CONTEXT_SOURCE = '''// Source-only preprocessing; no object declarations or execution.
 #include <stdafx.h>
 #include <STS.h>
@@ -658,6 +764,21 @@ def main():
                     preparation_excerpts+=selected
                 except (ValueError, UnicodeError) as error:
                     report.setdefault('cstring_preparation_extraction_errors', []).append({'header': header, 'error': str(error)})
+        helper_excerpts=[]
+        for header in headers:
+            if Path(header).name.lower() in CSTRING_HELPER_HEADERS:
+                try:
+                    selected=select_cstring_helpers(Path(header).read_bytes().decode('utf-8-sig',errors='strict'),header)
+                    for row in selected: row['header_sha256']=headers[header]
+                    helper_excerpts+=selected
+                except (ValueError, UnicodeError) as error:
+                    report.setdefault('cstring_helper_extraction_errors', []).append({'header':header,'error':str(error)})
+        report['cstring_helper_contract']=cstring_helper_contract(helper_excerpts)
+        if report.get('cstring_helper_extraction_errors'):
+            report['cstring_helper_contract']['complete']=False
+            report['cstring_helper_contract']['source_capture_complete']=False
+            report['cstring_helper_contract']['unresolved'].append('Helper source extraction failed')
+        excerpts+=helper_excerpts
         report['cstring_preparation_contract']=cstring_preparation_contract(preparation_excerpts)
         if report.get('cstring_preparation_extraction_errors'):
             report['cstring_preparation_contract']['complete']=False

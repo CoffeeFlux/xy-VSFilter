@@ -9,8 +9,9 @@ use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::ptr;
 use xy_vsfilter_compat::document::{
-    AddMode, Document, IdentityField, InterpretationField, LayoutField, MetadataField, Refusal,
-    ResolvedStyle, RetiredEmpty, ScriptField, StyleRenameError, StyleResolutionError,
+    AddMode, ConversionMode, Document, IdentityField, InterpretationField, LayoutField,
+    MetadataField, Refusal, ResolvedStyle, RetiredEmpty, ScriptField, StyleRenameError,
+    StyleResolutionError,
 };
 use xy_vsfilter_compat::document_style as style_wire;
 use xy_vsfilter_compat::document_wire::{self as wire, Counts, EntryHeader, SegmentHeader};
@@ -44,7 +45,9 @@ fn registry_error(error: RegistryError) -> u32 {
 }
 fn refusal(error: Refusal) -> u32 {
     match error {
-        Refusal::StaleEntryIndex | Refusal::WebVttEndIterator => UNRESOLVED_REFERENCE,
+        Refusal::StaleEntryIndex | Refusal::WebVttEndIterator | Refusal::UnsuppliedMode => {
+            UNRESOLVED_REFERENCE
+        }
         Refusal::EntryCountOverflow | Refusal::TimelineCountOverflow => COUNT_OVERFLOW,
         Refusal::EntryIndex | Refusal::SegmentIndex => OUT_OF_RANGE,
         Refusal::InvalidPermutation | Refusal::TimeCountMismatch => INVALID_INPUT,
@@ -816,7 +819,7 @@ pub unsafe extern "C" fn xy_vsfilter_document_snapshot_open_v1(
     capacity: usize,
 ) -> u32 {
     required!(output_capacity(output, capacity, 8));
-    if kind > 10 {
+    if kind > 11 {
         return INVALID_INPUT;
     }
     let bytes = required!(admitted(|registry| {
@@ -866,6 +869,12 @@ pub unsafe extern "C" fn xy_vsfilter_document_snapshot_open_v1(
                     return Err(OUT_OF_RANGE);
                 }
                 wire::encode_sort_snapshot(document.entries()).map_err(wire_error)
+            }
+            11 => {
+                if index != 0 {
+                    return Err(OUT_OF_RANGE);
+                }
+                wire::encode_time_snapshot(document.entries()).map_err(wire_error)
             }
             10 => {
                 if index != 0 {
@@ -1133,6 +1142,47 @@ pub unsafe extern "C" fn xy_vsfilter_document_replace_entry_times_v1(
         .collect();
     mutate(owner, |document| document.replace_entry_times(&times))
 }
+/// # Safety
+/// Input contains complete i64LE start/end pairs. Output follows the byte-buffer
+/// contract and receives one u64LE applied flag. Native arithmetic/callbacks
+/// remain outside admission; staging malformed buffers precedes the mode guard.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_commit_time_conversion_v1(
+    owner: u64,
+    target: u32,
+    input: *const u8,
+    length: usize,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let target = match target {
+        0 => ConversionMode::Time,
+        1 => ConversionMode::Frame,
+        _ => return INVALID_INPUT,
+    };
+    required!(element_shape(length, 16));
+    // SAFETY: caller range is copied before admission and before output writes.
+    let input = required!(unsafe { copy_input(input, length) });
+    let times: Vec<_> = input
+        .chunks_exact(16)
+        .map(|row| {
+            let mut start = [0; 8];
+            let mut end = [0; 8];
+            start.copy_from_slice(&row[..8]);
+            end.copy_from_slice(&row[8..]);
+            (i64::from_le_bytes(start), i64::from_le_bytes(end))
+        })
+        .collect();
+    let applied = required!(admitted(|registry| registry
+        .document_mut(owner)
+        .map_err(registry_error)?
+        .commit_time_conversion(target, &times)
+        .map_err(refusal)));
+    // SAFETY: capacity was validated before mutation; no registry reference escapes.
+    unsafe { write_output(output, &u64::from(applied).to_le_bytes()) };
+    OK
+}
 #[no_mangle]
 pub extern "C" fn xy_vsfilter_document_rebuild_segments_v1(owner: u64) -> u32 {
     mutate(owner, |document| {
@@ -1296,6 +1346,167 @@ mod tests {
         // SAFETY: allocated byte ranges below are valid for each supplied size;
         // explicit null/oversized checks are rejected before raw accesses.
         unsafe {
+            // Coarse time commit and immutable scalar snapshots, serialized with
+            // every other global registry export check in this single test.
+            let conversion_owner = create();
+            let mut applied = [0xa5; 16];
+            assert_eq!(
+                xy_vsfilter_document_commit_time_conversion_v1(
+                    conversion_owner,
+                    0,
+                    ptr::null(),
+                    0,
+                    applied.as_mut_ptr(),
+                    16
+                ),
+                UNRESOLVED_REFERENCE
+            );
+            assert_eq!(applied, [0xa5; 16]);
+            assert_eq!(
+                xy_vsfilter_document_set_interpretation_v1(conversion_owner, 0, 1),
+                OK
+            );
+            assert_eq!(add(conversion_owner, 0, &entry(0, 10)).0, OK);
+            assert_eq!(
+                xy_vsfilter_document_animation_or_v1(conversion_owner, 0, 1),
+                OK
+            );
+            let time_snapshot = open_snapshot(conversion_owner, 11);
+            let snapshot_bytes = read_snapshot(time_snapshot);
+            assert_eq!(
+                wire::decode_time_snapshot(&snapshot_bytes).unwrap(),
+                [(0, 10)]
+            );
+            let before = state(conversion_owner);
+            let mut pairs = Vec::new();
+            pairs.extend_from_slice(&2i64.to_le_bytes());
+            pairs.extend_from_slice(&8i64.to_le_bytes());
+            for (target, length, capacity, expected) in [
+                (0, 16, 7, INVALID_INPUT),
+                (2, 16, 16, INVALID_INPUT),
+                (0, 15, 16, INVALID_INPUT),
+                (0, 0, 16, INVALID_INPUT),
+            ] {
+                assert_eq!(
+                    xy_vsfilter_document_commit_time_conversion_v1(
+                        conversion_owner,
+                        target,
+                        pairs.as_ptr(),
+                        length,
+                        applied.as_mut_ptr(),
+                        capacity
+                    ),
+                    expected
+                );
+                assert_eq!(state(conversion_owner), before);
+                assert_eq!(applied, [0xa5; 16]);
+            }
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_commit_time_conversion_v1(
+                        conversion_owner,
+                        0,
+                        pairs.as_ptr(),
+                        16,
+                        applied.as_mut_ptr(),
+                        16
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                xy_vsfilter_document_commit_time_conversion_v1(
+                    time_snapshot,
+                    0,
+                    pairs.as_ptr(),
+                    16,
+                    applied.as_mut_ptr(),
+                    16
+                ),
+                BAD_HANDLE
+            );
+            assert_eq!(state(conversion_owner), before);
+            assert_eq!(applied, [0xa5; 16]);
+            // Overlapping input/output: input copied completely before flag write.
+            assert_eq!(
+                xy_vsfilter_document_commit_time_conversion_v1(
+                    conversion_owner,
+                    0,
+                    pairs.as_ptr(),
+                    16,
+                    pairs.as_mut_ptr(),
+                    8
+                ),
+                OK
+            );
+            assert_eq!(&pairs[..8], &1u64.to_le_bytes());
+            let converted = state(conversion_owner);
+            let mut expected = before.clone();
+            expected
+                .commit_time_conversion(ConversionMode::Time, &[(2, 8)])
+                .unwrap();
+            assert_eq!(converted, expected);
+            assert_eq!(read_snapshot(time_snapshot), snapshot_bytes);
+            assert_eq!(
+                xy_vsfilter_document_animation_or_v1(conversion_owner, 0, 1),
+                OK
+            );
+            assert_eq!(xy_vsfilter_document_remove_entries_v1(conversion_owner), OK);
+            let stale = state(conversion_owner);
+            assert_eq!(
+                xy_vsfilter_document_commit_time_conversion_v1(
+                    conversion_owner,
+                    0,
+                    ptr::null(),
+                    0,
+                    applied.as_mut_ptr(),
+                    16
+                ),
+                OK
+            );
+            assert_eq!(&applied[..8], &0u64.to_le_bytes());
+            assert_eq!(&applied[8..], &[0xa5; 8]);
+            assert_eq!(state(conversion_owner), stale);
+            assert_eq!(
+                xy_vsfilter_document_commit_time_conversion_v1(
+                    conversion_owner,
+                    1,
+                    ptr::null(),
+                    0,
+                    applied.as_mut_ptr(),
+                    16
+                ),
+                OK
+            );
+            assert_eq!(&applied[..8], &1u64.to_le_bytes());
+            assert!(state(conversion_owner).segments().is_empty());
+            applied.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_document_snapshot_open_v1(
+                    conversion_owner,
+                    11,
+                    1,
+                    applied.as_mut_ptr(),
+                    8
+                ),
+                OUT_OF_RANGE
+            );
+            assert_eq!(applied, [0xa5; 16]);
+            assert_eq!(
+                xy_vsfilter_document_snapshot_open_v1(
+                    conversion_owner,
+                    11,
+                    0,
+                    applied.as_mut_ptr(),
+                    7
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(applied, [0xa5; 16]);
+            assert_eq!(xy_vsfilter_document_destroy_v1(conversion_owner), OK);
+            assert_eq!(read_snapshot(time_snapshot), snapshot_bytes);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(time_snapshot), OK);
+
             // Separate supplied layout axes, atomic pair snapshots and retained ownership.
             let layout_owner = create();
             let layout_destination = create();
@@ -1554,7 +1765,7 @@ mod tests {
             );
             assert_eq!(output, [0xa5; 8]);
             assert_eq!(
-                xy_vsfilter_document_snapshot_open_v1(source, 11, 0, output.as_mut_ptr(), 8),
+                xy_vsfilter_document_snapshot_open_v1(source, 12, 0, output.as_mut_ptr(), 8),
                 INVALID_INPUT
             );
             assert_eq!(output, [0xa5; 8]);

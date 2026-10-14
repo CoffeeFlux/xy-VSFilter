@@ -1,0 +1,116 @@
+{
+  "schema": "rust-document-preparation-evidence-v1",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "candidate_commit": "66638ab93376a257261283efdd13a2bdcaaf9376",
+  "run_id": 38651297490,
+  "scope": "Bounded initialized actual-MFC final Add/AddSTSEntryOnly suffix and SetStr LF-only observations; selected SDK source only on both architectures",
+  "rust_parity": false,
+  "whole_document_or_renderer_gate": false,
+  "preparation": {
+    "Win32": {
+      "job_id": 116150470220,
+      "artifact": "document-preparation-Win32",
+      "independently_verified": true,
+      "observations": 620,
+      "repeat_equal": true,
+      "stderr_empty": true,
+      "actual_type": "class ATL::CStringT<wchar_t,class StrTraitMFC<wchar_t,class ATL::ChTraitsCRT<wchar_t> > >",
+      "report_sha256": "bdf614bae6021f7f622e82a1ad4c95a3640ef50e3e6828355add7da208f5cc06",
+      "exe_sha256": "8a7704302c28035ce26d3a0971dc8a89a58677a7d33d958b602e04b2e7862638",
+      "trace_sha256": [
+        "6ac88a87f8a61d1139d4085090305096a5ddb03fc68200f7ec2dd89180ae2f02",
+        "6ac88a87f8a61d1139d4085090305096a5ddb03fc68200f7ec2dd89180ae2f02"
+      ],
+      "verified": [
+        "candidate runner/test sources against exact Git commit with Windows newline normalization",
+        "pinned STS.cpp and exact suffix spans/hashes",
+        "regenerated C++ input and fixture corpus",
+        "PE x86 machine, retained binary/build log and both complete traces",
+        "all 620 exact inputs and outputs using archived validator"
+      ]
+    },
+    "x64": {
+      "job_id": 116150470385,
+      "artifact": "document-preparation-x64",
+      "complete": false,
+      "report_sha256": "80c7282872252326f60145b4b9dfa177c0ada64ed5eae76cfad510a3df70c805",
+      "failure": "Compiler/link subprocess exceeded 60-second timeout; no executable/runtime observation credit"
+    }
+  },
+  "sdk_source": {
+    "Win32": {
+      "job_id": 116150470194,
+      "artifact": "document-atl-contract-Win32",
+      "report_sha256": "21258f9b78fa51ab4a4b991c630abb2fe64b628ce05026c23b1c1070a9883451",
+      "selected_definitions_sha256": "dab90a1a265d9034be36eac62d8e0f102b755f9199d34ca4b15c1e62a87a8e65",
+      "retained_artifacts_verified": true,
+      "selected_methods": [
+        "Remove(XCHAR)",
+        "Replace(PCXSTR,PCXSTR)",
+        "TrimLeft(XCHAR)",
+        "IsEmpty()"
+      ],
+      "source_contract_complete": true,
+      "SDK_source_excerpts_tracked": false
+    },
+    "x64": {
+      "job_id": 116150470197,
+      "artifact": "document-atl-contract-x64",
+      "report_sha256": "0c5abd1c498162b40c45c944cec900cbc50e8249c92dd4ebec21e41b54e6f4c5",
+      "selected_definitions_sha256": "dab90a1a265d9034be36eac62d8e0f102b755f9199d34ca4b15c1e62a87a8e65",
+      "retained_artifacts_verified": true,
+      "selected_methods": [
+        "Remove(XCHAR)",
+        "Replace(PCXSTR,PCXSTR)",
+        "TrimLeft(XCHAR)",
+        "IsEmpty()"
+      ],
+      "source_contract_complete": true,
+      "SDK_source_excerpts_tracked": false
+    }
+  },
+  "contract": {
+    "text": "Add/Entry remove CR across logical string, then LF replacement; SetStr only LF replacement. No post-suffix empty rejection.",
+    "replace": "Count LF across logical NUL-separated chunks, but mutation outer loop retains original logical end. Expansion can skip a later chunk while publishing precomputed length. Flat replacement is incompatible.",
+    "observed_examples": [
+      {
+        "input": [
+          10,
+          0,
+          10
+        ],
+        "output": [
+          92,
+          78,
+          0,
+          10,
+          0
+        ]
+      },
+      {
+        "input": [
+          0,
+          10,
+          0,
+          10
+        ],
+        "output": [
+          0,
+          92,
+          78,
+          0,
+          10,
+          0
+        ]
+      }
+    ],
+    "safe_refusal": "More than one skipped expansion may expose tail units not assigned by selected method; backing-buffer history is unresolved. Do not invent zeros or run such reference histories.",
+    "style": "IsEmpty tests logical length; Default substitution only length zero. Add skips TrimLeft when CString prefix equality matches Default; Entry always trims initial stars after substitution. Trim retains full logical suffix including NUL/surrogates."
+  },
+  "limitations": [
+    "Earlier FastTrim/rejection, locale, WebVTT, charset conversion, append and callbacks excluded",
+    "Wide CharNext and StrTraitMFC helper dispatch source not yet selected; bounded surrogate observations do not establish every helper implementation",
+    "External compiler/SDK full files and full preprocessing streams unavailable locally; their hashes/provenance are runner-reported, while retained excerpts/binaries/logs/traces are independently rehashed",
+    "No x64 preparation runtime result, production switch or whole-renderer compatibility claim"
+  ]
+}

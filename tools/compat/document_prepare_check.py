@@ -193,7 +193,17 @@ def main():
         exe = out / 'document_prepare_probe.exe'
         command = [compiler,'/nologo','/Bv','/showIncludes','/MT','/O2','/EHsc','/std:c++14','/DUNICODE','/D_UNICODE','/DNDEBUG','/D_AFX_NO_MFC_CONTROLS_IN_DIALOGS','/DWINVER=0x0601','/D_WIN32_WINNT=0x0601',str(generated),'/Fe:'+str(exe),'/link','/VERBOSE:LIB']
         report.update(command=command, compiler_path=compiler, compiler_sha256=sha(Path(compiler).read_bytes()), runtime='static CRT/MFC /MT; actual MFC CStringW StrTraitMFC<wchar_t>; AfxWinInit', sanitizer='none'); save()
-        built = subprocess.run(command,cwd=out,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=60)
+        # Cold static MFC linking on shared runners can exceed one minute.
+        # Keep a bounded build deadline and preserve diagnostics even on timeout.
+        report['build_timeout_seconds'] = 180; save()
+        try:
+            built = subprocess.run(command,cwd=out,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=180)
+        except subprocess.TimeoutExpired as error:
+            log = error.stdout or b''
+            (out/'build.log').write_bytes(log)
+            report['build_log_sha256'] = sha(log)
+            report['build_timed_out'] = True
+            raise
         (out/'build.log').write_bytes(built.stdout)
         if built.returncode:
             raise ValueError('native compilation failed')
