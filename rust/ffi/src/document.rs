@@ -93,6 +93,90 @@ fn insert(resource: Resource) -> Result<u64, u32> {
     }
 }
 
+fn translated_search_bytes(state: xy_vsfilter_compat::document_search::State) -> [u8; 24] {
+    let mut bytes = [0u8; 24];
+    bytes[..4].copy_from_slice(&u32::from(state.pending).to_le_bytes());
+    bytes[4..8].copy_from_slice(&u32::from(state.start).to_le_bytes());
+    bytes[8..12].copy_from_slice(&state.request_index.to_le_bytes());
+    bytes[12..16].copy_from_slice(&state.result_index.to_le_bytes());
+    bytes[16..20].copy_from_slice(&u32::from(state.found).to_le_bytes());
+    bytes[20..].copy_from_slice(&state.count.to_le_bytes());
+    bytes
+}
+/// # Safety
+/// Output32 receives run ID:u64 followed by six LE state words. Native supplies
+/// each requested translated timestamp only after this registry call returns.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_search_begin_v1(
+    owner: u64,
+    mode: u32,
+    time: i64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 32));
+    let mode = match mode {
+        0 => Mode::Entry,
+        1 => Mode::NextSegment,
+        2 => Mode::ContainingSegment,
+        _ => return INVALID_INPUT,
+    };
+    let (result, state) = required!(admitted(|registry| {
+        let run = xy_vsfilter_compat::document_search::Run::new(
+            registry.document(owner).map_err(registry_error)?,
+            mode,
+            time,
+        )
+        .map_err(refusal)?;
+        let state = run.state();
+        Ok((registry.insert(Resource::SearchRun { owner, run }), state))
+    }));
+    let id = match result {
+        Ok(id) => id,
+        Err((error, resource)) => {
+            drop(resource);
+            return registry_error(error);
+        }
+    };
+    let mut bytes = [0u8; 32];
+    bytes[..8].copy_from_slice(&id.to_le_bytes());
+    bytes[8..].copy_from_slice(&translated_search_bytes(state));
+    // SAFETY: output validated before insertion; registry admission has ended.
+    unsafe {
+        write_output(output, &bytes);
+    }
+    OK
+}
+/// # Safety
+/// Output24 receives pending,start,requestIndex,resultIndex,found,count as six
+/// LE words. Counts stay frozen; the bound owner must still exist.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_search_supply_v1(
+    id: u64,
+    value: i64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 24));
+    let state = required!(admitted(|registry| {
+        let (_, run) = registry.search_pair(id).map_err(registry_error)?;
+        run.supply(value).map_err(|_| INVALID_INPUT)
+    }));
+    // SAFETY: checks precede mutation; no registry reference escapes.
+    unsafe {
+        write_output(output, &translated_search_bytes(state));
+    }
+    OK
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_search_drop_v1(id: u64) -> u32 {
+    status(
+        DOCUMENTS
+            .destroy(id, Kind::SearchRun)
+            .map_err(registry_error),
+    )
+}
+
 fn open_error(error: xy_vsfilter_compat::document_open::Error) -> u32 {
     use xy_vsfilter_compat::document_open::Error;
     match error {
@@ -2034,6 +2118,162 @@ mod tests {
             assert_eq!(state(suffix_owner).entries()[0].text, [92, 78, 0, 10, 0]);
             assert_eq!(state(suffix_owner).entries()[0].style, [65]);
             assert_eq!(xy_vsfilter_document_destroy_v1(suffix_owner), OK);
+
+            let search_owner = create();
+            assert_eq!(add(search_owner, 0, &entry(0, 10)).0, OK);
+            assert_eq!(add(search_owner, 0, &entry(20, 30)).0, OK);
+            let document = state(search_owner);
+            let mut begin = [0xa5u8; 32];
+            assert_eq!(
+                xy_vsfilter_document_search_begin_v1(search_owner, 0, 0, begin.as_mut_ptr(), 31),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_search_begin_v1(search_owner, 3, 0, begin.as_mut_ptr(), 32),
+                INVALID_INPUT
+            );
+            assert_eq!(begin, [0xa5; 32]);
+            for mode in 0..3 {
+                for time in [-1, 0, 5, 10, 15, 20, 30] {
+                    assert_eq!(
+                        xy_vsfilter_document_search_begin_v1(
+                            search_owner,
+                            mode,
+                            time,
+                            begin.as_mut_ptr(),
+                            32
+                        ),
+                        OK
+                    );
+                    let id = u64::from_le_bytes(begin[..8].try_into().unwrap());
+                    let mut packet = [0u8; 24];
+                    packet.copy_from_slice(&begin[8..]);
+                    let mut bad = [0xa5; 24];
+                    let before = admitted(|registry| {
+                        Ok(translated_search_bytes(
+                            registry.search_pair(id).map_err(registry_error)?.1.state(),
+                        ))
+                    })
+                    .unwrap();
+                    assert_eq!(
+                        xy_vsfilter_document_search_supply_v1(id, 999, bad.as_mut_ptr(), 23),
+                        INVALID_INPUT
+                    );
+                    assert_eq!(bad, [0xa5; 24]);
+                    assert_eq!(
+                        admitted(|registry| Ok(translated_search_bytes(
+                            registry.search_pair(id).map_err(registry_error)?.1.state()
+                        )))
+                        .unwrap(),
+                        before
+                    );
+                    assert_eq!(
+                        xy_vsfilter_document_search_supply_v1(
+                            search_owner,
+                            0,
+                            bad.as_mut_ptr(),
+                            24
+                        ),
+                        BAD_HANDLE
+                    );
+                    while u32::from_le_bytes(packet[..4].try_into().unwrap()) != 0 {
+                        let index = i32::from_le_bytes(packet[8..12].try_into().unwrap()) as usize;
+                        let start = u32::from_le_bytes(packet[4..8].try_into().unwrap()) != 0;
+                        let value = if mode == 0 {
+                            document.entries()[index].start
+                        } else if start {
+                            document.segments()[index].start
+                        } else {
+                            document.segments()[index].end
+                        };
+                        assert_eq!(
+                            xy_vsfilter_document_search_supply_v1(
+                                id,
+                                value,
+                                packet.as_mut_ptr(),
+                                24
+                            ),
+                            OK
+                        );
+                    }
+                    let query = document
+                        .query_time(
+                            match mode {
+                                0 => Mode::Entry,
+                                1 => Mode::NextSegment,
+                                _ => Mode::ContainingSegment,
+                            },
+                            time,
+                        )
+                        .unwrap();
+                    assert_eq!(
+                        i32::from_le_bytes(packet[12..16].try_into().unwrap()),
+                        query.index
+                    );
+                    assert_eq!(
+                        u32::from_le_bytes(packet[16..20].try_into().unwrap()) != 0,
+                        query.found
+                    );
+                    assert_eq!(
+                        u32::from_le_bytes(packet[20..].try_into().unwrap()),
+                        query.count as u32
+                    );
+                    assert_eq!(
+                        xy_vsfilter_document_search_supply_v1(id, 0, bad.as_mut_ptr(), 24),
+                        INVALID_INPUT
+                    );
+                    assert_eq!(bad, [0xa5; 24]);
+                    assert_eq!(xy_vsfilter_document_search_drop_v1(id), OK);
+                }
+            }
+            assert_eq!(state(search_owner), document);
+            let empty_search_owner = create();
+            for mode in 0..3 {
+                assert_eq!(
+                    xy_vsfilter_document_search_begin_v1(
+                        empty_search_owner,
+                        mode,
+                        0,
+                        begin.as_mut_ptr(),
+                        32
+                    ),
+                    OK
+                );
+                let id = u64::from_le_bytes(begin[..8].try_into().unwrap());
+                assert_eq!(&begin[8..20], &[0u8; 12]);
+                assert_eq!(&begin[24..], &[0u8; 8]);
+                assert_eq!(
+                    i32::from_le_bytes(begin[20..24].try_into().unwrap()),
+                    if mode == 0 { -1 } else { 0 }
+                );
+                assert_eq!(xy_vsfilter_document_search_drop_v1(id), OK);
+            }
+            assert_eq!(xy_vsfilter_document_destroy_v1(empty_search_owner), OK);
+            assert_eq!(
+                xy_vsfilter_document_search_begin_v1(search_owner, 0, 5, begin.as_mut_ptr(), 32),
+                OK
+            );
+            let search_run = u64::from_le_bytes(begin[..8].try_into().unwrap());
+            assert_eq!(xy_vsfilter_document_remove_entries_v1(search_owner), OK);
+            let frozen = admitted(|registry| {
+                Ok(registry
+                    .search_pair(search_run)
+                    .map_err(registry_error)?
+                    .1
+                    .state()
+                    .count)
+            })
+            .unwrap();
+            assert_eq!(frozen, 2);
+            assert_eq!(xy_vsfilter_document_destroy_v1(search_owner), OK);
+            let mut bad = [0xa5; 24];
+            assert_eq!(
+                xy_vsfilter_document_search_supply_v1(search_run, 0, bad.as_mut_ptr(), 24),
+                BAD_HANDLE
+            );
+            assert_eq!(bad, [0xa5; 24]);
+            assert_eq!(xy_vsfilter_document_search_drop_v1(search_run), OK);
+            assert_eq!(xy_vsfilter_document_search_drop_v1(search_run), BAD_HANDLE);
 
             let open_owner = create();
             let mut output = [0xa5; 8];

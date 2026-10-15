@@ -149,10 +149,10 @@ must nevertheless use the new owner correctly for this package to close.
 The initial table above is a baseline, not the current implementation status.
 A source audit after SetStr and Open identifies three remaining checkpoints:
 
-1. Consolidate FRAME lookup policy and validate one current candidate's Add,
+1. Validate the consolidated FRAME lookup policy and one current candidate's Add,
    Copy, text and Open behavior on both Windows architectures. TIME queries and
-   persistent segment ownership already use safe Rust; FRAME orchestration still
-   retains native search loops and ordered translation adapters.
+   persistent segment ownership already use safe Rust; FRAME now uses a typed
+   safe search session while retaining ordered native translation adapters.
 2. Migrate SaveAs/export policy coherently, with exact main-file and sidecar-byte
    comparisons across supported formats and encodings. Current native formatting,
    filename/file services, time/style casts and codepage adapters need distinct
@@ -1537,6 +1537,36 @@ metadata and entry visibility, the sidecar handle lifetime through callbacks,
 callback-edited screen fallback, filename double Empty and zero-byte rejection
 by all twelve parsers. No new modal or arbitrary malformed parser input is added.
 
+### FRAME lookup through typed safe search sessions
+
+Experimental SearchSub, FindNextSegment and SearchSubs2Snapshot now use an
+owner-bound Rust search run for non-TIME modes. The already verified search
+algorithm is byte-identical to `aa2e1997`; direct TIME queries are unchanged.
+The session freezes only the selected count. Native code supplies each requested
+time translation in order, preserving CRT rounding and lazy lookup behavior.
+No full timestamp array or document borrow crosses the boundary.
+
+The new fixed scalar replies preserve empty indices, equality shortcuts,
+nonmonotone storage behavior and start/end request selection. Native output
+writes retain their original order, including aliased index/count pointers:
+a failed nonempty containing query leaves the count in the shared output.
+Failed queries leave output snapshots untouched; successful snapshots are copied
+after final output writes. Empty and nonempty next-segment logging stays distinct.
+The previously retired raw-pointer TimelineSearch bridge remains absent from
+the experimental document path. Allocation and reentry timing remain qualified.
+
+Local validation passes 234 core and 122 FFI tests, pinned formatting/Clippy,
+and 140 Python tests with four Windows-only skips. Generation, lexical checks
+and unchanged default/RustText preprocessing also pass.
+Nineteen new full-class queries cover empty timelines, equal starts, gaps,
+endpoints, nonmonotone entry order and finite FRAME rounding ties, with aliases,
+snapshot independence and complete segment/animation retention. Native request
+tracing is not newly instrumented; prior extracted algorithm evidence is separate
+from this owner integration. Windows runtime validation remains pending. The
+preceding Open checkpoint `5627bc2c` compiles on both architectures in run
+38658367732 (jobs 116173444294 and 116173444486). Two existing-helper unsafe
+output blocks and two unsafe declarations are added; the core remains safe.
+
 ### Verified CopyStyles checkpoint
 
 The [f570 x64 integration archive](rust-document-x64-f570-evidence.json) verifies
@@ -1657,13 +1687,13 @@ Neither count measures the amount of application behavior replaced.
 The reproducible [Rust unsafe inventory](rust-unsafe-inventory.json) uses
 `python3 tools/compat/audit_rust_boundary.py OUTPUT.json`. It masks comments and
 literals, separates cfg(test) items, and includes all platform/feature branches.
-At the current frozen working-tree sources based on `2a64481a` (exact file
+At the current frozen working-tree sources based on `5627bc2c` (exact file
 hashes recorded by the regenerated inventory):
 
 | Layer | Production source inventory | Meaning |
 | --- | --- | --- |
-| `rust/compat` | 0 unsafe blocks/functions/impls; 8,655 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
-| `rust/ffi` | 377 explicit unsafe blocks, 314 unsafe function declarations, two unsafe impls (allocator and registry admission); 6,126 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
+| `rust/compat` | 0 unsafe blocks/functions/impls; 8,715 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
+| `rust/ffi` | 379 explicit unsafe blocks, 316 unsafe function declarations, two unsafe impls (allocator and registry admission); 6,232 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
 | Tests | 119 unsafe blocks in FFI tests | Exercise valid and deliberately bounded ownership/alias/initialization contracts; not production code |
 
 Unsafe-function declarations and blocks overlap and must not be added as

@@ -3876,8 +3876,10 @@ int CSimpleTextSubtitle::SearchSub(REFERENCE_TIME t, double fps)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     if(GetDocumentMode() == TIME) return m_document->Query(0, t).index;
-#endif
-#if defined(XY_VSFILTER_RUST_TEXT) && !defined(XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL)
+    XyRust::TranslatedDocumentSearch search(*m_document, 0, t);
+    while(search.Pending()) search.Supply(TranslateStart(search.Index(), fps));
+    return search.Result();
+#elif defined(XY_VSFILTER_RUST_TEXT)
     XyRust::TimelineSearch search(0, t, static_cast<int>(GetEntryCount()));
     while (search.Pending()) search.Supply(TranslateStart(search.Index(), fps));
     return search.Result();
@@ -4245,25 +4247,15 @@ bool CSimpleTextSubtitle::FindNextSegment(REFERENCE_TIME t, double fps,
         }
         return query.found;
     }
-    const int segmentsCount = (int)GetSegmentCount();
-    int i = 0, j = segmentsCount - 1;
-    if(nSegments) *nSegments = segmentsCount;
-    if(segmentsCount <= 0) {
-        if(iSegment) *iSegment = 0;
-        TRACE_SUB("No subtitles at "<<XY_LOG_VAR_2_STR(t));
-        return false;
+    XyRust::TranslatedDocumentSearch search(*m_document, 1, t);
+    if(nSegments) *nSegments = search.Count();
+    while(search.Pending()) search.Supply(TranslateSegmentEnd(search.Index(), fps));
+    if(iSegment) *iSegment = search.Result();
+    if(!search.Found()) {
+        if(search.Count() == 0) TRACE_SUB("No subtitles at "<<XY_LOG_VAR_2_STR(t));
+        else TRACE_SUB("No subtitles at "<<XY_LOG_VAR_2_STR(RT2MS(t)));
     }
-    if(t >= TranslateSegmentEnd(j, fps)) { i = j; j++; }
-    if(t < TranslateSegmentEnd(i, fps)) { j = i; i--; }
-    while(i < j-1) {
-        int mid = (i+j)>>1;
-        REFERENCE_TIME midt = TranslateSegmentEnd(mid, fps);
-        if(t < midt) j = mid; else i = mid;
-    }
-    if(iSegment) *iSegment = j;
-    if(j < segmentsCount) return true;
-    TRACE_SUB("No subtitles at "<<XY_LOG_VAR_2_STR(RT2MS(t)));
-    return false;
+    return search.Found();
 #else
     return SearchSubs(t, fps, iSegment, nSegments) != NULL;
 #endif
@@ -4285,23 +4277,17 @@ bool CSimpleTextSubtitle::SearchSubs2Snapshot(REFERENCE_TIME t, double fps,
         }
         return query.found ? m_document->Segment(query.index, snapshot) : false;
     }
-    const int segmentsCount = (int)GetSegmentCount();
-    int i = 0, j = segmentsCount - 1;
+    XyRust::TranslatedDocumentSearch search(*m_document, 2, t);
     if(iSegment) *iSegment = -1;
-    if(nSegments) *nSegments = segmentsCount;
-    if(segmentsCount <= 0) { if(iSegment) *iSegment = 0; return false; }
-    if(t >= TranslateSegmentEnd(j, fps)) { i = j; j++; }
-    if(t < TranslateSegmentEnd(i, fps)) { j = i; i--; }
-    while(i < j-1) {
-        int mid = (i+j)>>1;
-        REFERENCE_TIME midt = TranslateSegmentEnd(mid, fps);
-        if(t < midt) j = mid; else i = mid;
+    if(nSegments) *nSegments = search.Count();
+    while(search.Pending()) {
+        const int index = search.Index();
+        search.Supply(search.Start() ? TranslateSegmentStart(index, fps) : TranslateSegmentEnd(index, fps));
     }
-    if(j < segmentsCount && t >= TranslateSegmentStart(j, fps)) {
-        if(iSegment) *iSegment = j;
-        return m_document->Segment(j, snapshot);
+    if(search.Count() == 0 || search.Found()) {
+        if(iSegment) *iSegment = search.Result();
     }
-    return false;
+    return search.Found() ? m_document->Segment(search.Result(), snapshot) : false;
 #else
     const STSSegment* segment = SearchSubs2(t, fps, iSegment, nSegments);
     if(!segment) return false;
