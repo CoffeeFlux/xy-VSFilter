@@ -4707,18 +4707,17 @@ CStringW CSimpleTextSubtitle::GetStrWA(int i, bool fSSA)
 void CSimpleTextSubtitle::SetStr(int i, CStringW str, bool fUnicode)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    STSEntry stse = m_document->Entry(i);
+    const auto operation = m_document->TextWriteOperation(i, str, fUnicode);
+    const CStringW text = operation.action == 0 ? operation.text : ApplyDocumentTextOperation(operation);
+    m_document->SetText(i, text);
 #else
     STSEntry& stse = m_entries.GetAt(i);
-#endif
 
     str.Replace(L"\n", L"\\N");
 
     if(stse.fUnicode && !fUnicode) stse.str = MBCSSSAToUnicode(str, GetCharSet(i));
     else if(!stse.fUnicode && fUnicode) stse.str = UnicodeSSAToMBCS(str, GetCharSet(i));
     else stse.str = str;
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    m_document->SetText(i, stse.str);
 #endif
 }
 

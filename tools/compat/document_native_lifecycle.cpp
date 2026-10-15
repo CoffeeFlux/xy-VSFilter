@@ -19,6 +19,11 @@ static unsigned sequence = 0, empty_events[2] = {}, change_events[2] = {};
 static void check(bool value, const char* message) {
     if(!value) throw std::runtime_error(message);
 }
+static bool same_identity(const CString& a,const CString& b) {
+    if(a.GetLength()!=b.GetLength())return false;
+    for(int i=0;i<a.GetLength();++i)if(a[i]!=b[i])return false;
+    return true;
+}
 template<class String> static void units(const String& value) {
     printf(" %d",value.GetLength());
     for(int i=0;i<value.GetLength();i++) printf(" %04x",unsigned(static_cast<uint16_t>(value[i])));
@@ -589,6 +594,37 @@ static void text_plan_lifecycle() {
     printf("text-plan-stage text-plan-raw-independent\n");doc.Dump("text-plan-raw-independent");
 }
 
+static void setstr_plan_lifecycle() {
+    TraceDocument doc(0);STSStyle japanese;japanese.charSet=SHIFTJIS_CHARSET;named_add(doc,L"SetStrJapanese",japanese);
+    const wchar_t bytes[]={0x82,0xa0};
+    doc.AddSTSEntryOnly(CStringW(L"initial wide"),true,0,10,CString(L"SetStrJapanese"),CString(L"actor"),CString(L"effect"),CRect(1,2,3,4),2,7);
+    doc.AddSTSEntryOnly(CStringW(bytes,2),false,10,20,CString(L"SetStrJapanese"),CString(L"actor2"),CString(L"effect2"),CRect(5,6,7,8),3,9);
+    const STSEntry original[]={doc.Entry(0),doc.Entry(1)};
+    CStringW expectedText[]={original[0].str,original[1].str};
+    doc.CreateSegments();doc.Animate(0);const auto segments=segment_snapshot(doc);const unsigned callbacks=change_events[0];
+    auto update=[&](const char* stage,int index,const CStringW& input,bool inputUnicode,const CStringW& expected){
+        doc.SetStr(index,input,inputUnicode);expectedText[index]=expected;
+        for(int i=0;i<2;++i){const STSEntry actual=doc.Entry(i),old=original[i];
+            check(same_identity(actual.str,expectedText[i])&&actual.fUnicode==old.fUnicode,"SetStr replaces only selected text and retains both storage flags");
+            check(same_identity(actual.style,old.style)&&same_identity(actual.actor,old.actor)&&same_identity(actual.effect,old.effect)
+                &&actual.marginRect==old.marginRect&&actual.layer==old.layer&&actual.start==old.start&&actual.end==old.end&&actual.readorder==old.readorder,"SetStr retains complete non-text payload");}
+        check(change_events[0]==callbacks,"SetStr does not notify");require_same_segments(doc,segments,stage);
+        printf("setstr-stage %s\n",stage);doc.Dump(stage);
+        const STSEntry actual=doc.Entry(index);printf("setstr-value %s index=%d unicode=%d",stage,index,actual.fUnicode);units(actual.str);printf("\n");
+    };
+    const CStringW wideInput(L"\x3042\r\nZ"),wideExpected(L"\x3042\r\\NZ");
+    CStringW packedInput(bytes,2);packedInput+=L"\r\nZ";
+    CStringW packedExpected(bytes,2);packedExpected+=L"\r\\NZ";
+    update("setstr-same-wide",0,wideInput,true,wideExpected);
+    update("setstr-packed-to-wide",0,packedInput,false,wideExpected);
+    update("setstr-same-packed",1,packedInput,false,packedExpected);
+    update("setstr-wide-to-packed",1,wideInput,true,packedExpected);
+    // Exactly one skipped LF publishes the known former terminator. No getter
+    // conversion or callback is invoked on this raw NUL-tail entry afterward.
+    const wchar_t tail[]={10,0,10},expectedTail[]={92,78,0,10,0};
+    update("setstr-nul-tail",0,CStringW(tail,3),true,CStringW(expectedTail,5));
+}
+
 static void named_style_lifecycle() {
     TraceDocument source(0),destination(1);
     const STSStyle first=named_value(1),second=named_value(2),third=named_value(3);
@@ -680,11 +716,6 @@ static void named_style_exports() {
     SavedFiles absent(L"document-lifecycle-no-sidecar.srt");
     check(document.SaveAs(absent.name,EXTSRT,25.0,CTextFile::UTF8),"no mapped style SaveAs");
     saved_bytes(absent.name,"srt-no-map",true);saved_bytes(absent.name+L".style","srt-no-map-sidecar",false);
-}
-static bool same_identity(const CString& a,const CString& b) {
-    if(a.GetLength()!=b.GetLength())return false;
-    for(int i=0;i<a.GetLength();++i)if(a[i]!=b[i])return false;
-    return true;
 }
 static void identity_stage(TraceDocument& doc,const char* stage,const CString& name,const CString& path) {
     check(same_identity(doc.Name(),name)&&same_identity(doc.Path(),path),"complete raw identity values");
@@ -1400,6 +1431,7 @@ int main() {
         printf("environment ansi=%u oem=%u\n",GetACP(),GetOEMCP());
         default_style_lifecycle();
         text_plan_lifecycle();
+        setstr_plan_lifecycle();
         preparation_lifecycle();
         copy_selected_lifecycle();
         metadata_lifecycle();

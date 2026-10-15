@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-//! Owned DOC05 text-operation selection from pinned STS.cpp:3070–3116.
+//! Owned DOC05 text-operation selection from pinned STS.cpp:3070–3127.
 //!
 //! Native adapters perform SSA/codepage conversion and tag removal using the
 //! returned owned raw units, without any Rust borrow or generation guard.
 //! Conversion commits text before the requested flag; getters never mutate.
-//! SetStr's CString LF preparation is deliberately outside this module.
+//! SetStr applies the admitted LF-only helper before conditional charset
+//! selection, retains CR and commits text only without changing the stored flag.
 //! Native allocation/partial-failure, codepage quirks and allocator reentry
 //! remain qualified runtime dependencies, not certified by plan selection.
 use crate::document::{Document, ResolvedStyle, StyleResolutionError};
@@ -80,6 +81,60 @@ pub fn plan(document: &Document, index: u32, mode: Mode) -> Result<Plan, StyleRe
         has_style,
         charset,
         text: entry.text.clone(),
+    })
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum WriteError {
+    Entry(StyleResolutionError),
+    Preparation(crate::document_prepare::Error),
+}
+
+/// Pinned SetStr entry access precedes LF-only replacement, which precedes any
+/// conditional charset resolution. Equal input/stored flags still prepare text
+/// but skip the resolver; this is Keep, never NoOp. Native converters remain
+/// outside the loan, and the caller commits text ONLY (retaining current flag).
+/// Temporary destruction and allocation/exception timing remain qualified.
+pub fn plan_write(
+    document: &Document,
+    index: u32,
+    input_unicode: bool,
+    raw_units: &[u16],
+) -> Result<Plan, WriteError> {
+    let entry = document
+        .entries()
+        .get(index as usize)
+        .ok_or(WriteError::Entry(StyleResolutionError::EntryIndex))?;
+    let text = crate::document_prepare::replace_lf(raw_units).map_err(WriteError::Preparation)?;
+    let target_unicode = entry.unicode;
+    if input_unicode == target_unicode {
+        return Ok(Plan {
+            action: Action::Keep,
+            target_unicode,
+            strip_tags: false,
+            has_style: false,
+            charset: 0,
+            text,
+        });
+    }
+    let (has_style, charset) = match document
+        .resolve_entry_style(index)
+        .map_err(WriteError::Entry)?
+    {
+        ResolvedStyle::Null => (false, -1),
+        ResolvedStyle::Value(style) => (true, style.char_set),
+    };
+    Ok(Plan {
+        action: if target_unicode {
+            Action::ToWide
+        } else {
+            Action::ToPacked
+        },
+        target_unicode,
+        strip_tags: false,
+        has_style,
+        charset,
+        text,
     })
 }
 
@@ -238,5 +293,96 @@ mod tests {
         assert!(!operation.has_style);
         assert_eq!(operation.charset, -1);
         assert_eq!(operation.action, Action::Keep);
+    }
+    #[test]
+    fn write_plan_equal_flags_prepare_raw_units_without_style_resolution() {
+        for unicode in [false, true] {
+            let mut document = Document::default();
+            document.add_prepared(entry(unicode), AddMode::Add).unwrap();
+            document.feedback_animation(0, true).unwrap();
+            let before = document.clone();
+            let raw = [0xd800, 13, 10, 0, 0xdcff];
+            let operation = plan_write(&document, 0, unicode, &raw).unwrap();
+            assert_eq!(
+                operation,
+                Plan {
+                    action: Action::Keep,
+                    target_unicode: unicode,
+                    strip_tags: false,
+                    has_style: false,
+                    charset: 0,
+                    text: vec![0xd800, 13, 92, 78, 0, 0xdcff]
+                }
+            );
+            assert_eq!(document, before);
+            assert_eq!(
+                plan_write(&document, 0, unicode, &[]).unwrap().text,
+                Vec::<u16>::new()
+            );
+        }
+    }
+    #[test]
+    fn write_plan_conversion_targets_stored_encoding_and_preserves_owner() {
+        for (stored, input, action) in [
+            (true, false, Action::ToWide),
+            (false, true, Action::ToPacked),
+        ] {
+            let mut document = supplied();
+            document.add_prepared(entry(stored), AddMode::Add).unwrap();
+            document.feedback_animation(0, true).unwrap();
+            let before = document.clone();
+            let mut operation = plan_write(&document, 0, input, &[65, 13, 10, 66]).unwrap();
+            assert_eq!(operation.action, action);
+            assert_eq!(operation.target_unicode, stored);
+            assert!(!operation.strip_tags);
+            assert!(operation.has_style);
+            assert_eq!(operation.charset, 128);
+            assert_eq!(operation.text, [65, 13, 92, 78, 66]);
+            operation.text[0] = 90;
+            assert_eq!(document, before);
+            assert_eq!(document.entries()[0].unicode, stored);
+        }
+    }
+    #[test]
+    fn write_plan_error_precedence_entry_then_tail_then_charset() {
+        let mut document = Document::default();
+        let unresolved = [10, 10, 0, 10, 10];
+        assert_eq!(
+            plan_write(&document, 0, false, &unresolved),
+            Err(WriteError::Entry(StyleResolutionError::EntryIndex))
+        );
+        document.add_prepared(entry(true), AddMode::Add).unwrap();
+        let before = document.clone();
+        assert_eq!(
+            plan_write(&document, 0, false, &unresolved),
+            Err(WriteError::Preparation(
+                crate::document_prepare::Error::UnresolvedTail
+            ))
+        );
+        assert_eq!(
+            plan_write(&document, 0, false, &[10]),
+            Err(WriteError::Entry(StyleResolutionError::Uninitialized))
+        );
+        assert_eq!(
+            plan_write(&document, 0, true, &[10]).unwrap().action,
+            Action::Keep
+        );
+        assert_eq!(document, before);
+    }
+    #[test]
+    fn write_plan_bounded_skipped_lf_retains_initialized_tail_and_null_tag() {
+        let mut document = supplied();
+        document.add_prepared(entry(true), AddMode::Add).unwrap();
+        let before = document.clone();
+        let operation = plan_write(&document, 0, true, &[88, 10, 10, 0, 10, 89]).unwrap();
+        assert_eq!(operation.text, [88, 92, 78, 92, 78, 0, 10, 89, 0]);
+        assert_eq!(document, before);
+        // Safe-only present-null release model; no native dereference/history.
+        document.named_styles_mut().insert(vec![65], None);
+        let operation = plan_write(&document, 0, false, &[13, 10]).unwrap();
+        assert_eq!(operation.action, Action::ToWide);
+        assert!(!operation.has_style);
+        assert_eq!(operation.charset, -1);
+        assert_eq!(operation.text, [13, 92, 78]);
     }
 }

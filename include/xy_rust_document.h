@@ -191,6 +191,13 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_add_prepared_v1(uint64_t, uint32
 // Native charset conversion/SSA stripping remains outside admission; conversion
 // commit uses existing prepared text setter. Missing style carries charset-1.
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_text_plan_v1(uint64_t owner,uint32_t index,uint32_t mode,uint8_t*,size_t);
+// Read-only SetStr plan: input flag is 0/1, raw input is UTF-16LE. Output8
+// receives the same packet32 snapshot. Entry flag is read before LF-only
+// preparation; CR remains. Target is the stored flag. Equal flags return Keep,
+// has_style0/charset0, bypassing native charset assertion/conversion. Differing
+// flags resolve charset after preparation. Commit text with flag -1 to retain
+// stored Unicode state. No generation guard or mutation is performed here.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_set_text_plan_v1(uint64_t owner,uint32_t index,uint32_t input_unicode,const uint8_t*,size_t,uint8_t*,size_t);
 // Prepared text/style are raw UTF-16LE (even byte lengths). No native conversion,
 // normalization, style-map decisions or implicit rebuild. Flag -1 retains stored
 // Unicode mode, 0 stores false, 1 true, after caller's native preparation.
