@@ -197,6 +197,17 @@ def run_facade(out, generate_only):
     save()
 
 
+def owner_style_declarations(pinned_header, current_header):
+    """Exact real value declarations; never a layout-compatible surrogate."""
+    declarations = []
+    for signature in ("struct STSStyleBase", "struct STSStyle: public STSStyleBase"):
+        declaration = function(pinned_header, signature) + ";"
+        if function(current_header, signature) + ";" != declaration:
+            raise RuntimeError("Owner probe requires unchanged " + signature)
+        declarations.append(declaration)
+    return "\n".join(declarations)
+
+
 def run_owner(out, generate_only):
     """Real ATL records + exact experimental wrapper versus pinned storage tails."""
     out.mkdir(parents=True, exist_ok=True)
@@ -209,11 +220,13 @@ def run_owner(out, generate_only):
     runner = Path(__file__).resolve()
     paths = ["src/subtitles/STS.h", "src/subtitles/STS.cpp", "src/subtitles/RustDocumentOwner.h",
              "include/xy_rust_document.h", "tools/compat/document_owner_probe.cpp",
+             "src/subtitles/flyweight_base_types.h", "src/subtitles/mru_cache.h",
              "Cargo.toml", "Cargo.lock", "rust/compat/Cargo.toml", "rust/ffi/Cargo.toml"]
     paths += [str(p.relative_to(ROOT)) for parent in (ROOT / "rust/compat/src", ROOT / "rust/ffi/src")
               for p in parent.rglob("*.rs")]
     inputs = {path: (ROOT / path).read_bytes() for path in paths}
-    pinned_paths = ["src/subtitles/STS.h", "src/subtitles/STS.cpp", "src/subtitles/RTS.cpp"]
+    pinned_paths = ["src/subtitles/STS.h", "src/subtitles/STS.cpp", "src/subtitles/RTS.cpp",
+                    "src/subtitles/flyweight_base_types.h", "src/subtitles/mru_cache.h"]
     pinned_bytes = {path: source(path) for path in pinned_paths}
     report.update(runner_sha256=sha(runner.read_bytes()),
                   candidate_commit=subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, timeout=60).decode().strip(),
@@ -231,11 +244,25 @@ def run_owner(out, generate_only):
     segment = function(pinned_header, "class STSSegment") + ";"
     if function(decode(inputs["src/subtitles/STS.h"]), "class STSSegment") + ";" != segment:
         raise RuntimeError("Experimental owner probe requires unchanged STSSegment value declaration")
-    # Style adapter templates are intentionally uninstantiated in this storage
-    # probe. The linked full-class lifecycle gate supplies actual STSStyle/FwRect.
-    (out / "STS.h").write_bytes(("#pragma once\nstruct STSStyle;\n" + entry + "\n" + segment + "\n").encode())
+    styles = owner_style_declarations(pinned_header, decode(inputs["src/subtitles/STS.h"]))
+    report["style_dependency_scope"] = {
+        "declarations": ["STSStyleBase", "STSStyle"],
+        "declaration_sha256": sha(styles.encode()),
+        "fwrect_header": "src/subtitles/flyweight_base_types.h",
+        "cstring_type": "Actual MFC CString selected by afx.h before ATL headers; prior isolated ATL-alias evidence is not relabeled",
+        "runtime": "Static MFC and static CRT (/MT, no _AFXDLL); actual included SDK/repository headers captured by /showIncludes",
+        "limits": "Compile dependencies only; no new style lifecycle or full-class parity claim",
+    }
+    for dependency in ("src/subtitles/flyweight_base_types.h", "src/subtitles/mru_cache.h"):
+        if decode(inputs[dependency]) != decode(pinned_bytes[dependency]):
+            raise RuntimeError("Owner probe requires unchanged style dependency: " + dependency)
+    (out / "STS.h").write_bytes(("#pragma once\n#include \"flyweight_base_types.h\"\n" + styles + "\n" + entry + "\n" + segment + "\n").encode())
     shutil.copyfile(ROOT / "src/subtitles/RustDocumentOwner.h", out / "RustDocumentOwner.h")
-    shutil.copyfile(ROOT / "tools/compat/document_owner_probe.cpp", out / "document_owner_probe.cpp")
+    probe = decode(inputs["tools/compat/document_owner_probe.cpp"])
+    if probe.count("#include <windows.h>") != 1:
+        raise RuntimeError("Owner probe MFC include seam changed")
+    probe = probe.replace("#include <windows.h>", "#include <afx.h>\n#include <afxwin.h>")
+    (out / "document_owner_probe.cpp").write_bytes(probe.encode())
     reference = ["""class PinnedOwner { public:
  enum {TIME,FRAME}; int m_mode=TIME,m_subtitleType=0; unsigned callbacks=0;
  CAtlArray<STSEntry> m_entries; CAtlArray<STSSegment> m_segments;
@@ -300,7 +327,7 @@ def run_owner(out, generate_only):
                   complete_reference_methods=complete_signatures,
                   extracted_experimental_facade_methods=facade_signatures,
                   seams=["Add/AddSTSEntryOnly from initialized record/readorder assignment; native preparation bypassed",
-                         "Copy storage tail and Empty arrays tail only; style adapter templates uninstantiated, native style/metadata lifecycle excluded",
+                         "Copy storage tail and Empty arrays tail only; actual unchanged style declarations and FwRect dependencies compile adapter templates, native style/metadata lifecycle excluded",
                          "SetStr prepared assignment and optional ConvertUnicode flag assignment only",
                          "Actual AddStyle entry-rename loop; style map/duplicate naming excluded",
                          "RTS animation OR assignment and MicroDVD correction with precomputed bound",
@@ -346,8 +373,10 @@ def run_owner(out, generate_only):
     exe = out / "document_owner_probe.exe"
     command = [compiler, "/nologo", "/Bv", "/showIncludes", "/std:c++17", "/EHsc", "/O2", "/Oi", "/Ob2", "/MT", "/fp:precise",
                "/DNDEBUG", "/DUNICODE", "/D_UNICODE", "/DNOMINMAX", "/DWINVER=0x0601", "/D_WIN32_WINNT=0x0601",
+               "/D_ATL_CSTRING_EXPLICIT_CONSTRUCTORS",
                "/DXY_VSFILTER_RUST_TEXT", "/DXY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL", "/D_CRT_SECURE_NO_WARNINGS",
-               "/I" + str(ROOT / "include"), str(out / "document_owner_probe.cpp"), str(library), *shlex.split(match.group(1)),
+               "/I" + str(ROOT / "include"), "/I" + str(ROOT / "src/subtitles"),
+               "/I" + str(ROOT / "src/thirdparty/boost_lib"), str(out / "document_owner_probe.cpp"), str(library), *shlex.split(match.group(1)),
                "/Fe:" + str(exe), "/Fo:" + str(out / "document_owner_probe.obj"), "/link", "/VERBOSE:LIB"]
     report["build_command"] = command
     save()
@@ -398,6 +427,7 @@ def run_owner(out, generate_only):
     stable = (sha(runner.read_bytes()) == report["runner_sha256"]
               and all(sha((ROOT / p).read_bytes()) == value for p, value in report["candidate_source_sha256"].items())
               and all(sha((out / p).read_bytes()) == value for p, value in report["generated_sha256"].items())
+              and all(sha(Path(p).read_bytes()) == value for p, value in headers.items())
               and sha(exe.read_bytes()) == report["binary_sha256"]
               and sha(library.read_bytes()) == report["static_library_sha256"]
               and subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, timeout=60).decode().strip() == report["candidate_commit"])

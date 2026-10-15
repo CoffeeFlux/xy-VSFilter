@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-//! SaveAs body row formatting from pinned STS.cpp:3460–3538.
-//! Native retains text/newline preparation, numeric casts, headers, style rows,
-//! iteration/skip policy, file writes and codepages. Raw %s fields terminate at
+//! SaveAs body rows and fixed sections from pinned STS.cpp.
+//! Native retains text/newline preparation, numeric casts, style rows,
+//! iteration/skip and section emission policy, file writes and codepages. Raw %s fields terminate at
 //! the first NUL; no Unicode normalization or LF processing occurs here.
 use crate::document::PreparedEntry;
 use alloc::vec::Vec;
@@ -18,6 +18,7 @@ pub struct Numbers {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Error {
     InvalidFormat,
+    InvalidSection,
     CountOverflow,
 }
 fn checked_len(current: usize, added: usize) -> Result<usize, Error> {
@@ -166,6 +167,108 @@ pub fn format_row(format: u32, n: Numbers, entry: &PreparedEntry) -> Result<Vec<
     }
     Ok(r.0)
 }
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[repr(u32)]
+pub enum Section {
+    Header = 0,
+    Events = 1,
+    Footer = 2,
+    SidecarHeader = 3,
+}
+const SAMI_HEADER: &str = concat!(
+    "<SAMI>\n<HEAD>\n<STYLE TYPE=\"text/css\">\n<!--\n",
+    "P {margin-left: 16pt; margin-right: 16pt; margin-bottom: 16pt; margin-top: 16pt;\n",
+    "   text-align: center; font-size: 18pt; font-family: arial; font-weight: bold; color: #f0f0f0;}\n",
+    ".UNKNOWNCC {Name:Unknown; lang:en-US; SAMIType:CC;}\n-->\n</STYLE>\n</HEAD>\n\n<BODY>\n"
+);
+const SSA_STYLE_HEADER: &str = "[V4 Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, TertiaryColour, BackColour, Bold, Italic, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding\n";
+const ASS_STYLE_HEADER: &str = "[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n";
+fn resolution(row: &mut Row, width: i32, height: i32) -> Result<(), Error> {
+    row.literal("PlayResX: ")?;
+    row.integer(width, 0)?;
+    row.literal("\nPlayResY: ")?;
+    row.integer(height, 0)?;
+    row.literal("\n")
+}
+/// Fixed sections from pinned SaveAs. The caller retains emission order and
+/// the live entry-count condition for Events; style rows remain native.
+pub fn format_section(
+    format: u32,
+    section: u32,
+    width: i32,
+    height: i32,
+    collisions: i32,
+    scaled: bool,
+) -> Result<Vec<u16>, Error> {
+    if format >= 14 {
+        return Err(Error::InvalidFormat);
+    }
+    if section >= 4 {
+        return Err(Error::InvalidSection);
+    }
+    let mut r = Row(Vec::new());
+    match section {
+        0 if format == 2 => r.literal(SAMI_HEADER)?,
+        0 if format == 4 || format == 5 => {
+            r.literal("[Script Info]\n")?;
+            r.literal(if format == 4 {
+                "; This is a Sub Station Alpha v4 script.\n"
+            } else {
+                "; This is an Advanced Sub Station Alpha v4+ script.\n"
+            })?;
+            r.literal(concat!(
+                "; For Sub Station Alpha info and downloads,\n",
+                "; go to http://www.eswat.demon.co.uk/\n",
+                "; or email kotus@eswat.demon.co.uk\n; \n"
+            ))?;
+            if format == 5 {
+                r.literal(concat!("; Advanced Sub Station Alpha script format developed by #Anime-Fansubs@EfNET\n",
+                    "; http://www.anime-fansubs.org\n; \n",
+                    "; For additional info and downloads go to http://gabest.org/\n",
+                    "; or email gabest@freemail.hu\n; \n"))?;
+            }
+            r.literal("; Note: This file was saved by Subresync.\n; \n")?;
+            r.literal(if format == 4 {
+                "ScriptType: v4.00\n"
+            } else {
+                "ScriptType: v4.00+\n"
+            })?;
+            r.literal(if collisions == 0 {
+                "Collisions: Normal\n"
+            } else {
+                "Collisions: Reverse\n"
+            })?;
+            if format == 5 && scaled {
+                r.literal("ScaledBorderAndShadow: Yes\n")?;
+            }
+            resolution(&mut r, width, height)?;
+            r.literal("Timer: 100.0000\n\n")?;
+            r.literal(if format == 4 {
+                SSA_STYLE_HEADER
+            } else {
+                ASS_STYLE_HEADER
+            })?;
+        }
+        1 if format == 4 || format == 5 => {
+            r.literal("\n[Events]\n")?;
+            r.literal(if format == 4 {
+                "Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n"
+            } else {
+                "Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text\n"
+            })?;
+        }
+        2 if format == 2 => r.literal("</BODY>\n</SAMI>\n")?,
+        3 => {
+            r.literal("ScriptType: v4.00+\n")?;
+            resolution(&mut r, width, height)?;
+            r.literal("\n")?;
+            r.literal(ASS_STYLE_HEADER)?;
+        }
+        _ => {}
+    }
+    Ok(r.0)
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -255,6 +358,84 @@ mod tests {
         expected.extend(",-007,12345,-013,".encode_utf16());
         expected.extend([0xdfff, 44, 0xd800, 13, 10, 10]);
         assert_eq!(row, expected);
+    }
+
+    fn section_text(
+        format: u32,
+        section: u32,
+        width: i32,
+        height: i32,
+        collisions: i32,
+        scaled: bool,
+    ) -> alloc::string::String {
+        alloc::string::String::from_utf16(
+            &format_section(format, section, width, height, collisions, scaled).unwrap(),
+        )
+        .unwrap()
+    }
+    #[test]
+    fn exact_script_headers_and_signed_resolution() {
+        let ssa = concat!(
+            "[Script Info]\n; This is a Sub Station Alpha v4 script.\n",
+            "; For Sub Station Alpha info and downloads,\n; go to http://www.eswat.demon.co.uk/\n",
+            "; or email kotus@eswat.demon.co.uk\n; \n; Note: This file was saved by Subresync.\n; \n",
+            "ScriptType: v4.00\nCollisions: Normal\nPlayResX: -2147483648\nPlayResY: 2147483647\nTimer: 100.0000\n\n",
+            "[V4 Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, TertiaryColour, BackColour, Bold, Italic, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding\n"
+        );
+        assert_eq!(section_text(4, 0, i32::MIN, i32::MAX, 0, true), ssa);
+        let ass = concat!(
+            "[Script Info]\n; This is an Advanced Sub Station Alpha v4+ script.\n",
+            "; For Sub Station Alpha info and downloads,\n; go to http://www.eswat.demon.co.uk/\n",
+            "; or email kotus@eswat.demon.co.uk\n; \n",
+            "; Advanced Sub Station Alpha script format developed by #Anime-Fansubs@EfNET\n",
+            "; http://www.anime-fansubs.org\n; \n; For additional info and downloads go to http://gabest.org/\n",
+            "; or email gabest@freemail.hu\n; \n; Note: This file was saved by Subresync.\n; \n",
+            "ScriptType: v4.00+\nCollisions: Reverse\nScaledBorderAndShadow: Yes\nPlayResX: 0\nPlayResY: -1\nTimer: 100.0000\n\n",
+            "[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n"
+        );
+        assert_eq!(section_text(5, 0, 0, -1, -2, true), ass);
+        assert_eq!(
+            section_text(5, 0, 0, -1, 1, false),
+            ass.replace("ScaledBorderAndShadow: Yes\n", "")
+        );
+        assert_eq!(
+            section_text(4, 0, i32::MIN, i32::MAX, -1, false),
+            ssa.replace("Collisions: Normal", "Collisions: Reverse")
+        );
+    }
+    #[test]
+    fn fixed_sami_events_sidecar_and_empty_sections() {
+        assert_eq!(section_text(2,0,0,0,0,false),concat!(
+            "<SAMI>\n<HEAD>\n<STYLE TYPE=\"text/css\">\n<!--\n",
+            "P {margin-left: 16pt; margin-right: 16pt; margin-bottom: 16pt; margin-top: 16pt;\n",
+            "   text-align: center; font-size: 18pt; font-family: arial; font-weight: bold; color: #f0f0f0;}\n",
+            ".UNKNOWNCC {Name:Unknown; lang:en-US; SAMIType:CC;}\n-->\n</STYLE>\n</HEAD>\n\n<BODY>\n"));
+        assert_eq!(section_text(2, 2, 0, 0, 0, false), "</BODY>\n</SAMI>\n");
+        assert_eq!(section_text(4,1,0,0,0,false),"\n[Events]\nFormat: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n");
+        assert_eq!(section_text(5,1,0,0,0,false),"\n[Events]\nFormat: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text\n");
+        let sidecar=concat!("ScriptType: v4.00+\nPlayResX: -1\nPlayResY: 0\n\n",
+            "[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n");
+        for format in 0..14 {
+            assert_eq!(section_text(format, 3, -1, 0, 7, true), sidecar);
+            for section in 0..3 {
+                if !matches!(
+                    (format, section),
+                    (2, 0) | (2, 2) | (4, 0) | (5, 0) | (4, 1) | (5, 1)
+                ) {
+                    assert!(format_section(format, section, 0, 0, 0, false)
+                        .unwrap()
+                        .is_empty());
+                }
+            }
+        }
+        assert_eq!(
+            format_section(14, 0, 0, 0, 0, false),
+            Err(Error::InvalidFormat)
+        );
+        assert_eq!(
+            format_section(0, 4, 0, 0, 0, false),
+            Err(Error::InvalidSection)
+        );
     }
     #[test]
     fn native_string_count_bound_without_large_allocation() {

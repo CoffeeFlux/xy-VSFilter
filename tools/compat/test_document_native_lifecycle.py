@@ -27,6 +27,16 @@ def body_rows():
             rows.append(f"saved-file {name} exists=1 bytes={len(payload)} ".encode()+payload.hex(" ").encode())
     return b"\n".join(rows+[b"save-body-stage frame-after"])+b"\n"
 
+def section_rows():
+    rows=[b"save-sections-stage before"];values=lifecycle.save_section_bytes()
+    for label in ("sections-ssa","sections-ass","sections-smi","sections-srt"):
+        rows.append(f"save-sections-export {label}".encode())
+        for name in (label,label+"-sidecar"):
+            if name not in values:rows.append(f"saved-file {name} exists=0".encode());continue
+            payload=values[name]+(b"Style: Default,Arial,initialized native row\r\n" if name.endswith("sidecar") else b"")
+            rows.append(f"saved-file {name} exists=1 bytes={len(payload)} ".encode()+payload.hex(" ").encode())
+    return b"\n".join(rows+[b"save-sections-stage after"])+b"\n"
+
 TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
          b"segment 0 10 20\ncallback changed\ntext 0041\n"
          + b"".join(b"named-stage " + stage + b"\n" for stage in (
@@ -109,7 +119,7 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
          + b"".join(b"style-rename-segments "+row.split()[1]+b" count=2 animated=1\n" for row in setstr_plan_rows()[::2])
          + b"\n".join(open_order_rows()) + b"\n"
          + b"\n".join(frame_search_rows()) + b"\n"
-         + body_rows()
+         + body_rows() + section_rows()
          + b"saved-file ssa exists=1 bytes=1 41\nsaved-file ass exists=1 bytes=1 41\n"
          + b"saved-file srt exists=1 bytes=1 41\nsaved-file srt-sidecar exists=1 bytes=1 41\n"
          + b"saved-file ssa-sidecar exists=0\nsaved-file ass-sidecar exists=0\n"
@@ -301,13 +311,23 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
             compare_traces([truncated] * 4, 64)
 
     def test_legacy_trace_requires_explicit_named_stage_opt_out(self):
-        legacy = b"\n".join(line for line in TRACE.split(b"\n") if not (line.startswith(b"named-stage ") or (line.startswith(b"saved-file ") and not line.startswith(b"saved-file body-"))))
+        legacy = b"\n".join(line for line in TRACE.split(b"\n") if not (line.startswith(b"named-stage ") or (line.startswith(b"saved-file ") and not line.startswith((b"saved-file body-",b"saved-file sections-")))))
         with self.assertRaises(ValueError):
             compare_traces([legacy] * 4, 64)
         compare_traces([legacy] * 4, 64, require_named_stages=False)
         changed = legacy.replace(b"0041,0000,0042", b"0041,0000,0043")
         with self.assertRaises(ValueError):
             compare_traces([legacy, legacy, changed, changed], 64, require_named_stages=False)
+
+    def test_fixed_sections_exact_bytes_and_archival_opt_out(self):
+        legacy=b"\n".join(row for row in TRACE.split(b"\n") if not row.startswith((b"save-sections-",b"saved-file sections-")))
+        with self.assertRaises(ValueError):compare_traces([legacy]*4,64)
+        compare_traces([legacy]*4,64,require_save_sections_stages=False)
+        for old,new in ((b"save-sections-export sections-ass\n",b""),
+                        (b"saved-file sections-smi exists=1 bytes=",b"saved-file sections-smi exists=1 bytes=1")):
+            with self.assertRaises(ValueError):compare_traces([TRACE.replace(old,new)]*4,64)
+        changed=TRACE.replace(b"43 6f 6c 6c 69 73 69 6f 6e 73 3a 20 52",b"43 6f 6c 6c 69 73 69 6f 6e 73 3a 20 4e")
+        with self.assertRaises(ValueError):compare_traces([changed]*4,64)
 
     def test_save_body_bytes_and_archival_opt_out(self):
         legacy=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith((b"save-body-",b"saved-file body-")))

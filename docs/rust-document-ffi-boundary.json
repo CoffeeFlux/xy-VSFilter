@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "scope": "Experimental persistent document containers/styles/identity/interpretation/scriptlayout/initializedmetadata; defaultproduction unchanged",
-  "measured_base_commit": "30d00248814375883ab42841c4e5f6001ce88e96",
+  "measured_base_commit": "e5ff50f0f3259911ac10d659ace4d31d740ef7a0",
   "working_tree_source_hashes": true,
   "core_unsafe": {
     "production_block": 0,
@@ -16,8 +16,8 @@
     "test_other": 0
   },
   "ffi_total": {
-    "production_block": 381,
-    "production_function": 317,
+    "production_block": 382,
+    "production_function": 318,
     "production_impl": 2,
     "production_trait": 0,
     "production_other": 0,
@@ -30,12 +30,12 @@
   "new_boundary_files": [
     {
       "path": "rust/ffi/src/document.rs",
-      "sha256": "09e0ca7831e3f0f28bf4d5b9ef3f17b62a9b0a1a51ed44121f3581aff443c955",
-      "physical_lines_including_tests": 5399,
-      "nonblank_code_lines_excluding_tests": 1792,
+      "sha256": "4a7b90b5dfa1038414a97932f13d02229ebec87b3d8e55e6b6215b0bff725d6d",
+      "physical_lines_including_tests": 5534,
+      "nonblank_code_lines_excluding_tests": 1828,
       "counts": {
-        "production_block": 55,
-        "production_function": 44,
+        "production_block": 56,
+        "production_function": 45,
         "production_impl": 0,
         "production_trait": 0,
         "production_other": 0,
@@ -47,402 +47,402 @@
       },
       "sites": [
         {
-          "line": 101,
+          "line": 100,
           "kind": "function",
           "test": false
         },
         {
-          "line": 119,
+          "line": 130,
           "kind": "block",
           "test": false
         },
         {
           "line": 141,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 161,
           "kind": "function",
           "test": false
         },
         {
-          "line": 196,
+          "line": 159,
           "kind": "block",
           "test": false
         },
         {
-          "line": 205,
+          "line": 182,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 202,
           "kind": "function",
           "test": false
         },
         {
-          "line": 217,
+          "line": 237,
           "kind": "block",
           "test": false
         },
         {
-          "line": 243,
+          "line": 246,
           "kind": "function",
           "test": false
         },
         {
-          "line": 272,
+          "line": 258,
           "kind": "block",
           "test": false
         },
         {
-          "line": 281,
+          "line": 284,
           "kind": "function",
           "test": false
         },
         {
-          "line": 304,
+          "line": 313,
           "kind": "block",
           "test": false
         },
         {
-          "line": 328,
+          "line": 322,
           "kind": "function",
           "test": false
         },
         {
-          "line": 362,
+          "line": 345,
           "kind": "block",
           "test": false
         },
         {
-          "line": 371,
+          "line": 369,
           "kind": "function",
           "test": false
         },
         {
-          "line": 432,
+          "line": 403,
           "kind": "block",
           "test": false
         },
         {
-          "line": 440,
+          "line": 412,
           "kind": "function",
           "test": false
         },
         {
-          "line": 450,
+          "line": 473,
           "kind": "block",
           "test": false
         },
         {
-          "line": 467,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 493,
+          "line": 481,
           "kind": "function",
           "test": false
         },
         {
-          "line": 505,
+          "line": 491,
           "kind": "block",
           "test": false
         },
         {
-          "line": 506,
+          "line": 508,
           "kind": "block",
           "test": false
         },
         {
-          "line": 557,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 565,
+          "line": 534,
           "kind": "function",
           "test": false
         },
         {
-          "line": 575,
+          "line": 546,
           "kind": "block",
           "test": false
         },
         {
-          "line": 584,
+          "line": 547,
           "kind": "block",
           "test": false
         },
         {
-          "line": 609,
+          "line": 598,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 606,
           "kind": "function",
           "test": false
         },
         {
-          "line": 633,
+          "line": 616,
           "kind": "block",
           "test": false
         },
         {
-          "line": 643,
-          "kind": "function",
-          "test": false
-        },
-        {
-          "line": 687,
+          "line": 625,
           "kind": "block",
           "test": false
         },
         {
-          "line": 725,
+          "line": 650,
           "kind": "function",
           "test": false
         },
         {
-          "line": 732,
+          "line": 674,
           "kind": "block",
           "test": false
         },
         {
-          "line": 742,
+          "line": 684,
           "kind": "function",
           "test": false
         },
         {
-          "line": 746,
+          "line": 728,
           "kind": "block",
           "test": false
         },
         {
-          "line": 768,
+          "line": 766,
           "kind": "function",
           "test": false
         },
         {
-          "line": 772,
+          "line": 773,
           "kind": "block",
           "test": false
         },
         {
-          "line": 789,
+          "line": 783,
           "kind": "function",
           "test": false
         },
         {
-          "line": 795,
+          "line": 787,
           "kind": "block",
           "test": false
         },
         {
-          "line": 840,
+          "line": 809,
           "kind": "function",
           "test": false
         },
         {
-          "line": 846,
+          "line": 813,
           "kind": "block",
           "test": false
         },
         {
-          "line": 889,
+          "line": 830,
           "kind": "function",
           "test": false
         },
         {
-          "line": 911,
+          "line": 836,
           "kind": "block",
           "test": false
         },
         {
-          "line": 927,
+          "line": 881,
           "kind": "function",
           "test": false
         },
         {
-          "line": 939,
+          "line": 887,
           "kind": "block",
           "test": false
         },
         {
-          "line": 982,
+          "line": 930,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1008,
+          "line": 952,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1028,
+          "line": 968,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1043,
+          "line": 980,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1073,
+          "line": 1023,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1087,
+          "line": 1049,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1094,
+          "line": 1069,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1112,
+          "line": 1084,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1139,
+          "line": 1114,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1157,
+          "line": 1128,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1164,
+          "line": 1135,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1178,
+          "line": 1153,
           "kind": "block",
           "test": false
         },
         {
           "line": 1180,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1215,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1227,
+          "line": 1198,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1251,
+          "line": 1205,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1267,
+          "line": 1219,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1295,
+          "line": 1221,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1310,
+          "line": 1256,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1325,
+          "line": 1268,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1332,
+          "line": 1292,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1350,
+          "line": 1308,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1357,
+          "line": 1336,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1351,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1379,
+          "line": 1366,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1386,
+          "line": 1373,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1409,
+          "line": 1391,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1431,
+          "line": 1398,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1537,
+          "line": 1420,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1544,
+          "line": 1427,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1554,
+          "line": 1450,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1562,
+          "line": 1472,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1580,
+          "line": 1578,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1596,
+          "line": 1585,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1615,
+          "line": 1595,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1649,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1688,
+          "line": 1603,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1719,
+          "line": 1621,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1637,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 1656,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1690,
           "kind": "block",
           "test": false
         },
@@ -452,47 +452,42 @@
           "test": false
         },
         {
-          "line": 1744,
+          "line": 1760,
           "kind": "block",
           "test": false
         },
         {
           "line": 1770,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1779,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1794,
+          "line": 1785,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1810,
+          "line": 1811,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1820,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1818,
+          "line": 1835,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1829,
+          "line": 1851,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1840,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1841,
+          "line": 1859,
           "kind": "block",
           "test": false
         },
@@ -502,64 +497,59 @@
           "test": false
         },
         {
-          "line": 1877,
+          "line": 1881,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1888,
-          "kind": "function",
-          "test": false
-        },
-        {
-          "line": 1895,
+          "line": 1882,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1913,
+          "line": 1911,
           "kind": "function",
+          "test": false
+        },
+        {
+          "line": 1918,
+          "kind": "block",
           "test": false
         },
         {
           "line": 1929,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1946,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1989,
           "kind": "function",
           "test": false
         },
         {
-          "line": 2006,
+          "line": 1936,
           "kind": "block",
           "test": false
         },
         {
-          "line": 2019,
+          "line": 1954,
           "kind": "function",
-          "test": true
+          "test": false
         },
         {
-          "line": 2023,
+          "line": 1970,
           "kind": "block",
-          "test": true
+          "test": false
         },
         {
-          "line": 2045,
+          "line": 1987,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 2030,
           "kind": "function",
-          "test": true
+          "test": false
         },
         {
-          "line": 2048,
+          "line": 2047,
           "kind": "block",
-          "test": true
+          "test": false
         },
         {
           "line": 2060,
@@ -572,32 +562,52 @@
           "test": true
         },
         {
-          "line": 2069,
+          "line": 2086,
           "kind": "function",
           "test": true
         },
         {
-          "line": 2073,
+          "line": 2089,
           "kind": "block",
           "test": true
         },
         {
-          "line": 2078,
+          "line": 2101,
+          "kind": "function",
+          "test": true
+        },
+        {
+          "line": 2105,
           "kind": "block",
           "test": true
         },
         {
-          "line": 2102,
+          "line": 2110,
+          "kind": "function",
+          "test": true
+        },
+        {
+          "line": 2114,
           "kind": "block",
           "test": true
         },
         {
-          "line": 2111,
+          "line": 2119,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 2143,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 2152,
           "kind": "block",
           "test": true
         }
       ],
-      "production_extern_functions": 65,
+      "production_extern_functions": 66,
       "operations": {
         "raw_shared_slice_construction": 1,
         "raw_mutable_slice_construction": 0,
@@ -652,9 +662,9 @@
     }
   ],
   "prior_ffi_production_blocks": 325,
-  "added_production_blocks": 56,
+  "added_production_blocks": 57,
   "added_unsafe_impls": 1,
-  "retired_native_owners": 18,
+  "retired_native_owners": 20,
   "retired_ffi_crossings": 0,
   "review": "Frozen AddStyle session working-tree measurement; input staging, typed owner/run/reply lifetimes, two-slot preflight and native exception cleanup reviewed. Changed-source Windows gates and allocation/reentry/native unresolved histories remain pending.",
   "remaining_contracts": [
@@ -2810,28 +2820,74 @@
         "test_trait": 0,
         "test_other": 0
       }
+    },
+    {
+      "status": "Superseded export-row source measurement; original counts and hashes preserved",
+      "measured_base_commit": "30d00248814375883ab42841c4e5f6001ce88e96",
+      "working_tree_source_hashes": true,
+      "source_hashes": {
+        "src/subtitles/STS.h": "969cd4ba558665f1c7b64a6dca66ba9d3befe21d4a60d36076750d70af028ee4",
+        "src/subtitles/STS.cpp": "6e2d19be1bbaf202ec806d656263f43e7fba0e52c2b16e395ac908ce1d0eb0ce",
+        "src/subtitles/RTS.cpp": "17acfde7157426a0a7e3ace4c71b37e3de16ba15300636d39d40de8a4e82f631",
+        "src/subtitles/USFSubtitles.cpp": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
+        "src/subtitles/SubtitleInputPin.cpp": "210276fdf0da5108dd3135b5934dc83015512604d0e8c12fde4d1f9a02ad105d",
+        "src/filters/transform/vsfilter/DirectVobSubFilter.cpp": "d6e056e9357234b9935fe3a8760655df8e1c3c0a5fa6a9954d343ea0234033af",
+        "src/filters/transform/vsfilter/xy_sub_filter.cpp": "680a96edc424c3a4324b514c5f74fded15857d3525b78d114c5394205dac8f9d",
+        "src/filters/transform/vsfilter/plugins.cpp": "38526740c55b4bc51642925d1ded688ebdd0ff26a01b5a5dd7f587add31df3da",
+        "src/subtitles/RustDocumentOwner.h": "7c37fe1e74a229482b3e01aec792115f5b94d5344d7125a5f8865b2edaa00553",
+        "rust/compat/src/document.rs": "bd0ed77e56e3925b178b9a67f319ae3d1ac26b31f2bf41b7c1f28b568c00782f",
+        "rust/ffi/src/document.rs": "09e0ca7831e3f0f28bf4d5b9ef3f17b62a9b0a1a51ed44121f3581aff443c955",
+        "rust/ffi/src/document_registry.rs": "bd06c8e520af84c62b219ea08909b03fdc570edfba38ea63b72c9b2df4f5fff7",
+        "include/xy_rust_document.h": "13d0e3a18f012f4775f43e503ddbf66bc829e72f111d6efc448b833520c398b4",
+        "tools/compat/document_native_lifecycle.cpp": "a31e830e08c0417e2bd253c11bbac31a3d9c0d72bc27eeda47b0c31f3d4dae17",
+        "tools/compat/document_native_lifecycle.py": "71b7cb3e8b3e37627193a138b64b1cb67a0a3e3e203d188b29160c642756aa93",
+        "tools/compat/summarize_evidence.py": "1d60148c793711ec63d1eac6fdb31848948a02bb29cb26c235bc667795297fa1",
+        "tools/compat/audit_document_access.py": "6f2d56cc7db8bd8585ee15753d96cf8efe531d10414ee1e2f2b9514737207fe2",
+        "rust/compat/src/document_unknown.rs": "e9d0af429f752cc4ee0d9c31077b37304e0124b3fc9fa0974250e84612c84360",
+        "rust/compat/src/lib.rs": "38774e9b861592f5b67b65aa232dac73abe6287f35b7a748cc2a31c9a189a08d",
+        "rust/compat/src/document_style_add.rs": "1a9948d942dd3cd56a3d3d8c0c897762101859944def56a4b81ce6ae122e27a6",
+        "rust/compat/src/document_style_copy.rs": "6040a9114f2a875d84d0948b3ee938a7aa2a6b28af7314cbe3bb2040a01e9094",
+        "rust/compat/src/document_text.rs": "1a37d8f948906561e12a9ed1f93837c956b6e092c96a5974c86a9b459b9e02d3",
+        "rust/compat/src/document_prepare.rs": "ceda12df96c3386652c39f6d58bee7fc0bb665f8cc18bd46b9cd41e14998bf03",
+        "rust/compat/src/document_open.rs": "107573591d5c6aa961265a6f9efaddcb134d8f096988f039bf35fc188e327ab8",
+        "rust/compat/src/document_search.rs": "08718e6eab59eb3922d1b59cfb576185f6d457ca1e57fc396cb2b2c7dca71c4c",
+        "rust/compat/src/timeline_search.rs": "1b4d6b7a8eee6329b8cf4e564fa6e1aecbc866cfea26a59e9436590e0fe054a5",
+        "rust/compat/src/document_export.rs": "80769b962c3eea2b05bd62866b210f8ddf3e89f22677ce75ee75474981e02123"
+      },
+      "ffi_total": {
+        "production_block": 381,
+        "production_function": 317,
+        "production_impl": 2,
+        "production_trait": 0,
+        "production_other": 0,
+        "test_block": 119,
+        "test_function": 4,
+        "test_impl": 0,
+        "test_trait": 0,
+        "test_other": 0
+      }
     }
   ],
-  "retired_native_owners_scope": "Eighteen native fields/containers opt-in only; defaultproduction retirementzero",
+  "retired_native_owners_scope": "Twenty native fields/containers opt-in only, including supplied LCID and layout size; default production retirement zero",
   "measurement_method": "Current audit_rust_boundary.inventory over actual Rust source, comments/literals masked and test items separated; counts overlap and do not establish soundness. Historical original snapshot retained.",
   "source_hashes": {
     "src/subtitles/STS.h": "969cd4ba558665f1c7b64a6dca66ba9d3befe21d4a60d36076750d70af028ee4",
-    "src/subtitles/STS.cpp": "6e2d19be1bbaf202ec806d656263f43e7fba0e52c2b16e395ac908ce1d0eb0ce",
+    "src/subtitles/STS.cpp": "1354fa6a648cd9827636196ba2b9fe7b0cb64bb3e970fa71ffbf0dfe50dfa1d8",
     "src/subtitles/RTS.cpp": "17acfde7157426a0a7e3ace4c71b37e3de16ba15300636d39d40de8a4e82f631",
     "src/subtitles/USFSubtitles.cpp": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
     "src/subtitles/SubtitleInputPin.cpp": "210276fdf0da5108dd3135b5934dc83015512604d0e8c12fde4d1f9a02ad105d",
     "src/filters/transform/vsfilter/DirectVobSubFilter.cpp": "d6e056e9357234b9935fe3a8760655df8e1c3c0a5fa6a9954d343ea0234033af",
     "src/filters/transform/vsfilter/xy_sub_filter.cpp": "680a96edc424c3a4324b514c5f74fded15857d3525b78d114c5394205dac8f9d",
     "src/filters/transform/vsfilter/plugins.cpp": "38526740c55b4bc51642925d1ded688ebdd0ff26a01b5a5dd7f587add31df3da",
-    "src/subtitles/RustDocumentOwner.h": "7c37fe1e74a229482b3e01aec792115f5b94d5344d7125a5f8865b2edaa00553",
+    "src/subtitles/RustDocumentOwner.h": "6be5144e9d14a80d73ce10cbb9b709ebd1645fd29d19e2f1ad8c9990c21c2a65",
     "rust/compat/src/document.rs": "bd0ed77e56e3925b178b9a67f319ae3d1ac26b31f2bf41b7c1f28b568c00782f",
-    "rust/ffi/src/document.rs": "09e0ca7831e3f0f28bf4d5b9ef3f17b62a9b0a1a51ed44121f3581aff443c955",
+    "rust/ffi/src/document.rs": "4a7b90b5dfa1038414a97932f13d02229ebec87b3d8e55e6b6215b0bff725d6d",
     "rust/ffi/src/document_registry.rs": "bd06c8e520af84c62b219ea08909b03fdc570edfba38ea63b72c9b2df4f5fff7",
-    "include/xy_rust_document.h": "13d0e3a18f012f4775f43e503ddbf66bc829e72f111d6efc448b833520c398b4",
-    "tools/compat/document_native_lifecycle.cpp": "a31e830e08c0417e2bd253c11bbac31a3d9c0d72bc27eeda47b0c31f3d4dae17",
-    "tools/compat/document_native_lifecycle.py": "71b7cb3e8b3e37627193a138b64b1cb67a0a3e3e203d188b29160c642756aa93",
-    "tools/compat/summarize_evidence.py": "1d60148c793711ec63d1eac6fdb31848948a02bb29cb26c235bc667795297fa1",
-    "tools/compat/audit_document_access.py": "6f2d56cc7db8bd8585ee15753d96cf8efe531d10414ee1e2f2b9514737207fe2",
+    "include/xy_rust_document.h": "656155cc782caf09bc143cbb834f555062e2222f06874fa21bb8557bf416dc6f",
+    "tools/compat/document_native_lifecycle.cpp": "8c5056b2a9d264f81ec6eb7e72cf5fe4e50d24d34fe873b9bc26a791271627c5",
+    "tools/compat/document_native_lifecycle.py": "91a76d41841c06977fc149f7e140fd412805b496bc8f0fc74962c7adddba9fba",
+    "tools/compat/summarize_evidence.py": "ffdab1eec53794d39833ece2e313d72ccd8d0ba4eab873d9d51dcc29d3723888",
+    "tools/compat/audit_document_access.py": "e501b139e67a1a20d56850c8c6955b37196f0ee3a54308562409654a85b4bf47",
     "rust/compat/src/document_unknown.rs": "e9d0af429f752cc4ee0d9c31077b37304e0124b3fc9fa0974250e84612c84360",
     "rust/compat/src/lib.rs": "38774e9b861592f5b67b65aa232dac73abe6287f35b7a748cc2a31c9a189a08d",
     "rust/compat/src/document_style_add.rs": "1a9948d942dd3cd56a3d3d8c0c897762101859944def56a4b81ce6ae122e27a6",
@@ -2841,7 +2897,11 @@
     "rust/compat/src/document_open.rs": "107573591d5c6aa961265a6f9efaddcb134d8f096988f039bf35fc188e327ab8",
     "rust/compat/src/document_search.rs": "08718e6eab59eb3922d1b59cfb576185f6d457ca1e57fc396cb2b2c7dca71c4c",
     "rust/compat/src/timeline_search.rs": "1b4d6b7a8eee6329b8cf4e564fa6e1aecbc866cfea26a59e9436590e0fe054a5",
-    "rust/compat/src/document_export.rs": "80769b962c3eea2b05bd62866b210f8ddf3e89f22677ce75ee75474981e02123"
+    "rust/compat/src/document_export.rs": "736f07ccf56ac634447be9e59e0daa36d4fc2f84ae19b5a732423e872649897e",
+    "tools/compat/check_decoder.py": "c69ec84024b61c5dfef886dbff6ef082fdb48faf834f3c5a518311a459309bfe",
+    "tools/compat/test_check_decoder_extraction.py": "42910fc317cc2d8457c9293363f29728c106a090ef4582a9ca653ea04cea15e1",
+    "tools/compat/document_windows_probe.py": "b9c43d5ddc1381f76d3462163d965998adc2d163d44daf4ade098ff8ed45be23",
+    "tools/compat/test_document_windows_probe.py": "58f0e825a5ade8fbf85f3e78600d3ffe27241147d1843e2e003d455fd25340e0"
   },
   "default_style_extension": {
     "set": "xy_vsfilter_document_set_default_style_v1 copies input and decodes before admission; validates handle before taking pending value; retired Option drops outside admission, including failure/Busy pending input.",
@@ -4665,5 +4725,31 @@
       "local": "239 core and 122 FFI tests; five core formatter cases cover six exact layouts, signed padding/time components, extreme integers, raw prefixes and architecture-aware size bound. FFI covers all14formats, snapshotbytes, overlap, lifetime and malformed wire/output refusal. Full Python suite: 141 tests, four skipped. Pinned formatting/Clippy, probe generation, unchanged default/RustText preprocessing and lexical access audit pass.",
       "windows": "Eight full SaveAs fixtures now capture exact main/sidecar bytes for TIME SRT/SUB/SMI/PSB/SSA/ASS, valid unsupported TXT, and FRAME SRT, including negative-start skips, numbering, NUL-bearing metadata and unchanged document state. Changed-source execution remains pending. Prior FRAME checkpoint 30d00248 compiles document probes on x86/x64."
     }
+  },
+  "export_section_extension": {
+    "scope": "Pure fixed SaveAs sections, with native emission order and style formatting retained",
+    "exports": [
+      "xy_vsfilter_document_format_export_section_v1"
+    ],
+    "contracts": [
+      "Sections 0 header, 1 Events, 2 footer, 3 sidecar header; exact raw UTF16 templates, signed resolution, any nonzero collisions Reverse and ASS-only scaled line. Valid unsupported format/section combinations yield empty strings; sidecar header independent of valid format.",
+      "Output preflight, valid scalar domains, safe formatting and raw UTF16LE encoding precede snapshot registry admission. One output copy after admission; no document borrow or new registry type.",
+      "Native collision then conditional scaled reads precede dimension reads; Events retains live entry-count condition after styles. Sidecar lookup precedes format condition, file open precedes header, style-value read remains after header write. File/newline/codepage services and style-row integer/float conversions unchanged."
+    ],
+    "unsafe_delta": {
+      "production_blocks": 1,
+      "unsafe_function_declarations": 1,
+      "new_raw_helpers": 0,
+      "new_unsafe_impls": 0
+    },
+    "validation": {
+      "local": "241 core and 122 FFI tests pass, also all 363 tests under Miri nightly-2025-02-20 on macOS arm64; 146 Python tests with four skips; pinned formatting/Clippy, probe generation and unchanged native/RustText preprocessing pass. Full portable differential suite complete with source fingerprints at the e5ff50f0 working-tree base; this is local working-tree evidence, not an archive of committed candidate source. Two additional core exact-section suites and all 56 format/section FFI combinations.",
+      "windows": "Four empty SSA/ASS/SAMI/SRT exports cover exact framing, no Events, signed PlayRes, Reverse collisions, ASS-only scaled and sidecar prefix. Eight earlier body exports retained. Changed-source Windows execution pending."
+    },
+    "validation_repairs": [
+      "Seven overlap tests now derive input and output from one mutable raw pointer, preserving the intended alias contract; production staging unchanged.",
+      "Prepared Add extraction selects the complete undefined experimental-owner conditional before slicing; RustText directives retained. Focused oracle passes 59,215 comparisons / 1,453,819 mutation snapshots / 3,357 injected exceptions.",
+      "Isolated owner probe now compiles unchanged actual STSStyleBase/STSStyle/FwRect dependencies with MFC CString; previous isolated ATL evidence is not relabeled. Windows compile pending."
+    ]
   }
 }

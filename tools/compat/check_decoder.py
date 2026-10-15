@@ -65,6 +65,42 @@ def extract_fenced_method(source, signature, next_signature):
     return method
 
 
+def select_undefined_ifdef(source, macro):
+    """Select one explicitly undefined macro; preserve all other CPP branches.
+
+    Track every nesting level so an enclosing owner's #endif cannot leak into
+    a later prepared-record suffix. This does not preprocess RustText branches.
+    Unsupported selected-macro #elif forms fail rather than guess semantics.
+    """
+    output, stack = [], []
+    active = True
+    for line in source.splitlines(keepends=True):
+        directive = re.match(r"^\s*#\s*(if|ifdef|ifndef|elif|else|endif)\b(.*)", line)
+        if not directive:
+            if active: output.append(line)
+            continue
+        kind, argument = directive[1], directive[2].strip()
+        if kind in ("if", "ifdef", "ifndef"):
+            selected = kind in ("ifdef", "ifndef") and argument == macro
+            if not selected and re.search(r"\b" + re.escape(macro) + r"\b", argument):
+                raise ValueError("unsupported selected macro expression")
+            stack.append((selected, active, kind == "ifndef"))
+            if selected: active = active and kind == "ifndef"
+            elif active: output.append(line)
+        else:
+            if not stack: raise ValueError("unbalanced conditional")
+            selected, parent, condition = stack[-1]
+            if kind == "endif":
+                if not selected and active: output.append(line)
+                stack.pop(); active = parent
+            elif selected:
+                if kind == "elif": raise ValueError("unsupported selected macro elif")
+                active = parent and not condition
+            elif active: output.append(line)
+    if stack: raise ValueError("unterminated conditional")
+    return "".join(output)
+
+
 def capture_inputs():
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h", ROOT / "include/xy_rust_writer.h", ROOT / "include/xy_rust_seek.h",
@@ -591,6 +627,7 @@ public:
         method = extract_fenced_method(content.decode("utf-8-sig"),
                                       "void CSimpleTextSubtitle::Add(",
                                       "void CSimpleTextSubtitle::AddSTSEntryOnly(")
+        method = select_undefined_ifdef(method, "XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL")
         insertion += f"INSERTION_SHELL({name})\n#define STSSegment InsertionSegment\n"
         if name == "CandidateInsertion":
             insertion += "#define XY_VSFILTER_RUST_TEXT\n" + document_count_bindings
@@ -601,11 +638,8 @@ public:
         a = method.index("    sub.readorder  =")
         prepared = method.index(";", a) + 1
         insertion += method[a:prepared] + "\n"
-        # Keep the entire suffix after the initialized-record boundary, including
-        # any enclosing experimental ifdef/else/endif. Selecting the inner native
-        # int-n line would omit its opener and leave unbalanced preprocessing.
-        # This runner leaves the experimental owner undefined; its separate
-        # document/Windows harnesses validate that configuration.
+        # The owner branch was structurally selected above before slicing;
+        # retain RustText's leaf branches for the actual compiler to select.
         insertion += method[prepared:]
         insertion += "\n#undef STSSegment\n#undef XY_VSFILTER_RUST_TEXT\n" + document_count_unbind
     (destination / "original_segment_insert.h").write_text(insertion, encoding="utf-8")

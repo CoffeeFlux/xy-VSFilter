@@ -225,6 +225,11 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_remove_entries_v1(uint64_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_animation_or_v1(uint64_t, uint32_t segment, uint32_t animated);
 // No rebuild. Result: applied:u32, reserved-zero:u32, end:i64 (zero if absent).
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_correct_last_end_v1(uint64_t, int64_t bound, uint8_t*, size_t);
+// Pure SaveAs fixed section text. Sections 0 Header, 1 Events, 2 Footer,
+// 3 SidecarHeader; formats 0..13 valid. Scaled is 0/1; native retains when to
+// request/write sections and file/codepage services. Output8 receives snapshot
+// ID; snapshot contains raw UTF-16LE with no header.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_format_export_section_v1(uint32_t format,uint32_t section,int32_t width,int32_t height,int32_t collisions,uint32_t scaled,uint8_t*,size_t);
 // Pure SaveAs body row formatting. Formats 0..5 SRT/SUB/SMI/PSB/SSA/ASS;
 // valid formats 6..13 produce empty rows; >=14 refuses. Native supplies integer
 // arithmetic results and already converted/newline-prepared text in Entry64.
