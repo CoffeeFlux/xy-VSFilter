@@ -1447,6 +1447,32 @@ preprocessing pass. Changed-source Windows integration remains pending; the
 prerequisite captures do not establish this routing's full-class or renderer parity. No unsafe export, block or helper is
 added by this routing change; the owner count stays 20.
 
+### SetStr preparation and encoding policy in the safe owner
+
+The experimental SetStr now obtains an owned write plan from Rust. It reads the
+entry's stored encoding first, applies the admitted LF-only CString behavior,
+and resolves the charset only when the input encoding differs. Carriage returns
+and raw UTF-16 units remain intact. Equal flags still prepare and replace text;
+they skip charset lookup and the native style assertion. Conversion targets the
+stored encoding, and the existing text-only commit never changes that flag.
+
+The write plan shares the immutable packet encoder with text reads. Input is
+copied before admission; the owned plan leaves admission before reply encoding
+and registration. Native conversion stays outside admission. Entry errors precede
+LF-preparation errors, which precede charset errors. No callback, segment rebuild,
+generation guard or document mutation is added to planning. Allocation and
+reentry timing remain qualified, and unassigned CString tails remain unresolved.
+
+Local validation passes 224 core and 120 FFI tests, pinned formatting and Clippy,
+and 138 Python tests with four Windows-only skips. Five new full-class stages
+cover both same-encoding cases, both valid Shift-JIS conversion directions, CR/LF
+handling and an exact bounded skipped-LF/NUL tail. They check retained flags,
+nontext fields, animation, segments and callbacks. Windows execution of these
+stages is pending. CI also exposed a declaration-order error in the earlier text
+fixture; the helper declaration is moved before its callers in this increment.
+The new private export adds two unsafe blocks using existing input/output helpers
+and one unsafe function declaration; the portable core remains entirely safe.
+
 ### Newly verified x64 integration and preparation evidence
 
 [The retained x64 evidence](rust-document-x64-7f-evidence.json) for `7f3e5c9c`,
@@ -1555,13 +1581,13 @@ Neither count measures the amount of application behavior replaced.
 The reproducible [Rust unsafe inventory](rust-unsafe-inventory.json) uses
 `python3 tools/compat/audit_rust_boundary.py OUTPUT.json`. It masks comments and
 literals, separates cfg(test) items, and includes all platform/feature branches.
-At the current frozen working-tree sources based on `888e1b22` (exact file
+At the current frozen working-tree sources based on `e6678f23` (exact file
 hashes recorded by the regenerated inventory):
 
 | Layer | Production source inventory | Meaning |
 | --- | --- | --- |
-| `rust/compat` | 0 unsafe blocks/functions/impls; 8,500 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
-| `rust/ffi` | 373 explicit unsafe blocks, 311 unsafe function declarations, two unsafe impls (allocator and registry admission); 5,971 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
+| `rust/compat` | 0 unsafe blocks/functions/impls; 8,547 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
+| `rust/ffi` | 375 explicit unsafe blocks, 312 unsafe function declarations, two unsafe impls (allocator and registry admission); 6,020 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
 | Tests | 119 unsafe blocks in FFI tests | Exercise valid and deliberately bounded ownership/alias/initialization contracts; not production code |
 
 Unsafe-function declarations and blocks overlap and must not be added as

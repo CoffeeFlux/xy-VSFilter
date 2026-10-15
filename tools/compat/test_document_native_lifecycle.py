@@ -5,7 +5,7 @@ from pathlib import Path
 import subprocess
 import document_native_lifecycle as lifecycle
 
-from document_native_lifecycle import compare_traces, conversion_rows, unknown_rows, text_plan_rows, copy_styles_stages
+from document_native_lifecycle import compare_traces, conversion_rows, unknown_rows, text_plan_rows, copy_styles_stages, setstr_plan_rows
 
 
 STYLE_SCALARS = b" ".join(b"0000000000000000" if i in (0,11,12,13,14,23,24,25,26,27,28,29,30,31,32) else b"00000000" if i in (15,17,19,21) else b"0" for i in range(34))
@@ -89,6 +89,8 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
          + b"preparation-stage preparation-fields entries=5 segments=3 animated=1\n"
          + b"preparation-stage preparation-add-zero-rejected entries=5 segments=3 animated=1\n"
          + b"preparation-stage preparation-entry-zero entries=6 segments=3 animated=1\n"
+         + b"\n".join(setstr_plan_rows()) + b"\n"
+         + b"".join(b"style-rename-segments "+row.split()[1]+b" count=2 animated=1\n" for row in setstr_plan_rows()[::2])
          + b"saved-file ssa exists=1 bytes=1 41\nsaved-file ass exists=1 bytes=1 41\n"
          + b"saved-file srt exists=1 bytes=1 41\nsaved-file srt-sidecar exists=1 bytes=1 41\n"
          + b"saved-file ssa-sidecar exists=0\nsaved-file ass-sidecar exists=0\n"
@@ -106,6 +108,29 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
         with self.assertRaises(ValueError): compare_traces([missing] * 4, 64)
         old = TRACE.replace(b"copy-styles-stage copy-styles-self-before\n", b"")
         compare_traces([old] * 4, 64, require_copy_styles_stages=False)
+
+    def test_shared_native_helpers_are_defined_before_text_fixture_use(self):
+        source=lifecycle.SOURCE.read_text()
+        definition=source.index("static bool same_identity(")
+        self.assertEqual(source.count("static bool same_identity("),1)
+        self.assertEqual(source.index("same_identity("),definition+len("static bool "))
+        for fixture in ("text_plan_lifecycle", "setstr_plan_lifecycle"):
+            start=source.index("static void "+fixture+"(")
+            self.assertLess(definition,start)
+            for helper in ("named_add", "segment_snapshot", "require_same_segments"):
+                self.assertLess(source.index("static "+("void " if helper in ("named_add","require_same_segments") else "std::vector<STSSegment> ")+helper+"("),start)
+
+    def test_setstr_plan_requires_raw_tail_flags_conversion_and_retained_segments(self):
+        for prefix in (b"setstr-value setstr-packed-to-wide ",b"setstr-value setstr-nul-tail "):
+            missing=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith(prefix))
+            with self.assertRaises(ValueError):compare_traces([missing]*4,64)
+        for old,new in ((b"setstr-packed-to-wide index=0 unicode=1",b"setstr-packed-to-wide index=0 unicode=0"),
+                        (b"setstr-nul-tail index=0 unicode=1 5 005c 004e 0000 000a 0000",b"setstr-nul-tail index=0 unicode=1 4 005c 004e 0000 000a"),
+                        (b"setstr-same-wide index=0 unicode=1 5 3042 000d 005c 004e 005a",b"setstr-same-wide index=0 unicode=1 4 3042 005c 004e 005a")):
+            with self.assertRaises(ValueError):compare_traces([TRACE.replace(old,new)]*4,64)
+        legacy=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith((b"setstr-stage ",b"setstr-value ")))
+        with self.assertRaises(ValueError):compare_traces([legacy]*4,64)
+        compare_traces([legacy]*4,64,require_setstr_stages=False)
 
     def test_text_plan_requires_all_getters_noops_and_owned_suffix_independence(self):
         for prefix in (b"text-plan-get text-plan-wide wide=0 ssa=0 ",b"text-plan-noop wide=0 ",b"text-plan-owned-reread "):
@@ -301,7 +326,7 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
         with self.assertRaises(ValueError):compare_traces([TRACE,TRACE,changed,changed],64)
 
     def test_style_rename_stages_and_segment_invariants(self):
-        legacy = b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith(b"style-rename-") or line.startswith((b"style-rename-segments copy-styles-",b"style-rename-segments text-plan-")))
+        legacy = b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith(b"style-rename-") or line.startswith((b"style-rename-segments copy-styles-",b"style-rename-segments text-plan-",b"style-rename-segments setstr-")))
         with self.assertRaises(ValueError): compare_traces([legacy]*4,64)
         compare_traces([legacy]*4,64,require_style_rename_stages=False)
         for token in (b"style-rename-stage shrink-after\n", b"style-rename-segments raw-nul-to2 count=2 animated=1\n"):

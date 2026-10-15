@@ -1432,6 +1432,38 @@ pub unsafe extern "C" fn xy_vsfilter_document_add_prepared_v1(
     OK
 }
 
+fn insert_text_plan(plan: xy_vsfilter_compat::document_text::Plan) -> Result<u64, u32> {
+    use xy_vsfilter_compat::document_text::Action;
+    // All text/style loans ended. Encode and register only independently owned bytes.
+    if plan.text.len() > i32::MAX as usize {
+        return Err(COUNT_OVERFLOW);
+    }
+    let length = plan
+        .text
+        .len()
+        .checked_mul(2)
+        .and_then(|n| n.checked_add(32))
+        .filter(|n| *n <= isize::MAX as usize)
+        .ok_or(COUNT_OVERFLOW)?;
+    let mut bytes = Vec::with_capacity(length);
+    bytes.extend_from_slice(&(plan.action as u32).to_le_bytes());
+    bytes.extend_from_slice(&u32::from(plan.target_unicode).to_le_bytes());
+    bytes.extend_from_slice(&u32::from(plan.strip_tags).to_le_bytes());
+    bytes.extend_from_slice(&u32::from(plan.has_style).to_le_bytes());
+    let charset = if plan.action == Action::NoOp {
+        0
+    } else {
+        plan.charset
+    };
+    bytes.extend_from_slice(&charset.to_le_bytes());
+    bytes.extend_from_slice(&0u32.to_le_bytes());
+    bytes.extend_from_slice(&(plan.text.len() as u64).to_le_bytes());
+    for unit in &plan.text {
+        bytes.extend_from_slice(&unit.to_le_bytes());
+    }
+    insert(Resource::Snapshot(bytes))
+}
+
 /// # Safety
 /// Output receives one immutable snapshot ID in eight writable bytes.
 #[no_mangle]
@@ -1443,7 +1475,7 @@ pub unsafe extern "C" fn xy_vsfilter_document_text_plan_v1(
     capacity: usize,
 ) -> u32 {
     required!(output_capacity(output, capacity, 8));
-    use xy_vsfilter_compat::document_text::{Action, Mode};
+    use xy_vsfilter_compat::document_text::Mode;
     let mode = match mode {
         0 => Mode::GetWideSsa,
         1 => Mode::GetWideStrip,
@@ -1464,35 +1496,59 @@ pub unsafe extern "C" fn xy_vsfilter_document_text_plan_v1(
             StyleResolutionError::Uninitialized => UNRESOLVED_REFERENCE,
         })
     }));
-    // All text/style loans ended. Encode and register only independently owned bytes.
-    if plan.text.len() > i32::MAX as usize {
-        return COUNT_OVERFLOW;
-    }
-    let length = required!(plan
-        .text
-        .len()
-        .checked_mul(2)
-        .and_then(|n| n.checked_add(32))
-        .filter(|n| *n <= isize::MAX as usize)
-        .ok_or(COUNT_OVERFLOW));
-    let mut bytes = Vec::with_capacity(length);
-    bytes.extend_from_slice(&(plan.action as u32).to_le_bytes());
-    bytes.extend_from_slice(&u32::from(plan.target_unicode).to_le_bytes());
-    bytes.extend_from_slice(&u32::from(plan.strip_tags).to_le_bytes());
-    bytes.extend_from_slice(&u32::from(plan.has_style).to_le_bytes());
-    let charset = if plan.action == Action::NoOp {
-        0
-    } else {
-        plan.charset
-    };
-    bytes.extend_from_slice(&charset.to_le_bytes());
-    bytes.extend_from_slice(&0u32.to_le_bytes());
-    bytes.extend_from_slice(&(plan.text.len() as u64).to_le_bytes());
-    for unit in &plan.text {
-        bytes.extend_from_slice(&unit.to_le_bytes());
-    }
-    let id = required!(insert(Resource::Snapshot(bytes)));
+    let id = required!(insert_text_plan(plan));
     // SAFETY: preflighted destination, registry admission has ended.
+    unsafe {
+        write_output(output, &id.to_le_bytes());
+    }
+    OK
+}
+
+/// # Safety
+/// Raw text follows the byte-buffer contract; output receives one snapshot ID.
+/// Input is fully copied before admission and may overlap the output buffer.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_set_text_plan_v1(
+    owner: u64,
+    index: u32,
+    input_unicode: u32,
+    input: *const u8,
+    length: usize,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    if input_unicode > 1 {
+        return INVALID_INPUT;
+    }
+    required!(element_shape(length, 2));
+    // SAFETY: caller supplies the readable input region; no pointer enters admission.
+    let input = required!(unsafe { copy_input(input, length) });
+    let text = units(&input);
+    let plan = required!(admitted(|registry| {
+        xy_vsfilter_compat::document_text::plan_write(
+            registry.document(owner).map_err(registry_error)?,
+            index,
+            input_unicode != 0,
+            &text,
+        )
+        .map_err(|error| {
+            use xy_vsfilter_compat::document_text::WriteError;
+            match error {
+                WriteError::Entry(StyleResolutionError::EntryIndex) => OUT_OF_RANGE,
+                WriteError::Entry(StyleResolutionError::Uninitialized) => UNRESOLVED_REFERENCE,
+                WriteError::Preparation(
+                    xy_vsfilter_compat::document_prepare::Error::UnresolvedTail,
+                ) => UNRESOLVED_REFERENCE,
+                WriteError::Preparation(
+                    xy_vsfilter_compat::document_prepare::Error::CountOverflow
+                    | xy_vsfilter_compat::document_prepare::Error::LengthOverflow,
+                ) => COUNT_OVERFLOW,
+            }
+        })
+    }));
+    let id = required!(insert_text_plan(plan));
+    // SAFETY: capacity preflighted, input snapshotted, no registry reference remains.
     unsafe {
         write_output(output, &id.to_le_bytes());
     }
@@ -1895,6 +1951,196 @@ mod tests {
             assert_eq!(state(suffix_owner).entries()[0].text, [92, 78, 0, 10, 0]);
             assert_eq!(state(suffix_owner).entries()[0].style, [65]);
             assert_eq!(xy_vsfilter_document_destroy_v1(suffix_owner), OK);
+
+            let write_owner = create();
+            assert_eq!(add(write_owner, 0, &entry(0, 10)).0, OK);
+            let raw = [13u8, 0, 10, 0, 0, 0, 10, 0];
+            let mut output = [0xa5; 8];
+            let before = state(write_owner);
+            assert_eq!(
+                xy_vsfilter_document_set_text_plan_v1(
+                    write_owner,
+                    0,
+                    0,
+                    raw.as_ptr(),
+                    raw.len(),
+                    output.as_mut_ptr(),
+                    7
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_set_text_plan_v1(
+                    write_owner,
+                    0,
+                    2,
+                    raw.as_ptr(),
+                    raw.len(),
+                    output.as_mut_ptr(),
+                    8
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_set_text_plan_v1(
+                    write_owner,
+                    0,
+                    0,
+                    raw.as_ptr(),
+                    7,
+                    output.as_mut_ptr(),
+                    8
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(output, [0xa5; 8]);
+            assert_eq!(state(write_owner), before);
+            let mut overlapping = raw;
+            assert_eq!(
+                xy_vsfilter_document_set_text_plan_v1(
+                    write_owner,
+                    0,
+                    0,
+                    overlapping.as_ptr(),
+                    overlapping.len(),
+                    overlapping.as_mut_ptr(),
+                    8
+                ),
+                OK
+            );
+            let saved = u64::from_le_bytes(overlapping);
+            let packet = read_snapshot(saved);
+            assert_eq!(&packet[..24], &[0u8; 24]);
+            assert_eq!(&packet[24..32], &6u64.to_le_bytes());
+            assert_eq!(&packet[32..], &[13, 0, 92, 0, 78, 0, 0, 0, 10, 0, 0, 0]);
+            assert_eq!(state(write_owner), before);
+            assert_eq!(
+                xy_vsfilter_document_set_text_plan_v1(
+                    saved,
+                    0,
+                    0,
+                    raw.as_ptr(),
+                    raw.len(),
+                    output.as_mut_ptr(),
+                    8
+                ),
+                BAD_HANDLE
+            );
+            let unknown_tail = [10u8, 0, 10, 0, 0, 0, 10, 0, 10, 0];
+            assert_eq!(
+                xy_vsfilter_document_set_text_plan_v1(
+                    write_owner,
+                    9,
+                    0,
+                    unknown_tail.as_ptr(),
+                    unknown_tail.len(),
+                    output.as_mut_ptr(),
+                    8
+                ),
+                OUT_OF_RANGE
+            );
+            assert_eq!(
+                xy_vsfilter_document_set_text_plan_v1(
+                    write_owner,
+                    0,
+                    0,
+                    unknown_tail.as_ptr(),
+                    unknown_tail.len(),
+                    output.as_mut_ptr(),
+                    8
+                ),
+                UNRESOLVED_REFERENCE
+            );
+            assert_eq!(state(write_owner), before);
+            assert_eq!(output, [0xa5; 8]);
+            assert_eq!(
+                xy_vsfilter_document_set_text_plan_v1(
+                    write_owner,
+                    0,
+                    1,
+                    raw.as_ptr(),
+                    raw.len(),
+                    output.as_mut_ptr(),
+                    8
+                ),
+                UNRESOLVED_REFERENCE
+            );
+            assert_eq!(xy_vsfilter_document_set_metadata_v1(write_owner, 3, 0), OK);
+            let null_key = [0u8; 2];
+            assert_eq!(
+                xy_vsfilter_document_named_style_put_v1(
+                    write_owner,
+                    null_key.as_ptr(),
+                    2,
+                    ptr::null(),
+                    0
+                ),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_set_text_plan_v1(
+                    write_owner,
+                    0,
+                    1,
+                    raw.as_ptr(),
+                    raw.len(),
+                    output.as_mut_ptr(),
+                    8
+                ),
+                OK
+            );
+            let reply = u64::from_le_bytes(output);
+            let converted = read_snapshot(reply);
+            assert_eq!(&converted[..4], &2u32.to_le_bytes());
+            assert_eq!(&converted[4..8], &0u32.to_le_bytes());
+            assert_eq!(&converted[16..20], &(-1i32).to_le_bytes());
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(reply), OK);
+            assert_eq!(
+                xy_vsfilter_document_set_prepared_text_v1(
+                    write_owner,
+                    0,
+                    -1,
+                    packet[32..].as_ptr(),
+                    packet.len() - 32
+                ),
+                OK
+            );
+            assert!(!state(write_owner).entries()[0].unicode);
+            assert_eq!(
+                xy_vsfilter_document_set_prepared_text_v1(
+                    write_owner,
+                    0,
+                    1,
+                    packet[32..].as_ptr(),
+                    packet.len() - 32
+                ),
+                OK
+            );
+            let surrogate_input = [0u8, 0xd8, 13, 0, 0, 0xdc, 10, 0];
+            let before = state(write_owner);
+            assert_eq!(
+                xy_vsfilter_document_set_text_plan_v1(
+                    write_owner,
+                    0,
+                    0,
+                    surrogate_input.as_ptr(),
+                    surrogate_input.len(),
+                    output.as_mut_ptr(),
+                    8
+                ),
+                OK
+            );
+            let reply = u64::from_le_bytes(output);
+            let wide = read_snapshot(reply);
+            assert_eq!(&wide[..4], &1u32.to_le_bytes());
+            assert_eq!(&wide[4..8], &1u32.to_le_bytes());
+            assert_eq!(&wide[32..], &[0, 0xd8, 13, 0, 0, 0xdc, 92, 0, 78, 0]);
+            assert_eq!(state(write_owner), before);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(reply), OK);
+
+            assert_eq!(xy_vsfilter_document_destroy_v1(write_owner), OK);
+            assert_eq!(read_snapshot(saved), packet);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(saved), OK);
 
             let text_owner = create();
             assert_eq!(add(text_owner, 0, &entry(0, 10)).0, OK);

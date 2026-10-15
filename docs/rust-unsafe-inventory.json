@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "candidate_commit": "888e1b22338844a8472d6d0b592d28be34cb319a",
+  "candidate_commit": "e6678f23e5e871094e5aaa7fcea8ad46a1b826c5",
   "method": "Lexical source inventory with comments/string/character literals masked and cfg(test) item bodies excluded from production. All platform and feature branches included, not one compiled target. Source hashes identify the measured files; the inventory script may be uncommitted. Block counts and unsafe-function declarations overlap and must not be added as independent operations. Operation categories can overlap and omit raw-pointer dereferences; they are examples, not an exhaustive soundness classification.",
   "limitations": "Not a proof of soundness or a migration completion percentage. Does not measure C/C++/assembly, native libraries, standard-library internals, borrow correctness at native callsites or dynamic path coverage.",
   "crates": {
@@ -18,8 +18,8 @@
         "test_trait": 0,
         "test_other": 0
       },
-      "physical_lines_including_tests": 14398,
-      "nonblank_code_lines_excluding_tests": 8500,
+      "physical_lines_including_tests": 14544,
+      "nonblank_code_lines_excluding_tests": 8547,
       "production_extern_functions": 0,
       "operations": {
         "raw_shared_slice_construction": 0,
@@ -544,9 +544,9 @@
         },
         {
           "path": "rust/compat/src/document_text.rs",
-          "sha256": "63ede1bfe7c5e394034717e3053f44c62306b67d938185af78215a95aa9df06d",
-          "physical_lines_including_tests": 242,
-          "nonblank_code_lines_excluding_tests": 70,
+          "sha256": "1a37d8f948906561e12a9ed1f93837c956b6e092c96a5974c86a9b459b9e02d3",
+          "physical_lines_including_tests": 388,
+          "nonblank_code_lines_excluding_tests": 117,
           "counts": {
             "production_block": 0,
             "production_function": 0,
@@ -2647,8 +2647,8 @@
     "ffi": {
       "file_count": 69,
       "totals": {
-        "production_block": 373,
-        "production_function": 311,
+        "production_block": 375,
+        "production_function": 312,
         "production_impl": 2,
         "production_trait": 0,
         "production_other": 0,
@@ -2658,9 +2658,9 @@
         "test_trait": 0,
         "test_other": 0
       },
-      "physical_lines_including_tests": 13617,
-      "nonblank_code_lines_excluding_tests": 5971,
-      "production_extern_functions": 384,
+      "physical_lines_including_tests": 13863,
+      "nonblank_code_lines_excluding_tests": 6020,
+      "production_extern_functions": 385,
       "operations": {
         "raw_shared_slice_construction": 62,
         "raw_mutable_slice_construction": 22,
@@ -3555,12 +3555,12 @@
         },
         {
           "path": "rust/ffi/src/document.rs",
-          "sha256": "54f040f401686f5cd8b3d16fecd949e680063d5511aac57b92e1e2ba1fb45dfd",
-          "physical_lines_including_tests": 4542,
-          "nonblank_code_lines_excluding_tests": 1550,
+          "sha256": "1692ec83976a1c0735d8d6601f01177bc1764b7910ba4d582b81455bf91238f0",
+          "physical_lines_including_tests": 4788,
+          "nonblank_code_lines_excluding_tests": 1599,
           "counts": {
-            "production_block": 47,
-            "production_function": 38,
+            "production_block": 49,
+            "production_function": 39,
             "production_impl": 0,
             "production_trait": 0,
             "production_other": 0,
@@ -3907,152 +3907,167 @@
               "test": false
             },
             {
-              "line": 1438,
+              "line": 1470,
               "kind": "function",
               "test": false
             },
             {
-              "line": 1496,
+              "line": 1501,
               "kind": "block",
               "test": false
             },
             {
-              "line": 1505,
+              "line": 1511,
               "kind": "function",
               "test": false
             },
             {
-              "line": 1520,
+              "line": 1526,
               "kind": "block",
               "test": false
             },
             {
-              "line": 1536,
+              "line": 1552,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1561,
               "kind": "function",
               "test": false
             },
             {
-              "line": 1544,
+              "line": 1576,
               "kind": "block",
               "test": false
             },
             {
-              "line": 1555,
+              "line": 1592,
               "kind": "function",
               "test": false
             },
             {
-              "line": 1566,
+              "line": 1600,
               "kind": "block",
               "test": false
             },
             {
-              "line": 1567,
-              "kind": "block",
-              "test": false
-            },
-            {
-              "line": 1596,
+              "line": 1611,
               "kind": "function",
               "test": false
             },
             {
-              "line": 1603,
+              "line": 1622,
               "kind": "block",
               "test": false
             },
             {
-              "line": 1614,
+              "line": 1623,
+              "kind": "block",
+              "test": false
+            },
+            {
+              "line": 1652,
               "kind": "function",
               "test": false
             },
             {
-              "line": 1621,
+              "line": 1659,
               "kind": "block",
               "test": false
             },
             {
-              "line": 1639,
+              "line": 1670,
               "kind": "function",
               "test": false
             },
             {
-              "line": 1655,
+              "line": 1677,
               "kind": "block",
               "test": false
             },
             {
-              "line": 1672,
-              "kind": "block",
-              "test": false
-            },
-            {
-              "line": 1715,
+              "line": 1695,
               "kind": "function",
               "test": false
             },
             {
-              "line": 1732,
+              "line": 1711,
               "kind": "block",
               "test": false
             },
             {
-              "line": 1745,
-              "kind": "function",
-              "test": true
-            },
-            {
-              "line": 1749,
+              "line": 1728,
               "kind": "block",
-              "test": true
+              "test": false
             },
             {
               "line": 1771,
               "kind": "function",
-              "test": true
+              "test": false
             },
             {
-              "line": 1774,
+              "line": 1788,
               "kind": "block",
-              "test": true
+              "test": false
             },
             {
-              "line": 1786,
+              "line": 1801,
               "kind": "function",
               "test": true
             },
             {
-              "line": 1790,
+              "line": 1805,
               "kind": "block",
               "test": true
             },
             {
-              "line": 1795,
+              "line": 1827,
               "kind": "function",
               "test": true
             },
             {
-              "line": 1799,
+              "line": 1830,
               "kind": "block",
               "test": true
             },
             {
-              "line": 1804,
+              "line": 1842,
+              "kind": "function",
+              "test": true
+            },
+            {
+              "line": 1846,
               "kind": "block",
               "test": true
             },
             {
-              "line": 1828,
+              "line": 1851,
+              "kind": "function",
+              "test": true
+            },
+            {
+              "line": 1855,
               "kind": "block",
               "test": true
             },
             {
-              "line": 1837,
+              "line": 1860,
+              "kind": "block",
+              "test": true
+            },
+            {
+              "line": 1884,
+              "kind": "block",
+              "test": true
+            },
+            {
+              "line": 1893,
               "kind": "block",
               "test": true
             }
           ],
-          "production_extern_functions": 57,
+          "production_extern_functions": 58,
           "operations": {
             "raw_shared_slice_construction": 1,
             "raw_mutable_slice_construction": 0,
