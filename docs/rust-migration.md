@@ -68,7 +68,8 @@ low-level `check_decoder.py` suite now explicitly uses historical native
 adapters from `6915e8d9` against upstream `4911cacb`, with the current Rust and
 C ABI headers. It preserves removed-API regressions without restoring those
 APIs to production. Its reports identify both historical commits and do not
-claim cleanup integration. The document core/primitive regressions likewise
+claim cleanup integration; the suite passes locally on x64 and x86. The
+document core/primitive regressions likewise
 retain their historical oracle. Current native integration evidence comes
 from the linked probes and whole DLL comparisons above.
 
@@ -76,7 +77,10 @@ The cleanup also removed SSF OutputStream/Dump. Its current native probe reads
 public node graph fields and raw UTF-16 values instead, retaining comment,
 literal, Arabic-text, input-ownership and parser-error controls. It does not
 claim parity for removed serialization APIs. Historical output-stream leaf
-regressions remain in the explicitly historical suite.
+regressions remain in the explicitly historical suite. On each architecture,
+36 parser/node-snapshot cases and 20 expected parser-error cases match. The
+reference produces blank SSF frames, so this establishes no visible SSF
+rendering parity. All 148 Python harness tests complete (one skipped).
 
 See [the local evidence index](rust-cleanup-local-evidence.json) for report
 locations, hashes, tested commits, DLL hashes and scoped results. Raw reports

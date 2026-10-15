@@ -1,0 +1,364 @@
+{
+  "schema": 1,
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "production_source_commit": "efdff18612c954d95fb8375df062fce18add777b",
+  "tested_harness_commit": "31145e96df4135f2f92bcbef62a9d00877e49666",
+  "source_note": "Later commits only adapt test harnesses and document results; binary and per-report hashes remain authoritative.",
+  "configuration": {
+    "configuration": "Release",
+    "RustTextDecoder": true,
+    "RustDocumentOwnerExperimental": true,
+    "rust": "1.85.0",
+    "msvc": "14.44.35207",
+    "sdk": "10.0.26100.0",
+    "native_crt": "static",
+    "powershell": "5.1.19041.7725",
+    "python_x64": "3.12.9",
+    "python_x86": "3.12.9 portable official embed distribution"
+  },
+  "limits": [
+    "Finite local compatibility evidence; no full migration or universal parity claim.",
+    "No real Aegisub/player playback, Miri or non-Windows execution in this local run.",
+    "COM comparisons cover disconnected contracts, not graph playback or custom method behavior; two autoloader pin-ID controls are candidate-only.",
+    "The default native-document configuration was not rerun locally; these DLLs enable the experimental Rust document owner.",
+    "SSF characterizes blank frames in the reference; no visible SSF rendering parity claim.",
+    "Historical leaf and document regressions retain the upstream oracle and do not establish cleanup native integration."
+  ],
+  "architectures": {
+    "x64": {
+      "corpus": {
+        "report": "artifacts/cleanup-csri-final-x64/summary.json",
+        "report_sha256": "2882dfd9374bf84c10dc4fcd3cb5f3c9121998aa0cd937b233bf7d33777bab10",
+        "complete": true,
+        "partition_exact": true,
+        "frames": 8586,
+        "distinct_controls": 72,
+        "case_count": 814,
+        "shards": [
+          {
+            "report": "artifacts/cleanup-csri-final-x64/shard-0/report.json",
+            "report_sha256": "aeb2bb6c185118f0df6fd576937d7606222dbd81edecb9aba55569a5bc2b1460",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 2162,
+            "controls_passed": true,
+            "environment_unchanged": true,
+            "case_count": 204
+          },
+          {
+            "report": "artifacts/cleanup-csri-final-x64/shard-1/report.json",
+            "report_sha256": "eff7e94ae898a12abd1864b2bbc556e0f74327e054577d41b80d04f0ee6f2c26",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 2162,
+            "controls_passed": true,
+            "environment_unchanged": true,
+            "case_count": 204
+          },
+          {
+            "report": "artifacts/cleanup-csri-final-x64/shard-2/report.json",
+            "report_sha256": "0a0f96cd512f86b06b615e5885d245cf905de45bd84ca8c8b9d51e3ff47f4143",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 2131,
+            "controls_passed": true,
+            "environment_unchanged": true,
+            "case_count": 203
+          },
+          {
+            "report": "artifacts/cleanup-csri-final-x64/shard-3/report.json",
+            "report_sha256": "3df70544d9d383ae62c336eed0c104b6b0b02c4e693bf6321ea087723a09f809",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 2131,
+            "controls_passed": true,
+            "environment_unchanged": true,
+            "case_count": 203
+          }
+        ]
+      },
+      "mutations": {
+        "report": "artifacts/cleanup-mutations-x64/report.json",
+        "report_sha256": "d77d6f86868551c83beada07a6dfb82927cc8ec74653f8a7dc651ba84b39f80c",
+        "complete": true,
+        "passed": true,
+        "rendered_frames": 224,
+        "controls_passed": true,
+        "environment_unchanged": true,
+        "case_count": 32
+      },
+      "lifecycle": {
+        "report": "artifacts/cleanup-lifecycle-x64-v2/report.json",
+        "report_sha256": "24f5ba7e42a6e7c8a9699eb38adb18bc15386156c002b4bec692c481135d909a",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "efdff18612c954d95fb8375df062fce18add777b",
+        "trace_lines": 3583,
+        "dialog_count": 3,
+        "inputs_unchanged": true
+      },
+      "style_values": {
+        "report": "artifacts/cleanup-style-value-x64/report.json",
+        "report_sha256": "5b167e4562119f51a56c5b90ecd7433a36f5169b722cc10452b1e3b8d303a870",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "31145e96df4135f2f92bcbef62a9d00877e49666",
+        "scope": "Fixed initialized pinned-native fixtures only; no native arbitrary-input injection or style owner routing",
+        "value_count": 209,
+        "equality_cells": 43681,
+        "inputs_unchanged": true
+      },
+      "preparation": {
+        "report": "artifacts/cleanup-prepare-rust-x64/report.json",
+        "report_sha256": "4d815e885b06848aec1e60ba6c2594be89fe0b9ee4bbbb3aae607e50b8cef679",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "31145e96df4135f2f92bcbef62a9d00877e49666",
+        "scope": "Bounded final Add/EntryOnly suffix; excludes preceding trimming, WebVTT, encoding, append, callbacks, unassigned CString tail units and full host parity",
+        "native_pointer_bits": 64,
+        "observations": 600,
+        "inputs_unchanged": true
+      },
+      "com": {
+        "report": "artifacts/cleanup-contracts-x64/com-authorized/report.json",
+        "report_sha256": "d005c6e153a9370c11fec6672939dfc1b07ec348198fbea6bb95b7e6839706cc",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "31145e96df4135f2f92bcbef62a9d00877e49666",
+        "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+        "inputs_unchanged": true,
+        "case_count": 10
+      },
+      "ssf": {
+        "report": "artifacts/cleanup-ssf-final-x64/comparison/report.json",
+        "report_sha256": "3918620866d3a4fef82145b27f4d45f7d1787f2cb49fcb955571421f8ae33f78",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "7eb413f1ed70b365bd19fa5008e130732501652e",
+        "scope": "Actual separately linked libssf parser, parsed text and public node graph snapshots (ordered child links, types, names, priority, predefined flags, value kinds and raw UTF-16 values; excludes private numeric unit/cache fields). Cleanup removed native Dump and OutputStream; no serialization parity is claimed. Native renderer traces and blank RGBA frames are characterized separately: the pinned FontCache::Create returns NULL after successful CreateFontIndirect. No visible rendering parity is established. WCHAR and UTF-16LE/BOM byte input in borrowed, adopted and copied modes, including mutation of the source after copying; bounded valid fixtures plus declared unterminated/newline literal errors with completed native exception handlers, each side repeated in fresh processes. Error line/column and exact UTF-16 messages are compared separately from successful parsing. Crashes, timeouts and unexpected exceptions never pass. DirectShow, host playback, other byte encodings and broader malformed-document coverage remain separate.",
+        "inputs_unchanged": true,
+        "case_count": 56
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "2d254068a40e5f59cf191c3c6bbfc984b548193b668c4decac21dc1e94e02169",
+          "candidate_sha256": "7fd5ec1b214fe0532e383d54a3c74adbbf17e751be9a5170b63bb260af6e3c63",
+          "exports_equal": true,
+          "declared_dependencies_compatible": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "858b557df4643353cc2b7f7a4faf24fb20fc571f39dc8929949a8b9d80276024"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "32b7c2cd6eb817120414db53b3c3005e719ae4b993c4a69d0d66c7f6ac363d5a",
+          "candidate_sha256": "f29990fa5ca8e7549f8820b70a8a62f5cfec488aa7682bcfa1bfb60f4b2cef76",
+          "exports_equal": true,
+          "declared_dependencies_compatible": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "09623cbd08a08a70ca726d32f1ac7a80358fe93589dfe22d814f7c9544f6d751"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "f1165742064181b7fb73bacb16017d8e202c8bb0be90ed8c2eb812ac282c2df8",
+          "candidate_sha256": "1cf44fd40b1df616ba355e1ec710687390218a763f8663d6599736d1e4a6a817",
+          "exports_equal": true,
+          "declared_dependencies_compatible": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "b0b48a3cf2bf2ecbbac4ecca863a815ab4a0c1137277a9b7d5830d9d1beca5c9"
+        }
+      },
+      "historical_leaf_regression": {
+        "report": "artifacts/decoder/x86_64-pc-windows-msvc/report.json",
+        "report_sha256": "2572338d6bb7bed6f06a5155ae9d487b59412967b53d93b26d202693327d073c",
+        "complete": true,
+        "candidate_commit": "31145e96df4135f2f92bcbef62a9d00877e49666",
+        "scope": "Current Rust and C ABI headers through historical native adapters; current production adapters are not exercised",
+        "native_adapter_commit": "6915e8d9d8aa1ab30cb0b815b11ef3717eecf56b",
+        "reference": {
+          "commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "scope": "historical leaf algorithms; not cleanup-baseline integration"
+        }
+      }
+    },
+    "x86": {
+      "corpus": {
+        "report": "artifacts/cleanup-csri-final-x86/summary.json",
+        "report_sha256": "edfe5782e05ea5bc9098b31eb4dfb7296c573a813fbcc776bf6330d1d209f64a",
+        "complete": true,
+        "partition_exact": true,
+        "frames": 8586,
+        "distinct_controls": 72,
+        "case_count": 814,
+        "shards": [
+          {
+            "report": "artifacts/cleanup-csri-final-x86/shard-0/report.json",
+            "report_sha256": "279ca4af58936be164f2b407f4967563296f49ceee8c36dba91f91fb6d949b4c",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 2162,
+            "controls_passed": true,
+            "environment_unchanged": true,
+            "case_count": 204
+          },
+          {
+            "report": "artifacts/cleanup-csri-final-x86/shard-1/report.json",
+            "report_sha256": "59d875a5b2697218ce11e7ed1836581b06db5ff3d1fefb42d2e79e6a31196c83",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 2162,
+            "controls_passed": true,
+            "environment_unchanged": true,
+            "case_count": 204
+          },
+          {
+            "report": "artifacts/cleanup-csri-final-x86/shard-2/report.json",
+            "report_sha256": "f1ead889917d214fd467ffb6366b824751429ccf808d26cb69d1fc60a62b52f6",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 2131,
+            "controls_passed": true,
+            "environment_unchanged": true,
+            "case_count": 203
+          },
+          {
+            "report": "artifacts/cleanup-csri-final-x86/shard-3/report.json",
+            "report_sha256": "acb8a452e5e9089c0abc91bdd3e829df83d14398c895f54a98210884f05cf470",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 2131,
+            "controls_passed": true,
+            "environment_unchanged": true,
+            "case_count": 203
+          }
+        ]
+      },
+      "mutations": {
+        "report": "artifacts/cleanup-mutations-x86/report.json",
+        "report_sha256": "0cd3ecc3500e4a1b4b1b7a15688e6235fb6805e5ef9b4d8b81aba5d46c34d1cc",
+        "complete": true,
+        "passed": true,
+        "rendered_frames": 224,
+        "controls_passed": true,
+        "environment_unchanged": true,
+        "case_count": 32
+      },
+      "lifecycle": {
+        "report": "artifacts/cleanup-lifecycle-x86-v2/report.json",
+        "report_sha256": "c5eba706867e913be1366fb4b6064592a5f3967a29f2b721c7bbbc6ac16a82c7",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "efdff18612c954d95fb8375df062fce18add777b",
+        "trace_lines": 3583,
+        "dialog_count": 3,
+        "inputs_unchanged": true
+      },
+      "style_values": {
+        "report": "artifacts/cleanup-style-value-x86/report.json",
+        "report_sha256": "c9c571d912dc631168282eb44c40673e124b0ed109b298c7f9df0ee494b5dce3",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "31145e96df4135f2f92bcbef62a9d00877e49666",
+        "scope": "Fixed initialized pinned-native fixtures only; no native arbitrary-input injection or style owner routing",
+        "value_count": 209,
+        "equality_cells": 43681,
+        "inputs_unchanged": true
+      },
+      "preparation": {
+        "report": "artifacts/cleanup-prepare-rust-x86/report.json",
+        "report_sha256": "b99f106257ab80920b22ac19810b9429234444723786f4989bda27708576e36b",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "31145e96df4135f2f92bcbef62a9d00877e49666",
+        "scope": "Bounded final Add/EntryOnly suffix; excludes preceding trimming, WebVTT, encoding, append, callbacks, unassigned CString tail units and full host parity",
+        "native_pointer_bits": 32,
+        "observations": 600,
+        "inputs_unchanged": true
+      },
+      "com": {
+        "report": "artifacts/cleanup-contracts-x86/com-authorized/report.json",
+        "report_sha256": "adc3575dd03650b7f8ca00b73946bda03fce07be2a1b5197c221118c932aca9e",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "31145e96df4135f2f92bcbef62a9d00877e49666",
+        "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+        "inputs_unchanged": true,
+        "case_count": 10
+      },
+      "ssf": {
+        "report": "artifacts/cleanup-ssf-final-x86/comparison/report.json",
+        "report_sha256": "301dd17df8ac40cc528180227751def2cfbef122e94430d54b78bf0923ccf699",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "7eb413f1ed70b365bd19fa5008e130732501652e",
+        "scope": "Actual separately linked libssf parser, parsed text and public node graph snapshots (ordered child links, types, names, priority, predefined flags, value kinds and raw UTF-16 values; excludes private numeric unit/cache fields). Cleanup removed native Dump and OutputStream; no serialization parity is claimed. Native renderer traces and blank RGBA frames are characterized separately: the pinned FontCache::Create returns NULL after successful CreateFontIndirect. No visible rendering parity is established. WCHAR and UTF-16LE/BOM byte input in borrowed, adopted and copied modes, including mutation of the source after copying; bounded valid fixtures plus declared unterminated/newline literal errors with completed native exception handlers, each side repeated in fresh processes. Error line/column and exact UTF-16 messages are compared separately from successful parsing. Crashes, timeouts and unexpected exceptions never pass. DirectShow, host playback, other byte encodings and broader malformed-document coverage remain separate.",
+        "inputs_unchanged": true,
+        "case_count": 56
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "69faa2d5f90f35fe4184e9e9bd892adb76fee60295701988f61ab7af0664d9eb",
+          "candidate_sha256": "883be270d6b452eeccd35e0b65f5b001f1442164ed2bd2a0c03504318cf79af7",
+          "exports_equal": true,
+          "declared_dependencies_compatible": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "dbd365316d54d5a3d590b63604fbbc5ea6849a912eb7660e52d8df4bdd6b2120"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "2c3b904d7f91902ef456e07b648c5d6351878318c235397eeb9b39eb3fffa34f",
+          "candidate_sha256": "fa17843af63a25bb6403bcae1be25c76e687a4422dd30ad2124a5423d0d9f9d9",
+          "exports_equal": true,
+          "declared_dependencies_compatible": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "8821591e5f42e83c8361380a00b4869b748312f9374da70041ad829e381b6bbc"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "3e7c20a4d6c42457d92eb56c42e4fd9f3bddb93276f2c1cd28bfb73edd06484c",
+          "candidate_sha256": "8032b288fe7c2b5eb767fce69f128c8fc6b2b7121ca72554a3df5bac3dde9164",
+          "exports_equal": true,
+          "declared_dependencies_compatible": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "bee8a1d975859e0ab8a9b6843e14f813df818b8538e6501927e792bb180eb7c1"
+        }
+      },
+      "historical_leaf_regression": {
+        "report": "artifacts/decoder/i686-pc-windows-msvc/report.json",
+        "report_sha256": "873fb034c29f1c8666078578251647931ad6d58de2e2745daf37b94468dd19d1",
+        "complete": true,
+        "candidate_commit": "31145e96df4135f2f92bcbef62a9d00877e49666",
+        "scope": "Current Rust and C ABI headers through historical native adapters; current production adapters are not exercised",
+        "native_adapter_commit": "6915e8d9d8aa1ab30cb0b815b11ef3717eecf56b",
+        "reference": {
+          "commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "scope": "historical leaf algorithms; not cleanup-baseline integration"
+        }
+      }
+    }
+  },
+  "rust_checks": {
+    "core_tests_per_architecture": 241,
+    "ffi_tests_per_architecture": 123,
+    "fmt": true,
+    "clippy_warnings_denied": true,
+    "corpus_regeneration": true,
+    "log": "artifacts/final-rust-checks.log",
+    "log_sha256": "0bcfe538b1233fe7659a0debfb62ddeacc723408241ee8f1fc846b4e07faf86e"
+  },
+  "python_harness_checks": {
+    "tests_run": 148,
+    "skipped": 1,
+    "failures": 0,
+    "log": "artifacts/python-tests.log",
+    "log_sha256": "963bbfcfed274513297fa75a90c8b0f27aac54309ce1c5c6baee5ddad60ef87d"
+  }
+}
