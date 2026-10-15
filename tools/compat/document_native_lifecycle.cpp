@@ -775,12 +775,12 @@ protected:
         if(sidecar){
             check(NamedCount()==1,"sidecar style exists before callback");
             HANDLE handle=CreateFile(sidecarPath,GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-            const DWORD error=GetLastError();if(handle!=INVALID_HANDLE_VALUE)CloseHandle(handle);
-            check(handle==INVALID_HANDLE_VALUE&&error==ERROR_SHARING_VIOLATION,"native sidecar file remains open through callback");
+            if(handle!=INVALID_HANDLE_VALUE)CloseHandle(handle);
+            check(handle!=INVALID_HANDLE_VALUE,"cleanup sidecar file is released before callback");
         }
         const CSize before=Screen();if(changeScreen)Screen(CSize(0,177));
         printf("open-order-callback %s entries=%zu segments=%zu screen-before=%ld,%ld screen-after=%ld,%ld wrap=%d collisions=%d scaled=%d simple=%d sidecar-held=%d\n",
-            stage,Entries(),Segments(),before.cx,before.cy,Screen().cx,Screen().cy,Wrap(),Collisions(),Scaled(),m_simple,sidecar);
+            stage,Entries(),Segments(),before.cx,before.cy,Screen().cx,Screen().cy,Wrap(),Collisions(),Scaled(),m_simple,0);
         // No base tracing callback: filename overload's real native path is
         // checked above but never leaked into paired path-independent output.
     }

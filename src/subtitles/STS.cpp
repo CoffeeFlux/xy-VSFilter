@@ -4515,16 +4515,18 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
             SetDocumentPath(f->GetFilePath());
             m_simple = i > 0;
             operation = run.Next(-1);
-            // Preserve the sidecar file lifetime through rebuild and warnings.
-            CWebTextFile f2(CTextFile::UTF8);
             for(;;)
             {
                 switch(operation.kind)
                 {
                 case XyRust::OpenLifecycle::Sidecar:
+                {
+                    // The cleanup closes the sidecar before rebuild callbacks.
+                    CWebTextFile f2(CTextFile::UTF8);
                     if(f2.Open(f->GetFilePath() + _T(".style")))
                         OpenSubStationAlpha(&f2, *this, CharSet);
                     break;
+                }
                 case XyRust::OpenLifecycle::Rebuild:
                     CreateSegments();
                     break;

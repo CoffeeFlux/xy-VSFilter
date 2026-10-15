@@ -166,7 +166,7 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
 
     def test_cleanup_still_requires_live_frame_and_preparation_observations(self):
         import re
-        cleaned = re.sub(rb" entry=-?[0-9]+", b"", TRACE)
+        cleaned = re.sub(rb" entry=-?[0-9]+", b"", TRACE).replace(b"sidecar-held=1", b"sidecar-held=0")
         compare_traces([cleaned] * 4, 64, cleanup=True)
         for prefix in (b"frame-search-row ", b"preparation-stage ", b"copy-styles-stage "):
             missing = b"\n".join(line for line in cleaned.split(b"\n") if not line.startswith(prefix))

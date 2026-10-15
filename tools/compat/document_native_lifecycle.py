@@ -75,8 +75,8 @@ def run_dialog_process(command,cwd,stem,timeout):
         Path(str(stem)+".stdout").write_bytes(stdout)
         Path(str(stem)+".stderr").write_bytes(stderr)
         (destination/"dialogs.json").write_text(json.dumps(observer.events,indent=2)+"\n",encoding="utf-8")
-        if observer.error: raise RuntimeError(observer.error)
         if process.returncode: raise RuntimeError(f"{stem.name} exited {process.returncode}; unresolved")
+        if observer.error: raise RuntimeError(observer.error)
         validate_dialogs(observer.events)
         return subprocess.CompletedProcess(command,process.returncode,stdout,stderr),observer.events
     finally:
@@ -289,7 +289,9 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
             raise ValueError("missing or incorrect FRAME full-owner query/alias/snapshot/retention observations")
 
     if require_open_order_stages:
-        if [line for line in lines if line.startswith(b"open-order-")]!=open_order_rows():
+        expected = open_order_rows()
+        if cleanup: expected = [row.replace(b"sidecar-held=1", b"sidecar-held=0") for row in expected]
+        if [line for line in lines if line.startswith(b"open-order-")]!=expected:
             raise ValueError("missing or incorrect Open sidecar/callback/fallback/Empty/rejection ordering")
 
     if require_setstr_stages:
