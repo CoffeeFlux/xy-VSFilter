@@ -27,7 +27,6 @@
 typedef const char *csri_rend;
 extern "C" struct csri_vsfilter_inst {
 	CRenderedTextSubtitle *rts;
-	CCritSec *cs;
 	CSize script_res;
 	CSize screen_res;
 	CRect video_rect;
@@ -53,8 +52,7 @@ CSRIAPI csri_inst *csri_open_file(csri_rend *renderer, const char *filename, str
 	MultiByteToWideChar(CP_UTF8, 0, filename, -1, namebuf, namesize);
 
 	csri_inst *inst = new csri_inst();
-	inst->cs = new CCritSec();
-	inst->rts = new CRenderedTextSubtitle(inst->cs);
+	inst->rts = new CRenderedTextSubtitle();
 	if (inst->rts->Open(CString(namebuf), DEFAULT_CHARSET)) {
 		delete[] namebuf;
 		inst->readorder = 0;
@@ -62,7 +60,6 @@ CSRIAPI csri_inst *csri_open_file(csri_rend *renderer, const char *filename, str
 	} else {
 		delete[] namebuf;
 		delete inst->rts;
-		delete inst->cs;
 		delete inst;
 		return 0;
 	}
@@ -74,14 +71,12 @@ CSRIAPI csri_inst *csri_open_mem(csri_rend *renderer, const void *data, size_t l
     AMTRACE((TEXT(__FUNCTION__),0));
 	csri_inst *inst = new csri_inst();
 
-	inst->cs = new CCritSec();
-	inst->rts = new CRenderedTextSubtitle(inst->cs);
+	inst->rts = new CRenderedTextSubtitle();
 	if (inst->rts->Open((BYTE*)data, (int)length, DEFAULT_CHARSET, _T("CSRI memory subtitles"))) {
 		inst->readorder = 0;
 		return inst;
 	} else {
 		delete inst->rts;
-		delete inst->cs;
 		delete inst;
 		return 0;
 	}
@@ -93,7 +88,6 @@ CSRIAPI void csri_close(csri_inst *inst)
 	if (!inst) return;
 
 	delete inst->rts;
-	delete inst->cs;
 	delete inst;
 }
 

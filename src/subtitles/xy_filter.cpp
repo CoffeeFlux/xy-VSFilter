@@ -28,90 +28,7 @@ bool AlmostEqual(float A, float B, int maxUlps=0)
     return false;
 }
 
-/****
- * See @xy_filter_c
- **/
-__forceinline void xy_filter_one_line_c(float *dst, int width, const float *filter, int filter_width)
-{
-    const float *filter_start = filter;
-    int xx_fix = width > filter_width ? 0 : filter_width - width;
-    float *dst2 = dst - filter_width;
-    float *dst_endr = dst + width;
-    float *dst_end0 = dst_endr - filter_width;
-    float *dst_endl = dst - xx_fix;
-    ASSERT(xx_fix==0 || dst_end0==dst_endl);
 
-    ASSERT(filter_start == filter);
-    filter_start += filter_width;
-    const float *filter_end = filter_start;
-    for (;dst2<dst_endl;dst2++, filter_start--)//left margin
-    {
-        const float *src = dst;
-        float sum = 0;
-        for(const float* f=filter_start;f<filter_end;f++, src++)
-        {
-            sum += src[0] * f[0];
-        }
-        *dst2 = sum;
-    }
-    for (;dst2<dst;dst2++, filter_start--, filter_end--)//if width < filter_width
-    {
-        const float *src = dst;
-        float sum = 0;
-        for(const float* f=filter_start;f<filter_end;f++, src++)
-        {
-            sum += src[0] * f[0];
-        }
-        *dst2 = sum;
-    }
-    ASSERT(filter_start==filter);
-    for (;dst2<dst_end0;dst2++)
-    {
-        const float *src = dst2;
-
-        float sum = 0;
-        for(const float* f=filter_start;f<filter_end;f++, src++)
-        {
-            sum += src[0] * f[0];
-        }
-        *dst2 = sum;
-    }
-    for (;dst2<dst_endr;dst2++, filter_end--)//right margin
-    {
-        const float *src = dst2;
-        float sum = 0;
-        for(const float* f=filter;f<filter_end;f++, src++)
-        {
-            sum += src[0] * f[0];
-        }
-        *dst2 = sum;
-    }
-}
-
-/****
- * dst memory layout:
- * 1. Source content starts from @dst;
- * 2. Output content starts from @dst-@mwitdth;
- * 
- * |-                     stride                            -|
- * | <- @dst-@mwidth --------| <- @dst+0 --------------------|
- * |-                       -|-                             -|
- * |- margin                -|-  src width*height items     -|
- * |- mwidth*heigth items   -|-                             -|
- * |- do NOT need to init   -|-                             -|
- * |- when input            -|-                             -|
- * |---------------------------------------------------------|
- **/
-void xy_filter_c(float *dst, int width, int height, int stride, const float *filter, int filter_width)
-{
-    ASSERT( stride>=4*(width+filter_width) );
-    BYTE* end = reinterpret_cast<BYTE*>(dst) + height*stride;
-    BYTE* dst_byte = reinterpret_cast<BYTE*>(dst);
-    for( ; dst_byte<end; dst_byte+=stride )
-    {
-        xy_filter_one_line_c(reinterpret_cast<float*>(dst_byte), width, filter, filter_width);
-    }
-}
 
 /****
  * inline function sometimes generates stupid code
@@ -287,7 +204,7 @@ __forceinline void xy_filter_one_line_sse_v6(float *dst, int width, const float 
 }
 
 /****
- * See @xy_filter_c
+ * See @xy_filter_sse
  **/
 void xy_filter_sse_v6(float *dst, int width, int height, int stride, const float *filter, int filter_width)
 {
@@ -479,8 +396,8 @@ struct FilterAllRightMargin<FILTER_LENGTH,0>
 
 /****
  * Equivalent:
- *   xy_filter_c(float *dst, int width, int height, int stride, const float *filter, (FILTER_LENGTH+3)&~3 );
- * See @xy_filter_c
+ *   xy_filter_sse(float *dst, int width, int height, int stride, const float *filter, (FILTER_LENGTH+3)&~3 );
+ * See @xy_filter_sse
  * Constrain:
  *   FILTER_LENGTH<=width && width%4==0
  **/
@@ -537,8 +454,8 @@ void xy_filter_sse_template(float *dst, int width, int height, int stride, const
 
 /****
  * Equivalent:
- *   xy_filter_c(float *dst, int width, int height, int stride, const float *filter, 4 );
- * See @xy_filter_c
+ *   xy_filter_sse(float *dst, int width, int height, int stride, const float *filter, 4 );
+ * See @xy_filter_sse
  * Constrain:
  *   filter[3] == 0 && filter[0] == filter[2] (symmetric) (&& sum(filter)==1)
  **/
@@ -591,7 +508,20 @@ void xy_3_tag_symmetric_filter_sse(float *dst, int width, int height, int stride
 
 
 /****
- * See @xy_filter_c
+ * Filters each row of @dst in place with @filter.
+ *
+ * dst memory layout:
+ * 1. Source content starts from @dst;
+ * 2. Output content starts from @dst-@mwitdth;
+ *
+ * |-                     stride                            -|
+ * | <- @dst-@mwidth --------| <- @dst+0 --------------------|
+ * |-                       -|-                             -|
+ * |- margin                -|-  src width*height items     -|
+ * |- mwidth*heigth items   -|-                             -|
+ * |- do NOT need to init   -|-                             -|
+ * |- when input            -|-                             -|
+ * |---------------------------------------------------------|
  **/
 void xy_filter_sse(float *dst, int width, int height, int stride, const float *filter, int filter_width)
 {
@@ -627,37 +557,11 @@ void xy_filter_sse(float *dst, int width, int height, int stride, const float *f
     }   
 }
 
+
 /****
  * Copy and convert src to dst line by line.
  * @dst_width MUST >= @width
  * if @dst_width>@width, the extra elements will be filled with 0.
- **/
-void xy_byte_2_float_c(float *dst, int dst_width, int dst_stride, 
-    PCUINT8 src, int width, int height, int stride)
-{
-    PUINT8 dst_byte = reinterpret_cast<PUINT8>(dst);
-
-    PCUINT8 src_end = src + height*stride;
-    for( ; src<src_end; src+=stride, dst_byte+=dst_stride )
-    {
-        PCUINT8 src2 = src;
-        PCUINT8 src_end = src2 + width;
-        float *dst2 = reinterpret_cast<float*>(dst_byte);
-
-        for (;src2<src_end;src2++, dst2++)
-        {
-            *dst2 = *src2;
-        }
-        float *dst2_end=reinterpret_cast<float*>(dst_byte)+dst_width;
-        for (;dst2<dst2_end;dst2++)
-        {
-            *dst2=0;
-        }
-    }
-}
-
-/****
- * See @xy_byte_2_float_c
  **/
 void xy_byte_2_float_sse(float *dst, int dst_width, int dst_stride, 
     PCUINT8 src, int width, int height, int stride)
@@ -705,34 +609,6 @@ void xy_byte_2_float_sse(float *dst, int dst_width, int dst_stride,
     }
 }
 
-/****
- * Copy transposed Matrix src to dst.
- * @dst_width MUST >= @height.
- * if @dst_width > @height, the extra elements will be filled with 0.
- **/
-void xy_float_2_float_transpose_c(float *dst, int dst_width, int dst_stride, 
-    const float *src, int width, int height, int src_stride)
-{
-    ASSERT(dst_width >= height);
-    PUINT8 dst_byte = reinterpret_cast<PUINT8>(dst);
-    const float* src_end = src + width;
-    PCUINT8 src2_end = reinterpret_cast<PCUINT8>(src) + height*src_stride;
-    for( ; src<src_end; src++, dst_byte+=dst_stride )
-    {
-        PCUINT8 src2 = reinterpret_cast<PCUINT8>(src);
-
-        float *dst2 = reinterpret_cast<float*>(dst_byte);        
-        for (;src2<src2_end;src2+=src_stride,dst2++)
-        {
-            *dst2 = *reinterpret_cast<const float*>(src2);
-        }
-        float *dst2_end = reinterpret_cast<float*>(dst_byte) + dst_width;
-        for (;dst2<dst2_end;dst2++)
-        {
-            *dst2 = 0;
-        }
-    }
-}
 
 /****
  * see @xy_float_2_float_transpose_c
@@ -775,34 +651,6 @@ void xy_float_2_float_transpose_sse(float *dst, int dst_width, int dst_stride,
     }
 }
 
-/****
- * Transpose and round Matrix src, then copy to dst.
- * @dst_width MUST >= @height.
- * if @dst_width > @height, the extra elements will be filled with 0.
- **/
-void xy_float_2_byte_transpose_c(UINT8 *dst, int dst_width, int dst_stride, 
-    const float *src, int width, int height, int src_stride)
-{
-    ASSERT(dst_width >= height);
-    PUINT8 dst_byte = reinterpret_cast<PUINT8>(dst);
-    const float* src_end = src + width;
-    PCUINT8 src2_end = reinterpret_cast<PCUINT8>(src) + height*src_stride;
-    for( ; src<src_end; src++, dst_byte+=dst_stride )
-    {
-        PCUINT8 src2 = reinterpret_cast<PCUINT8>(src);
-
-        UINT8 *dst2 = reinterpret_cast<UINT8*>(dst_byte);
-        for (;src2<src2_end;src2+=src_stride,dst2++)
-        {
-            *dst2 = static_cast<UINT8>(*reinterpret_cast<const float*>(src2)+0.5);
-        }
-        UINT8 *dst2_end = reinterpret_cast<UINT8*>(dst_byte) + dst_width;
-        for (;dst2<dst2_end;dst2++)
-        {
-            *dst2 = 0;
-        }
-    }
-}
 
 void xy_float_2_byte_transpose_sse(UINT8 *dst, int dst_width, int dst_stride, 
     const float *src, int width, int height, int src_stride)
@@ -1063,50 +911,6 @@ void xy_be_filter_c(PUINT8 dst, int width, int height, int stride)
     }
 }
 
-/****
- * 1. It is a in-place symmetric 3-tag horizontal filter
- * 2. Boundary Pixels are filtered by padding 0. E.g. 
- *      dst[0] = (0*1 + dst[0]*2 + dst[1]*1)/4;
- * 3. sum(filter) == 256
- **/
-template<int ROUNDING_POLICY>
-void xy_be_filter2_c(PUINT8 dst, int width, int height, int stride, PCUINT filter)
-{
-    ASSERT(width>=1);
-    if (width<=0)
-    {
-        return;
-    }
-
-    const int VOLUME_BITS = 8;
-    const int VOLUME = (1<<VOLUME_BITS);
-    if (filter[0]==0)
-    {
-        return;//nothing to do;
-    }
-    else if (filter[0]== (VOLUME>>2))
-    {
-        return xy_be_filter_c<ROUNDING_POLICY>(dst, width, height, stride);
-    }
-
-    PUINT8 dst2 = NULL;
-    XyRounding<ROUNDING_POLICY, VOLUME_BITS> xy_rounding;
-    for (int y=0;y<height;y++)
-    {
-        dst2 = dst + y*stride;
-        int old_pix = 0;
-        int tmp = 0;
-        int x=0;
-        for (x=0;x<width-1;x++)
-        {
-            tmp = (old_pix + dst2[x+1]) * filter[0] + dst2[x] * filter[1];
-            old_pix = dst2[x];
-            dst2[x] = (xy_rounding.round(tmp)>>VOLUME_BITS);
-        }
-        tmp = old_pix * filter[0] + dst2[x] * filter[1];
-        dst2[x] = (xy_rounding.round(tmp)>>VOLUME_BITS);
-    }
-}
 
 /****
  * See @xy_be_filter_c
@@ -1165,7 +969,10 @@ void xy_be_filter_sse(PUINT8 dst, int width, int height, int stride)
 }
 
 /****
- * See @xy_be_filter2_c
+ * 1. It is a in-place symmetric 3-tag horizontal filter
+ * 2. Boundary Pixels are filtered by padding 0. E.g.
+ *      dst[0] = (0*1 + dst[0]*2 + dst[1]*1)/4;
+ * 3. sum(filter) == 256
  * No alignment requirement.
  **/
 template<int ROUNDING_POLICY>
@@ -1283,7 +1090,9 @@ void xy_calculate_filter(float pass, PUINT filter)
 }
 
 /****
- * See @xy_float_2_byte_transpose_c
+ * Transpose Matrix src, then copy to dst.
+ * @dst_width MUST >= @height.
+ * if @dst_width > @height, the extra elements will be filled with 0.
  **/
 void xy_byte_2_byte_transpose_c(UINT8 *dst, int dst_width, int dst_stride, 
     PCUINT8 src, int width, int height, int src_stride)

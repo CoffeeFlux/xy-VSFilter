@@ -203,56 +203,6 @@ CString g_default_style(_T("Default"));
 
 //
 
-BYTE CharSetList[] =
-{
-    ANSI_CHARSET,
-    DEFAULT_CHARSET,
-    SYMBOL_CHARSET,
-    SHIFTJIS_CHARSET,
-    HANGEUL_CHARSET,
-    HANGUL_CHARSET,
-    GB2312_CHARSET,
-    CHINESEBIG5_CHARSET,
-    OEM_CHARSET,
-    JOHAB_CHARSET,
-    HEBREW_CHARSET,
-    ARABIC_CHARSET,
-    GREEK_CHARSET,
-    TURKISH_CHARSET,
-    VIETNAMESE_CHARSET,
-    THAI_CHARSET,
-    EASTEUROPE_CHARSET,
-    RUSSIAN_CHARSET,
-    MAC_CHARSET,
-    BALTIC_CHARSET
-};
-
-TCHAR* CharSetNames[] =
-{
-    _T("ANSI"),
-    _T("DEFAULT"),
-    _T("SYMBOL"),
-    _T("SHIFTJIS"),
-    _T("HANGEUL"),
-    _T("HANGUL"),
-    _T("GB2312"),
-    _T("CHINESEBIG5"),
-    _T("OEM"),
-    _T("JOHAB"),
-    _T("HEBREW"),
-    _T("ARABIC"),
-    _T("GREEK"),
-    _T("TURKISH"),
-    _T("VIETNAMESE"),
-    _T("THAI"),
-    _T("EASTEUROPE"),
-    _T("RUSSIAN"),
-    _T("MAC"),
-    _T("BALTIC"),
-};
-
-int CharSetLen = countof(CharSetList);
-
 static void LogSegments(const CAtlArray<STSSegment>& segments)
 {
 #if ENABLE_XY_LOG_TEXT_SUBTITLE
@@ -270,17 +220,6 @@ static void LogSegments(const CAtlArray<STSSegment>& segments)
 #endif
 }
 
-static void LogStyles(const CSTSStyleMap& styles)
-{
-#if ENABLE_XY_LOG_TEXT_SUBTITLE
-    TRACE_SUB("m_styles count:"<<styles.GetCount());
-
-    for(POSITION pos=styles.GetStartPosition(); pos!=NULL;)
-    {
-        TRACE_SUB("\tm_styles["<<styles.GetNextKey(pos)<<"]");
-    }
-#endif
-}
 //
 
 static DWORD CharSetToCodePage(DWORD dwCharSet)
@@ -591,8 +530,6 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 
     int version = 3, sver = 3;
 
-    ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT601;
-    ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_TV;
 
     CStringW buff;
     while(true)
@@ -808,46 +745,6 @@ if(sver <= 4)   style->scrAlignment = (style->scrAlignment&4) ? ((style->scrAlig
         {
             LoadUUEFont(file);
         }
-        else if(entry == L"ycbcr matrix")
-        {
-            buff = GetStr(buff);
-            buff.MakeLower();
-            if (buff.Left(4)==L"none")
-            {
-                ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_AUTO;
-                ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_AUTO;
-            }
-            else if (buff.Left(6)==L"tv.601")
-            {
-                ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT601;
-                ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_TV;
-            }
-            else if (buff.Left(6)==L"tv.709")
-            {
-                ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT709;
-                ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_TV;
-            }
-            else if (buff.Left(7)==L"tv.2020")
-            {
-                ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT2020;
-                ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_TV;
-            }
-            else if (buff.Left(6)==L"pc.601")
-            {
-                ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT601;
-                ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_PC;
-            }
-            else if (buff.Left(6)==L"pc.709")
-            {
-                ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT709;
-                ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_PC;
-            }
-            else if (buff.Left(7)==L"pc.2020")
-            {
-                ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT2020;
-                ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_PC;
-            }
-        }
         if(fEOF) break;
     }
 //    ret.Sort();
@@ -880,9 +777,6 @@ CSimpleTextSubtitle::CSimpleTextSubtitle()
     m_encoding             = CTextFile::DEFAULT_ENCODING;
     m_ePARCompensationType = EPCTDisabled;
     m_dPARCompensation     = 1.0;
-    m_eYCbCrMatrix         = YCbCrMatrix_AUTO;
-    m_eYCbCrRange          = YCbCrRange_AUTO;
-    m_fForcedDefaultStyle  = false;
     m_defaultStyle.charSet = DEFAULT_CHARSET;
 }
 
@@ -903,7 +797,6 @@ void CSimpleTextSubtitle::Copy(CSimpleTextSubtitle& sts)
     m_fScaledBAS                   = sts.m_fScaledBAS;
     m_encoding                     = sts.m_encoding;
     m_defaultStyle                 = sts.m_defaultStyle;
-    m_fForcedDefaultStyle          = sts.m_fForcedDefaultStyle;
     CopyStyles     (sts.m_styles  );
     m_segments.Copy(sts.m_segments);
     m_entries.Copy (sts.m_entries );
@@ -1202,64 +1095,8 @@ void CSimpleTextSubtitle::AddStyle(CString name, STSStyle* style)
     m_styles[name] = style;
 }
 
-bool CSimpleTextSubtitle::SetDefaultStyle(STSStyle& s)
-{
-    LogStyles(m_styles);
 
-    m_defaultStyle = s;
-    return true;
-}
 
-void CSimpleTextSubtitle::SetForceDefaultStyle( bool value )
-{
-    m_fForcedDefaultStyle = value;
-}
-
-const STSSegment* CSimpleTextSubtitle::SearchSubs(REFERENCE_TIME t, double fps, /*[out]*/ int* iSegment, int* nSegments)
-{
-    int segmentsCount = m_segments.GetCount();
-    int i = 0, j = segmentsCount - 1;
-
-    if(nSegments) *nSegments = segmentsCount;
-    if(segmentsCount<=0)
-    {
-        if(iSegment!=NULL)
-            *iSegment = 0;
-        TRACE_SUB("No subtitles at "<<XY_LOG_VAR_2_STR(t));
-        return NULL;
-    }
-
-    if(t >= TranslateSegmentEnd(j, fps))
-    {
-        i = j;
-        j++;
-    }
-    if(t < TranslateSegmentEnd(i, fps))
-    {
-        j = i;
-        i--;
-    }
-
-    while(i < j-1)
-    {
-        int mid = (i + j) >> 1;
-
-        REFERENCE_TIME midt = TranslateSegmentEnd(mid, fps);
-
-        if(t < midt)
-            j=mid;
-        else
-            i=mid;
-    }
-    if(iSegment!=NULL)
-        *iSegment = j;
-    if(j<segmentsCount)
-    {
-        return &m_segments[j];
-    }
-    TRACE_SUB("No subtitles at "<<XY_LOG_VAR_2_STR(RT2MS(t)));
-    return(NULL);
-}
 
 STSSegment* CSimpleTextSubtitle::SearchSubs2(REFERENCE_TIME t, double fps, /*[out]*/ int* iSegment, int* nSegments)
 {
@@ -1341,41 +1178,12 @@ REFERENCE_TIME CSimpleTextSubtitle::TranslateSegmentEnd(int i, double fps)
         0);
 }
 
-void CSimpleTextSubtitle::TranslateSegmentStartEnd(int i, double fps, /*out*/REFERENCE_TIME& start, /*out*/REFERENCE_TIME& end)
-{
-    int n = m_segments.GetCount();
-    if(i < 0 || n <= i)
-    {
-        start=-1;
-        end=-1;
-    }
-    else
-    {
-        if(m_mode == TIME)
-        {
-            start = m_segments[i].start;
-            end = m_segments[i].end;
-        }
-        else //m_mode == FRAME
-        {
-            start = std::llround(m_segments[i].start * UNITS_FLOAT / fps);
-            end = std::llround(m_segments[i].end * UNITS_FLOAT / fps);
-        }
-    }
-}
 
 STSStyle* CSimpleTextSubtitle::GetStyle(int i)
 {
     STSStyle* style = NULL;
-    if (!m_fForcedDefaultStyle)
-    {
-        if (!m_styles.Lookup(m_entries.GetAt(i).style, style) &&
-            !m_styles.Lookup(         g_default_style, style))
-        {
-            style = &m_defaultStyle;
-        }
-    }
-    else
+    if (!m_styles.Lookup(m_entries.GetAt(i).style, style) &&
+        !m_styles.Lookup(         g_default_style, style))
     {
         style = &m_defaultStyle;
     }
@@ -1533,7 +1341,6 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
         m_mode = OpenFuncts[i].mode;
         m_encoding = f->GetEncoding();
         m_path = f->GetFilePath();
-        m_simple = i > 0;
 
         if(!m_path.IsEmpty())
         {
@@ -1570,10 +1377,6 @@ bool CSimpleTextSubtitle::IsEmpty()
     return m_entries.IsEmpty();
 }
 
-void CSimpleTextSubtitle::RemoveAllEntries()
-{
-    m_entries.RemoveAll();
-}
 
 ////////////////////////////////////////////////////////////////////
 

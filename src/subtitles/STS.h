@@ -159,7 +159,6 @@ public:
 
 class CSimpleTextSubtitle
 {
-    friend class CSubtitleEditorDlg;
 
 protected:
     CAtlArray<STSEntry>   m_entries;
@@ -167,9 +166,7 @@ protected:
     virtual void OnChanged() {}
 
 public:
-    bool           m_simple;
     CString        m_name;
-    LCID           m_lcid;
     tmode          m_mode;
     CTextFile::enc m_encoding;
     CString        m_path;
@@ -182,7 +179,6 @@ public:
 
     CSTSStyleMap   m_styles;
 
-    bool           m_fForcedDefaultStyle;
     STSStyle       m_defaultStyle;
 
     enum EPARCompensationType
@@ -196,21 +192,6 @@ public:
     EPARCompensationType m_ePARCompensationType;
     double               m_dPARCompensation;
 
-    enum YCbCrMatrix
-    {
-        YCbCrMatrix_BT601,
-        YCbCrMatrix_BT709,
-        YCbCrMatrix_BT2020,
-        YCbCrMatrix_AUTO
-    };
-    enum YCbCrRange
-    {
-        YCbCrRange_PC,
-        YCbCrRange_TV,
-        YCbCrRange_AUTO
-    };
-    YCbCrMatrix    m_eYCbCrMatrix;
-    YCbCrRange     m_eYCbCrRange;
 public:
     CSimpleTextSubtitle();
     virtual ~CSimpleTextSubtitle();
@@ -220,7 +201,6 @@ public:
 
     bool IsEmpty();
 
-    void RemoveAllEntries();
     void CreateSegments();
 
     bool Open(CString    fn           , int CharSet, CString name = _T(""));
@@ -242,22 +222,13 @@ public:
     void ChangeUnknownStylesToDefault();
     void AddStyle(CString name, STSStyle* style); // style will be stored and freed in Empty() later
 
-    bool SetDefaultStyle(STSStyle& s);
 
-    void SetForceDefaultStyle(bool value);
 
     REFERENCE_TIME TranslateStart(int i, double fps);
     REFERENCE_TIME TranslateEnd  (int i, double fps);
 
     REFERENCE_TIME TranslateSegmentStart   (int i, double fps);
     REFERENCE_TIME TranslateSegmentEnd     (int i, double fps);
-    void TranslateSegmentStartEnd(int i, double fps, /*out*/REFERENCE_TIME& start, /*out*/REFERENCE_TIME& end);
-
-    //find the first STSSegment with stop time > @t
-    //@iSegment: return the index, 0 based, of the STSSegment found, return STSSegments count if all STSSegments' stop time are NOT bigger than @t
-    //@nSegment: return the STSSegments count
-    //@return: the ptr to the STSSegment found, return NULL if such STSSegment not exist
-    const STSSegment* SearchSubs(REFERENCE_TIME t, double fps, /*[out]*/ int* iSegment = NULL, int* nSegments = NULL);
 
     //find STSSegment with a duration containing @t, i.e. with a start time <= @t and a stop time > @t
     //@iSegment: return the index, 0 based, of the STSSegment found. Return -1 if such STSSegment not exist
@@ -265,7 +236,6 @@ public:
     //@return: the ptr to the STSSegment found, return NULL if such STSSegment not exist
     STSSegment* SearchSubs2(REFERENCE_TIME t, double fps, /*[out]*/ int* iSegment=NULL, int* nSegments=NULL);
 
-    const STSSegment* GetSegment(int iSegment) {return iSegment >= 0 && iSegment < (int)m_segments.GetCount() ? &m_segments[iSegment] : NULL;}
 
     STSStyle* GetStyle(int i);
     bool      GetStyle(int i, STSStyle* const stss);
@@ -275,14 +245,10 @@ public:
 
 #  define GetStr GetStrW
 
-    friend bool OpenMicroDVD(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet);
 private:
     bool CopyStyles(const CSTSStyleMap& styles, bool fAppend = false);
 };
 
-extern BYTE   CharSetList[];
-extern TCHAR* CharSetNames[];
-extern int    CharSetLen;
 
 class CHtmlColorMap : public CAtlMap<CString, DWORD, CStringElementTraits<CString> > {public: CHtmlColorMap();};
 extern CHtmlColorMap g_colors;

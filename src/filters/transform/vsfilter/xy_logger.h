@@ -148,7 +148,6 @@ std::wostream& operator<<(std::wostream& os, const SIZE& obj);
 std::ostream& operator<<(std::ostream& os, const RECT& obj);
 std::wostream& operator<<(std::wostream& os, const RECT& obj);
 
-CString XyUuidToString(const UUID& in_uuid);
 
 namespace xy_logger
 {
@@ -158,14 +157,6 @@ namespace xy_logger
 //   file=<path>    also append log lines to this file (UTF-8)
 // Log lines always go to OutputDebugString.
 bool doConfigure(const tstring& configFilename);
-
-void write_file(const char * filename, const void * buff, int size);
-
-void DumpPackBitmap2File(POINT pos, SIZE size, LPCVOID pixels, int pitch, const char *filename);
-
-void XyDisplayType(LPTSTR label, const AM_MEDIA_TYPE *pmtIn);
-
-void XyDumpGraph(IFilterGraph *pGraph, DWORD dwLevel);
 
 } //namespace xy
 

@@ -42,16 +42,6 @@
 
 typedef const UINT8 CUINT8, *PCUINT8;
 
-//NOTE: signed or unsigned affects the result seriously
-#define COMBINE_AYUV(a, y, u, v) ((((((((int)(a))<<8)|y)<<8)|u)<<8)|v)
-
-#define SPLIT_AYUV(color, a, y, u, v) do { \
-        *(v)=(color)&0xff; \
-        *(u)=((color)>>8) &0xff; \
-        *(y)=((color)>>16)&0xff;\
-        *(a)=((color)>>24)&0xff;\
-    } while(0)
-
 class GaussianCoefficients
 {
 public:
@@ -889,194 +879,6 @@ static __forceinline void packed_pix_add_sse2(BYTE* dst, const BYTE* alpha, int 
 
 ///////////////////////////////////////////////////////////////////////////
 
-typedef void (*AlphaBlt8bppFunc)(byte* pY, const byte* am, const byte Y, int h, int w, int src_stride, int dst_stride);
-void           AlphaBlt8bppC    (byte* pY, const byte* am, const byte Y, int h, int w, int src_stride, int dst_stride);
-void           AlphaBlt8bppSse2 (byte* pY, const byte* am, const byte Y, int h, int w, int src_stride, int dst_stride);
-
-void AlphaBlt8bppC(byte* pY,
-    const byte* pAlphaMask, 
-    const byte Y, 
-    int h, int w, int src_stride, int dst_stride)
-{
-    for( ; h>0; h--, pAlphaMask += src_stride, pY += dst_stride )
-    {
-        const BYTE* sa = pAlphaMask;
-        BYTE* dy = pY;
-        const BYTE* dy_end = pY + w;
-
-        for(;dy < dy_end; sa++, dy++)
-        {
-            *dy = (*dy * (256 - *sa)+ Y*(*sa+1))>>8;
-        }
-    }
-}
-
-/***
- * No aligned requirement
- * 
- **/
-void AlphaBlt8bppSse2(byte* pY,
-    const byte* pAlphaMask, 
-    const byte Y, 
-    int h, int w, int src_stride, int dst_stride)
-{   
-    __m128i zero = _mm_setzero_si128();
-    __m128i s = _mm_set1_epi16(Y);               //s = c  0  c  0  c  0  c  0  c  0  c  0  c  0  c  0    
-
-    __m128i ones;
-#ifdef _DEBUG
-    ones = _mm_setzero_si128();
-#endif // _DEBUG
-    ones = _mm_cmpeq_epi32(ones, ones);
-    ones = _mm_srli_epi16(ones, 15);
-    ones = _mm_slli_epi16(ones, 8);
-
-    if( w>16 )//IMPORTANT! The result of the following code is undefined with w<15.
-    {
-        for( ; h>0; h--, pAlphaMask += src_stride, pY += dst_stride )
-        {
-            const BYTE* sa = pAlphaMask;      
-            BYTE* dy = pY;
-            const BYTE* dy_first_mod16 = reinterpret_cast<BYTE*>((reinterpret_cast<intptr_t>(pY)+15)&~15);  //IMPORTANT! w must >= 15
-            const BYTE* dy_end_mod16 = reinterpret_cast<BYTE*>(reinterpret_cast<intptr_t>(pY+w)&~15);
-            const BYTE* dy_end = pY + w;   
-
-            for(;dy < dy_first_mod16; sa++, dy++)
-            {
-                *dy = (*dy * (256 - *sa)+ Y*(*sa+1))>>8;
-            }
-            for(; dy < dy_end_mod16; sa+=8, dy+=16)
-            {
-                __m128i a = _mm_loadl_epi64((__m128i*)sa);
-
-                //Y
-                __m128i d = _mm_load_si128((__m128i*)dy);
-
-                a = _mm_unpacklo_epi8(a,zero);               //a= a0 0  a1 0  a2 0  a3 0  a4 0  a5 0  a6 0  a7 0
-                __m128i ia = _mm_sub_epi16(ones,a);         //ia   = 256-a0 ... 256-a7
-
-                __m128i dl = _mm_unpacklo_epi8(d,zero);               //d    = b0 0  b1 0  b2 0  b3 0  b4 0  b5 0  b6 0  b7 0 
-                __m128i sl = _mm_mullo_epi16(s,a);            //sl   = c0*a0  c1*a1  ... c7*a7
-                sl = _mm_add_epi16(sl,s);
-
-                dl = _mm_mullo_epi16(dl,ia);                   //d    = b0*~a0 b1*~a1 ... b7*~a7
-
-                dl = _mm_add_epi16(dl,sl);                     //d   = (256-a)*d + s + a*s
-                dl = _mm_srli_epi16(dl,8);                    //d   = d>>8
-
-                sa += 8;
-                a = _mm_loadl_epi64((__m128i*)sa);
-
-                a = _mm_unpacklo_epi8(a,zero);
-                ia = _mm_sub_epi16(ones,a);
-
-                d = _mm_unpackhi_epi8(d,zero);
-                sl = _mm_mullo_epi16(s,a);
-                sl = _mm_add_epi16(sl,s);
-
-                d = _mm_mullo_epi16(d,ia);
-                d = _mm_add_epi16(d,sl);
-                d = _mm_srli_epi16(d, 8);
-
-                dl = _mm_packus_epi16(dl,d);
-
-                _mm_store_si128((__m128i*)dy, dl);
-            }
-            for(;dy < dy_end; sa++, dy++)
-            {
-                *dy = (*dy * (256 - *sa)+ Y*(*sa+1))>>8;
-            }
-        }
-    }
-    else
-    {
-        AlphaBlt8bppC(pY, pAlphaMask, Y, h, w, src_stride, dst_stride);
-    }
-}
-
-typedef 
-void (*AlphaBlt8bppSingleAlphaFunc)(byte* pY, const byte alpha, const byte Y, int h, int w, int dst_stride);
-void   AlphaBlt8bppSingleAlphaC    (byte* pY, const byte alpha, const byte Y, int h, int w, int dst_stride);
-void   AlphaBlt8bppSingleAlphaSse2 (byte* pY, const byte alpha, const byte Y, int h, int w, int dst_stride);
-
-void AlphaBlt8bppSingleAlphaC(byte* pY,
-    const byte alpha, 
-    const byte Y, 
-    int h, int w, int dst_stride)
-{   
-    int yPremul = Y*(alpha+1);
-    int dstAlpha = 0x100 - alpha;
-
-    for( ; h>0; h--, pY += dst_stride )
-    {
-        BYTE* dy = pY;
-        const BYTE* dy_end = pY + w;
-
-        for(;dy < dy_end; dy++)
-        {
-            *dy = (*dy * dstAlpha + yPremul)>>8;
-        }
-    }
-}
-
-/***
- * No aligned requirement
- * 
- **/
-void AlphaBlt8bppSingleAlphaSse2(byte* pY,
-    const byte alpha, 
-    const byte Y, 
-    int h, int w, int dst_stride)
-{   
-    int yPremul = Y*(alpha+1);
-    int dstAlpha = 0x100 - alpha;
-    if( w>32 )//IMPORTANT! The result of the following code is undefined with w<15.
-    {
-        __m128i zero = _mm_setzero_si128();
-        __m128i s = _mm_set1_epi16(yPremul);    //s = c  0  c  0  c  0  c  0  c  0  c  0  c  0  c  0            
-        __m128i ia = _mm_set1_epi16(dstAlpha);
-        for( ; h>0; h--, pY += dst_stride )
-        {   
-            BYTE* dy = pY;
-            const BYTE* dy_first_mod16 = reinterpret_cast<BYTE*>((reinterpret_cast<intptr_t>(pY)+15)&~15);  //IMPORTANT! w must >= 15
-            const BYTE* dy_end_mod16 = reinterpret_cast<BYTE*>(reinterpret_cast<intptr_t>(pY+w)&~15);
-            const BYTE* dy_end = pY + w;   
-
-            for(;dy < dy_first_mod16; dy++)
-            {
-                *dy = (*dy * dstAlpha + yPremul)>>8;
-            }
-            for(; dy < dy_end_mod16; dy+=16)
-            {
-                //Y
-                __m128i d = _mm_load_si128(reinterpret_cast<const __m128i*>(dy));
-                __m128i dl = _mm_unpacklo_epi8(d,zero);        //d    = b0 0  b1 0  b2 0  b3 0  b4 0  b5 0  b6 0  b7 0                 
-
-                dl = _mm_mullo_epi16(dl,ia);                   //d    = b0*~a0 b1*~a1 ... b7*~a7
-                dl = _mm_adds_epu16(dl,s);                     //d   = d + s
-                dl = _mm_srli_epi16(dl, 8);                    //d   = d>>8
-                
-                d = _mm_unpackhi_epi8(d,zero);                
-                d = _mm_mullo_epi16(d,ia);
-                d = _mm_adds_epu16(d,s);
-                d = _mm_srli_epi16(d, 8);
-
-                dl = _mm_packus_epi16(dl,d);
-                
-                _mm_store_si128(reinterpret_cast<__m128i*>(dy), dl);
-            }
-            for(;dy < dy_end; dy++)
-            {
-                *dy = (*dy * dstAlpha + yPremul)>>8;
-            }
-        }
-    }
-    else
-    {
-        AlphaBlt8bppSingleAlphaC(pY, alpha, Y, h, w, dst_stride);
-    }
-}
-
 ///////////////////////////////////////////////////////////////////////////
 
 void OverlapRegion(tSpanBuffer& dst, const tSpanBuffer& src, int dx, int dy)
@@ -1327,118 +1129,27 @@ void Rasterizer::Draw(XyBitmap* bitmap, SharedPtrOverlay overlay, const CRect& c
     ASSERT(x >= bitmap->x && y >= bitmap->y && x+w <= bitmap->x + bitmap->w && y+h <= bitmap->y + bitmap->h );
 
     bool fSingleColor = (switchpts[1]==0xffffffff);
-    bool PLANAR = (bitmap->type==XyBitmap::PLANNA);
-    int draw_method = 0;
-    if(fSingleColor)
-        draw_method |= DM::SINGLE_COLOR;
-    if(PLANAR)
-        draw_method |= DM::AYUV_PLANAR;
 
     // draw
     // Grab the first colour
     DWORD color = switchpts[0];
     const byte* s = s_base + overlay->mOverlayPitch*yo + xo;
-    
-    int dst_offset = 0;
-    if (bitmap->type==XyBitmap::PLANNA)
-        dst_offset = bitmap->pitch*(y-bitmap->y) + x - bitmap->x;
-    else
-        dst_offset = bitmap->pitch*(y-bitmap->y) + (x - bitmap->x)*4;
+
+    int dst_offset = bitmap->pitch*(y-bitmap->y) + (x - bitmap->x)*4;
     unsigned long* dst = (unsigned long*)((BYTE*)bitmap->plans[0] + dst_offset);
 
     // Every remaining line in the bitmap to be rendered...
-    switch(draw_method)
-    {
-    case   DM::SINGLE_COLOR | 0*DM::AYUV_PLANAR :
+    if (fSingleColor)
     {
         DrawSingleColorPackPix(dst, s, color, w, h, overlayPitch, bitmap->pitch);
     }
-    break;
-    case 0*DM::SINGLE_COLOR | 0*DM::AYUV_PLANAR :
+    else
     {
         DrawMultiColorPackPix(dst, s, switchpts, xo, w, h, overlayPitch, bitmap->pitch);
-    }
-    break;
-    case   DM::SINGLE_COLOR |   DM::AYUV_PLANAR :
-    {
-        unsigned char* dst_A = bitmap->plans[0] + dst_offset;
-        unsigned char* dst_Y = bitmap->plans[1] + dst_offset;
-        unsigned char* dst_U = bitmap->plans[2] + dst_offset;
-        unsigned char* dst_V = bitmap->plans[3] + dst_offset;
-
-        AlphaBlt8bppSse2(dst_Y, s, ((color)>>16)&0xff, h, w, overlayPitch, bitmap->pitch);
-        AlphaBlt8bppSse2(dst_U, s, ((color)>>8 )&0xff, h, w, overlayPitch, bitmap->pitch);
-        AlphaBlt8bppSse2(dst_V, s, ((color)    )&0xff, h, w, overlayPitch, bitmap->pitch);
-        AlphaBlt8bppSse2(dst_A, s,                  0, h, w, overlayPitch, bitmap->pitch);
-    }
-    break;
-    case 0*DM::SINGLE_COLOR |   DM::AYUV_PLANAR :
-    {
-        unsigned char* dst_A = bitmap->plans[0] + dst_offset;
-        unsigned char* dst_Y = bitmap->plans[1] + dst_offset;
-        unsigned char* dst_U = bitmap->plans[2] + dst_offset;
-        unsigned char* dst_V = bitmap->plans[3] + dst_offset;
-
-        const DWORD *sw = switchpts;
-        int last_x = xo;
-        color = sw[0];
-        while(last_x<w+xo)
-        {
-            int new_x = sw[3] < w+xo ? sw[3] : w+xo;
-            color = sw[0];
-            sw += 2;
-            if( new_x < last_x )
-                continue;
-            AlphaBlt8bppSse2(dst_Y, s + last_x - xo, (color>>16)&0xff, h, new_x-last_x, overlayPitch, bitmap->pitch);
-            AlphaBlt8bppSse2(dst_U, s + last_x - xo, (color>>8 )&0xff, h, new_x-last_x, overlayPitch, bitmap->pitch);
-            AlphaBlt8bppSse2(dst_V, s + last_x - xo, (color    )&0xff, h, new_x-last_x, overlayPitch, bitmap->pitch);
-            AlphaBlt8bppSse2(dst_A, s + last_x - xo,                0, h, new_x-last_x, overlayPitch, bitmap->pitch);
-
-            dst_A += new_x - last_x;
-            dst_Y += new_x - last_x;
-            dst_U += new_x - last_x;
-            dst_V += new_x - last_x;
-            last_x = new_x;
-        }
-    }
-    break;
     }
     return;
 }
 
-void Rasterizer::FillSolidRect(SubPicDesc& spd, int x, int y, int nWidth, int nHeight, DWORD argb)
-{
-    bool AYUV_PLANAR = (spd.type==MSP_AYUV_PLANAR);
-    int draw_method = 0;
-    if(AYUV_PLANAR)
-        draw_method |= DM::AYUV_PLANAR;
-
-    switch (draw_method)
-    {
-    case 0*DM::AYUV_PLANAR :
-    {
-        BYTE *dst = ((BYTE*)spd.bits + spd.pitch * y) + x*4;
-        for (int wy=y; wy<y+nHeight; wy++) {
-            packed_pix_mix_sse2(dst, argb>>24, nWidth, argb);
-            dst += spd.pitch;
-        }
-    }
-    break;
-    case   DM::AYUV_PLANAR :
-    {
-        BYTE* dst = reinterpret_cast<BYTE*>(spd.bits) + spd.pitch * y + x;
-        BYTE* dst_A = dst;
-        BYTE* dst_Y = dst_A + spd.pitch*spd.h;
-        BYTE* dst_U = dst_Y + spd.pitch*spd.h;
-        BYTE* dst_V = dst_U + spd.pitch*spd.h;
-        AlphaBlt8bppSingleAlphaSse2(dst_Y, argb>>24, ((argb)>>16)&0xff, nHeight, nWidth, spd.pitch);
-        AlphaBlt8bppSingleAlphaSse2(dst_U, argb>>24, ((argb)>>8)&0xff , nHeight, nWidth, spd.pitch);
-        AlphaBlt8bppSingleAlphaSse2(dst_V, argb>>24, ((argb))&0xff    , nHeight, nWidth, spd.pitch);
-        AlphaBlt8bppSingleAlphaSse2(dst_A, argb>>24,                 0, nHeight, nWidth, spd.pitch);
-    }
-    break;
-    }
-}
 
 ///////////////////////////////////////////////////////////////
 
@@ -1540,26 +1251,15 @@ void Rasterizer::AdditionDraw(XyBitmap         *bitmap   ,
     }
 
     bool fSingleColor = (switchpts[1]==0xffffffff);
-    bool PLANAR = (bitmap->type==XyBitmap::PLANNA);
 
     // draw
     // Grab the first colour
     DWORD color = switchpts[0];
     const byte* s = s_base + overlay->mOverlayPitch*yo + xo;
 
-    int dst_offset = 0;
-    if (bitmap->type==XyBitmap::PLANNA)
-        dst_offset = bitmap->pitch*(y-bitmap->y) +  x - bitmap->x;
-    else
-        dst_offset = bitmap->pitch*(y-bitmap->y) + (x - bitmap->x)*4;
+    int dst_offset = bitmap->pitch*(y-bitmap->y) + (x - bitmap->x)*4;
     BYTE* dst = (BYTE*)bitmap->plans[0] + dst_offset;
 
-    if (PLANAR)
-    {
-        ASSERT(0);
-        XY_LOG_FATAL("Not Supported yet");
-        return;
-    }
     if (fSingleColor)
     {
         DoAdditionDraw(dst, s, color, w, h, overlayPitch, bitmap->pitch);

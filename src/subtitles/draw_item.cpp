@@ -48,13 +48,7 @@ CRectCoor2 DrawItem::GetDirtyRect()
 
 CRectCoor2 DrawItem::Draw( XyBitmap* bitmap, DrawItem& draw_item, const CRectCoor2& clip_rect )
 {
-
-    // PF 20180411 disable use_addition=true for planar
-    // because bitmap->type == XyBitmap::PLANNA is not supported and
-    // asserts FATAL in AdditionDraw (use case: Avisynth TextSub plugin for YV12)
-    bool PLANAR = (bitmap->type == XyBitmap::PLANNA);
-
-    return !PLANAR && draw_item.use_addition_draw ? AdditionDraw(bitmap, draw_item, clip_rect) 
+    return draw_item.use_addition_draw ? AdditionDraw(bitmap, draw_item, clip_rect) 
                                        : AlphaBltDraw(bitmap, draw_item, clip_rect);
 }
 
@@ -541,34 +535,24 @@ void GroupedDrawItems::Draw( SharedPtrXyBitmap *bitmap, int *bitmap_identity_num
             DrawItem& item = *draw_item_list.GetNext(pos);
             DrawItem::Draw(tmp, item, clip_rect);
         }
-        XyColorSpace color_space;
-        HRESULT hr = XySubRenderFrameCreater::GetDefaultCreater()->GetColorSpace(&color_space);
-        ASSERT(SUCCEEDED(hr));
-        if (color_space==XY_CS_ARGB_F)
-            XyBitmap::FlipAlphaValue(tmp->bits, tmp->w, tmp->h, tmp->pitch);
 #ifdef XY_DBG_SHOW_BITMAP_BOX_IN_COLOR
-        if (color_space==XY_CS_ARGB_F||color_space==XY_CS_ARGB)//not support plannar format yet
+        if (tmp->w>0 && tmp->h>0)
         {
-            if (tmp->w>0 && tmp->h>0)
+            DWORD color = 0x00ffffff & XY_DBG_SHOW_BITMAP_BOX_IN_COLOR;
+            BYTE *pixel = (BYTE *)tmp->bits;
+            memsetd(pixel, color, tmp->w*4);
+            int i=1;
+            for (;i<tmp->h-1;i++)
             {
-                DWORD color = color_space==XY_CS_ARGB_F ? (0xff000000 | XY_DBG_SHOW_BITMAP_BOX_IN_COLOR)
-                    : (0x00ffffff & XY_DBG_SHOW_BITMAP_BOX_IN_COLOR);
-                BYTE *pixel = (BYTE *)tmp->bits;
-                memsetd(pixel, color, tmp->w*4);
-                int i=1;
-                for (;i<tmp->h-1;i++)
-                {
-                    pixel += tmp->pitch;
-                    *(DWORD*)pixel = color;
-                    *((DWORD*)pixel+tmp->w-1) = color;
-                }
-                if (i<tmp->h)
-                {
-                    pixel += tmp->pitch;
-                    memsetd(pixel, color, tmp->w*4);
-                }
+                pixel += tmp->pitch;
+                *(DWORD*)pixel = color;
+                *((DWORD*)pixel+tmp->w-1) = color;
             }
-
+            if (i<tmp->h)
+            {
+                pixel += tmp->pitch;
+                memsetd(pixel, color, tmp->w*4);
+            }
         }
 #endif
         bitmap_cache->UpdateCache(key_id, *bitmap);

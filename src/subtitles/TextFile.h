@@ -66,13 +66,10 @@ public:
 	CTextFile(enc e = DEFAULT_ENCODING);
 
 	virtual bool Open(LPCTSTR lpszFileName);
-	virtual bool Save(LPCTSTR lpszFileName, enc e /*= DEFAULT_ENCODING*/);
 
 	// Reads from a caller-owned buffer, which must outlive this object.
 	// GetFilePath() returns an empty string for in-memory data.
 	bool OpenMemory(const void* pData, size_t len);
-	// Returns the buffer passed to OpenMemory(), or NULL when reading a file.
-	const BYTE* GetMemoryData(size_t& len) const;
 
 	enc GetEncoding();
 	bool IsUnicode();
@@ -86,7 +83,6 @@ public:
 	ULONGLONG GetLength() const;
 	ULONGLONG Seek(LONGLONG lOff, UINT nFrom);
 
-	void WriteString(LPCWSTR lpsz/*CStringW str*/);
 	BOOL ReadString(CStringW& str);
 };
 
@@ -100,5 +96,4 @@ public:
 
 	// http:// URLs are downloaded into memory; anything else is opened as a file.
 	bool Open(LPCTSTR lpszFileName);
-	bool Save(LPCTSTR lpszFileName, enc e /*= DEFAULT_ENCODING*/);
 };

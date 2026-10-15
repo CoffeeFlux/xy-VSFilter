@@ -66,11 +66,6 @@ bool CTextFile::OpenMemory(const void* pData, size_t len)
 	return DetectEncoding();
 }
 
-const BYTE* CTextFile::GetMemoryData(size_t& len) const
-{
-	len = m_inMemory ? m_memLen : 0;
-	return m_inMemory ? m_memData : NULL;
-}
 
 bool CTextFile::DetectEncoding()
 {
@@ -115,33 +110,6 @@ bool CTextFile::DetectEncoding()
 	return true;
 }
 
-bool CTextFile::Save(LPCTSTR lpszFileName, enc e)
-{
-	m_inMemory = false;
-
-	if(!__super::Open(lpszFileName, modeCreate|modeWrite|shareDenyWrite|(e==DEFAULT_ENCODING?typeText:typeBinary)))
-		return(false);
-
-	if(e == UTF8)
-	{
-		BYTE b[3] = {0xef,0xbb,0xbf};
-		Write(b, sizeof(b));
-	}
-	else if(e == LE16)
-	{
-		BYTE b[2] = {0xff,0xfe};
-		Write(b, sizeof(b));
-	}
-	else if(e == BE16)
-	{
-		BYTE b[2] = {0xfe,0xff};
-		Write(b, sizeof(b));
-	}
-
-	m_encoding = e;
-
-	return true;
-}
 
 CTextFile::enc CTextFile::GetEncoding()
 {
@@ -233,34 +201,6 @@ ULONGLONG CTextFile::Seek(LONGLONG lOff, UINT nFrom)
 	return pos;
 }
 
-void CTextFile::WriteString(LPCWSTR lpsz/*CStringW str*/)
-{
-	CStringW str(lpsz);
-
-	if(m_encoding == DEFAULT_ENCODING)
-	{
-		__super::WriteString(str);
-	}
-	else if(m_encoding == UTF8)
-	{
-		str.Replace(L"\n", L"\r\n");
-		CW2AEX<1024> utf8(str, CP_UTF8);
-		Write(utf8, ::strlen(utf8));
-	}
-	else if(m_encoding == LE16)
-	{
-		str.Replace(L"\n", L"\r\n");
-		Write((LPCWSTR)str, str.GetLength()*2);
-	}
-	else if(m_encoding == BE16)
-	{
-		str.Replace(L"\n", L"\r\n");
-		for (unsigned int i = 0, l = str.GetLength(); i < l; i++) {
-			str.SetAt(i, ((str[i] >> 8) & 0x00ff) | ((str[i] << 8) & 0xff00));
-		}
-		Write((LPCWSTR)str, str.GetLength() * 2);
-	}
-}
 
 bool CTextFile::ReadLine() {
 	m_convertedBuffer.clear();
@@ -420,9 +360,3 @@ bool CWebTextFile::Open(LPCTSTR lpszFileName)
 	return OpenMemory(m_data.empty() ? NULL : &m_data[0], m_data.size());
 }
 
-bool CWebTextFile::Save(LPCTSTR lpszFileName, enc e)
-{
-	// CWebTextFile is read-only...
-	ASSERT(0);
-	return(false);
-}

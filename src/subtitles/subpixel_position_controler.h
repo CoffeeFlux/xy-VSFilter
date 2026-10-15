@@ -27,7 +27,6 @@ public:
         EIGHT_X_EIGHT_MASK = 7,
         EIGHT_X_EIGHT_INTERPOLATE_MASK = 0,
     };
-    SUBPIXEL_LEVEL SetSubpixelLevel(SUBPIXEL_LEVEL subpixel_level);
     inline CPoint GetSubpixel(const CPoint& p)
     {
         CPoint result(p.x & _subpixel_mask, p.y & _subpixel_mask);

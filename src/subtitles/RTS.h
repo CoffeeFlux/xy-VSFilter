@@ -23,8 +23,6 @@
 
 #include "STS.h"
 #include "Rasterizer.h"
-#include "../SubPic/SubPicProviderImpl.h"
-#include "../SubPic/ISimpleSubPic.h"
 #include <atlcoll.h>
 #include <memory>
 #include "mru_cache.h"
@@ -66,7 +64,7 @@ class CClipperPaintMachine;
 typedef std::shared_ptr<CClipperPaintMachine> SharedPtrCClipperPaintMachine;
 
 class OverlayKey;
-interface IXySubRenderFrame;
+class XySubRenderFrame;
 
 class CWord
 {
@@ -323,7 +321,7 @@ public:
 };
 
 [uuid("537DCACA-2812-4a4f-B2C6-1A34C17ADEB0")]
-class CRenderedTextSubtitle : public CSubPicProviderImpl, public ISubStream, public ISubPicProviderEx2, public CSimpleTextSubtitle
+class CRenderedTextSubtitle : public CSimpleTextSubtitle
 {
 public:
     enum AssCmdType
@@ -399,8 +397,6 @@ public:
         CAtlArray<CStringW> strParams;
         AssTagList embeded;
     };
-public:
-    static std::size_t SetMaxCacheSize(std::size_t max_cache_size);
 private:
     XyIntMap<CSubtitle*>     m_subtitleCache;
     CAtlList<int>            m_subtitleCacheEntry;
@@ -420,9 +416,7 @@ private:
     int                      m_nPolygon;
     int                      m_polygonBaselineOffset;
     double                   m_fps;
-    int                      m_period;//1000/m_fps
     double                   m_target_scale_x, m_target_scale_y;
-    bool                     m_movable;
 
     static void InitCmdMap();
 
@@ -448,7 +442,7 @@ protected:
     virtual void OnChanged();
     
 public:
-    CRenderedTextSubtitle(CCritSec* pLock);
+    CRenderedTextSubtitle();
     virtual ~CRenderedTextSubtitle();
 
     virtual void Copy(CSimpleTextSubtitle& sts);
@@ -466,26 +460,12 @@ private:
 public:
     void Deinit();
 
-    DECLARE_IUNKNOWN
-    STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
-
-    // ISubPicProviderEx2
-    STDMETHODIMP Lock();
-    STDMETHODIMP Unlock();
-    STDMETHODIMP RenderEx(IXySubRenderFrame**subRenderFrame, int spd_type, 
+    HRESULT Render(SubPicDesc& spd, REFERENCE_TIME rt, double fps, RECTCoor2& bbox);
+    HRESULT RenderEx(SubPicDesc& spd, REFERENCE_TIME rt, double fps, CAtlList<CRectCoor2>& rectList);
+    HRESULT RenderEx(XySubRenderFrame**subRenderFrame,
         const RECT& video_rect, const RECT& subtitle_target_rect,
         const SIZE& original_video_size,
         REFERENCE_TIME rt, double fps);
-
-    // ISubPicProviderEx && ISubPicProviderEx2
-    STDMETHODIMP_(POSITION) GetStartPosition(REFERENCE_TIME rt, double fps);
-    STDMETHODIMP_(POSITION) GetNext(POSITION pos);
-    STDMETHODIMP_(REFERENCE_TIME) GetStart(POSITION pos, double fps);
-    STDMETHODIMP_(REFERENCE_TIME) GetStop(POSITION pos, double fps);
-    STDMETHODIMP_(VOID) GetStartStop(POSITION pos, double fps, /*out*/REFERENCE_TIME &start, /*out*/REFERENCE_TIME &stop);
-    STDMETHODIMP_(bool) IsAnimated(POSITION pos);
-    STDMETHODIMP Render(SubPicDesc& spd, REFERENCE_TIME rt, double fps, RECTCoor2& bbox);
-    STDMETHODIMP RenderEx(SubPicDesc& spd, REFERENCE_TIME rt, double fps, CAtlList<CRectCoor2>& rectList);
     HRESULT ParseScript(REFERENCE_TIME rt, double fps, CSubtitle2List *outputSub2List );
     static void DoRender( const SIZECoor2& output_size, 
         const POINTCoor2& video_org, const RECTCoor2& margin_rect, 
@@ -495,17 +475,4 @@ public:
         const POINTCoor2& video_org, const RECTCoor2& margin_rect, 
         const CSubtitle2& sub2, 
         CompositeDrawItemList* compDrawItemList /*output*/);
-    STDMETHODIMP_(bool) IsColorTypeSupported(int type);
-    STDMETHODIMP_(bool) IsMovable();
-    STDMETHODIMP_(bool) IsSimple();
-
-    // IPersist
-    STDMETHODIMP GetClassID(CLSID* pClassID);
-
-    // ISubStream
-    STDMETHODIMP_(int) GetStreamCount();
-    STDMETHODIMP GetStreamInfo(int i, WCHAR** ppName, LCID* pLCID);
-    STDMETHODIMP_(int) GetStream();
-    STDMETHODIMP SetStream(int iStream);
-    STDMETHODIMP Reload();
 };

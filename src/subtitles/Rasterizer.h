@@ -200,17 +200,6 @@ class Rasterizer
 private:
     typedef unsigned char byte;
 
-    struct DM
-    {
-        enum
-        {
-            SSE2 = 1,
-            ALPHA_MASK = 1<<1,
-            SINGLE_COLOR = 1<<2,
-            BODY = 1<<3,
-            AYUV_PLANAR = 1<<4
-        };
-    };
 public:
     static const float GAUSSIAN_BLUR_THREHOLD;
 public:
@@ -241,7 +230,6 @@ public:
         int xsub, int ysub, 
         const DWORD* switchpts, bool fBody, bool fBorder);
 
-    static void FillSolidRect(SubPicDesc& spd, int x, int y, int nWidth, int nHeight, DWORD lColor);
 
     static void AdditionDraw(XyBitmap         *bitmap   , 
                              SharedPtrOverlay  overlay  , 

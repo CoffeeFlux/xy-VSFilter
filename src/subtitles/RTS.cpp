@@ -68,20 +68,6 @@ inline CStringW::PCXSTR SkipWhiteSpaceLeft(const CStringW& str)
     return psz;
 }
 
-// Skip all trailing whitespace
-inline CStringW::PCXSTR SkipWhiteSpaceRight(const CStringW& str)
-{
-    CStringW::PCXSTR psz = str.GetString();
-    CStringW::PCXSTR pszLast = psz + str.GetLength() - 1;
-    bool first_white = false;
-    while( iswspace( *pszLast ) )
-    {
-        pszLast--;
-        if(pszLast<psz)
-            break;
-    }
-    return pszLast;
-}
 
 // Skip all leading whitespace
 inline CStringW::PCXSTR SkipWhiteSpaceLeft(CStringW::PCXSTR start, CStringW::PCXSTR end)
@@ -1255,7 +1241,6 @@ CRectCoor2 CLine::PaintAll( CompositeDrawItemList* output, const CRectCoor2& cli
             COLORREF shadow = revcolor(w->m_style.get().colors[3]) | (a<<24);
 
             DWORD sw[6] = {shadow, -1};
-            sw[0] = XySubRenderFrameCreater::GetDefaultCreater()->TransColor(sw[0]);
             if(w->m_style.get().borderStyle == 0)
             {
                 outputItem.shadow.reset( 
@@ -1278,7 +1263,6 @@ CRectCoor2 CLine::PaintAll( CompositeDrawItemList* output, const CRectCoor2& cli
             if(alpha > 0) aoutline += MulDiv(alpha, 0xff - w->m_style.get().alpha[2], 0xff);
             COLORREF outline = revcolor(w->m_style.get().colors[2]) | ((0xff-aoutline)<<24);
             DWORD sw[6] = {outline, -1};
-            sw[0] = XySubRenderFrameCreater::GetDefaultCreater()->TransColor(sw[0]);
             if(w->m_style.get().borderStyle == 0)
             {
                 outputItem.outline.reset( 
@@ -1334,9 +1318,6 @@ CRectCoor2 CLine::PaintAll( CompositeDrawItemList* output, const CRectCoor2& cli
             sw[3] = (int)( (w->m_style.get().outlineWidthX + t*w->m_width)*w->m_target_scale_x ) >> 3;
             sw[4] = sw[2];
             sw[5] = 0x00ffffff;
-            sw[0] = XySubRenderFrameCreater::GetDefaultCreater()->TransColor(sw[0]);
-            sw[2] = XySubRenderFrameCreater::GetDefaultCreater()->TransColor(sw[2]);
-            sw[4] = XySubRenderFrameCreater::GetDefaultCreater()->TransColor(sw[4]);
             outputItem.body.reset( 
                 DrawItem::CreateDrawItem(body_pm, clipRect, clipper, bodyPos.x, bodyPos.y, sw, true, false)
                 );
@@ -1641,18 +1622,11 @@ CAtlMap<CStringW, CRenderedTextSubtitle::AssCmdType, CStringElementTraits<CStrin
 
 std::size_t CRenderedTextSubtitle::s_max_cache_size = SIZE_MAX;
 
-std::size_t CRenderedTextSubtitle::SetMaxCacheSize( std::size_t max_cache_size )
-{
-    s_max_cache_size = max_cache_size;
-    XY_LOG_INFO("MAX_CACHE_SIZE: "<<s_max_cache_size);
-    return s_max_cache_size;
-}
 
 CAtlArray<AssCmdPosLevel> CRenderedTextSubtitle::m_cmd_pos_level;
 
-CRenderedTextSubtitle::CRenderedTextSubtitle(CCritSec* pLock)
-    : CSubPicProviderImpl(pLock)
-    , m_target_scale_x(1.0), m_target_scale_y(1.0)
+CRenderedTextSubtitle::CRenderedTextSubtitle()
+    : m_target_scale_x(1.0), m_target_scale_y(1.0)
 {
     if( m_cmdMap.IsEmpty() )
     {
@@ -1667,7 +1641,6 @@ CRenderedTextSubtitle::CRenderedTextSubtitle(CCritSec* pLock)
         SetMapMode(g_hDC, MM_TEXT);
     }
     g_hDC_refcnt++;
-    m_movable = true;
 }
 
 CRenderedTextSubtitle::~CRenderedTextSubtitle()
@@ -3013,76 +2986,6 @@ void CRenderedTextSubtitle::ShrinkCache()
     }
 }
 
-//
-
-STDMETHODIMP CRenderedTextSubtitle::NonDelegatingQueryInterface(REFIID riid, void** ppv)
-{
-    CheckPointer(ppv, E_POINTER);
-    *ppv = NULL;
-    return
-        QI(IPersist)
-        QI(ISubStream)
-        QI(ISubPicProviderEx2)
-        QI(ISubPicProvider)
-        QI(ISubPicProviderEx)
-        __super::NonDelegatingQueryInterface(riid, ppv);
-}
-
-// ISubPicProvider
-
-STDMETHODIMP_(POSITION) CRenderedTextSubtitle::GetStartPosition(REFERENCE_TIME rt, double fps)
-{
-    m_fps = fps;
-
-    int iSegment;
-    const STSSegment* stss = SearchSubs(rt, fps, &iSegment, NULL);
-    if(stss==NULL) {
-        TRACE_PARSER("No subtitle at "<<XY_LOG_VAR_2_STR(RT2MS(rt)));
-        return NULL;
-    }
-    return (POSITION)(iSegment + 1);
-}
-
-STDMETHODIMP_(POSITION) CRenderedTextSubtitle::GetNext(POSITION pos)
-{
-    int iSegment = (int)pos;
-    const STSSegment *stss = GetSegment(iSegment);
-    while(stss && stss->subs.GetCount() == 0) {
-        iSegment++;
-        stss = GetSegment(iSegment);
-    }
-    return(stss ? (POSITION)(iSegment+1) : NULL);
-}
-
-STDMETHODIMP_(REFERENCE_TIME) CRenderedTextSubtitle::GetStart(POSITION pos, double fps)
-{
-    return TranslateSegmentStart((int)pos - 1, fps);
-}
-
-STDMETHODIMP_(REFERENCE_TIME) CRenderedTextSubtitle::GetStop(POSITION pos, double fps)
-{
-    return TranslateSegmentEnd((int)pos - 1, fps);
-}
-
-//@start, @stop: -1 if segment not found; @stop may < @start if subIndex exceed uppper bound
-STDMETHODIMP_(VOID) CRenderedTextSubtitle::GetStartStop(POSITION pos, double fps, /*out*/REFERENCE_TIME &start, /*out*/REFERENCE_TIME &stop)
-{
-    int iSegment = (int)pos-1;
-    REFERENCE_TIME tempStart, tempEnd;
-    TranslateSegmentStartEnd(iSegment, fps, tempStart, tempEnd);
-    start = tempStart;
-    stop = tempEnd;
-}
-
-STDMETHODIMP_(bool) CRenderedTextSubtitle::IsAnimated(POSITION pos)
-{
-    unsigned int iSegment = (int)pos-1;
-    if(iSegment<m_segments.GetCount())
-        return m_segments[iSegment].animated;
-    else
-        return false;
-    //return(true);
-}
 
 struct LSub {int idx, layer, readorder;};
 
@@ -3263,7 +3166,7 @@ HRESULT CRenderedTextSubtitle::ParseScript(REFERENCE_TIME rt, double fps, CSubti
     return (subs.GetCount()) ? S_OK : S_FALSE;
 }
 
-STDMETHODIMP CRenderedTextSubtitle::RenderEx(SubPicDesc& spd, REFERENCE_TIME rt, double fps, CAtlList<CRectCoor2>& rectList)
+HRESULT CRenderedTextSubtitle::RenderEx(SubPicDesc& spd, REFERENCE_TIME rt, double fps, CAtlList<CRectCoor2>& rectList)
 {
     CSize output_size = CSize(spd.w,spd.h);
     CRectCoor2 video_rect = CRect(0,0,spd.w,spd.h);
@@ -3273,18 +3176,13 @@ STDMETHODIMP CRenderedTextSubtitle::RenderEx(SubPicDesc& spd, REFERENCE_TIME rt,
         XY_LOG_WARN("Video rectangle is different from window. But support for relative to video rectangle has been removed.");
     }
 
-    CComPtr<IXySubRenderFrame> sub_render_frame;
-    HRESULT hr = RenderEx(&sub_render_frame, spd.type, video_rect, video_rect, output_size, rt, fps);
+    XySubRenderFrame *frame = NULL;
+    HRESULT hr = RenderEx(&frame, video_rect, video_rect, output_size, rt, fps);
+    std::unique_ptr<XySubRenderFrame> sub_render_frame(frame);
     if (SUCCEEDED(hr) && sub_render_frame)
     {
         int count = 0;
         hr = sub_render_frame->GetBitmapCount(&count);
-        if(FAILED(hr))
-        {
-            return hr;
-        }
-        int color_space;
-        hr = sub_render_frame->GetXyColorSpace(&color_space);
         if(FAILED(hr))
         {
             return hr;
@@ -3301,26 +3199,13 @@ STDMETHODIMP CRenderedTextSubtitle::RenderEx(SubPicDesc& spd, REFERENCE_TIME rt,
                 return hr;
             }
             rectList.AddTail(CRect(pos, size));
-            if (color_space==XY_CS_AYUV_PLANAR)
-            {
-                XyPlannerFormatExtra plans;
-                hr = sub_render_frame->GetBitmapExtra(i, &plans);
-                if(FAILED(hr))
-                {
-                    return hr;
-                }
-                XyBitmap::AlphaBltPlannar(spd, pos, size, plans, pitch);
-            }
-            else
-            {
-                XyBitmap::AlphaBltPack(spd, pos, size, pixels, pitch);
-            }
+            XyBitmap::AlphaBltPack(spd, pos, size, pixels, pitch);
         }
     }
     return (!rectList.IsEmpty()) ? S_OK : S_FALSE;
 }
 
-STDMETHODIMP CRenderedTextSubtitle::RenderEx( IXySubRenderFrame**subRenderFrame, int spd_type,
+HRESULT CRenderedTextSubtitle::RenderEx( XySubRenderFrame**subRenderFrame,
     const RECT& video_rect, const RECT& subtitle_target_rect,
     const SIZE& original_video_size,
     REFERENCE_TIME rt, double fps )
@@ -3352,29 +3237,7 @@ STDMETHODIMP CRenderedTextSubtitle::RenderEx( IXySubRenderFrame**subRenderFrame,
         layout_size.cy = m_layout_size.cy;
     }
 
-    XyColorSpace color_space = XY_CS_ARGB;
-    switch(spd_type)
-    {
-    case MSP_AYUV_PLANAR:
-        color_space = XY_CS_AYUV_PLANAR;
-        break;
-    case MSP_XY_AUYV:
-        color_space = XY_CS_AUYV;
-        break;
-    case MSP_AYUV:
-        color_space = XY_CS_AYUV;
-        break;
-    case MSP_RGBA_F:
-        color_space = XY_CS_ARGB_F;
-        break;
-    default:
-        color_space = XY_CS_ARGB;
-        break;
-    }
-
     XySubRenderFrameCreater *render_frame_creater = XySubRenderFrameCreater::GetDefaultCreater();
-    render_frame_creater->SetColorSpace(color_space);
-
     if( m_video_rect != CRect(cvideo_rect.left*MAX_SUB_PIXEL,
                               cvideo_rect.top*MAX_SUB_PIXEL,
                               cvideo_rect.right*MAX_SUB_PIXEL,
@@ -3403,22 +3266,6 @@ STDMETHODIMP CRenderedTextSubtitle::RenderEx( IXySubRenderFrame**subRenderFrame,
         return hr;
     }
 
-    if (!m_simple)
-    {
-        bool newMovable = true;
-        POSITION pos=sub2List.GetHeadPosition();
-        while ( pos!=NULL )
-        {
-            const CSubtitle2& sub2 = sub2List.GetNext(pos);
-            if (sub2.s->m_hard_position_level > POS_LVL_NONE)
-            {
-              newMovable = false;
-              break;
-            }
-        }
-        m_movable = newMovable;
-    }
-
     TRACE_RENDERER_REQUEST("Begin build draw item tree");
     CRectCoor2 margin_rect(
         m_video_rect.left - m_subtitle_target_rect.left,
@@ -3433,7 +3280,7 @@ STDMETHODIMP CRenderedTextSubtitle::RenderEx( IXySubRenderFrame**subRenderFrame,
     XySubRenderFrame *sub_render_frame;
     CompositeDrawItem::Draw(&sub_render_frame, compDrawItemListList);
     sub_render_frame->MoveTo(video_rect.left, video_rect.top);
-    (*subRenderFrame = sub_render_frame)->AddRef();
+    *subRenderFrame = sub_render_frame;
 
     ShrinkCache();
 
@@ -3551,7 +3398,7 @@ void CRenderedTextSubtitle::RenderOneSubtitle( const SIZECoor2& output_size,
     }
 }
 
-STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fps, RECTCoor2& bbox)
+HRESULT CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fps, RECTCoor2& bbox)
 {
     CAtlList<CRect> rectList;
     HRESULT result = RenderEx(spd, rt, fps, rectList);
@@ -3563,80 +3410,4 @@ STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
     }
     bbox = bbox2;
     return result;
-}
-
-// IPersist
-
-STDMETHODIMP CRenderedTextSubtitle::GetClassID(CLSID* pClassID)
-{
-    return pClassID ? *pClassID = __uuidof(this), S_OK : E_POINTER;
-}
-
-// ISubStream
-
-STDMETHODIMP_(int) CRenderedTextSubtitle::GetStreamCount()
-{
-    return(1);
-}
-
-STDMETHODIMP CRenderedTextSubtitle::GetStreamInfo(int iStream, WCHAR** ppName, LCID* pLCID)
-{
-    if(iStream != 0) return E_INVALIDARG;
-    if(ppName)
-    {
-        *ppName = (WCHAR*)CoTaskMemAlloc((m_name.GetLength()+1)*sizeof(WCHAR));
-        if(!(*ppName))
-            return E_OUTOFMEMORY;
-        wcscpy(*ppName, CStringW(m_name));
-    }
-    if(pLCID)
-    {
-        *pLCID = 0; // TODO
-    }
-    return S_OK;
-}
-
-STDMETHODIMP_(int) CRenderedTextSubtitle::GetStream()
-{
-    return(0);
-}
-
-STDMETHODIMP CRenderedTextSubtitle::SetStream(int iStream)
-{
-    return iStream == 0 ? S_OK : E_FAIL;
-}
-
-STDMETHODIMP CRenderedTextSubtitle::Reload()
-{
-    CFileStatus s;
-    if(!CFile::GetStatus(m_path, s)) return E_FAIL;
-    return !m_path.IsEmpty() && Open(m_path, DEFAULT_CHARSET) ? S_OK : E_FAIL;
-}
-
-STDMETHODIMP_(bool) CRenderedTextSubtitle::IsColorTypeSupported( int type )
-{
-    return type==MSP_AYUV_PLANAR ||
-           type==MSP_AYUV ||
-           type==MSP_XY_AUYV ||
-           type==MSP_RGBA;
-}
-
-STDMETHODIMP_(bool) CRenderedTextSubtitle::IsMovable()
-{
-    return m_movable;
-}
-
-STDMETHODIMP_(bool) CRenderedTextSubtitle::IsSimple()
-{
-    return m_simple;
-}
-
-STDMETHODIMP CRenderedTextSubtitle::Lock()
-{
-    return CSubPicProviderImpl::Lock();
-}
-
-STDMETHODIMP CRenderedTextSubtitle::Unlock()
-{
-    return CSubPicProviderImpl::Unlock();
 }
