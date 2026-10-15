@@ -59,7 +59,7 @@ after
         self.assertIn("m_segments.InsertAt", body)
         self.assertNotIn(next_signature, body)
         pinned = subprocess.check_output([
-            "git", "show", "4911cacb102bc0cbd41449793e54473265b04e62:src/subtitles/STS.cpp"
+            "git", "show", "67da07cda068088b93e6de300f56cbad15ab6c5d:src/subtitles/STS.cpp"
         ], cwd=ROOT).decode("utf-8-sig")
         self.assertEqual(extract_fenced_method(pinned, signature, next_signature),
                          extract_method(pinned, signature))

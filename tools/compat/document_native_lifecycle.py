@@ -19,8 +19,7 @@ PIN = json.loads((ROOT / "tools/compat/reference.json").read_text())["commit"]
 SOURCE = ROOT / "tools/compat/document_native_lifecycle.cpp"
 LIBRARIES = (
     "strmbaseR.lib", "dsutilR.lib", "subtitlesR.lib", "subpicR.lib",
-    "basevideofilterR.lib", "libssfR.lib", "log4cplus_staticRU.lib",
-    "KasumiR.lib", "systemR.lib", "unrarR.lib",
+    "basevideofilterR.lib", "libssfR.lib", "unrarR.lib",
 )
 SYSTEM_LIBRARIES = (
     "delayimp.lib", "winmm.lib", "dwmapi.lib", "Mfuuid.lib", "strmiids.lib",
@@ -202,7 +201,12 @@ def save_section_bytes():
     texts["sections-srt-sidecar"]="ScriptType: v4.00+\nPlayResX: -17\nPlayResY: 23\n\n"+styles["ass"]
     return {name:b"\xef\xbb\xbf"+value.replace("\n","\r\n").encode() for name,value in texts.items()}
 
-def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True, require_unknown_stages=True, require_add_style_stages=True, require_copy_styles_stages=True, require_text_plan_stages=True, require_preparation_stages=True, require_setstr_stages=True, require_open_order_stages=True, require_frame_search_stages=True, require_save_body_stages=True, require_save_sections_stages=True):
+def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True, require_unknown_stages=True, require_add_style_stages=True, require_copy_styles_stages=True, require_text_plan_stages=True, require_preparation_stages=True, require_setstr_stages=True, require_open_order_stages=True, require_frame_search_stages=True, require_save_body_stages=True, require_save_sections_stages=True, cleanup=False):
+    if cleanup:
+        # These APIs were removed from the pinned cleanup, not skipped failures.
+        require_sort_stages = require_conversion_stages = False
+        require_text_plan_stages = require_setstr_stages = False
+        require_save_body_stages = require_save_sections_stages = False
     lines = data.splitlines()
     if not lines or lines[0] != f"provenance pointer_bits={pointer_bits}".encode():
         raise ValueError("missing or incorrect native architecture provenance")
@@ -279,7 +283,9 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
         if payloads["body-srt-utf8"]!=srt: raise ValueError("incorrect interleaved-negative SRT numbering/body")
 
     if require_frame_search_stages:
-        if [line for line in lines if line.startswith(b"frame-search-")]!=frame_search_rows():
+        expected = frame_search_rows()
+        if cleanup: expected = [re.sub(rb" entry=-?[0-9]+", b"", row) for row in expected]
+        if [line for line in lines if line.startswith(b"frame-search-")]!=expected:
             raise ValueError("missing or incorrect FRAME full-owner query/alias/snapshot/retention observations")
 
     if require_open_order_stages:
@@ -367,6 +373,7 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
                   "interpretation-copy-independent", "interpretation-empty", "interpretation-self-copy",
                   "interpretation-microdvd-open", "interpretation-frame", "interpretation-frame-noop",
                   "interpretation-time", "interpretation-time-noop")
+        if cleanup: stages = stages[:7]
         positions = []
         for stage in stages:
             matches = [(index, line) for index, line in enumerate(lines)
@@ -550,20 +557,20 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
                       "named-copy-append", "named-self-clear", "named-empty"):
             if f"named-stage {stage}".encode() not in lines:
                 raise ValueError(f"missing named style lifecycle stage {stage}")
-        for observation in (b"saved-file ssa exists=1 bytes=", b"saved-file ass exists=1 bytes=",
+        for observation in (() if cleanup else (b"saved-file ssa exists=1 bytes=", b"saved-file ass exists=1 bytes=",
                             b"saved-file srt exists=1 bytes=", b"saved-file srt-sidecar exists=1 bytes=",
                             b"saved-file ssa-sidecar exists=0", b"saved-file ass-sidecar exists=0",
-                            b"saved-file srt-no-map exists=1 bytes=", b"saved-file srt-no-map-sidecar exists=0"):
+                            b"saved-file srt-no-map exists=1 bytes=", b"saved-file srt-no-map-sidecar exists=0")):
             if not any(line.startswith(observation) for line in lines):
                 raise ValueError(f"missing named style export observation {observation!r}")
 
 
 
-def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True, require_unknown_stages=True, require_add_style_stages=True, require_copy_styles_stages=True, require_text_plan_stages=True, require_preparation_stages=True, require_setstr_stages=True, require_open_order_stages=True, require_frame_search_stages=True, require_save_body_stages=True, require_save_sections_stages=True):
+def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True, require_unknown_stages=True, require_add_style_stages=True, require_copy_styles_stages=True, require_text_plan_stages=True, require_preparation_stages=True, require_setstr_stages=True, require_open_order_stages=True, require_frame_search_stages=True, require_save_body_stages=True, require_save_sections_stages=True, cleanup=False):
     if len(traces) != 4:
         raise ValueError("two reference and two candidate executions required")
     for trace in traces:
-        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages, require_metadata_stages=require_metadata_stages, require_selected_copy_stages=require_selected_copy_stages, require_style_rename_stages=require_style_rename_stages, require_sort_stages=require_sort_stages, require_base_empty_stages=require_base_empty_stages, require_lcid_stages=require_lcid_stages, require_resolution_stages=require_resolution_stages, require_layout_size_stages=require_layout_size_stages, require_conversion_stages=require_conversion_stages, require_unknown_stages=require_unknown_stages, require_add_style_stages=require_add_style_stages, require_copy_styles_stages=require_copy_styles_stages, require_text_plan_stages=require_text_plan_stages, require_preparation_stages=require_preparation_stages, require_setstr_stages=require_setstr_stages, require_open_order_stages=require_open_order_stages, require_frame_search_stages=require_frame_search_stages, require_save_body_stages=require_save_body_stages, require_save_sections_stages=require_save_sections_stages)
+        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages, require_metadata_stages=require_metadata_stages, require_selected_copy_stages=require_selected_copy_stages, require_style_rename_stages=require_style_rename_stages, require_sort_stages=require_sort_stages, require_base_empty_stages=require_base_empty_stages, require_lcid_stages=require_lcid_stages, require_resolution_stages=require_resolution_stages, require_layout_size_stages=require_layout_size_stages, require_conversion_stages=require_conversion_stages, require_unknown_stages=require_unknown_stages, require_add_style_stages=require_add_style_stages, require_copy_styles_stages=require_copy_styles_stages, require_text_plan_stages=require_text_plan_stages, require_preparation_stages=require_preparation_stages, require_setstr_stages=require_setstr_stages, require_open_order_stages=require_open_order_stages, require_frame_search_stages=require_frame_search_stages, require_save_body_stages=require_save_body_stages, require_save_sections_stages=require_save_sections_stages, cleanup=cleanup)
     if any(trace != traces[0] for trace in traces[1:]):
         raise ValueError("native lifecycle traces differ or are nondeterministic")
 
@@ -682,7 +689,7 @@ def main():
                 dialog_observations.append(dialogs)
                 if result.stderr:
                     raise ValueError(f"{label} execution produced unexpected stderr")
-                validate_trace(result.stdout, bits)
+                validate_trace(result.stdout, bits, cleanup=True)
                 traces.append(result.stdout)
             if sha(exe.read_bytes()) != build["binary_sha256"]:
                 raise ValueError("native probe executable changed during execution")
@@ -692,7 +699,7 @@ def main():
             for path, expected in headers.items():
                 if sha(Path(path).read_bytes()) != expected:
                     raise ValueError("included header changed during execution")
-        compare_traces(traces, bits)
+        compare_traces(traces, bits, cleanup=True)
         if any(dialogs!=dialog_observations[0] for dialogs in dialog_observations[1:]):
             raise ValueError("native dialog observations differ or are not repeatable")
         if [git(root, "rev-parse", "HEAD") for root in roots] != commits:

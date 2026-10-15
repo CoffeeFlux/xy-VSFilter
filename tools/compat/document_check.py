@@ -21,7 +21,7 @@ import subprocess
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[2]
-REFERENCE = '4911cacb102bc0cbd41449793e54473265b04e62'
+REFERENCE = '67da07cda068088b93e6de300f56cbad15ab6c5d'
 
 def run(args, timeout=60, **kwargs):
     try:

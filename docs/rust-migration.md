@@ -2,13 +2,22 @@
 
 ## Contract
 
-The behavioral reference is pinterf/xy-VSFilter commit
-`4911cacb102bc0cbd41449793e54473265b04e62`. All functionality remains in scope.
+The behavioral reference is CoffeeFlux/xy-VSFilter cleanup commit
+`67da07cda068088b93e6de300f56cbad15ab6c5d`, selected by the user. All supported
+functionality in that cleanup remains in scope.
 The target is a drop-in replacement in players, Aegisub and other existing hosts,
 with bit-identical output. The repository itself defines ASS behavior; another
 renderer or format description must not override it. Memory safety is the reason
 for migration. A performance regression is acceptable. No deliberate semantic
 cleanup is part of a port.
+
+The confirmed final endpoint is Rust for this repository's implementation,
+including the host adapters currently written in C++. Retained C++ adapters are
+transitional, not a completed migration boundary. Windows system libraries may
+remain external dependencies, reached through narrowly audited unsafe FFI in
+Rust. The portable application core stays safe Rust; preserving public DLL/COM
+interfaces does not require preserving their C++ implementation. Vendored native
+code remains part of the migration and memory-safety inventory.
 
 Preserve deterministic malformed-input results, parser recovery, byte and code
 unit handling, integer truncation, timing boundaries, rounding, font metrics,
@@ -17,6 +26,30 @@ observable settings, interfaces, exports, identity and calling conventions.
 Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
+
+## Cleanup rebase: current status
+
+The user requested rebasing onto the fork's cleanup, rather than continuing from
+upstream. All 203 migration commits have been replayed onto `67da07cd`; the
+pre-rebase branch is retained locally as `backup/rust-before-cleanup-6915e8d9`.
+Earlier evidence and commit IDs below remain historical and are not evidence
+against this new baseline. Do not rewrite their recorded reference hashes.
+
+Cleanup deletions win over changes to unused native methods. In particular,
+SaveAs, Sort, SetStr, ConvertUnicode, SearchSub, frame/time mode conversion,
+unused CCDecoder, obsolete VobSub outline/scaler methods and unused raster
+paths remain removed. Their existing Rust modules and historical regression
+fixtures are not evidence of live production paths. Document closure must now
+inventory the cleanup's actual callers instead of completing removed APIs.
+Rust buffering uses the cleanup's RawRead/RawSeek file-or-memory adapters;
+GetStrW retains the safe text plan without restoring the removed reverse encoder.
+
+All three reference and experimental-document candidate DLLs build locally on
+x64 and x86 with VS2022, without YASM. Fresh rendering and lifecycle comparisons
+are in progress; no full parity claim is made yet. Legacy extraction harnesses
+are being reconciled with the removed APIs and replaced native dependencies.
+The older progress ledger and next-step recommendations below predate this
+rebase and must be read with these scope corrections.
 
 ## Progress accounting
 
@@ -4657,20 +4690,35 @@ not VSFilter's output.
 
 ## Windows handoff
 
-The workflow `.github/workflows/native-compat.yml` is the executable build recipe
-already used on Windows runners. It pins YASM and its required VC2010 runtime
-with checksums. Use it when reproducing the setup locally; installing a newer
-Visual C++ runtime alone does not provide `MSVCR100.dll` for that assembler.
+Local Windows setup check at implementation commit `6915e8d9`: Rust 1.85.0
+passes 241 safe-core and 123 FFI tests on each of x64 and x86 (the Windows CRT
+test accounts for the extra FFI test versus macOS). Formatting, Clippy and the
+814-case corpus generation check pass. Both Release `native-runtime` static
+libraries build with `+crt-static`, reporting `/defaultlib:libcmt`. These are
+local checks, not full DLL or rendering compatibility evidence. VS2022 v143
+and MFC/ATL headers are present; PowerShell 7 and YASM were not found in the
+checked installation locations or PATH, and only x64 Python was identified.
+The full paired DLL comparisons and x86 Python setup remain outstanding.
+
+The workflow `.github/workflows/native-compat.yml` is the executable build recipe.
+The cleanup removed YASM, VirtualDub implementation libraries, log4cplus and
+prebuilt asmlib. Neither reference nor candidate now needs YASM or its runtime.
 
 Once the prerequisites below are installed, the combined runner builds both
 trees, checks exports/imports, and runs the smoke, corpus and mutation comparisons:
 
 ```powershell
-git worktree add --detach ..\xy-VSFilter-reference 4911cacb102bc0cbd41449793e54473265b04e62
-pwsh -File tools/compat/run_native_comparison.ps1 -Platform x64 -Baseline ..\xy-VSFilter-reference -MutationCount 32
+git worktree add --detach ..\xy-VSFilter-reference 67da07cda068088b93e6de300f56cbad15ab6c5d
+pwsh -File tools/compat/run_native_comparison.ps1 -Platform x64 -Baseline ..\xy-VSFilter-reference -MutationCount 32 -RustDocumentOwner
 # Run from an x86 Native Tools prompt with x86 Python:
-pwsh -File tools/compat/run_native_comparison.ps1 -Platform Win32 -Baseline ..\xy-VSFilter-reference -MutationCount 32
+pwsh -File tools/compat/run_native_comparison.ps1 -Platform Win32 -Baseline ..\xy-VSFilter-reference -MutationCount 32 -RustDocumentOwner
 ```
+
+`-RustDocumentOwner` enables the experimental canonical document owner. Omitting
+it deliberately tests native document storage with the other Rust integrations;
+that configuration does not validate the current document-ownership milestone.
+CI covers both configurations. Use distinct output directories and rebuild all
+dependent native projects when changing ownership mode.
 
 To repeat the larger incremental-timeline campaign, use
 `-MutationCount 256 -MutationSeed 20261019` on the same command and give each
@@ -4695,7 +4743,7 @@ artifacts, restore their `candidate/artifacts/native/...` tree under this checko
    Windows installation, fonts, locale and settings for each pair. Preserve the
    binaries and record their hashes. Do not mix x86 and x64 binaries.
 3. Install Visual Studio C++ build tools including MFC/ATL, the Windows SDK,
-   and the YASM integration needed by the original projects. The existing
+   with the components needed by the cleaned-up projects. The existing
    `build_vsfilter.sh` and `.github/workflows/build.yml` document the historical
    VS2019 build; `src/configuration.props` also selects v143 for VS2022. The
    legacy workflow uses old Actions/runner versions, so don't assume it still
@@ -4719,7 +4767,7 @@ artifacts, restore their `candidate/artifacts/native/...` tree under this checko
 
    ```powershell
    powershell -File tools/compat/build_rust_windows.ps1 -Platform x64
-   msbuild VSFilter.sln /m /t:Rebuild /p:Configuration=Release /p:Platform=x64 /p:RustTextDecoder=true
+   msbuild VSFilter.sln /m /t:Rebuild /p:Configuration=Release /p:Platform=x64 /p:RustTextDecoder=true /p:RustDocumentOwnerExperimental=true
    ```
 
    The Rust library uses a static CRT to match `/MT`. Debug integration is

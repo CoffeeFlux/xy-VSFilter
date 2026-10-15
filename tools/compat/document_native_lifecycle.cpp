@@ -449,10 +449,12 @@ protected:
         ++change_events[id_];printf("event %u %u changed-enter\n",++sequence,id_);Dump("callback-state");
         // Actual native read operations reenter after rebuild's Rust loan ends.
         // They never mutate/reallocate reference storage during the callback.
-        printf("callback query %u %d %d %d\n",id_,SearchSub(-1,25.0),SearchSub(0,25.0),SearchSub(4,25.0));
+        int next = -1, count = -1;
+        FrameNext(0,25.0,&next,&count);
+        printf("callback query %u %d %d\n",id_,next,count);
         for(size_t i=0;i<Entries();i++) {
-            CStringW wide=GetStrW(int(i),true),packed=GetStrWA(int(i),true);
-            printf("text callback %u %zu %d",id_,i,IsEntryUnicode(int(i)));units(wide);units(packed);printf("\n");
+            CStringW wide=GetStrW(int(i),true);
+            printf("text callback %u %zu %d",id_,i,Entry(int(i)).fUnicode);units(wide);printf("\n");
         }
         printf("event %u %u changed-exit\n",++sequence,id_);
     }
@@ -469,23 +471,6 @@ static void populate(TraceDocument& doc) {
     STSStyle* replacement=new STSStyle;replacement->charSet=SHIFTJIS_CHARSET;replacement->fontSize=21;
     doc.AddStyle(CString(L"Japanese"),replacement);
     doc.CreateSegments();doc.Animate(0);doc.Dump("populated");
-}
-static void text_edits(TraceDocument& doc) {
-    unsigned notifications=change_events[1];
-    const wchar_t raw[]={L'R',0,0xd800,L'\n',L'Z'};
-    doc.SetStr(0,CStringW(raw,5),true);doc.Dump("setstr-retain-unicode");
-    check(doc.IsEntryUnicode(0),"SetStr retains stored Unicode flag");
-    // Known Windows charsets, normal valid Shift-JIS byte sequence; native
-    // TranslateCharsetInfo and codepage conversions execute in both binaries.
-    doc.ConvertUnicode(1,true);doc.Dump("convert-sjis-to-unicode");
-    doc.ConvertUnicode(1,true);doc.Dump("convert-unicode-noop");
-    doc.SetStr(1,CStringW(L"edited\ntext"),false);doc.Dump("setstr-input-packed-store-unicode");
-    check(doc.IsEntryUnicode(1),"SetStr never toggles stored Unicode flag");
-    doc.ConvertUnicode(1,false);doc.Dump("convert-unicode-to-sjis");
-    doc.ConvertUnicode(1,false);doc.Dump("convert-packed-noop");
-    doc.SetStr(1,CStringW(L"plain\ntext"),true);doc.Dump("setstr-input-unicode-store-packed");
-    check(!doc.IsEntryUnicode(1),"SetStr retains packed storage flag");
-    check(change_events[1]==notifications,"text edits have no OnChanged");
 }
 static void check_default(TraceDocument& doc,const STSStyle& expected,const char* stage) {
     STSStyle actual;check(doc.GetDefaultStyle(actual),"GetDefaultStyle status");
@@ -573,73 +558,7 @@ static void require_same_segments(const TraceDocument& doc,const std::vector<STS
 static void style_rename_stage(TraceDocument& doc,const char* stage) {
     printf("style-rename-stage %s\n",stage);doc.Dump(stage);
 }
-static void text_plan_lifecycle() {
-    TraceDocument doc(0);STSStyle japanese;japanese.charSet=SHIFTJIS_CHARSET;named_add(doc,L"JapaneseText",japanese);
-    const wchar_t sjis[]={0x82,0xa0};
-    CStringW packed(L"{\\i1}");packed+=CStringW(sjis,2);packed+=L"{\\i}\\NZ";
-    CStringW wide(L"{\\i1}\x3042{\\i}\\NZ");
-    CStringW plainPacked(L"<i>");plainPacked+=CStringW(sjis,2);plainPacked+=L"</i>\nZ";
-    const CStringW plainWide(L"<i>\x3042</i>\nZ");
-    doc.AddSTSEntryOnly(packed,false,0,10,CString(L"JapaneseText"),CString(L"actor"),CString(L"effect"),CRect(1,2,3,4),2,7);
-    doc.CreateSegments();doc.Animate(0);const auto segments=segment_snapshot(doc);const unsigned callbacks=change_events[0];
-    auto stage=[&](const char* name,bool unicode){
-        check(doc.IsEntryUnicode(0)==unicode&&same_identity(doc.Entry(0).str,unicode?wide:packed),"text plan exact stored text and flag");
-        printf("text-plan-stage %s\n",name);doc.Dump(name);
-        for(int ssa=1;ssa>=0;--ssa)for(int nativeWide=1;nativeWide>=0;--nativeWide){
-            const CStringW value=nativeWide?doc.GetStrW(0,ssa!=0):doc.GetStrWA(0,ssa!=0);
-            const CStringW& expected=ssa?(nativeWide?wide:packed):(nativeWide?plainWide:plainPacked);
-            check(same_identity(value,expected),"text getter exact supplied Shift-JIS/SSA result");
-            printf("text-plan-get %s wide=%d ssa=%d",name,nativeWide,ssa);units(value);printf("\n");}
-    };
-    stage("text-plan-packed-input",false);
-    doc.ConvertUnicode(0,true);stage("text-plan-wide",true);
-    doc.ConvertUnicode(0,true);check(same_identity(doc.Entry(0).str,wide)&&doc.IsEntryUnicode(0),"wide conversion noop retains state");
-    require_same_segments(doc,segments,"text-plan-wide-noop");printf("text-plan-noop wide=1 callbacks=0\n");
-    doc.ConvertUnicode(0,false);stage("text-plan-packed-roundtrip",false);
-    doc.ConvertUnicode(0,false);check(same_identity(doc.Entry(0).str,packed)&&!doc.IsEntryUnicode(0),"packed conversion noop retains state");
-    require_same_segments(doc,segments,"text-plan-packed-noop");printf("text-plan-noop wide=0 callbacks=0\n");
-    // Raw Unicode getter true is identity, with no native byte conversion of
-    // this entry. EntryOnly retains the existing animated segments unchanged.
-    const wchar_t raw[]={L'R',0,0xd83d,0xde00,L'Z'};
-    doc.AddSTSEntryOnly(CStringW(raw,5),true,10,20,CString(L"JapaneseText"));
-    CStringW owned=doc.GetStrW(1,true);check(same_identity(owned,CStringW(raw,5)),"raw Unicode getter preserves full units");
-    owned.SetAt(4,L'Q');printf("text-plan-owned-mutated");units(owned);printf("\n");
-    const CStringW reread=doc.GetStrW(1,true);check(same_identity(reread,CStringW(raw,5)),"raw getter copy suffix mutation independent");
-    printf("text-plan-owned-reread");units(reread);printf("\n");
-    require_same_segments(doc,segments,"text-plan-final");check(change_events[0]==callbacks,"text plans do not rebuild or notify");
-    printf("text-plan-stage text-plan-raw-independent\n");doc.Dump("text-plan-raw-independent");
-}
 
-static void setstr_plan_lifecycle() {
-    TraceDocument doc(0);STSStyle japanese;japanese.charSet=SHIFTJIS_CHARSET;named_add(doc,L"SetStrJapanese",japanese);
-    const wchar_t bytes[]={0x82,0xa0};
-    doc.AddSTSEntryOnly(CStringW(L"initial wide"),true,0,10,CString(L"SetStrJapanese"),CString(L"actor"),CString(L"effect"),CRect(1,2,3,4),2,7);
-    doc.AddSTSEntryOnly(CStringW(bytes,2),false,10,20,CString(L"SetStrJapanese"),CString(L"actor2"),CString(L"effect2"),CRect(5,6,7,8),3,9);
-    const STSEntry original[]={doc.Entry(0),doc.Entry(1)};
-    CStringW expectedText[]={original[0].str,original[1].str};
-    doc.CreateSegments();doc.Animate(0);const auto segments=segment_snapshot(doc);const unsigned callbacks=change_events[0];
-    auto update=[&](const char* stage,int index,const CStringW& input,bool inputUnicode,const CStringW& expected){
-        doc.SetStr(index,input,inputUnicode);expectedText[index]=expected;
-        for(int i=0;i<2;++i){const STSEntry actual=doc.Entry(i),old=original[i];
-            check(same_identity(actual.str,expectedText[i])&&actual.fUnicode==old.fUnicode,"SetStr replaces only selected text and retains both storage flags");
-            check(same_identity(actual.style,old.style)&&same_identity(actual.actor,old.actor)&&same_identity(actual.effect,old.effect)
-                &&actual.marginRect==old.marginRect&&actual.layer==old.layer&&actual.start==old.start&&actual.end==old.end&&actual.readorder==old.readorder,"SetStr retains complete non-text payload");}
-        check(change_events[0]==callbacks,"SetStr does not notify");require_same_segments(doc,segments,stage);
-        printf("setstr-stage %s\n",stage);doc.Dump(stage);
-        const STSEntry actual=doc.Entry(index);printf("setstr-value %s index=%d unicode=%d",stage,index,actual.fUnicode);units(actual.str);printf("\n");
-    };
-    const CStringW wideInput(L"\x3042\r\nZ"),wideExpected(L"\x3042\r\\NZ");
-    CStringW packedInput(bytes,2);packedInput+=L"\r\nZ";
-    CStringW packedExpected(bytes,2);packedExpected+=L"\r\\NZ";
-    update("setstr-same-wide",0,wideInput,true,wideExpected);
-    update("setstr-packed-to-wide",0,packedInput,false,wideExpected);
-    update("setstr-same-packed",1,packedInput,false,packedExpected);
-    update("setstr-wide-to-packed",1,wideInput,true,packedExpected);
-    // Exactly one skipped LF publishes the known former terminator. No getter
-    // conversion or callback is invoked on this raw NUL-tail entry afterward.
-    const wchar_t tail[]={10,0,10},expectedTail[]={92,78,0,10,0};
-    update("setstr-nul-tail",0,CStringW(tail,3),true,CStringW(expectedTail,5));
-}
 
 static bool same_segment(const STSSegment& a,const STSSegment& b) {
     if(a.start!=b.start||a.end!=b.end||a.animated!=b.animated||a.subs.GetCount()!=b.subs.GetCount())return false;
@@ -657,7 +576,7 @@ static void frame_search_lifecycle() {
         for(size_t i=0;i<doc.Segments();++i)storage.push_back(doc.Segment(int(i)));
         printf("frame-search-stage %s entries=%zu segments=%zu\n",name,doc.Entries(),doc.Segments());
         for(size_t q=0;q<times.size();++q){const REFERENCE_TIME t=times[q];
-            const int entry=doc.SearchSub(t,fps);int next=-77,count=-88,alias=-99;
+            int next=-77,count=-88,alias=-99;
             const bool nextFound=doc.FrameNext(t,fps,&next,&count);
             check(doc.FrameNext(t,fps,&alias,&alias)==nextFound&&alias==next,"FindNext output alias final index");
             STSSegment snapshot(111,222);snapshot.animated=true;snapshot.subs.Add(77);const STSSegment untouched=snapshot;
@@ -671,8 +590,8 @@ static void frame_search_lifecycle() {
                 STSSegment owned=snapshot;owned.start=-444;owned.end=-333;owned.animated=!owned.animated;owned.subs[0]=77;
                 STSSegment reread(111,222);check(doc.FrameContaining(t,fps,reread,NULL,NULL)&&same_segment(snapshot,reread),"FRAME found snapshot copy independent");}
             else check(same_segment(snapshot,untouched)&&same_segment(aliasedSnapshot,untouched),"FRAME failed snapshot completely untouched");
-            printf("frame-search-row %s %zu time=%lld entry=%d next=%d,%d,%d contain=%d,%d,%d alias=%d,%d snapshot=%lld,%lld,%d,%zu",
-                name,q,t,entry,nextFound,next,count,found,containing,containingCount,alias,containingAlias,
+            printf("frame-search-row %s %zu time=%lld next=%d,%d,%d contain=%d,%d,%d alias=%d,%d snapshot=%lld,%lld,%d,%zu",
+                name,q,t,nextFound,next,count,found,containing,containingCount,alias,containingAlias,
                 snapshot.start,snapshot.end,snapshot.animated,snapshot.subs.GetCount());
             for(size_t i=0;i<snapshot.subs.GetCount();++i)printf(",%d",snapshot.subs[i]);printf("\n");
         }
@@ -756,73 +675,6 @@ static void saved_bytes(const CString& path,const char* label,bool expected) {
     std::vector<BYTE> bytes(static_cast<size_t>(length));
     check(file.Read(bytes.data(),static_cast<UINT>(bytes.size()))==bytes.size(),"short saved file read");
     printf(" bytes=%zu",bytes.size());for(BYTE byte:bytes)printf(" %02x",unsigned(byte));printf("\n");
-}
-static void named_style_exports() {
-    TraceDocument document(0);STSStyle first=named_value(1),second=named_value(2);
-    first.fontName=L"Arial";second.fontName=L"Courier New";
-    named_add(document,L"Default",first);named_add(document,L"Export",second);
-    document.AddSTSEntryOnly(CStringW(L"ordinary export\nsecond line"),true,1000000,20000000,CString(L"Export"),CString(L"actor"));
-    document.AddSTSEntryOnly(CStringW(L"default export"),true,21000000,30000000,CString(L"Default"));
-    const exttype types[]={EXTSSA,EXTASS,EXTSRT};
-    const wchar_t* paths[]={L"document-lifecycle-save.ssa",L"document-lifecycle-save.ass",L"document-lifecycle-save.srt"};
-    const char* labels[]={"ssa","ass","srt"};
-    for(int i=0;i<3;++i){SavedFiles files(paths[i]);
-        check(document.SaveAs(files.name,types[i],25.0,CTextFile::UTF8),"named style SaveAs");
-        saved_bytes(files.name,labels[i],true);
-        saved_bytes(files.name+L".style",i==0?"ssa-sidecar":i==1?"ass-sidecar":"srt-sidecar",i==2);
-    }
-    document.Empty();
-    document.AddSTSEntryOnly(CStringW(L"without mapped default"),true,0,10000000,CString(L"Default"));
-    SavedFiles absent(L"document-lifecycle-no-sidecar.srt");
-    check(document.SaveAs(absent.name,EXTSRT,25.0,CTextFile::UTF8),"no mapped style SaveAs");
-    saved_bytes(absent.name,"srt-no-map",true);saved_bytes(absent.name+L".style","srt-no-map-sidecar",false);
-}
-static void save_body_lifecycle() {
-    TraceDocument doc(0);STSStyle style;style.fontName=L"Arial";
-    named_add(doc,L"Default",style);named_add(doc,L"RowStyle",style);
-    const wchar_t rawStyle[]={L'R',L'o',L'w',L'S',L't',L'y',L'l',L'e',0,L'T'};
-    const wchar_t rawActor[]={L'A',L'c',L't',L'o',L'r',0,L'T'},rawEffect[]={L'E',L'f',L'f',L'e',L'c',L't',0,L'T'};
-    const CString name(rawStyle,10),actor(rawActor,7),effect(rawEffect,8);
-    doc.AddSTSEntryOnly(L"skipped first",true,-20000000,-10000000,name);
-    doc.AddSTSEntryOnly(L"row one",true,123450000,234560000,name,actor,effect,CRect(-7,-9,12345,4),-3,8);
-    doc.AddSTSEntryOnly(L"skipped second",true,-10000000,0,name);
-    doc.AddSTSEntryOnly(L"row two",true,36000123000LL,36010123000LL,name,actor,effect,CRect(2,3,4,6),17,2);
-    doc.CreateSegments();doc.Animate(0);
-    auto run=[&](const char* phase,const exttype* types,const wchar_t* const* paths,const char* const* labels,int count,CTextFile::enc encoding,double fps){
-        std::vector<STSEntry> entries;for(size_t i=0;i<doc.Entries();++i)entries.push_back(doc.Entry(int(i)));
-        std::vector<STSSegment> segments;for(size_t i=0;i<doc.Segments();++i){STSSegment value=doc.Segment(int(i));segments.push_back(value);}
-        const unsigned callbacks=change_events[0];printf("save-body-stage %s-before\n",phase);doc.Dump(phase);
-        for(int i=0;i<count;++i){SavedFiles files(paths[i]);printf("save-body-export %s\n",labels[i]);
-            check(doc.SaveAs(files.name,types[i],fps,types[i]==EXTTXT?CTextFile::LE16:encoding),"body SaveAs");saved_bytes(files.name,labels[i],true);
-            const std::string sidecar=std::string(labels[i])+"-sidecar";saved_bytes(files.name+L".style",sidecar.c_str(),types[i]!=EXTSSA&&types[i]!=EXTASS);}
-        check(change_events[0]==callbacks&&doc.Entries()==entries.size()&&doc.Segments()==segments.size(),"SaveAs retains counts and callback state");
-        for(size_t i=0;i<entries.size();++i){const STSEntry a=doc.Entry(int(i)),b=entries[i];
-            check(same_identity(a.str,b.str)&&same_identity(a.style,b.style)&&same_identity(a.actor,b.actor)&&same_identity(a.effect,b.effect)&&a.fUnicode==b.fUnicode&&a.marginRect==b.marginRect&&a.layer==b.layer&&a.start==b.start&&a.end==b.end&&a.readorder==b.readorder,"SaveAs retains complete entry");}
-        for(size_t i=0;i<segments.size();++i){STSSegment actual=doc.Segment(int(i));check(same_segment(actual,segments[i]),"SaveAs retains animated segments");}
-        printf("save-body-stage %s-after\n",phase);doc.Dump(phase);
-    };
-    const exttype types[]={EXTSRT,EXTSUB,EXTSMI,EXTPSB,EXTSSA,EXTASS,EXTTXT};
-    const wchar_t* paths[]={L"document-lifecycle-body.srt",L"document-lifecycle-body.sub",L"document-lifecycle-body.smi",L"document-lifecycle-body.psb",L"document-lifecycle-body.ssa",L"document-lifecycle-body.ass",L"document-lifecycle-body.txt"};
-    const char* labels[]={"body-srt-utf8","body-sub-utf8","body-smi-utf8","body-psb-utf8","body-ssa-utf8","body-ass-utf8","body-txt-le16"};
-    run("time",types,paths,labels,7,CTextFile::UTF8,23.976);
-    doc.Empty();doc.Mode(FRAME);named_add(doc,L"Default",style);doc.AddSTSEntryOnly(L"Frame body",true,1,3);doc.CreateSegments();doc.Animate(0);
-    const exttype frameTypes[]={EXTSRT};const wchar_t* framePaths[]={L"document-lifecycle-body-frame.srt"};const char* frameLabels[]={"body-frame-srt-le16"};
-    run("frame",frameTypes,framePaths,frameLabels,1,CTextFile::LE16,256.0);
-}
-static void save_sections_lifecycle() {
-    TraceDocument doc(0);doc.Screen(CSize(-17,23));doc.Collisions(-2);doc.Scaled(true);
-    const unsigned callbacks=change_events[0];printf("save-sections-stage before\n");doc.Dump("save-sections-before");
-    const exttype types[]={EXTSSA,EXTASS,EXTSMI,EXTSRT};
-    const wchar_t* paths[]={L"document-lifecycle-sections.ssa",L"document-lifecycle-sections.ass",L"document-lifecycle-sections.smi",L"document-lifecycle-sections.srt"};
-    const char* labels[]={"sections-ssa","sections-ass","sections-smi","sections-srt"};
-    for(int i=0;i<4;++i){
-        if(i==3){STSStyle style;style.fontName=L"Arial";named_add(doc,L"Default",style);}
-        SavedFiles files(paths[i]);printf("save-sections-export %s\n",labels[i]);
-        check(doc.SaveAs(files.name,types[i],25.0,CTextFile::UTF8),"empty section SaveAs");saved_bytes(files.name,labels[i],true);
-        const std::string sidecar=std::string(labels[i])+"-sidecar";saved_bytes(files.name+L".style",sidecar.c_str(),i==3);
-        check(doc.Entries()==0&&doc.Segments()==0&&change_events[0]==callbacks,"empty section exports retain storage and callbacks");
-    }
-    printf("save-sections-stage after\n");doc.Dump("save-sections-after");
 }
 static void identity_stage(TraceDocument& doc,const char* stage,const CString& name,const CString& path) {
     check(same_identity(doc.Name(),name)&&same_identity(doc.Path(),path),"complete raw identity values");
@@ -1309,37 +1161,6 @@ protected:
                 const STSEntry e=Entry(seg.subs[j]);check(e.start<=seg.start&&e.end>=seg.end,"Sort callback membership observes final records");}}
     }
 };
-static void sort_lifecycle() {
-    SortDocument doc;
-    const int starts[12]={20,0,10,10,10,10,0,20,-10,10,0,20};
-    const int layers[12]={1,0,2,2,2,-1,1,0,0,2,0,1};
-    const int orders[12]={4,3,7,7,7,3,7,3,0,2,3,4};
-    std::vector<STSEntry> originals;
-    for(int i=0;i<12;++i){
-        const wchar_t payload[]={wchar_t(L'A'+i),0,wchar_t(0xd800+i),wchar_t(L'a'+i)};
-        const wchar_t name[]={L'S',wchar_t(L'A'+i),0,wchar_t(0xdc00+i)};
-        doc.AddSTSEntryOnly(CStringW(payload,4),true,starts[i],starts[i]+30,CString(name,4),
-            CString(L"actor"),CString(L"effect"),CRect(i,100+i,200+i,300+i),layers[i],orders[i]);
-        originals.push_back(doc.Entry(i));
-    }
-    doc.CreateSegments();doc.Animate(0);
-    printf("sort-stage sort-input\n");doc.Dump("sort-input");
-    const char* stages[]={"sort-time","sort-time-repeat","sort-readorder","sort-readorder-repeat"};
-    for(int n=0;n<4;++n){
-        doc.expected=stages[n];const unsigned before=doc.notifications;
-        doc.Sort(n>=2);check(doc.notifications==before+1,"Sort exactly one OnChanged");
-        bool seen[12]={};
-        for(size_t j=0;j<doc.Entries();++j){const STSEntry e=doc.Entry(int(j));const int id=e.marginRect.left;
-            check(id>=0&&id<12&&!seen[id],"Sort original identity bijection");seen[id]=true;
-            const STSEntry& old=originals[size_t(id)];
-            check(same_identity(e.str,old.str)&&same_identity(e.style,old.style)&&same_identity(e.actor,old.actor)&&same_identity(e.effect,old.effect)
-                &&e.marginRect==old.marginRect&&e.fUnicode==old.fUnicode&&e.start==old.start&&e.end==old.end&&e.layer==old.layer&&e.readorder==old.readorder,"Sort preserves complete initialized record");
-        }
-        printf("sort-stage %s\n",stages[n]);doc.Dump(stages[n]);
-        doc.Animate(0); // each subsequent Sort must rebuild, including repeated same comparator
-    }
-    doc.expected=NULL;
-}
 static void base_empty_lifecycle() {
     TraceDocument doc(0);
     const wchar_t rawName[]={L'E',0,0xd800,L'N'},rawPath[]={L'P',0,0xdcff,L'X'};
@@ -1500,47 +1321,6 @@ protected:
         if(expected){++notifications;Observe("conversion-callback",expected,false);}
     }
 };
-static void conversion_lifecycle() {
-    ConversionDocument doc;
-    const wchar_t raw[]={L'C',0,0xd800,L'X'};
-    doc.AddSTSEntryOnly(CStringW(raw,4),true,-1200000,-400000,CString(L"Default"),CString(L"actor"),CString(L"effect"),CRect(1,2,3,4),3,7);
-    doc.AddSTSEntryOnly(CStringW(L"positive"),true,400000,1200000,CString(L"Default"),CString(L"actor2"),CString(L"effect2"),CRect(5,6,7,8),4,8);
-    std::vector<STSEntry> payloads;for(int i=0;i<2;++i)payloads.push_back(doc.Entry(i));
-    doc.expectedTimes={{-1200000,-400000},{400000,1200000}};
-    doc.CreateSegments();doc.Animate(0);doc.Observe("conversion-stage","conversion-time-input",true);doc.Dump("conversion-time-input");
-    auto transition=[&](const char* stage,bool frame,double fps,const std::vector<std::pair<REFERENCE_TIME,REFERENCE_TIME> >& times,bool real){
-        doc.expected=stage;doc.expectedMode=frame?FRAME:TIME;doc.expectedTimes=times;
-        const unsigned before=doc.notifications;
-        std::vector<STSSegment> oldSegments;
-        if(!real)for(size_t i=0;i<doc.Segments();++i)oldSegments.push_back(doc.Segment(int(i)));
-        if(frame)doc.ConvertToFrameBased(fps);else doc.ConvertToTimeBased(fps);
-        if(!real){check(doc.Segments()==oldSegments.size(),"no-op conversion segment count retained");
-            for(size_t i=0;i<oldSegments.size();++i){const STSSegment actual=doc.Segment(int(i)),old=oldSegments[i];
-                check(actual.start==old.start&&actual.end==old.end&&actual.animated==old.animated&&actual.subs.GetCount()==old.subs.GetCount(),"no-op conversion complete segment retained");
-                for(size_t j=0;j<old.subs.GetCount();++j)check(actual.subs[j]==old.subs[j],"no-op conversion members retained");}}
-
-        check(doc.notifications==before+(real?1:0),"conversion exactly one callback only on transition");
-        doc.Observe("conversion-stage",stage,!real);doc.Dump(stage);
-        for(int i=0;i<2;++i){const STSEntry e=doc.Entry(i),old=payloads[size_t(i)];
-            check(same_identity(e.str,old.str)&&same_identity(e.style,old.style)&&same_identity(e.actor,old.actor)&&same_identity(e.effect,old.effect)
-                &&e.fUnicode==old.fUnicode&&e.marginRect==old.marginRect&&e.layer==old.layer&&e.readorder==old.readorder,"conversion preserves full non-time entry payload");}
-        doc.expected=NULL;
-    };
-    transition("conversion-frame-half",true,12.5,{{-2,-1},{1,2}},true);
-    doc.Animate(0);transition("conversion-frame-noop-zero",true,0.0,{{-2,-1},{1,2}},false);
-    transition("conversion-time-half",false,256.0,{{-78125,-39063},{39063,78125}},true);
-    doc.Animate(0);transition("conversion-time-noop-zero",false,0.0,{{-78125,-39063},{39063,78125}},false);
-    ConversionDocument empty;
-    auto emptyTransition=[&](const char* stage,bool frame,double fps,bool real){
-        empty.expected=stage;empty.expectedMode=frame?FRAME:TIME;const unsigned before=empty.notifications;
-        if(frame)empty.ConvertToFrameBased(fps);else empty.ConvertToTimeBased(fps);
-        check(empty.notifications==before+(real?1:0),"empty conversion callback count");
-        empty.Observe("conversion-stage",stage,false);empty.Dump(stage);empty.expected=NULL;
-    };
-    emptyTransition("conversion-empty-frame",true,12.5,true);
-    emptyTransition("conversion-empty-frame-noop",true,0.0,false);
-    emptyTransition("conversion-empty-time",false,256.0,true);
-}
 
 static void layout_size_lifecycle() {
     TraceDocument source(0),destination(1);
@@ -1616,8 +1396,6 @@ int main() {
         printf("provenance pointer_bits=%zu\n",sizeof(void*)*8);
         printf("environment ansi=%u oem=%u\n",GetACP(),GetOEMCP());
         default_style_lifecycle();
-        text_plan_lifecycle();
-        setstr_plan_lifecycle();
         frame_search_lifecycle();
         preparation_lifecycle();
         copy_selected_lifecycle();
@@ -1630,34 +1408,17 @@ int main() {
         prepared_style_conflicts();
         add_style_session_lifecycle();
         copy_styles_session_lifecycle();
-        sort_lifecycle();
         base_empty_lifecycle();
         lcid_lifecycle();
         resolution_lifecycle();
         layout_size_lifecycle();
-        conversion_lifecycle();
         unknown_style_lifecycle();
-        named_style_exports();
-        save_body_lifecycle();
-        save_sections_lifecycle();
         {
             TraceDocument source(0),destination(1);populate(source);populate(destination);
             unsigned notifications=change_events[1];
             destination.Copy(source);destination.Dump("copied-nonempty");source.Dump("copy-source-unchanged");
             check(change_events[1]==notifications,"Copy does not call OnChanged");
-            text_edits(destination);source.Dump("copy-independent-source");
-            destination.Sort(false);destination.Dump("sort-normal");
-            destination.Sort(true);destination.Dump("sort-readorder");
-            destination.ConvertToFrameBased(25.0);destination.Animate(0);destination.Dump("converted-to-frame");
-            interpretation_stage(destination,"interpretation-frame",FRAME,EXTSRT,CTextFile::UTF8);
-            notifications=change_events[1];destination.ConvertToFrameBased(25.0);destination.Dump("frame-noop");
-            interpretation_stage(destination,"interpretation-frame-noop",FRAME,EXTSRT,CTextFile::UTF8);
-            check(change_events[1]==notifications,"frame no-op does not notify");
-            destination.ConvertToTimeBased(25.0);destination.Animate(0);destination.Dump("converted-to-time");
-            interpretation_stage(destination,"interpretation-time",TIME,EXTSRT,CTextFile::UTF8);
-            notifications=change_events[1];destination.ConvertToTimeBased(25.0);destination.Dump("time-noop");
-            interpretation_stage(destination,"interpretation-time-noop",TIME,EXTSRT,CTextFile::UTF8);
-            check(change_events[1]==notifications,"time no-op does not notify");
+            source.Dump("copy-independent-source");
             destination.RemoveAllEntries();destination.Dump("entries-only-removed");
             check(change_events[1]==notifications,"RemoveAllEntries does not notify");
             destination.CreateSegments();destination.Dump("rebuilt-empty");

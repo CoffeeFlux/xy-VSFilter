@@ -4312,7 +4312,12 @@ int CSimpleTextSubtitle::GetCharSet(int i)
 CStringW CSimpleTextSubtitle::GetStrW(int i, bool fSSA)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    return ApplyDocumentTextOperation(m_document->TextOperation(i, fSSA ? 0 : 1));
+    const auto operation = m_document->TextOperation(i, fSSA ? 0 : 1);
+    ASSERT(operation.has_style && (operation.action == 0 || operation.action == 1));
+    CStringW text = operation.text;
+    if(operation.action == 1) text = MBCSSSAToUnicode(text, operation.charset);
+    if(operation.strip_tags) text = RemoveSSATags(text, true, operation.charset);
+    return text;
 #else
     STSEntry const& stse = m_entries.GetAt(i);
     int CharSet = GetCharSet(i);

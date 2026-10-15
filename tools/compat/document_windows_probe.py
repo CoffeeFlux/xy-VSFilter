@@ -16,7 +16,7 @@ import shlex
 import subprocess
 import sys
 
-PIN = "4911cacb102bc0cbd41449793e54473265b04e62"
+PIN = "67da07cda068088b93e6de300f56cbad15ab6c5d"
 ROOT = Path(__file__).resolve().parents[2]
 
 
