@@ -15,12 +15,42 @@ static void writeFile(const CStringW& path,const void* data,size_t count){
     const int closed=fclose(file);
     if(!ok||closed)throw 1;
 }
-class Output:public ssf::OutputStream {
-public:
-    std::vector<unsigned> units;
-    explicit Output(encoding_t encoding):OutputStream(encoding){}
-    void NextByte(int value){units.push_back(static_cast<unsigned>(value));}
-};
+// Observe the retained public node API. Cleanup removed OutputStream and Dump.
+static void appendString(std::vector<unsigned>& output,const CStringW& text){
+    output.push_back(static_cast<unsigned>(text.GetLength()));
+    for(int i=0;i<text.GetLength();++i)output.push_back(static_cast<unsigned>(text[i]));
+}
+static std::vector<unsigned> snapshotNodes(ssf::Reference* root){
+    if(!root)throw 1;
+    std::vector<ssf::Node*> nodes(1,root);
+    std::vector<unsigned> output;
+    for(size_t index=0;index<nodes.size();++index){
+        if(nodes.size()>10000)throw 1;
+        ssf::Node* node=nodes[index];
+        output.push_back(static_cast<unsigned>(index));
+        appendString(output,node->m_type);appendString(output,node->m_name);
+        output.push_back(static_cast<unsigned>(node->m_priority));
+        output.push_back(node->m_predefined?1:0);
+        ssf::Definition* definition=dynamic_cast<ssf::Definition*>(node);
+        output.push_back(definition?1:0);
+        if(definition){
+            for(int status=1;status<=4;++status)
+                output.push_back(definition->IsValue(static_cast<ssf::Definition::status_t>(status))?1:0);
+            CStringW value;if(definition->IsValue())definition->GetAsString(value);
+            appendString(output,value);
+        }
+        output.push_back(static_cast<unsigned>(node->m_nodes.GetCount()));
+        POSITION position=node->m_nodes.GetHeadPosition();
+        while(position){
+            ssf::Node* child=node->m_nodes.GetNext(position);
+            size_t childIndex=0;
+            while(childIndex<nodes.size()&&nodes[childIndex]!=child)++childIndex;
+            if(childIndex==nodes.size())nodes.push_back(child);
+            output.push_back(static_cast<unsigned>(childIndex));
+        }
+    }
+    return output;
+}
 int wmain(int argc,wchar_t** argv){
     if(argc!=4)return 64;
     setvbuf(stdout,NULL,_IONBF,0);
@@ -52,12 +82,10 @@ int wmain(int argc,wchar_t** argv){
         ssf::SubtitleFile file;
         file.Parse(*stream);
         printf("ssf-native-v1 parsed segments %llu\n",static_cast<unsigned long long>(file.m_segments.GetCount()));
-        for(int encoding=0;encoding<6;++encoding){
-            Output output(static_cast<ssf::Stream::encoding_t>(encoding));file.Dump(output);
-            CStringW path;path.Format(L"%s\\dump-%d.units",directory.GetString(),encoding);
-            writeFile(path,output.units.data(),output.units.size()*sizeof(unsigned));
-            printf("dump %d units %llu\n",encoding,static_cast<unsigned long long>(output.units.size()));
-        }
+        const std::vector<unsigned> snapshot=snapshotNodes(file.GetRootRef());
+        CStringW nodePath;nodePath.Format(L"%s\\nodes.units",directory.GetString());
+        writeFile(nodePath,snapshot.data(),snapshot.size()*sizeof(unsigned));
+        printf("nodes units %llu\n",static_cast<unsigned long long>(snapshot.size()));
         ssf::Renderer renderer;
         const float times[]={-0.25f,0.0f,0.5f,1.75f,2.0f,0.5f};
         for(unsigned frame=0;frame<sizeof(times)/sizeof(times[0]);++frame){

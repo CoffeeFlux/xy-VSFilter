@@ -45,11 +45,53 @@ Rust buffering uses the cleanup's RawRead/RawSeek file-or-memory adapters;
 GetStrW retains the safe text plan without restoring the removed reverse encoder.
 
 All three reference and experimental-document candidate DLLs build locally on
-x64 and x86 with VS2022, without YASM. Fresh rendering and lifecycle comparisons
-are in progress; no full parity claim is made yet. Legacy extraction harnesses
-are being reconciled with the removed APIs and replaced native dependencies.
-The older progress ledger and next-step recommendations below predate this
-rebase and must be read with these scope corrections.
+x64 and x86 with VS2022, without YASM. Final DLL comparisons pass on **each**
+architecture: all 814 corpus cases / 8,586 frames, 72 distinct-frame controls,
+and 32 mutation cases / 224 frames (seed 12345). Four disjoint batches cover
+exactly the original corpus and keep every distinct-frame pair together.
+The comparisons check the complete captured pixel buffers, including padding.
+Exports and dependency checks pass for VSFilter, XySubFilter and its consumer;
+10 disconnected COM contract cases and two candidate-only pin-ID controls pass.
+These are bounded local results, not a universal compatibility claim.
+
+Linked document lifecycle traces match (3,583 lines, repeated runs and three
+dialog observations per execution), as do 209 style values / 43,681 equality
+cells and 600 live Add/EntryOnly preparation observations on each architecture.
+A real rebase difference was found and fixed: the cleanup closes a `.style`
+sidecar before segment rebuild and document callbacks. The Rust Open path now
+uses the same lifetime; the linked probe verifies that the callback can open
+the sidecar exclusively.
+
+Rust 1.85 passes 241 core + 123 FFI tests on each architecture; formatting,
+Clippy with warnings denied, and corpus generation checks pass. The full
+low-level `check_decoder.py` suite now explicitly uses historical native
+adapters from `6915e8d9` against upstream `4911cacb`, with the current Rust and
+C ABI headers. It preserves removed-API regressions without restoring those
+APIs to production. Its reports identify both historical commits and do not
+claim cleanup integration. The document core/primitive regressions likewise
+retain their historical oracle. Current native integration evidence comes
+from the linked probes and whole DLL comparisons above.
+
+The cleanup also removed SSF OutputStream/Dump. Its current native probe reads
+public node graph fields and raw UTF-16 values instead, retaining comment,
+literal, Arabic-text, input-ownership and parser-error controls. It does not
+claim parity for removed serialization APIs. Historical output-stream leaf
+regressions remain in the explicitly historical suite.
+
+See [the local evidence index](rust-cleanup-local-evidence.json) for report
+locations, hashes, tested commits, DLL hashes and scoped results. Raw reports
+remain under `artifacts/cleanup-*`; earlier failed and interrupted attempts
+are retained separately and are not passes. A transient MSVC incremental-link
+failure was resolved by a serial full-LTCG relink, with no behavior change.
+No remote branch has been rewritten.
+
+Next: inventory the cleanup's remaining live document callers and move the
+remaining `m_simple` state and native orchestration into Rust, preserving these
+checks. Keep the document owner opt-in until the remaining ownership review
+and real Aegisub/player lifecycle validation are complete. Do not spend closure
+work reimplementing deleted export, editing or conversion methods. The older
+progress ledger below predates the cleanup and must be read with these scope
+corrections. The final target still includes replacing all C++ host adapters.
 
 ## Progress accounting
 
@@ -4690,21 +4732,22 @@ not VSFilter's output.
 
 ## Windows handoff
 
-Local Windows setup check at implementation commit `6915e8d9`: Rust 1.85.0
-passes 241 safe-core and 123 FFI tests on each of x64 and x86 (the Windows CRT
-test accounts for the extra FFI test versus macOS). Formatting, Clippy and the
-814-case corpus generation check pass. Both Release `native-runtime` static
-libraries build with `+crt-static`, reporting `/defaultlib:libcmt`. These are
-local checks, not full DLL or rendering compatibility evidence. VS2022 v143
-and MFC/ATL headers are present; PowerShell 7 and YASM were not found in the
-checked installation locations or PATH, and only x64 Python was identified.
-The full paired DLL comparisons and x86 Python setup remain outstanding.
+Local cleanup-baseline validation is recorded at the top of this document and
+in `rust-cleanup-local-evidence.json`. Installed tools: Windows PowerShell
+5.1.19041.7725, VS2022 v143 14.44.35207 with ATL/MFC, Windows SDK 10.0.26100.0,
+and Rust 1.85.0 with both Windows MSVC targets. The native Rust libraries use
+`+crt-static` and report `/defaultlib:libcmt`. System Python 3.12.9 is x64;
+official portable Python 3.12.9 x86 was placed under
+`artifacts/tools/python-x86` for 32-bit DLL loading. PowerShell 7 was not
+required for the local checks: equivalent cmd/Python invocations were used
+from the VS2022 developer environment. No additional installation is needed
+for continuing local migration work.
 
 The workflow `.github/workflows/native-compat.yml` is the executable build recipe.
 The cleanup removed YASM, VirtualDub implementation libraries, log4cplus and
 prebuilt asmlib. Neither reference nor candidate now needs YASM or its runtime.
 
-Once the prerequisites below are installed, the combined runner builds both
+With PowerShell 7 for this convenience wrapper, the combined runner builds both
 trees, checks exports/imports, and runs the smoke, corpus and mutation comparisons:
 
 ```powershell

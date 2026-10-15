@@ -57,7 +57,7 @@ def inspect(directory, returncode, timed_out=False, expected_error=None):
         exception = re.fullmatch(rb"ssf exception utf16((?: [0-9a-f]{4})+)\nssf-native-v1 exception complete\n", trace)
         if returncode != 2 or exception is None or (directory / "stderr.txt").read_bytes():
             return result
-        if list(directory.glob("dump-*.units")) or list(directory.glob("frame-*.bgra")):
+        if list(directory.glob("*.units")) or list(directory.glob("frame-*.bgra")):
             return result
         units = exception[1].split()
         message = b"".join(int(unit, 16).to_bytes(2, "little") for unit in units).decode("utf-16-le", errors="surrogatepass")
@@ -72,12 +72,12 @@ def inspect(directory, returncode, timed_out=False, expected_error=None):
     if returncode != 0 or not trace.endswith(b"ssf-native-v1 complete\n"):
         return result
     frames = re.findall(rb"^pixels (\d+) changed (\d+) bounds (-?\d+) (-?\d+) (-?\d+) (-?\d+)$", trace, re.M)
-    dumps = re.findall(rb"^dump (\d+) units (\d+)$", trace, re.M)
+    nodes = re.findall(rb"^nodes units (\d+)$", trace, re.M)
     segments = re.findall(rb"^ssf-native-v1 parsed segments (\d+)$", trace, re.M)
     headers = re.findall(rb"^frame (\d+) found ([01]) subtitles (\d+)$", trace, re.M)
     if [int(h[0]) for h in headers] != list(range(6)):
         return result
-    if len(segments) != 1 or int(segments[0]) == 0 or [int(f[0]) for f in frames] != list(range(6)) or [int(d[0]) for d in dumps] != list(range(6)):
+    if len(segments) != 1 or int(segments[0]) == 0 or [int(f[0]) for f in frames] != list(range(6)) or len(nodes) != 1 or int(nodes[0]) == 0:
         return result
     timeline = [[int(value) for value in header] for header in headers]
     expected_timeline = [[0, 0, 0], [1, 1, 1], [2, 1, 1], [3, 1, 1], [4, 0, 0], [5, 1, 1]]
@@ -87,12 +87,10 @@ def inspect(directory, returncode, timed_out=False, expected_error=None):
     if any(int(frame[1]) != 0 for frame in frames) or not re.search(rb"^text units [0-9a-f]{4}", trace, re.M) or re.search(rb"^rendered 1 glyphs [0-9a-f]{4}", trace, re.M):
         result["status"] = "control_failed"
         return result
-    for index, count in dumps:
-        name = f"dump-{int(index)}.units"
-        path = directory / name
-        if not path.is_file() or path.stat().st_size != int(count) * 4 or (int(index) >= 2 and int(count) == 0):
-            return result
-        result["files"][name] = sha(path)
+    path = directory / "nodes.units"
+    if not path.is_file() or path.stat().st_size != int(nodes[0]) * 4:
+        return result
+    result["files"]["nodes.units"] = sha(path)
     for frame in frames:
         name = f"frame-{int(frame[0])}.bgra"
         path = directory / name
@@ -118,7 +116,7 @@ def capture(probe, source, directory, mode, expected_error=None):
         except subprocess.TimeoutExpired:
             timed_out, code = True, None
     # Windows CRT stdout is text mode. Compare the canonical trace and preserve
-    # the original capture as well; binary dump/frame files are never rewritten.
+    # the original capture as well; binary node/frame files are never rewritten.
     raw = (directory / "stdout.txt").read_bytes()
     (directory / "stdout.raw").write_bytes(raw)
     (directory / "stdout.txt").write_bytes(raw.replace(b"\r\n", b"\n"))
@@ -148,7 +146,7 @@ def main():
     harness = {name: sha(ROOT / name) for name in HARNESS}
     report = {"complete": False, "passed": False, "reference_commit": reference, "candidate_commit": commit,
               "platform": args.platform, "probes": probes, "harness_sources": harness, "cases": [],
-              "scope": "Actual separately linked libssf parser, parsed text and node dump in six encodings. Native renderer traces and blank RGBA frames are characterized separately: the pinned FontCache::Create returns NULL after successful CreateFontIndirect. No visible rendering parity is established. WCHAR and UTF-16LE/BOM byte input in borrowed, adopted and copied modes, including mutation of the source after copying; bounded valid fixtures plus declared unterminated/newline literal errors with completed native exception handlers, each side repeated in fresh processes. Error line/column and exact UTF-16 messages are compared separately from successful parsing. Crashes, timeouts and unexpected exceptions never pass. DirectShow, host playback, other byte encodings and broader malformed-document coverage remain separate."}
+              "scope": "Actual separately linked libssf parser, parsed text and public node graph snapshots (ordered child links, types, names, priority, predefined flags, value kinds and raw UTF-16 values; excludes private numeric unit/cache fields). Cleanup removed native Dump and OutputStream; no serialization parity is claimed. Native renderer traces and blank RGBA frames are characterized separately: the pinned FontCache::Create returns NULL after successful CreateFontIndirect. No visible rendering parity is established. WCHAR and UTF-16LE/BOM byte input in borrowed, adopted and copied modes, including mutation of the source after copying; bounded valid fixtures plus declared unterminated/newline literal errors with completed native exception handlers, each side repeated in fresh processes. Error line/column and exact UTF-16 messages are compared separately from successful parsing. Crashes, timeouts and unexpected exceptions never pass. DirectShow, host playback, other byte encodings and broader malformed-document coverage remain separate."}
     path = args.output / "report.json"
     path.write_text(json.dumps(report, indent=2) + "\n")
     modes = ("wide", "borrow", "copy", "adopt")
@@ -180,11 +178,11 @@ def main():
             a = by_name["plain-" + mode]["captures"][side]["files"]
             b = by_name["comments-" + mode]["captures"][side]["files"]
             c = by_name["arabic-" + mode]["captures"][side]["files"]
-            report["controls"][side + "-" + mode] = a == b and a["dump-5.units"] != c["dump-5.units"]
+            report["controls"][side + "-" + mode] = a == b and a["nodes.units"] != c["nodes.units"]
             for name in ("quoted-literals", "nested-block"):
                 literal = by_name[name + "-" + mode]["captures"][side]["files"]
                 report["controls"][side + "-" + mode + "-" + name] = (
-                    literal["dump-5.units"] != a["dump-5.units"])
+                    literal["nodes.units"] != a["nodes.units"])
         for name in cases():
             wide = by_name[name + "-wide"]["captures"][side]
             report["controls"][side + "-" + name + "-input-modes"] = all(
@@ -207,7 +205,7 @@ def main():
     path.write_text(json.dumps(report, indent=2) + "\n")
     if not report["passed"]:
         raise SystemExit("SSF controls or source stability failed")
-    print(f"{len(cases()) * len(modes)} native SSF parser/dump cases and {len(error_cases()) * len(modes)} expected parser errors matched; {len(cases()) * len(modes) * 6} blank-frame observations, zero visible rendering parity frames")
+    print(f"{len(cases()) * len(modes)} native SSF parser/node-snapshot cases and {len(error_cases()) * len(modes)} expected parser errors matched; {len(cases()) * len(modes) * 6} blank-frame observations, zero visible rendering parity frames")
 
 
 if __name__ == "__main__":

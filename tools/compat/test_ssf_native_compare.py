@@ -14,10 +14,9 @@ class EvidenceTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         lines = ["ssf-native-v1 parsed segments 1"]
+        lines.append("nodes units 1")
+        (self.root / "nodes.units").write_bytes(bytes(4))
         for index in range(6):
-            count = int(index >= 2)
-            lines.append(f"dump {index} units {count}")
-            (self.root / f"dump-{index}.units").write_bytes(bytes(4 * count))
             active = int(index not in (0, 4))
             lines.append(f"frame {index} found {active} subtitles {active}")
             lines.append(f"pixels {index} changed {0} bounds 0 0 20 20")
@@ -48,6 +47,13 @@ class EvidenceTests(unittest.TestCase):
         frame.unlink()
         self.assertEqual(MODULE.inspect(self.root, 0)["status"], "incomplete")
 
+    def test_missing_or_partial_node_snapshot_never_passes(self):
+        snapshot = self.root / "nodes.units"
+        snapshot.write_bytes(b"partial")
+        self.assertEqual(MODULE.inspect(self.root, 0)["status"], "incomplete")
+        snapshot.unlink()
+        self.assertEqual(MODULE.inspect(self.root, 0)["status"], "incomplete")
+
     def test_blank_characterization_must_match_actual_pixels(self):
         (self.root / "frame-2.bgra").write_bytes(b"\x01\x00\x00\xff" * (320 * 180))
         self.assertEqual(MODULE.inspect(self.root, 0)["status"], "control_failed")
@@ -66,7 +72,7 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(MODULE.inspect(self.root, 0)["status"], "control_failed")
 
     def test_expected_error_requires_exact_declared_message_and_completed_handler(self):
-        for path in list(self.root.glob("dump-*.units")) + list(self.root.glob("frame-*.bgra")):
+        for path in list(self.root.glob("*.units")) + list(self.root.glob("frame-*.bgra")):
             path.unlink()
         expected = "unterminated quoted string"
         message = "Error (Ln 1 Col 23): " + expected + "\x00"
@@ -88,7 +94,7 @@ class EvidenceTests(unittest.TestCase):
         path.write_text(trace.replace("ssf-native-v1 exception complete\n", ""), newline="\n")
         self.assertEqual(MODULE.inspect(self.root, 2, expected_error=expected)["status"], "incomplete")
         path.write_text(trace, newline="\n")
-        (self.root / "dump-0.units").write_bytes(b"")
+        (self.root / "nodes.units").write_bytes(b"")
         self.assertEqual(MODULE.inspect(self.root, 2, expected_error=expected)["status"], "incomplete")
 
 
