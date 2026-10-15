@@ -27,6 +27,11 @@ NATIVE_ROOT = ROOT / "artifacts/historical-adapters" / HISTORICAL_ADAPTERS
 
 def prepare_historical_adapters():
     """Materialize pinned test-only C++ sources; never restore production files."""
+    available = subprocess.run(["git", "cat-file", "-e", HISTORICAL_ADAPTERS],
+                               cwd=ROOT, capture_output=True)
+    if available.returncode:
+        run(["git", "fetch", "https://github.com/CoffeeFlux/xy-VSFilter.git",
+             HISTORICAL_ADAPTERS])
     NATIVE_ROOT.mkdir(parents=True, exist_ok=True)
     archive = NATIVE_ROOT / "sources.zip"
     with archive.open("wb") as output:
@@ -1561,7 +1566,7 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
     if not match:
         raise RuntimeError("rustc did not report native link dependencies")
     libraries = shlex.split(match[1])
-    library_dir = ROOT / "target"
+    library_dir = Path(os.environ.get("CARGO_TARGET_DIR", ROOT / "target")).resolve()
     if args.target:
         library_dir /= args.target
     library_dir /= "release"
