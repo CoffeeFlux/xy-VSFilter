@@ -26,7 +26,6 @@
 #include <algorithm>
 #include "Rasterizer.h"
 #include <math.h>
-#include "xy_logger.h"
 #include "xy_bitmap.h"
 #include "xy_widen_region.h"
 
@@ -352,7 +351,7 @@ bool Rasterizer::Rasterize(const ScanLineData2& scan_line_data2, int xsub, int y
 
     // Are we doing a border?
     const tSpanBuffer* pOutline[2] = {&(scan_line_data.mOutline), &(scan_line_data2.mWideOutline)};
-    for(int i = countof(pOutline)-1; i >= 0; i--)
+    for(int i = _countof(pOutline)-1; i >= 0; i--)
     {
         tSpanBuffer::const_iterator it = pOutline[i]->begin();
         tSpanBuffer::const_iterator itEnd = pOutline[i]->end();
@@ -1246,7 +1245,6 @@ void Rasterizer::AdditionDraw(XyBitmap         *bitmap   ,
     // must have enough space to draw into
     if (!(x >= bitmap->x && y >= bitmap->y && x+w <= bitmap->x + bitmap->w && y+h <= bitmap->y + bitmap->h))
     {
-        XY_LOG_FATAL("Overflow!");
         ASSERT(0);
     }
 
@@ -1280,10 +1278,6 @@ void Rasterizer::AdditionDraw(XyBitmap         *bitmap   ,
                 new_switchpts[2*i+1] = w;
                 break;
             }
-        }
-        if (i==MAX_COLOR_NUM)
-        {
-            XY_LOG_WARN("Unexpected!");
         }
         DoAdditionDrawMultiColor(dst, s, new_switchpts, w, h, overlayPitch, bitmap->pitch);
     }
@@ -1421,7 +1415,6 @@ void Overlay::FillAlphaMash( byte* outputAlphaMask, bool fBody, bool fBorder, in
     {
         //should NOT happen
         ASSERT(0);
-        XY_LOG_FATAL("Unexpected!");
     }
 }
 

@@ -3,10 +3,10 @@
 function Usage()
 {
   echo "Usage:"
-  echo -e "\t$1 [-conf "'"Release"|"Debug"'"]  [-plat platform "'"Win32"|"x64"'"] [-action build|clean|rebuild] [-proj projects] [-voff|--versioning-off] [-solution sln_file] [-compiler VS2010|VS2012|VS2013|VS2019|VS2022]"
+  echo -e "\t$1 [-conf "'"Release"|"Debug"'"]  [-plat platform "'"x64"'"] [-action build|clean|rebuild] [-proj projects] [-voff|--versioning-off] [-solution sln_file] [-compiler VS2010|VS2012|VS2013|VS2019|VS2022]"
   echo -e "\nDefault:"
   echo -e '-conf\t\t"Release"'
-  echo -e '-plat\t\t"Win32"'
+  echo -e '-plat\t\t"x64"'
   echo -e '-action\t\tbuild'
   echo -e '-proj\t\t"vsfilter"'
   echo -e '-solution\tVSFilter.sln'
@@ -27,7 +27,7 @@ cd $script_dir
 solution="VSFilter.sln"
 action="build"
 configuration="Release"
-platform="Win32"
+platform="x64"
 projects="vsfilter"
 compiler="VS2010"
 common_tools="%VS100COMNTOOLS%"

@@ -22,44 +22,12 @@
 #include "stdafx.h"
 #include "VSFilter.h"
 
-// The DirectShow base classes' DllEntryPoint walks the factory template list;
-// this DLL only exports the CSRI API, so the list is empty.
-CFactoryTemplate g_Templates[1] = {};
-int g_cTemplates = 0;
-
 BEGIN_MESSAGE_MAP(CVSFilterApp, CWinApp)
 END_MESSAGE_MAP()
 
 CVSFilterApp::CVSFilterApp()
 {
     _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
-#if ENABLE_XY_LOG
-    LPTSTR  strDLLPath = DEBUG_NEW TCHAR[_MAX_PATH];
-    ::GetModuleFileName( reinterpret_cast<HINSTANCE>(&__ImageBase), strDLLPath, _MAX_PATH);
-    CString dllPath = strDLLPath;
-    dllPath += ".properties";
-    xy_logger::doConfigure( dllPath.GetString() );
-    delete [] strDLLPath;
-#endif
-}
-
-extern "C" BOOL WINAPI DllEntryPoint(HINSTANCE, ULONG, LPVOID);
-
-BOOL CVSFilterApp::InitInstance()
-{
-	if(!CWinApp::InitInstance())
-		return FALSE;
-
-	DllEntryPoint(AfxGetInstanceHandle(), DLL_PROCESS_ATTACH, 0); // "DllMain" of the dshow baseclasses
-
-	return TRUE;
-}
-
-int CVSFilterApp::ExitInstance()
-{
-	DllEntryPoint(AfxGetInstanceHandle(), DLL_PROCESS_DETACH, 0); // "DllMain" of the dshow baseclasses
-
-	return CWinApp::ExitInstance();
 }
 
 CVSFilterApp theApp;

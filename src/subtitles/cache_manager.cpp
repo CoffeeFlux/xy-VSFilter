@@ -351,7 +351,7 @@ DrawItemHashKey::DrawItemHashKey( const DrawItem& draw_item)
     , m_fBody(draw_item.fBody)
     , m_fBorder(draw_item.fBorder)
 {
-    for(int i=0;i<countof(m_switchpts);i++)
+    for(int i=0;i<_countof(m_switchpts);i++)
         m_switchpts[i] = draw_item.switchpts[i];
 }
 

@@ -1,13 +1,8 @@
 #include "stdafx.h"
 #include "xy_bitmap.h"
+#include <algorithm>
 #include "xy_malloc.h"
 #include "../SubPic/ISubPic.h"
-
-#if ENABLE_XY_LOG_SUB_RENDER_FRAME
-#  define TRACE_SUB_RENDER_FRAME(msg) XY_LOG_TRACE(msg)
-#else
-#  define TRACE_SUB_RENDER_FRAME(msg)
-#endif
 
 XyBitmap::~XyBitmap()
 {
@@ -42,7 +37,7 @@ void XyBitmap::ClearBitmap( XyBitmap *bitmap )
     BYTE * p = bitmap->plans[0];
     for (int i=0;i<bitmap->h;i++, p+=bitmap->pitch)
     {
-        memsetd(p, 0xFF000000, bitmap->w*4);
+        std::fill_n(reinterpret_cast<DWORD*>(p), bitmap->w, (DWORD)0xFF000000);
     }        
 }
 
@@ -96,7 +91,6 @@ XySubRenderFrame::~XySubRenderFrame()
 
 HRESULT XySubRenderFrame::GetBitmapCount( int *count )
 {
-    TRACE_SUB_RENDER_FRAME(count<<" "<<m_bitmaps.GetCount());
     if (!count)
     {
         return E_POINTER;
@@ -134,10 +128,6 @@ HRESULT XySubRenderFrame::GetBitmap( int index, ULONGLONG *id, POINT *position, 
     {
         *pitch = bitmap.pitch;
     }
-    TRACE_SUB_RENDER_FRAME(index<<" id: "<<m_bitmap_ids.GetAt(index)
-        <<" dirty_rect: x "<<bitmap.x+m_output_rect.left<<", y "<<bitmap.y + m_output_rect.top
-        <<", w "<<bitmap.w<<", h "<<bitmap.h
-        <<" pitch:"<<bitmap.pitch<<" pixels:"<<(void*)bitmap.plans[0]);
     return S_OK;
 }
 

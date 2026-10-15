@@ -22,7 +22,6 @@
 #include "stdafx.h"
 
 #include <atlbase.h>
-#include <afxinet.h>
 
 #include "TextFile.h"
 #include "Utf8.h"
@@ -250,7 +249,6 @@ bool CTextFile::ReadLine() {
 			}
 		}
 
-		XY_LOG_ERROR("This character code '" << c << "'is out of UTF-16 accessible range");
 		m_convertedBuffer.push_back(L'?');
 	}
 }
@@ -310,53 +308,3 @@ BOOL CTextFile::ReadString(CStringW& str) {
 	}
 	return !fEOF;
 }
-
-//
-// CWebTextFile
-//
-CWebTextFile::CWebTextFile(CTextFile::enc e, LONGLONG llMaxSize)
-: CTextFile(e)
-, m_llMaxSize(llMaxSize)
-{
-}
-
-bool CWebTextFile::Open(LPCTSTR lpszFileName)
-{
-	CString fn(lpszFileName);
-
-	if(fn.Find(_T("http://")) != 0)
-		return __super::Open(lpszFileName);
-
-	std::vector<BYTE> data;
-
-	try
-	{
-		CInternetSession is;
-
-		CAutoPtr<CStdioFile> f(is.OpenURL(fn, 1, INTERNET_FLAG_TRANSFER_BINARY|INTERNET_FLAG_EXISTING_CONNECT));
-		if(!f) return(false);
-
-		BYTE buff[1024];
-		UINT len;
-		while((len = f->Read(buff, sizeof(buff))) > 0)
-		{
-			data.insert(data.end(), buff, buff + len);
-			if(m_llMaxSize >= 0 && (LONGLONG)data.size() >= m_llMaxSize)
-			{
-				data.resize((size_t)m_llMaxSize);
-				break;
-			}
-		}
-
-		f->Close(); // must close it because the desctructor doesn't seem to do it and we will get an exception when "is" is destroying
-	}
-	catch(CInternetException* ie)
-	{
-		ie->Delete();
-		return(false);
-	}
-
-	m_data.swap(data);
-	return OpenMemory(m_data.empty() ? NULL : &m_data[0], m_data.size());
-}
-

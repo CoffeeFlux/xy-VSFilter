@@ -40,7 +40,6 @@ static csri_rend csri_vsfilter = "vsfilter";
 
 CSRIAPI csri_inst *csri_open_file(csri_rend *renderer, const char *filename, struct csri_openflag *flags)
 {
-    AMTRACE((TEXT(__FUNCTION__),0));
 	int namesize;
 	wchar_t *namebuf;
 
@@ -68,7 +67,6 @@ CSRIAPI csri_inst *csri_open_file(csri_rend *renderer, const char *filename, str
 
 CSRIAPI csri_inst *csri_open_mem(csri_rend *renderer, const void *data, size_t length, struct csri_openflag *flags)
 {
-    AMTRACE((TEXT(__FUNCTION__),0));
 	csri_inst *inst = new csri_inst();
 
 	inst->rts = new CRenderedTextSubtitle();
@@ -98,18 +96,11 @@ CSRIAPI int csri_request_fmt(csri_inst *inst, const struct csri_fmt *fmt)
 		return -1;
 	}
 
-	// Check if pixel format is supported
-	switch (fmt->pixfmt) {
-		case CSRI_F_BGR_:
-		case CSRI_F_BGR:
-		case CSRI_F_YUY2:
-		case CSRI_F_YV12:
-			inst->pixfmt = fmt->pixfmt;
-			break;
-
-		default:
-			return -1;
+	// The renderer only produces 32-bit BGRA
+	if (fmt->pixfmt != CSRI_F_BGR_) {
+		return -1;
 	}
+	inst->pixfmt = fmt->pixfmt;
 	inst->screen_res = CSize(fmt->width, fmt->height);
 	inst->video_rect = CRect(0, 0, fmt->width, fmt->height);
 	return 0;
@@ -119,25 +110,16 @@ CSRIAPI int csri_request_fmt(csri_inst *inst, const struct csri_fmt *fmt)
 CSRIAPI void csri_render(csri_inst *inst, struct csri_frame *frame, double time)
 {
 	const double arbitrary_framerate = 25.0;
+	if (inst->pixfmt != CSRI_F_BGR_) {
+		return; // no supported format was requested
+	}
 	SubPicDesc spd;
 	spd.w = inst->screen_res.cx;
 	spd.h = inst->screen_res.cy;
-	switch (inst->pixfmt) {
-		case CSRI_F_BGR_:
-			spd.type = MSP_RGBA;
-			spd.bpp = 32;
-			spd.bits = frame->planes[0];
-			spd.pitch = frame->strides[0];
-			break;
-
-		default:
-            ASSERT(0);
-            CString msg;
-            msg.Format(_T("Anything other then RGB32 is NOT supported!"));
-            MessageBox(NULL, msg, _T("Warning"), MB_OKCANCEL|MB_ICONWARNING);
-            int o = 0; o=o/o;
-			return;
-	}
+	spd.type = MSP_RGBA;
+	spd.bpp = 32;
+	spd.bits = frame->planes[0];
+	spd.pitch = frame->strides[0];
 	spd.vidrect = inst->video_rect;
 
 	inst->rts->Render(spd, (REFERENCE_TIME)(time*10000000), arbitrary_framerate, inst->video_rect);

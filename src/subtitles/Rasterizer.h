@@ -26,10 +26,6 @@
 #include "../SubPic/ISubPic.h"
 #include "xy_malloc.h"
 
-#ifdef _OPENMP
-#include <omp.h>
-#endif
-
 #define PT_MOVETONC 0xfe
 #define PT_BSPLINETO 0xfc
 #define PT_BSPLINEPATCHTO 0xfa

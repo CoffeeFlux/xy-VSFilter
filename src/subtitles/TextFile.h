@@ -86,14 +86,3 @@ public:
 	BOOL ReadString(CStringW& str);
 };
 
-class CWebTextFile : public CTextFile
-{
-	LONGLONG m_llMaxSize;
-	std::vector<BYTE> m_data;
-
-public:
-    CWebTextFile(CTextFile::enc e = DEFAULT_ENCODING, LONGLONG llMaxSize = 1024 * 1024);
-
-	// http:// URLs are downloaded into memory; anything else is opened as a file.
-	bool Open(LPCTSTR lpszFileName);
-};

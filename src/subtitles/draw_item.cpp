@@ -8,12 +8,6 @@
 #include "../SubPic/ISubPic.h"
 #include "xy_bitmap.h"
 
-#if ENABLE_XY_LOG_TRACE_DRAW
-#  define TRACE_DRAW(msg) XY_LOG_TRACE(msg)
-#else
-#  define TRACE_DRAW(msg)
-#endif
-
 using namespace std;
 
 //////////////////////////////////////////////////////////////////////////
@@ -73,7 +67,6 @@ CRectCoor2 DrawItem::AlphaBltDraw( XyBitmap* bitmap, DrawItem& draw_item, const 
 
 CRectCoor2 DrawItem::AdditionDraw( XyBitmap *bitmap, DrawItem& draw_item, const CRectCoor2& clip_rect )
 {
-    TRACE_DRAW("AdditionDraw");
     CRect result;
     SharedPtrGrayImage2 alpha_mask;
     draw_item.clipper->Paint(&alpha_mask);
@@ -540,7 +533,7 @@ void GroupedDrawItems::Draw( SharedPtrXyBitmap *bitmap, int *bitmap_identity_num
         {
             DWORD color = 0x00ffffff & XY_DBG_SHOW_BITMAP_BOX_IN_COLOR;
             BYTE *pixel = (BYTE *)tmp->bits;
-            memsetd(pixel, color, tmp->w*4);
+            std::fill_n(reinterpret_cast<DWORD*>(pixel), tmp->w, color);
             int i=1;
             for (;i<tmp->h-1;i++)
             {
@@ -551,7 +544,7 @@ void GroupedDrawItems::Draw( SharedPtrXyBitmap *bitmap, int *bitmap_identity_num
             if (i<tmp->h)
             {
                 pixel += tmp->pitch;
-                memsetd(pixel, color, tmp->w*4);
+                std::fill_n(reinterpret_cast<DWORD*>(pixel), tmp->w, color);
             }
         }
 #endif

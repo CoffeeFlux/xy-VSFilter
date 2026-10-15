@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include <windowsx.h>
 #include <math.h>
 #include <time.h>
 #include "RTS.h"
@@ -28,21 +29,6 @@
 #include "subpixel_position_controler.h"
 #include "xy_overlay_paint_machine.h"
 #include "xy_clipper_paint_machine.h"
-#include "..\dsutil\DSUtil.h"
-
-#if ENABLE_XY_LOG_TEXT_PARSER
-#  define TRACE_PARSER(msg) XY_LOG_TRACE(msg)
-#else
-#  define TRACE_PARSER(msg)
-#endif
-
-#if ENABLE_XY_LOG_RENDERER_REQUEST2
-#  define TRACE_RENDERER_REQUEST(msg) XY_LOG_TRACE(msg)
-#  define TRACE_RENDERER_REQUEST_TIMING(msg) XY_AUTO_TIMING(msg)
-#else
-#  define TRACE_RENDERER_REQUEST(msg)
-#  define TRACE_RENDERER_REQUEST_TIMING(msg)
-#endif
 
 const int MAX_SUB_PIXEL = 8;
 const double MAX_SUB_PIXEL_F = 8.0;
@@ -753,7 +739,6 @@ bool CPolygon::Get6BitFixedPoint(CStringW& str, LONG& ret)
     LPWSTR s = (LPWSTR)(LPCWSTR)str, e = s;
     ret = wcstod(str, &e) * 64;
     str.Delete(0,e-s); 
-    TRACE_PARSER(ret);//fix me: use a specific logger for it
     return(e > s);
 }
 
@@ -904,7 +889,6 @@ bool CPolygon::CreatePath(PathData* path_data)
         BYTE* pNewPathTypes = (BYTE*)realloc(path_data->mpPathTypes, len * sizeof(BYTE));
         if (!pNewPathTypes)
         {
-            TRACE_PARSER("Overflow!");
             return false;
         }
         path_data->mpPathTypes = pNewPathTypes;
@@ -912,7 +896,6 @@ bool CPolygon::CreatePath(PathData* path_data)
         POINT* pNewPathPoints = (POINT*)realloc(path_data->mpPathPoints, len*sizeof(POINT));
         if (!pNewPathPoints)
         {
-            TRACE_PARSER("Overflow!");
             return false;
         }
         path_data->mpPathPoints = pNewPathPoints;
@@ -1545,8 +1528,6 @@ void CScreenLayoutAllocator::Empty()
 
 void CScreenLayoutAllocator::AdvanceToSegment(int segment, const CAtlArray<int>& sa)
 {
-    TRACE_RENDERER_REQUEST("Begin AdvanceToSegment. m_subrects.size:"
-        <<m_subrects.GetCount()<<" sa.size:"<<sa.GetCount());
     POSITION pos = m_subrects.GetHeadPosition();
     while(pos)
     {
@@ -1813,7 +1794,6 @@ void CRenderedTextSubtitle::OnChanged()
 bool CRenderedTextSubtitle::Init( const CRectCoor2& video_rect, const CRectCoor2& subtitle_target_rect,
     const SIZE& layout_size )
 {
-    XY_LOG_INFO(_T(""));
     Deinit();
 
     m_video_rect = CRect(video_rect.left*MAX_SUB_PIXEL, 
@@ -2950,7 +2930,6 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
     {
         if (!m_subtitleCache.SetAt(entry, sub))
         {
-            XY_LOG_FATAL("Out of Memory!");
             delete sub;
             return NULL;
         }
@@ -2998,7 +2977,6 @@ static int lscomp(const void* ls1, const void* ls2)
 
 HRESULT CRenderedTextSubtitle::ParseScript(REFERENCE_TIME rt, double fps, CSubtitle2List *outputSub2List )
 {
-    TRACE_RENDERER_REQUEST("Begin search subtitle segment");
     //fix me: check input and log error
     int segment;
     //const
@@ -3006,7 +2984,6 @@ HRESULT CRenderedTextSubtitle::ParseScript(REFERENCE_TIME rt, double fps, CSubti
     if(!stss) return S_FALSE;
     // clear any cached subs that has been passed
     {
-        TRACE_RENDERER_REQUEST("Begin clear parsed subtitle cache. m_subtitleCache.size:"<<m_subtitleCacheEntry.GetCount());
         POSITION pos = m_subtitleCacheEntry.GetHeadPosition();
         while(pos)
         {
@@ -3022,7 +2999,6 @@ HRESULT CRenderedTextSubtitle::ParseScript(REFERENCE_TIME rt, double fps, CSubti
         }
     }
     m_sla.AdvanceToSegment(segment, stss->subs);
-    TRACE_RENDERER_REQUEST("Begin copy LSub. subs.size:"<<stss->subs.GetCount());
     CAtlArray<LSub> subs;
     for(int i = 0, j = stss->subs.GetCount(); i < j; i++)
     {
@@ -3032,9 +3008,7 @@ HRESULT CRenderedTextSubtitle::ParseScript(REFERENCE_TIME rt, double fps, CSubti
         ls.readorder = m_entries.GetAt(stss->subs[i]).readorder;
         subs.Add(ls);
     }
-    TRACE_RENDERER_REQUEST("Begin sort LSub.");
     qsort(subs.GetData(), subs.GetCount(), sizeof(LSub), lscomp);
-    TRACE_RENDERER_REQUEST("Begin parse subs.");
     for(int i = 0, j = subs.GetCount(); i < j; i++)
     {
         int entry = subs[i].idx;
@@ -3171,10 +3145,6 @@ HRESULT CRenderedTextSubtitle::RenderEx(SubPicDesc& spd, REFERENCE_TIME rt, doub
     CSize output_size = CSize(spd.w,spd.h);
     CRectCoor2 video_rect = CRect(0,0,spd.w,spd.h);
     rectList.RemoveAll();
-    if (spd.vidrect.left!=0 || spd.vidrect.top!=0 || spd.vidrect.right!=spd.w || spd.vidrect.bottom!=spd.h)
-    {
-        XY_LOG_WARN("Video rectangle is different from window. But support for relative to video rectangle has been removed.");
-    }
 
     XySubRenderFrame *frame = NULL;
     HRESULT hr = RenderEx(&frame, video_rect, video_rect, output_size, rt, fps);
@@ -3210,7 +3180,6 @@ HRESULT CRenderedTextSubtitle::RenderEx( XySubRenderFrame**subRenderFrame,
     const SIZE& original_video_size,
     REFERENCE_TIME rt, double fps )
 {
-    TRACE_RENDERER_REQUEST("Begin RenderEx rt"<<rt);
     if (!subRenderFrame)
     {
         return S_FALSE;
@@ -3221,13 +3190,11 @@ HRESULT CRenderedTextSubtitle::RenderEx( XySubRenderFrame**subRenderFrame,
     cvideo_rect &= subtitle_target_rect;
     if (cvideo_rect!=video_rect)
     {
-        XY_LOG_WARN("NOT supported yet!");
         return E_NOTIMPL;
     }
 
     if (cvideo_rect.left!=0 || cvideo_rect.top!=0)
     {
-        XY_LOG_WARN("FIXME: supported with hack");
         cvideo_rect.MoveToXY(0,0);
     }
 
@@ -3250,7 +3217,6 @@ HRESULT CRenderedTextSubtitle::RenderEx( XySubRenderFrame**subRenderFrame,
     {
         if (!Init(cvideo_rect, subtitle_target_rect, layout_size))
         {
-            XY_LOG_FATAL("Failed to Init.");
             return E_FAIL;
         }
 
@@ -3258,7 +3224,6 @@ HRESULT CRenderedTextSubtitle::RenderEx( XySubRenderFrame**subRenderFrame,
         render_frame_creater->SetClipRect(subtitle_target_rect);
     }
 
-    TRACE_RENDERER_REQUEST("Begin ParseScript");
     CSubtitle2List sub2List;
     HRESULT hr = ParseScript(rt, fps, &sub2List);
     if(hr!=S_OK)
@@ -3266,7 +3231,6 @@ HRESULT CRenderedTextSubtitle::RenderEx( XySubRenderFrame**subRenderFrame,
         return hr;
     }
 
-    TRACE_RENDERER_REQUEST("Begin build draw item tree");
     CRectCoor2 margin_rect(
         m_video_rect.left - m_subtitle_target_rect.left,
         m_video_rect.top  - m_subtitle_target_rect.top,
@@ -3276,7 +3240,6 @@ HRESULT CRenderedTextSubtitle::RenderEx( XySubRenderFrame**subRenderFrame,
     DoRender(m_video_rect.Size(), m_video_rect.TopLeft(), margin_rect, sub2List, &compDrawItemListList);
     ClearUnCachedSubtitle(sub2List);
 
-    TRACE_RENDERER_REQUEST("Begin Draw");
     XySubRenderFrame *sub_render_frame;
     CompositeDrawItem::Draw(&sub_render_frame, compDrawItemListList);
     sub_render_frame->MoveTo(video_rect.left, video_rect.top);
@@ -3284,7 +3247,6 @@ HRESULT CRenderedTextSubtitle::RenderEx( XySubRenderFrame**subRenderFrame,
 
     ShrinkCache();
 
-    TRACE_RENDERER_REQUEST("Finished");
     return hr;
 }
 

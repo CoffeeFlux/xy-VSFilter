@@ -12,14 +12,6 @@ permissions:
 jobs:
   build:
     runs-on: windows-2022
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - vsfplat: x64
-            namesuf: x86-64
-          - vsfplat: Win32
-            namesuf: x86-32
     defaults:
       run:
         shell: 'bash'
@@ -43,7 +35,7 @@ jobs:
       - name: Build VSFilter (CSRI)
         run: |
           # Version info in version_in.h is maintained by hand, so don't regenerate it
-          bash ./build_vsfilter.sh -platform "${{ matrix.vsfplat }}" -compiler VS2022 -voff
+          bash ./build_vsfilter.sh -platform "x64" -compiler VS2022 -voff
           cp License.txt bin/
 
       - name: Check binary hardening
@@ -51,10 +43,7 @@ jobs:
           msvc_dir="$(cygpath -u "$VS170COMNTOOLS")../../VC/Tools/MSVC"
           dumpbins=("$msvc_dir"/*/bin/Hostx64/x64/dumpbin.exe)
           dumpbin="$(printf '%s\n' "${dumpbins[@]}" | sort -V | tail -1)"
-          required=("Dynamic base" "NX compatible" "Control Flow Guard" "CET compatible")
-          if [ "${{ matrix.vsfplat }}" = x64 ] ; then
-              required+=("High Entropy Virtual Addresses")
-          fi
+          required=("Dynamic base" "NX compatible" "Control Flow Guard" "CET compatible" "High Entropy Virtual Addresses")
           fail=0
           for dll in bin/lib*/*/Release/*.dll ; do
               headers="$("$dumpbin" -nologo -headers "$dll")"
@@ -69,11 +58,6 @@ jobs:
                   echo "::error::$dll: no .rdata section (merged into .text?)"
                   fail=1
               fi
-              if [ "${{ matrix.vsfplat }}" = Win32 ] &&
-                 ! "$dumpbin" -nologo -loadconfig "$dll" | grep -qF "Safe Exception Handler Table" ; then
-                  echo "::error::$dll: no SafeSEH table"
-                  fail=1
-              fi
               echo "$dll: checked"
           done
           exit $fail
@@ -81,7 +65,7 @@ jobs:
       - name: Publish output
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: xy-VSFilter-CSRI_nightly_${{ matrix.namesuf }}
+          name: xy-VSFilter-CSRI_nightly_x86-64
           if-no-files-found: error
           path: |
             bin/lib*/*/Release
@@ -90,7 +74,7 @@ jobs:
       # Runs after publishing so unit_test.exe stays out of the artifact (it shares
       # the Release output dir).
       - name: Build unit tests
-        run: bash ./build_vsfilter.sh -platform "${{ matrix.vsfplat }}" -compiler VS2022 -voff -proj unit_test
+        run: bash ./build_vsfilter.sh -platform "x64" -compiler VS2022 -voff -proj unit_test
 
       # OverallTest needs a script argument and is skipped; MemoryOpen compares
       # every test/*.ass rendered from a file against the same script from memory,
@@ -101,5 +85,5 @@ jobs:
         env:
           XY_TEST_DATA: test
         run: |
-          exe=(bin/lib*/"${{ matrix.vsfplat }}"/Release/unit_test.exe)
+          exe=(bin/lib*/"x64"/Release/unit_test.exe)
           "${exe[0]}"

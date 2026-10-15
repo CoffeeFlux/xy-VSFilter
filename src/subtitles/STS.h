@@ -22,8 +22,13 @@
 #pragma once
 
 #include <atlcoll.h>
-#include <wxutil.h>
 #include "TextFile.h"
+
+typedef LONGLONG REFERENCE_TIME; // 100 ns units, as in the Windows SDK
+
+#define MS2RT(t)        (10000i64 * (t))
+#define RT2MS(t)        ((t) / 10000)
+#define UNITS_FLOAT     (10000000.0)
 
 typedef enum {TIME, FRAME} tmode; // the meaning of STSEntry::start/end
 

@@ -26,20 +26,6 @@
 
 #include <algorithm>
 #include <vector>
-#include "xy_logger.h"
-
-#include "..\dsutil\DSUtil.h"
-
-
-#if ENABLE_XY_LOG_TEXT_SUBTITLE
-#  define TRACE_SUB(msg) XY_LOG_TRACE(msg)
-#else
-#  define TRACE_SUB(msg) __noop
-#endif
-
-#ifndef ReftimeToCString
-#  define  ReftimeToCString(rt) ReftimeToString(rt).GetString()
-#endif
 
 // gathered from http://www.netwave.or.jp/~shikai/shikai/shcolor.htm
 
@@ -193,7 +179,7 @@ static struct htmlcolor {TCHAR* name; DWORD color;} htmlcolors[] =
 
 CHtmlColorMap::CHtmlColorMap()
 {
-    for(int i = 0; i < countof(htmlcolors); i++)
+    for(int i = 0; i < _countof(htmlcolors); i++)
         SetAt(htmlcolors[i].name, htmlcolors[i].color);
 }
 
@@ -203,22 +189,6 @@ CString g_default_style(_T("Default"));
 
 //
 
-static void LogSegments(const CAtlArray<STSSegment>& segments)
-{
-#if ENABLE_XY_LOG_TEXT_SUBTITLE
-    for (int i=0, n=segments.GetCount();i<n;i++)
-    {
-        const STSSegment& s = segments[i];
-        TRACE_SUB(_T("\tsegments ")<<i<<_T(":")<<s.start<<_T(" ")
-            <<s.end<<_T(" ")<<s.subs.GetCount());
-        TRACE_SUB(_T("\tsubs: "));
-        for (int j=0, m=s.subs.GetCount();j<m;j++)
-        {
-            TRACE_SUB(_T("\t\t ")<<s.subs[j]);
-        }
-    }
-#endif
-}
 
 //
 
@@ -502,7 +472,7 @@ static bool LoadUUEFont(CTextFile* file)
     CString s, font;
     while(file->ReadString(s))
     {
-        FastTrim(s);
+        s.Trim();
         if(s.IsEmpty()) break;
         if(s[0] == '[') // check for standard section headers
         {
@@ -537,7 +507,7 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
     	bool fEOF = !file->ReadString(buff);
     	if(fEOF && buff.IsEmpty()) break;
 
-        FastTrim(buff);
+        buff.Trim();
         if(buff.IsEmpty() || buff.GetAt(0) == ';') continue;
 
         CStringW entry = GetStr(buff, ':');
@@ -763,7 +733,7 @@ static OpenFunctStruct OpenFuncts[] =
     OpenSubStationAlpha, TIME,
 };
 
-static int nOpenFuncts = countof(OpenFuncts);
+static int nOpenFuncts = _countof(OpenFuncts);
 
 //
 
@@ -854,14 +824,7 @@ static bool SegmentCompStart(const STSSegment& segment, REFERENCE_TIME start)
 void CSimpleTextSubtitle::Add(CStringW str, bool fUnicode, REFERENCE_TIME start, REFERENCE_TIME end,
     CString style, const CString& actor, const CString& effect, const CRect& marginRect, int layer, int readorder)
 {
-    TRACE_SUB(ReftimeToCString(start)<<" "<<ReftimeToCString(end)<<" "<<str.GetString()<<" style:"<<style.GetString()
-        <<" Unicode:"<<fUnicode
-        <<" actor:"<<actor.GetString()<<" effect:"<<effect.GetString()
-        <<" (l:"<<marginRect.left<<",t:"<<marginRect.top<<",r:"<<marginRect.right<<",b:"<<marginRect.bottom
-        <<" layer:"<<layer<<" readorder:"<<readorder
-        <<" entries:"<<m_entries.GetCount()<<" seg:"<<m_segments.GetCount());
-
-    FastTrim(str);
+    str.Trim();
     if (str.IsEmpty() || start > end) return;
 
     str.Remove('\r');
@@ -974,7 +937,7 @@ void CSimpleTextSubtitle::Add(CStringW str, bool fUnicode, REFERENCE_TIME start,
 
 void CSimpleTextSubtitle::AddSTSEntryOnly( CStringW str, bool fUnicode, REFERENCE_TIME start, REFERENCE_TIME end, CString style /*= _T("Default")*/, const CString& actor /*= _T("")*/, const CString& effect /*= _T("")*/, const CRect& marginRect /*= CRect(0,0,0,0)*/, int layer /*= 0*/, int readorder /*= -1*/ )
 {
-    FastTrim(str);
+    str.Trim();
     if (str.IsEmpty() || start > end) return;
 
     str.Remove('\r');
@@ -999,8 +962,6 @@ void CSimpleTextSubtitle::AddSTSEntryOnly( CStringW str, bool fUnicode, REFERENC
 
 void CSimpleTextSubtitle::ChangeUnknownStylesToDefault()
 {
-    CAtlMap<CString, STSStyle*, CStringElementTraits<CString> > unknown;
-    bool fReport = true;
     CString last_style = _T("!@dkdfjlakfkjjklezdv^5132ae");
     bool last_style_changed_to_unknow = false;
     for(size_t i = 0; i < m_entries.GetCount(); i++)
@@ -1023,18 +984,6 @@ void CSimpleTextSubtitle::ChangeUnknownStylesToDefault()
             last_style_changed_to_unknow = !m_styles.Lookup(stse.style, val);
             if (last_style_changed_to_unknow)
             {
-                if(!unknown.Lookup(stse.style, val))
-                {
-                    if(fReport && stse.style!=g_default_style)
-                    {
-                        CString msg;
-                        msg.Format(_T("Unknown style found: \"%s\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."), stse.style);
-                        if(MessageBox(NULL, msg, _T("Warning"), MB_OKCANCEL|MB_ICONWARNING) != IDOK) fReport = false;
-                    }
-
-                    unknown[stse.style] = NULL;
-                }
-
                 stse.style = g_default_style;
             }
         }
@@ -1278,14 +1227,13 @@ void CSimpleTextSubtitle::CreateSegments()
                 m_segments.Add(tempSegments[i]);
     }
     OnChanged();
-    LogSegments(m_segments);
 }
 
 bool CSimpleTextSubtitle::Open(CString fn, int CharSet, CString name)
 {
     Empty();
 
-    CWebTextFile f(CTextFile::UTF8);
+    CTextFile f(CTextFile::UTF8);
     if(!f.Open(fn)) return(false);
 
     fn.Replace('\\', '/');
@@ -1299,13 +1247,6 @@ bool CSimpleTextSubtitle::Open(CString fn, int CharSet, CString name)
     return(Open(&f, CharSet, name));
 }
 
-static size_t CountLines(CTextFile* f, ULONGLONG from, ULONGLONG to, CString& s = CString())
-{
-    size_t n = 0;
-    f->Seek(from, CFile::begin);
-    while(f->ReadString(s) && f->GetPosition() < to) n++;
-    return(n);
-}
 
 bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
 {
@@ -1315,18 +1256,10 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
 
     for(int i = 0; i < nOpenFuncts; i++)
     {
-         const TCHAR* func_name[]={
-             TEXT("OpenSubStationAlpha")};
-        XY_LOG_INFO("Open '"<<f->GetFilePath().GetString()<<"' with "<<func_name[i]<<" begin" );
         if(!OpenFuncts[i].open(f, *this, CharSet) /*|| !GetCount()*/)
         {
             if(m_entries.GetCount() > 0)
             {
-                CString lastLine;
-                size_t n = CountLines(f, pos, f->GetPosition(), lastLine);
-                CString msg;
-                msg.Format(_T("Unable to parse the subtitle file. Syntax error at line %Iu:\n\"%s\""), n + 1, lastLine);
-                AfxMessageBox(msg, MB_OK | MB_ICONERROR);
                 Empty();
                 break;
             }
@@ -1335,7 +1268,6 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
             Empty();
             continue;
         }
-        XY_LOG_INFO("Open '"<<f->GetFilePath().GetString()<<"' with "<<func_name[i]<<" succeeded" );
 
         m_name = name;
         m_mode = OpenFuncts[i].mode;
@@ -1344,7 +1276,7 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
 
         if(!m_path.IsEmpty())
         {
-            CWebTextFile f2(CTextFile::UTF8);
+            CTextFile f2(CTextFile::UTF8);
             if(f2.Open(m_path + _T(".style")))
                 OpenSubStationAlpha(&f2, *this, CharSet);
         }

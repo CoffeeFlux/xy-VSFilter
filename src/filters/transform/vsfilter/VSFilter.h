@@ -26,9 +26,6 @@ class CVSFilterApp : public CWinApp
 public:
 	CVSFilterApp();
 
-	BOOL InitInstance();
-	int ExitInstance();
-
 	DECLARE_MESSAGE_MAP()
 };
 

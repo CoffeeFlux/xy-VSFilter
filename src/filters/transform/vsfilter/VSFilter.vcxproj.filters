@@ -29,9 +29,6 @@
     <ClCompile Include="VSFilter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="xy_logger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="csri.h">
@@ -41,9 +38,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VSFilter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="xy_logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="version.h">

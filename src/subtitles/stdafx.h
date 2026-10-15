@@ -41,11 +41,8 @@
 
 #include "vsfilter_config.h"
 
-#include <streams.h>
-#include "../DSUtil/DSUtil.h"
-#include "../DSUtil/SharedInclude.h"
+#include "SharedInclude.h"
 #include "xy_malloc.h"
-#include "xy_logger.h"
 #include "flyweight_base_types.h"
 #include "RTS.h"
 #include "cache_manager.h"
