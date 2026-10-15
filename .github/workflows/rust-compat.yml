@@ -76,9 +76,9 @@ jobs:
             artifacts/document/**
             artifacts/document-primitives/**
       - run: python -m unittest discover -s tools/compat -p "test_*.py" -v
-      - name: Compare original C++ with Rust through the C ABI
+      - name: Compare current Rust through historical pre-cleanup C++ adapters
         run: python tools/compat/check_decoder.py --target ${{ matrix.target }}
-      - name: Sanitize the native decoder boundary
+      - name: Sanitize historical adapter regressions
         if: runner.os != 'Windows'
         run: python tools/compat/check_decoder.py --target ${{ matrix.target }} --sanitize
       - uses: actions/upload-artifact@v4

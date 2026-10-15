@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Compile the original C++ decoder and compare it with the real Rust C ABI.
+"""Compare historical native adapters with the current Rust C ABI.
+
+This preserves pre-cleanup leaf regressions, including APIs removed by cleanup.
+It does not establish current native integration or cleanup-baseline parity;
+those are covered by linked document lifecycle and whole-DLL comparisons.
 
 No Python packages, Rust dependencies, Windows headers, or copied reference
 algorithm are needed. Run in a VS Native Tools prompt on Windows (x86 or x64).
@@ -13,8 +17,27 @@ import re
 import shlex
 import subprocess
 import sys
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
+HISTORICAL_REFERENCE = "4911cacb102bc0cbd41449793e54473265b04e62"
+HISTORICAL_ADAPTERS = "6915e8d9d8aa1ab30cb0b815b11ef3717eecf56b"
+NATIVE_ROOT = ROOT / "artifacts/historical-adapters" / HISTORICAL_ADAPTERS
+
+
+def prepare_historical_adapters():
+    """Materialize pinned test-only C++ sources; never restore production files."""
+    NATIVE_ROOT.mkdir(parents=True, exist_ok=True)
+    archive = NATIVE_ROOT / "sources.zip"
+    with archive.open("wb") as output:
+        run(["git", "archive", "--format=zip", HISTORICAL_ADAPTERS, "src"], stdout=output)
+    with zipfile.ZipFile(archive) as sources:
+        for member in sources.infolist():
+            target = (NATIVE_ROOT / member.filename).resolve()
+            if not target.is_relative_to(NATIVE_ROOT.resolve()):
+                raise ValueError("historical source path escapes fixture directory")
+        sources.extractall(NATIVE_ROOT)
+
 
 
 def run(command, **kwargs):
@@ -104,37 +127,38 @@ def select_undefined_ifdef(source, macro):
 def capture_inputs():
     inputs = [ROOT / "Cargo.toml", ROOT / "Cargo.lock", ROOT / "include/xy_rust_text.h",
               ROOT / "include/xy_rust_ass.h", ROOT / "include/xy_rust_reader.h", ROOT / "include/xy_rust_writer.h", ROOT / "include/xy_rust_seek.h",
-              ROOT / "include/xy_rust_drawing.h", ROOT / "include/xy_rust_layout.h", ROOT / "include/xy_rust_text_runs.h", ROOT / "include/xy_rust_wrap.h", ROOT / "include/xy_rust_line_layout.h", ROOT / "src/subtitles/RTS.h",
-              ROOT / "include/xy_rust_drawing_tokens.h", ROOT / "include/xy_rust_path_align.h", ROOT / "include/xy_rust_path_buffer.h", ROOT / "include/xy_rust_spans.h", ROOT / "include/xy_rust_edges.h", ROOT / "include/xy_rust_span_coverage.h", ROOT / "include/xy_rust_plane.h", ROOT / "src/subtitles/Rasterizer.h", ROOT / "include/xy_rust_arc_queue.h", ROOT / "include/xy_rust_ellipse.h",
-              ROOT / "src/subtitles/xy_widen_region.cpp", ROOT / "src/subtitles/xy_circular_array_queue.h",
+              ROOT / "include/xy_rust_drawing.h", ROOT / "include/xy_rust_layout.h", ROOT / "include/xy_rust_text_runs.h", ROOT / "include/xy_rust_wrap.h", ROOT / "include/xy_rust_line_layout.h", NATIVE_ROOT / "src/subtitles/RTS.h",
+              ROOT / "include/xy_rust_drawing_tokens.h", ROOT / "include/xy_rust_path_align.h", ROOT / "include/xy_rust_path_buffer.h", ROOT / "include/xy_rust_spans.h", ROOT / "include/xy_rust_edges.h", ROOT / "include/xy_rust_span_coverage.h", ROOT / "include/xy_rust_plane.h", NATIVE_ROOT / "src/subtitles/Rasterizer.h", ROOT / "include/xy_rust_arc_queue.h", ROOT / "include/xy_rust_ellipse.h",
+              NATIVE_ROOT / "src/subtitles/xy_widen_region.cpp", NATIVE_ROOT / "src/subtitles/xy_circular_array_queue.h",
               ROOT / "include/xy_rust_pipe_line.h", ROOT / "include/xy_rust_subrip_cue.h", ROOT / "include/xy_rust_sami_file.h", ROOT / "include/xy_rust_microdvd_style.h", ROOT / "include/xy_rust_font_records.h", ROOT / "include/xy_rust_ass_headers.h", ROOT / "include/xy_rust_ass_style.h", ROOT / "include/xy_rust_ass_dialogue.h", ROOT / "include/xy_rust_encoding.h", ROOT / "include/xy_rust_sami.h", ROOT / "include/xy_rust_case_replace.h", ROOT / "include/xy_rust_remove_tags.h", ROOT / "include/xy_rust_mpl2.h", ROOT / "include/xy_rust_microdvd.h", ROOT / "include/xy_rust_find_char.h", ROOT / "include/xy_rust_fields.h", ROOT / "include/xy_rust_subrip.h", ROOT / "include/xy_rust_webvtt.h", ROOT / "include/xy_rust_realtext.h",
-              ROOT / "src/subtitles/RealTextParser.cpp", ROOT / "src/subtitles/RealTextParser.h",
-              ROOT / "include/xy_rust_cc.h", ROOT / "src/subtitles/CCDecoder.cpp", ROOT / "src/subtitles/CCDecoder.h",
+              NATIVE_ROOT / "src/subtitles/RealTextParser.cpp", NATIVE_ROOT / "src/subtitles/RealTextParser.h",
+              ROOT / "include/xy_rust_cc.h", NATIVE_ROOT / "src/subtitles/CCDecoder.cpp", NATIVE_ROOT / "src/subtitles/CCDecoder.h",
               ROOT / "include/xy_rust_segments.h",
               ROOT / "include/xy_rust_segment_insert.h",
               ROOT / "include/xy_rust_hdmv.h",
               ROOT / "include/xy_rust_dvb.h", ROOT / "include/xy_rust_golomb.h", ROOT / "include/xy_rust_fill.h",
-              ROOT / "src/subtitles/Rasterizer.cpp", ROOT / "include/xy_rust_mask.h", ROOT / "include/xy_rust_bilinear.h", ROOT / "include/xy_rust_be_blur.h", ROOT / "include/xy_rust_gauss_integer.h", ROOT / "include/xy_rust_be_filter.h", ROOT / "include/xy_rust_transpose.h", ROOT / "include/xy_rust_byte_float.h",
-              ROOT / "src/subtitles/xy_bitmap.cpp", ROOT / "src/subtitles/xy_bitmap.h", ROOT / "src/filters/transform/vsfilter/XySubRenderIntf.h", ROOT / "include/xy_rust_shifted_plane.h",
-              ROOT / "src/subtitles/xy_filter.cpp", ROOT / "src/subtitles/VobSubImage.cpp", ROOT / "src/subtitles/VobSubImage.h", ROOT / "include/xy_rust_vobsub.h",
-              ROOT / "src/dsutil/GolombBuffer.cpp", ROOT / "src/dsutil/GolombBuffer.h",
-              ROOT / "src/subtitles/DVBSub.cpp", ROOT / "src/subtitles/DVBSub.h", ROOT / "src/subtitles/HdmvSub.cpp", ROOT / "src/subtitles/HdmvSub.h", ROOT / "src/subtitles/CompositionObject.cpp", ROOT / "src/subtitles/CompositionObject.h", ROOT / "include/xy_rust_byte_storage.h",
+              NATIVE_ROOT / "src/subtitles/Rasterizer.cpp", ROOT / "include/xy_rust_mask.h", ROOT / "include/xy_rust_bilinear.h", ROOT / "include/xy_rust_be_blur.h", ROOT / "include/xy_rust_gauss_integer.h", ROOT / "include/xy_rust_be_filter.h", ROOT / "include/xy_rust_transpose.h", ROOT / "include/xy_rust_byte_float.h",
+              NATIVE_ROOT / "src/subtitles/xy_bitmap.cpp", NATIVE_ROOT / "src/subtitles/xy_bitmap.h", NATIVE_ROOT / "src/filters/transform/vsfilter/XySubRenderIntf.h", ROOT / "include/xy_rust_shifted_plane.h",
+              NATIVE_ROOT / "src/subtitles/xy_filter.cpp", NATIVE_ROOT / "src/subtitles/VobSubImage.cpp", NATIVE_ROOT / "src/subtitles/VobSubImage.h", ROOT / "include/xy_rust_vobsub.h",
+              NATIVE_ROOT / "src/dsutil/GolombBuffer.cpp", NATIVE_ROOT / "src/dsutil/GolombBuffer.h",
+              NATIVE_ROOT / "src/subtitles/DVBSub.cpp", NATIVE_ROOT / "src/subtitles/DVBSub.h", NATIVE_ROOT / "src/subtitles/HdmvSub.cpp", NATIVE_ROOT / "src/subtitles/HdmvSub.h", NATIVE_ROOT / "src/subtitles/CompositionObject.cpp", NATIVE_ROOT / "src/subtitles/CompositionObject.h", ROOT / "include/xy_rust_byte_storage.h",
               ROOT / "include/xy_rust_timeline_search.h",
-              ROOT / "src/subtitles/TextFile.h",
-              ROOT / "src/subtitles/TextFile.cpp", ROOT / "src/subtitles/STS.cpp",
-              ROOT / "src/subtitles/RTS.cpp", ROOT / "tools/compat/reference.json"]
-    inputs += [ROOT / "src/subtitles/libssf/File.cpp", ROOT / "include/xy_rust_ssf_literal.h", ROOT / "include/xy_rust_ssf_literal_text.h"]
-    inputs += [ROOT / "src/subtitles/libssf/Split.cpp", ROOT / "src/subtitles/libssf/Split.h", ROOT / "include/xy_rust_ssf_split.h"]
-    inputs += [ROOT / "src/subtitles/libssf/Arabic.cpp", ROOT / "src/subtitles/libssf/Arabic.h", ROOT / "include/xy_rust_ssf_arabic.h"]
-    inputs += [ROOT / "src/filters/transform/vsfilter/csriapi.cpp", ROOT / "src/subtitles/libssf/Stream.cpp", ROOT / "src/subtitles/libssf/Stream.h", ROOT / "include/xy_rust_ssf_stream.h"]
-    inputs += [ROOT / "src/thirdparty/boost_lib/boost/flyweight.hpp"]
-    inputs += sorted((ROOT / "src/thirdparty/boost_lib/boost/flyweight").rglob("*.hpp"))
+              NATIVE_ROOT / "src/subtitles/TextFile.h",
+              NATIVE_ROOT / "src/subtitles/TextFile.cpp", NATIVE_ROOT / "src/subtitles/STS.cpp",
+              NATIVE_ROOT / "src/subtitles/RTS.cpp", ROOT / "tools/compat/reference.json"]
+    inputs += [NATIVE_ROOT / "src/subtitles/libssf/File.cpp", ROOT / "include/xy_rust_ssf_literal.h", ROOT / "include/xy_rust_ssf_literal_text.h"]
+    inputs += [NATIVE_ROOT / "src/subtitles/libssf/Split.cpp", NATIVE_ROOT / "src/subtitles/libssf/Split.h", ROOT / "include/xy_rust_ssf_split.h"]
+    inputs += [NATIVE_ROOT / "src/subtitles/libssf/Arabic.cpp", NATIVE_ROOT / "src/subtitles/libssf/Arabic.h", ROOT / "include/xy_rust_ssf_arabic.h"]
+    inputs += [NATIVE_ROOT / "src/filters/transform/vsfilter/csriapi.cpp", NATIVE_ROOT / "src/subtitles/libssf/Stream.cpp", NATIVE_ROOT / "src/subtitles/libssf/Stream.h", ROOT / "include/xy_rust_ssf_stream.h"]
+    inputs += [NATIVE_ROOT / "src/thirdparty/boost_lib/boost/flyweight.hpp"]
+    inputs += sorted((NATIVE_ROOT / "src/thirdparty/boost_lib/boost/flyweight").rglob("*.hpp"))
     inputs += sorted((ROOT / "tools/compat").glob("*oracle.cpp"))
     inputs += sorted((ROOT / "tools/compat").glob("*shell.h"))
     inputs += [ROOT / "tools/compat/check_decoder.py"]
     inputs += sorted((ROOT / "rust").rglob("*.rs")) + sorted((ROOT / "rust").rglob("Cargo.toml"))
-    return {path.relative_to(ROOT).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
-            for path in inputs}
+    return {("historical-adapter/" + path.relative_to(NATIVE_ROOT).as_posix()
+             if path.is_relative_to(NATIVE_ROOT) else path.relative_to(ROOT).as_posix()):
+            hashlib.sha256(path.read_bytes()).hexdigest() for path in inputs}
 
 
 def main():
@@ -143,7 +167,10 @@ def main():
     parser.add_argument("--cxx", default="cl" if os.name == "nt" else "c++")
     parser.add_argument("--sanitize", action="store_true", help="Clang/GCC ASan + UBSan")
     args = parser.parse_args()
-    reference = json.loads((ROOT / "tools/compat/reference.json").read_text())
+    production_reference = json.loads((ROOT / "tools/compat/reference.json").read_text())
+    reference = {"commit": HISTORICAL_REFERENCE,
+                 "scope": "historical leaf algorithms; not cleanup-baseline integration"}
+    prepare_historical_adapters()
     destination = ROOT / "artifacts/decoder" / (args.target or "host")
     destination.mkdir(parents=True, exist_ok=True)
     # A failed rerun must never leave a previous run's successful report behind.
@@ -169,7 +196,7 @@ public:
 '''
     license_header = source.decode("utf-8-sig").split("#include", 1)[0]
     (destination / "original_next_char.h").write_text(license_header + shell + method, encoding="utf-8")
-    candidate_source = (ROOT / "src/subtitles/TextFile.cpp").read_bytes()
+    candidate_source = (NATIVE_ROOT / "src/subtitles/TextFile.cpp").read_bytes()
     methods = ["bool CTextFile::Open(", "ULONGLONG CTextFile::GetPosition(",
                "ULONGLONG CTextFile::GetLength(", "ULONGLONG CTextFile::Seek(",
                "bool CTextFile::ReadLine(", "int CTextFile::NextChar("]
@@ -216,7 +243,7 @@ public:
         writer += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_text_writer.h").write_text(writer, encoding="utf-8")
     font_source = original("src/subtitles/STS.cpp", reference["commit"])
-    candidate_font = (ROOT / "src/subtitles/STS.cpp").read_bytes()
+    candidate_font = (NATIVE_ROOT / "src/subtitles/STS.cpp").read_bytes()
     font = font_source.decode("utf-8-sig").split("#include", 1)[0]
     font += '#include "font_shell.h"\n#include "xy_rust_text.h"\n'
     for name, content in (("OriginalFont", font_source), ("CandidateFont", candidate_font)):
@@ -235,7 +262,7 @@ public:
     cc_header = original("src/subtitles/CCDecoder.h", reference["commit"])
     cc_class = extract_method(cc_header.decode("utf-8-sig"), "class CCDecoder").replace("{", "{\npublic:", 1)
     cc = '#include "cc_shell.h"\n'
-    for name, content in (("ReferenceCC", cc_source), ("CandidateCC", (ROOT / "src/subtitles/CCDecoder.cpp").read_bytes())):
+    for name, content in (("ReferenceCC", cc_source), ("CandidateCC", (NATIVE_ROOT / "src/subtitles/CCDecoder.cpp").read_bytes())):
         cc += f"namespace {name} {{\n" + cc_class + ";\n"
         if name == "CandidateCC":
             cc += "#define XY_VSFILTER_RUST_TEXT\n"
@@ -250,7 +277,7 @@ public:
     layout_source = original("src/subtitles/RTS.cpp", reference["commit"])
     layout_header = original("src/subtitles/RTS.h", reference["commit"])
     layout = '#include "layout_rects_shell.h"\n'
-    for name, content, header_content in (("ReferenceLayout", layout_source, layout_header), ("CandidateLayout", (ROOT / "src/subtitles/RTS.cpp").read_bytes(), (ROOT / "src/subtitles/RTS.h").read_bytes())):
+    for name, content, header_content in (("ReferenceLayout", layout_source, layout_header), ("CandidateLayout", (NATIVE_ROOT / "src/subtitles/RTS.cpp").read_bytes(), (NATIVE_ROOT / "src/subtitles/RTS.h").read_bytes())):
         layout += f"namespace {name} {{\n"
         if name == "CandidateLayout":
             layout += "#define XY_VSFILTER_RUST_TEXT\n"
@@ -274,7 +301,7 @@ public:
         layout += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_layout_rects.h").write_text(layout, encoding="utf-8")
     text_runs = '#include "text_runs_shell.h"\n'
-    for name, content in (("ReferenceTextRuns", layout_source), ("CandidateTextRuns", (ROOT / "src/subtitles/RTS.cpp").read_bytes())):
+    for name, content in (("ReferenceTextRuns", layout_source), ("CandidateTextRuns", (NATIVE_ROOT / "src/subtitles/RTS.cpp").read_bytes())):
         text_runs += f"namespace {name} {{\n"
         text_runs += "class CRenderedTextSubtitle : public RenderState { public: void ParseString(CSubtitle*, CStringW, const FwSTSStyle&); };\n"
         if name == "CandidateTextRuns":
@@ -286,7 +313,7 @@ public:
         text_runs += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_text_runs.h").write_text(text_runs, encoding="utf-8")
     wrap_width = '#include "wrap_width_shell.h"\n'
-    for name, content in (("ReferenceWrap", layout_source), ("CandidateWrap", (ROOT / "src/subtitles/RTS.cpp").read_bytes())):
+    for name, content in (("ReferenceWrap", layout_source), ("CandidateWrap", (NATIVE_ROOT / "src/subtitles/RTS.cpp").read_bytes())):
         wrap_width += f"namespace {name} {{\n"
         wrap_width += "class CSubtitle { public: WrapWords m_words; int m_wrapStyle; int GetFullLineWidth(POSITION); int GetWrapWidth(POSITION,int); };\n"
         if name == "CandidateWrap":
@@ -300,7 +327,7 @@ public:
         wrap_width += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_wrap_width.h").write_text(wrap_width, encoding="utf-8")
     line_layout = '#include "line_layout_shell.h"\n'
-    for name, content in (("ReferenceLineLayout", layout_source), ("CandidateLineLayout", (ROOT / "src/subtitles/RTS.cpp").read_bytes())):
+    for name, content in (("ReferenceLineLayout", layout_source), ("CandidateLineLayout", (NATIVE_ROOT / "src/subtitles/RTS.cpp").read_bytes())):
         line_layout += f"namespace {name} {{\n"
         line_layout += "class CSubtitle : public LineState { public: void MakeLines(CSize,CRect); };\n"
         if name == "CandidateLineLayout":
@@ -324,7 +351,7 @@ public:
                   "int CRealTextParser::GetTimecode(", "std::wstring CRealTextParser::StringToLower(",
                   "std::wstring CRealTextParser::RenderTags(", "void CRealTextParser::PopTag(",
                   "std::wstring CRealTextParser::FormatTimecode(", "bool CRealTextParser::OutputSRT("]
-    for name, content in (("ReferenceRealText", realtext_source), ("CandidateRealText", (ROOT / "src/subtitles/RealTextParser.cpp").read_bytes())):
+    for name, content in (("ReferenceRealText", realtext_source), ("CandidateRealText", (NATIVE_ROOT / "src/subtitles/RealTextParser.cpp").read_bytes())):
         realtext += f"namespace {name} {{\n#define private public\n" + realtext_class + ";\n#undef private\n"
         if name == "CandidateRealText":
             realtext += "#define XY_VSFILTER_RUST_TEXT\n"
@@ -659,7 +686,7 @@ public:
         searches += "\n#undef CSimpleTextSubtitle\n#undef XY_VSFILTER_RUST_TEXT\n" + document_count_unbind
     (destination / "original_timeline_search.h").write_text(searches, encoding="utf-8")
     lexer_source = original("src/subtitles/RTS.cpp", reference["commit"])
-    candidate_lexer = (ROOT / "src/subtitles/RTS.cpp").read_bytes()
+    candidate_lexer = (NATIVE_ROOT / "src/subtitles/RTS.cpp").read_bytes()
     lexer = lexer_source.decode("utf-8-sig").split("#include", 1)[0]
     lexer += '#include "ass_lexer_shell.h"\n#include "xy_rust_ass.h"\n'
     for name, content in (("OriginalLexer", lexer_source), ("CandidateLexer", candidate_lexer)):
@@ -754,7 +781,7 @@ public:
 
     dvb_storage = '#include "dvb_storage_shell.h"\n'
     reference_dvb_storage_header = original("src/subtitles/DVBSub.h", reference["commit"])
-    for name, content, dvb_storage_header in (("ReferenceDvbStorage", original("src/subtitles/DVBSub.cpp", reference["commit"]), reference_dvb_storage_header), ("CandidateDvbStorage", (ROOT / "src/subtitles/DVBSub.cpp").read_bytes(), (ROOT / "src/subtitles/DVBSub.h").read_bytes())):
+    for name, content, dvb_storage_header in (("ReferenceDvbStorage", original("src/subtitles/DVBSub.cpp", reference["commit"]), reference_dvb_storage_header), ("CandidateDvbStorage", (NATIVE_ROOT / "src/subtitles/DVBSub.cpp").read_bytes(), (NATIVE_ROOT / "src/subtitles/DVBSub.h").read_bytes())):
         text = content.decode("utf-8-sig").replace("\r\n", "\n")
         dvb_storage_header = dvb_storage_header.decode("utf-8-sig").replace("\r\n", "\n")
         if name == "CandidateDvbStorage":
@@ -771,7 +798,7 @@ public:
         dvb_storage += "}\n#undef XY_VSFILTER_RUST_TEXT\n#undef BUFFER_CHUNK_GROW\n"
     (destination / "original_dvb_storage.h").write_text(dvb_storage, encoding="utf-8")
     clip_fade = '#include "clip_fade_shell.h"\n'
-    for name, content in (("ReferenceFade", original("src/subtitles/RTS.cpp", reference["commit"])), ("CandidateFade", (ROOT / "src/subtitles/RTS.cpp").read_bytes())):
+    for name, content in (("ReferenceFade", original("src/subtitles/RTS.cpp", reference["commit"])), ("CandidateFade", (NATIVE_ROOT / "src/subtitles/RTS.cpp").read_bytes())):
         text = content.decode("utf-8-sig").replace("\r\n", "\n")
         clip_fade += f"namespace {name} {{\nCLIP_FADE_CLASS\n"
         if name == "CandidateFade":
@@ -783,7 +810,7 @@ public:
         clip_fade += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_clip_fade.h").write_text(clip_fade, encoding="utf-8")
     clip_mask = '#include "clip_mask_shell.h"\n'
-    for name, content in (("ReferenceClip", original("src/subtitles/RTS.cpp", reference["commit"])), ("CandidateClip", (ROOT / "src/subtitles/RTS.cpp").read_bytes())):
+    for name, content in (("ReferenceClip", original("src/subtitles/RTS.cpp", reference["commit"])), ("CandidateClip", (NATIVE_ROOT / "src/subtitles/RTS.cpp").read_bytes())):
         text = content.decode("utf-8-sig").replace("\r\n", "\n")
         clip_mask += f"namespace {name} {{\nCLIP_MASK_CLASS\n"
         if name == "CandidateClip":
@@ -794,10 +821,10 @@ public:
         clip_mask += method + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_clip_mask.h").write_text(clip_mask, encoding="utf-8")
     hdmv_source = original("src/subtitles/CompositionObject.cpp", reference["commit"])
-    candidate_hdmv = (ROOT / "src/subtitles/CompositionObject.cpp").read_bytes()
+    candidate_hdmv = (NATIVE_ROOT / "src/subtitles/CompositionObject.cpp").read_bytes()
     rle_storage = '#include "rle_storage_shell.h"\n'
     reference_rle_header = original("src/subtitles/CompositionObject.h", reference["commit"])
-    for name, content, rle_header in (("ReferenceRle", hdmv_source, reference_rle_header), ("CandidateRle", candidate_hdmv, (ROOT / "src/subtitles/CompositionObject.h").read_bytes())):
+    for name, content, rle_header in (("ReferenceRle", hdmv_source, reference_rle_header), ("CandidateRle", candidate_hdmv, (NATIVE_ROOT / "src/subtitles/CompositionObject.h").read_bytes())):
         text = content.decode("utf-8-sig").replace("\r\n", "\n")
         rle_header = rle_header.decode("utf-8-sig").replace("\r\n", "\n")
         if name == "CandidateRle":
@@ -820,7 +847,7 @@ public:
     golomb_header = original("src/dsutil/GolombBuffer.h", reference["commit"])
     raster_source = original("src/subtitles/Rasterizer.cpp", reference["commit"])
     path_align = '#include "path_align_shell.h"\n'
-    for name, content in (("ReferenceAlign", raster_source), ("CandidateAlign", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+    for name, content in (("ReferenceAlign", raster_source), ("CandidateAlign", (NATIVE_ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         path_align += f"namespace {name} {{\n"
         path_align += "class PathData : public AlignState { public: PathData(const std::vector<POINT>& p,int n):AlignState(p,n){} void AlignLeftTop(CPoint*,CSize*); };\n"
         if name == "CandidateAlign":
@@ -832,7 +859,7 @@ public:
         path_align += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_path_align.h").write_text(path_align, encoding="utf-8")
     path_buffer = '#include "path_buffer_shell.h"\n'
-    for name, content in (("ReferencePathBuffer", raster_source), ("CandidatePathBuffer", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+    for name, content in (("ReferencePathBuffer", raster_source), ("CandidatePathBuffer", (NATIVE_ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         path_buffer += f"namespace {name} {{\n"
         path_buffer += "class PathData : public PathBufferState { public: explicit PathData(int n):PathBufferState(n){} bool PartialEndPath(HDC,PathOffset,PathOffset); };\n"
         if name == "CandidatePathBuffer":
@@ -852,7 +879,7 @@ public:
         path_buffer += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_path_buffer.h").write_text(path_buffer, encoding="utf-8")
     span_merge = '#include "span_merge_shell.h"\n'
-    for name, content in (("ReferenceSpans", raster_source), ("CandidateSpans", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+    for name, content in (("ReferenceSpans", raster_source), ("CandidateSpans", (NATIVE_ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         span_merge += f"namespace {name} {{\n"
         if name == "CandidateSpans":
             span_merge += "#define XY_VSFILTER_RUST_TEXT\n"
@@ -873,7 +900,7 @@ public:
     (destination / "original_arc_queue.h").write_bytes(queue_header)
     widen_source = original("src/subtitles/xy_widen_region.cpp", reference["commit"])
     arc_code = '#include "arc_queue_shell.h"\n'
-    for name, content in (("ReferenceArcs", widen_source), ("CandidateArcs", (ROOT / "src/subtitles/xy_widen_region.cpp").read_bytes())):
+    for name, content in (("ReferenceArcs", widen_source), ("CandidateArcs", (NATIVE_ROOT / "src/subtitles/xy_widen_region.cpp").read_bytes())):
         text = content.decode("utf-8-sig")
         arc_code += f"namespace {name} {{\n"
         if name == "CandidateArcs":
@@ -888,7 +915,7 @@ public:
         arc_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_arc_updates.h").write_text(arc_code, encoding="utf-8")
     ellipse_code = '#include "ellipse_arc_shell.h"\n'
-    for name, content in (("ReferenceEllipse", widen_source), ("CandidateEllipse", (ROOT / "src/subtitles/xy_widen_region.cpp").read_bytes())):
+    for name, content in (("ReferenceEllipse", widen_source), ("CandidateEllipse", (NATIVE_ROOT / "src/subtitles/xy_widen_region.cpp").read_bytes())):
         text = content.decode("utf-8-sig")
         ellipse_code += f"namespace {name} {{\n"
         if name == "CandidateEllipse":
@@ -902,7 +929,7 @@ public:
         ellipse_code += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_ellipse_arc.h").write_text(ellipse_code, encoding="utf-8")
     storage_code = '#include "ellipse_storage_shell.h"\n'
-    for name, content in (("ReferenceEllipseStorage", widen_source), ("CandidateEllipseStorage", (ROOT / "src/subtitles/xy_widen_region.cpp").read_bytes())):
+    for name, content in (("ReferenceEllipseStorage", widen_source), ("CandidateEllipseStorage", (NATIVE_ROOT / "src/subtitles/xy_widen_region.cpp").read_bytes())):
         text = content.decode("utf-8-sig")
         storage_code += f"namespace {name} {{\n"
         if name == "CandidateEllipseStorage":
@@ -920,7 +947,7 @@ public:
         storage_code += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_ellipse_storage.h").write_text(storage_code, encoding="utf-8")
     edge_code = '#include "edge_storage_shell.h"\n'
-    for name, content in (("ReferenceEdges", raster_source), ("CandidateEdges", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+    for name, content in (("ReferenceEdges", raster_source), ("CandidateEdges", (NATIVE_ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         text = content.decode("utf-8-sig").replace("\r\n", "\n")
         edge_code += f"namespace {name} {{\n"
         raw_edges = "#define EDGE_OWNER\n#define EDGE_HEAD(i) mpScanBuffer[i]\n#define EDGE_NEXT(i) static_cast<unsigned>(mpEdgeBuffer[i].next)\n#define EDGE_POS(i) mpEdgeBuffer[i].posandflag\n#define EDGE_CHECK\n"
@@ -949,7 +976,7 @@ public:
         edge_code += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n#undef EDGE_OWNER\n#undef EDGE_HEAD\n#undef EDGE_NEXT\n#undef EDGE_POS\n#undef EDGE_CHECK\n"
     (destination / "original_edge_storage.h").write_text(edge_code, encoding="utf-8")
     coverage_code = '#include "span_coverage_shell.h"\n'
-    for name, content in (("ReferenceCoverage", raster_source), ("CandidateCoverage", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+    for name, content in (("ReferenceCoverage", raster_source), ("CandidateCoverage", (NATIVE_ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         text = content.decode("utf-8-sig").replace("\r\n", "\n")
         coverage_code += f"namespace {name} {{\nCOVERAGE_RASTER_CLASS\n"
         if name == "CandidateCoverage":
@@ -959,7 +986,7 @@ public:
         coverage_code += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_span_coverage.h").write_text(coverage_code, encoding="utf-8")
     variance_code = '#include "variance_shell.h"\n'
-    for name, content in (("ReferenceVariance", raster_source), ("CandidateVariance", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+    for name, content in (("ReferenceVariance", raster_source), ("CandidateVariance", (NATIVE_ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         text = content.decode("utf-8-sig").replace("\r\n", "\n")
         variance_code += f"namespace {name} {{\nVARIANCE_CLASS\n"
         if name == "CandidateVariance":
@@ -970,7 +997,7 @@ public:
         variance_code += definition + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_variance.h").write_text(variance_code, encoding="utf-8")
     blur_planes_code = '#include "blur_planes_shell.h"\n'
-    for name, content in (("ReferenceBlurPlanes", raster_source), ("CandidateBlurPlanes", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+    for name, content in (("ReferenceBlurPlanes", raster_source), ("CandidateBlurPlanes", (NATIVE_ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         text = content.decode("utf-8-sig").replace("\r\n", "\n")
         blur_planes_code += f"namespace {name} {{\nBLUR_PLANES_CLASS\n"
         if name == "CandidateBlurPlanes":
@@ -978,7 +1005,7 @@ public:
         blur_planes_code += extract_definition(text, "bool Rasterizer::BeBlur(") + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_blur_planes.h").write_text(blur_planes_code, encoding="utf-8")
     legacy_blur_code = '#include "legacy_blur_shell.h"\n'
-    for name, content in (("ReferenceLegacyBlur", raster_source), ("CandidateLegacyBlur", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+    for name, content in (("ReferenceLegacyBlur", raster_source), ("CandidateLegacyBlur", (NATIVE_ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         text = content.decode("utf-8-sig").replace("\r\n", "\n")
         legacy_blur_code += f"namespace {name} {{\nLEGACY_BLUR_CLASS\n"
         if name == "CandidateLegacyBlur":
@@ -988,7 +1015,7 @@ public:
         legacy_blur_code += extract_definition(text, "bool Rasterizer::OldFixedPointBlur(").replace("memcpy(", "checkedLegacyCopy(") + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_legacy_blur.h").write_text(legacy_blur_code, encoding="utf-8")
     gauss_planes_code = '#include "gauss_planes_shell.h"\n'
-    for name, content in (("ReferenceGaussPlanes", raster_source), ("CandidateGaussPlanes", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+    for name, content in (("ReferenceGaussPlanes", raster_source), ("CandidateGaussPlanes", (NATIVE_ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         text = content.decode("utf-8-sig").replace("\r\n", "\n")
         gauss_planes_code += f"namespace {name} {{\nGAUSS_PLANES_CLASS\n"
         if name == "CandidateGaussPlanes":
@@ -1005,7 +1032,7 @@ public:
     bitmap_code = '#include "bitmap_storage_shell.h"\n'
     bitmap_code += extract_definition(bitmap_interface, "enum XyColorSpace") + ";\n"
     bitmap_code += extract_definition(bitmap_interface, "struct XyPlannerFormatExtra") + ";\n"
-    for name, content, declaration in (("ReferenceBitmap", bitmap_source, bitmap_header), ("CandidateBitmap", (ROOT / "src/subtitles/xy_bitmap.cpp").read_bytes(), (ROOT / "src/subtitles/xy_bitmap.h").read_bytes())):
+    for name, content, declaration in (("ReferenceBitmap", bitmap_source, bitmap_header), ("CandidateBitmap", (NATIVE_ROOT / "src/subtitles/xy_bitmap.cpp").read_bytes(), (NATIVE_ROOT / "src/subtitles/xy_bitmap.h").read_bytes())):
         bitmap_text = content.decode("utf-8-sig").replace("\r\n", "\n")
         bitmap_declaration = declaration.decode("utf-8-sig").replace("\r\n", "\n")
         bitmap_code += f"namespace {name} {{\n"
@@ -1018,7 +1045,7 @@ public:
         bitmap_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_bitmap_storage.h").write_text(bitmap_code, encoding="utf-8")
     coeff_storage_code = '#include "coeff_storage_shell.h"\n'
-    for name, content in (("ReferenceCoefficients", raster_source), ("CandidateCoefficients", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+    for name, content in (("ReferenceCoefficients", raster_source), ("CandidateCoefficients", (NATIVE_ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         coeff_text = content.decode("utf-8-sig").replace("\r\n", "\n")
         coeff_storage_code += f"namespace {name} {{\n"
         if name == "CandidateCoefficients":
@@ -1026,7 +1053,7 @@ public:
         coeff_storage_code += extract_definition(coeff_text, "class GaussianCoefficients").replace("private:", "public:").replace("XyRust::ShiftedPlaneStorage", "XyRust::ObservedCoefficientStorage").replace("memcpy(", "coeffCopy(") + ";\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_coeff_storage.h").write_text(coeff_storage_code, encoding="utf-8")
     cc_packet_code = '#include "cc_packet_shell.h"\n'
-    for name, content in (("ReferencePacket", original("src/subtitles/CCDecoder.cpp", reference["commit"])), ("CandidatePacket", (ROOT / "src/subtitles/CCDecoder.cpp").read_bytes())):
+    for name, content in (("ReferencePacket", original("src/subtitles/CCDecoder.cpp", reference["commit"])), ("CandidatePacket", (NATIVE_ROOT / "src/subtitles/CCDecoder.cpp").read_bytes())):
         packet_text = content.decode("utf-8-sig").replace("\r\n", "\n")
         cc_packet_code += f"namespace {name} {{\nPACKET_CLASS\n"
         if name == "CandidatePacket":
@@ -1038,7 +1065,7 @@ public:
         cc_packet_code += packet_method + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_cc_packet.h").write_text(cc_packet_code, encoding="utf-8")
     csri_filename_code = '#include "csri_filename_shell.h"\n'
-    for name, content in (("ReferenceFilename", original("src/filters/transform/vsfilter/csriapi.cpp", reference["commit"])), ("CandidateFilename", (ROOT / "src/filters/transform/vsfilter/csriapi.cpp").read_bytes())):
+    for name, content in (("ReferenceFilename", original("src/filters/transform/vsfilter/csriapi.cpp", reference["commit"])), ("CandidateFilename", (NATIVE_ROOT / "src/filters/transform/vsfilter/csriapi.cpp").read_bytes())):
         filename_text = content.decode("utf-8-sig").replace("\r\n", "\n")
         csri_filename_code += f"namespace {name} {{\n"
         if name == "CandidateFilename":
@@ -1054,7 +1081,7 @@ public:
     for operation in ("create", "release", "append", "data"):
         literal_adapter = literal_adapter.replace("xy_vsfilter_ssf_literal_text_" + operation, "literalText" + operation.capitalize())
     ssf_literal_code += "namespace XyRust {" + literal_adapter + ";}\n"
-    for name, content in (("ReferenceLiteral", original("src/subtitles/libssf/File.cpp", reference["commit"])), ("CandidateLiteral", (ROOT / "src/subtitles/libssf/File.cpp").read_bytes())):
+    for name, content in (("ReferenceLiteral", original("src/subtitles/libssf/File.cpp", reference["commit"])), ("CandidateLiteral", (NATIVE_ROOT / "src/subtitles/libssf/File.cpp").read_bytes())):
         literal_text = content.decode("utf-8-sig").replace("\r\n", "\n")
         ssf_literal_code += f"namespace {name} {{\nclass File {{public: void ParseQuotedString(InputStream&,Definition*); void ParseBlock(InputStream&,Definition*);}};\n"
         if name == "CandidateLiteral":
@@ -1070,7 +1097,7 @@ public:
         ssf_literal_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_ssf_literal.h").write_text(ssf_literal_code, encoding="utf-8")
     ssf_split_code = '#include "ssf_split_shell.h"\n'
-    for name, content, declaration in (("ReferenceSplit", original("src/subtitles/libssf/Split.cpp", reference["commit"]), original("src/subtitles/libssf/Split.h", reference["commit"])), ("CandidateSplit", (ROOT / "src/subtitles/libssf/Split.cpp").read_bytes(), (ROOT / "src/subtitles/libssf/Split.h").read_bytes())):
+    for name, content, declaration in (("ReferenceSplit", original("src/subtitles/libssf/Split.cpp", reference["commit"]), original("src/subtitles/libssf/Split.h", reference["commit"])), ("CandidateSplit", (NATIVE_ROOT / "src/subtitles/libssf/Split.cpp").read_bytes(), (NATIVE_ROOT / "src/subtitles/libssf/Split.h").read_bytes())):
         split_text = content.decode("utf-8-sig").replace("\r\n", "\n")
         split_declaration = declaration.decode("utf-8-sig").replace("\r\n", "\n")
         ssf_split_code += f"namespace {name} {{\n"
@@ -1082,7 +1109,7 @@ public:
         ssf_split_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_ssf_split.h").write_text(ssf_split_code, encoding="utf-8")
     ssf_arabic_code = '#include "ssf_arabic_shell.h"\n'
-    for name, content, declaration in (("ReferenceArabic", original("src/subtitles/libssf/Arabic.cpp", reference["commit"]), original("src/subtitles/libssf/Arabic.h", reference["commit"])), ("CandidateArabic", (ROOT / "src/subtitles/libssf/Arabic.cpp").read_bytes(), (ROOT / "src/subtitles/libssf/Arabic.h").read_bytes())):
+    for name, content, declaration in (("ReferenceArabic", original("src/subtitles/libssf/Arabic.cpp", reference["commit"]), original("src/subtitles/libssf/Arabic.h", reference["commit"])), ("CandidateArabic", (NATIVE_ROOT / "src/subtitles/libssf/Arabic.cpp").read_bytes(), (NATIVE_ROOT / "src/subtitles/libssf/Arabic.h").read_bytes())):
         arabic_text = content.decode("utf-8-sig").replace("\r\n", "\n")
         arabic_declaration = declaration.decode("utf-8-sig").replace("\r\n", "\n")
         if name == "CandidateArabic":
@@ -1093,7 +1120,7 @@ public:
     ssf_stream_code = '#include "ssf_stream_shell.h"\n'
     ssf_source = original("src/subtitles/libssf/Stream.cpp", reference["commit"])
     ssf_header = original("src/subtitles/libssf/Stream.h", reference["commit"])
-    for name, content, declaration in (("ReferenceSsf", ssf_source, ssf_header), ("CandidateSsf", (ROOT / "src/subtitles/libssf/Stream.cpp").read_bytes(), (ROOT / "src/subtitles/libssf/Stream.h").read_bytes())):
+    for name, content, declaration in (("ReferenceSsf", ssf_source, ssf_header), ("CandidateSsf", (NATIVE_ROOT / "src/subtitles/libssf/Stream.cpp").read_bytes(), (NATIVE_ROOT / "src/subtitles/libssf/Stream.h").read_bytes())):
         ssf_text = content.decode("utf-8-sig").replace("\r\n", "\n")
         ssf_declaration = declaration.decode("utf-8-sig").replace("\r\n", "\n")
         ssf_stream_code += f"namespace {name} {{\n"
@@ -1113,7 +1140,7 @@ public:
         ssf_stream_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_ssf_stream.h").write_text(ssf_stream_code, encoding="utf-8")
     ssf_memory_code = '#include "ssf_memory_shell.h"\n' + ssf_stream_code
-    for name, content, declaration in (("ReferenceSsf", ssf_source, ssf_header), ("CandidateSsf", (ROOT / "src/subtitles/libssf/Stream.cpp").read_bytes(), (ROOT / "src/subtitles/libssf/Stream.h").read_bytes())):
+    for name, content, declaration in (("ReferenceSsf", ssf_source, ssf_header), ("CandidateSsf", (NATIVE_ROOT / "src/subtitles/libssf/Stream.cpp").read_bytes(), (NATIVE_ROOT / "src/subtitles/libssf/Stream.h").read_bytes())):
         memory_text = content.decode("utf-8-sig").replace("\r\n", "\n")
         memory_declaration = declaration.decode("utf-8-sig").replace("\r\n", "\n")
         ssf_memory_code += f"namespace {name} {{\n"
@@ -1126,7 +1153,7 @@ public:
     (destination / "original_ssf_memory.h").write_text(ssf_memory_code, encoding="utf-8")
     ssf_wide_adapter = extract_definition((ROOT / "include/xy_rust_ssf_stream.h").read_text(), "class SsfWide").replace("SsfWide", "ObservedSsfWide").replace("xy_vsfilter_ssf_wide_create(", "ssfWideCreate(").replace("xy_vsfilter_ssf_wide_read(", "ssfWideRead(").replace("xy_vsfilter_ssf_wide_release(", "ssfWideRelease(")
     ssf_wide_code = '#include "ssf_wide_shell.h"\nnamespace XyRust {\n' + ssf_wide_adapter + ";}\n" + ssf_stream_code
-    for name, content, declaration in (("ReferenceSsf", ssf_source, ssf_header), ("CandidateSsf", (ROOT / "src/subtitles/libssf/Stream.cpp").read_bytes(), (ROOT / "src/subtitles/libssf/Stream.h").read_bytes())):
+    for name, content, declaration in (("ReferenceSsf", ssf_source, ssf_header), ("CandidateSsf", (NATIVE_ROOT / "src/subtitles/libssf/Stream.cpp").read_bytes(), (NATIVE_ROOT / "src/subtitles/libssf/Stream.h").read_bytes())):
         wide_text = content.decode("utf-8-sig").replace("\r\n", "\n")
         wide_declaration = declaration.decode("utf-8-sig").replace("\r\n", "\n")
         ssf_wide_code += f"namespace {name} {{\n"
@@ -1138,7 +1165,7 @@ public:
         ssf_wide_code += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_ssf_wide.h").write_text(ssf_wide_code, encoding="utf-8")
     ssf_bom_code = '#include "ssf_bom_shell.h"\n'
-    for name, content, declaration in (("ReferenceSsf", ssf_source, ssf_header), ("CandidateSsf", (ROOT / "src/subtitles/libssf/Stream.cpp").read_bytes(), (ROOT / "src/subtitles/libssf/Stream.h").read_bytes())):
+    for name, content, declaration in (("ReferenceSsf", ssf_source, ssf_header), ("CandidateSsf", (NATIVE_ROOT / "src/subtitles/libssf/Stream.cpp").read_bytes(), (NATIVE_ROOT / "src/subtitles/libssf/Stream.h").read_bytes())):
         bom_text = content.decode("utf-8-sig").replace("\r\n", "\n")
         bom_declaration = declaration.decode("utf-8-sig").replace("\r\n", "\n")
         ssf_bom_code += f"namespace {name} {{\n"
@@ -1155,7 +1182,7 @@ public:
     (destination / "original_ssf_bom.h").write_text(ssf_bom_code, encoding="utf-8")
     filter_source = original("src/subtitles/xy_filter.cpp", reference["commit"])
     gauss_storage_code = '#include "gauss_storage_shell.h"\n'
-    for name, content in (("ReferenceGaussStorage", filter_source), ("CandidateGaussStorage", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
+    for name, content in (("ReferenceGaussStorage", filter_source), ("CandidateGaussStorage", (NATIVE_ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
         text = content.decode("utf-8-sig").replace("\r\n", "\n")
         gauss_storage_code += f"namespace {name} {{\n"
         if name == "CandidateGaussStorage":
@@ -1164,8 +1191,8 @@ public:
     (destination / "original_gauss_storage.h").write_text(gauss_storage_code, encoding="utf-8")
     vobsub_source = original("src/subtitles/VobSubImage.cpp", reference["commit"])
     golomb = '#pragma once\n#include "golomb_shell.h"\n'
-    candidate_golomb = (ROOT / "src/dsutil/GolombBuffer.cpp").read_bytes()
-    candidate_golomb_header = (ROOT / "src/dsutil/GolombBuffer.h").read_bytes()
+    candidate_golomb = (NATIVE_ROOT / "src/dsutil/GolombBuffer.cpp").read_bytes()
+    candidate_golomb_header = (NATIVE_ROOT / "src/dsutil/GolombBuffer.h").read_bytes()
     for name, content, declaration in (("ReferenceGolomb", golomb_source, golomb_header),
                                       ("CandidateGolomb", candidate_golomb, candidate_golomb_header)):
         golomb += content.decode("utf-8-sig").split("#include", 1)[0]
@@ -1187,7 +1214,7 @@ public:
     (destination / "segment_golomb.h").write_text(segment_golomb, encoding="utf-8")
     hdmv_storage = '#include "hdmv_storage_shell.h"\n'
     reference_segment_header = original("src/subtitles/HdmvSub.h", reference["commit"])
-    for name, content, hdmv_segment_header, reader in (("ReferenceSegment", original("src/subtitles/HdmvSub.cpp", reference["commit"]), reference_segment_header, "ReferenceGolomb"), ("CandidateSegment", (ROOT / "src/subtitles/HdmvSub.cpp").read_bytes(), (ROOT / "src/subtitles/HdmvSub.h").read_bytes(), "CandidateGolomb")):
+    for name, content, hdmv_segment_header, reader in (("ReferenceSegment", original("src/subtitles/HdmvSub.cpp", reference["commit"]), reference_segment_header, "ReferenceGolomb"), ("CandidateSegment", (NATIVE_ROOT / "src/subtitles/HdmvSub.cpp").read_bytes(), (NATIVE_ROOT / "src/subtitles/HdmvSub.h").read_bytes(), "CandidateGolomb")):
         text = content.decode("utf-8-sig").replace("\r\n", "\n")
         hdmv_segment_header = hdmv_segment_header.decode("utf-8-sig").replace("\r\n", "\n")
         if name == "CandidateSegment":
@@ -1238,7 +1265,7 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         hdmv += "\n#undef CompositionObject\n#undef XY_VSFILTER_RUST_TEXT\n#undef CGolombBuffer\n"
     hdmv += "#undef CGolombBuffer\n#if HDMV_NATIVE_PIXELS\n"
     for name, content in (("ReferencePixels", raster_source),
-                          ("CandidatePixels", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+                          ("CandidatePixels", (NATIVE_ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         hdmv += f"namespace {name} {{\n"
         if name == "CandidatePixels":
             hdmv += "#define XY_VSFILTER_RUST_TEXT\n"
@@ -1265,7 +1292,7 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
     (destination / "original_hdmv.h").write_text(hdmv, encoding="utf-8")
     vobsub_storage = '#include "vobsub_storage_shell.h"\n'
     reference_vob_storage_header = original("src/subtitles/VobSubImage.h", reference["commit"])
-    for name, content, vob_storage_header in (("ReferenceVobStorage", vobsub_source, reference_vob_storage_header), ("CandidateVobStorage", (ROOT / "src/subtitles/VobSubImage.cpp").read_bytes(), (ROOT / "src/subtitles/VobSubImage.h").read_bytes()), ("ProductionVobStorage", (ROOT / "src/subtitles/VobSubImage.cpp").read_bytes(), (ROOT / "src/subtitles/VobSubImage.h").read_bytes())):
+    for name, content, vob_storage_header in (("ReferenceVobStorage", vobsub_source, reference_vob_storage_header), ("CandidateVobStorage", (NATIVE_ROOT / "src/subtitles/VobSubImage.cpp").read_bytes(), (NATIVE_ROOT / "src/subtitles/VobSubImage.h").read_bytes()), ("ProductionVobStorage", (NATIVE_ROOT / "src/subtitles/VobSubImage.cpp").read_bytes(), (NATIVE_ROOT / "src/subtitles/VobSubImage.h").read_bytes())):
         text = content.decode("utf-8-sig").replace("\r\n", "\n")
         vob_storage_header = vob_storage_header.decode("utf-8-sig").replace("\r\n", "\n")
         if name != "ReferenceVobStorage":
@@ -1283,7 +1310,7 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         vobsub_storage += "}\n#undef XY_VSFILTER_RUST_TEXT\n#undef XY_VSFILTER_RUST_VOBSUB_STORAGE_EXPERIMENT\n"
     (destination / "original_vobsub_storage.h").write_text(vobsub_storage, encoding="utf-8")
     vobsub = '#include "vobsub_packet_shell.h"\n'
-    for name, content in (("ReferenceVobSub", vobsub_source), ("CandidateVobSub", (ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
+    for name, content in (("ReferenceVobSub", vobsub_source), ("CandidateVobSub", (NATIVE_ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
         vobsub += f"VOBSUB_PACKET_SHELL({name})\n#define CVobSubImage {name}\n"
         if name == "CandidateVobSub":
             vobsub += "#define XY_VSFILTER_RUST_TEXT\n"
@@ -1291,7 +1318,7 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         vobsub += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_vobsub_packet.h").write_text(vobsub, encoding="utf-8")
     vobsub_pixels = '#include "vobsub_pixels_shell.h"\n'
-    for name, content in (("ReferenceVobPixels", vobsub_source), ("CandidateVobPixels", (ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
+    for name, content in (("ReferenceVobPixels", vobsub_source), ("CandidateVobPixels", (NATIVE_ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
         vobsub_pixels += f"VOBSUB_PIXELS_SHELL({name})\n#define CVobSubImage {name}\n"
         if name == "CandidateVobPixels":
             vobsub_pixels += "#define XY_VSFILTER_RUST_TEXT\n"
@@ -1299,7 +1326,7 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         vobsub_pixels += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_vobsub_pixels.h").write_text(vobsub_pixels, encoding="utf-8")
     vobsub_rle = '#include "vobsub_rle_shell.h"\n'
-    for name, content in (("ReferenceVobRle", vobsub_source), ("CandidateVobRle", (ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
+    for name, content in (("ReferenceVobRle", vobsub_source), ("CandidateVobRle", (NATIVE_ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
         vobsub_rle += f"VOBSUB_RLE_SHELL({name})\n#define CVobSubImage {name}\n"
         if name == "CandidateVobRle":
             vobsub_rle += "#define XY_VSFILTER_RUST_TEXT\n"
@@ -1311,7 +1338,7 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         vobsub_rle += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_vobsub_rle.h").write_text(vobsub_rle, encoding="utf-8")
     vobsub_trim = '#include "vobsub_trim_shell.h"\n'
-    for name, content in (("ReferenceVobTrim", vobsub_source), ("CandidateVobTrim", (ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
+    for name, content in (("ReferenceVobTrim", vobsub_source), ("CandidateVobTrim", (NATIVE_ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
         vobsub_trim += f"VOBSUB_TRIM_SHELL({name})\n#define CVobSubImage {name}\n"
         if name == "CandidateVobTrim":
             vobsub_trim += "#define XY_VSFILTER_RUST_TEXT\n"
@@ -1319,7 +1346,7 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         vobsub_trim += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_vobsub_trim.h").write_text(vobsub_trim, encoding="utf-8")
     vobsub_scale = '#include "vobsub_scale_shell.h"\n'
-    for name, content in (("ReferenceVobScale", vobsub_source), ("CandidateVobScale", (ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
+    for name, content in (("ReferenceVobScale", vobsub_source), ("CandidateVobScale", (NATIVE_ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
         vobsub_scale += f"VOBSUB_SCALE_SHELL({name})\n#define CVobSubImage {name}\n"
         if name == "CandidateVobScale":
             vobsub_scale += "#define XY_VSFILTER_RUST_TEXT\n"
@@ -1329,7 +1356,7 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         vobsub_scale += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_vobsub_scale.h").write_text(vobsub_scale, encoding="utf-8")
     vobsub_outline = '#include "vobsub_outline_shell.h"\n'
-    for name, content in (("ReferenceVobOutline", vobsub_source), ("CandidateVobOutline", (ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
+    for name, content in (("ReferenceVobOutline", vobsub_source), ("CandidateVobOutline", (NATIVE_ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
         vobsub_outline += f"VOBSUB_OUTLINE_SHELL({name})\n#define CVobSubImage {name}\n"
         if name == "CandidateVobOutline":
             vobsub_outline += "#define XY_VSFILTER_RUST_TEXT\n"
@@ -1343,7 +1370,7 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         vobsub_outline += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_vobsub_outline.h").write_text(vobsub_outline, encoding="utf-8")
     vobsub_segment = '#include "vobsub_segment_shell.h"\n'
-    for name, content in (("ReferenceVobSegment", vobsub_source), ("CandidateVobSegment", (ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
+    for name, content in (("ReferenceVobSegment", vobsub_source), ("CandidateVobSegment", (NATIVE_ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
         vobsub_segment += f"VOBSUB_SEGMENT_SHELL({name})\n#define CVobSubImage {name}\n"
         if name == "CandidateVobSegment":
             vobsub_segment += "#define XY_VSFILTER_RUST_TEXT\n"
@@ -1351,7 +1378,7 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         vobsub_segment += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_vobsub_segment.h").write_text(vobsub_segment, encoding="utf-8")
     vobsub_split = '#include "vobsub_split_shell.h"\n'
-    for name, content in (("ReferenceVobSplit", vobsub_source), ("CandidateVobSplit", (ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
+    for name, content in (("ReferenceVobSplit", vobsub_source), ("CandidateVobSplit", (NATIVE_ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
         vobsub_split += f"VOBSUB_SPLIT_SHELL({name})\n#define CVobSubImage {name}\n"
         if name == "CandidateVobSplit":
             vobsub_split += "#define XY_VSFILTER_RUST_TEXT\n"
@@ -1371,7 +1398,7 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         vobsub_split += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_vobsub_split.h").write_text(vobsub_split, encoding="utf-8")
     vobsub_path = '#include "vobsub_path_shell.h"\n'
-    for name, content in (("ReferenceVobPath", vobsub_source), ("CandidateVobPath", (ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
+    for name, content in (("ReferenceVobPath", vobsub_source), ("CandidateVobPath", (NATIVE_ROOT / "src/subtitles/VobSubImage.cpp").read_bytes())):
         vobsub_path += f"VOBSUB_PATH_SHELL({name})\n#define CVobSubImage {name}\n"
         if name == "CandidateVobPath":
             vobsub_path += "#define XY_VSFILTER_RUST_TEXT\n"
@@ -1379,7 +1406,7 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         vobsub_path += "#undef CVobSubImage\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_vobsub_path.h").write_text(vobsub_path, encoding="utf-8")
     byte_float = '#include "byte_float_shell.h"\n'
-    for name, content in (("ReferenceByteFloat", filter_source), ("CandidateByteFloat", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
+    for name, content in (("ReferenceByteFloat", filter_source), ("CandidateByteFloat", (NATIVE_ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
         byte_float += f"namespace {name} {{\n"
         if name == "CandidateByteFloat":
             byte_float += "#define XY_VSFILTER_RUST_TEXT\n"
@@ -1388,7 +1415,7 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         byte_float += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_byte_float.h").write_text(byte_float, encoding="utf-8")
     transpose = '#include "transpose_shell.h"\n'
-    for name, content in (("ReferenceTranspose", filter_source), ("CandidateTranspose", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
+    for name, content in (("ReferenceTranspose", filter_source), ("CandidateTranspose", (NATIVE_ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
         transpose += f"namespace {name} {{\n"
         if name == "CandidateTranspose":
             transpose += "#define XY_VSFILTER_RUST_TEXT\n"
@@ -1398,7 +1425,7 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         transpose += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_transpose.h").write_text(transpose, encoding="utf-8")
     filters = '#include "be_filter_shell.h"\n'
-    for name, content in (("ReferenceFilter", filter_source), ("CandidateFilter", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
+    for name, content in (("ReferenceFilter", filter_source), ("CandidateFilter", (NATIVE_ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
         filters += f"namespace {name} {{\n"
         text_source = content.decode("utf-8-sig")
         rounding = text_source[text_source.index("enum RoundingPolicy"):text_source.index("template<int ROUNDING_POLICY>\r\nvoid xy_be_filter_c(") if "template<int ROUNDING_POLICY>\r\nvoid xy_be_filter_c(" in text_source else text_source.index("template<int ROUNDING_POLICY>\nvoid xy_be_filter_c(")]
@@ -1420,7 +1447,7 @@ typedef ObservedGolombBase<CandidateGolomb> CandidateObservedGolomb;
         filters += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_be_filter.h").write_text(filters, encoding="utf-8")
     fraction_code = '#include "fraction_storage_shell.h"\n'
-    for name, kernels, transposes, content in (("ReferenceFraction", "ReferenceFilter", "ReferenceTranspose", filter_source), ("CandidateFraction", "CandidateFilter", "CandidateTranspose", (ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
+    for name, kernels, transposes, content in (("ReferenceFraction", "ReferenceFilter", "ReferenceTranspose", filter_source), ("CandidateFraction", "CandidateFilter", "CandidateTranspose", (NATIVE_ROOT / "src/subtitles/xy_filter.cpp").read_bytes())):
         fraction_text = content.decode("utf-8-sig").replace("\r\n", "\n")
         fraction_code += f"namespace {name} {{\nconst int ROUND_HALF_TO_EVEN = {kernels}::ROUND_HALF_TO_EVEN;\n"
         fraction_code += f"""
@@ -1454,7 +1481,7 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
         fraction_code += extract_definition(fraction_text, "void xy_be_blur(") + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_fraction_storage.h").write_text(fraction_code, encoding="utf-8")
     integer_gauss = '#include "gauss_integer_shell.h"\n'
-    for name, content in (("ReferenceIntegerGauss", raster_source), ("CandidateIntegerGauss", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+    for name, content in (("ReferenceIntegerGauss", raster_source), ("CandidateIntegerGauss", (NATIVE_ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         integer_gauss += f"namespace {name} {{\n"
         source_text=content.decode("utf-8-sig")
         volume_bits=re.search(r"static const int VOLUME_BITS = [0-9]+;", source_text[source_text.index("class ass_synth_priv"):]).group(0)
@@ -1465,7 +1492,7 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
         integer_gauss += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_gauss_integer.h").write_text(integer_gauss, encoding="utf-8")
     blur = '#include "be_blur_shell.h"\n'
-    for name, content in (("ReferenceBlur", raster_source), ("CandidateBlur", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+    for name, content in (("ReferenceBlur", raster_source), ("CandidateBlur", (NATIVE_ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         blur += f"namespace {name} {{\n"
         if name == "CandidateBlur":
             blur += "#define XY_VSFILTER_RUST_TEXT\n"
@@ -1476,7 +1503,7 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
         blur += "#endif\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_be_blur.h").write_text(blur, encoding="utf-8")
     bilinear = '#include "bilinear_shell.h"\n'
-    for name, content in (("ReferenceBilinear", raster_source), ("CandidateBilinear", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+    for name, content in (("ReferenceBilinear", raster_source), ("CandidateBilinear", (NATIVE_ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         bilinear += f"namespace {name} {{\n"
         if name == "CandidateBilinear":
             bilinear += "#define XY_VSFILTER_RUST_TEXT\n"
@@ -1484,7 +1511,7 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
         bilinear += "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_bilinear.h").write_text(bilinear, encoding="utf-8")
     masks = '#include "mask_shell.h"\n'
-    for name, content in (("ReferenceMask", raster_source), ("CandidateMask", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+    for name, content in (("ReferenceMask", raster_source), ("CandidateMask", (NATIVE_ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         masks += f"namespace {name} {{\n"
         if name == "CandidateMask":
             masks += "#define XY_VSFILTER_RUST_TEXT\n#ifndef _WIN64\n"
@@ -1499,7 +1526,7 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
         masks += "}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_mask.h").write_text(masks, encoding="utf-8")
     composite_code = '#include "composite_storage_shell.h"\n'
-    for name, kernels, content in (("ReferenceComposite", "ReferenceMask", raster_source), ("CandidateComposite", "CandidateMask", (ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
+    for name, kernels, content in (("ReferenceComposite", "ReferenceMask", raster_source), ("CandidateComposite", "CandidateMask", (NATIVE_ROOT / "src/subtitles/Rasterizer.cpp").read_bytes())):
         composite_text = content.decode("utf-8-sig").replace("\r\n", "\n")
         composite_code += f"namespace {name} {{\nusing namespace {kernels};\nCOMPOSITE_CLASSES\n"
         if name == "CandidateComposite":
@@ -1845,7 +1872,7 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
     print(cc_packet_result.stderr, end="", file=sys.stderr)
     coeff_storage_executable = destination / ("coeff-storage-oracle.exe" if os.name == "nt" else "coeff-storage-oracle")
     coeff_storage_compile = [arg.replace("find_char_oracle.cpp", "coeff_storage_oracle.cpp").replace("find-char-oracle", "coeff-storage-oracle") for arg in find_char_compile]
-    coeff_storage_compile += ["-I", str(ROOT / "src/thirdparty/boost_lib")]
+    coeff_storage_compile += ["-I", str(NATIVE_ROOT / "src/thirdparty/boost_lib")]
     if os.name == "nt":
         coeff_storage_compile += ["/fp:strict"]
     else:
@@ -2249,6 +2276,9 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
         "sanitizers": args.sanitize, "compile_command": compile_command,
         "cpp_compiler": compiler.stdout + compiler.stderr,
         "candidate_commit": candidate_commit,
+        "native_adapter_commit": HISTORICAL_ADAPTERS,
+        "production_reference_not_compared": production_reference,
+        "scope": "Current Rust and C ABI headers through historical native adapters; current production adapters are not exercised",
         "candidate_inputs": candidate_inputs,
         "candidate_inputs_stable": True,
         "hdmv_source_sha256": hashlib.sha256(hdmv_source).hexdigest(),
