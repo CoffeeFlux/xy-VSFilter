@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "scope": "Experimental persistent document containers/styles/identity/interpretation/scriptlayout/initializedmetadata; defaultproduction unchanged",
-  "measured_base_commit": "e6678f23e5e871094e5aaa7fcea8ad46a1b826c5",
+  "measured_base_commit": "2a64481a751c9e0b2c156e46fbe72dcd3856a3a4",
   "working_tree_source_hashes": true,
   "core_unsafe": {
     "production_block": 0,
@@ -16,8 +16,8 @@
     "test_other": 0
   },
   "ffi_total": {
-    "production_block": 375,
-    "production_function": 312,
+    "production_block": 377,
+    "production_function": 314,
     "production_impl": 2,
     "production_trait": 0,
     "production_other": 0,
@@ -30,12 +30,12 @@
   "new_boundary_files": [
     {
       "path": "rust/ffi/src/document.rs",
-      "sha256": "1692ec83976a1c0735d8d6601f01177bc1764b7910ba4d582b81455bf91238f0",
-      "physical_lines_including_tests": 4788,
-      "nonblank_code_lines_excluding_tests": 1599,
+      "sha256": "3d118f5a7fe71357f13d9a8833719818fd4fc0c0e571e7bc33d61d5f82c7fc30",
+      "physical_lines_including_tests": 4989,
+      "nonblank_code_lines_excluding_tests": 1674,
       "counts": {
-        "production_block": 49,
-        "production_function": 39,
+        "production_block": 51,
+        "production_function": 41,
         "production_impl": 0,
         "production_trait": 0,
         "production_other": 0,
@@ -47,267 +47,262 @@
       },
       "sites": [
         {
-          "line": 110,
+          "line": 108,
           "kind": "function",
           "test": false
         },
         {
-          "line": 144,
+          "line": 137,
           "kind": "block",
           "test": false
         },
         {
-          "line": 153,
+          "line": 146,
           "kind": "function",
           "test": false
         },
         {
-          "line": 214,
+          "line": 169,
           "kind": "block",
           "test": false
         },
         {
-          "line": 222,
+          "line": 193,
           "kind": "function",
           "test": false
         },
         {
-          "line": 232,
+          "line": 227,
           "kind": "block",
           "test": false
         },
         {
-          "line": 249,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 275,
+          "line": 236,
           "kind": "function",
           "test": false
         },
         {
-          "line": 287,
+          "line": 297,
           "kind": "block",
           "test": false
         },
         {
-          "line": 288,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 339,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 347,
+          "line": 305,
           "kind": "function",
           "test": false
         },
         {
-          "line": 357,
+          "line": 315,
           "kind": "block",
           "test": false
         },
         {
-          "line": 366,
+          "line": 332,
           "kind": "block",
           "test": false
         },
         {
-          "line": 391,
+          "line": 358,
           "kind": "function",
           "test": false
         },
         {
-          "line": 415,
+          "line": 370,
           "kind": "block",
           "test": false
         },
         {
-          "line": 425,
+          "line": 371,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 422,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 430,
           "kind": "function",
           "test": false
         },
         {
-          "line": 469,
+          "line": 440,
           "kind": "block",
           "test": false
         },
         {
-          "line": 507,
+          "line": 449,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 474,
           "kind": "function",
           "test": false
         },
         {
-          "line": 514,
+          "line": 498,
           "kind": "block",
           "test": false
         },
         {
-          "line": 524,
+          "line": 508,
           "kind": "function",
           "test": false
         },
         {
-          "line": 528,
+          "line": 552,
           "kind": "block",
           "test": false
         },
         {
-          "line": 550,
+          "line": 590,
           "kind": "function",
           "test": false
         },
         {
-          "line": 554,
+          "line": 597,
           "kind": "block",
           "test": false
         },
         {
-          "line": 571,
+          "line": 607,
           "kind": "function",
           "test": false
         },
         {
-          "line": 577,
+          "line": 611,
           "kind": "block",
           "test": false
         },
         {
-          "line": 622,
+          "line": 633,
           "kind": "function",
           "test": false
         },
         {
-          "line": 628,
+          "line": 637,
           "kind": "block",
           "test": false
         },
         {
-          "line": 671,
+          "line": 654,
           "kind": "function",
           "test": false
         },
         {
-          "line": 693,
+          "line": 660,
           "kind": "block",
           "test": false
         },
         {
-          "line": 709,
+          "line": 705,
           "kind": "function",
           "test": false
         },
         {
-          "line": 721,
+          "line": 711,
           "kind": "block",
           "test": false
         },
         {
-          "line": 764,
+          "line": 754,
           "kind": "function",
           "test": false
         },
         {
-          "line": 790,
+          "line": 776,
           "kind": "block",
           "test": false
         },
         {
-          "line": 810,
+          "line": 792,
           "kind": "function",
           "test": false
         },
         {
-          "line": 825,
+          "line": 804,
           "kind": "block",
           "test": false
         },
         {
-          "line": 855,
+          "line": 847,
           "kind": "function",
           "test": false
         },
         {
-          "line": 869,
+          "line": 873,
           "kind": "block",
           "test": false
         },
         {
-          "line": 876,
+          "line": 893,
           "kind": "function",
           "test": false
         },
         {
-          "line": 894,
+          "line": 908,
           "kind": "block",
           "test": false
         },
         {
-          "line": 921,
+          "line": 938,
           "kind": "function",
           "test": false
         },
         {
-          "line": 939,
+          "line": 952,
           "kind": "block",
           "test": false
         },
         {
-          "line": 946,
+          "line": 959,
           "kind": "function",
           "test": false
         },
         {
-          "line": 960,
+          "line": 977,
           "kind": "block",
           "test": false
         },
         {
-          "line": 962,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 997,
+          "line": 1004,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1009,
+          "line": 1022,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1033,
+          "line": 1029,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1049,
+          "line": 1043,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1077,
+          "line": 1045,
           "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1080,
+          "kind": "function",
           "test": false
         },
         {
           "line": 1092,
-          "kind": "function",
-          "test": false
-        },
-        {
-          "line": 1107,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1114,
+          "line": 1116,
           "kind": "function",
           "test": false
         },
@@ -317,132 +312,122 @@
           "test": false
         },
         {
-          "line": 1139,
+          "line": 1160,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1175,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1161,
+          "line": 1190,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1168,
+          "line": 1197,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1191,
+          "line": 1215,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1213,
+          "line": 1222,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1319,
+          "line": 1244,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1326,
+          "line": 1251,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1336,
+          "line": 1274,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1344,
+          "line": 1296,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1362,
+          "line": 1402,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1378,
+          "line": 1409,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1397,
+          "line": 1419,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1431,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1470,
+          "line": 1427,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1501,
+          "line": 1445,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1511,
+          "line": 1461,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1526,
+          "line": 1480,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1552,
+          "line": 1514,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1561,
+          "line": 1553,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1576,
+          "line": 1584,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1592,
+          "line": 1594,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1600,
+          "line": 1609,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1611,
-          "kind": "function",
-          "test": false
-        },
-        {
-          "line": 1622,
+          "line": 1635,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1623,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1652,
+          "line": 1644,
           "kind": "function",
           "test": false
         },
@@ -452,97 +437,132 @@
           "test": false
         },
         {
-          "line": 1670,
+          "line": 1675,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1677,
+          "line": 1683,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1695,
+          "line": 1694,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1711,
+          "line": 1705,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1728,
+          "line": 1706,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1771,
+          "line": 1735,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1788,
+          "line": 1742,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1801,
+          "line": 1753,
           "kind": "function",
-          "test": true
+          "test": false
         },
         {
-          "line": 1805,
+          "line": 1760,
           "kind": "block",
-          "test": true
+          "test": false
         },
         {
-          "line": 1827,
+          "line": 1778,
           "kind": "function",
-          "test": true
+          "test": false
         },
         {
-          "line": 1830,
+          "line": 1794,
           "kind": "block",
-          "test": true
+          "test": false
         },
         {
-          "line": 1842,
+          "line": 1811,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1854,
           "kind": "function",
-          "test": true
+          "test": false
         },
         {
-          "line": 1846,
+          "line": 1871,
           "kind": "block",
-          "test": true
-        },
-        {
-          "line": 1851,
-          "kind": "function",
-          "test": true
-        },
-        {
-          "line": 1855,
-          "kind": "block",
-          "test": true
-        },
-        {
-          "line": 1860,
-          "kind": "block",
-          "test": true
+          "test": false
         },
         {
           "line": 1884,
+          "kind": "function",
+          "test": true
+        },
+        {
+          "line": 1888,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1893,
+          "line": 1910,
+          "kind": "function",
+          "test": true
+        },
+        {
+          "line": 1913,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 1925,
+          "kind": "function",
+          "test": true
+        },
+        {
+          "line": 1929,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 1934,
+          "kind": "function",
+          "test": true
+        },
+        {
+          "line": 1938,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 1943,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 1967,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 1976,
           "kind": "block",
           "test": true
         }
       ],
-      "production_extern_functions": 58,
+      "production_extern_functions": 61,
       "operations": {
         "raw_shared_slice_construction": 1,
         "raw_mutable_slice_construction": 0,
@@ -556,9 +576,9 @@
     },
     {
       "path": "rust/ffi/src/document_registry.rs",
-      "sha256": "b0c91d1f8e7411ead43ff5ea64572002ab32f7fc327ba4bebfa8c6abed1d70ba",
-      "physical_lines_including_tests": 673,
-      "nonblank_code_lines_excluding_tests": 328,
+      "sha256": "71eab8bc7c9e29ab69d4b53e62382cce241c6208829e557701e512f11cb80601",
+      "physical_lines_including_tests": 734,
+      "nonblank_code_lines_excluding_tests": 359,
       "counts": {
         "production_block": 1,
         "production_function": 0,
@@ -573,12 +593,12 @@
       },
       "sites": [
         {
-          "line": 335,
+          "line": 367,
           "kind": "impl",
           "test": false
         },
         {
-          "line": 379,
+          "line": 411,
           "kind": "block",
           "test": false
         }
@@ -597,7 +617,7 @@
     }
   ],
   "prior_ffi_production_blocks": 325,
-  "added_production_blocks": 50,
+  "added_production_blocks": 52,
   "added_unsafe_impls": 1,
   "retired_native_owners": 18,
   "retired_ffi_crossings": 0,
@@ -606,7 +626,7 @@
     "Changed-code Windows x86/x64 full-class named/default lifecycle, style API/value and renderer comparisons",
     "Native wrapper publication/destruction and real host lifetimes",
     "Allocator/new-handler reentry/privateBusy and Rust abort versus native allocation/partial-failure behavior",
-    "Native duplicate naming/CopyStyles/serializer choreography and malformed/reference-null outcomes",
+    "Native CRT duplicate suffix generation, SaveAs/format logic, FRAME search orchestration and malformed/reference-null outcomes",
     "Native CRT duplicate naming and warning display remain adapters; m_simple supply contract remains unresolved"
   ],
   "historical_measurements": [
@@ -2621,34 +2641,78 @@
         "test_trait": 0,
         "test_other": 0
       }
+    },
+    {
+      "status": "Superseded SetStr source measurement; original counts and hashes preserved",
+      "measured_base_commit": "e6678f23e5e871094e5aaa7fcea8ad46a1b826c5",
+      "working_tree_source_hashes": true,
+      "source_hashes": {
+        "src/subtitles/STS.h": "969cd4ba558665f1c7b64a6dca66ba9d3befe21d4a60d36076750d70af028ee4",
+        "src/subtitles/STS.cpp": "ba5a1dc46d49e911fdb8edd741dbc5ade0915deda3e8243e8c76eadca38a99ee",
+        "src/subtitles/RTS.cpp": "17acfde7157426a0a7e3ace4c71b37e3de16ba15300636d39d40de8a4e82f631",
+        "src/subtitles/USFSubtitles.cpp": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
+        "src/subtitles/SubtitleInputPin.cpp": "210276fdf0da5108dd3135b5934dc83015512604d0e8c12fde4d1f9a02ad105d",
+        "src/filters/transform/vsfilter/DirectVobSubFilter.cpp": "d6e056e9357234b9935fe3a8760655df8e1c3c0a5fa6a9954d343ea0234033af",
+        "src/filters/transform/vsfilter/xy_sub_filter.cpp": "680a96edc424c3a4324b514c5f74fded15857d3525b78d114c5394205dac8f9d",
+        "src/filters/transform/vsfilter/plugins.cpp": "38526740c55b4bc51642925d1ded688ebdd0ff26a01b5a5dd7f587add31df3da",
+        "src/subtitles/RustDocumentOwner.h": "af8ba6201b16f2040e807486867775551d2761ee654900bd5f584d32d4eef97c",
+        "rust/compat/src/document.rs": "bd0ed77e56e3925b178b9a67f319ae3d1ac26b31f2bf41b7c1f28b568c00782f",
+        "rust/ffi/src/document.rs": "1692ec83976a1c0735d8d6601f01177bc1764b7910ba4d582b81455bf91238f0",
+        "rust/ffi/src/document_registry.rs": "b0c91d1f8e7411ead43ff5ea64572002ab32f7fc327ba4bebfa8c6abed1d70ba",
+        "include/xy_rust_document.h": "28003dfada82e49ffb206656fe86fb698164f548f26ce53c637d82de4807ec02",
+        "tools/compat/document_native_lifecycle.cpp": "9fe378d241897a9b67a14461d8a4b341ebee6b15447fa18afa4c44f040679a54",
+        "tools/compat/document_native_lifecycle.py": "0067bb9a84065329b11ad3a78a2dc38e2c3c582210363e2100b47c7f265bedcf",
+        "tools/compat/summarize_evidence.py": "fbee664536f75a8a586ad8fd8e6436ff145ae6ca5b8491e28324a47e8914b48b",
+        "tools/compat/audit_document_access.py": "ef5ecbadfee91d5e173902ec540cdd7f404a44ba90e6d405356c228146044d94",
+        "rust/compat/src/document_unknown.rs": "e9d0af429f752cc4ee0d9c31077b37304e0124b3fc9fa0974250e84612c84360",
+        "rust/compat/src/lib.rs": "b7825eb5b59dbb8e14d5f2a0a347aa2006a7957df1a3cc7292b6d2fe7ab91395",
+        "rust/compat/src/document_style_add.rs": "1a9948d942dd3cd56a3d3d8c0c897762101859944def56a4b81ce6ae122e27a6",
+        "rust/compat/src/document_style_copy.rs": "6040a9114f2a875d84d0948b3ee938a7aa2a6b28af7314cbe3bb2040a01e9094",
+        "rust/compat/src/document_text.rs": "1a37d8f948906561e12a9ed1f93837c956b6e092c96a5974c86a9b459b9e02d3",
+        "rust/compat/src/document_prepare.rs": "ceda12df96c3386652c39f6d58bee7fc0bb665f8cc18bd46b9cd41e14998bf03",
+        "rust/compat/src/document_open.rs": ""
+      },
+      "ffi_total": {
+        "production_block": 375,
+        "production_function": 312,
+        "production_impl": 2,
+        "production_trait": 0,
+        "production_other": 0,
+        "test_block": 119,
+        "test_function": 4,
+        "test_impl": 0,
+        "test_trait": 0,
+        "test_other": 0
+      }
     }
   ],
   "retired_native_owners_scope": "Eighteen native fields/containers opt-in only; defaultproduction retirementzero",
   "measurement_method": "Current audit_rust_boundary.inventory over actual Rust source, comments/literals masked and test items separated; counts overlap and do not establish soundness. Historical original snapshot retained.",
   "source_hashes": {
     "src/subtitles/STS.h": "969cd4ba558665f1c7b64a6dca66ba9d3befe21d4a60d36076750d70af028ee4",
-    "src/subtitles/STS.cpp": "ba5a1dc46d49e911fdb8edd741dbc5ade0915deda3e8243e8c76eadca38a99ee",
+    "src/subtitles/STS.cpp": "d30fde2686cc52e8dafa63d633bfe953e604789d9ae678e5dfbe92500c9c4ed8",
     "src/subtitles/RTS.cpp": "17acfde7157426a0a7e3ace4c71b37e3de16ba15300636d39d40de8a4e82f631",
     "src/subtitles/USFSubtitles.cpp": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
     "src/subtitles/SubtitleInputPin.cpp": "210276fdf0da5108dd3135b5934dc83015512604d0e8c12fde4d1f9a02ad105d",
     "src/filters/transform/vsfilter/DirectVobSubFilter.cpp": "d6e056e9357234b9935fe3a8760655df8e1c3c0a5fa6a9954d343ea0234033af",
     "src/filters/transform/vsfilter/xy_sub_filter.cpp": "680a96edc424c3a4324b514c5f74fded15857d3525b78d114c5394205dac8f9d",
     "src/filters/transform/vsfilter/plugins.cpp": "38526740c55b4bc51642925d1ded688ebdd0ff26a01b5a5dd7f587add31df3da",
-    "src/subtitles/RustDocumentOwner.h": "af8ba6201b16f2040e807486867775551d2761ee654900bd5f584d32d4eef97c",
+    "src/subtitles/RustDocumentOwner.h": "a42893d70f847b6e7b17a7a3257ec6f76faf4d598ebd48650658a089ee3e48ef",
     "rust/compat/src/document.rs": "bd0ed77e56e3925b178b9a67f319ae3d1ac26b31f2bf41b7c1f28b568c00782f",
-    "rust/ffi/src/document.rs": "1692ec83976a1c0735d8d6601f01177bc1764b7910ba4d582b81455bf91238f0",
-    "rust/ffi/src/document_registry.rs": "b0c91d1f8e7411ead43ff5ea64572002ab32f7fc327ba4bebfa8c6abed1d70ba",
-    "include/xy_rust_document.h": "28003dfada82e49ffb206656fe86fb698164f548f26ce53c637d82de4807ec02",
-    "tools/compat/document_native_lifecycle.cpp": "9fe378d241897a9b67a14461d8a4b341ebee6b15447fa18afa4c44f040679a54",
-    "tools/compat/document_native_lifecycle.py": "0067bb9a84065329b11ad3a78a2dc38e2c3c582210363e2100b47c7f265bedcf",
-    "tools/compat/summarize_evidence.py": "fbee664536f75a8a586ad8fd8e6436ff145ae6ca5b8491e28324a47e8914b48b",
-    "tools/compat/audit_document_access.py": "ef5ecbadfee91d5e173902ec540cdd7f404a44ba90e6d405356c228146044d94",
+    "rust/ffi/src/document.rs": "3d118f5a7fe71357f13d9a8833719818fd4fc0c0e571e7bc33d61d5f82c7fc30",
+    "rust/ffi/src/document_registry.rs": "71eab8bc7c9e29ab69d4b53e62382cce241c6208829e557701e512f11cb80601",
+    "include/xy_rust_document.h": "4378a13668e3f2b89b3cab1ee9dc73acfea2161d5ae7f61e1857c55e7950b971",
+    "tools/compat/document_native_lifecycle.cpp": "1e88eb5006bcc204ad202653f3cf1b56c91ddb52b53a81c99cec4df80e160edd",
+    "tools/compat/document_native_lifecycle.py": "9494cfe4c392be190571501b6334ac6cb0bd68fa9de616097e2b9b62932d622f",
+    "tools/compat/summarize_evidence.py": "5868e5c388c16eb334980ff58e495702a4b4869bc1d7f474d47ad2415a476234",
+    "tools/compat/audit_document_access.py": "327f5d52a088465b9a5e3de9a9de5d16fbb356fd97ec7c0438a4b40c51ac482e",
     "rust/compat/src/document_unknown.rs": "e9d0af429f752cc4ee0d9c31077b37304e0124b3fc9fa0974250e84612c84360",
-    "rust/compat/src/lib.rs": "b7825eb5b59dbb8e14d5f2a0a347aa2006a7957df1a3cc7292b6d2fe7ab91395",
+    "rust/compat/src/lib.rs": "f4e28648809e24e81d761e37346a31ce373571fe53b705d29581e3189c6fcac1",
     "rust/compat/src/document_style_add.rs": "1a9948d942dd3cd56a3d3d8c0c897762101859944def56a4b81ce6ae122e27a6",
     "rust/compat/src/document_style_copy.rs": "6040a9114f2a875d84d0948b3ee938a7aa2a6b28af7314cbe3bb2040a01e9094",
     "rust/compat/src/document_text.rs": "1a37d8f948906561e12a9ed1f93837c956b6e092c96a5974c86a9b459b9e02d3",
-    "rust/compat/src/document_prepare.rs": "ceda12df96c3386652c39f6d58bee7fc0bb665f8cc18bd46b9cd41e14998bf03"
+    "rust/compat/src/document_prepare.rs": "ceda12df96c3386652c39f6d58bee7fc0bb665f8cc18bd46b9cd41e14998bf03",
+    "rust/compat/src/document_open.rs": "107573591d5c6aa961265a6f9efaddcb134d8f096988f039bf35fc188e327ab8"
   },
   "default_style_extension": {
     "set": "xy_vsfilter_document_set_default_style_v1 copies input and decodes before admission; validates handle before taking pending value; retired Option drops outside admission, including failure/Busy pending input.",
@@ -4385,6 +4449,34 @@
     "validation": {
       "local": "224 core and 120 FFI tests; pinned fmt/Clippy. Five full-class SetStr fixtures and strict archival gate; declaration-order regression for prior text fixture helper.",
       "windows": "Changed-source compilation/runtime pending; earlier e667 compile exposed harness helper declaration ordering, corrected here."
+    }
+  },
+  "open_lifecycle_extension": {
+    "scope": "Experimental Open(CTextFile*) lifecycle policy with native parser/file/dialog/virtual callback adapters and ordered success-header publication retained",
+    "capture_scope": "Working-tree source hashes over measured_base_commit; changed-source Windows validation pending",
+    "exports": [
+      "xy_vsfilter_document_open_lifecycle_begin_v1",
+      "xy_vsfilter_document_open_lifecycle_step_v1",
+      "xy_vsfilter_document_open_lifecycle_drop_v1"
+    ],
+    "contracts": [
+      "Typed OpenRun binds one owner. Begin validates owner/count and performs no document mutation. Fixed eight-byte replies contain action:u32 and parser index:u32; no snapshot allocation. Ack -2 peeks, -1 acknowledges non-parser action, 0/1 supplies parser result. Only Parse and SuccessHeader carry an index.",
+      "Initial virtual Empty precedes position capture. Parser failure reads live entry count: positive count requests syntax warning then virtual Empty then false; zero count seeks before retry Empty, including the final failed parser. Success with zero entries is not rejected.",
+      "Success header retains name/type/mode/file encoding/path/m_simple assignment order in native code. Sidecar parsing precedes rebuild/OnChanged and unknown-style warnings. Sidecar file lifetime extends through these actions and final return.",
+      "Only completion of UnknownStyles reads live screen dimensions and commits 384x288 for exactly [0,0]. One-zero and other supplied pairs are preserved. Unsupplied dimensions produce unresolved status without advancing or mutation.",
+      "No document/run references cross native parsers, file operations, dialogs or virtual callbacks. Protocol, output and typed-handle checks precede mutation. Safe registry split supports either slot order; drop retires after admission. No rollback, generation guard or callback policy is invented.",
+      "Initial run registration adds allocation/admission before virtual Empty; allocation/exception/reentry timing remains qualified. m_simple remains native, and pre-Open indeterminate histories are not executed or resolved."
+    ],
+    "unsafe_delta": {
+      "production_blocks": 2,
+      "unsafe_function_declarations": 2,
+      "new_raw_helpers": 0,
+      "new_unsafe_impls": 0
+    },
+    "validation": {
+      "local": "Five core protocol tests; 229 core and 121 FFI tests, pinned fmt/Clippy. Safe pair tests cover both slot orders and stale owner; byte tests cover fixed reply/refusal/phase preservation and live fallback.",
+      "windows": "Changed-source Open full-class comparison pending. Prior SetStr checkpoint 2a64481a compiles probes on x86/x64.",
+      "fixtures": "Five bounded full-class cases cover SRT sidecar metadata/entry before callback, sidecar handle lifetime, live callback screen fallback, filename double Empty and zero-byte twelve-parser rejection. Existing scripted unknown-style modal fixture retains warning ordering coverage."
     }
   }
 }

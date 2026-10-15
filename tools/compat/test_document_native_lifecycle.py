@@ -5,7 +5,7 @@ from pathlib import Path
 import subprocess
 import document_native_lifecycle as lifecycle
 
-from document_native_lifecycle import compare_traces, conversion_rows, unknown_rows, text_plan_rows, copy_styles_stages, setstr_plan_rows
+from document_native_lifecycle import compare_traces, conversion_rows, unknown_rows, text_plan_rows, copy_styles_stages, setstr_plan_rows, open_order_rows
 
 
 STYLE_SCALARS = b" ".join(b"0000000000000000" if i in (0,11,12,13,14,23,24,25,26,27,28,29,30,31,32) else b"00000000" if i in (15,17,19,21) else b"0" for i in range(34))
@@ -91,6 +91,7 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
          + b"preparation-stage preparation-entry-zero entries=6 segments=3 animated=1\n"
          + b"\n".join(setstr_plan_rows()) + b"\n"
          + b"".join(b"style-rename-segments "+row.split()[1]+b" count=2 animated=1\n" for row in setstr_plan_rows()[::2])
+         + b"\n".join(open_order_rows()) + b"\n"
          + b"saved-file ssa exists=1 bytes=1 41\nsaved-file ass exists=1 bytes=1 41\n"
          + b"saved-file srt exists=1 bytes=1 41\nsaved-file srt-sidecar exists=1 bytes=1 41\n"
          + b"saved-file ssa-sidecar exists=0\nsaved-file ass-sidecar exists=0\n"
@@ -109,11 +110,26 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
         old = TRACE.replace(b"copy-styles-stage copy-styles-self-before\n", b"")
         compare_traces([old] * 4, 64, require_copy_styles_stages=False)
 
+    def test_open_order_requires_sidecar_lifetime_live_callback_pair_and_empty_counts(self):
+        for old,new in ((b"sidecar-held=1",b"sidecar-held=0"),
+                        (b"open-filename result=1 empties=2",b"open-filename result=1 empties=1"),
+                        (b"screen=0,177",b"screen=384,288"),
+                        (b"open-rejected result=0 empties=13",b"open-rejected result=0 empties=12")):
+            with self.assertRaises(ValueError):compare_traces([TRACE.replace(old,new)]*4,64)
+        rows=open_order_rows();reordered=TRACE.replace(rows[0]+b"\n",b"").replace(rows[1]+b"\n",rows[1]+b"\n"+rows[0]+b"\n")
+        with self.assertRaises(ValueError):compare_traces([reordered]*4,64)
+        legacy=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith(b"open-order-"))
+        with self.assertRaises(ValueError):compare_traces([legacy]*4,64)
+        compare_traces([legacy]*4,64,require_open_order_stages=False)
+
     def test_shared_native_helpers_are_defined_before_text_fixture_use(self):
         source=lifecycle.SOURCE.read_text()
         definition=source.index("static bool same_identity(")
         self.assertEqual(source.count("static bool same_identity("),1)
         self.assertEqual(source.index("same_identity("),definition+len("static bool "))
+        self.assertLess(source.index("static CStringA ass_fixture("),source.index("static void open_order_lifecycle("))
+        self.assertLess(source.index("struct SavedFiles"),source.index("static void open_order_lifecycle("))
+        self.assertLess(definition,source.index("class OpenOrderingDocument"))
         for fixture in ("text_plan_lifecycle", "setstr_plan_lifecycle"):
             start=source.index("static void "+fixture+"(")
             self.assertLess(definition,start)

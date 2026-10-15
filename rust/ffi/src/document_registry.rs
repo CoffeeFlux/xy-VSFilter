@@ -28,6 +28,7 @@ pub(crate) enum Kind {
     UnknownRun,
     StyleAddRun,
     StyleCopyRun,
+    OpenRun,
 }
 
 // Inline sessions avoid a new fallible box allocation after core ownership transfer.
@@ -50,6 +51,10 @@ pub(crate) enum Resource {
         source: Handle,
         run: xy_vsfilter_compat::document_style_copy::Run,
     },
+    OpenRun {
+        owner: Handle,
+        run: xy_vsfilter_compat::document_open::Run,
+    },
 }
 impl Resource {
     fn kind(&self) -> Kind {
@@ -59,6 +64,7 @@ impl Resource {
             Self::UnknownRun { .. } => Kind::UnknownRun,
             Self::StyleAddRun { .. } => Kind::StyleAddRun,
             Self::StyleCopyRun { .. } => Kind::StyleCopyRun,
+            Self::OpenRun { .. } => Kind::OpenRun,
         }
     }
 }
@@ -276,6 +282,32 @@ impl Registry {
         }
     }
 
+    pub(crate) fn open_pair(
+        &mut self,
+        id: Handle,
+    ) -> Result<(&mut Document, &mut xy_vsfilter_compat::document_open::Run), Error> {
+        let run_index = self.position(id)?;
+        let owner = match &self.slots[run_index].1 {
+            Resource::OpenRun { owner, .. } => *owner,
+            _ => return Err(Error::TypeMismatch),
+        };
+        let owner_index = self.position(owner)?;
+        if owner_index == run_index {
+            return Err(Error::TypeMismatch);
+        }
+        let (document_resource, run_resource) = if owner_index < run_index {
+            let (before, after) = self.slots.split_at_mut(run_index);
+            (&mut before[owner_index].1, &mut after[0].1)
+        } else {
+            let (before, after) = self.slots.split_at_mut(owner_index);
+            (&mut after[0].1, &mut before[run_index].1)
+        };
+        match (document_resource, run_resource) {
+            (Resource::Document(document), Resource::OpenRun { run, .. }) => Ok((document, run)),
+            _ => Err(Error::TypeMismatch),
+        }
+    }
+
     /// Deep storage copy within this acquisition. This is not native Copy's
     /// metadata, virtual Empty, self-copy orchestration or partial-failure model.
     /// Returns retired destination storage to be dropped after admission ends.
@@ -402,6 +434,35 @@ mod tests {
             .try_with(|registry| registry.insert(resource).map_err(|(error, _)| error))
             .unwrap()
             .unwrap()
+    }
+
+    #[test]
+    fn open_run_safe_pair_in_both_orders_and_stale_owner() {
+        let mut registry = Registry::new();
+        let owner = registry
+            .insert(Resource::Document(Box::default()))
+            .ok()
+            .unwrap();
+        let id = registry
+            .insert(Resource::OpenRun {
+                owner,
+                run: xy_vsfilter_compat::document_open::Run::new(1),
+            })
+            .ok()
+            .unwrap();
+        for _ in 0..2 {
+            let (document, run) = registry.open_pair(id).unwrap();
+            document.set_script_size(1, 2);
+            assert_eq!(run.action().kind as u32, 0);
+            registry.slots.swap(0, 1);
+        }
+        assert!(matches!(
+            registry.open_pair(owner),
+            Err(Error::TypeMismatch)
+        ));
+        registry.remove(owner, Kind::Document).unwrap();
+        assert!(matches!(registry.open_pair(id), Err(Error::InvalidHandle)));
+        assert!(registry.remove(id, Kind::OpenRun).is_ok());
     }
 
     #[test]
