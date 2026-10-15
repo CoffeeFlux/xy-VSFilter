@@ -1,0 +1,322 @@
+{
+  "schema": "rust-document-x64-validated-increment-v1",
+  "candidate_commit": "f570dd2bebdd5abf9d12a93783e2a48a54390df3",
+  "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+  "workflow_run": 38655399588,
+  "job_id": 116163841016,
+  "job_conclusion": "success",
+  "job_completed_at": "2026-10-14T23:51:34Z",
+  "platform": "x64",
+  "document_storage": "rust-experimental",
+  "artifact": "renderer-evidence-x64-rust-document",
+  "build_info_sha256": "aa392bc2ad8e6c3ea3bcdc3446e298c12b1f31de4a611a5a2af5a97f8278f28c",
+  "checks": {
+    "smoke": {
+      "report_sha256": "d4933b3ed4a315506c0d3e6114e09575ed1b5779c487216baa10fb12c717eb2f",
+      "case_count": 1,
+      "rendered_frames": 10,
+      "changed_frames": 6,
+      "case_verdicts": {
+        "equal": 1
+      },
+      "candidate_statuses": {
+        "ok": 1
+      },
+      "manifest_sha256": "aff943a1c633c5a1aca2d2f504b0b17c5a7f19b3d3bbffaa215d1889fff2da25",
+      "retained_frame_hash_observations_verified": 30,
+      "pixel_files_retained": 0,
+      "frame_file_references_checked": 30
+    },
+    "csri": {
+      "report_sha256": "29d30889c89d09513be74660118b1a1523702c9808e1d02bb7e3004c23a58def",
+      "case_count": 814,
+      "rendered_frames": 8586,
+      "changed_frames": 5720,
+      "case_verdicts": {
+        "equal": 814
+      },
+      "candidate_statuses": {
+        "ok": 796,
+        "open_rejected": 18
+      },
+      "manifest_sha256": "2e197b56427d6b94bb389a8e25e73e8910ea3c71ddf89ebd11658b369b48cd07",
+      "retained_frame_hash_observations_verified": 25758,
+      "pixel_files_retained": 0,
+      "frame_file_references_checked": 25758
+    },
+    "mutation-results": {
+      "report_sha256": "07e45242375e526c08b3399654a7b6fd6fd8a93948014f8c75253ef0dcb0b46a",
+      "case_count": 32,
+      "rendered_frames": 224,
+      "changed_frames": 160,
+      "case_verdicts": {
+        "equal": 32
+      },
+      "candidate_statuses": {
+        "ok": 32
+      },
+      "manifest_sha256": "90e89279db719c739c6a1363611c04225b3486f03fee6ad9ceaca20e084ce43c",
+      "retained_frame_hash_observations_verified": 672,
+      "pixel_files_retained": 0,
+      "frame_file_references_checked": 672
+    },
+    "com-contracts": {
+      "report_sha256": "26a65b077b4eddb538e7a79cd1ae6a32a2fbf906c9a02c7407310328d00071e7",
+      "cases": 10,
+      "passed": true,
+      "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+      "headers": {
+        "src/filters/transform/vsfilter/DirectVobSubFilter.h": {
+          "reference_sha256": "d0ad74ce5efb68be080cd77c75f9288489cc2c79499941c83e2c238a9e8ddaf9",
+          "candidate_sha256": "d0ad74ce5efb68be080cd77c75f9288489cc2c79499941c83e2c238a9e8ddaf9"
+        },
+        "src/filters/transform/vsfilter/xy_sub_filter.h": {
+          "reference_sha256": "61b2cb40e906d4147255400be2142ff912c58628feb1da03d1fd68bea29d6a4d",
+          "candidate_sha256": "61b2cb40e906d4147255400be2142ff912c58628feb1da03d1fd68bea29d6a4d"
+        },
+        "src/filters/transform/vsfilter/auto_load_helper.h": {
+          "reference_sha256": "b280254485e02444630a996804e14ef10a97cbcd1f8ee707f919f03e5b59c488",
+          "candidate_sha256": "d37e2ed8ac0142ea7862b1d475a0ae74d1018e0f29ee802c4edf40a76069a102"
+        },
+        "src/filters/transform/vsfilter/xy_sub_filter_consumer.h": {
+          "reference_sha256": "67f5cb83a9c83df388069feea50b7db5f7200971b0b50ae11abd39de1c5294a0",
+          "candidate_sha256": "67f5cb83a9c83df388069feea50b7db5f7200971b0b50ae11abd39de1c5294a0"
+        },
+        "src/filters/transform/vsfilter/IDirectVobSub.h": {
+          "reference_sha256": "c0d693a5c0fc3d91c68f41f539ad8c0f13e6dfe0b19941c99b7ad6d5b15f165f",
+          "candidate_sha256": "c0d693a5c0fc3d91c68f41f539ad8c0f13e6dfe0b19941c99b7ad6d5b15f165f"
+        },
+        "src/filters/transform/vsfilter/XyOptions.h": {
+          "reference_sha256": "9efa9e222e74a84fcdac202be5ddfd13b32ee49b837b9b2649f7bbcc6cf4618c",
+          "candidate_sha256": "9efa9e222e74a84fcdac202be5ddfd13b32ee49b837b9b2649f7bbcc6cf4618c"
+        }
+      },
+      "reference_exclusions": [
+        "XySubFilterAutoLoader QueryId/FindPin; see docs/autoloader-pin-id-scope.json"
+      ],
+      "candidate_only_controls": 2,
+      "settings_environment": "Private volatile HKCU per worker, removed by parent after termination; native constructor writes are isolated."
+    },
+    "document-lifecycle": {
+      "report_sha256": "4b88b5ee84846dcd863a21f373addb341f277311d4ea400aaf933c3a525def90",
+      "equal": true,
+      "trace_lines": 3912,
+      "limits": [
+        "Bounded normal lifecycles and initialized metadata only",
+        "No allocator-failure, concurrent close, or dialog-reentry parity",
+        "Not a real Aegisub/player host test"
+      ],
+      "library_hash_scope": "Build-library hashes are runner-reported; executables, source headers and traces rehashed",
+      "dialogs": {
+        "count": 3,
+        "equal": true,
+        "observer_sha256": "5854127d209d140d19cd9a8578b77dcc8473d0f576de51c3c4f5f76e32eda8a1",
+        "canonical_sha256": [
+          "38f6696cd3a8c61cb8a01618f0465c3a37f7d98dd601fc2113b41adad5f267d4",
+          "38f6696cd3a8c61cb8a01618f0465c3a37f7d98dd601fc2113b41adad5f267d4",
+          "38f6696cd3a8c61cb8a01618f0465c3a37f7d98dd601fc2113b41adad5f267d4",
+          "38f6696cd3a8c61cb8a01618f0465c3a37f7d98dd601fc2113b41adad5f267d4"
+        ],
+        "retained_file_sha256": [
+          "66d762db75102a7e394ce5c5e3e23ebfca82c396795d5e232f9fc3a064ca48a0",
+          "66d762db75102a7e394ce5c5e3e23ebfca82c396795d5e232f9fc3a064ca48a0",
+          "66d762db75102a7e394ce5c5e3e23ebfca82c396795d5e232f9fc3a064ca48a0",
+          "66d762db75102a7e394ce5c5e3e23ebfca82c396795d5e232f9fc3a064ca48a0"
+        ],
+        "scope": "ordered full warning text, controls and scripted responses; no document edits from observer",
+        "ordered_warnings": [
+          {
+            "title": "Warning",
+            "text": [
+              "Unknown style found: \"UnknownA\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+            ],
+            "buttons": [
+              {
+                "id": 1,
+                "text": "OK",
+                "style": 1342373889
+              },
+              {
+                "id": 2,
+                "text": "Cancel",
+                "style": 1342242816
+              }
+            ],
+            "response": "ok"
+          },
+          {
+            "title": "Warning",
+            "text": [
+              "Unknown style found: \"UnknownB\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+            ],
+            "buttons": [
+              {
+                "id": 1,
+                "text": "OK",
+                "style": 1342373889
+              },
+              {
+                "id": 2,
+                "text": "Cancel",
+                "style": 1342242816
+              }
+            ],
+            "response": "cancel"
+          },
+          {
+            "title": "Warning",
+            "text": [
+              "Unknown style found: \"UnknownOpen\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+            ],
+            "buttons": [
+              {
+                "id": 1,
+                "text": "OK",
+                "style": 1342373889
+              },
+              {
+                "id": 2,
+                "text": "Cancel",
+                "style": 1342242816
+              }
+            ],
+            "response": "cancel"
+          }
+        ],
+        "executions": 4,
+        "total_warning_observations": 12
+      },
+      "verified_source_requirements": {
+        "require_named_stages": true,
+        "require_identity_stages": true,
+        "require_interpretation_stages": true,
+        "require_layout_stages": true,
+        "require_metadata_stages": true,
+        "require_selected_copy_stages": true,
+        "require_style_rename_stages": true,
+        "require_sort_stages": true,
+        "require_base_empty_stages": true,
+        "require_lcid_stages": true,
+        "require_resolution_stages": true,
+        "require_layout_size_stages": true,
+        "require_conversion_stages": true,
+        "require_unknown_stages": true,
+        "require_add_style_stages": true,
+        "require_copy_styles_stages": true,
+        "require_text_plan_stages": false,
+        "require_preparation_stages": false,
+        "require_setstr_stages": false
+      },
+      "builds": {
+        "reference": {
+          "sha256": "4c695bdc43a7c0f95f42b632314a9e46650d4aab6ccd0e1355cc33bfed64df72",
+          "pe_machine": "0x8664",
+          "repository_header_hashes_verified": 850
+        },
+        "candidate": {
+          "sha256": "8a0cc2d01b3134d1e71d20ede22f42e714c3b84bc2552c0e24ca14259e34776e",
+          "pe_machine": "0x8664",
+          "repository_header_hashes_verified": 856
+        }
+      },
+      "copy_styles_stages": [
+        "state 366 0 copy-styles-self-before 3 3",
+        "state 367 0 copy-styles-self-after 3 3",
+        "state 372 0 copy-styles-grown-source-before 0 0",
+        "state 373 1 copy-styles-grown-result 1 1",
+        "state 374 0 copy-styles-grown-source-after 0 0",
+        "state 380 0 copy-styles-mixed-source-before 0 0",
+        "state 381 1 copy-styles-mixed-result 3 3",
+        "state 382 0 copy-styles-mixed-source-after 0 0"
+      ],
+      "trace_sha256": [
+        "1131f89173e374a000e387c2736f441a211cfa18353093b7880d0b6244d26e23",
+        "1131f89173e374a000e387c2736f441a211cfa18353093b7880d0b6244d26e23",
+        "1131f89173e374a000e387c2736f441a211cfa18353093b7880d0b6244d26e23",
+        "1131f89173e374a000e387c2736f441a211cfa18353093b7880d0b6244d26e23"
+      ]
+    },
+    "document-style-api": {
+      "report_sha256": "c9510783f9c4da3e8b38782a4d202a4c90d27f90bce6be66e5ca95e5aceaa464",
+      "equal": true,
+      "class_mode_pairs": 4,
+      "executions": 16,
+      "scope": "Test-instrumented copies of actual DLLs; native style values remain in-module; production DLL hashes unchanged. Build-library hashes are runner-reported. No graph/real-host/callback-count coverage.",
+      "binaries": {
+        "host": {
+          "sha256": "109d78e63973133b15452d49ab2c62ab99f01f39ee51d8bc2a5931e03504c893",
+          "pe_machine": "0x8664"
+        },
+        "reference-VSFilter": {
+          "sha256": "c5272ecad874276dbe52e38c8350dbb3cb314df5494b474fae0181c69f2b2e1b",
+          "pe_machine": "0x8664"
+        },
+        "reference-XySubFilter": {
+          "sha256": "09c9243bad341696046c19d37c0d27b92677ebf91f1ee5bbc4ec9ae57893bd51",
+          "pe_machine": "0x8664"
+        },
+        "candidate-VSFilter": {
+          "sha256": "74adde452975bf14c65b1328015a4f3e842a7dc49aee369eae049dae97f01af6",
+          "pe_machine": "0x8664"
+        },
+        "candidate-XySubFilter": {
+          "sha256": "899c699b44615309bc1c3edac6c13bd5b6e9d1f1b8108540e713530d4644450e",
+          "pe_machine": "0x8664"
+        }
+      }
+    },
+    "document-style-value": {
+      "report_sha256": "d20baba6c7b57ed468b658b352afec8610780cdf9df9d7f1f69f59dc37f0826a",
+      "equal": true,
+      "values": 209,
+      "equality_cells": 43681,
+      "scope": "Fixed initialized pinned-native fixtures only; no native arbitrary-input injection or style owner routing",
+      "provenance_scope": "Retained sources, headers, executables, input and traces rehashed; external toolchain and native library hashes runner-reported."
+    }
+  },
+  "production_dlls": {
+    "VSFilter.dll": {
+      "exports_equal": true,
+      "no_added_imports_or_changed_platform_headers": true,
+      "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+      "dependencies_report_sha256": "84a27c3f09cb0d719d9eda44878694f94595dada4c14ceb22a2e4e614f9ec4ff",
+      "baseline_sha256": "5eb8ab85f7fe0d808aea789912e4f6d7ff5c6f221fa9360a33ad6c2cc8919078",
+      "candidate_sha256": "a4284445006203a36aeec240ad944b03769033388316e09d814687fb79708108",
+      "pe_machine": "0x8664"
+    },
+    "XySubFilter.dll": {
+      "exports_equal": true,
+      "no_added_imports_or_changed_platform_headers": true,
+      "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+      "dependencies_report_sha256": "70a7daaf1cbd89db83662b6014439fe736474ef9fe6ad152a955d625901c74b2",
+      "baseline_sha256": "3475733d3cab5e4a2949b49c9c164feff69fca0896881a7a2fbed93158048b15",
+      "candidate_sha256": "9769ac424c449292adf3145677de354cc78c104c327136fd0d667ebe25961cad",
+      "pe_machine": "0x8664"
+    },
+    "xy_sub_filter_consumer.dll": {
+      "exports_equal": true,
+      "no_added_imports_or_changed_platform_headers": true,
+      "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+      "dependencies_report_sha256": "d0b61ec5540588c5f5e14949472e20c26b17713b3700e75d9fc088d2bcc176b9",
+      "baseline_sha256": "a9ef82e90e3496ac7110d9d38250c2119ffe7cb48802a8e6a4840c1939889f21",
+      "candidate_sha256": "24c1bced13ff1db3d2d160a51151994f1d774c7705ea1441c30e2f44c568474e",
+      "pe_machine": "0x8664"
+    }
+  },
+  "candidate_log_sha256": "80e711663c43765728b2a1718284f27b95c1277562701f1fee7be2e03d184bdc",
+  "limitations": [
+    "Exact f570dd2b x64 only: unknown-style, AddStyle and CopyStyles coarse sessions verified. No later DOC05 text-plan, preparation routing, SetStr or Open lifecycle credit.",
+    "Renderer result/frame hashes, metadata and guards independently checked; pixel binary files not retained, so exact pixel-byte comparison remains runner-reported.",
+    "Bounded dialogs use exact process filtering/readiness/control identity and scripted responses; no document mutation from observer or dialog-driven document reentry claim.",
+    "Actual style API executes in instrumented DLL copies with isolated registry setup; no real player/Aegisub graph or arbitrary host/callback-count claim.",
+    "Tracked sources, source headers, executables/DLLs, four lifecycle traces and all four dialog JSON artifacts independently rehashed; external SDK/compiler/build libraries remain runner-reported.",
+    "No production-switch authorization, complete document/subsystem closure, or universal malformed-input compatibility claim."
+  ],
+  "archival_verification": {
+    "summarize_native_passed": true,
+    "script": "artifacts/document-x64-f570-verification/verify.py",
+    "script_sha256": "5e416f34e0e46db055c45dbba470bedae3aca7901852f6791847dda9b886e20c",
+    "summarize_evidence_sha256": "fbee664536f75a8a586ad8fd8e6436ff145ae6ca5b8491e28324a47e8914b48b",
+    "document_lifecycle_validator_sha256": "0067bb9a84065329b11ad3a78a2dc38e2c3c582210363e2100b47c7f265bedcf"
+  }
+}

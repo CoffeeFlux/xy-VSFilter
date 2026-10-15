@@ -37,7 +37,7 @@ inventory is incomplete, so there is no defensible overall percentage today.
 | Work package | Implemented/verified pieces | Required closure work | State |
 | --- | --- | --- | --- |
 | Text input, encodings and attachments | Reader/writer buffers, seek targets, charset sequence, embedded-font records | Full input/file/archive/network lifetime inventory; retained CRT/code-page boundaries and public containers | Partial |
-| ASS/SSA documents and timeline | Opt-in canonical entries/segments/styles and 20 retired native owners; safe copy, style-conflict/unknown-style policy, text-operation selection and time-conversion commits | Remaining m_simple contract and native orchestration; exact current x86/x64 lifecycle/render/style parity and real-host validation | Partial; shared document package remains active, ASS frontend next |
+| ASS/SSA documents and timeline | Opt-in canonical entries/segments/styles and 20 retired native owners; safe copy, style-conflict/unknown-style policy, text preparation/selection, Open lifecycle control and time-conversion commits | Remaining m_simple contract and native orchestration; exact current x86/x64 lifecycle/render/style parity and real-host validation | Partial; shared document package remains active, ASS frontend next |
 | Other text formats | RealText, SAMI, SubRip, MicroDVD, WebVTT and other parser pieces | Complete per-format path checklist, USF and remaining legacy formats, public document storage and malformed-input recovery | Partial |
 | ASS tags, layout and text preparation | Tag lexer, text runs/escape preparation, collision records, placement and width/dimension decisions | Tag interpretation/interactions, native word traversal, karaoke/transforms and cache state | Partial |
 | Fonts, shaping and glyph paths | Font records, path staging, ellipse/arc helpers, selected Arabic handling | GDI/font fallback/metrics, shaping and kerning; persistent path ownership including all copy/reallocation paths | Partial; Windows APIs retained behind bounded adapters |
@@ -143,6 +143,31 @@ These eleven operation groups are unequal and are not a progress percentage.
 They cover the shared owner; the implementation of each independent format
 parser, serializer and rasterizer remains in its named package. All such callers
 must nevertheless use the new owner correctly for this package to close.
+
+### Current document closure checkpoints
+
+The initial table above is a baseline, not the current implementation status.
+A source audit after SetStr and Open identifies three remaining checkpoints:
+
+1. Consolidate FRAME lookup policy and validate one current candidate's Add,
+   Copy, text and Open behavior on both Windows architectures. TIME queries and
+   persistent segment ownership already use safe Rust; FRAME orchestration still
+   retains native search loops and ordered translation adapters.
+2. Migrate SaveAs/export policy coherently, with exact main-file and sidecar-byte
+   comparisons across supported formats and encodings. Current native formatting,
+   filename/file services, time/style casts and codepage adapters need distinct
+   accounting. Existing SSA/ASS/SRT fixtures do not cover the complete export set.
+3. Close the package's ownership and host contract: resolve pre-Open m_simple
+   without inventing a default, review retained boundaries and exceptional domains,
+   retire superseded diagnostic crossings, and complete current boundary/streaming
+   checks plus representative real-host load/edit/seek/reload/close validation.
+
+DOC-01 through DOC-09 have substantial safe ownership or operation implementations;
+that is not nine completed units. DOC-10 still includes substantial native export
+logic, and DOC-11 still needs host integration evidence. The three checkpoints
+are unequal and are not a percentage denominator. The Windows handoff can start
+now from the fork; it does not depend on exhausting all portable implementation
+work. Automated Windows CI gates and human application checks are separate.
 
 ### Review corrections and first integrated increment
 
@@ -1473,6 +1498,57 @@ fixture; the helper declaration is moved before its callers in this increment.
 The new private export adds two unsafe blocks using existing input/output helpers
 and one unsafe function declaration; the portable core remains entirely safe.
 
+### Open lifecycle policy in the safe owner
+
+The experimental Open(CTextFile*) now follows a safe Rust lifecycle protocol.
+The protocol selects parser indices in their existing order, distinguishes an
+empty failed attempt from failure after entries were produced, and preserves
+seek-before-retry-Empty and syntax-warning-before-abort-Empty. It observes the
+live entry count after each parser returns. Even the final empty failed attempt
+still seeks and calls virtual Empty before returning false.
+
+Successful metadata assignments remain ordered native adapters: name, type,
+mode, file encoding, path, then m_simple. The sidecar parser still runs before
+segment rebuild/OnChanged and unknown-style warnings, and its CWebTextFile stays
+alive through those calls and the return. Only after warning completion does
+Rust inspect the live screen size and apply 384x288 when both dimensions are
+zero. A one-zero pair is retained. No document borrow spans any parser, virtual
+callback, file operation or dialog; no rollback or generation guard is added.
+The filename and memory overloads keep their existing outer file handling.
+
+The three private lifecycle exports use a typed owner-bound run and fixed
+eight-byte action/index replies. Protocol/output/handle checks precede changes;
+unsupplied screen metadata leaves the action pending. Run resources retire after
+admission. This adds two unsafe output blocks and two unsafe declarations using
+existing helpers, with no raw-pointer helper or unsafe registry implementation.
+The portable core remains safe. New allocation and admission timing remain
+qualified; neither this protocol nor its tests resolves pre-Open m_simple.
+
+Five core tests exercise retries, partial-parse abort, sidecar/rebuild/warning
+ordering, callback screen edits, exact fallback and protocol errors. Local Rust
+validation passes 229 core and 121 FFI tests, pinned formatting/Clippy, and
+139 Python tests with four Windows-only skips. Probe generation, lexical checks
+and unchanged eight-file default/RustText preprocessing pass. The prior SetStr checkpoint
+`2a64481a` compiles the full document/lifecycle/style API probes on both Windows
+architectures (run 38657513919, jobs 116170681714 and 116170682013); this also
+confirms the earlier fixture declaration-order correction. Changed-source Open
+runtime evidence remains pending. Five new full-class cases check sidecar
+metadata and entry visibility, the sidecar handle lifetime through callbacks,
+callback-edited screen fallback, filename double Empty and zero-byte rejection
+by all twelve parsers. No new modal or arbitrary malformed parser input is added.
+
+### Verified CopyStyles checkpoint
+
+The [f570 x64 integration archive](rust-document-x64-f570-evidence.json) verifies
+run 38655399588/job 116163841016 against the exact CopyStyles commit. Four
+identical 3,912-line lifecycle traces include all eight new CopyStyles states;
+16 style API executions, 209 style values and the existing COM checks pass.
+Rendering reports cover 814 corpus cases/8,586 frames, 32 mutations/224 frames
+and the smoke case. Retained source/header/binary/trace and frame-hash metadata
+were independently checked. Pixel files were not retained, so exact pixel-byte
+comparison remains runner-reported. This archive provides no credit for later
+text, preparation, SetStr or Open changes and does not close x86/real-host gates.
+
 ### Newly verified x64 integration and preparation evidence
 
 [The retained x64 evidence](rust-document-x64-7f-evidence.json) for `7f3e5c9c`,
@@ -1581,13 +1657,13 @@ Neither count measures the amount of application behavior replaced.
 The reproducible [Rust unsafe inventory](rust-unsafe-inventory.json) uses
 `python3 tools/compat/audit_rust_boundary.py OUTPUT.json`. It masks comments and
 literals, separates cfg(test) items, and includes all platform/feature branches.
-At the current frozen working-tree sources based on `e6678f23` (exact file
+At the current frozen working-tree sources based on `2a64481a` (exact file
 hashes recorded by the regenerated inventory):
 
 | Layer | Production source inventory | Meaning |
 | --- | --- | --- |
-| `rust/compat` | 0 unsafe blocks/functions/impls; 8,547 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
-| `rust/ffi` | 375 explicit unsafe blocks, 312 unsafe function declarations, two unsafe impls (allocator and registry admission); 6,020 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
+| `rust/compat` | 0 unsafe blocks/functions/impls; 8,655 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
+| `rust/ffi` | 377 explicit unsafe blocks, 314 unsafe function declarations, two unsafe impls (allocator and registry admission); 6,126 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
 | Tests | 119 unsafe blocks in FFI tests | Exercise valid and deliberately bounded ownership/alias/initialization contracts; not production code |
 
 Unsafe-function declarations and blocks overlap and must not be added as

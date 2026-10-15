@@ -225,6 +225,18 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_remove_entries_v1(uint64_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_animation_or_v1(uint64_t, uint32_t segment, uint32_t animated);
 // No rebuild. Result: applied:u32, reserved-zero:u32, end:i64 (zero if absent).
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_correct_last_end_v1(uint64_t, int64_t bound, uint8_t*, size_t);
+// Open lifecycle control only; all parsing, dialogs, virtual callbacks and
+// ordered success-header publication remain native. Begin binds a live owner without
+// mutation; parser count must fit INT_MAX. Step output8 is action:u32,index:u32.
+// Ack -2 reads current action, -1 acknowledges non-parse, 0/1 parser result.
+// Actions: 0 InitialEmpty, 1 CapturePosition, 2 Parse, 3 SyntaxWarning, 4 Seek,
+// 5 RetryEmpty, 6 AbortEmpty, 7 SuccessHeader, 8 Sidecar, 9 Rebuild,
+// 10 UnknownStyles, 11 DoneFalse, 12 DoneTrue. Index is used only by Parse/Header.
+// Acknowledging UnknownStyles applies the live both-zero screen fallback; no
+// callback executes under admission. Missing screen leaves the phase unchanged.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_open_lifecycle_begin_v1(uint64_t owner,uint32_t parser_count,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_open_lifecycle_step_v1(uint64_t run,int32_t ack,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_open_lifecycle_drop_v1(uint64_t run);
 // CopyStyles typed run binds destination and source. Open performs no mutation;
 // first step initializes/clears and returns Advanced before reading source rows.
 // Step output8 is snapshot ID; packet16: action:u32(0Done/1Advanced/2NeedSuffix),

@@ -4886,6 +4886,92 @@ static size_t CountLines(CTextFile* f, ULONGLONG from, ULONGLONG to, CString& s 
 
 bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    XyRust::OpenLifecycle run(*m_document, static_cast<uint32_t>(nOpenFuncts));
+    auto operation = run.Next();
+    ULONGLONG pos = 0;
+    const TCHAR* func_name[]={
+        TEXT("OpenSubStationAlpha"), TEXT("OpenSubRipper"), TEXT("OpenOldSubRipper"),
+        TEXT("OpenSubViewer"), TEXT("OpenMicroDVD"), TEXT("OpenSami"), TEXT("OpenVTT"),
+        TEXT("OpenVPlayer"), TEXT("OpenXombieSub"), TEXT("OpenUSF"), TEXT("OpenMPL2"), TEXT("OpenRealText")};
+    for(;;)
+    {
+        switch(operation.kind)
+        {
+        case XyRust::OpenLifecycle::InitialEmpty:
+        case XyRust::OpenLifecycle::RetryEmpty:
+        case XyRust::OpenLifecycle::AbortEmpty:
+            Empty();
+            operation = run.Next(-1);
+            break;
+        case XyRust::OpenLifecycle::CapturePosition:
+            pos = f->GetPosition();
+            operation = run.Next(-1);
+            break;
+        case XyRust::OpenLifecycle::Parse:
+        {
+            const uint32_t i = operation.index;
+            XY_LOG_INFO("Open '"<<f->GetFilePath().GetString()<<"' with "<<func_name[i]<<" begin" );
+            const bool parsed = OpenFuncts[i].open(f, *this, CharSet);
+            operation = run.Next(parsed ? 1 : 0);
+            break;
+        }
+        case XyRust::OpenLifecycle::SyntaxWarning:
+        {
+            CString lastLine;
+            size_t n = CountLines(f, pos, f->GetPosition(), lastLine);
+            CString msg;
+            msg.Format(_T("Unable to parse the subtitle file. Syntax error at line %Iu:\n\"%s\""), n + 1, lastLine);
+            AfxMessageBox(msg, MB_OK | MB_ICONERROR);
+            operation = run.Next(-1);
+            break;
+        }
+        case XyRust::OpenLifecycle::Seek:
+            f->Seek(pos, CFile::begin);
+            operation = run.Next(-1);
+            break;
+        case XyRust::OpenLifecycle::SuccessHeader:
+        {
+            const uint32_t i = operation.index;
+            XY_LOG_INFO("Open '"<<f->GetFilePath().GetString()<<"' with "<<func_name[i]<<" succeeded" );
+            SetDocumentName(name);
+            SetDocumentType(OpenFuncts[i].type);
+            SetDocumentMode(OpenFuncts[i].mode);
+            SetDocumentEncoding(f->GetEncoding());
+            SetDocumentPath(f->GetFilePath());
+            m_simple = i > 0;
+            operation = run.Next(-1);
+            // Preserve the sidecar file lifetime through rebuild and warnings.
+            CWebTextFile f2(CTextFile::UTF8);
+            for(;;)
+            {
+                switch(operation.kind)
+                {
+                case XyRust::OpenLifecycle::Sidecar:
+                    if(f2.Open(f->GetFilePath() + _T(".style")))
+                        OpenSubStationAlpha(&f2, *this, CharSet);
+                    break;
+                case XyRust::OpenLifecycle::Rebuild:
+                    CreateSegments();
+                    break;
+                case XyRust::OpenLifecycle::UnknownStyles:
+                    ChangeUnknownStylesToDefault();
+                    break;
+                case XyRust::OpenLifecycle::DoneTrue:
+                    return(true);
+                default:
+                    XyRust::DocumentDetail::Shape(false);
+                }
+                operation = run.Next(-1);
+            }
+        }
+        case XyRust::OpenLifecycle::DoneFalse:
+            return(false);
+        default:
+            XyRust::DocumentDetail::Shape(false);
+        }
+    }
+#else
     Empty();
 
     ULONGLONG pos = f->GetPosition();
@@ -4971,6 +5057,7 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
     }
 
     return(false);
+#endif
 }
 
 bool CSimpleTextSubtitle::Open(BYTE* data, int len, int CharSet, CString name)

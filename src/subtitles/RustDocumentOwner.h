@@ -234,6 +234,7 @@ template<class Style = STSStyle> inline Style StyleValue(const Bytes& bytes) {
 } // namespace DocumentDetail
 
 class DocumentOwner;
+class OpenLifecycle;
 class UnknownStylesPass;
 class StyleAddition;
 class NamedStyleCopy;
@@ -275,6 +276,7 @@ struct DocumentTextOperation {
 };
 
 class DocumentOwner {
+    friend class OpenLifecycle;
     friend class UnknownStylesPass;
     friend class StyleAddition;
     friend class NamedStyleCopy;
@@ -644,6 +646,40 @@ public:
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_query_time_v1(id_,mode,time,out.data(),out.size());}));
         DocumentDetail::Shape(DocumentDetail::Load(out,4,4) <= 1 && DocumentDetail::Load(out,12,4) == 0);
         return {DocumentDetail::I32(DocumentDetail::Load(out,0,4)),DocumentDetail::Load(out,4,4) != 0,DocumentDetail::Count(static_cast<size_t>(DocumentDetail::Load(out,8,4)))};
+    }
+};
+// Each operation is fully owned scalar policy state. Native file services,
+// virtual callbacks and parsers execute after registry admission has ended.
+class OpenLifecycle {
+    uint64_t id_ = 0;
+    uint32_t count_;
+public:
+    enum Kind : uint32_t {
+        InitialEmpty=0, CapturePosition=1, Parse=2, SyntaxWarning=3, Seek=4,
+        RetryEmpty=5, AbortEmpty=6, SuccessHeader=7, Sidecar=8, Rebuild=9,
+        UnknownStyles=10, DoneFalse=11, DoneTrue=12
+    };
+    struct Operation { Kind kind; uint32_t index; };
+    OpenLifecycle(const DocumentOwner& owner, uint32_t count) : count_(count) {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_open_lifecycle_begin_v1(
+            owner.id_,count,out.data(),out.size());}));
+        id_ = DocumentDetail::Load(out,0,8);
+    }
+    OpenLifecycle(const OpenLifecycle&) = delete;
+    OpenLifecycle& operator=(const OpenLifecycle&) = delete;
+    ~OpenLifecycle() noexcept {
+        if(id_) { const uint64_t id = id_; id_ = 0;
+            DocumentDetail::Release(DocumentDetail::Invoke([&]{return xy_vsfilter_document_open_lifecycle_drop_v1(id);})); }
+    }
+    Operation Next(int acknowledgement = -2) {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_open_lifecycle_step_v1(
+            id_,acknowledgement,out.data(),out.size());}));
+        const uint32_t kind = static_cast<uint32_t>(DocumentDetail::Load(out,0,4));
+        const uint32_t index = static_cast<uint32_t>(DocumentDetail::Load(out,4,4));
+        DocumentDetail::Shape(kind <= DoneTrue && ((kind == Parse || kind == SuccessHeader) ? index < count_ : index == 0));
+        return {static_cast<Kind>(kind),index};
     }
 };
 // Scoped policy state; the only native work between Step and Resume is the

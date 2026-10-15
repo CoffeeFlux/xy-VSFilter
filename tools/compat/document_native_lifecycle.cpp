@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Full native class lifecycle probe: compile this source separately against the
 // pinned and candidate checkouts' actual static libraries. No copied methods,
-// reference member invalidation, allocator failures, dialogs or rendering.
+// reference member invalidation, allocator failures or rendering. Only bounded
+// scripted unknown-style dialogs; the observer never edits the document.
 #include <stdafx.h> // runner puts the selected checkout's src/subtitles first
 #include <STS.h>
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
@@ -795,6 +796,85 @@ static CStringA ass_fixture(const char* headers) {
     text+="[V4+ Styles]\r\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\r\nStyle: Default,Arial,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1\r\n[Events]\r\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\r\nDialogue: 0,0:00:00.00,0:00:01.00,Default,,0,0,0,,ordinary layout\r\n";
     return text;
 }
+class OpenOrderingDocument : public TraceDocument {
+public:
+    const char* stage=NULL;
+    unsigned notifications=0;
+    int expectedEntries=1;
+    CSize expectedScreen=CSize(0,0);
+    exttype expectedType=EXTSRT;
+    CString expectedName,fixturePath,sidecarPath;
+    bool sidecar=false,changeScreen=false;
+    OpenOrderingDocument():TraceDocument(0){}
+protected:
+    void OnChanged() override {
+        ++notifications;
+        check(stage&&Mode()==TIME&&Type()==expectedType&&Encoding()==CTextFile::UTF8,"Open callback interpretation assigned before notification");
+        check(m_simple==(expectedType==EXTSRT),"Open callback observes initialized parser simple flag");
+        check(Entries()==size_t(expectedEntries)&&Segments()==1&&Screen()==expectedScreen,"Open callback observes parsed records/segments and pre-fallback screen");
+        check(same_identity(Name(),expectedName)&&Path().Right(fixturePath.GetLength())==fixturePath,"Open callback observes assigned name/path");
+        check(Wrap()==(sidecar?1:0)&&Collisions()==(sidecar?1:0)&&Scaled()==sidecar,"sidecar script metadata precedes callback");
+        if(sidecar){
+            check(NamedCount()==1,"sidecar style exists before callback");
+            HANDLE handle=CreateFile(sidecarPath,GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+            const DWORD error=GetLastError();if(handle!=INVALID_HANDLE_VALUE)CloseHandle(handle);
+            check(handle==INVALID_HANDLE_VALUE&&error==ERROR_SHARING_VIOLATION,"native sidecar file remains open through callback");
+        }
+        const CSize before=Screen();if(changeScreen)Screen(CSize(0,177));
+        printf("open-order-callback %s entries=%zu segments=%zu screen-before=%ld,%ld screen-after=%ld,%ld wrap=%d collisions=%d scaled=%d simple=%d sidecar-held=%d\n",
+            stage,Entries(),Segments(),before.cx,before.cy,Screen().cx,Screen().cy,Wrap(),Collisions(),Scaled(),m_simple,sidecar);
+        // No base tracing callback: filename overload's real native path is
+        // checked above but never leaked into paired path-independent output.
+    }
+};
+static void write_open_fixture(const CString& path,const CStringA& data) {
+    CFile file;check(file.Open(path,CFile::modeCreate|CFile::modeWrite|CFile::typeBinary)!=FALSE,"write Open fixture");
+    if(!data.IsEmpty())file.Write(data.GetString(),data.GetLength());
+}
+static void open_order_lifecycle() {
+    const CStringA srt("1\r\n00:00:00,000 --> 00:00:01,000\r\nordinary Open\r\n\r\n");
+    auto textCase=[&](const char* label,bool sidecar,bool changeScreen){
+        OpenOrderingDocument doc;SavedFiles fixture(L"document-lifecycle-open-order.srt");write_open_fixture(fixture.name,srt);
+        doc.stage=label;doc.expectedName=CString(L"Open order");doc.fixturePath=fixture.name;
+        doc.sidecar=sidecar;doc.changeScreen=changeScreen;doc.expectedEntries=sidecar?2:1;
+        doc.expectedScreen=sidecar?CSize(720,480):CSize(0,0);
+        if(sidecar){doc.sidecarPath=fixture.name+L".style";
+            write_open_fixture(doc.sidecarPath,ass_fixture("PlayResX: 720\r\nPlayResY: 480\r\nWrapStyle: 1\r\nCollisions: Reverse\r\nScaledBorderAndShadow: yes\r\n"));}
+        FixtureTextFile input(CTextFile::UTF8);check(input.Open(fixture.name),"Open order SRT input");input.SetFixturePath(fixture.name);
+        const unsigned empties=empty_events[0];const bool result=doc.Open(&input,ANSI_CHARSET,doc.expectedName);
+        check(result&&empty_events[0]-empties==2&&doc.notifications==1,"SRT Open initial Empty plus failed ASS cleanup before success");
+        const CSize expected=sidecar?CSize(720,480):changeScreen?CSize(0,177):CSize(384,288);
+        check(doc.Screen()==expected,"Open fallback reads live pair and requires both axes zero");
+        if(sidecar){HANDLE handle=CreateFile(doc.sidecarPath,GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+            check(handle!=INVALID_HANDLE_VALUE,"native sidecar file released after Open return");CloseHandle(handle);}
+        printf("open-order-stage %s result=%d empties=%u callbacks=%u entries=%zu segments=%zu screen=%ld,%ld sidecar-released=%d\n",
+            label,result,empty_events[0]-empties,doc.notifications,doc.Entries(),doc.Segments(),doc.Screen().cx,doc.Screen().cy,sidecar);
+    };
+    textCase("open-sidecar",true,false);
+    textCase("open-fallback-zero",false,false);
+    textCase("open-fallback-live",false,true);
+    {
+        OpenOrderingDocument doc;SavedFiles fixture(L"document-lifecycle-open-filename.ass");
+        write_open_fixture(fixture.name,ass_fixture("PlayResX: 640\r\nPlayResY: 360\r\n"));
+        doc.stage="open-filename";doc.fixturePath=fixture.name;doc.expectedName=CString(L"filename Open");doc.expectedType=EXTSSA;doc.expectedScreen=CSize(640,360);
+        const unsigned empties=empty_events[0];const bool result=doc.Open(fixture.name,ANSI_CHARSET,doc.expectedName);
+        check(result&&empty_events[0]-empties==2&&doc.notifications==1,"filename overload and text overload each call virtual Empty");
+        printf("open-order-stage open-filename result=%d empties=%u callbacks=%u entries=%zu segments=%zu screen=%ld,%ld sidecar-released=0\n",
+            result,empty_events[0]-empties,doc.notifications,doc.Entries(),doc.Segments(),doc.Screen().cx,doc.Screen().cy);
+    }
+    {
+        // Zero bytes: every parser read loop is skipped. VTT rejects its empty
+        // initialized prefix, USF never instantiates an XML parser, RealText's
+        // empty timeline guards avoid back(). No partial parse/modal path.
+        OpenOrderingDocument doc;SavedFiles fixture(L"document-lifecycle-open-empty.txt");write_open_fixture(fixture.name,CStringA());
+        FixtureTextFile input(CTextFile::UTF8);check(input.Open(fixture.name),"zero-byte Open input");input.SetFixturePath(fixture.name);
+        const unsigned empties=empty_events[0];const bool result=doc.Open(&input,ANSI_CHARSET,CString(L"empty Open"));
+        check(!result&&empty_events[0]-empties==13&&doc.notifications==0&&doc.Entries()==0&&doc.Segments()==0&&input.GetPosition()==0,"all twelve parsers reject with rewind/Empty and no callback");
+        printf("open-order-stage open-rejected result=0 empties=%u callbacks=0 entries=0 segments=0 screen=%ld,%ld sidecar-released=0 position=%llu\n",
+            empty_events[0]-empties,doc.Screen().cx,doc.Screen().cy,input.GetPosition());
+    }
+}
+
 static void layout_open(const char* label,const char* headers,const CSize& expected,int wrap,int collisions,bool scaled,const CSize& callbackSize) {
     TraceDocument doc(0);SavedFiles fixture(L"document-lifecycle-layout.ass");
     const CStringA text=ass_fixture(headers);
@@ -1438,6 +1518,7 @@ int main() {
         layout_lifecycle();
         interpretation_lifecycle();
         identity_lifecycle();
+        open_order_lifecycle();
         named_style_lifecycle();
         prepared_style_conflicts();
         add_style_session_lifecycle();

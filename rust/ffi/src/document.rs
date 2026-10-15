@@ -93,6 +93,89 @@ fn insert(resource: Resource) -> Result<u64, u32> {
     }
 }
 
+fn open_error(error: xy_vsfilter_compat::document_open::Error) -> u32 {
+    use xy_vsfilter_compat::document_open::Error;
+    match error {
+        Error::MissingParserResult | Error::UnexpectedParserResult | Error::Finished => {
+            INVALID_INPUT
+        }
+        Error::UnsuppliedScreen => UNRESOLVED_REFERENCE,
+    }
+}
+/// # Safety
+/// Output receives a typed run ID in eight writable bytes. No owner mutation.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_open_lifecycle_begin_v1(
+    owner: u64,
+    parser_count: u32,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    if parser_count > i32::MAX as u32 {
+        return COUNT_OVERFLOW;
+    }
+    let resource = Resource::OpenRun {
+        owner,
+        run: xy_vsfilter_compat::document_open::Run::new(parser_count),
+    };
+    let result = DOCUMENTS.try_with(|registry| {
+        if let Err(error) = registry.document(owner) {
+            return Err((error, resource));
+        }
+        registry.insert(resource)
+    });
+    let id = match result {
+        Ok(Ok(id)) => id,
+        Ok(Err((error, resource))) => {
+            drop(resource);
+            return registry_error(error);
+        }
+        Err(error) => return registry_error(error),
+    };
+    // SAFETY: validated output, registry admission has ended.
+    unsafe {
+        write_output(output, &id.to_le_bytes());
+    }
+    OK
+}
+/// # Safety
+/// Output receives action:u32,index:u32 in eight writable bytes. Ack -2 peeks,
+/// -1 acknowledges a non-parse action, 0/1 supplies a parser result.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_open_lifecycle_step_v1(
+    id: u64,
+    ack: i32,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    if !(-2..=1).contains(&ack) {
+        return INVALID_INPUT;
+    }
+    let action = required!(admitted(|registry| {
+        let (document, run) = registry.open_pair(id).map_err(registry_error)?;
+        if ack == -2 {
+            Ok(run.action())
+        } else {
+            run.advance(document, if ack == -1 { None } else { Some(ack != 0) })
+                .map_err(open_error)
+        }
+    }));
+    let mut bytes = [0u8; 8];
+    bytes[..4].copy_from_slice(&(action.kind as u32).to_le_bytes());
+    bytes[4..].copy_from_slice(&action.index.to_le_bytes());
+    // SAFETY: all fallible output checks precede advance; no reference escapes.
+    unsafe {
+        write_output(output, &bytes);
+    }
+    OK
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_open_lifecycle_drop_v1(id: u64) -> u32 {
+    status(DOCUMENTS.destroy(id, Kind::OpenRun).map_err(registry_error))
+}
+
 fn style_copy_error(error: xy_vsfilter_compat::document_style_copy::ErrorKind) -> u32 {
     use xy_vsfilter_compat::document_style_copy::ErrorKind as Error;
     match error {
@@ -1951,6 +2034,124 @@ mod tests {
             assert_eq!(state(suffix_owner).entries()[0].text, [92, 78, 0, 10, 0]);
             assert_eq!(state(suffix_owner).entries()[0].style, [65]);
             assert_eq!(xy_vsfilter_document_destroy_v1(suffix_owner), OK);
+
+            let open_owner = create();
+            let mut output = [0xa5; 8];
+            let before = state(open_owner);
+            assert_eq!(
+                xy_vsfilter_document_open_lifecycle_begin_v1(open_owner, 1, output.as_mut_ptr(), 7),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_open_lifecycle_begin_v1(
+                    open_owner,
+                    i32::MAX as u32 + 1,
+                    output.as_mut_ptr(),
+                    8
+                ),
+                COUNT_OVERFLOW
+            );
+            assert_eq!(output, [0xa5; 8]);
+            assert_eq!(state(open_owner), before);
+            assert_eq!(
+                xy_vsfilter_document_open_lifecycle_begin_v1(open_owner, 1, output.as_mut_ptr(), 8),
+                OK
+            );
+            let open_run = u64::from_le_bytes(output);
+            assert_eq!(state(open_owner), before);
+            let peek = |id| {
+                let mut bytes = [0u8; 8];
+                assert_eq!(
+                    xy_vsfilter_document_open_lifecycle_step_v1(id, -2, bytes.as_mut_ptr(), 8),
+                    OK
+                );
+                bytes
+            };
+            assert_eq!(peek(open_run), [0; 8]);
+            let mut sentinel = [0xa5; 8];
+            assert_eq!(
+                xy_vsfilter_document_open_lifecycle_step_v1(open_run, 2, sentinel.as_mut_ptr(), 8),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_open_lifecycle_step_v1(open_run, 0, sentinel.as_mut_ptr(), 8),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_open_lifecycle_step_v1(open_run, -1, sentinel.as_mut_ptr(), 7),
+                INVALID_INPUT
+            );
+            assert_eq!(sentinel, [0xa5; 8]);
+            assert_eq!(peek(open_run), [0; 8]);
+            assert_eq!(
+                xy_vsfilter_document_open_lifecycle_step_v1(
+                    open_owner,
+                    -2,
+                    sentinel.as_mut_ptr(),
+                    8
+                ),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                xy_vsfilter_document_open_lifecycle_begin_v1(open_run, 1, sentinel.as_mut_ptr(), 8),
+                BAD_HANDLE
+            );
+            for (ack, kind) in [(-1, 1u32), (-1, 2), (1, 7), (-1, 8), (-1, 9), (-1, 10)] {
+                assert_eq!(
+                    xy_vsfilter_document_open_lifecycle_step_v1(
+                        open_run,
+                        ack,
+                        output.as_mut_ptr(),
+                        8
+                    ),
+                    OK
+                );
+                assert_eq!(&output[..4], &kind.to_le_bytes());
+                assert_eq!(&output[4..], &0u32.to_le_bytes());
+                if kind == 2 {
+                    assert_eq!(
+                        xy_vsfilter_document_open_lifecycle_step_v1(
+                            open_run,
+                            -1,
+                            sentinel.as_mut_ptr(),
+                            8
+                        ),
+                        INVALID_INPUT
+                    );
+                }
+            }
+            assert_eq!(
+                xy_vsfilter_document_open_lifecycle_step_v1(open_run, -1, sentinel.as_mut_ptr(), 8),
+                UNRESOLVED_REFERENCE
+            );
+            assert_eq!(sentinel, [0xa5; 8]);
+            assert_eq!(state(open_owner), before);
+            assert_eq!(&peek(open_run)[..4], &10u32.to_le_bytes());
+            assert_eq!(
+                xy_vsfilter_document_set_script_size_v1(open_owner, 0, 0),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_open_lifecycle_step_v1(open_run, -1, output.as_mut_ptr(), 8),
+                OK
+            );
+            assert_eq!(&output[..4], &12u32.to_le_bytes());
+            assert_eq!(state(open_owner).script_size(), Some([384, 288]));
+            assert_eq!(
+                xy_vsfilter_document_open_lifecycle_step_v1(open_run, -1, sentinel.as_mut_ptr(), 8),
+                INVALID_INPUT
+            );
+            assert_eq!(&peek(open_run)[..4], &12u32.to_le_bytes());
+            assert_eq!(xy_vsfilter_document_destroy_v1(open_owner), OK);
+            assert_eq!(
+                xy_vsfilter_document_open_lifecycle_step_v1(open_run, -2, sentinel.as_mut_ptr(), 8),
+                BAD_HANDLE
+            );
+            assert_eq!(xy_vsfilter_document_open_lifecycle_drop_v1(open_run), OK);
+            assert_eq!(
+                xy_vsfilter_document_open_lifecycle_drop_v1(open_run),
+                BAD_HANDLE
+            );
 
             let write_owner = create();
             assert_eq!(add(write_owner, 0, &entry(0, 10)).0, OK);
