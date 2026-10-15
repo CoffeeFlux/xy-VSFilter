@@ -1229,25 +1229,6 @@ void CSimpleTextSubtitle::CreateSegments()
     OnChanged();
 }
 
-bool CSimpleTextSubtitle::Open(CString fn, int CharSet, CString name)
-{
-    Empty();
-
-    CTextFile f(CTextFile::UTF8);
-    if(!f.Open(fn)) return(false);
-
-    fn.Replace('\\', '/');
-    if(name.IsEmpty())
-    {
-        name = fn.Left(fn.ReverseFind('.'));
-        name = name.Mid(name.ReverseFind('/')+1);
-        name = name.Mid(name.ReverseFind('.')+1);
-    }
-
-    return(Open(&f, CharSet, name));
-}
-
-
 bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
 {
     Empty();
@@ -1272,14 +1253,6 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
         m_name = name;
         m_mode = OpenFuncts[i].mode;
         m_encoding = f->GetEncoding();
-        m_path = f->GetFilePath();
-
-        if(!m_path.IsEmpty())
-        {
-            CTextFile f2(CTextFile::UTF8);
-            if(f2.Open(m_path + _T(".style")))
-                OpenSubStationAlpha(&f2, *this, CharSet);
-        }
 
         //      Sort();
         CreateSegments();

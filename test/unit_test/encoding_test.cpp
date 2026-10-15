@@ -1,6 +1,6 @@
-// Checks that subtitles opened from memory (csri_open_mem, as used by Aegisub
-// and for embedded subtitle streams) render exactly like the same script
-// opened from a file, for each of the text encodings CTextFile detects.
+// Checks that a script re-encoded into each of the text encodings CTextFile
+// detects (UTF-8, UTF-16LE and UTF-16BE, each with a BOM) renders exactly like
+// the original.
 //
 // Scripts are read from the directory named by the XY_TEST_DATA environment
 // variable (default: "test", relative to the working directory).
@@ -54,17 +54,6 @@ namespace
         return true;
     }
 
-    bool WriteAll(const std::wstring& path, const std::vector<BYTE>& data)
-    {
-        FILE* f = NULL;
-        if (_wfopen_s(&f, path.c_str(), L"wb") != 0 || !f) {
-            return false;
-        }
-        bool ok = data.empty() || fwrite(&data[0], 1, data.size(), f) == data.size();
-        fclose(f);
-        return ok;
-    }
-
     enum Variant { AS_IS, UTF8_BOM, UTF16LE_BOM, UTF16BE_BOM, VARIANT_COUNT };
     const char* const kVariantNames[] = { "as-is", "UTF-8 BOM", "UTF-16LE BOM", "UTF-16BE BOM" };
 
@@ -88,6 +77,17 @@ namespace
             MultiByteToWideChar(CP_UTF8, 0, p, len, &wide[0], n);
         }
         return wide;
+    }
+
+    // A script without a BOM that isn't valid UTF-8 is read byte by byte by the
+    // renderer, which re-encoding can't preserve.
+    bool CanReencode(const std::vector<BYTE>& src)
+    {
+        if (src.size() >= 2 && (src[0] == 0xff && src[1] == 0xfe || src[0] == 0xfe && src[1] == 0xff)) {
+            return true;
+        }
+        return src.empty() || MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS,
+            (const char*)&src[0], (int)src.size(), NULL, 0) > 0;
     }
 
     // Re-encodes a script into the given variant.
@@ -145,9 +145,14 @@ namespace
         frame.strides[0] = kWidth * 4;
         csri_render(inst, &frame, time);
     }
+
+    csri_inst* OpenMem(csri_rend* rend, const std::vector<BYTE>& data)
+    {
+        return csri_open_mem(rend, data.empty() ? NULL : &data[0], data.size(), NULL);
+    }
 }
 
-TEST(MemoryOpen, RendersLikeFileOpen)
+TEST(Encodings, RenderLikeOriginal)
 {
     std::vector<std::wstring> scripts = ListScripts(DataDir());
     ASSERT_FALSE(scripts.empty()) << "no .ass scripts found in " << Narrow(DataDir());
@@ -155,56 +160,59 @@ TEST(MemoryOpen, RendersLikeFileOpen)
     csri_rend* rend = csri_renderer_default();
     ASSERT_TRUE(rend != NULL);
 
-    wchar_t tempDir[MAX_PATH];
-    ASSERT_NE(0u, GetTempPathW(MAX_PATH, tempDir));
-    const std::wstring tempPath = std::wstring(tempDir) + L"xy_memory_open_test.ass";
-
-    int opened = 0, frames = 0, nonEmptyFrames = 0;
-    std::vector<BYTE> fileFrame, memFrame;
+    int opened = 0, skipped = 0, frames = 0, nonEmptyFrames = 0;
+    std::vector<BYTE> originalFrame, encodedFrame;
+    csri_fmt fmt = { CSRI_F_BGR_, kWidth, kHeight };
 
     for (size_t i = 0; i < scripts.size(); i++) {
         std::vector<BYTE> original;
         ASSERT_TRUE(ReadAll(scripts[i], original)) << Narrow(scripts[i]);
 
-        for (int v = 0; v < VARIANT_COUNT; v++) {
+        csri_inst* orig = OpenMem(rend, original);
+        EXPECT_TRUE(orig != NULL) << Narrow(scripts[i]) << " does not open";
+        if (!orig) {
+            continue;
+        }
+        opened++;
+        ASSERT_EQ(0, csri_request_fmt(orig, &fmt));
+        if (!CanReencode(original)) {
+            printf("%s isn't UTF-8 or UTF-16; not re-encoded\n", Narrow(scripts[i]).c_str());
+            skipped += VARIANT_COUNT - 1;
+            csri_close(orig);
+            continue;
+        }
+
+        for (int v = AS_IS + 1; v < VARIANT_COUNT; v++) {
             SCOPED_TRACE(Narrow(scripts[i]) + " (" + kVariantNames[v] + ")");
 
             std::vector<BYTE> data = Encode(original, (Variant)v);
-            ASSERT_TRUE(WriteAll(tempPath, data));
+            csri_inst* encoded = OpenMem(rend, data);
+            EXPECT_TRUE(encoded != NULL) << "does not open";
 
-            csri_inst* fromFile = csri_open_file(rend, Narrow(tempPath).c_str(), NULL);
-            csri_inst* fromMem = csri_open_mem(rend, data.empty() ? NULL : &data[0], data.size(), NULL);
-            EXPECT_TRUE(fromFile != NULL) << "does not open from a file";
-            EXPECT_TRUE(fromMem != NULL) << "does not open from memory";
-
-            if (fromFile && fromMem) {
+            if (encoded) {
                 opened++;
-                csri_fmt fmt = { CSRI_F_BGR_, kWidth, kHeight };
-                ASSERT_EQ(0, csri_request_fmt(fromFile, &fmt));
-                ASSERT_EQ(0, csri_request_fmt(fromMem, &fmt));
+                ASSERT_EQ(0, csri_request_fmt(encoded, &fmt));
 
                 for (double t = 0; t < 60; t += 2) {
-                    RenderFrame(fromFile, t, fileFrame);
-                    RenderFrame(fromMem, t, memFrame);
-                    ASSERT_TRUE(fileFrame == memFrame) << "frame at " << t << "s differs";
+                    RenderFrame(orig, t, originalFrame);
+                    RenderFrame(encoded, t, encodedFrame);
+                    ASSERT_TRUE(originalFrame == encodedFrame) << "frame at " << t << "s differs";
                     frames++;
-                    if (std::find_if(fileFrame.begin(), fileFrame.end(),
-                                     [](BYTE b) { return b != 0; }) != fileFrame.end()) {
+                    if (std::find_if(originalFrame.begin(), originalFrame.end(),
+                                     [](BYTE b) { return b != 0; }) != originalFrame.end()) {
                         nonEmptyFrames++;
                     }
                 }
             }
 
-            csri_close(fromFile);
-            csri_close(fromMem);
+            csri_close(encoded);
         }
+        csri_close(orig);
     }
 
-    DeleteFileW(tempPath.c_str());
+    printf("%d of %d script variants opened (%d skipped); %d frames compared, %d with subtitles\n",
+        opened, (int)scripts.size() * VARIANT_COUNT - skipped, skipped, frames, nonEmptyFrames);
 
-    printf("%d of %d script variants opened; %d frames compared, %d with subtitles\n",
-        opened, (int)scripts.size() * VARIANT_COUNT, frames, nonEmptyFrames);
-
-    // Guard against both paths silently rendering nothing.
+    // Guard against every variant silently rendering nothing.
     EXPECT_GT(nonEmptyFrames, 0);
 }

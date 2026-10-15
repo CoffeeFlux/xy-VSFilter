@@ -58,7 +58,7 @@
       <AssemblerOutput>AssemblyAndSourceCode</AssemblerOutput>
     </ClCompile>
     <ClCompile Include="interned_test.cpp" />
-    <ClCompile Include="memory_open_test.cpp" />
+    <ClCompile Include="encoding_test.cpp" />
     <ClCompile Include="overall_test.cpp" />
   </ItemGroup>
   <ItemGroup>

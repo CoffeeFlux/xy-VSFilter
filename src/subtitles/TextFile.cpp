@@ -21,8 +21,6 @@
 
 #include "stdafx.h"
 
-#include <share.h>
-
 #include "TextFile.h"
 #include "Utf8.h"
 
@@ -32,62 +30,17 @@ CTextFile::CTextFile(enc e)
 , m_offset(0)
 , m_bufferPos(0)
 , m_bufferCount(0)
-, m_file(NULL)
-, m_inMemory(false)
 , m_memData(NULL)
 , m_memLen(0)
 , m_memPos(0)
 {
 }
 
-CTextFile::~CTextFile()
-{
-	Close();
-}
-
-bool CTextFile::Open(LPCTSTR lpszFileName)
-{
-	Close();
-	m_inMemory = false;
-
-	// Binary, read-only, letting others read and write it meanwhile
-	m_file = _tfsopen(lpszFileName, _T("rb"), _SH_DENYNO);
-	if (!m_file) {
-		return false;
-	}
-
-	DWORD len = GetFullPathName(lpszFileName, 0, NULL, NULL);
-	if (len && GetFullPathName(lpszFileName, len, m_strFileName.GetBuffer(len), NULL) < len) {
-		m_strFileName.ReleaseBuffer();
-	} else {
-		m_strFileName.ReleaseBuffer(0);
-		m_strFileName = lpszFileName;
-	}
-
-	if (!DetectEncoding()) {
-		return Close(), false;
-	}
-
-	return true;
-}
-
-void CTextFile::Close()
-{
-	if (m_file) {
-		fclose(m_file);
-		m_file = NULL;
-	}
-	m_strFileName.Empty();
-}
-
 bool CTextFile::OpenMemory(const void* pData, size_t len)
 {
-	Close();
-	m_inMemory = true;
 	m_memData = static_cast<const BYTE*>(pData);
 	m_memLen = pData ? len : 0;
 	m_memPos = 0;
-	m_strFileName.Empty();
 
 	return DetectEncoding();
 }
@@ -147,14 +100,10 @@ bool CTextFile::IsUnicode()
 	return m_encoding != DEFAULT_ENCODING;
 }
 
-// Raw access to the underlying file or memory buffer
+// Raw access to the underlying memory buffer
 
 UINT CTextFile::RawRead(void* lpBuf, UINT nCount)
 {
-	if (!m_inMemory) {
-		return (UINT)fread(lpBuf, 1, nCount, m_file);
-	}
-
 	size_t left = m_memLen - m_memPos;
 	if (nCount > left) {
 		nCount = (UINT)left;
@@ -168,35 +117,18 @@ UINT CTextFile::RawRead(void* lpBuf, UINT nCount)
 
 ULONGLONG CTextFile::RawGetPosition() const
 {
-	return m_inMemory ? m_memPos : _ftelli64(m_file);
+	return m_memPos;
 }
 
 ULONGLONG CTextFile::RawGetLength() const
 {
-	if (m_inMemory) {
-		return m_memLen;
-	}
-	__int64 pos = _ftelli64(m_file);
-	_fseeki64(m_file, 0, SEEK_END);
-	__int64 len = _ftelli64(m_file);
-	_fseeki64(m_file, pos, SEEK_SET);
-	return len;
+	return m_memLen;
 }
 
 ULONGLONG CTextFile::RawSeek(ULONGLONG pos)
 {
-	if (!m_inMemory) {
-		_fseeki64(m_file, pos, SEEK_SET);
-		return _ftelli64(m_file);
-	}
-
 	m_memPos = (size_t)min(pos, (ULONGLONG)m_memLen);
 	return m_memPos;
-}
-
-CString CTextFile::GetFilePath() const
-{
-	return m_strFileName;
 }
 
 ULONGLONG CTextFile::GetPosition() const

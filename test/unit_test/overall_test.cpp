@@ -1,5 +1,6 @@
 #define CSRIAPI extern "C" __declspec(dllimport)
 #include "csri.h"
+#include <stdio.h>
 #include <vector>
 
 using namespace std;
@@ -11,7 +12,17 @@ void OpenTestScript( const char *filename )
 {
     csri_rend * csri_rend_xxx = csri_renderer_default();
 
-    g_csri_inst_yyy = csri_open_file(csri_rend_xxx, filename, NULL);
+    FILE* f = NULL;
+    if (fopen_s(&f, filename, "rb") != 0 || !f)
+        return;
+    vector<unsigned char> data;
+    unsigned char buf[4096];
+    size_t n;
+    while ((n = fread(buf, 1, sizeof(buf), f)) > 0)
+        data.insert(data.end(), buf, buf + n);
+    fclose(f);
+
+    g_csri_inst_yyy = csri_open_mem(csri_rend_xxx, data.empty() ? NULL : &data[0], data.size(), NULL);
 }
 
 bool TestScriptOpened()

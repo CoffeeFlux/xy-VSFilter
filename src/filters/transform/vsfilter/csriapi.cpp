@@ -38,30 +38,11 @@ typedef struct csri_vsfilter_inst csri_inst;
 static csri_rend csri_vsfilter = "vsfilter";
 
 
+// Scripts are only opened from memory (csri_open_mem). This export stays
+// because CSRI loaders skip a renderer DLL that doesn't have it.
 CSRIAPI csri_inst *csri_open_file(csri_rend *renderer, const char *filename, struct csri_openflag *flags)
 {
-	int namesize;
-	wchar_t *namebuf;
-
-	namesize = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
-	if (!namesize)
-		return 0;
-	namesize++;
-	namebuf = new wchar_t[namesize];
-	MultiByteToWideChar(CP_UTF8, 0, filename, -1, namebuf, namesize);
-
-	csri_inst *inst = new csri_inst();
-	inst->rts = new CRenderedTextSubtitle();
-	if (inst->rts->Open(CString(namebuf), DEFAULT_CHARSET)) {
-		delete[] namebuf;
-		inst->readorder = 0;
-		return inst;
-	} else {
-		delete[] namebuf;
-		delete inst->rts;
-		delete inst;
-		return 0;
-	}
+	return 0;
 }
 
 

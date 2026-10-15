@@ -174,7 +174,6 @@ public:
     CString        m_name;
     tmode          m_mode;
     CTextFile::enc m_encoding;
-    CString        m_path;
 
     CSize          m_dstScreenSize;
     int            m_defaultWrapStyle;
@@ -208,7 +207,6 @@ public:
 
     void CreateSegments();
 
-    bool Open(CString    fn           , int CharSet, CString name = _T(""));
     bool Open(CTextFile* f            , int CharSet, CString name);
     bool Open(BYTE     * data, int len, int CharSet, CString name);
 

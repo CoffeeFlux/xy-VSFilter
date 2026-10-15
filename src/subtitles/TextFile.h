@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <vector>
 
-// Reads text line by line from a file or a memory buffer. The encoding comes
+// Reads text line by line from a memory buffer. The encoding comes
 // from the BOM (UTF-8, UTF-16LE/BE); without one the default encoding is used,
 // and a line that isn't valid UTF-8 is re-read as one character per byte.
 class CTextFile
@@ -51,11 +51,6 @@ private:
 
 	enum charerror {CHARERR_NEED_MORE=-1, CHARERR_REOPEN=-2};
 
-	FILE* m_file;
-	CString m_strFileName;
-
-	// Set by OpenMemory(): read from this buffer instead of the file.
-	bool m_inMemory;
 	const BYTE* m_memData;
 	size_t m_memLen;
 	size_t m_memPos;
@@ -74,20 +69,12 @@ private:
 
 public:
 	CTextFile(enc e = DEFAULT_ENCODING);
-	~CTextFile();
-
-	bool Open(LPCTSTR lpszFileName);
-	void Close();
 
 	// Reads from a caller-owned buffer, which must outlive this object.
-	// GetFilePath() returns an empty string for in-memory data.
 	bool OpenMemory(const void* pData, size_t len);
 
 	enc GetEncoding();
 	bool IsUnicode();
-
-	// Full path of the open file; empty for in-memory data.
-	CString GetFilePath() const;
 
     ULONGLONG GetPosition() const;
 	ULONGLONG GetLength() const;

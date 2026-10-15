@@ -76,10 +76,9 @@ jobs:
       - name: Build unit tests
         run: bash ./build_vsfilter.sh -platform "x64" -compiler VS2022 -voff -proj unit_test
 
-      # OverallTest needs a script argument and is skipped; MemoryOpen compares
-      # every test/*.ass rendered from a file against the same script from memory,
-      # Blit checks the frame copies and colorspace conversions, and Interned checks
-      # the value interning the subtitle renderer relies on.
+      # OverallTest needs a script argument and is skipped; Encodings renders every
+      # test/*.ass re-encoded as UTF-8 and UTF-16LE/BE against the original, and
+      # Interned checks the value interning the subtitle renderer relies on.
       - name: Run unit tests
         timeout-minutes: 15
         env:
