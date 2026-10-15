@@ -5220,6 +5220,7 @@ bool CSimpleTextSubtitle::SaveAs(CString fn, exttype et, double fps, CTextFile::
         }
     }
 
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     CStringW fmt =
         et == EXTSRT ? L"%d\n%02d:%02d:%02d,%03d --> %02d:%02d:%02d,%03d\n%s\n\n" :
         et == EXTSUB ? L"{%d}{%d}%s\n" :
@@ -5228,6 +5229,7 @@ bool CSimpleTextSubtitle::SaveAs(CString fn, exttype et, double fps, CTextFile::
         et == EXTSSA ? L"Dialogue: Marked=0,%d:%02d:%02d.%02d,%d:%02d:%02d.%02d,%s,%s,%04d,%04d,%04d,%s,%s\n" :
         et == EXTASS ? L"Dialogue: %d,%d:%02d:%02d.%02d,%d:%02d:%02d.%02d,%s,%s,%04d,%04d,%04d,%s,%s\n" :
                        L"";
+#endif
 //  Sort(true);
 
     for(int i = 0, j = GetEntryCount(), k = 0; i < j; i++)
@@ -5245,6 +5247,7 @@ bool CSimpleTextSubtitle::SaveAs(CString fn, exttype et, double fps, CTextFile::
 
         int t2 = (int)(RT2MS(TranslateEnd(i, fps)) + delay);
 
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
         int hh1 = (t1/60/60/1000);
         int mm1 = (t1/60/1000)%60;
         int ss1 = (t1/1000)%60;
@@ -5254,12 +5257,25 @@ bool CSimpleTextSubtitle::SaveAs(CString fn, exttype et, double fps, CTextFile::
         int ss2 = (t2/1000)%60;
         int ms2 = (t2)%1000;
 
+#endif
         CStringW str = f.IsUnicode()
             ? GetStrW(i, et == EXTSSA || et == EXTASS)
             : GetStrWA(i, et == EXTSSA || et == EXTASS);
 
         CStringW str2;
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        if(et == EXTSUB || et == EXTPSB) str.Replace('\n', '|');
+        else if(et == EXTSMI) str.Replace(L"\n", L"<br>");
+        else if(et == EXTSSA || et == EXTASS) str.Replace(L"\n", L"\\N");
+        // Preserve native casts and margin arithmetic at the formatting boundary.
+        // All CString preparations and file/codepage services remain native.
+        str2 = XyRust::DocumentOwner::FormatExportRow(static_cast<uint32_t>(et), i-k+1, t1, t2,
+            et == EXTSUB ? int(t1*fps/1000) : 0,
+            et == EXTSUB ? int(t2*fps/1000) : 0,
+            (et == EXTSSA || et == EXTASS) ? (stse.marginRect.top + stse.marginRect.bottom) / 2 : 0,
+            stse, str);
+#else
         if(et == EXTSRT)
         {
             str2.Format(fmt, i-k+1, hh1, mm1, ss1, ms1, hh2, mm2, ss2, ms2, str);
@@ -5301,6 +5317,7 @@ bool CSimpleTextSubtitle::SaveAs(CString fn, exttype et, double fps, CTextFile::
                 stse.effect, str);
         }
 
+#endif
         f.WriteString(str2);
     }
 

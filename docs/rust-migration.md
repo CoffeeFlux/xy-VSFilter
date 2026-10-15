@@ -1567,6 +1567,44 @@ preceding Open checkpoint `5627bc2c` compiles on both architectures in run
 38658367732 (jobs 116173444294 and 116173444486). Two existing-helper unsafe
 output blocks and two unsafe declarations are added; the core remains safe.
 
+### Safe SaveAs body-row serialization
+
+Experimental SaveAs now formats the six supported dialogue/body row layouts in
+safe Rust: SRT, MicroDVD SUB, SAMI, PSB, SSA and ASS. The formatter builds owned
+UTF-16 units directly, preserving minimum-width signed decimal padding, integer
+time decomposition, centisecond truncation and raw `%s` prefixes ending at the
+first NUL. It neither normalizes Unicode nor prepares newlines. Valid enum values
+without a body template still produce empty rows; they are not rejected.
+
+The native loop still freezes its count, skips negative translated starts before
+translating the end or getting text, and supplies SRT numbering. All GetStr/WA,
+CString replacements, frame casts, signed margin arithmetic, header/style/sidecar
+formatting, filenames, codepage conversion and file writes remain in their original
+places. The boundary transports the copied entry with already prepared text and
+returns a raw UTF-16LE snapshot. Formatting and encoding occur outside registry
+admission; replies and temporary native strings own their storage independently.
+
+Five new core tests cover all six exact templates, negative components and
+margins, full integer widths, raw NUL/surrogate fields and output count limits.
+The count bound checks both native CString length and addressable UTF-16 storage
+before extending a row. Local Rust validation passes 239 core and 122 FFI tests;
+FFI byte checks also cover all fourteen valid enum values, overlap staging and
+malformed input/output refusal. This adds two unsafe blocks using existing copy
+and write helpers and one unsafe declaration; the core remains entirely safe.
+The full Python suite passes 141 tests with four skips; pinned formatting and
+Clippy, probe generation, unchanged default/RustText preprocessing and the lexical
+access audit also pass. Eight full SaveAs fixtures capture main and sidecar bytes
+for the six TIME formats, valid unsupported TXT, and FRAME SRT. They check
+negative-start skipping, SRT numbering, embedded-NUL metadata, and unchanged
+entries/segments/animation with no callbacks. Changed-source Windows row/file
+parity remains pending. The preceding FRAME
+checkpoint `30d00248` compiles its full document probes on both architectures in
+run 38659082920 (jobs 116175775797 and 116175776089).
+
+This is body serialization, not complete SaveAs closure. Header and style output,
+export orchestration, remaining CString preparation and native service contracts
+still need their own migration and exact-byte evidence.
+
 ### Verified CopyStyles checkpoint
 
 The [f570 x64 integration archive](rust-document-x64-f570-evidence.json) verifies
@@ -1687,13 +1725,13 @@ Neither count measures the amount of application behavior replaced.
 The reproducible [Rust unsafe inventory](rust-unsafe-inventory.json) uses
 `python3 tools/compat/audit_rust_boundary.py OUTPUT.json`. It masks comments and
 literals, separates cfg(test) items, and includes all platform/feature branches.
-At the current frozen working-tree sources based on `5627bc2c` (exact file
+At the current frozen working-tree sources based on `30d00248` (exact file
 hashes recorded by the regenerated inventory):
 
 | Layer | Production source inventory | Meaning |
 | --- | --- | --- |
-| `rust/compat` | 0 unsafe blocks/functions/impls; 8,715 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
-| `rust/ffi` | 379 explicit unsafe blocks, 316 unsafe function declarations, two unsafe impls (allocator and registry admission); 6,232 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
+| `rust/compat` | 0 unsafe blocks/functions/impls; 8,877 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
+| `rust/ffi` | 381 explicit unsafe blocks, 317 unsafe function declarations, two unsafe impls (allocator and registry admission); 6,275 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
 | Tests | 119 unsafe blocks in FFI tests | Exercise valid and deliberately bounded ownership/alias/initialization contracts; not production code |
 
 Unsafe-function declarations and blocks overlap and must not be added as

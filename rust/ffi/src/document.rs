@@ -93,6 +93,57 @@ fn insert(resource: Resource) -> Result<u64, u32> {
     }
 }
 
+/// # Safety
+/// Input is one exact Entry64 wire with natively prepared text. Output receives
+/// one immutable snapshot ID; its bytes are raw UTF-16LE without a header.
+/// Input may overlap output and is fully copied before any output writes.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_format_export_row_v1(
+    format: u32,
+    sequence: i32,
+    start_ms: i32,
+    end_ms: i32,
+    frame_start: i32,
+    frame_end: i32,
+    margin_v: i32,
+    input: *const u8,
+    length: usize,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    if format >= 14 {
+        return INVALID_INPUT;
+    }
+    // SAFETY: caller supplies the complete readable input wire.
+    let input = required!(unsafe { copy_input(input, length) });
+    let entry = required!(wire::decode_entry(&input).map_err(wire_error));
+    let numbers = xy_vsfilter_compat::document_export::Numbers {
+        sequence,
+        start_ms,
+        end_ms,
+        frame_start,
+        frame_end,
+        margin_v,
+    };
+    let text = required!(
+        xy_vsfilter_compat::document_export::format_row(format, numbers, &entry).map_err(|error| {
+            match error {
+                xy_vsfilter_compat::document_export::Error::InvalidFormat => INVALID_INPUT,
+                xy_vsfilter_compat::document_export::Error::CountOverflow => COUNT_OVERFLOW,
+            }
+        })
+    );
+    // All core formatting and encoding occurs without registry admission.
+    let bytes = required!(raw_units_bytes(&text));
+    let id = required!(insert(Resource::Snapshot(bytes)));
+    // SAFETY: preflighted output; staged input and registry loans have ended.
+    unsafe {
+        write_output(output, &id.to_le_bytes());
+    }
+    OK
+}
+
 fn translated_search_bytes(state: xy_vsfilter_compat::document_search::State) -> [u8; 24] {
     let mut bytes = [0u8; 24];
     bytes[..4].copy_from_slice(&u32::from(state.pending).to_le_bytes());
@@ -2118,6 +2169,125 @@ mod tests {
             assert_eq!(state(suffix_owner).entries()[0].text, [92, 78, 0, 10, 0]);
             assert_eq!(state(suffix_owner).entries()[0].style, [65]);
             assert_eq!(xy_vsfilter_document_destroy_v1(suffix_owner), OK);
+
+            let mut export_entry = wire::decode_entry(&entry(0, 10)).unwrap();
+            export_entry.text = vec![0xd800, 0, 65];
+            export_entry.style = vec![83, 0, 88];
+            export_entry.actor = vec![65, 0, 88];
+            export_entry.effect = vec![70, 0, 88];
+            export_entry.margins = [-1, 2, 3, 4];
+            export_entry.layer = -1;
+            let encoded = wire::encode_entry(&export_entry).unwrap();
+            let mut output = [0xa5; 8];
+            for (format, input, length, capacity) in [
+                (14, encoded.as_ptr(), encoded.len(), 8),
+                (0, encoded.as_ptr(), encoded.len(), 7),
+                (0, ptr::null(), 1, 8),
+                (0, ptr::null(), 0, 8),
+            ] {
+                assert_eq!(
+                    xy_vsfilter_document_format_export_row_v1(
+                        format,
+                        12,
+                        3723456,
+                        0,
+                        i32::MIN,
+                        i32::MAX,
+                        -3,
+                        input,
+                        length,
+                        output.as_mut_ptr(),
+                        capacity
+                    ),
+                    INVALID_INPUT
+                );
+                assert_eq!(output, [0xa5; 8]);
+            }
+            let mut malformed = encoded.clone();
+            malformed[60] = 1;
+            assert_eq!(
+                xy_vsfilter_document_format_export_row_v1(
+                    0,
+                    12,
+                    3723456,
+                    0,
+                    0,
+                    0,
+                    -3,
+                    malformed.as_ptr(),
+                    malformed.len(),
+                    output.as_mut_ptr(),
+                    8
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(output, [0xa5; 8]);
+            for format in 0..14 {
+                assert_eq!(
+                    xy_vsfilter_document_format_export_row_v1(
+                        format,
+                        12,
+                        3723456,
+                        0,
+                        i32::MIN,
+                        i32::MAX,
+                        -3,
+                        encoded.as_ptr(),
+                        encoded.len(),
+                        output.as_mut_ptr(),
+                        8
+                    ),
+                    OK
+                );
+                let snapshot = u64::from_le_bytes(output);
+                let bytes = read_snapshot(snapshot);
+                let prefix = match format {
+                    0 => "12\n01:02:03,456 --> 00:00:00,000\n",
+                    1 => "{-2147483648}{2147483647}",
+                    2 => "<SYNC Start=3723456><P Class=UNKNOWNCC>\n",
+                    3 => "{1:02:03}{0:00:00}",
+                    4 => "Dialogue: Marked=0,1:02:03.45,0:00:00.00,S,A,-001,0003,-003,F,",
+                    5 => "Dialogue: -1,1:02:03.45,0:00:00.00,S,A,-001,0003,-003,F,",
+                    _ => "",
+                };
+                let mut expected: Vec<u16> = prefix.encode_utf16().collect();
+                if format < 6 {
+                    expected.push(0xd800);
+                    expected.extend(
+                        match format {
+                            0 => "\n\n",
+                            2 => "\n<SYNC Start=0><P Class=UNKNOWNCC>&nbsp;\n",
+                            _ => "\n",
+                        }
+                        .encode_utf16(),
+                    );
+                }
+                assert_eq!(bytes, raw_units_bytes(&expected).unwrap());
+                assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
+            }
+            let mut overlapping = encoded.clone();
+            assert_eq!(
+                xy_vsfilter_document_format_export_row_v1(
+                    1,
+                    0,
+                    0,
+                    0,
+                    -2,
+                    3,
+                    0,
+                    overlapping.as_ptr(),
+                    overlapping.len(),
+                    overlapping.as_mut_ptr(),
+                    8
+                ),
+                OK
+            );
+            let snapshot = u64::from_le_bytes(overlapping[..8].try_into().unwrap());
+            overlapping.fill(0);
+            let mut expected: Vec<u16> = "{-2}{3}".encode_utf16().collect();
+            expected.extend([0xd800, 10]);
+            assert_eq!(read_snapshot(snapshot), raw_units_bytes(&expected).unwrap());
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
 
             let search_owner = create();
             assert_eq!(add(search_owner, 0, &entry(0, 10)).0, OK);

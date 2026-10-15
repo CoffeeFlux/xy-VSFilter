@@ -577,6 +577,20 @@ public:
         DocumentDetail::Shape(operation.action != 3 && !operation.strip_tags);
         return operation;
     }
+    static CStringW FormatExportRow(uint32_t format, int sequence, int start_ms, int end_ms,
+        int frame_start, int frame_end, int margin_v, const STSEntry& entry, const CStringW& prepared_text) {
+        const auto input = DocumentDetail::EntryBytes(prepared_text,entry.fUnicode,entry.start,entry.end,
+            entry.style,entry.actor,entry.effect,entry.marginRect,entry.layer,entry.readorder);
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_format_export_row_v1(
+            format,sequence,start_ms,end_ms,frame_start,frame_end,margin_v,
+            input.data(),input.size(),out.data(),out.size());}));
+        DocumentReply reply(DocumentDetail::Load(out,0,8));
+        const auto bytes = reply.Read();
+        DocumentDetail::Shape(bytes.size() % 2 == 0);
+        size_t offset = 0;
+        return DocumentDetail::String(bytes,offset,DocumentDetail::Count(bytes.size()/2));
+    }
     void SetText(int i, const CStringW& text, int flag = -1) {
         const auto bytes = DocumentDetail::Units(text); const uint32_t index = DocumentDetail::Index(i);
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_set_prepared_text_v1(id_,index,flag,bytes.data(),bytes.size());}));

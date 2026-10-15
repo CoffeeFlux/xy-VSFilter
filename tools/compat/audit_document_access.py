@@ -21,7 +21,7 @@ METHODS.extend('GetDocumentName GetDocumentPath SetDocumentName SetDocumentPath'
 METHODS.extend('GetDocumentMode GetDocumentType GetDocumentEncoding SetDocumentMode SetDocumentType SetDocumentEncoding'.split())
 METHODS.extend('GetDocumentScreenSize SetDocumentScreenSize SetDocumentScreenWidth SetDocumentScreenHeight GetDocumentWrapStyle SetDocumentWrapStyle GetDocumentCollisions SetDocumentCollisions GetDocumentScaledBAS SetDocumentScaledBAS'.split())
 METHODS.extend('GetDocumentForcedDefaultStyle SetDocumentForcedDefaultStyle GetDocumentPARType SetDocumentPARType GetDocumentPARCompensation SetDocumentPARCompensation GetDocumentColorMatrix SetDocumentColorMatrix GetDocumentColorRange SetDocumentColorRange'.split())
-PATTERN = re.compile(r'\b(' + '|'.join(FIELDS + METHODS + ['CSimpleTextSubtitle', 'STSEntry', 'STSSegment', 'DocumentOwner', 'DocumentReply', 'UnknownStylesPass', 'StyleAddition', 'NamedStyleCopy', 'SubmitStyleSuffix', 'DocumentTextOperation', 'TextOperation', 'ApplyDocumentTextOperation', 'AddFinalSuffix', 'TextWriteOperation', 'DecodeTextOperation', 'OpenLifecycle', 'TranslatedDocumentSearch']) + r')\b')
+PATTERN = re.compile(r'\b(' + '|'.join(FIELDS + METHODS + ['CSimpleTextSubtitle', 'STSEntry', 'STSSegment', 'DocumentOwner', 'DocumentReply', 'UnknownStylesPass', 'StyleAddition', 'NamedStyleCopy', 'SubmitStyleSuffix', 'DocumentTextOperation', 'TextOperation', 'ApplyDocumentTextOperation', 'AddFinalSuffix', 'TextWriteOperation', 'DecodeTextOperation', 'OpenLifecycle', 'TranslatedDocumentSearch', 'FormatExportRow']) + r')\b')
 
 def scan(reviewed):
     records = []

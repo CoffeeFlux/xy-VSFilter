@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "scope": "Experimental persistent document containers/styles/identity/interpretation/scriptlayout/initializedmetadata; defaultproduction unchanged",
-  "measured_base_commit": "5627bc2c43d80118984326d4d6704117d571cf76",
+  "measured_base_commit": "30d00248814375883ab42841c4e5f6001ce88e96",
   "working_tree_source_hashes": true,
   "core_unsafe": {
     "production_block": 0,
@@ -16,8 +16,8 @@
     "test_other": 0
   },
   "ffi_total": {
-    "production_block": 379,
-    "production_function": 316,
+    "production_block": 381,
+    "production_function": 317,
     "production_impl": 2,
     "production_trait": 0,
     "production_other": 0,
@@ -30,12 +30,12 @@
   "new_boundary_files": [
     {
       "path": "rust/ffi/src/document.rs",
-      "sha256": "25eabb91dd0e014363dc5a71bf4d60187792315b7ca310f55ddc160c963aa91e",
-      "physical_lines_including_tests": 5229,
-      "nonblank_code_lines_excluding_tests": 1749,
+      "sha256": "09e0ca7831e3f0f28bf4d5b9ef3f17b62a9b0a1a51ed44121f3581aff443c955",
+      "physical_lines_including_tests": 5399,
+      "nonblank_code_lines_excluding_tests": 1792,
       "counts": {
-        "production_block": 53,
-        "production_function": 43,
+        "production_block": 55,
+        "production_function": 44,
         "production_impl": 0,
         "production_trait": 0,
         "production_other": 0,
@@ -47,92 +47,102 @@
       },
       "sites": [
         {
-          "line": 110,
+          "line": 101,
           "kind": "function",
           "test": false
         },
         {
-          "line": 145,
+          "line": 119,
           "kind": "block",
           "test": false
         },
         {
-          "line": 154,
+          "line": 141,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 161,
           "kind": "function",
           "test": false
         },
         {
-          "line": 166,
+          "line": 196,
           "kind": "block",
           "test": false
         },
         {
-          "line": 192,
+          "line": 205,
           "kind": "function",
           "test": false
         },
         {
-          "line": 221,
+          "line": 217,
           "kind": "block",
           "test": false
         },
         {
-          "line": 230,
+          "line": 243,
           "kind": "function",
           "test": false
         },
         {
-          "line": 253,
+          "line": 272,
           "kind": "block",
           "test": false
         },
         {
-          "line": 277,
+          "line": 281,
           "kind": "function",
           "test": false
         },
         {
-          "line": 311,
+          "line": 304,
           "kind": "block",
           "test": false
         },
         {
-          "line": 320,
+          "line": 328,
           "kind": "function",
           "test": false
         },
         {
-          "line": 381,
+          "line": 362,
           "kind": "block",
           "test": false
         },
         {
-          "line": 389,
+          "line": 371,
           "kind": "function",
           "test": false
         },
         {
-          "line": 399,
+          "line": 432,
           "kind": "block",
           "test": false
         },
         {
-          "line": 416,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 442,
+          "line": 440,
           "kind": "function",
           "test": false
         },
         {
-          "line": 454,
+          "line": 450,
           "kind": "block",
           "test": false
         },
         {
-          "line": 455,
+          "line": 467,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 493,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 505,
           "kind": "block",
           "test": false
         },
@@ -142,77 +152,72 @@
           "test": false
         },
         {
-          "line": 514,
-          "kind": "function",
-          "test": false
-        },
-        {
-          "line": 524,
+          "line": 557,
           "kind": "block",
           "test": false
         },
         {
-          "line": 533,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 558,
+          "line": 565,
           "kind": "function",
           "test": false
         },
         {
-          "line": 582,
+          "line": 575,
           "kind": "block",
           "test": false
         },
         {
-          "line": 592,
-          "kind": "function",
-          "test": false
-        },
-        {
-          "line": 636,
+          "line": 584,
           "kind": "block",
           "test": false
         },
         {
-          "line": 674,
+          "line": 609,
           "kind": "function",
           "test": false
         },
         {
-          "line": 681,
+          "line": 633,
           "kind": "block",
           "test": false
         },
         {
-          "line": 691,
+          "line": 643,
           "kind": "function",
           "test": false
         },
         {
-          "line": 695,
+          "line": 687,
           "kind": "block",
           "test": false
         },
         {
-          "line": 717,
+          "line": 725,
           "kind": "function",
           "test": false
         },
         {
-          "line": 721,
+          "line": 732,
           "kind": "block",
           "test": false
         },
         {
-          "line": 738,
+          "line": 742,
           "kind": "function",
           "test": false
         },
         {
-          "line": 744,
+          "line": 746,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 768,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 772,
           "kind": "block",
           "test": false
         },
@@ -227,87 +232,82 @@
           "test": false
         },
         {
-          "line": 838,
+          "line": 840,
           "kind": "function",
           "test": false
         },
         {
-          "line": 860,
+          "line": 846,
           "kind": "block",
           "test": false
         },
         {
-          "line": 876,
+          "line": 889,
           "kind": "function",
           "test": false
         },
         {
-          "line": 888,
+          "line": 911,
           "kind": "block",
           "test": false
         },
         {
-          "line": 931,
+          "line": 927,
           "kind": "function",
           "test": false
         },
         {
-          "line": 957,
+          "line": 939,
           "kind": "block",
           "test": false
         },
         {
-          "line": 977,
+          "line": 982,
           "kind": "function",
           "test": false
         },
         {
-          "line": 992,
+          "line": 1008,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1022,
+          "line": 1028,
           "kind": "function",
-          "test": false
-        },
-        {
-          "line": 1036,
-          "kind": "block",
           "test": false
         },
         {
           "line": 1043,
-          "kind": "function",
-          "test": false
-        },
-        {
-          "line": 1061,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1088,
+          "line": 1073,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1106,
+          "line": 1087,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1113,
+          "line": 1094,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1127,
+          "line": 1112,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1129,
+          "line": 1139,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 1157,
           "kind": "block",
           "test": false
         },
@@ -317,128 +317,128 @@
           "test": false
         },
         {
-          "line": 1176,
+          "line": 1178,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1200,
+          "line": 1180,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1215,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1216,
+          "line": 1227,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1244,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1259,
+          "line": 1251,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1274,
+          "line": 1267,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1281,
+          "line": 1295,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1310,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1299,
+          "line": 1325,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1306,
+          "line": 1332,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1328,
+          "line": 1350,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1335,
+          "line": 1357,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1358,
+          "line": 1379,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1380,
+          "line": 1386,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1486,
+          "line": 1409,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1493,
+          "line": 1431,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1503,
+          "line": 1537,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1511,
+          "line": 1544,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1529,
+          "line": 1554,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1545,
+          "line": 1562,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1564,
+          "line": 1580,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1598,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1637,
+          "line": 1596,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1668,
+          "line": 1615,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1678,
+          "line": 1649,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1688,
           "kind": "function",
-          "test": false
-        },
-        {
-          "line": 1693,
-          "kind": "block",
           "test": false
         },
         {
@@ -447,68 +447,68 @@
           "test": false
         },
         {
-          "line": 1728,
+          "line": 1729,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1743,
+          "line": 1744,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1759,
+          "line": 1770,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1779,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1767,
+          "line": 1794,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1778,
+          "line": 1810,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1789,
+          "line": 1818,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1790,
-          "kind": "block",
-          "test": false
-        },
-        {
-          "line": 1819,
+          "line": 1829,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1826,
+          "line": 1840,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1837,
+          "line": 1841,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1870,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1844,
+          "line": 1877,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1862,
+          "line": 1888,
           "kind": "function",
-          "test": false
-        },
-        {
-          "line": 1878,
-          "kind": "block",
           "test": false
         },
         {
@@ -517,72 +517,87 @@
           "test": false
         },
         {
-          "line": 1938,
+          "line": 1913,
           "kind": "function",
           "test": false
         },
         {
-          "line": 1955,
+          "line": 1929,
           "kind": "block",
           "test": false
         },
         {
-          "line": 1968,
+          "line": 1946,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 1989,
+          "kind": "function",
+          "test": false
+        },
+        {
+          "line": 2006,
+          "kind": "block",
+          "test": false
+        },
+        {
+          "line": 2019,
           "kind": "function",
           "test": true
         },
         {
-          "line": 1972,
+          "line": 2023,
           "kind": "block",
           "test": true
         },
         {
-          "line": 1994,
+          "line": 2045,
           "kind": "function",
           "test": true
         },
         {
-          "line": 1997,
-          "kind": "block",
-          "test": true
-        },
-        {
-          "line": 2009,
-          "kind": "function",
-          "test": true
-        },
-        {
-          "line": 2013,
-          "kind": "block",
-          "test": true
-        },
-        {
-          "line": 2018,
-          "kind": "function",
-          "test": true
-        },
-        {
-          "line": 2022,
-          "kind": "block",
-          "test": true
-        },
-        {
-          "line": 2027,
-          "kind": "block",
-          "test": true
-        },
-        {
-          "line": 2051,
+          "line": 2048,
           "kind": "block",
           "test": true
         },
         {
           "line": 2060,
+          "kind": "function",
+          "test": true
+        },
+        {
+          "line": 2064,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 2069,
+          "kind": "function",
+          "test": true
+        },
+        {
+          "line": 2073,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 2078,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 2102,
+          "kind": "block",
+          "test": true
+        },
+        {
+          "line": 2111,
           "kind": "block",
           "test": true
         }
       ],
-      "production_extern_functions": 64,
+      "production_extern_functions": 65,
       "operations": {
         "raw_shared_slice_construction": 1,
         "raw_mutable_slice_construction": 0,
@@ -637,7 +652,7 @@
     }
   ],
   "prior_ffi_production_blocks": 325,
-  "added_production_blocks": 54,
+  "added_production_blocks": 56,
   "added_unsafe_impls": 1,
   "retired_native_owners": 18,
   "retired_ffi_crossings": 0,
@@ -2749,37 +2764,84 @@
         "test_trait": 0,
         "test_other": 0
       }
+    },
+    {
+      "status": "Superseded translated-search source measurement; original counts and hashes preserved",
+      "measured_base_commit": "5627bc2c43d80118984326d4d6704117d571cf76",
+      "working_tree_source_hashes": true,
+      "source_hashes": {
+        "src/subtitles/STS.h": "969cd4ba558665f1c7b64a6dca66ba9d3befe21d4a60d36076750d70af028ee4",
+        "src/subtitles/STS.cpp": "dfa1ef5c466a84f1aa727bdfc17a86bccee767fbf297aa150a5a253febc3e629",
+        "src/subtitles/RTS.cpp": "17acfde7157426a0a7e3ace4c71b37e3de16ba15300636d39d40de8a4e82f631",
+        "src/subtitles/USFSubtitles.cpp": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
+        "src/subtitles/SubtitleInputPin.cpp": "210276fdf0da5108dd3135b5934dc83015512604d0e8c12fde4d1f9a02ad105d",
+        "src/filters/transform/vsfilter/DirectVobSubFilter.cpp": "d6e056e9357234b9935fe3a8760655df8e1c3c0a5fa6a9954d343ea0234033af",
+        "src/filters/transform/vsfilter/xy_sub_filter.cpp": "680a96edc424c3a4324b514c5f74fded15857d3525b78d114c5394205dac8f9d",
+        "src/filters/transform/vsfilter/plugins.cpp": "38526740c55b4bc51642925d1ded688ebdd0ff26a01b5a5dd7f587add31df3da",
+        "src/subtitles/RustDocumentOwner.h": "a38e0043e6826ea8dd6a2a5e165b1b1619e6c85b62a4454f9a8d1fb5611b5534",
+        "rust/compat/src/document.rs": "bd0ed77e56e3925b178b9a67f319ae3d1ac26b31f2bf41b7c1f28b568c00782f",
+        "rust/ffi/src/document.rs": "25eabb91dd0e014363dc5a71bf4d60187792315b7ca310f55ddc160c963aa91e",
+        "rust/ffi/src/document_registry.rs": "bd06c8e520af84c62b219ea08909b03fdc570edfba38ea63b72c9b2df4f5fff7",
+        "include/xy_rust_document.h": "c005204ebad26d30dad362bf25ef07d95df463b713748ec3cc05d1d787ada070",
+        "tools/compat/document_native_lifecycle.cpp": "f36cd94c28cd3ce2de502d13f3724788e872dede54840dde4891d41a9ef22ca7",
+        "tools/compat/document_native_lifecycle.py": "4d5e0da22ef2dd05865d8e660d933648c6f928672c6deeeea15b8a366ef3fcac",
+        "tools/compat/summarize_evidence.py": "d7ade177f0b0f79011aac97a6dd7effb2756d586bf8a55d86969a223a15f5ecd",
+        "tools/compat/audit_document_access.py": "b36e64225dec01dc6c94683779438a295ed0aa7ad16d9b320366cb9a43bf6fc0",
+        "rust/compat/src/document_unknown.rs": "e9d0af429f752cc4ee0d9c31077b37304e0124b3fc9fa0974250e84612c84360",
+        "rust/compat/src/lib.rs": "96f0ea79324ae2c1a0f1966c0f49e124b6421a794f69a6cefce0b19c0b23917b",
+        "rust/compat/src/document_style_add.rs": "1a9948d942dd3cd56a3d3d8c0c897762101859944def56a4b81ce6ae122e27a6",
+        "rust/compat/src/document_style_copy.rs": "6040a9114f2a875d84d0948b3ee938a7aa2a6b28af7314cbe3bb2040a01e9094",
+        "rust/compat/src/document_text.rs": "1a37d8f948906561e12a9ed1f93837c956b6e092c96a5974c86a9b459b9e02d3",
+        "rust/compat/src/document_prepare.rs": "ceda12df96c3386652c39f6d58bee7fc0bb665f8cc18bd46b9cd41e14998bf03",
+        "rust/compat/src/document_open.rs": "107573591d5c6aa961265a6f9efaddcb134d8f096988f039bf35fc188e327ab8",
+        "rust/compat/src/document_search.rs": "08718e6eab59eb3922d1b59cfb576185f6d457ca1e57fc396cb2b2c7dca71c4c",
+        "rust/compat/src/timeline_search.rs": "1b4d6b7a8eee6329b8cf4e564fa6e1aecbc866cfea26a59e9436590e0fe054a5",
+        "rust/compat/src/document_export.rs": ""
+      },
+      "ffi_total": {
+        "production_block": 379,
+        "production_function": 316,
+        "production_impl": 2,
+        "production_trait": 0,
+        "production_other": 0,
+        "test_block": 119,
+        "test_function": 4,
+        "test_impl": 0,
+        "test_trait": 0,
+        "test_other": 0
+      }
     }
   ],
   "retired_native_owners_scope": "Eighteen native fields/containers opt-in only; defaultproduction retirementzero",
   "measurement_method": "Current audit_rust_boundary.inventory over actual Rust source, comments/literals masked and test items separated; counts overlap and do not establish soundness. Historical original snapshot retained.",
   "source_hashes": {
     "src/subtitles/STS.h": "969cd4ba558665f1c7b64a6dca66ba9d3befe21d4a60d36076750d70af028ee4",
-    "src/subtitles/STS.cpp": "dfa1ef5c466a84f1aa727bdfc17a86bccee767fbf297aa150a5a253febc3e629",
+    "src/subtitles/STS.cpp": "6e2d19be1bbaf202ec806d656263f43e7fba0e52c2b16e395ac908ce1d0eb0ce",
     "src/subtitles/RTS.cpp": "17acfde7157426a0a7e3ace4c71b37e3de16ba15300636d39d40de8a4e82f631",
     "src/subtitles/USFSubtitles.cpp": "e74dea9ac0921d3af536db3176fff0480d56717a8689e10ca3fc8fea2c80097d",
     "src/subtitles/SubtitleInputPin.cpp": "210276fdf0da5108dd3135b5934dc83015512604d0e8c12fde4d1f9a02ad105d",
     "src/filters/transform/vsfilter/DirectVobSubFilter.cpp": "d6e056e9357234b9935fe3a8760655df8e1c3c0a5fa6a9954d343ea0234033af",
     "src/filters/transform/vsfilter/xy_sub_filter.cpp": "680a96edc424c3a4324b514c5f74fded15857d3525b78d114c5394205dac8f9d",
     "src/filters/transform/vsfilter/plugins.cpp": "38526740c55b4bc51642925d1ded688ebdd0ff26a01b5a5dd7f587add31df3da",
-    "src/subtitles/RustDocumentOwner.h": "a38e0043e6826ea8dd6a2a5e165b1b1619e6c85b62a4454f9a8d1fb5611b5534",
+    "src/subtitles/RustDocumentOwner.h": "7c37fe1e74a229482b3e01aec792115f5b94d5344d7125a5f8865b2edaa00553",
     "rust/compat/src/document.rs": "bd0ed77e56e3925b178b9a67f319ae3d1ac26b31f2bf41b7c1f28b568c00782f",
-    "rust/ffi/src/document.rs": "25eabb91dd0e014363dc5a71bf4d60187792315b7ca310f55ddc160c963aa91e",
+    "rust/ffi/src/document.rs": "09e0ca7831e3f0f28bf4d5b9ef3f17b62a9b0a1a51ed44121f3581aff443c955",
     "rust/ffi/src/document_registry.rs": "bd06c8e520af84c62b219ea08909b03fdc570edfba38ea63b72c9b2df4f5fff7",
-    "include/xy_rust_document.h": "c005204ebad26d30dad362bf25ef07d95df463b713748ec3cc05d1d787ada070",
-    "tools/compat/document_native_lifecycle.cpp": "f36cd94c28cd3ce2de502d13f3724788e872dede54840dde4891d41a9ef22ca7",
-    "tools/compat/document_native_lifecycle.py": "4d5e0da22ef2dd05865d8e660d933648c6f928672c6deeeea15b8a366ef3fcac",
-    "tools/compat/summarize_evidence.py": "d7ade177f0b0f79011aac97a6dd7effb2756d586bf8a55d86969a223a15f5ecd",
-    "tools/compat/audit_document_access.py": "b36e64225dec01dc6c94683779438a295ed0aa7ad16d9b320366cb9a43bf6fc0",
+    "include/xy_rust_document.h": "13d0e3a18f012f4775f43e503ddbf66bc829e72f111d6efc448b833520c398b4",
+    "tools/compat/document_native_lifecycle.cpp": "a31e830e08c0417e2bd253c11bbac31a3d9c0d72bc27eeda47b0c31f3d4dae17",
+    "tools/compat/document_native_lifecycle.py": "71b7cb3e8b3e37627193a138b64b1cb67a0a3e3e203d188b29160c642756aa93",
+    "tools/compat/summarize_evidence.py": "1d60148c793711ec63d1eac6fdb31848948a02bb29cb26c235bc667795297fa1",
+    "tools/compat/audit_document_access.py": "6f2d56cc7db8bd8585ee15753d96cf8efe531d10414ee1e2f2b9514737207fe2",
     "rust/compat/src/document_unknown.rs": "e9d0af429f752cc4ee0d9c31077b37304e0124b3fc9fa0974250e84612c84360",
-    "rust/compat/src/lib.rs": "96f0ea79324ae2c1a0f1966c0f49e124b6421a794f69a6cefce0b19c0b23917b",
+    "rust/compat/src/lib.rs": "38774e9b861592f5b67b65aa232dac73abe6287f35b7a748cc2a31c9a189a08d",
     "rust/compat/src/document_style_add.rs": "1a9948d942dd3cd56a3d3d8c0c897762101859944def56a4b81ce6ae122e27a6",
     "rust/compat/src/document_style_copy.rs": "6040a9114f2a875d84d0948b3ee938a7aa2a6b28af7314cbe3bb2040a01e9094",
     "rust/compat/src/document_text.rs": "1a37d8f948906561e12a9ed1f93837c956b6e092c96a5974c86a9b459b9e02d3",
     "rust/compat/src/document_prepare.rs": "ceda12df96c3386652c39f6d58bee7fc0bb665f8cc18bd46b9cd41e14998bf03",
     "rust/compat/src/document_open.rs": "107573591d5c6aa961265a6f9efaddcb134d8f096988f039bf35fc188e327ab8",
     "rust/compat/src/document_search.rs": "08718e6eab59eb3922d1b59cfb576185f6d457ca1e57fc396cb2b2c7dca71c4c",
-    "rust/compat/src/timeline_search.rs": "1b4d6b7a8eee6329b8cf4e564fa6e1aecbc866cfea26a59e9436590e0fe054a5"
+    "rust/compat/src/timeline_search.rs": "1b4d6b7a8eee6329b8cf4e564fa6e1aecbc866cfea26a59e9436590e0fe054a5",
+    "rust/compat/src/document_export.rs": "80769b962c3eea2b05bd62866b210f8ddf3e89f22677ce75ee75474981e02123"
   },
   "default_style_extension": {
     "set": "xy_vsfilter_document_set_default_style_v1 copies input and decodes before admission; validates handle before taking pending value; retired Option drops outside admission, including failure/Busy pending input.",
@@ -4577,6 +4639,31 @@
     "validation": {
       "local": "234 core and 122 FFI tests. Five core session tests cover exact requests, equal/nonmonotone behavior, endpoint/gap/empty outputs, frozen count and midpoint bound. FFI checks fixed replies, refusals, owner/type/lifetime and safe slot order.",
       "windows": "Nineteen bounded full-owner queries across empty/equal-start-gap/nonmonotone FRAME histories plus alias/snapshot/animation checks await Windows execution; Open checkpoint 5627bc2c compile gates passed both architectures."
+    }
+  },
+  "export_row_extension": {
+    "scope": "Experimental SaveAs body/dialogue row serialization for six supported formats; native export orchestration and services retained",
+    "capture_scope": "Working-tree source hashes over measured_base_commit; changed-source Windows file-byte parity pending",
+    "exports": [
+      "xy_vsfilter_document_format_export_row_v1"
+    ],
+    "contracts": [
+      "Input is exact Entry64 with text already produced by native GetStr/WA and format-specific CString Replace. Scalars supply sequence, native translated milliseconds, optional frame casts and signed margin average. No document owner borrow is involved.",
+      "Safe formatter builds raw UTF16 layouts for SRT/SUB/SMI/PSB/SSA/ASS. Signed integer divisions/remainders truncate toward zero; minimum-width decimal formatting prints sign before zero padding and never truncates large values. Raw string fields stop at first NUL; surrogate units remain raw.",
+      "Valid ext values6..13 produce empty rows as native fmt-empty branches do. Invalid private format>=14 refuses. Native loop still performs original translations/getters for valid unsupported formats, skips negative start before end/getter and preserves SRT sequence numbering.",
+      "Native all-newline transformations, actual fps casts, signed margin arithmetic, filename logic, header/style/sidecar formatting, file writes and codepage conversion remain. No original native undefined arithmetic or unassigned-tail history is probed.",
+      "Output length bounds both CString signed units and checked addressable UTF16 bytes including terminator before extending. Input is copied before output, allowing overlap. Core formatting and UTF16LE encoding occur outside admission; output8 identifies an independent raw-byte snapshot without header.",
+      "Native reply RAII covers reading and CString materialization. Default/RustText branch preprocessing remains identical. Allocation/exception/reentry timing is qualified; integer time decomposition now occurs after text preparation but is pure nonfailing work in its supplied integer domain."
+    ],
+    "unsafe_delta": {
+      "production_blocks": 2,
+      "unsafe_function_declarations": 1,
+      "new_raw_helpers": 0,
+      "new_unsafe_impls": 0
+    },
+    "validation": {
+      "local": "239 core and 122 FFI tests; five core formatter cases cover six exact layouts, signed padding/time components, extreme integers, raw prefixes and architecture-aware size bound. FFI covers all14formats, snapshotbytes, overlap, lifetime and malformed wire/output refusal. Full Python suite: 141 tests, four skipped. Pinned formatting/Clippy, probe generation, unchanged default/RustText preprocessing and lexical access audit pass.",
+      "windows": "Eight full SaveAs fixtures now capture exact main/sidecar bytes for TIME SRT/SUB/SMI/PSB/SSA/ASS, valid unsupported TXT, and FRAME SRT, including negative-start skips, numbering, NUL-bearing metadata and unchanged document state. Changed-source execution remains pending. Prior FRAME checkpoint 30d00248 compiles document probes on x86/x64."
     }
   }
 }
