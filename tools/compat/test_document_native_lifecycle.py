@@ -5,7 +5,7 @@ from pathlib import Path
 import subprocess
 import document_native_lifecycle as lifecycle
 
-from document_native_lifecycle import compare_traces, conversion_rows, unknown_rows, text_plan_rows, copy_styles_stages, setstr_plan_rows, open_order_rows
+from document_native_lifecycle import compare_traces, conversion_rows, unknown_rows, text_plan_rows, copy_styles_stages, setstr_plan_rows, open_order_rows, frame_search_rows
 
 
 STYLE_SCALARS = b" ".join(b"0000000000000000" if i in (0,11,12,13,14,23,24,25,26,27,28,29,30,31,32) else b"00000000" if i in (15,17,19,21) else b"0" for i in range(34))
@@ -92,6 +92,7 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
          + b"\n".join(setstr_plan_rows()) + b"\n"
          + b"".join(b"style-rename-segments "+row.split()[1]+b" count=2 animated=1\n" for row in setstr_plan_rows()[::2])
          + b"\n".join(open_order_rows()) + b"\n"
+         + b"\n".join(frame_search_rows()) + b"\n"
          + b"saved-file ssa exists=1 bytes=1 41\nsaved-file ass exists=1 bytes=1 41\n"
          + b"saved-file srt exists=1 bytes=1 41\nsaved-file srt-sidecar exists=1 bytes=1 41\n"
          + b"saved-file ssa-sidecar exists=0\nsaved-file ass-sidecar exists=0\n"
@@ -109,6 +110,20 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
         with self.assertRaises(ValueError): compare_traces([missing] * 4, 64)
         old = TRACE.replace(b"copy-styles-stage copy-styles-self-before\n", b"")
         compare_traces([old] * 4, 64, require_copy_styles_stages=False)
+
+    def test_frame_search_requires_alias_order_untouched_failure_and_native_start_order(self):
+        for old,new in ((b"frame-boundaries 3 time=800000 entry=1",b"frame-boundaries 3 time=800000 entry=0"),
+                        (b"alias=1,2 snapshot=111,222,1,1,77",b"alias=1,-1 snapshot=111,222,1,1,77"),
+                        (b"snapshot=111,222,1,1,77",b"snapshot=111,222,0,1,77"),
+                        (b"frame-nonmonotone 5 time=78125 entry=2",b"frame-nonmonotone 5 time=78125 entry=0"),
+                        (b"frame-boundaries segments=2 animated=1 callbacks=0",b"frame-boundaries segments=2 animated=0 callbacks=0")):
+            self.assertIn(old,TRACE)
+            with self.assertRaises(ValueError):compare_traces([TRACE.replace(old,new)]*4,64)
+        missing=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith(b"frame-search-row frame-empty 0 "))
+        with self.assertRaises(ValueError):compare_traces([missing]*4,64)
+        legacy=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith(b"frame-search-"))
+        with self.assertRaises(ValueError):compare_traces([legacy]*4,64)
+        compare_traces([legacy]*4,64,require_frame_search_stages=False)
 
     def test_open_order_requires_sidecar_lifetime_live_callback_pair_and_empty_counts(self):
         for old,new in ((b"sidecar-held=1",b"sidecar-held=0"),
@@ -130,6 +145,7 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
         self.assertLess(source.index("static CStringA ass_fixture("),source.index("static void open_order_lifecycle("))
         self.assertLess(source.index("struct SavedFiles"),source.index("static void open_order_lifecycle("))
         self.assertLess(definition,source.index("class OpenOrderingDocument"))
+        self.assertLess(source.index("static bool same_segment("),source.index("static void frame_search_lifecycle("))
         for fixture in ("text_plan_lifecycle", "setstr_plan_lifecycle"):
             start=source.index("static void "+fixture+"(")
             self.assertLess(definition,start)

@@ -234,6 +234,7 @@ template<class Style = STSStyle> inline Style StyleValue(const Bytes& bytes) {
 } // namespace DocumentDetail
 
 class DocumentOwner;
+class TranslatedDocumentSearch;
 class OpenLifecycle;
 class UnknownStylesPass;
 class StyleAddition;
@@ -276,6 +277,7 @@ struct DocumentTextOperation {
 };
 
 class DocumentOwner {
+    friend class TranslatedDocumentSearch;
     friend class OpenLifecycle;
     friend class UnknownStylesPass;
     friend class StyleAddition;
@@ -646,6 +648,54 @@ public:
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_query_time_v1(id_,mode,time,out.data(),out.size());}));
         DocumentDetail::Shape(DocumentDetail::Load(out,4,4) <= 1 && DocumentDetail::Load(out,12,4) == 0);
         return {DocumentDetail::I32(DocumentDetail::Load(out,0,4)),DocumentDetail::Load(out,4,4) != 0,DocumentDetail::Count(static_cast<size_t>(DocumentDetail::Load(out,8,4)))};
+    }
+};
+// Typed search state replaces the former raw-pointer search bridge on the
+// document path. Native translations occur between calls, outside admission.
+class TranslatedDocumentSearch {
+    uint64_t id_ = 0;
+    bool pending_ = false, start_ = false, found_ = false;
+    int index_ = 0, result_ = -1, count_ = 0;
+    void Close() noexcept {
+        if(id_) { const uint64_t id = id_; id_ = 0;
+            DocumentDetail::Release(DocumentDetail::Invoke([&]{return xy_vsfilter_document_search_drop_v1(id);})); }
+    }
+    template<class Buffer> void Decode(const Buffer& bytes, size_t offset) {
+        const uint64_t pending = DocumentDetail::Load(bytes,offset,4), start = DocumentDetail::Load(bytes,offset+4,4);
+        const int index = DocumentDetail::I32(DocumentDetail::Load(bytes,offset+8,4));
+        const int result = DocumentDetail::I32(DocumentDetail::Load(bytes,offset+12,4));
+        const uint64_t found = DocumentDetail::Load(bytes,offset+16,4);
+        const uint32_t count = DocumentDetail::Count(static_cast<size_t>(DocumentDetail::Load(bytes,offset+20,4)));
+        DocumentDetail::Shape(pending <= 1 && start <= 1 && found <= 1 &&
+            (pending ? index >= 0 && static_cast<uint32_t>(index) < count : index == 0 && start == 0) &&
+            result >= -1 && (result < 0 || static_cast<uint32_t>(result) <= count) &&
+            (!found || (result >= 0 && static_cast<uint32_t>(result) < count)));
+        pending_ = pending != 0; start_ = start != 0; index_ = index;
+        result_ = result; found_ = found != 0; count_ = static_cast<int>(count);
+    }
+public:
+    TranslatedDocumentSearch(const DocumentOwner& owner, uint32_t mode, REFERENCE_TIME time) {
+        std::array<uint8_t,32> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_search_begin_v1(
+            owner.id_,mode,time,out.data(),out.size());}));
+        id_ = DocumentDetail::Load(out,0,8);
+        try { DocumentDetail::Shape(id_ != 0); Decode(out,8); }
+        catch(...) { Close(); throw; }
+    }
+    TranslatedDocumentSearch(const TranslatedDocumentSearch&) = delete;
+    TranslatedDocumentSearch& operator=(const TranslatedDocumentSearch&) = delete;
+    ~TranslatedDocumentSearch() noexcept { Close(); }
+    bool Pending() const { return pending_; }
+    bool Start() const { return start_; }
+    int Index() const { return index_; }
+    int Result() const { return result_; }
+    int Count() const { return count_; }
+    bool Found() const { return found_; }
+    void Supply(REFERENCE_TIME value) {
+        std::array<uint8_t,24> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_search_supply_v1(
+            id_,value,out.data(),out.size());}));
+        Decode(out,0);
     }
 };
 // Each operation is fully owned scalar policy state. Native file services,

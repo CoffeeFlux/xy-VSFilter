@@ -133,3 +133,5 @@ pub mod ssf_literal;
 pub mod document_prepare;
 
 pub mod document_open;
+
+pub mod document_search;

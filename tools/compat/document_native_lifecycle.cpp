@@ -356,6 +356,21 @@ public:
         return m_segments.GetAt(index);
 #endif
     }
+    bool FrameNext(REFERENCE_TIME time,double fps,int* index,int* count) {
+#ifdef XY_DOCUMENT_PINNED_REFERENCE
+        return SearchSubs(time,fps,index,count)!=NULL;
+#else
+        return FindNextSegment(time,fps,index,count);
+#endif
+    }
+    bool FrameContaining(REFERENCE_TIME time,double fps,STSSegment& snapshot,int* index,int* count) {
+#ifdef XY_DOCUMENT_PINNED_REFERENCE
+        const STSSegment* found=SearchSubs2(time,fps,index,count);
+        if(!found)return false;snapshot=*found;return true;
+#else
+        return SearchSubs2Snapshot(time,fps,snapshot,index,count);
+#endif
+    }
     void Animate(int index) {
 #ifdef XY_DOCUMENT_PINNED_REFERENCE
         m_segments.GetAt(index).animated=true;
@@ -624,6 +639,50 @@ static void setstr_plan_lifecycle() {
     // conversion or callback is invoked on this raw NUL-tail entry afterward.
     const wchar_t tail[]={10,0,10},expectedTail[]={92,78,0,10,0};
     update("setstr-nul-tail",0,CStringW(tail,3),true,CStringW(expectedTail,5));
+}
+
+static bool same_segment(const STSSegment& a,const STSSegment& b) {
+    if(a.start!=b.start||a.end!=b.end||a.animated!=b.animated||a.subs.GetCount()!=b.subs.GetCount())return false;
+    for(size_t i=0;i<a.subs.GetCount();++i)if(a.subs[i]!=b.subs[i])return false;
+    return true;
+}
+static void frame_search_lifecycle() {
+    auto history=[](const char* name,int shape,double fps,const std::vector<REFERENCE_TIME>& times){
+        TraceDocument doc(0);doc.Mode(FRAME);
+        if(shape){const int sorted[]={0,0,2},unsorted[]={2,0,1};
+            for(int i=0;i<3;++i){const int start=shape==1?sorted[i]:unsorted[i];
+                doc.AddSTSEntryOnly(CStringW(L"FRAME query"),true,start,start+1,CString(L"Default"),CString(L"actor"),CString(L"effect"),CRect(1,2,3,4),i,i);}
+            doc.CreateSegments();doc.Animate(0);}
+        const unsigned callbacks=change_events[0];std::vector<STSSegment> storage;
+        for(size_t i=0;i<doc.Segments();++i)storage.push_back(doc.Segment(int(i)));
+        printf("frame-search-stage %s entries=%zu segments=%zu\n",name,doc.Entries(),doc.Segments());
+        for(size_t q=0;q<times.size();++q){const REFERENCE_TIME t=times[q];
+            const int entry=doc.SearchSub(t,fps);int next=-77,count=-88,alias=-99;
+            const bool nextFound=doc.FrameNext(t,fps,&next,&count);
+            check(doc.FrameNext(t,fps,&alias,&alias)==nextFound&&alias==next,"FindNext output alias final index");
+            STSSegment snapshot(111,222);snapshot.animated=true;snapshot.subs.Add(77);const STSSegment untouched=snapshot;
+            int containing=-77,containingCount=-88;const bool found=doc.FrameContaining(t,fps,snapshot,&containing,&containingCount);
+            STSSegment aliasedSnapshot=untouched;int containingAlias=-99;
+            check(doc.FrameContaining(t,fps,aliasedSnapshot,&containingAlias,&containingAlias)==found,"containing alias found result");
+            check(containingAlias==(found?containing:containingCount==0?0:containingCount),"containing conditional alias write order");
+            check(count==int(doc.Segments())&&containingCount==count,"FRAME query segment counts");
+            if(found){check(same_segment(snapshot,aliasedSnapshot),"separate and alias found snapshots equal");
+                check(snapshot.subs.GetCount()>0,"found FRAME snapshot has initialized members");
+                STSSegment owned=snapshot;owned.start=-444;owned.end=-333;owned.animated=!owned.animated;owned.subs[0]=77;
+                STSSegment reread(111,222);check(doc.FrameContaining(t,fps,reread,NULL,NULL)&&same_segment(snapshot,reread),"FRAME found snapshot copy independent");}
+            else check(same_segment(snapshot,untouched)&&same_segment(aliasedSnapshot,untouched),"FRAME failed snapshot completely untouched");
+            printf("frame-search-row %s %zu time=%lld entry=%d next=%d,%d,%d contain=%d,%d,%d alias=%d,%d snapshot=%lld,%lld,%d,%zu",
+                name,q,t,entry,nextFound,next,count,found,containing,containingCount,alias,containingAlias,
+                snapshot.start,snapshot.end,snapshot.animated,snapshot.subs.GetCount());
+            for(size_t i=0;i<snapshot.subs.GetCount();++i)printf(",%d",snapshot.subs[i]);printf("\n");
+        }
+        check(change_events[0]==callbacks&&doc.Segments()==storage.size(),"FRAME queries do not notify or rebuild");unsigned animated=0;
+        for(size_t i=0;i<storage.size();++i){const STSSegment actual=doc.Segment(int(i));check(same_segment(actual,storage[i]),"FRAME queries retain full canonical segments");if(actual.animated)++animated;}
+        printf("frame-search-storage %s segments=%zu animated=%u callbacks=0\n",name,doc.Segments(),animated);
+    };
+    history("frame-empty",0,12.5,{-1,0,800000});
+    history("frame-boundaries",1,12.5,{-1,0,799999,800000,1599999,1600000,2399999,2400000});
+    history("frame-nonmonotone",2,256.0,{-1,0,39062,39063,78124,78125,117187,117188});
 }
 
 static void named_style_lifecycle() {
@@ -1512,6 +1571,7 @@ int main() {
         default_style_lifecycle();
         text_plan_lifecycle();
         setstr_plan_lifecycle();
+        frame_search_lifecycle();
         preparation_lifecycle();
         copy_selected_lifecycle();
         metadata_lifecycle();

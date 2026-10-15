@@ -225,6 +225,15 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_remove_entries_v1(uint64_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_animation_or_v1(uint64_t, uint32_t segment, uint32_t animated);
 // No rebuild. Result: applied:u32, reserved-zero:u32, end:i64 (zero if absent).
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_correct_last_end_v1(uint64_t, int64_t bound, uint8_t*, size_t);
+// Translated search run, modes 0 Entry, 1 NextSegment, 2 ContainingSegment.
+// Begin output32 is runID:u64 then state24. Supply output24 is six LE words:
+// pending:u32,start:u32,requestIndex:i32,resultIndex:i32,found:u32,count:u32.
+// Native evaluates exactly each requested timestamp between calls. No owner
+// borrow crosses translation; selected count is frozen, bound owner stays live.
+// Supplying after completion refuses without changing run or output.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_search_begin_v1(uint64_t owner,uint32_t mode,int64_t time,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_search_supply_v1(uint64_t run,int64_t value,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_search_drop_v1(uint64_t run);
 // Open lifecycle control only; all parsing, dialogs, virtual callbacks and
 // ordered success-header publication remain native. Begin binds a live owner without
 // mutation; parser count must fit INT_MAX. Step output8 is action:u32,index:u32.
