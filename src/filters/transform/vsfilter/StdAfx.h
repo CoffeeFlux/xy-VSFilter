@@ -27,6 +27,7 @@
 
 #include "../../../../include/SharedInclude.h"
 #include "../../../../include/stdafx_common.h"
-#include <afxwin.h>
+#include <windows.h>
+#include "xy_atl.h"
 #include "../../../subtitles/flyweight_base_types.h"
 #include "../../../subtitles/RTS.h"

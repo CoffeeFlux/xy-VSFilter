@@ -5,7 +5,7 @@
 // Scripts are read from the directory named by the XY_TEST_DATA environment
 // variable (default: "test", relative to the working directory).
 
-#include <afx.h>
+#include <windows.h>
 #include <gtest/gtest.h>
 #include <algorithm>
 #include <string>

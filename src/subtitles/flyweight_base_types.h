@@ -4,7 +4,7 @@
 #include <functional>
 #include <memory>
 #include <unordered_map>
-#include <afx.h>
+#include "xy_atl.h"
 
 #include "mru_cache.h"
 

@@ -1264,7 +1264,7 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
                 break;
             }
 
-            f->Seek(pos, CFile::begin);
+            f->Seek(pos, CTextFile::begin);
             Empty();
             continue;
         }

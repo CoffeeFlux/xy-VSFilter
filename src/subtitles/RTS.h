@@ -36,12 +36,21 @@ enum AssCmdPosLevel
     POS_LVL_HARD
 };
 
-class CMyFont : public CFont
+class CMyFont
 {
 public:
     int m_ascent, m_descent;
 
     CMyFont(const STSStyleBase& style);
+    ~CMyFont();
+
+    operator HFONT() const { return m_hFont; }
+
+private:
+    HFONT m_hFont;
+
+    CMyFont(const CMyFont&);
+    CMyFont& operator=(const CMyFont&);
 };
 
 typedef XyInternedByKey<STSStyleBase, CMyFont> FwCMyFont;

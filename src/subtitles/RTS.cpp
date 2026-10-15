@@ -95,17 +95,25 @@ CMyFont::CMyFont(const STSStyleBase& style)
     lf.lfClipPrecision  = CLIP_DEFAULT_PRECIS;
     lf.lfQuality        = ANTIALIASED_QUALITY;
     lf.lfPitchAndFamily = DEFAULT_PITCH|FF_DONTCARE;
-    if(!CreateFontIndirect(&lf))
+    m_hFont = CreateFontIndirect(&lf);
+    if(!m_hFont)
     {
         _tcscpy(lf.lfFaceName, _T("Arial"));
-        VERIFY(CreateFontIndirect(&lf));
+        m_hFont = CreateFontIndirect(&lf);
+        ASSERT(m_hFont);
     }
-    HFONT hOldFont = SelectFont(g_hDC, *this);
+    HFONT hOldFont = SelectFont(g_hDC, m_hFont);
     TEXTMETRIC tm;
     GetTextMetrics(g_hDC, &tm);
     m_ascent  = ((tm.tmAscent  + 4) >> 3);
     m_descent = ((tm.tmDescent + 4) >> 3);
     SelectFont(g_hDC, hOldFont);
+}
+
+CMyFont::~CMyFont()
+{
+    if(m_hFont)
+        DeleteObject(m_hFont);
 }
 
 // CWord

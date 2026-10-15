@@ -1,7 +1,7 @@
 // Version information for the CSRI-only VSFilter build.
 
 #include "version.h"
-#include "afxres.h"
+#include "winres.h"
 
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)

@@ -33,8 +33,8 @@
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 #endif
 
-#include <afx.h>
-#include <afxwin.h>         // MFC core and standard components
+#include <windows.h>
+#include "xy_atl.h"
 #include <crtdefs.h>
 
 // TODO: reference additional headers your program requires here

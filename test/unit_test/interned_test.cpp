@@ -2,7 +2,6 @@
 // subtitle renderer: equal values share one handle, and entries go away with
 // their last handle.
 
-#include <afx.h>
 #include <gtest/gtest.h>
 #include "flyweight_base_types.h"
 

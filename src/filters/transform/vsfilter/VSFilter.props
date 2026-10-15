@@ -7,20 +7,18 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <PreprocessorDefinitions Condition="'$(VisualStudioVersion)'&gt;'10.0'">_AFX_NO_MFC_CONTROLS_IN_DIALOGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions Condition="'$(Configuration)|$(VisualStudioVersion)'=='Release|12.0'">/Gw %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(VisualStudioVersion)'=='Release|16.0'">/Gw /Qfast_transcendentals %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OutDir)..</AdditionalLibraryDirectories>
-      <AdditionalDependencies Condition="'$(Configuration)'=='Debug'">subtitlesD.lib</AdditionalDependencies>
-      <AdditionalDependencies Condition="'$(Configuration)'=='Debug' And '$(VisualStudioVersion)'&gt;'11.0'">subtitlesD.lib</AdditionalDependencies>
-      <AdditionalDependencies Condition="'$(Configuration)'=='Release'">delayimp.lib;subtitlesR.lib</AdditionalDependencies>
-      <AdditionalDependencies Condition="'$(Configuration)'=='Release' And '$(VisualStudioVersion)'&gt;'11.0'">delayimp.lib;subtitlesR.lib</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'=='Debug'">subtitlesD.lib;gdi32.lib</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'=='Debug' And '$(VisualStudioVersion)'&gt;'11.0'">subtitlesD.lib;gdi32.lib</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'=='Release'">subtitlesR.lib;gdi32.lib</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'=='Release' And '$(VisualStudioVersion)'&gt;'11.0'">subtitlesR.lib;gdi32.lib</AdditionalDependencies>
       <RegisterOutput>false</RegisterOutput>
     </Link>
     <ResourceCompile>
-      <PreprocessorDefinitions>AFX_RESOURCE_DLL;AFX_TARG_ENU;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
@@ -34,7 +32,6 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
-	  <DelayLoadDLLs>oleacc.dll</DelayLoadDLLs>
       <Profile>false</Profile>
     </Link>
   </ItemDefinitionGroup>
