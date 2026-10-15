@@ -1605,6 +1605,53 @@ This is body serialization, not complete SaveAs closure. Header and style output
 export orchestration, remaining CString preparation and native service contracts
 still need their own migration and exact-byte evidence.
 
+### Safe fixed export sections and validation repairs
+
+The experimental SaveAs path now builds SAMI framing, SSA/ASS script headers,
+style-format headers, Events headers, and sidecar headers in safe Rust. Signed
+screen dimensions, all nonzero collision values, ASS-only scaled borders, blank
+lines and historical literal text are retained. Native code still decides when
+each section is written: Events follows style rows only for a live nonempty
+entry array; sidecar lookup precedes its format condition, and sidecar style
+materialization remains after opening and writing the header. Style rows, native
+floating-point formatting, newline preparation and file/codepage services remain.
+
+Four empty-document file fixtures add exact SSA/ASS/SAMI framing, absence of
+Events, negative dimensions, Reverse collisions, ASS-only scaled output, and an
+SRT sidecar header. They supplement the eight body exports. These are bounded
+full-file comparisons, not complete export or subsystem closure.
+
+Foundation run 38659082963 failed and remains failed. Its extracted Add suffix
+lost an enclosing preprocessor opener after preparation moved; extraction now
+selects the complete native document branch before slicing, preserving RustText
+branches. The isolated Windows owner probe also needed real STSStyle declarations
+and their FwRect dependencies after the adapter began instantiating style helpers.
+Finally, overlap tests created input and output pointers through successive Rust
+borrows; they now derive both pointers from one mutable raw pointer before the
+call. Production staging remains unchanged. These repairs require fresh checks;
+earlier green renderer runs do not replace the foundation gate. Local validation
+passes 241 core and 122 FFI tests, pinned formatting/Clippy, and 146 Python tests
+with four skips. All 363 Rust tests also pass under pinned nightly-2025-02-20
+Miri on macOS arm64. The full portable differential runner completes against
+the frozen working tree (report `artifacts/decoder/host/report.json`); this local
+report records source fingerprints but is not a committed-candidate archive.
+Probe generation and unchanged native/RustText preprocessing also pass.
+
+The [x64](rust-document-x64-2a644-evidence.json) and
+[x86](rust-document-Win32-2a644-evidence.json) archives verify SetStr checkpoint
+`2a64481a`, run 38657513919, jobs 116170681944 and 116170681830. Each architecture
+has four equal 4,111-line document traces, sixteen style-API executions, 814
+renderer cases / 8,586 frames, 32 mutation cases / 224 frames, and the smoke and
+COM checks. Retained binaries, source hashes, traces, frame-hash metadata and PE
+architecture are checked independently. Pixel files are not retained, so exact
+pixel-byte equality remains runner-reported. These archives include text plans,
+preparation and SetStr, but give no later Open, FRAME or export credit. The failed
+foundation workflow remains failed.
+
+The preceding body-export checkpoint `e5ff50f0` also passes both Windows document
+compile gates in run 38660481619 (jobs 116180281655 and 116180281912); its full
+renderer execution remains pending at this capture.
+
 ### Verified CopyStyles checkpoint
 
 The [f570 x64 integration archive](rust-document-x64-f570-evidence.json) verifies
@@ -1725,13 +1772,13 @@ Neither count measures the amount of application behavior replaced.
 The reproducible [Rust unsafe inventory](rust-unsafe-inventory.json) uses
 `python3 tools/compat/audit_rust_boundary.py OUTPUT.json`. It masks comments and
 literals, separates cfg(test) items, and includes all platform/feature branches.
-At the current frozen working-tree sources based on `30d00248` (exact file
+At the current frozen working-tree sources based on `e5ff50f0` (exact file
 hashes recorded by the regenerated inventory):
 
 | Layer | Production source inventory | Meaning |
 | --- | --- | --- |
-| `rust/compat` | 0 unsafe blocks/functions/impls; 8,877 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
-| `rust/ffi` | 381 explicit unsafe blocks, 317 unsafe function declarations, two unsafe impls (allocator and registry admission); 6,275 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
+| `rust/compat` | 0 unsafe blocks/functions/impls; 8,967 nonblank code lines excluding comments/tests | Compiler-enforced `forbid(unsafe_code)`; typed algorithms and collections |
+| `rust/ffi` | 382 explicit unsafe blocks, 318 unsafe function declarations, two unsafe impls (allocator and registry admission); 6,311 nonblank code lines excluding comments/tests | Native pointer/length contracts, temporary slices, opaque-owner access/release, copies, data loans and Windows CRT calls |
 | Tests | 119 unsafe blocks in FFI tests | Exercise valid and deliberately bounded ownership/alias/initialization contracts; not production code |
 
 Unsafe-function declarations and blocks overlap and must not be added as

@@ -1,7 +1,7 @@
 import subprocess
 import unittest
 
-from check_decoder import ROOT, extract_fenced_method, extract_method
+from check_decoder import ROOT, extract_fenced_method, extract_method, select_undefined_ifdef
 
 
 class SourceExtractionTests(unittest.TestCase):
@@ -12,6 +12,42 @@ class SourceExtractionTests(unittest.TestCase):
             extract_fenced_method(body + "\n#endif\nvoid B() {}", "void A()", "void B()")
         with self.assertRaises(ValueError):
             extract_fenced_method(body, "void A()", "void B()")
+
+    def test_selects_native_owner_branch_preserving_leaf_conditions(self):
+        source="""before
+#ifdef OWNER
+bad();
+#else
+native();
+#if LEAF
+leaf();
+#else
+baseline();
+#endif
+#endif
+after
+"""
+        selected=select_undefined_ifdef(source,"OWNER")
+        self.assertEqual(selected,"before\nnative();\n#if LEAF\nleaf();\n#else\nbaseline();\n#endif\nafter\n")
+        with self.assertRaises(ValueError):select_undefined_ifdef("#ifdef OWNER\n", "OWNER")
+        with self.assertRaises(ValueError):select_undefined_ifdef("#if defined(OWNER)\n#endif\n", "OWNER")
+
+    def test_actual_prepared_suffix_preprocesses_in_both_leaf_modes(self):
+        import shutil
+        compiler=shutil.which("c++")
+        if not compiler:self.skipTest("C++ preprocessor unavailable")
+        source=(ROOT/"src/subtitles/STS.cpp").read_text(encoding="utf-8-sig")
+        body=extract_fenced_method(source,"void CSimpleTextSubtitle::Add(","void CSimpleTextSubtitle::AddSTSEntryOnly(")
+        native=select_undefined_ifdef(body,"XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL")
+        self.assertNotIn("AddFinalSuffix",native)
+        start=native.index("    sub.readorder  =")
+        suffix=native[start:]
+        self.assertIn("m_segments.InsertAt",suffix)
+        for defines in ([],["-DXY_VSFILTER_RUST_TEXT"]):
+            result=subprocess.run([compiler,"-E","-P","-x","c++",*defines,"-"],input=suffix,text=True,capture_output=True)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertIn("sub.readorder",result.stdout)
+            self.assertIn("XyRust::SegmentInsertion" if defines else "m_segments.InsertAt",result.stdout)
 
     def test_actual_add_boundaries_and_pinned_equivalence(self):
         signature = "void CSimpleTextSubtitle::Add("

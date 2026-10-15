@@ -94,6 +94,46 @@ fn insert(resource: Resource) -> Result<u64, u32> {
 }
 
 /// # Safety
+/// Output receives one immutable snapshot ID in eight writable bytes. Snapshot
+/// contains raw UTF-16LE section text, without a packet header.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_format_export_section_v1(
+    format: u32,
+    section: u32,
+    width: i32,
+    height: i32,
+    collisions: i32,
+    scaled: u32,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    if scaled > 1 {
+        return INVALID_INPUT;
+    }
+    let text = required!(xy_vsfilter_compat::document_export::format_section(
+        format,
+        section,
+        width,
+        height,
+        collisions,
+        scaled != 0
+    )
+    .map_err(|error| match error {
+        xy_vsfilter_compat::document_export::Error::InvalidFormat
+        | xy_vsfilter_compat::document_export::Error::InvalidSection => INVALID_INPUT,
+        xy_vsfilter_compat::document_export::Error::CountOverflow => COUNT_OVERFLOW,
+    }));
+    let bytes = required!(raw_units_bytes(&text));
+    let id = required!(insert(Resource::Snapshot(bytes)));
+    // SAFETY: output preflighted; no registry reference remains.
+    unsafe {
+        write_output(output, &id.to_le_bytes());
+    }
+    OK
+}
+
+/// # Safety
 /// Input is one exact Entry64 wire with natively prepared text. Output receives
 /// one immutable snapshot ID; its bytes are raw UTF-16LE without a header.
 /// Input may overlap output and is fully copied before any output writes.
@@ -129,7 +169,8 @@ pub unsafe extern "C" fn xy_vsfilter_document_format_export_row_v1(
     let text = required!(
         xy_vsfilter_compat::document_export::format_row(format, numbers, &entry).map_err(|error| {
             match error {
-                xy_vsfilter_compat::document_export::Error::InvalidFormat => INVALID_INPUT,
+                xy_vsfilter_compat::document_export::Error::InvalidFormat
+                | xy_vsfilter_compat::document_export::Error::InvalidSection => INVALID_INPUT,
                 xy_vsfilter_compat::document_export::Error::CountOverflow => COUNT_OVERFLOW,
             }
         })
@@ -2155,13 +2196,15 @@ mod tests {
             suffix_entry.text = vec![10, 0, 10];
             suffix_entry.style = vec![42, 65];
             let mut overlap = wire::encode_entry(&suffix_entry).unwrap();
+            let overlap_length = overlap.len();
+            let overlap_pointer = overlap.as_mut_ptr();
             assert_eq!(
                 xy_vsfilter_document_add_prepared_v1(
                     suffix_owner,
                     3,
-                    overlap.as_ptr(),
-                    overlap.len(),
-                    overlap.as_mut_ptr(),
+                    overlap_pointer.cast_const(),
+                    overlap_length,
+                    overlap_pointer,
                     8
                 ),
                 OK
@@ -2169,6 +2212,80 @@ mod tests {
             assert_eq!(state(suffix_owner).entries()[0].text, [92, 78, 0, 10, 0]);
             assert_eq!(state(suffix_owner).entries()[0].style, [65]);
             assert_eq!(xy_vsfilter_document_destroy_v1(suffix_owner), OK);
+
+            let mut section_output = [0xa5u8; 8];
+            for (format, section, scaled, capacity) in
+                [(14, 0, 0, 8), (0, 4, 0, 8), (0, 0, 2, 8), (0, 0, 0, 7)]
+            {
+                assert_eq!(
+                    xy_vsfilter_document_format_export_section_v1(
+                        format,
+                        section,
+                        0,
+                        0,
+                        0,
+                        scaled,
+                        section_output.as_mut_ptr(),
+                        capacity
+                    ),
+                    INVALID_INPUT
+                );
+                assert_eq!(section_output, [0xa5; 8]);
+            }
+            assert_eq!(
+                xy_vsfilter_document_format_export_section_v1(0, 0, 0, 0, 0, 0, ptr::null_mut(), 8),
+                INVALID_INPUT
+            );
+            let mut saved_section = None;
+            for format in 0..14 {
+                for section in 0..4 {
+                    assert_eq!(
+                        xy_vsfilter_document_format_export_section_v1(
+                            format,
+                            section,
+                            i32::MIN,
+                            i32::MAX,
+                            -1,
+                            1,
+                            section_output.as_mut_ptr(),
+                            8
+                        ),
+                        OK
+                    );
+                    let snapshot = u64::from_le_bytes(section_output);
+                    let bytes = read_snapshot(snapshot);
+                    assert_eq!(bytes.len() % 2, 0);
+                    let units: Vec<u16> = bytes
+                        .chunks_exact(2)
+                        .map(|b| u16::from_le_bytes([b[0], b[1]]))
+                        .collect();
+                    let text = alloc::string::String::from_utf16(&units).unwrap();
+                    match section {
+                        0 if format == 2 => assert!(text.starts_with("<SAMI>\n<HEAD>\n")),
+                        0 if format == 4 || format == 5 => {
+                            assert!(text.contains("PlayResX: -2147483648\nPlayResY: 2147483647\n"));
+                            assert!(text.contains("Collisions: Reverse\n"));
+                            assert_eq!(text.contains("ScaledBorderAndShadow: Yes\n"), format == 5);
+                        }
+                        1 if format == 4 || format == 5 => {
+                            assert!(text.starts_with("\n[Events]\nFormat: "))
+                        }
+                        2 if format == 2 => assert_eq!(text, "</BODY>\n</SAMI>\n"),
+                        3 => assert!(text.starts_with(
+                            "ScriptType: v4.00+\nPlayResX: -2147483648\nPlayResY: 2147483647\n"
+                        )),
+                        _ => assert!(text.is_empty()),
+                    }
+                    if format == 5 && section == 0 {
+                        saved_section = Some((snapshot, bytes));
+                    } else {
+                        assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
+                    }
+                }
+            }
+            let (snapshot, bytes) = saved_section.unwrap();
+            assert_eq!(read_snapshot(snapshot), bytes);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
 
             let mut export_entry = wire::decode_entry(&entry(0, 10)).unwrap();
             export_entry.text = vec![0xd800, 0, 65];
@@ -2266,6 +2383,8 @@ mod tests {
                 assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
             }
             let mut overlapping = encoded.clone();
+            let overlapping_length = overlapping.len();
+            let overlapping_pointer = overlapping.as_mut_ptr();
             assert_eq!(
                 xy_vsfilter_document_format_export_row_v1(
                     1,
@@ -2275,9 +2394,9 @@ mod tests {
                     -2,
                     3,
                     0,
-                    overlapping.as_ptr(),
-                    overlapping.len(),
-                    overlapping.as_mut_ptr(),
+                    overlapping_pointer.cast_const(),
+                    overlapping_length,
+                    overlapping_pointer,
                     8
                 ),
                 OK
@@ -2607,14 +2726,16 @@ mod tests {
             assert_eq!(output, [0xa5; 8]);
             assert_eq!(state(write_owner), before);
             let mut overlapping = raw;
+            let overlapping_length = overlapping.len();
+            let overlapping_pointer = overlapping.as_mut_ptr();
             assert_eq!(
                 xy_vsfilter_document_set_text_plan_v1(
                     write_owner,
                     0,
                     0,
-                    overlapping.as_ptr(),
-                    overlapping.len(),
-                    overlapping.as_mut_ptr(),
+                    overlapping_pointer.cast_const(),
+                    overlapping_length,
+                    overlapping_pointer,
                     8
                 ),
                 OK
@@ -2977,12 +3098,14 @@ mod tests {
             assert_eq!(handles, 0u64.to_le_bytes());
             assert_eq!(state(copy_destination), before);
             let mut overlap = [88u8, 0, 0, 0, 0, 0, 0, 0];
+            let overlap_length = overlap.len();
+            let overlap_pointer = overlap.as_mut_ptr();
             assert_eq!(
                 xy_vsfilter_document_copy_styles_submit_v1(
                     copy_run,
-                    overlap.as_ptr(),
-                    8,
-                    overlap.as_mut_ptr(),
+                    overlap_pointer.cast_const(),
+                    overlap_length,
+                    overlap_pointer,
                     8
                 ),
                 OK
@@ -3128,12 +3251,14 @@ mod tests {
                     assert_eq!(&result[..8], &0u64.to_le_bytes());
                     assert_eq!(state(style_owner), before);
                     let mut overlapping = [88u8, 0, 0, 0, 0, 0, 0, 0];
+                    let overlapping_length = overlapping.len();
+                    let overlapping_pointer = overlapping.as_mut_ptr();
                     assert_eq!(
                         xy_vsfilter_document_add_style_submit_v1(
                             run,
-                            overlapping.as_ptr(),
-                            8,
-                            overlapping.as_mut_ptr(),
+                            overlapping_pointer.cast_const(),
+                            overlapping_length,
+                            overlapping_pointer,
                             8
                         ),
                         OK
@@ -3332,13 +3457,14 @@ mod tests {
             assert_eq!(state(conversion_owner), before);
             assert_eq!(applied, [0xa5; 16]);
             // Overlapping input/output: input copied completely before flag write.
+            let pairs_pointer = pairs.as_mut_ptr();
             assert_eq!(
                 xy_vsfilter_document_commit_time_conversion_v1(
                     conversion_owner,
                     0,
-                    pairs.as_ptr(),
+                    pairs_pointer.cast_const(),
                     16,
-                    pairs.as_mut_ptr(),
+                    pairs_pointer,
                     8
                 ),
                 OK
@@ -4981,10 +5107,19 @@ mod tests {
 
             // Input/output alias is allowed: staging finishes before output.
             let mut overlapping = encoded.clone();
-            let input = overlapping.as_ptr();
-            let output = overlapping.as_mut_ptr();
+            let overlapping_length = overlapping.len();
+            let overlapping_pointer = overlapping.as_mut_ptr();
+            let input = overlapping_pointer.cast_const();
+            let output = overlapping_pointer;
             assert_eq!(
-                xy_vsfilter_document_add_prepared_v1(owner, 0, input, overlapping.len(), output, 8),
+                xy_vsfilter_document_add_prepared_v1(
+                    owner,
+                    0,
+                    input,
+                    overlapping_length,
+                    output,
+                    8
+                ),
                 OK
             );
             assert_eq!(&overlapping[..8], &[1, 0, 0, 0, 0, 0, 0, 0]);

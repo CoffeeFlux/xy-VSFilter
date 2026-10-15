@@ -186,7 +186,23 @@ def copy_styles_stages():
             b"copy-styles-mixed-source-before", b"copy-styles-mixed-result", b"copy-styles-mixed-source-after")
 
 
-def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True, require_unknown_stages=True, require_add_style_stages=True, require_copy_styles_stages=True, require_text_plan_stages=True, require_preparation_stages=True, require_setstr_stages=True, require_open_order_stages=True, require_frame_search_stages=True, require_save_body_stages=True):
+def save_section_bytes():
+    common="; For Sub Station Alpha info and downloads,\n; go to http://www.eswat.demon.co.uk/\n; or email kotus@eswat.demon.co.uk\n; \n"
+    advanced="; Advanced Sub Station Alpha script format developed by #Anime-Fansubs@EfNET\n; http://www.anime-fansubs.org\n; \n; For additional info and downloads go to http://gabest.org/\n; or email gabest@freemail.hu\n; \n"
+    styles={"ssa":"[V4 Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, TertiaryColour, BackColour, Bold, Italic, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding\n",
+            "ass":"[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n"}
+    texts={}
+    for fmt in ("ssa","ass"):
+        text="[Script Info]\n"+("; This is a Sub Station Alpha v4 script.\n" if fmt=="ssa" else "; This is an Advanced Sub Station Alpha v4+ script.\n")+common+(advanced if fmt=="ass" else "")
+        text+="; Note: This file was saved by Subresync.\n; \nScriptType: "+("v4.00" if fmt=="ssa" else "v4.00+")+"\nCollisions: Reverse\n"
+        text+=("ScaledBorderAndShadow: Yes\n" if fmt=="ass" else "")+"PlayResX: -17\nPlayResY: 23\nTimer: 100.0000\n\n"+styles[fmt]
+        texts["sections-"+fmt]=text
+    texts["sections-smi"]='<SAMI>\n<HEAD>\n<STYLE TYPE="text/css">\n<!--\nP {margin-left: 16pt; margin-right: 16pt; margin-bottom: 16pt; margin-top: 16pt;\n   text-align: center; font-size: 18pt; font-family: arial; font-weight: bold; color: #f0f0f0;}\n.UNKNOWNCC {Name:Unknown; lang:en-US; SAMIType:CC;}\n-->\n</STYLE>\n</HEAD>\n\n<BODY>\n</BODY>\n</SAMI>\n'
+    texts["sections-srt"]=""
+    texts["sections-srt-sidecar"]="ScriptType: v4.00+\nPlayResX: -17\nPlayResY: 23\n\n"+styles["ass"]
+    return {name:b"\xef\xbb\xbf"+value.replace("\n","\r\n").encode() for name,value in texts.items()}
+
+def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True, require_unknown_stages=True, require_add_style_stages=True, require_copy_styles_stages=True, require_text_plan_stages=True, require_preparation_stages=True, require_setstr_stages=True, require_open_order_stages=True, require_frame_search_stages=True, require_save_body_stages=True, require_save_sections_stages=True):
     lines = data.splitlines()
     if not lines or lines[0] != f"provenance pointer_bits={pointer_bits}".encode():
         raise ValueError("missing or incorrect native architecture provenance")
@@ -210,6 +226,28 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
         raw = b"preparation-value skipped-lf 9 0058 005c 004e 005c 004e 0000 000a 0059 0000 0"
         if lines.count(raw) != 1 or not positions[0] < lines.index(raw) < positions[1]:
             raise ValueError("missing/invalid bounded native skipped-LF observation")
+
+    if require_save_sections_stages:
+        labels=["sections-ssa","sections-ass","sections-smi","sections-srt"]
+        expected=[b"save-sections-stage before"]+[f"save-sections-export {name}".encode() for name in labels]+[b"save-sections-stage after"]
+        if [line for line in lines if line.startswith(b"save-sections-")]!=expected:
+            raise ValueError("missing or incorrect fixed SaveAs section stages")
+        rows=[line for line in lines if line.startswith(b"saved-file sections-")]
+        names=[name for label in labels for name in (label,label+"-sidecar")]
+        if len(rows)!=len(names):raise ValueError("missing fixed SaveAs section bytes")
+        expected_bytes=save_section_bytes()
+        for row,name in zip(rows,names):
+            if name.endswith("-sidecar") and name!="sections-srt-sidecar":
+                if row!=f"saved-file {name} exists=0".encode():raise ValueError("unexpected empty script sidecar")
+                continue
+            match=re.fullmatch(f"saved-file {name} exists=1 bytes=".encode()+rb"([0-9]+)((?: [0-9a-f]{2})+)",row)
+            if not match:raise ValueError("invalid section byte trace")
+            value=bytes.fromhex(match[2].decode())
+            if len(value)!=int(match[1]) or len(value)>1024*1024:raise ValueError("invalid section byte count")
+            if name=="sections-srt-sidecar":
+                if not value.startswith(expected_bytes[name]) or not value[len(expected_bytes[name]):].startswith(b"Style: Default,Arial,"):
+                    raise ValueError("incorrect fixed sidecar header/native style boundary")
+            elif value!=expected_bytes[name]:raise ValueError("incorrect fixed SaveAs section bytes")
 
     if require_save_body_stages:
         expected = [b"save-body-stage time-before"]
@@ -521,11 +559,11 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
 
 
 
-def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True, require_unknown_stages=True, require_add_style_stages=True, require_copy_styles_stages=True, require_text_plan_stages=True, require_preparation_stages=True, require_setstr_stages=True, require_open_order_stages=True, require_frame_search_stages=True, require_save_body_stages=True):
+def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True, require_unknown_stages=True, require_add_style_stages=True, require_copy_styles_stages=True, require_text_plan_stages=True, require_preparation_stages=True, require_setstr_stages=True, require_open_order_stages=True, require_frame_search_stages=True, require_save_body_stages=True, require_save_sections_stages=True):
     if len(traces) != 4:
         raise ValueError("two reference and two candidate executions required")
     for trace in traces:
-        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages, require_metadata_stages=require_metadata_stages, require_selected_copy_stages=require_selected_copy_stages, require_style_rename_stages=require_style_rename_stages, require_sort_stages=require_sort_stages, require_base_empty_stages=require_base_empty_stages, require_lcid_stages=require_lcid_stages, require_resolution_stages=require_resolution_stages, require_layout_size_stages=require_layout_size_stages, require_conversion_stages=require_conversion_stages, require_unknown_stages=require_unknown_stages, require_add_style_stages=require_add_style_stages, require_copy_styles_stages=require_copy_styles_stages, require_text_plan_stages=require_text_plan_stages, require_preparation_stages=require_preparation_stages, require_setstr_stages=require_setstr_stages, require_open_order_stages=require_open_order_stages, require_frame_search_stages=require_frame_search_stages, require_save_body_stages=require_save_body_stages)
+        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages, require_metadata_stages=require_metadata_stages, require_selected_copy_stages=require_selected_copy_stages, require_style_rename_stages=require_style_rename_stages, require_sort_stages=require_sort_stages, require_base_empty_stages=require_base_empty_stages, require_lcid_stages=require_lcid_stages, require_resolution_stages=require_resolution_stages, require_layout_size_stages=require_layout_size_stages, require_conversion_stages=require_conversion_stages, require_unknown_stages=require_unknown_stages, require_add_style_stages=require_add_style_stages, require_copy_styles_stages=require_copy_styles_stages, require_text_plan_stages=require_text_plan_stages, require_preparation_stages=require_preparation_stages, require_setstr_stages=require_setstr_stages, require_open_order_stages=require_open_order_stages, require_frame_search_stages=require_frame_search_stages, require_save_body_stages=require_save_body_stages, require_save_sections_stages=require_save_sections_stages)
     if any(trace != traces[0] for trace in traces[1:]):
         raise ValueError("native lifecycle traces differ or are nondeterministic")
 

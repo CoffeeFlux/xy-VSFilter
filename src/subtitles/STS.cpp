@@ -5084,6 +5084,9 @@ bool CSimpleTextSubtitle::SaveAs(CString fn, exttype et, double fps, CTextFile::
 
     if(et == EXTSMI)
     {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        f.WriteString(XyRust::DocumentOwner::FormatExportSection(et, 0));
+#else
         CString str;
 
         str += _T("<SAMI>\n<HEAD>\n");
@@ -5099,11 +5102,18 @@ bool CSimpleTextSubtitle::SaveAs(CString fn, exttype et, double fps, CTextFile::
         str += _T("<BODY>\n");
 
         f.WriteString(str);
+#endif
     }
     else if(et == EXTSSA || et == EXTASS)
     {
         CString str;
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        const int collisions = GetDocumentCollisions();
+        const bool scaled = et == EXTASS && GetDocumentScaledBAS();
+        f.WriteString(XyRust::DocumentOwner::FormatExportSection(et, 0,
+            GetDocumentScreenSize().cx, GetDocumentScreenSize().cy, collisions, scaled));
+#else
         str  = _T("[Script Info]\n");
         str += (et == EXTSSA) ? _T("; This is a Sub Station Alpha v4 script.\n") : _T("; This is an Advanced Sub Station Alpha v4+ script.\n");
         str += _T("; For Sub Station Alpha info and downloads,\n");
@@ -5147,6 +5157,7 @@ bool CSimpleTextSubtitle::SaveAs(CString fn, exttype et, double fps, CTextFile::
         str2.Format(str, m_dstScreenSize.cx, m_dstScreenSize.cy);
 #endif
         f.WriteString(str2);
+#endif
 
         str  = (et == EXTSSA)
             ? _T("Style: %s,%s,%d,&H%06x,&H%06x,&H%06x,&H%06x,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n")
@@ -5211,12 +5222,16 @@ bool CSimpleTextSubtitle::SaveAs(CString fn, exttype et, double fps, CTextFile::
 
         if(GetEntryCount() > 0)
         {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            f.WriteString(XyRust::DocumentOwner::FormatExportSection(et, 1));
+#else
             str  = _T("\n");
             str += _T("[Events]\n");
             str += (et == EXTSSA)
                 ? _T("Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n")
                 : _T("Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text\n");
             f.WriteString(str);
+#endif
         }
     }
 
@@ -5325,7 +5340,11 @@ bool CSimpleTextSubtitle::SaveAs(CString fn, exttype et, double fps, CTextFile::
 
     if(et == EXTSMI)
     {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        f.WriteString(XyRust::DocumentOwner::FormatExportSection(et, 2));
+#else
         f.WriteString(_T("</BODY>\n</SAMI>\n"));
+#endif
     }
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
@@ -5344,6 +5363,10 @@ bool CSimpleTextSubtitle::SaveAs(CString fn, exttype et, double fps, CTextFile::
 
         CString str, str2;
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        f.WriteString(XyRust::DocumentOwner::FormatExportSection(et, 3,
+            GetDocumentScreenSize().cx, GetDocumentScreenSize().cy));
+#else
         str += _T("ScriptType: v4.00+\n");
         str += _T("PlayResX: %d\n");
         str += _T("PlayResY: %d\n");
@@ -5355,6 +5378,7 @@ bool CSimpleTextSubtitle::SaveAs(CString fn, exttype et, double fps, CTextFile::
         str2.Format(str, m_dstScreenSize.cx, m_dstScreenSize.cy);
 #endif
         f.WriteString(str2);
+#endif
 
         str  = _T("Style: Default,%s,%d,&H%08x,&H%08x,&H%08x,&H%08x,%d,%d,%d,%d,%d,%d,%d,%.2f,%d,%d,%d,%d,%d,%d,%d,%d\n");
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL

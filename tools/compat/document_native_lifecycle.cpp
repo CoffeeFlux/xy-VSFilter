@@ -809,6 +809,21 @@ static void save_body_lifecycle() {
     const exttype frameTypes[]={EXTSRT};const wchar_t* framePaths[]={L"document-lifecycle-body-frame.srt"};const char* frameLabels[]={"body-frame-srt-le16"};
     run("frame",frameTypes,framePaths,frameLabels,1,CTextFile::LE16,256.0);
 }
+static void save_sections_lifecycle() {
+    TraceDocument doc(0);doc.Screen(CSize(-17,23));doc.Collisions(-2);doc.Scaled(true);
+    const unsigned callbacks=change_events[0];printf("save-sections-stage before\n");doc.Dump("save-sections-before");
+    const exttype types[]={EXTSSA,EXTASS,EXTSMI,EXTSRT};
+    const wchar_t* paths[]={L"document-lifecycle-sections.ssa",L"document-lifecycle-sections.ass",L"document-lifecycle-sections.smi",L"document-lifecycle-sections.srt"};
+    const char* labels[]={"sections-ssa","sections-ass","sections-smi","sections-srt"};
+    for(int i=0;i<4;++i){
+        if(i==3){STSStyle style;style.fontName=L"Arial";named_add(doc,L"Default",style);}
+        SavedFiles files(paths[i]);printf("save-sections-export %s\n",labels[i]);
+        check(doc.SaveAs(files.name,types[i],25.0,CTextFile::UTF8),"empty section SaveAs");saved_bytes(files.name,labels[i],true);
+        const std::string sidecar=std::string(labels[i])+"-sidecar";saved_bytes(files.name+L".style",sidecar.c_str(),i==3);
+        check(doc.Entries()==0&&doc.Segments()==0&&change_events[0]==callbacks,"empty section exports retain storage and callbacks");
+    }
+    printf("save-sections-stage after\n");doc.Dump("save-sections-after");
+}
 static void identity_stage(TraceDocument& doc,const char* stage,const CString& name,const CString& path) {
     check(same_identity(doc.Name(),name)&&same_identity(doc.Path(),path),"complete raw identity values");
     printf("identity-stage %s name",stage);units(doc.Name());printf(" path");units(doc.Path());printf("\n");
@@ -1624,6 +1639,7 @@ int main() {
         unknown_style_lifecycle();
         named_style_exports();
         save_body_lifecycle();
+        save_sections_lifecycle();
         {
             TraceDocument source(0),destination(1);populate(source);populate(destination);
             unsigned notifications=change_events[1];
