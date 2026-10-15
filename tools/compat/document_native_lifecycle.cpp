@@ -91,6 +91,13 @@ public:
         Forced(false);PARType(EPCTDownscale);PAR(1.25+id);Matrix(YCbCrMatrix_BT709);Range(YCbCrRange_PC);
     }
     ~TraceDocument() override {printf("event %u %u destructor-body\n",++sequence,id_);}
+    STSStyle DefaultValue() const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        return m_document->DefaultStyle();
+#else
+        return m_defaultStyle;
+#endif
+    }
     CSize LayoutSize() const {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
         return GetDocumentLayoutSize();
@@ -473,7 +480,7 @@ static void populate(TraceDocument& doc) {
     doc.CreateSegments();doc.Animate(0);doc.Dump("populated");
 }
 static void check_default(TraceDocument& doc,const STSStyle& expected,const char* stage) {
-    STSStyle actual;check(doc.GetDefaultStyle(actual),"GetDefaultStyle status");
+    STSStyle actual=doc.DefaultValue();
     // Full initialized values are serialized for direct pinned comparison;
     // these assertions additionally detect loss of raw CString suffix/zero sign.
     check(actual.fontName.GetLength()==expected.fontName.GetLength(),"default font logical length");
@@ -497,7 +504,7 @@ static void default_style_lifecycle() {
     check(source.SetDefaultStyle(supplied),"SetDefaultStyle status");
     check(source.SetDefaultStyle(supplied),"SetDefaultStyle identical still true");
     check_default(source,supplied,"default-supplied");
-    STSStyle isolated;check(source.GetDefaultStyle(isolated),"default owned read");
+    STSStyle isolated=source.DefaultValue();
     isolated.fontName.SetAt(4,L'Q');isolated.fontSize=11;
     check_default(source,supplied,"default-read-independent");
     source.Empty();check_default(source,supplied,"default-retained-empty");
@@ -519,14 +526,7 @@ static void default_style_lifecycle() {
     resolved(source,1,expectedNamed,"mapped-named");
     source.SetForceDefaultStyle(true);resolved(source,0,supplied,"forced-missing");resolved(source,1,supplied,"forced-named");
     source.SetForceDefaultStyle(false);resolved(source,1,expectedNamed,"unforced-named");
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    source.ResetDefaultStyle(HANGEUL_CHARSET);
-#else
-    source.CreateDefaultStyle(HANGEUL_CHARSET);
-#endif
-    STSStyle reset;reset.charSet=HANGEUL_CHARSET;check_default(source,reset,"default-reset");
-    source.SetForceDefaultStyle(true);resolved(source,1,reset,"forced-reset");
-    check(change_events[0]==notifications,"default resolution/reset do not notify");
+    check(change_events[0]==notifications,"default resolution does not notify");
     source.Dump("default-resolution-final");
 }
 static STSStyle named_value(int id) {
@@ -1185,7 +1185,7 @@ static void base_empty_lifecycle() {
         check(same_identity(doc.Name(),name)&&same_identity(doc.Path(),path)&&same_metadata(doc.Metadata(),metadata)
             &&doc.Mode()==mode&&doc.Type()==type&&doc.Encoding()==encoding&&doc.Wrap()==wrap&&doc.Collisions()==collisions&&doc.Scaled()==scaled
             &&doc.m_simple==simple&&doc.LCIDValue()==lcid&&doc.LayoutSize()==layout,"Empty retains initialized identity/metadata");
-        STSStyle actual;check(doc.GetDefaultStyle(actual)&&actual==defaultValue&&same_identity(actual.fontName,defaultValue.fontName),"Empty retains complete default");
+        STSStyle actual=doc.DefaultValue();check(actual==defaultValue&&same_identity(actual.fontName,defaultValue.fontName),"Empty retains complete default");
         uint64_t bits;std::memcpy(&bits,&actual.fontSize,8);check(bits==UINT64_C(0x8000000000000000),"Empty preserves default signedzero");
         printf("empty-stage %s\n",stage);doc.Dump(stage);
     };

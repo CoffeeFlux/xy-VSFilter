@@ -164,6 +164,15 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
         with self.assertRaises(ValueError):compare_traces([legacy]*4,64)
         compare_traces([legacy]*4,64,require_open_order_stages=False)
 
+    def test_cleanup_still_requires_live_frame_and_preparation_observations(self):
+        import re
+        cleaned = re.sub(rb" entry=-?[0-9]+", b"", TRACE)
+        compare_traces([cleaned] * 4, 64, cleanup=True)
+        for prefix in (b"frame-search-row ", b"preparation-stage ", b"copy-styles-stage "):
+            missing = b"\n".join(line for line in cleaned.split(b"\n") if not line.startswith(prefix))
+            with self.assertRaises(ValueError):
+                compare_traces([missing] * 4, 64, cleanup=True)
+
     def test_shared_native_helpers_are_defined_before_text_fixture_use(self):
         source=lifecycle.SOURCE.read_text()
         definition=source.index("static bool same_identity(")
@@ -173,18 +182,9 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
         self.assertLess(source.index("struct SavedFiles"),source.index("static void open_order_lifecycle("))
         self.assertLess(definition,source.index("class OpenOrderingDocument"))
         self.assertLess(source.index("static bool same_segment("),source.index("static void frame_search_lifecycle("))
-        body=source.index("static void save_body_lifecycle(")
-        self.assertLess(source.index("static void saved_bytes("),body)
-        self.assertLess(source.index("struct SavedFiles"),body)
-        self.assertLess(source.index("static bool same_segment("),body)
-        for extension in ("srt","sub","smi","psb","ssa","ass","txt"):
-            self.assertEqual(source.count('L"document-lifecycle-body.'+extension+'"'),1)
-        self.assertEqual(source.count('L"document-lifecycle-body-frame.srt"'),1)
-        for fixture in ("text_plan_lifecycle", "setstr_plan_lifecycle"):
-            start=source.index("static void "+fixture+"(")
-            self.assertLess(definition,start)
-            for helper in ("named_add", "segment_snapshot", "require_same_segments"):
-                self.assertLess(source.index("static "+("void " if helper in ("named_add","require_same_segments") else "std::vector<STSSegment> ")+helper+"("),start)
+        # Cleanup removed these entry points; never resurrect them for a probe.
+        for removed in ("SaveAs(", ".SetStr(", ".ConvertUnicode(", ".Sort(", ".SearchSub("):
+            self.assertNotIn(removed, source)
 
     def test_setstr_plan_requires_raw_tail_flags_conversion_and_retained_segments(self):
         for prefix in (b"setstr-value setstr-packed-to-wide ",b"setstr-value setstr-nul-tail "):

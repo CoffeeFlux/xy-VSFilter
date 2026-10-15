@@ -37,22 +37,18 @@ def fixtures():
               default + [0, 42, 0xd800], [0xd800, 42], [42, 0xdc00],
               [42, 42, 0, 42, 0, 66], [0, 0], [42, 68, 101, 102, 97, 117, 108, 116]]
     rows = [(mode, text, style) for mode in ('add', 'entry') for text in texts for style in styles]
-    rows += [('set', text, []) for text in texts]
     return rows
 
 
 def extract(source):
     result = {}
     for name, signature in [('add', 'void CSimpleTextSubtitle::Add('),
-                            ('entry', 'void CSimpleTextSubtitle::AddSTSEntryOnly('),
-                            ('set', 'void CSimpleTextSubtitle::SetStr(')]:
+                            ('entry', 'void CSimpleTextSubtitle::AddSTSEntryOnly(')]:
         method = source.index(signature)
-        start = source.index("    str.Replace", method) if name == 'set' else source.index("    str.Remove", method)
-        end = source.index('\n\n    if(stse.fUnicode', start) if name == 'set' else source.index('    STSEntry sub;', start)
+        start = source.index("    str.Remove", method)
+        end = source.index('    STSEntry sub;', start)
         suffix = source[start:end].rstrip()
-        if name == 'set' and suffix.strip() != 'str.Replace(L"\\n", L"\\\\N");':
-            raise ValueError('SetStr suffix fence changed')
-        if name != 'set' and ('str.Remove' not in suffix or 'style.TrimLeft' not in suffix):
+        if 'str.Remove' not in suffix or 'style.TrimLeft' not in suffix:
             raise ValueError('Add suffix fence changed')
         result[name] = {'normalized_character_start': start, 'normalized_character_end': end, 'sha256': sha(suffix.encode('utf-8')), 'text': suffix}
     return result
@@ -90,7 +86,7 @@ static void Print(const CStringW& value) {
 }
 static void Run(const char* mode,unsigned index,CStringW text,CStringW style) {
     std::printf("input %s %u",mode,index); Print(text); Print(style); std::puts("");
-    if(mode[0]=='a') add(text,style); else if(mode[0]=='e') entry(text,style); else set(text,style);
+    if(mode[0]=='a') add(text,style); else entry(text,style);
     std::printf("value %s %u",mode,index); Print(text); Print(style); std::puts("");
 }
 int main() {
@@ -149,7 +145,7 @@ def main():
     args = parser.parse_args()
     out = args.output.resolve(); out.mkdir(parents=True, exist_ok=True)
     report = {'schema': 1, 'complete': False, 'reference_commit': PIN,
-              'rust_parity': False, 'scope': 'actual ATL final Add/EntryOnly suffix and SetStr LF-only; excludes FastTrim, locale, WebVTT, charset conversion, append and callbacks'}
+              'rust_parity': False, 'scope': 'actual ATL final Add/EntryOnly suffix; excludes FastTrim, locale, WebVTT, charset conversion, append and callbacks'}
     path = out / 'report.json'
     def save():
         path.write_text(json.dumps(report, indent=2) + '\n')

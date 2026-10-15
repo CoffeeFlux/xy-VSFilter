@@ -16,7 +16,9 @@ import shlex
 import subprocess
 import sys
 
-PIN = "67da07cda068088b93e6de300f56cbad15ab6c5d"
+# Historical core/primitive regression oracle, including APIs removed by cleanup.
+# Current production compatibility is checked by document_native_lifecycle/CSRI.
+PIN = "4911cacb102bc0cbd41449793e54473265b04e62"
 ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -253,9 +255,17 @@ def run_owner(out, generate_only):
         "runtime": "Static MFC and static CRT (/MT, no _AFXDLL); actual included SDK/repository headers captured by /showIncludes",
         "limits": "Compile dependencies only; no new style lifecycle or full-class parity claim",
     }
+    # The old storage algorithms are tested with the cleanup's value adapters.
+    # Their interning implementation is no longer Boost; validate and identify it
+    # independently rather than claiming an unchanged upstream dependency.
+    adapter_pin = json.loads((ROOT / "tools/compat/reference.json").read_text())["commit"]
+    report["style_adapter_commit"] = adapter_pin
+    report["style_adapter_source_sha256"] = {}
     for dependency in ("src/subtitles/flyweight_base_types.h", "src/subtitles/mru_cache.h"):
-        if decode(inputs[dependency]) != decode(pinned_bytes[dependency]):
-            raise RuntimeError("Owner probe requires unchanged style dependency: " + dependency)
+        adapter = subprocess.check_output(["git", "show", f"{adapter_pin}:{dependency}"], cwd=ROOT, timeout=60)
+        if decode(inputs[dependency]) != decode(adapter):
+            raise RuntimeError("Owner probe requires unchanged cleanup style dependency: " + dependency)
+        report["style_adapter_source_sha256"][dependency] = sha(adapter)
     (out / "STS.h").write_bytes(("#pragma once\n#include \"flyweight_base_types.h\"\n" + styles + "\n" + entry + "\n" + segment + "\n").encode())
     shutil.copyfile(ROOT / "src/subtitles/RustDocumentOwner.h", out / "RustDocumentOwner.h")
     probe = decode(inputs["tools/compat/document_owner_probe.cpp"])

@@ -93,7 +93,7 @@ def main():
     args = parser.parse_args()
     out = args.output.resolve(); out.mkdir(parents=True, exist_ok=True)
     report = {'schema':'document-prepare-rust-v1', 'complete':False, 'equal':False,
-              'scope':'Bounded final Add/EntryOnly suffix and SetStr LF-only; excludes preceding trimming, WebVTT, encoding, append, callbacks, unassigned CString tail units and full host parity',
+              'scope':'Bounded final Add/EntryOnly suffix; excludes preceding trimming, WebVTT, encoding, append, callbacks, unassigned CString tail units and full host parity',
               'executions':[], 'artifact_sha256':{}}
     protected = report['artifact_sha256']
     def save(): (out/'report.json').write_text(json.dumps(report,indent=2)+'\n')

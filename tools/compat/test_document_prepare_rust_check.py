@@ -27,7 +27,7 @@ class RustPreparationComparisonTests(unittest.TestCase):
     def test_exact_raw_output_and_repeat_required(self):
         reference = trace()
         values = b'\n'.join(line for line in reference.splitlines() if line.startswith(b'value '))+b'\n'
-        self.assertEqual(check.compare_values(reference,[values,values],64),620)
+        self.assertEqual(check.compare_values(reference,[values,values],64),600)
         changed = values.replace(b'value add 1 0 -',b'value add 1 1 0000',1)
         with self.assertRaisesRegex(ValueError,'differs'):
             check.compare_values(reference,[changed,changed],64)
@@ -41,7 +41,7 @@ class RustPreparationComparisonTests(unittest.TestCase):
     def test_transport_line_endings_do_not_change_codeunits(self):
         reference = trace().replace(b'\n',b'\r\n')
         values = b'\n'.join(line for line in reference.splitlines() if line.startswith(b'value '))+b'\n'
-        self.assertEqual(check.compare_values(reference,[values,values],64),620)
+        self.assertEqual(check.compare_values(reference,[values,values],64),600)
 
     def test_incomplete_native_report_is_not_evidence(self):
         with TemporaryDirectory() as directory:
