@@ -225,6 +225,12 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_remove_entries_v1(uint64_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_animation_or_v1(uint64_t, uint32_t segment, uint32_t animated);
 // No rebuild. Result: applied:u32, reserved-zero:u32, end:i64 (zero if absent).
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_correct_last_end_v1(uint64_t, int64_t bound, uint8_t*, size_t);
+// Pure SaveAs body row formatting. Formats 0..5 SRT/SUB/SMI/PSB/SSA/ASS;
+// valid formats 6..13 produce empty rows; >=14 refuses. Native supplies integer
+// arithmetic results and already converted/newline-prepared text in Entry64.
+// Each string field uses raw UTF-16 up to its first NUL, matching native %s.
+// Output8 receives snapshot ID; snapshot bytes are raw UTF-16LE without header.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_format_export_row_v1(uint32_t format,int32_t sequence,int32_t start_ms,int32_t end_ms,int32_t frame_start,int32_t frame_end,int32_t margin_v,const uint8_t* input,size_t bytes,uint8_t*,size_t);
 // Translated search run, modes 0 Entry, 1 NextSegment, 2 ContainingSegment.
 // Begin output32 is runID:u64 then state24. Supply output24 is six LE words:
 // pending:u32,start:u32,requestIndex:i32,resultIndex:i32,found:u32,count:u32.

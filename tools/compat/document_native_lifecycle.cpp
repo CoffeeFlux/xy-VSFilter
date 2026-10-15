@@ -777,6 +777,38 @@ static void named_style_exports() {
     check(document.SaveAs(absent.name,EXTSRT,25.0,CTextFile::UTF8),"no mapped style SaveAs");
     saved_bytes(absent.name,"srt-no-map",true);saved_bytes(absent.name+L".style","srt-no-map-sidecar",false);
 }
+static void save_body_lifecycle() {
+    TraceDocument doc(0);STSStyle style;style.fontName=L"Arial";
+    named_add(doc,L"Default",style);named_add(doc,L"RowStyle",style);
+    const wchar_t rawStyle[]={L'R',L'o',L'w',L'S',L't',L'y',L'l',L'e',0,L'T'};
+    const wchar_t rawActor[]={L'A',L'c',L't',L'o',L'r',0,L'T'},rawEffect[]={L'E',L'f',L'f',L'e',L'c',L't',0,L'T'};
+    const CString name(rawStyle,10),actor(rawActor,7),effect(rawEffect,8);
+    doc.AddSTSEntryOnly(L"skipped first",true,-20000000,-10000000,name);
+    doc.AddSTSEntryOnly(L"row one",true,123450000,234560000,name,actor,effect,CRect(-7,-9,12345,4),-3,8);
+    doc.AddSTSEntryOnly(L"skipped second",true,-10000000,0,name);
+    doc.AddSTSEntryOnly(L"row two",true,36000123000LL,36010123000LL,name,actor,effect,CRect(2,3,4,6),17,2);
+    doc.CreateSegments();doc.Animate(0);
+    auto run=[&](const char* phase,const exttype* types,const wchar_t* const* paths,const char* const* labels,int count,CTextFile::enc encoding,double fps){
+        std::vector<STSEntry> entries;for(size_t i=0;i<doc.Entries();++i)entries.push_back(doc.Entry(int(i)));
+        std::vector<STSSegment> segments;for(size_t i=0;i<doc.Segments();++i){STSSegment value=doc.Segment(int(i));segments.push_back(value);}
+        const unsigned callbacks=change_events[0];printf("save-body-stage %s-before\n",phase);doc.Dump(phase);
+        for(int i=0;i<count;++i){SavedFiles files(paths[i]);printf("save-body-export %s\n",labels[i]);
+            check(doc.SaveAs(files.name,types[i],fps,types[i]==EXTTXT?CTextFile::LE16:encoding),"body SaveAs");saved_bytes(files.name,labels[i],true);
+            const std::string sidecar=std::string(labels[i])+"-sidecar";saved_bytes(files.name+L".style",sidecar.c_str(),types[i]!=EXTSSA&&types[i]!=EXTASS);}
+        check(change_events[0]==callbacks&&doc.Entries()==entries.size()&&doc.Segments()==segments.size(),"SaveAs retains counts and callback state");
+        for(size_t i=0;i<entries.size();++i){const STSEntry a=doc.Entry(int(i)),b=entries[i];
+            check(same_identity(a.str,b.str)&&same_identity(a.style,b.style)&&same_identity(a.actor,b.actor)&&same_identity(a.effect,b.effect)&&a.fUnicode==b.fUnicode&&a.marginRect==b.marginRect&&a.layer==b.layer&&a.start==b.start&&a.end==b.end&&a.readorder==b.readorder,"SaveAs retains complete entry");}
+        for(size_t i=0;i<segments.size();++i){STSSegment actual=doc.Segment(int(i));check(same_segment(actual,segments[i]),"SaveAs retains animated segments");}
+        printf("save-body-stage %s-after\n",phase);doc.Dump(phase);
+    };
+    const exttype types[]={EXTSRT,EXTSUB,EXTSMI,EXTPSB,EXTSSA,EXTASS,EXTTXT};
+    const wchar_t* paths[]={L"document-lifecycle-body.srt",L"document-lifecycle-body.sub",L"document-lifecycle-body.smi",L"document-lifecycle-body.psb",L"document-lifecycle-body.ssa",L"document-lifecycle-body.ass",L"document-lifecycle-body.txt"};
+    const char* labels[]={"body-srt-utf8","body-sub-utf8","body-smi-utf8","body-psb-utf8","body-ssa-utf8","body-ass-utf8","body-txt-le16"};
+    run("time",types,paths,labels,7,CTextFile::UTF8,23.976);
+    doc.Empty();doc.Mode(FRAME);named_add(doc,L"Default",style);doc.AddSTSEntryOnly(L"Frame body",true,1,3);doc.CreateSegments();doc.Animate(0);
+    const exttype frameTypes[]={EXTSRT};const wchar_t* framePaths[]={L"document-lifecycle-body-frame.srt"};const char* frameLabels[]={"body-frame-srt-le16"};
+    run("frame",frameTypes,framePaths,frameLabels,1,CTextFile::LE16,256.0);
+}
 static void identity_stage(TraceDocument& doc,const char* stage,const CString& name,const CString& path) {
     check(same_identity(doc.Name(),name)&&same_identity(doc.Path(),path),"complete raw identity values");
     printf("identity-stage %s name",stage);units(doc.Name());printf(" path");units(doc.Path());printf("\n");
@@ -1591,6 +1623,7 @@ int main() {
         conversion_lifecycle();
         unknown_style_lifecycle();
         named_style_exports();
+        save_body_lifecycle();
         {
             TraceDocument source(0),destination(1);populate(source);populate(destination);
             unsigned notifications=change_events[1];

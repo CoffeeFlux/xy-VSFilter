@@ -186,7 +186,7 @@ def copy_styles_stages():
             b"copy-styles-mixed-source-before", b"copy-styles-mixed-result", b"copy-styles-mixed-source-after")
 
 
-def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True, require_unknown_stages=True, require_add_style_stages=True, require_copy_styles_stages=True, require_text_plan_stages=True, require_preparation_stages=True, require_setstr_stages=True, require_open_order_stages=True, require_frame_search_stages=True):
+def validate_trace(data, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True, require_unknown_stages=True, require_add_style_stages=True, require_copy_styles_stages=True, require_text_plan_stages=True, require_preparation_stages=True, require_setstr_stages=True, require_open_order_stages=True, require_frame_search_stages=True, require_save_body_stages=True):
     lines = data.splitlines()
     if not lines or lines[0] != f"provenance pointer_bits={pointer_bits}".encode():
         raise ValueError("missing or incorrect native architecture provenance")
@@ -210,6 +210,35 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
         raw = b"preparation-value skipped-lf 9 0058 005c 004e 005c 004e 0000 000a 0059 0000 0"
         if lines.count(raw) != 1 or not positions[0] < lines.index(raw) < positions[1]:
             raise ValueError("missing/invalid bounded native skipped-LF observation")
+
+    if require_save_body_stages:
+        expected = [b"save-body-stage time-before"]
+        labels = [f"body-{fmt}-utf8" for fmt in ("srt","sub","smi","psb","ssa","ass")] + ["body-txt-le16", "body-frame-srt-le16"]
+        expected += [f"save-body-export {label}".encode() for label in labels[:7]]
+        expected += [b"save-body-stage time-after", b"save-body-stage frame-before", b"save-body-export body-frame-srt-le16", b"save-body-stage frame-after"]
+        if [line for line in lines if line.startswith(b"save-body-")] != expected:
+            raise ValueError("missing or incorrect SaveAs body stage/export order")
+        observed = [line for line in lines if line.startswith(b"saved-file body-")]
+        expected_names = [name for label in labels for name in (label,label+"-sidecar")]
+        if len(observed)!=len(expected_names):
+            raise ValueError("missing SaveAs body file observations")
+        payloads = {}
+        for line,name in zip(observed,expected_names):
+            absent=name in ("body-ssa-utf8-sidecar","body-ass-utf8-sidecar")
+            prefix=f"saved-file {name} exists={int(not absent)}".encode()
+            if absent:
+                if line!=prefix: raise ValueError("unexpected SaveAs sidecar")
+                continue
+            match=re.fullmatch(re.escape(prefix)+rb" bytes=([0-9]+)((?: [0-9a-f]{2})+)",line)
+            if not match: raise ValueError("invalid SaveAs exact byte trace")
+            payload=bytes.fromhex(match[2].decode());count=int(match[1])
+            if len(payload)!=count or not 0<count<=1024*1024: raise ValueError("invalid SaveAs byte count")
+            payloads[name]=payload
+        frame=b"\xff\xfe"+"1\r\n00:00:00,003 --> 00:00:00,011\r\nFrame body\r\n\r\n".encode("utf-16-le")
+        if payloads["body-frame-srt-le16"]!=frame or payloads["body-txt-le16"]!=b"\xff\xfe":
+            raise ValueError("incorrect supported LE16 body or unsupported TXT bytes")
+        srt=b"\xef\xbb\xbf1\r\n00:00:12,345 --> 00:00:23,456\r\nrow one\r\n\r\n2\r\n01:00:00,012 --> 01:00:01,012\r\nrow two\r\n\r\n"
+        if payloads["body-srt-utf8"]!=srt: raise ValueError("incorrect interleaved-negative SRT numbering/body")
 
     if require_frame_search_stages:
         if [line for line in lines if line.startswith(b"frame-search-")]!=frame_search_rows():
@@ -492,11 +521,11 @@ def validate_trace(data, pointer_bits, *, require_named_stages=True, require_ide
 
 
 
-def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True, require_unknown_stages=True, require_add_style_stages=True, require_copy_styles_stages=True, require_text_plan_stages=True, require_preparation_stages=True, require_setstr_stages=True, require_open_order_stages=True, require_frame_search_stages=True):
+def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_identity_stages=True, require_interpretation_stages=True, require_layout_stages=True, require_metadata_stages=True, require_selected_copy_stages=True, require_style_rename_stages=True, require_sort_stages=True, require_base_empty_stages=True, require_lcid_stages=True, require_resolution_stages=True, require_layout_size_stages=True, require_conversion_stages=True, require_unknown_stages=True, require_add_style_stages=True, require_copy_styles_stages=True, require_text_plan_stages=True, require_preparation_stages=True, require_setstr_stages=True, require_open_order_stages=True, require_frame_search_stages=True, require_save_body_stages=True):
     if len(traces) != 4:
         raise ValueError("two reference and two candidate executions required")
     for trace in traces:
-        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages, require_metadata_stages=require_metadata_stages, require_selected_copy_stages=require_selected_copy_stages, require_style_rename_stages=require_style_rename_stages, require_sort_stages=require_sort_stages, require_base_empty_stages=require_base_empty_stages, require_lcid_stages=require_lcid_stages, require_resolution_stages=require_resolution_stages, require_layout_size_stages=require_layout_size_stages, require_conversion_stages=require_conversion_stages, require_unknown_stages=require_unknown_stages, require_add_style_stages=require_add_style_stages, require_copy_styles_stages=require_copy_styles_stages, require_text_plan_stages=require_text_plan_stages, require_preparation_stages=require_preparation_stages, require_setstr_stages=require_setstr_stages, require_open_order_stages=require_open_order_stages, require_frame_search_stages=require_frame_search_stages)
+        validate_trace(trace, pointer_bits, require_named_stages=require_named_stages, require_identity_stages=require_identity_stages, require_interpretation_stages=require_interpretation_stages, require_layout_stages=require_layout_stages, require_metadata_stages=require_metadata_stages, require_selected_copy_stages=require_selected_copy_stages, require_style_rename_stages=require_style_rename_stages, require_sort_stages=require_sort_stages, require_base_empty_stages=require_base_empty_stages, require_lcid_stages=require_lcid_stages, require_resolution_stages=require_resolution_stages, require_layout_size_stages=require_layout_size_stages, require_conversion_stages=require_conversion_stages, require_unknown_stages=require_unknown_stages, require_add_style_stages=require_add_style_stages, require_copy_styles_stages=require_copy_styles_stages, require_text_plan_stages=require_text_plan_stages, require_preparation_stages=require_preparation_stages, require_setstr_stages=require_setstr_stages, require_open_order_stages=require_open_order_stages, require_frame_search_stages=require_frame_search_stages, require_save_body_stages=require_save_body_stages)
     if any(trace != traces[0] for trace in traces[1:]):
         raise ValueError("native lifecycle traces differ or are nondeterministic")
 

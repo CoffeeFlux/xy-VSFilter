@@ -14542,7 +14542,7 @@
     }
   ],
   "generated": {
-    "candidate_commit": "5627bc2c43d80118984326d4d6704117d571cf76",
+    "candidate_commit": "30d00248814375883ab42841c4e5f6001ce88e96",
     "capture_scope": "Working-tree source hashes; candidate_commit is capture base HEAD, not a claim that uncommitted source is in that commit.",
     "source_files": [
       {
@@ -14775,7 +14775,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "sha256": "a38e0043e6826ea8dd6a2a5e165b1b1619e6c85b62a4454f9a8d1fb5611b5534"
+        "sha256": "7c37fe1e74a229482b3e01aec792115f5b94d5344d7125a5f8865b2edaa00553"
       },
       {
         "path": "src/subtitles/SSF.cpp",
@@ -14787,7 +14787,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "sha256": "dfa1ef5c466a84f1aa727bdfc17a86bccee767fbf297aa150a5a253febc3e629"
+        "sha256": "6e2d19be1bbaf202ec806d656263f43e7fba0e52c2b16e395ac908ce1d0eb0ce"
       },
       {
         "path": "src/subtitles/STS.h",
@@ -22500,11 +22500,35 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 607,
+        "line": 580,
         "tokens": [
-          "EntryTimes"
+          "FormatExportRow"
         ],
-        "source": "std::vector<std::pair<int64_t,int64_t>> EntryTimes() const {",
+        "source": "static CStringW FormatExportRow(uint32_t format, int sequence, int start_ms, int end_ms,",
+        "reviewed_scope_ids": [
+          "experimental-native-document-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/RustDocumentOwner.h",
+        "line": 581,
+        "tokens": [
+          "STSEntry"
+        ],
+        "source": "int frame_start, int frame_end, int margin_v, const STSEntry& entry, const CStringW& prepared_text) {",
+        "reviewed_scope_ids": [
+          "experimental-native-document-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/RustDocumentOwner.h",
+        "line": 588,
+        "tokens": [
+          "DocumentReply"
+        ],
+        "source": "DocumentReply reply(DocumentDetail::Load(out,0,8));",
         "reviewed_scope_ids": [
           "experimental-native-document-owner",
           "experimental-unknown-style-step-resume"
@@ -22513,7 +22537,19 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 623,
+        "line": 621,
+        "tokens": [
+          "EntryTimes"
+        ],
+        "source": "std::vector<std::pair<int64_t,int64_t>> EntryTimes() const {",
+        "reviewed_scope_ids": [
+          "experimental-native-document-owner"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/RustDocumentOwner.h",
+        "line": 637,
         "tokens": [
           "CommitTimeConversion"
         ],
@@ -22523,7 +22559,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 655,
+        "line": 669,
         "tokens": [
           "TranslatedDocumentSearch"
         ],
@@ -22533,7 +22569,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 677,
+        "line": 691,
         "tokens": [
           "DocumentOwner",
           "TranslatedDocumentSearch"
@@ -22544,7 +22580,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 685,
+        "line": 699,
         "tokens": [
           "TranslatedDocumentSearch"
         ],
@@ -22554,7 +22590,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 686,
+        "line": 700,
         "tokens": [
           "TranslatedDocumentSearch"
         ],
@@ -22564,7 +22600,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 687,
+        "line": 701,
         "tokens": [
           "TranslatedDocumentSearch"
         ],
@@ -22574,7 +22610,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 703,
+        "line": 717,
         "tokens": [
           "OpenLifecycle"
         ],
@@ -22584,7 +22620,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 713,
+        "line": 727,
         "tokens": [
           "DocumentOwner",
           "OpenLifecycle"
@@ -22595,7 +22631,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 719,
+        "line": 733,
         "tokens": [
           "OpenLifecycle"
         ],
@@ -22605,7 +22641,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 720,
+        "line": 734,
         "tokens": [
           "OpenLifecycle"
         ],
@@ -22615,7 +22651,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 721,
+        "line": 735,
         "tokens": [
           "OpenLifecycle"
         ],
@@ -22625,7 +22661,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 737,
+        "line": 751,
         "tokens": [
           "UnknownStylesPass"
         ],
@@ -22635,7 +22671,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 740,
+        "line": 754,
         "tokens": [
           "DocumentOwner",
           "UnknownStylesPass"
@@ -22646,7 +22682,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 746,
+        "line": 760,
         "tokens": [
           "UnknownStylesPass"
         ],
@@ -22656,7 +22692,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 747,
+        "line": 761,
         "tokens": [
           "UnknownStylesPass"
         ],
@@ -22666,7 +22702,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 748,
+        "line": 762,
         "tokens": [
           "UnknownStylesPass"
         ],
@@ -22676,7 +22712,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 756,
+        "line": 770,
         "tokens": [
           "DocumentReply"
         ],
@@ -22686,7 +22722,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 771,
+        "line": 785,
         "tokens": [
           "AddStyle"
         ],
@@ -22696,7 +22732,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 772,
+        "line": 786,
         "tokens": [
           "NamedStyleCopy"
         ],
@@ -22706,7 +22742,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 775,
+        "line": 789,
         "tokens": [
           "DocumentOwner",
           "NamedStyleCopy"
@@ -22717,7 +22753,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 781,
+        "line": 795,
         "tokens": [
           "NamedStyleCopy"
         ],
@@ -22727,7 +22763,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 782,
+        "line": 796,
         "tokens": [
           "NamedStyleCopy"
         ],
@@ -22737,7 +22773,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 783,
+        "line": 797,
         "tokens": [
           "NamedStyleCopy"
         ],
@@ -22747,7 +22783,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 791,
+        "line": 805,
         "tokens": [
           "DocumentReply"
         ],
@@ -22757,7 +22793,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 812,
+        "line": 826,
         "tokens": [
           "AddStyle"
         ],
@@ -22767,7 +22803,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 813,
+        "line": 827,
         "tokens": [
           "StyleAddition"
         ],
@@ -22777,7 +22813,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 817,
+        "line": 831,
         "tokens": [
           "DocumentOwner",
           "StyleAddition"
@@ -22788,7 +22824,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 825,
+        "line": 839,
         "tokens": [
           "DocumentReply"
         ],
@@ -22798,7 +22834,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 841,
+        "line": 855,
         "tokens": [
           "StyleAddition"
         ],
@@ -22808,7 +22844,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 842,
+        "line": 856,
         "tokens": [
           "StyleAddition"
         ],
@@ -22818,7 +22854,7 @@
       },
       {
         "path": "src/subtitles/RustDocumentOwner.h",
-        "line": 843,
+        "line": 857,
         "tokens": [
           "StyleAddition"
         ],
@@ -35185,7 +35221,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5231,
+        "line": 5233,
         "tokens": [
           "Sort"
         ],
@@ -35200,7 +35236,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5233,
+        "line": 5235,
         "tokens": [
           "GetEntryCount"
         ],
@@ -35215,7 +35251,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5236,
+        "line": 5238,
         "tokens": [
           "STSEntry",
           "m_document"
@@ -35231,7 +35267,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5238,
+        "line": 5240,
         "tokens": [
           "STSEntry",
           "m_entries"
@@ -35247,7 +35283,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5243,
+        "line": 5245,
         "tokens": [
           "TranslateStart"
         ],
@@ -35262,7 +35298,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5246,
+        "line": 5248,
         "tokens": [
           "TranslateEnd"
         ],
@@ -35277,7 +35313,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5258,
+        "line": 5262,
         "tokens": [
           "GetStrW"
         ],
@@ -35291,7 +35327,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5259,
+        "line": 5263,
         "tokens": [
           "GetStrWA"
         ],
@@ -35305,7 +35341,20 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5307,
+        "line": 5273,
+        "tokens": [
+          "DocumentOwner",
+          "FormatExportRow"
+        ],
+        "source": "str2 = XyRust::DocumentOwner::FormatExportRow(static_cast<uint32_t>(et), i-k+1, t1, t2,",
+        "reviewed_scope_ids": [
+          "serialize"
+        ],
+        "evidence_status": "lexical-candidate-in-reviewed-scope"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "line": 5324,
         "tokens": [
           "Sort"
         ],
@@ -35315,7 +35364,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5317,
+        "line": 5334,
         "tokens": [
           "LookupNamedStyle"
         ],
@@ -35325,7 +35374,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5321,
+        "line": 5338,
         "tokens": [
           "m_styles"
         ],
@@ -35335,7 +35384,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5336,
+        "line": 5353,
         "tokens": [
           "GetDocumentScreenSize"
         ],
@@ -35345,7 +35394,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5338,
+        "line": 5355,
         "tokens": [
           "m_dstScreenSize"
         ],
@@ -35355,7 +35404,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5348,
+        "line": 5365,
         "tokens": [
           "LookupNamedStyle"
         ],
@@ -35365,7 +35414,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5373,
+        "line": 5390,
         "tokens": [
           "CSimpleTextSubtitle",
           "IsEmpty"
@@ -35376,7 +35425,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5376,
+        "line": 5393,
         "tokens": [
           "m_document"
         ],
@@ -35386,7 +35435,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5378,
+        "line": 5395,
         "tokens": [
           "IsEmpty",
           "m_entries"
@@ -35397,7 +35446,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5382,
+        "line": 5399,
         "tokens": [
           "CSimpleTextSubtitle",
           "RemoveAllEntries"
@@ -35408,7 +35457,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5385,
+        "line": 5402,
         "tokens": [
           "m_document"
         ],
@@ -35418,7 +35467,7 @@
       },
       {
         "path": "src/subtitles/STS.cpp",
-        "line": 5387,
+        "line": 5404,
         "tokens": [
           "m_entries"
         ],

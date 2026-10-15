@@ -11,6 +11,22 @@ from document_native_lifecycle import compare_traces, conversion_rows, unknown_r
 STYLE_SCALARS = b" ".join(b"0000000000000000" if i in (0,11,12,13,14,23,24,25,26,27,28,29,30,31,32) else b"00000000" if i in (15,17,19,21) else b"0" for i in range(34))
 STYLE_VALUE = b"style 0 1 0041 " + STYLE_SCALARS
 
+def body_rows():
+    labels=[f"body-{fmt}-utf8" for fmt in ("srt","sub","smi","psb","ssa","ass")]+["body-txt-le16","body-frame-srt-le16"]
+    rows=[b"save-body-stage time-before"]
+    for i,label in enumerate(labels):
+        if i==7: rows += [b"save-body-stage time-after",b"save-body-stage frame-before"]
+        rows.append(f"save-body-export {label}".encode())
+        for name in (label,label+"-sidecar"):
+            if name in ("body-ssa-utf8-sidecar","body-ass-utf8-sidecar"):
+                rows.append(f"saved-file {name} exists=0".encode());continue
+            payload=b"A"
+            if name=="body-txt-le16":payload=b"\xff\xfe"
+            if name=="body-frame-srt-le16":payload=b"\xff\xfe"+"1\r\n00:00:00,003 --> 00:00:00,011\r\nFrame body\r\n\r\n".encode("utf-16-le")
+            if name=="body-srt-utf8":payload=b"\xef\xbb\xbf1\r\n00:00:12,345 --> 00:00:23,456\r\nrow one\r\n\r\n2\r\n01:00:00,012 --> 01:00:01,012\r\nrow two\r\n\r\n"
+            rows.append(f"saved-file {name} exists=1 bytes={len(payload)} ".encode()+payload.hex(" ").encode())
+    return b"\n".join(rows+[b"save-body-stage frame-after"])+b"\n"
+
 TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
          b"segment 0 10 20\ncallback changed\ntext 0041\n"
          + b"".join(b"named-stage " + stage + b"\n" for stage in (
@@ -93,6 +109,7 @@ TRACE = (b"provenance pointer_bits=64\nstate copy\nentry 0 raw=0041,0000,0042\n"
          + b"".join(b"style-rename-segments "+row.split()[1]+b" count=2 animated=1\n" for row in setstr_plan_rows()[::2])
          + b"\n".join(open_order_rows()) + b"\n"
          + b"\n".join(frame_search_rows()) + b"\n"
+         + body_rows()
          + b"saved-file ssa exists=1 bytes=1 41\nsaved-file ass exists=1 bytes=1 41\n"
          + b"saved-file srt exists=1 bytes=1 41\nsaved-file srt-sidecar exists=1 bytes=1 41\n"
          + b"saved-file ssa-sidecar exists=0\nsaved-file ass-sidecar exists=0\n"
@@ -146,6 +163,13 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
         self.assertLess(source.index("struct SavedFiles"),source.index("static void open_order_lifecycle("))
         self.assertLess(definition,source.index("class OpenOrderingDocument"))
         self.assertLess(source.index("static bool same_segment("),source.index("static void frame_search_lifecycle("))
+        body=source.index("static void save_body_lifecycle(")
+        self.assertLess(source.index("static void saved_bytes("),body)
+        self.assertLess(source.index("struct SavedFiles"),body)
+        self.assertLess(source.index("static bool same_segment("),body)
+        for extension in ("srt","sub","smi","psb","ssa","ass","txt"):
+            self.assertEqual(source.count('L"document-lifecycle-body.'+extension+'"'),1)
+        self.assertEqual(source.count('L"document-lifecycle-body-frame.srt"'),1)
         for fixture in ("text_plan_lifecycle", "setstr_plan_lifecycle"):
             start=source.index("static void "+fixture+"(")
             self.assertLess(definition,start)
@@ -277,13 +301,24 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
             compare_traces([truncated] * 4, 64)
 
     def test_legacy_trace_requires_explicit_named_stage_opt_out(self):
-        legacy = b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith((b"named-stage ", b"saved-file ")))
+        legacy = b"\n".join(line for line in TRACE.split(b"\n") if not (line.startswith(b"named-stage ") or (line.startswith(b"saved-file ") and not line.startswith(b"saved-file body-"))))
         with self.assertRaises(ValueError):
             compare_traces([legacy] * 4, 64)
         compare_traces([legacy] * 4, 64, require_named_stages=False)
         changed = legacy.replace(b"0041,0000,0042", b"0041,0000,0043")
         with self.assertRaises(ValueError):
             compare_traces([legacy, legacy, changed, changed], 64, require_named_stages=False)
+
+    def test_save_body_bytes_and_archival_opt_out(self):
+        legacy=b"\n".join(line for line in TRACE.split(b"\n") if not line.startswith((b"save-body-",b"saved-file body-")))
+        with self.assertRaises(ValueError):compare_traces([legacy]*4,64)
+        compare_traces([legacy]*4,64,require_save_body_stages=False)
+        for changed in (TRACE.replace(b"save-body-export body-sub-utf8\n",b""),
+                        TRACE.replace(b"saved-file body-frame-srt-le16 exists=1 bytes=",b"saved-file body-frame-srt-le16 exists=1 bytes=1"),
+                        TRACE.replace(b"saved-file body-txt-le16 exists=1 bytes=2 ff fe",b"saved-file body-txt-le16 exists=1 bytes=2 ff ff")):
+            with self.assertRaises(ValueError):compare_traces([changed]*4,64)
+        changed=TRACE.replace(b"saved-file body-sub-utf8 exists=1 bytes=1 41",b"saved-file body-sub-utf8 exists=1 bytes=1 42")
+        with self.assertRaises(ValueError):compare_traces([TRACE,TRACE,changed,changed],64)
 
     def test_rejects_missing_or_changed_saved_bytes(self):
         missing = TRACE.replace(b"saved-file srt-sidecar exists=1 bytes=1 41\n", b"")

@@ -135,3 +135,5 @@ pub mod document_prepare;
 pub mod document_open;
 
 pub mod document_search;
+
+pub mod document_export;
