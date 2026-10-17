@@ -5,7 +5,7 @@
 // Rust, including supplied default/named styles and raw name/path identity.
 // Interpretation and script layout scalars are supplied by native construction
 // and parsing.
-// Other metadata, string preparation and CRT numeric/sort/name-generation
+// Parsing, string preparation and native numeric/name-generation
 // choices remain native.
 #include "STS.h"
 #include "xy_rust_document.h"
@@ -422,12 +422,12 @@ public:
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_copy_selected_state_v1(id_,source.id_);}));
     }
     int32_t Metadata(uint32_t field) const {
-        DocumentDetail::Shape(field <= 4); std::array<uint8_t,4> out{};
+        DocumentDetail::Shape(field <= 5); std::array<uint8_t,4> out{};
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_get_metadata_v1(id_,field,out.data(),out.size());}));
         return DocumentDetail::I32(DocumentDetail::Load(out,0,4));
     }
     void SetMetadata(uint32_t field, int32_t value) {
-        DocumentDetail::Shape(field <= 4);
+        DocumentDetail::Shape(field <= 5);
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_set_metadata_v1(id_,field,value);}));
     }
     uint32_t LCIDValue() const { return static_cast<uint32_t>(Metadata(4)); }
