@@ -263,7 +263,9 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_open_lifecycle_drop_v1(uint64_t 
 // ASS header run binds a document and initializes BT601/TV at Begin. Step
 // commands:0 lowered key,1 GetInt result,2 GetInt failure,3 detected script
 // version(0,4,5,6),4 extracted/lowered value. Text is raw UTF-16LE bytes;
-// scalar commands require empty text and text commands require scalar zero.
+// 5 starts dialogue parsing,6 supplies a numeric token result,7 commits with
+// native-trimmed text and flags(bit0 Unicode,bit1 native Default comparison).
+// Scalar commands require empty text; other text commands require scalar zero.
 // Reply: kind/version/style-version/accepted as four LE i32. A numeric parse
 // failure commits the legacy size/wrap reset and makes the run terminal.
 // Invalid protocol/capacity leaves the run, document and output untouched;
@@ -272,6 +274,10 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_open_lifecycle_drop_v1(uint64_t 
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_begin_v1(uint64_t owner,uint8_t*,size_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_step_v1(uint64_t run,uint32_t command,int32_t value,const uint8_t*,size_t,uint8_t*,size_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_drop_v1(uint64_t run);
+// Dialogue part returns a snapshot ID. Snapshot: request:u32,separator:u32,
+// raw UTF-16LE. Groups:0 next numeric token or completion,1 stripped style,
+// 4 text before native FastTrim. Groups1/4 require completed numeric parsing.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_dialogue_part_v1(uint64_t run,uint32_t group,uint8_t*,size_t);
 // CopyStyles typed run binds destination and source. Open performs no mutation;
 // first step initializes/clears and returns Advanced before reading source rows.
 // Step output8 is snapshot ID; packet16: action:u32(0Done/1Advanced/2NeedSuffix),

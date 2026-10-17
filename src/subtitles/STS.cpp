@@ -2269,6 +2269,22 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
         {
             try
             {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                headers.BeginDialogue(buff);
+                CStringW token;
+                WCHAR separator;
+                while(headers.DialoguePart(0,token,separator)) {
+                    CStringW::PXSTR cursor=token.GetBuffer();
+                    headers.DialogueNumber(NextInt(&cursor,separator));
+                }
+                CStringW style, text;
+                headers.DialoguePart(1,style,separator);
+                const bool isDefault=!style.CompareNoCase(L"Default");
+                headers.DialoguePart(4,text,separator);
+                const bool unicode=file->IsUnicode();
+                FastTrim(text);
+                headers.AppendDialogue(text,unicode,isDefault);
+#else
 #ifdef XY_VSFILTER_RUST_TEXT
                 XyRust::AssDialogue dialogue(buff, version);
                 int reply = 0;
@@ -2331,6 +2347,7 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
                     Style, Actor, Effect,
                     marginRect,
                     layer);
+#endif
             }
             catch(...)
             {

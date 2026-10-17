@@ -243,6 +243,7 @@ class NamedStyleCopy;
 class DocumentReply {
     uint64_t id_ = 0;
     explicit DocumentReply(uint64_t id) : id_(id) {}
+    friend class AssDocument;
     friend class DocumentOwner;
     friend class UnknownStylesPass;
     friend class StyleAddition;
@@ -756,6 +757,19 @@ public:
     void NumberFailed() {Step(2,0);}
     void ScriptVersion(int value) {Step(3,value);}
     void Text(const CStringW& value) {Step(4,0,value);}
+    void BeginDialogue(const CStringW& value) {Step(5,0,value);}
+    void DialogueNumber(int value) {Step(6,value);}
+    void AppendDialogue(const CStringW& text, bool unicode, bool isDefault) {Step(7,(unicode?1:0)|(isDefault?2:0),text);}
+    bool DialoguePart(unsigned group, CStringW& text, WCHAR& separator) const {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_ass_dialogue_part_v1(id_,group,out.data(),out.size());}));
+        DocumentReply snapshot(DocumentDetail::Load(out,0,8));
+        const auto bytes=snapshot.Read();
+        DocumentDetail::Shape(bytes.size()>=8 && (bytes.size()-8)%2==0 && DocumentDetail::Load(bytes,0,4)<=1 && DocumentDetail::Load(bytes,4,4)<=0xffff);
+        separator=static_cast<WCHAR>(DocumentDetail::Load(bytes,4,4));
+        size_t offset=8;text=DocumentDetail::String(bytes,offset,DocumentDetail::Count((bytes.size()-8)/2));
+        return DocumentDetail::Load(bytes,0,4)!=0;
+    }
 };
 class OpenLifecycle {
     uint64_t id_ = 0;

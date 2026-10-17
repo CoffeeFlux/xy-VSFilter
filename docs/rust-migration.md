@@ -35,9 +35,15 @@ color initialization and updates, numeric failure resets, and live resolution
 inference through a safe Rust session bound to the canonical document. Native
 file reading, trim/lowercase, CRT numeric conversion, style/dialogue actions and
 font loading remain explicit transitional adapters. The session retains no
-native pointer and releases admission before each adapter operation.
+native pointer and releases admission before each adapter operation. Dialogue
+records now stay in the typed Rust session through numeric token exchange,
+effect-prefix removal, star/default normalization, timestamp construction and
+entry-only append. Only CRT numeric conversion, the locale-sensitive Default
+comparison and FastTrim remain native obligations for that record path.
 
-Validation is in progress against cleanup `67da07cd`, including a new probe that
+The first header comparison at `0ee2e4ee` passed 157 cases twice on each side on
+both x86 and x64, including integer extremes and partial numeric-error updates.
+Expanded validation is in progress against cleanup `67da07cd`, using a probe that
 includes the actual reference/candidate STS.cpp and observes partial parser
 state, exceptions and byte consumption directly. No production switch or full
 ASS/frontend closure is claimed. The uninitialized embedded-stream simplicity

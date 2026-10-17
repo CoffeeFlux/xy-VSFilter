@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 //! ASS dialogue fields, in the pinned parser's order. Numeric conversion,
-//! style/effect cleanup, timestamps and entry insertion remain native.
+//! normalization and prepared entry construction. Numeric conversion and the
+//! locale-sensitive Default comparison/text trimming remain native adapters.
 use crate::fields::next_field;
 use alloc::vec::Vec;
 
@@ -99,6 +100,72 @@ impl Dialogue {
     }
     pub fn number(&self, index: usize) -> i32 {
         self.numbers.get(index).copied().unwrap_or(0)
+    }
+    pub fn complete(&self) -> bool {
+        self.stage == 14 && self.pending.is_none()
+    }
+    /// The parser removes leading stars before the native Default comparison.
+    pub fn style_name(&self) -> &[u16] {
+        let style = self.string(1);
+        &style[style.iter().take_while(|&&unit| unit == 42).count()..]
+    }
+    fn timestamp(&self, first: usize) -> i64 {
+        let n = &self.numbers[first..first + 4];
+        // Explicit safe emulation of the pinned Windows machine arithmetic.
+        // Every intermediate is i64; centiseconds are multiplied before adding.
+        i64::from(n[0])
+            .wrapping_mul(60)
+            .wrapping_add(i64::from(n[1]))
+            .wrapping_mul(60)
+            .wrapping_add(i64::from(n[2]))
+            .wrapping_mul(1000)
+            .wrapping_add(i64::from(n[3]).wrapping_mul(10))
+            .wrapping_mul(10000)
+    }
+    /// Called only after completion and native FastTrim/CompareNoCase. Rejection
+    /// precedes CR/LF preparation, just as AddSTSEntryOnly does in the reference.
+    pub fn record(
+        &self,
+        trimmed_text: &[u16],
+        unicode: bool,
+        default_style: bool,
+    ) -> Result<Option<crate::document::PreparedEntry>, crate::document_prepare::Error> {
+        let start = self.timestamp(1);
+        let end = self.timestamp(5);
+        if trimmed_text.is_empty() || start > end {
+            return Ok(None);
+        }
+        let style = if default_style {
+            &[68, 101, 102, 97, 117, 108, 116][..]
+        } else {
+            self.style_name()
+        };
+        let effect = self.string(3);
+        let text = self.string(4);
+        let length = effect.len().min(text.len());
+        let effect = if effect[..length] == text[..length] {
+            &[]
+        } else {
+            effect
+        };
+        let entry = crate::document::PreparedEntry {
+            text: trimmed_text.to_vec(),
+            style: style.to_vec(),
+            actor: self.string(2).to_vec(),
+            effect: effect.to_vec(),
+            unicode,
+            start,
+            end,
+            layer: self.number(0),
+            readorder: -1,
+            margins: [
+                self.number(9),
+                self.number(11),
+                self.number(10),
+                self.number(12),
+            ],
+        };
+        crate::document_prepare::prepare_add_record(entry, true).map(Some)
     }
     pub fn string(&self, group: usize) -> &[u16] {
         self.strings.get(group).map_or(&[], Vec::as_slice)

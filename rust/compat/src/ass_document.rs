@@ -11,6 +11,8 @@ use crate::document::{Document, LayoutField, MetadataField, ScriptField};
 pub enum Error {
     Protocol,
     UnsuppliedScreen,
+    Preparation(crate::document_prepare::Error),
+    Storage(crate::document::Refusal),
 }
 
 #[derive(Default)]
@@ -19,6 +21,7 @@ pub struct Run {
     kind: u32,
     pending: bool,
     failed: bool,
+    dialogue: Option<crate::ass_dialogue::Dialogue>,
 }
 
 impl Run {
@@ -43,7 +46,76 @@ impl Run {
             return Err(Error::Protocol);
         }
         self.kind = self.headers.classify(lowered_key);
-        self.pending = matches!(self.kind, 4..=11 | 17);
+        self.pending = matches!(self.kind, 1 | 4..=11 | 17);
+        Ok(())
+    }
+
+    pub fn begin_dialogue(&mut self, input: &[u16]) -> Result<(), Error> {
+        if self.kind != 1 || !self.pending || self.dialogue.is_some() {
+            return Err(Error::Protocol);
+        }
+        let mut dialogue = crate::ass_dialogue::Dialogue::new(input, self.headers.version);
+        dialogue.step(0);
+        self.dialogue = Some(dialogue);
+        Ok(())
+    }
+    pub fn dialogue_number(&mut self, value: i32) -> Result<(), Error> {
+        let dialogue = self.dialogue.as_mut().ok_or(Error::Protocol)?;
+        if dialogue.complete() {
+            return Err(Error::Protocol);
+        }
+        dialogue.step(value);
+        Ok(())
+    }
+    /// Owned snapshot: request:u32, separator:u32, followed by raw UTF-16LE.
+    /// Group 0 exposes the next token (or completion), 1 the stripped style,
+    /// 4 the pre-trim text. Style/text queries require all numbers supplied.
+    pub fn dialogue_part(&self, group: u32) -> Result<alloc::vec::Vec<u8>, Error> {
+        let dialogue = self.dialogue.as_ref().ok_or(Error::Protocol)?;
+        let text = match group {
+            0 => {
+                if dialogue.complete() {
+                    &[][..]
+                } else {
+                    dialogue.string(0)
+                }
+            }
+            1 if dialogue.complete() => dialogue.style_name(),
+            4 if dialogue.complete() => dialogue.string(4),
+            _ => return Err(Error::Protocol),
+        };
+        let mut bytes = alloc::vec::Vec::new();
+        bytes.extend_from_slice(&u32::from(!dialogue.complete()).to_le_bytes());
+        bytes.extend_from_slice(&u32::from(dialogue.separator).to_le_bytes());
+        for unit in text {
+            bytes.extend_from_slice(&unit.to_le_bytes());
+        }
+        Ok(bytes)
+    }
+    pub fn append_dialogue(
+        &mut self,
+        document: &mut Document,
+        trimmed_text: &[u16],
+        unicode: bool,
+        default_style: bool,
+    ) -> Result<(), Error> {
+        let dialogue = self.dialogue.as_ref().ok_or(Error::Protocol)?;
+        if !dialogue.complete() {
+            return Err(Error::Protocol);
+        }
+        if let Some(entry) = dialogue
+            .record(trimmed_text, unicode, default_style)
+            .map_err(Error::Preparation)?
+        {
+            if document.entries().len() >= i32::MAX as usize {
+                return Err(Error::Storage(crate::document::Refusal::EntryCountOverflow));
+            }
+            document
+                .add_prepared(entry, crate::document::AddMode::EntryOnly)
+                .map_err(Error::Storage)?;
+        }
+        self.dialogue = None;
+        self.pending = false;
         Ok(())
     }
 
@@ -275,5 +347,98 @@ mod tests {
         run.text(&mut doc, &units("no\0yes")).unwrap();
         assert_eq!(doc.scaled_bas(), Some(false));
         assert_eq!(run.state()[3], 0); // values alone never accept an ASS file
+    }
+
+    #[test]
+    fn dialogue_commit_preserves_prefix_effect_zero_duration_and_entry_only_timeline() {
+        let mut doc = Document::default();
+        let mut run = Run::begin(&mut doc);
+        classify(&mut run, "scripttype");
+        run.script_version(6).unwrap();
+        classify(&mut run, "[events]");
+        for (text, expected) in [("  shared body  ", "shared body"), ("   ", "")] {
+            classify(&mut run, "dialogue");
+            let body = units(&alloc::format!(
+                "9,0:00:01.20,0:00:01.20,**dEfAuLt,Actor,1,2,3,4,shared,{text}"
+            ));
+            run.begin_dialogue(&body).unwrap();
+            assert_eq!(run.dialogue_part(1), Err(Error::Protocol));
+            assert_eq!(
+                run.append_dialogue(&mut doc, &units(expected), true, true),
+                Err(Error::Protocol)
+            );
+            for number in [9, 0, 0, 1, 20, 0, 0, 1, 20, 1, 2, 3, 4] {
+                run.dialogue_number(number).unwrap();
+            }
+            assert_eq!(run.dialogue_number(999), Err(Error::Protocol));
+            assert_eq!(
+                &run.dialogue_part(1).unwrap()[8..],
+                &units("dEfAuLt")
+                    .iter()
+                    .flat_map(|u| u.to_le_bytes())
+                    .collect::<alloc::vec::Vec<_>>()
+            );
+            assert_eq!(run.classify(&units("[events]")), Err(Error::Protocol));
+            run.append_dialogue(&mut doc, &units(expected), true, true)
+                .unwrap();
+            assert_eq!(
+                run.append_dialogue(&mut doc, &units(expected), true, true),
+                Err(Error::Protocol)
+            );
+        }
+        assert_eq!(doc.entries().len(), 1);
+        assert!(doc.segments().is_empty());
+        let entry = &doc.entries()[0];
+        assert_eq!(
+            (entry.start, entry.end, entry.layer, entry.readorder),
+            (12_000_000, 12_000_000, 9, 0)
+        );
+        assert_eq!(entry.margins, [1, 3, 2, 4]);
+        assert_eq!(entry.style, units("Default"));
+        // Effect comparison is against pre-trim text, so the leading spaces
+        // make this one different even though trimmed text starts with shared.
+        assert_eq!(entry.effect, units("shared"));
+        assert_eq!(entry.text, units("shared body"));
+        assert_eq!(entry.actor, units("Actor"));
+        assert!(entry.unicode);
+    }
+
+    #[test]
+    fn dialogue_prefix_effect_legacy_marked_and_safe_machine_time_arithmetic() {
+        for version in 3..=6 {
+            for (effect, text, expected_effect) in [
+                ("same", "same tail", ""),
+                ("same tail", "same", ""),
+                ("effect", "text", "effect"),
+                ("", "text", ""),
+            ] {
+                let mut doc = Document::default();
+                let mut run = Run::begin(&mut doc);
+                if version >= 4 {
+                    classify(&mut run, "scripttype");
+                    run.script_version(version).unwrap();
+                }
+                classify(&mut run, "dialogue");
+                let first = if version <= 4 { "Marked=9" } else { "9" };
+                let bottom = if version >= 6 { "4," } else { "" };
+                run.begin_dialogue(&units(&alloc::format!(
+                    "{first},0:00:01.20,0:00:01.20,***,Actor,1,2,3,{bottom}{effect},{text}"
+                )))
+                .unwrap();
+                for number in [9, 0, 0, 1, 20, 0, 0, 1, 20, 1, 2, 3] {
+                    run.dialogue_number(number).unwrap();
+                }
+                if version >= 6 {
+                    run.dialogue_number(4).unwrap();
+                }
+                run.append_dialogue(&mut doc, &units(text), false, false)
+                    .unwrap();
+                let entry = &doc.entries()[0];
+                assert_eq!(entry.effect, units(expected_effect));
+                assert_eq!(entry.style, units("Default"));
+                assert_eq!(entry.layer, if version <= 4 { 0 } else { 9 });
+                assert_eq!(entry.margins[3], if version >= 6 { 4 } else { 3 });
+            }
+        }
     }
 }

@@ -65,6 +65,27 @@ int main() {
                 L"Dialogue: 9,0:00:01.20,0:00:02.30,*Default,Actor,1,2,3,4,,text\r\n";
             ass_case(index++,text,CSize(0,0));
         }
+        const wchar_t* names[]={L"Default",L"**dEfAuLt",L"***",L"",L"Other",L" Default ",L"\tDefault",L"\xd800"};
+        const wchar_t* effects[]={L"",L"same",L"same tail",L"effect",L"text",L"\xdc00"};
+        const wchar_t* bodies[]={L"text",L"same",L"same tail",L"  same  ",L"   ",L"\xd800"};
+        for(int version=3;version<=6;++version) {
+            CStringW prefix;prefix.Format(L"[Script Info]\r\nScriptType: v4.00%s\r\nDialogue: %s,",
+                version==3?L"unknown":version==4?L"":version==5?L"+":L"++",version<=4?L"Marked=9":L"9");
+            for(auto name:names) for(auto effect:effects) for(auto body:bodies) {
+                CStringW fields;fields.Format(L"0:00:01.20,0:00:01.20,%s,Actor,1,2,3,%s%s,%s\r\n",
+                    name,version>=6?L"4,":L"",effect,body);
+                ass_case(index++,prefix+fields,CSize(0,0));
+            }
+            const wchar_t* values[]={L"0",L"-1",L"1",L"2147483647",L"-2147483648",L"&Hffffffff",L"999999999999999999999"};
+            for(auto value:values) for(int field=0;field<4;++field) {
+                CStringW time;time.Format(L"%s:%s:%s.%s",field==0?value:L"0",field==1?value:L"0",field==2?value:L"0",field==3?value:L"0");
+                CStringW fields;fields.Format(L"%s,%s,Default,Actor,1,2,3,%s,text\r\n",static_cast<LPCWSTR>(time),static_cast<LPCWSTR>(time),version>=6?L"4,":L"");
+                ass_case(index++,prefix+fields,CSize(0,0));
+            }
+            CStringW base=prefix+L"0:00:01.20,0:00:02.30,Default,Actor,1,2,3,"+(version>=6?L"4,":L"")+L"effect,text\r\n";
+            for(int pos=0;pos<16;++pos) {CStringW raw=base;raw.SetAt(pos*3,0);ass_case(index++,raw,CSize(0,0));}
+            for(int tail=0;tail<20;++tail) ass_case(index++,base.Left(base.GetLength()-tail),CSize(0,0));
+        }
         printf("ass-complete cases=%u\n",index);
         return 0;
     } catch(const std::exception& error) {fprintf(stderr,"unresolved: %s\n",error.what());return 1;}

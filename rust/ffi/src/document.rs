@@ -298,8 +298,9 @@ pub unsafe extern "C" fn xy_vsfilter_document_ass_begin_v1(
 /// 16 writable bytes (kind/version/style-version/accepted, all LE i32), may
 /// overlap input, and is unchanged on error. Neither buffer is retained.
 /// Commands: 0 classify lowered key, 1 successful GetInt, 2 failed GetInt,
-/// 3 detected script version, 4 extracted/lowered text value. Scalar commands
-/// take empty text; text commands take scalar zero.
+/// 3 detected script version, 4 extracted/lowered text value, 5 begin dialogue,
+/// 6 dialogue numeric reply, 7 commit dialogue with trimmed text and flags
+/// (bit0 Unicode, bit1 native Default match). Other text commands use value 0.
 #[no_mangle]
 pub unsafe extern "C" fn xy_vsfilter_document_ass_step_v1(
     id: u64,
@@ -311,10 +312,11 @@ pub unsafe extern "C" fn xy_vsfilter_document_ass_step_v1(
     capacity: usize,
 ) -> u32 {
     required!(output_capacity(output, capacity, 16));
-    if command > 4
-        || (matches!(command, 0 | 4) && value != 0)
-        || (matches!(command, 1..=3) && length != 0)
+    if command > 7
+        || (matches!(command, 0 | 4 | 5) && value != 0)
+        || (matches!(command, 1..=3 | 6) && length != 0)
         || (command == 2 && value != 0)
+        || (command == 7 && !(0..=3).contains(&value))
         || length % 2 != 0
     {
         return INVALID_INPUT;
@@ -333,12 +335,12 @@ pub unsafe extern "C" fn xy_vsfilter_document_ass_step_v1(
             2 => run.number(document, None),
             3 => run.script_version(value),
             4 => run.text(document, &text),
+            5 => run.begin_dialogue(&text),
+            6 => run.dialogue_number(value),
+            7 => run.append_dialogue(document, &text, value & 1 != 0, value & 2 != 0),
             _ => unreachable!(),
         }
-        .map_err(|error| match error {
-            xy_vsfilter_compat::ass_document::Error::Protocol => INVALID_INPUT,
-            xy_vsfilter_compat::ass_document::Error::UnsuppliedScreen => UNRESOLVED_REFERENCE,
-        })?;
+        .map_err(ass_error)?;
         Ok(run.state())
     }));
     let mut bytes = [0; 16];
@@ -353,6 +355,46 @@ pub unsafe extern "C" fn xy_vsfilter_document_ass_step_v1(
 #[no_mangle]
 pub extern "C" fn xy_vsfilter_document_ass_drop_v1(id: u64) -> u32 {
     status(DOCUMENTS.destroy(id, Kind::AssRun).map_err(registry_error))
+}
+
+fn ass_error(error: xy_vsfilter_compat::ass_document::Error) -> u32 {
+    use xy_vsfilter_compat::ass_document::Error;
+    match error {
+        Error::Protocol => INVALID_INPUT,
+        Error::UnsuppliedScreen => UNRESOLVED_REFERENCE,
+        Error::Storage(error) => refusal(error),
+        Error::Preparation(crate_error) => match crate_error {
+            xy_vsfilter_compat::document_prepare::Error::UnresolvedTail => UNRESOLVED_REFERENCE,
+            _ => COUNT_OVERFLOW,
+        },
+    }
+}
+
+/// # Safety
+/// Output receives one immutable snapshot ID in eight writable bytes. Snapshot
+/// starts with request:u32 and separator:u32, then raw UTF-16LE. Group 0 is the
+/// next numeric token, group 1 the stripped style, group 4 the untrimmed text.
+/// No document or session borrow escapes; snapshots survive run destruction.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_ass_dialogue_part_v1(
+    id: u64,
+    group: u32,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let bytes = required!(admitted(|registry| {
+        registry
+            .ass_pair(id)
+            .map_err(registry_error)?
+            .1
+            .dialogue_part(group)
+            .map_err(ass_error)
+    }));
+    let snapshot = required!(insert(Resource::Snapshot(bytes)));
+    // SAFETY: validated output, and all native/session loans have ended.
+    unsafe { write_output(output, &snapshot.to_le_bytes()) };
+    OK
 }
 
 fn open_error(error: xy_vsfilter_compat::document_open::Error) -> u32 {
@@ -2381,6 +2423,143 @@ mod tests {
             assert_eq!(out, [0xa5; 16]);
             assert_eq!(xy_vsfilter_document_ass_drop_v1(ass_run), OK);
             assert_eq!(xy_vsfilter_document_ass_drop_v1(ass_run), BAD_HANDLE);
+            let owner = create();
+            assert_eq!(
+                xy_vsfilter_document_ass_begin_v1(owner, out.as_mut_ptr(), 8),
+                OK
+            );
+            let run = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let key: Vec<u8> = "dialogue"
+                .encode_utf16()
+                .flat_map(u16::to_le_bytes)
+                .collect();
+            assert_eq!(
+                xy_vsfilter_document_ass_step_v1(
+                    run,
+                    0,
+                    0,
+                    key.as_ptr(),
+                    key.len(),
+                    out.as_mut_ptr(),
+                    16
+                ),
+                OK
+            );
+            let input: Vec<u8> = "Marked=1,0:00:01.20,0:00:01.20,**Default,,1,2,3,same,same tail"
+                .encode_utf16()
+                .flat_map(u16::to_le_bytes)
+                .collect();
+            assert_eq!(
+                xy_vsfilter_document_ass_step_v1(
+                    run,
+                    5,
+                    0,
+                    input.as_ptr(),
+                    input.len(),
+                    out.as_mut_ptr(),
+                    16
+                ),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_ass_dialogue_part_v1(run, 0, out.as_mut_ptr(), 8),
+                OK
+            );
+            let token = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let retained = read_snapshot(token);
+            assert_eq!(&retained[8..], &[49, 0]);
+            out.fill(0xa5);
+            for group in [1, 4, 99] {
+                assert_eq!(
+                    xy_vsfilter_document_ass_dialogue_part_v1(run, group, out.as_mut_ptr(), 8),
+                    INVALID_INPUT
+                );
+                assert_eq!(out, [0xa5; 16]);
+            }
+            assert_eq!(
+                xy_vsfilter_document_ass_dialogue_part_v1(run, 0, out.as_mut_ptr(), 7),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_ass_dialogue_part_v1(owner, 0, out.as_mut_ptr(), 8),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_ass_dialogue_part_v1(
+                        run,
+                        0,
+                        out.as_mut_ptr(),
+                        8
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            for number in [1, 0, 0, 1, 20, 0, 0, 1, 20, 1, 2, 3] {
+                assert_eq!(
+                    xy_vsfilter_document_ass_step_v1(
+                        run,
+                        6,
+                        number,
+                        ptr::null(),
+                        0,
+                        out.as_mut_ptr(),
+                        16
+                    ),
+                    OK
+                );
+            }
+            out.fill(0xa5);
+            let body: Vec<u8> = "same tail"
+                .encode_utf16()
+                .flat_map(u16::to_le_bytes)
+                .collect();
+            assert_eq!(
+                xy_vsfilter_document_ass_step_v1(
+                    run,
+                    7,
+                    4,
+                    body.as_ptr(),
+                    body.len(),
+                    out.as_mut_ptr(),
+                    16
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_ass_step_v1(
+                    run,
+                    7,
+                    3,
+                    body.as_ptr(),
+                    body.len(),
+                    out.as_mut_ptr(),
+                    15
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(out, [0xa5; 16]);
+            assert!(state(owner).entries().is_empty());
+            assert_eq!(
+                xy_vsfilter_document_ass_step_v1(
+                    run,
+                    7,
+                    3,
+                    body.as_ptr(),
+                    body.len(),
+                    out.as_mut_ptr(),
+                    16
+                ),
+                OK
+            );
+            assert_eq!(state(owner).entries().len(), 1);
+            assert!(state(owner).entries()[0].effect.is_empty());
+            assert_eq!(state(owner).entries()[0].start, 12_000_000);
+            assert_eq!(state(owner).entries()[0].readorder, 0);
+            assert_eq!(xy_vsfilter_document_ass_drop_v1(run), OK);
+            assert_eq!(xy_vsfilter_document_destroy_v1(owner), OK);
+            assert_eq!(read_snapshot(token), retained);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(token), OK);
             let simple_owner = create();
             let mut simple_out = [0xa5; 4];
             assert_eq!(
