@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "candidate_code_commit": "5ce7f0552f830a1088e94a5a33b3457bd69fa879",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "ASS/SSA header policy, dialogue assembly and style construction in the experimental document configuration; no package closure or default enablement.",
+  "reference_sources": {
+    "src/subtitles/STS.cpp": "2616b67db84f7329ac6e2363a3f03d61977fa07c37ed9c04d32ec2b1197f31e0",
+    "src/subtitles/STS.h": "57dc87a3de9470ca04adc007c175956bd4acfddcb720324886bb4a2c7699080b"
+  },
+  "operations": [
+    {
+      "operation": "Parser header state and document mutation",
+      "core": {
+        "path": "rust/compat/src/ass_document.rs",
+        "line": 19,
+        "sha256": "d836bd74306d650cf8ff2ec73b875947cabb4b120f6890a44fbebd7b44488b3f"
+      },
+      "native": {
+        "path": "src/subtitles/STS.cpp",
+        "line": 2226,
+        "sha256": "2a9788fba5c643f555debc271988b1431a24cded14e18be7e75c054535476507"
+      },
+      "behavior": "BT601/TV initialization, c-string key classification, independent script/style versions, section acceptance, live opposite-axis inference including 1280/1024 special case and safe emulation of observed i32 wrapping multiplication, per-field failure resets, substring/prefix values and unknown-value retention."
+    },
+    {
+      "operation": "Dialogue parsing and insertion",
+      "core": {
+        "path": "rust/compat/src/ass_dialogue.rs",
+        "line": 8,
+        "sha256": "4b6bc72b9572b5351f679a5c7d5cc04abea75d6e64411cf4adcc94f7a0e19250"
+      },
+      "session": {
+        "path": "rust/compat/src/ass_document.rs",
+        "line": 53,
+        "sha256": "d836bd74306d650cf8ff2ec73b875947cabb4b120f6890a44fbebd7b44488b3f"
+      },
+      "behavior": "Owned raw UTF-16 token state, native numeric requests in original order, Marked consumption, margins, star trimming, pre-FastTrim effect-prefix equality, supplied locale Default match, safe i64 wrapping timestamp arithmetic, empty/reversed-range rejection, CR/LF suffix preparation and direct EntryOnly append with no segment rebuild."
+    },
+    {
+      "operation": "Style assembly",
+      "core": {
+        "path": "rust/compat/src/ass_style_value.rs",
+        "line": 8,
+        "sha256": "22000e28d7dfa3635ff9fb3ee19724a84147e69e5faba42599f0e95a0f2ec928"
+      },
+      "session": {
+        "path": "rust/compat/src/ass_style.rs",
+        "line": 125,
+        "sha256": "76a2856867d45298b81f9c46b2ba67328fab9be7a7a7d847492b2958efa01446"
+      },
+      "behavior": "Pinned constructor defaults, version-dependent fields, exact scalar/raw text assignment, color/alpha/charset/border/alignment normalization, ordered-comparison floating clamps including NaN and signed zero, raw style name normalization; one bounded style result after all required fields are supplied."
+    }
+  ],
+  "ffi_review": [
+    {
+      "exports": [
+        "xy_vsfilter_document_ass_begin_v1",
+        "xy_vsfilter_document_ass_step_v1",
+        "xy_vsfilter_document_ass_dialogue_part_v1",
+        "xy_vsfilter_document_ass_drop_v1"
+      ],
+      "source": {
+        "path": "rust/ffi/src/document.rs",
+        "line": 276,
+        "sha256": "1fbb6bb59478c0e3793398e3761424e9d394356b987cec6ee752d334f3741425"
+      },
+      "contract": "Typed monotonically issued run ID bound to validated document. Input byte spans are copied before nonblocking registry admission; output preflight precedes mutation and copy-out follows admission. No native pointer is a resource handle; snapshots are independently owned and survive run destruction. Native conversion, CompareNoCase, trim and all other callbacks run after all registry loans end. Reject stale/wrong kinds and invalid command/phase/flag/length/capacity; numeric parser failure is a modeled mutation, not a boundary error. Destructor releases once through the shared native gate. Unsupplied screen remains unresolved.",
+      "tests": [
+        "invalid and stale handles",
+        "BUSY and rejected-output atomicity",
+        "overlapping input/output",
+        "snapshot independence",
+        "unfinished dialogue and missing/duplicate style-field rejection"
+      ]
+    },
+    {
+      "exports": [
+        "xy_vsfilter_ass_style_integer",
+        "xy_vsfilter_ass_style_float_bits",
+        "xy_vsfilter_ass_style_text",
+        "xy_vsfilter_ass_style_finish"
+      ],
+      "source": {
+        "path": "rust/ffi/src/ass_style.rs",
+        "line": 91,
+        "sha256": "bf9b1775400e0ec325eb52018465574c836c3dbee215c7eb8b50216fbaff71df"
+      },
+      "contract": "Extends existing noncopyable AssStyle RAII owner, with exclusive live owner precondition. Native inputs are initialized, bounded, disjoint u16 spans and copied immediately. Scalars carry exact native conversion results; float uses bits. No writable native object pointer is retained. Existing scalar copy-out API returns encoded result bytes/name units; one native style value is decoded after finish. Four new unsafe entrypoints; native owner lifetime remains an audited transitional precondition, not a checked integer handle. Encoded result limited to u32 byte count."
+    }
+  ],
+  "retained_native_boundaries": [
+    "CTextFile line reads, file/memory/encoding lifetime, EOF loop, FastTrim, key extraction/lowercase and script-version suffix comparison.",
+    "NextInt wcstol/wcstoul and GetInt/GetFloat swscanf, including original token/remainder behavior and float-to-double promotion; no Rust numeric parser substitution.",
+    "Native locale-sensitive Default comparison; dialogue text FastTrim before safe append.",
+    "Temporary STSStyle allocation and wire conversion; AddStyle native value wrapper and CRT suffix conversion around existing safe style-map sessions.",
+    "Font loading/Windows font installation, with existing safe font record helpers; font installation is not exercised by the new probe.",
+    "Public CSimpleTextSubtitle/renderer/host adapters and outer Open orchestration remain transitional C++ even where their policy is Rust."
+  ],
+  "unresolved_or_unverified": [
+    "Pre-Open embedded-stream m_simple reads remain uninitialized in the reference; no default invented and not counted as passing.",
+    "Host lock/reentry and allocator failure behavior, real Aegisub/player graph lifecycle, native boundary elimination and full document/frontend closure remain open.",
+    "No Miri or non-Windows run in this increment. Default native-document configuration receives compile-only checks, not new runtime parity.",
+    "Finite malformed inputs only; no crash, timeout, or unstable observation accepted as parity."
+  ],
+  "next_closure_work": [
+    "Move ASS line-read/dispatch loop and text/code-unit preparation behind a bounded safe session while preserving native EOF, exception and font-consumption observations.",
+    "Migrate style conversion/session state to the checked document boundary and remove superseded per-field pointer crossings after caller parity.",
+    "Resolve embedded-stream initialization and real-host lifecycle contracts before enabling the owner by default; continue layout/render/fonts/surfaces/other-formats/hosts from the full work-package ledger."
+  ]
+}

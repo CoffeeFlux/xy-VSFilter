@@ -1,0 +1,364 @@
+{
+  "schema": 1,
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "candidate_code_commit": "5ce7f0552f830a1088e94a5a33b3457bd69fa879",
+  "prior_increment": "760887c3",
+  "configuration": {
+    "native": "Release, RustTextDecoder=true, RustDocumentOwnerExperimental=true",
+    "rust": "1.85.0; native-runtime with +crt-static",
+    "msvc": "14.44.35207",
+    "sdk": "10.0.26100.0"
+  },
+  "scope": "ASS header control, dialogue assembly/append and style construction/normalization; not a full frontend, host or default-enablement claim.",
+  "limits": [
+    "Native pre-Open simplicity is uninitialized; embedded paths that omit successful Open remain unresolved, not passing results.",
+    "No Aegisub/player playback or full graph integration; COM probes are disconnected and omit custom interface method behavior.",
+    "No non-Windows or Miri run for this increment.",
+    "Default native-document configuration has compile-only probes, not new runtime parity.",
+    "Header-only 157-case and header/dialogue 1565-case comparisons are earlier checkpoints; final comparisons below exercise the combined 2644-case parser candidate."
+  ],
+  "architectures": {
+    "x64": {
+      "corpus": {
+        "report": "artifacts/ass-csri-x64/summary.json",
+        "sha256": "9e44754c8833dbdd332edbc44d0ffbf2060c9ebe73ada2bbb575cbb895a8aa82",
+        "complete": true,
+        "frames": 8586,
+        "distinct_controls": 72,
+        "partition_exact": true,
+        "shards": [
+          {
+            "report": "artifacts/ass-csri-x64/shard-0/report.json",
+            "sha256": "8de73033bb9c57aeba8f8d27743a9e2e6ee81f51776b3211bc1afde99a5cd8a5",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1103,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/ass-csri-x64/shard-1/report.json",
+            "sha256": "0937978b529e41e1d26068407c5bb6bc8e905989f42d1d8015931641f0c5b13b",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1103,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/ass-csri-x64/shard-2/report.json",
+            "sha256": "e4f74ad98e9744d126b60d69eeb0adc08b3f36d1085d705ef04ff6b11ce794e4",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1071,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/ass-csri-x64/shard-3/report.json",
+            "sha256": "a65dc9880acfb477e225128933760309d22f0888c33b8d90984d1ff983b91909",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1071,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/ass-csri-x64/shard-4/report.json",
+            "sha256": "2e5b232365cd53333b3812a17d80bc4c977cf61b1a00de2e1aefa8459e7cd436",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1051,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/ass-csri-x64/shard-5/report.json",
+            "sha256": "ba939c6c3131066ea8287bc4a83ba36f98dfd99ed9d892b795195f6315c09ce7",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1051,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/ass-csri-x64/shard-6/report.json",
+            "sha256": "f4e3ebb9f2d08da95fd12f3993be0ca48ae4f522e39d3475e28b81e62747f782",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1068,
+            "cases": 101
+          },
+          {
+            "report": "artifacts/ass-csri-x64/shard-7/report.json",
+            "sha256": "58444bcafd45e8f16d9b04a8d256f6a9725f5ab8b06188f3940d5022a9262617",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1068,
+            "cases": 101
+          }
+        ],
+        "cases": 814,
+        "rendered_frames": 8586,
+        "source_manifest_sha256": "2e197b56427d6b94bb389a8e25e73e8910ea3c71ddf89ebd11658b369b48cd07",
+        "partition_driver_sha256": "4ac6acfac2f56c857521da8bb017afb0e5223edab176701480cd709180e4e535"
+      },
+      "mutations": {
+        "report": "artifacts/ass-mutations-x64/report.json",
+        "sha256": "0c30117383f68f9ba0093ad77283b51356adc8a309bc6c546870ec3c3aa69720",
+        "complete": true,
+        "passed": true,
+        "rendered_frames": 224,
+        "cases": 32
+      },
+      "lifecycle": {
+        "report": "artifacts/ass-lifecycle-x64/report.json",
+        "sha256": "e1826d6f8c45ad683eb7336d3e5f81c0e44cfe9617817108cf6e7dbf98faa0ff",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "5ce7f0552f830a1088e94a5a33b3457bd69fa879",
+        "trace_lines": 3693,
+        "dialog_count": 3,
+        "inputs_unchanged": true
+      },
+      "parser": {
+        "report": "artifacts/ass-probe-v3-x64/report.json",
+        "sha256": "61239b21c14113a0aed24dc9c6a3c29ada196ee5f15260281be5d24751d01fe6",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "5ce7f0552f830a1088e94a5a33b3457bd69fa879",
+        "trace_lines": 18272,
+        "inputs_unchanged": true,
+        "cases": 2644
+      },
+      "compile": {
+        "report": "artifacts/ass-compile-x64/report.json",
+        "sha256": "7848924a4abec29f16c3dadacdb164533ee8f7f9fdbc0b2c3ca47c982bed3b61",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "5ce7f0552f830a1088e94a5a33b3457bd69fa879",
+        "inputs_unchanged": true,
+        "scope": "Compile-only actual style helper/lifecycle sources and headers; no link, execution or parity claim"
+      },
+      "com": {
+        "report": "artifacts/ass-contracts-x64/com/report.json",
+        "sha256": "33b36287a73a278533b9ea73e3777604b8e945515a5d6dccbbbde3a9b39d30cb",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "5ce7f0552f830a1088e94a5a33b3457bd69fa879",
+        "inputs_unchanged": true,
+        "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "2d254068a40e5f59cf191c3c6bbfc984b548193b668c4decac21dc1e94e02169",
+          "candidate_sha256": "a45f4a0a315b468ebe24eef2db41d6384251b95150c6c459ebf12fbe54365548",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "858b557df4643353cc2b7f7a4faf24fb20fc571f39dc8929949a8b9d80276024"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "32b7c2cd6eb817120414db53b3c3005e719ae4b993c4a69d0d66c7f6ac363d5a",
+          "candidate_sha256": "15cdd927e33ce9daccdeac2af7027c3c3e4327bdd8cf490cccf3b53af6a27656",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "09623cbd08a08a70ca726d32f1ac7a80358fe93589dfe22d814f7c9544f6d751"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "f1165742064181b7fb73bacb16017d8e202c8bb0be90ed8c2eb812ac282c2df8",
+          "candidate_sha256": "fd273eec988b09b40c6fa3559e80142506d5542c385c986921c08c238e12c5a8",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "b0b48a3cf2bf2ecbbac4ecca863a815ab4a0c1137277a9b7d5830d9d1beca5c9"
+        }
+      }
+    },
+    "x86": {
+      "corpus": {
+        "report": "artifacts/ass-csri-x86/summary.json",
+        "sha256": "dd453a4c87b7b8b58ee6aa005563756712187d1ae682c927a17f068c1de84c46",
+        "complete": true,
+        "frames": 8586,
+        "distinct_controls": 72,
+        "partition_exact": true,
+        "shards": [
+          {
+            "report": "artifacts/ass-csri-x86/shard-0/report.json",
+            "sha256": "8699e275aab4189861ecaa728fd07f74c416726e966dfbe47c3649629c16fbc3",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1103,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/ass-csri-x86/shard-1/report.json",
+            "sha256": "7e339492c148bf9408c2573614e8b1a5b7fb770d05ed59564159486469f6f762",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1103,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/ass-csri-x86/shard-2/report.json",
+            "sha256": "5292463155b74c4003e0f78ce308528ee061cf3f5ca7e79674421d359d0127fa",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1071,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/ass-csri-x86/shard-3/report.json",
+            "sha256": "555b8424d06b683f9bafbd8510beb2f043598ac19623082d7dc496abd0745d0a",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1071,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/ass-csri-x86/shard-4/report.json",
+            "sha256": "ef3a14383aece23a957c484e9744313d14f411365ca5b7c2e4d697377835d4d7",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1051,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/ass-csri-x86/shard-5/report.json",
+            "sha256": "ff49bbe4828fd60774f8a41890db3f7fc1b44e808278f2ca040e770997fd3d2e",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1051,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/ass-csri-x86/shard-6/report.json",
+            "sha256": "e834d4734e3db26ec469dbbe20d0bcefde28ab878af64b0a6813942a427e6b44",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1068,
+            "cases": 101
+          },
+          {
+            "report": "artifacts/ass-csri-x86/shard-7/report.json",
+            "sha256": "48cb9e5dc1b7978d3c4370c2646feac80a1bfdd4f6cbebd8e1ca79900b5b8a5e",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1068,
+            "cases": 101
+          }
+        ],
+        "cases": 814,
+        "rendered_frames": 8586,
+        "source_manifest_sha256": "2e197b56427d6b94bb389a8e25e73e8910ea3c71ddf89ebd11658b369b48cd07",
+        "partition_driver_sha256": "4ac6acfac2f56c857521da8bb017afb0e5223edab176701480cd709180e4e535"
+      },
+      "mutations": {
+        "report": "artifacts/ass-mutations-x86/report.json",
+        "sha256": "5f62f378aafe833345cbec304a81913c7ee59a6a5c76dbb0dc5b2d4aadde6a7c",
+        "complete": true,
+        "passed": true,
+        "rendered_frames": 224,
+        "cases": 32
+      },
+      "lifecycle": {
+        "report": "artifacts/ass-lifecycle-x86/report.json",
+        "sha256": "1e6f91d5ae59e5bec70b29dba304538f1c9d68aeca00b23ea6df002ff78475bd",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "5ce7f0552f830a1088e94a5a33b3457bd69fa879",
+        "trace_lines": 3693,
+        "dialog_count": 3,
+        "inputs_unchanged": true
+      },
+      "parser": {
+        "report": "artifacts/ass-probe-v3-x86/report.json",
+        "sha256": "2129060148b416c274920832312bbd6da0b961fdd5fd6f0b6c9d8ebc04ea9d9a",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "5ce7f0552f830a1088e94a5a33b3457bd69fa879",
+        "trace_lines": 18272,
+        "inputs_unchanged": true,
+        "cases": 2644
+      },
+      "compile": {
+        "report": "artifacts/ass-compile-x86/report.json",
+        "sha256": "73bc54bbdab4339b6fe5d84e724fbeaeeaaec3f04b071261b55c1dfcd9123294",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "5ce7f0552f830a1088e94a5a33b3457bd69fa879",
+        "inputs_unchanged": true,
+        "scope": "Compile-only actual style helper/lifecycle sources and headers; no link, execution or parity claim"
+      },
+      "com": {
+        "report": "artifacts/ass-contracts-x86/com/report.json",
+        "sha256": "e2deca089f3ccfb75919cf468d70a75a72f6c56036fc2050bf0a52c46867752d",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "5ce7f0552f830a1088e94a5a33b3457bd69fa879",
+        "inputs_unchanged": true,
+        "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "69faa2d5f90f35fe4184e9e9bd892adb76fee60295701988f61ab7af0664d9eb",
+          "candidate_sha256": "26ab7d07cf0db98340ee766ca399debec74ecff2b03de928bc2e13d488c57f17",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "dbd365316d54d5a3d590b63604fbbc5ea6849a912eb7660e52d8df4bdd6b2120"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "2c3b904d7f91902ef456e07b648c5d6351878318c235397eeb9b39eb3fffa34f",
+          "candidate_sha256": "2774d76a397fc643c8a684cebdf1f566b5bb45e961ab46c45844f5bc3bbe9702",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "8821591e5f42e83c8361380a00b4869b748312f9374da70041ad829e381b6bbc"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "3e7c20a4d6c42457d92eb56c42e4fd9f3bddb93276f2c1cd28bfb73edd06484c",
+          "candidate_sha256": "05204edf104e9d25fc2b23f9853b9350abe4b316aac4d13e9533c2b4510abd51",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "bee8a1d975859e0ab8a9b6843e14f813df818b8538e6501927e792bb180eb7c1"
+        }
+      }
+    }
+  },
+  "source_inventory": {
+    "path": "docs/rust-ass-parser-inventory.json",
+    "sha256": "ac066b41a42084743f9eec6d255e681603dd8635f9d19fe42751f696345f5b32"
+  },
+  "unsafe_lexical_inventory": {
+    "report": "artifacts/ass-unsafe-inventory.json",
+    "sha256": "420f9912b091a36acf54d56742b13dc2f721a25a24b8dc7f34296741abae03eb",
+    "safe_core_unsafe_sites": 0,
+    "limits": "Lexical inventory only, not a soundness proof."
+  },
+  "rust_tests": {
+    "core_per_architecture": 251,
+    "ffi_per_architecture": 124,
+    "fmt": true,
+    "clippy_all_targets": true,
+    "clippy_native_runtime": true,
+    "logs": {
+      "artifacts/ass-checks-v3.log": "8e536d385b473f5f5ea6a1f0487424ef7c678a65965c8865a89703920c6dfc5a"
+    }
+  },
+  "python_harness_tests": {
+    "count": 150,
+    "skipped": 1,
+    "failures": 0,
+    "corpus_generation_checked": true,
+    "log": "artifacts/ass-checks-v3.log"
+  }
+}

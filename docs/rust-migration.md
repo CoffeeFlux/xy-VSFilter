@@ -27,34 +27,72 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Active port: ASS/SSA parser control (2026-10-17)
+## Current port: ASS/SSA parser control (2026-10-17)
 
-The whole repository remains the target. The experimental document configuration
-now routes ASS/SSA header dispatch, independent script/style versions, acceptance,
-color initialization and updates, numeric failure resets, and live resolution
-inference through a safe Rust session bound to the canonical document. Native
-file reading, trim/lowercase, CRT numeric conversion, style/dialogue actions and
-font loading remain explicit transitional adapters. The session retains no
-native pointer and releases admission before each adapter operation. Dialogue
-records now stay in the typed Rust session through numeric token exchange,
-effect-prefix removal, star/default normalization, timestamp construction and
-entry-only append. Only CRT numeric conversion, the locale-sensitive Default
-comparison and FastTrim remain native obligations for that record path.
-Style defaults, field assignment, color/alpha/charset/alignment normalization,
-floating clamps and style-name preparation now execute in Rust as well. A
-bounded style value crosses back to the transitional native AddStyle adapter;
-the existing Rust style-map policy owns its canonical storage.
+The full repository replacement remains the goal. This milestone moves three
+connected parts of ASS/SSA ingestion into safe Rust in the experimental document
+configuration:
 
-The first header comparison at `0ee2e4ee` passed 157 cases twice on each side on
-both x86 and x64, including integer extremes and partial numeric-error updates.
-The dialogue increment at `2e2c611d` then passed 1,565 direct parser cases per
-architecture, with repeated runs on both sides. Those tests include raw code
-units, prefix effects, missing fields, truncation and signed timestamp overflow.
-Expanded validation is in progress against cleanup `67da07cd`, using a probe that
-includes the actual reference/candidate STS.cpp and observes partial parser
-state, exceptions and byte consumption directly. No production switch or full
-ASS/frontend closure is claimed. The uninitialized embedded-stream simplicity
-contract remains unresolved; it does not block migration of defined parser paths.
+* Header dispatch and state: independent script/style versions, section
+  acceptance, color initialization, numeric failure resets, and resolution
+  inference using the live document state.
+* Dialogue assembly and direct entry-only append: owned raw code units, numeric
+  token sequencing, timestamps, effect-prefix cleanup, style normalization,
+  rejection order, CR/LF preparation and readorder assignment. No native entry
+  object is assembled on this path.
+* Style assembly: pinned constructor defaults, ordered field assignment,
+  color/alpha/charset/alignment normalization, floating clamps and style-name
+  preparation. Rust returns an owned value to the transitional native AddStyle
+  adapter; the existing Rust style-map policy owns canonical storage.
+
+The document-bound ASS session uses checked integer IDs and immutable snapshots.
+Native conversions execute after registry loans end. Style construction extends
+its existing noncopyable RAII owner with four audited unsafe entrypoints; this
+pointer-based adapter remains transitional. The safe core still forbids unsafe
+code. See [the ownership and boundary inventory](rust-ass-parser-inventory.json)
+for the exact moved operations, contracts, retained adapters and remaining work.
+
+Final code `5ce7f055` passes fresh Windows x86/x64 validation against cleanup
+`67da07cd`, on **each** architecture:
+
+* 2,644 direct parser cases, run twice on both reference and candidate, with
+  18,272 identical trace lines. The probe includes each checkout's actual
+  STS.cpp and observes initialized document state, exceptions and byte
+  consumption. It covers malformed/truncated fields, raw UTF-16/NULs, independent
+  versions, zero-duration records, effect prefixes, extreme integers, NaNs,
+  infinities, signed zero, and safe emulation of observed timestamp wrapping.
+* All 814 corpus cases / 8,586 bit-exact frames, 72 distinct-frame controls, and
+  32 mutation cases / 224 exact frames (seed 12345). Eight disjoint corpus
+  batches cover the original manifest exactly and retain every control pair.
+* All three Release DLL builds, exports/dependency requirements, 10 scoped COM
+  cases plus two candidate-only pin-ID controls, and 3,693 identical linked
+  lifecycle trace lines with the expected dialogs. Nine compile probes cover
+  reference, native-document candidate and experimental-document candidate.
+* 251 safe-core + 124 FFI tests, formatting, Clippy with warnings denied including
+  native-runtime, corpus generation and 150 Python harness tests (one skipped).
+
+See [the evidence index](rust-ass-parser-local-evidence.json) for source commits,
+DLL/report hashes and local artifact paths. Earlier checkpoints `0ee2e4ee`
+(header-only, 157 cases) and `2e2c611d` (header/dialogue, 1,565 cases) retain their
+own reports under `artifacts/ass-probe-*`; final parser evidence is under
+`artifacts/ass-probe-v3-*`. No crash, timeout or unstable outcome is a pass.
+
+This remains opt-in and does not close the document or ASS frontend package.
+CTextFile lifetime/encoding, the outer read/dispatch loop, native trim/lowercase,
+CRT numeric parsing, locale comparison, font installation and native value
+adapters still need migration or a bounded audited system boundary. Pre-Open
+embedded-stream simplicity remains unresolved; no default was invented. Real
+Aegisub/player graph lifecycle, allocator/reentry behavior and full host closure
+remain open. There was no Miri/non-Windows run or new default-native-document
+runtime comparison in this increment.
+
+Next, move ASS line-read/dispatch and text preparation into the safe session,
+then retire the remaining style pointer crossings. Resolve embedded-stream
+initialization and host lifetime contracts before default enablement. The
+remaining layout, fonts, rendering, surfaces, other formats, vendored code and
+all C++ host adapters stay in the full work-package plan below. Migration work
+for this milestone is published on `rust/cleanup-ass-parser` in the CoffeeFlux
+fork; the preceding simplicity branch remains available.
 
 ## Previous port: document simplicity (2026-10-16)
 
