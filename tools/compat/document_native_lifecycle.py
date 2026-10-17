@@ -577,6 +577,16 @@ def compare_traces(traces, pointer_bits, *, require_named_stages=True, require_i
         raise ValueError("native lifecycle traces differ or are nondeterministic")
 
 
+def validate_simple_rows(data):
+    rows = [line for line in data.splitlines() if line.startswith(b"simple-retained ")]
+    if rows != [b"simple-retained destination=0 source=1", b"simple-retained destination=1 source=0"]:
+        raise ValueError("missing/invalid simple flag retention observations")
+    rendered = [line for line in data.splitlines() if line.startswith(b"simple-render ")]
+    expected = [f"simple-render phase={phase} simple={phase%2} movable={int(phase>=2)}".encode() for phase in range(4)]
+    if rendered != expected:
+        raise ValueError("missing/invalid renderer simplicity/movement observations")
+
+
 def find_library(root, platform, name):
     paths = [p for p in (root / "bin").glob(f"lib_*/{platform}/{name}") if p.is_file()]
     if len(paths) != 1:
@@ -692,6 +702,7 @@ def main():
                 if result.stderr:
                     raise ValueError(f"{label} execution produced unexpected stderr")
                 validate_trace(result.stdout, bits, cleanup=True)
+                validate_simple_rows(result.stdout)
                 traces.append(result.stdout)
             if sha(exe.read_bytes()) != build["binary_sha256"]:
                 raise ValueError("native probe executable changed during execution")

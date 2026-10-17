@@ -92,6 +92,9 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_commit_style_rename_v1(uint64_t 
 // 3 forced default style(strict0/1),4 supplied-only LCID(raw u32 bits carried
 // through the i32 setter argument). No constructor LCID default. Clone copies
 // LCID; selected Copy/Empty/storage operations retain destination LCID.
+// 5 simple subtitle(strict0/1), also initially absent. Open success-header
+// acknowledgement sets it from parser index > 0 before Sidecar/Rebuild.
+// Clone copies simple; selected Copy/Empty/storage retain destination simple.
 // Other fields are initially absent until native initialization.
 // Get writes4 LE bytes; absence => UNRESOLVED_REFERENCE, output unchanged.
 // PAR compensation is separately supplied/stored as opaque u64 double bits;

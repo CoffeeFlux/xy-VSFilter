@@ -4021,6 +4021,16 @@ void CSimpleTextSubtitle::OrSegmentAnimated(int iSegment, bool animated)
 }
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+bool CSimpleTextSubtitle::GetDocumentSimple() const
+{
+    return m_document->Metadata(5) != 0;
+}
+
+void CSimpleTextSubtitle::SetDocumentSimple(bool value)
+{
+    m_document->SetMetadata(5, value ? 1 : 0);
+}
+
 LCID CSimpleTextSubtitle::GetDocumentLCID() const
 {
     return static_cast<LCID>(m_document->LCIDValue());
@@ -4513,7 +4523,7 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
             SetDocumentMode(OpenFuncts[i].mode);
             SetDocumentEncoding(f->GetEncoding());
             SetDocumentPath(f->GetFilePath());
-            m_simple = i > 0;
+            // Rust commits parser simplicity before sidecar and callbacks.
             operation = run.Next(-1);
             for(;;)
             {

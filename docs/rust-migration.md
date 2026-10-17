@@ -27,6 +27,26 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
+## Current port: document simplicity (2026-10-16)
+
+The experimental document owner now stores the remaining `m_simple` flag in
+safe Rust. Rust Open control selects it after successful header assignments and
+before sidecar parsing and callbacks. The native field is compiled out in this
+configuration, and both renderer reads use the checked Rust boundary. Native
+Copy, self-copy, Empty and failed Open retain the destination's supplied value.
+
+The constructor supplies no value in the cleanup reference. Rust represents
+that absence explicitly instead of inventing a default. The caller audit found
+embedded text/UTF8 paths that can reach renderer queries without successful
+Open. Their native uninitialized flag has no established compatibility result;
+Rust reports it unresolved. This remains a blocker to default enablement and
+full host closure. See [the scoped caller inventory](rust-document-simple-inventory.json).
+
+Validation is in progress for this increment. Earlier cleanup evidence below
+belongs to the preceding code and is not evidence for this change. The document
+owner remains opt-in; host adapters and broader native orchestration remain to
+be ported.
+
 ## Cleanup rebase: current status
 
 The user requested rebasing onto the fork's cleanup, rather than continuing from

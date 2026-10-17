@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "scope": "Simplicity flag only; older document inventory remains historical and is not relabeled.",
+  "reference_sources": {
+    "src/subtitles/STS.h": "57dc87a3de9470ca04adc007c175956bd4acfddcb720324886bb4a2c7699080b",
+    "src/subtitles/STS.cpp": "2616b67db84f7329ac6e2363a3f03d61977fa07c37ed9c04d32ec2b1197f31e0",
+    "src/subtitles/RTS.cpp": "ef6aae1b68accd3da5cc9093377a118cf11f5754c597cec68173b06c80f71454",
+    "src/subtitles/SubtitleInputPin.cpp": "2126f2ad9af043bb2ed627f6d467e809d4c08f24cbb16379b0e10fd57bcba9dd",
+    "src/filters/transform/vsfilter/xy_sub_filter.cpp": "0ed48835da6c4dd35ec98310492802fc5ada0ad6d96579f3e6d01a57246b540a"
+  },
+  "field": "CSimpleTextSubtitle::m_simple",
+  "rust_owner": "Document.simple: Option<bool>",
+  "native_declaration": "Compiled out under XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL only.",
+  "lifecycle": {
+    "construction": "None: pinned constructor supplies no value.",
+    "open_success": "Open lifecycle success-header acknowledgement selects parser_index > 0 after native header assignments and before sidecar / segment callbacks.",
+    "open_failure": "Retains prior value or None.",
+    "copy": "Destination retains its own value, including self-copy; source not copied.",
+    "empty": "Retains prior value or None.",
+    "rust_clone": "Independent owned copy, including presence; not a native Copy operation."
+  },
+  "live_accesses": [
+    {
+      "site": "CSimpleTextSubtitle::Open(CTextFile*) success header",
+      "access": "write",
+      "rust_route": "document_open::Run::advance(SuccessHeader)"
+    },
+    {
+      "site": "CRenderedTextSubtitle::RenderEx(IXySubRenderFrame**,...)",
+      "access": "read",
+      "rust_route": "GetDocumentSimple -> checked metadata field 5",
+      "behavior": "ASS recalculates m_movable from hard positioning; simple formats retain prior m_movable."
+    },
+    {
+      "site": "CRenderedTextSubtitle::IsSimple",
+      "access": "read",
+      "rust_route": "GetDocumentSimple -> checked metadata field 5",
+      "callers": [
+        "XySubFilter::XySetBool movement setting",
+        "XySubFilter::RequestFrame movement decision",
+        "XySubFilter::SetSubtitle movement decision"
+      ]
+    }
+  ],
+  "unresolved": [
+    {
+      "site": "CSubtitleInputPin::CreateHelper MEDIATYPE_Text and some UTF8/WebVTT subtitle paths",
+      "reason": "Construct renderer and deliver Add records without necessarily completing Open; XySubFilter can call IsSimple, and RenderEx reads the flag. Native flag is constructor-indeterminate.",
+      "policy": "No invented constructor default and no native uninitialized read in parity probes. Rust reports UNRESOLVED_REFERENCE for an absent supplied value. Not a passing compatibility outcome; blocks default enablement/full host closure."
+    }
+  ],
+  "validation_plan": [
+    "Safe-core optional-state retention, clone independence, all 12 parser selections, action ordering and callback edits.",
+    "C ABI strict booleans, absent state, buffer atomicity, busy gate and stale/wrong handles.",
+    "Paired linked native lifecycle, public IsSimple and RenderEx movement across ASS-positioned/SRT/ASS-plain/SRT reloads.",
+    "Paired final x86/x64 DLL rendering corpus, mutations, exports/dependencies and scoped COM checks."
+  ]
+}

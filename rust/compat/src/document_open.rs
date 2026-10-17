@@ -4,8 +4,9 @@
 //! Actions are ordered native adapter obligations, not callbacks executed by
 //! this core. Acknowledgements hold no file, parser, dialog or document borrow
 //! across calls. Native retains successful metadata assignments (and their
-//! order), m_simple, parsing, virtual Empty, seeking, dialogs and notifications.
-//! Only the final live both-zero screen fallback is performed here. Protocol
+//! order), parsing, virtual Empty, seeking, dialogs and notifications.
+//! After successful header assignment, Rust commits the parser's simple flag
+//! before Sidecar/Rebuild. The final live both-zero screen fallback is also here. Protocol
 //! tests do not establish native parser, allocation or reentry compatibility.
 use crate::document::Document;
 
@@ -105,7 +106,10 @@ impl Run {
                     DoneFalse
                 }
             }
-            SuccessHeader => Sidecar,
+            SuccessHeader => {
+                document.replace_simple(self.parser_index > 0);
+                Sidecar
+            }
             Sidecar => Rebuild,
             Rebuild => UnknownStyles,
             UnknownStyles => {
@@ -142,6 +146,48 @@ mod tests {
         ack(run, doc, ActionKind::Sidecar);
         ack(run, doc, ActionKind::Rebuild);
         ack(run, doc, ActionKind::UnknownStyles);
+    }
+    #[test]
+    fn simple_commits_only_after_success_header_and_before_sidecar() {
+        for initial in [None, Some(false), Some(true)] {
+            for selected in 0..12 {
+                let mut d = Document::default();
+                if let Some(value) = initial {
+                    d.replace_simple(value);
+                }
+                let mut r = Run::new(12);
+                parsed(&mut r, &mut d);
+                for _ in 0..selected {
+                    assert_eq!(
+                        r.advance(&mut d, Some(false)).unwrap().kind,
+                        ActionKind::Seek
+                    );
+                    ack(&mut r, &mut d, ActionKind::RetryEmpty);
+                    drop(d.empty());
+                    ack(&mut r, &mut d, ActionKind::Parse);
+                    assert_eq!(d.simple(), initial);
+                }
+                assert_eq!(
+                    r.advance(&mut d, Some(true)).unwrap().kind,
+                    ActionKind::SuccessHeader
+                );
+                assert_eq!(d.simple(), initial);
+                assert_eq!(
+                    r.advance(&mut d, Some(false)),
+                    Err(Error::UnexpectedParserResult)
+                );
+                assert_eq!(d.simple(), initial);
+                ack(&mut r, &mut d, ActionKind::Sidecar);
+                assert_eq!(d.simple(), Some(selected > 0));
+                // Sidecar and callbacks may update state; no later replay of the flag.
+                d.replace_simple(selected == 0);
+                ack(&mut r, &mut d, ActionKind::Rebuild);
+                ack(&mut r, &mut d, ActionKind::UnknownStyles);
+                d.set_script_size(0, 0);
+                ack(&mut r, &mut d, ActionKind::DoneTrue);
+                assert_eq!(d.simple(), Some(selected == 0));
+            }
+        }
     }
     #[test]
     fn retries_seek_then_empty_even_after_last_parser() {

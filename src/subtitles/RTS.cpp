@@ -3685,7 +3685,11 @@ STDMETHODIMP CRenderedTextSubtitle::RenderEx( IXySubRenderFrame**subRenderFrame,
         return hr;
     }
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    if (!GetDocumentSimple())
+#else
     if (!m_simple)
+#endif
     {
         bool newMovable = true;
         POSITION pos=sub2List.GetHeadPosition();
@@ -3925,7 +3929,11 @@ STDMETHODIMP_(bool) CRenderedTextSubtitle::IsMovable()
 
 STDMETHODIMP_(bool) CRenderedTextSubtitle::IsSimple()
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return GetDocumentSimple();
+#else
     return m_simple;
+#endif
 }
 
 STDMETHODIMP CRenderedTextSubtitle::Lock()

@@ -5,6 +5,7 @@
 // scripted unknown-style dialogs; the observer never edits the document.
 #include <stdafx.h> // runner puts the selected checkout's src/subtitles first
 #include <STS.h>
+#include <RTS.h>
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 #include <RustDocumentOwner.h>
 #endif
@@ -77,7 +78,7 @@ public:
         initial_mode_=Mode();initial_type_=Type();initial_encoding_=Encoding();
         // Assign every observed metadata scalar before the first observation;
         // constructor-indeterminate m_simple/m_lcid are never read.
-        m_simple = id != 0;Name(id ? CString(L"destination") : CString(L"source"));
+        Simple(id != 0);Name(id ? CString(L"destination") : CString(L"source"));
         LCIDValue(1033+id);Type(EXTSRT);Mode(TIME);Encoding(CTextFile::UTF8);
         Path(id ? CString(L"destination-path") : CString(L"source-path"));
         Screen(CSize(640+id,480+id));Wrap(int(id));Collisions(int(id));
@@ -91,6 +92,20 @@ public:
         Forced(false);PARType(EPCTDownscale);PAR(1.25+id);Matrix(YCbCrMatrix_BT709);Range(YCbCrRange_PC);
     }
     ~TraceDocument() override {printf("event %u %u destructor-body\n",++sequence,id_);}
+    bool Simple() const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        return GetDocumentSimple();
+#else
+        return m_simple;
+#endif
+    }
+    void Simple(bool value) {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        SetDocumentSimple(value);
+#else
+        m_simple = value;
+#endif
+    }
     STSStyle DefaultValue() const {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
         return m_document->DefaultStyle();
@@ -413,7 +428,7 @@ public:
     }
     void Dump(const char* stage) const {
         printf("state %u %u %s %zu %zu\n",++sequence,id_,stage,Entries(),Segments());
-        printf("metadata %d",m_simple);units(Name());
+        printf("metadata %d",Simple());units(Name());
         printf(" %lu %d %d %d",static_cast<unsigned long>(LCIDValue()),int(Type()),Mode(),int(Encoding()));units(Path());
         printf(" %ld %ld %d %d %d %ld %ld %d %d",Screen().cx,Screen().cy,
             Wrap(),Collisions(),Scaled(),LayoutSize().cx,LayoutSize().cy,
@@ -768,7 +783,7 @@ protected:
     void OnChanged() override {
         ++notifications;
         check(stage&&Mode()==TIME&&Type()==expectedType&&Encoding()==CTextFile::UTF8,"Open callback interpretation assigned before notification");
-        check(m_simple==(expectedType==EXTSRT),"Open callback observes initialized parser simple flag");
+        check(Simple()==(expectedType==EXTSRT),"Open callback observes initialized parser simple flag");
         check(Entries()==size_t(expectedEntries)&&Segments()==1&&Screen()==expectedScreen,"Open callback observes parsed records/segments and pre-fallback screen");
         check(same_identity(Name(),expectedName)&&Path().Right(fixturePath.GetLength())==fixturePath,"Open callback observes assigned name/path");
         check(Wrap()==(sidecar?1:0)&&Collisions()==(sidecar?1:0)&&Scaled()==sidecar,"sidecar script metadata precedes callback");
@@ -780,7 +795,7 @@ protected:
         }
         const CSize before=Screen();if(changeScreen)Screen(CSize(0,177));
         printf("open-order-callback %s entries=%zu segments=%zu screen-before=%ld,%ld screen-after=%ld,%ld wrap=%d collisions=%d scaled=%d simple=%d sidecar-held=%d\n",
-            stage,Entries(),Segments(),before.cx,before.cy,Screen().cx,Screen().cy,Wrap(),Collisions(),Scaled(),m_simple,0);
+            stage,Entries(),Segments(),before.cx,before.cy,Screen().cx,Screen().cy,Wrap(),Collisions(),Scaled(),Simple(),0);
         // No base tracing callback: filename overload's real native path is
         // checked above but never leaked into paired path-independent output.
     }
@@ -1170,7 +1185,7 @@ static void base_empty_lifecycle() {
     check(doc.SetDefaultStyle(defaultValue),"Empty fixture default set");
     const CString name=doc.Name(),path=doc.Path();const MetadataValue metadata=doc.Metadata();
     const int mode=doc.Mode(),wrap=doc.Wrap(),collisions=doc.Collisions();const exttype type=doc.Type();
-    const CTextFile::enc encoding=doc.Encoding();const bool scaled=doc.Scaled(),simple=doc.m_simple;
+    const CTextFile::enc encoding=doc.Encoding();const bool scaled=doc.Scaled(),simple=doc.Simple();
     const LCID lcid=doc.LCIDValue();const CSize layout=doc.LayoutSize();
     named_add(doc,L"EmptyA",named_value(1));named_add(doc,L"EmptyB",named_value(2));
     for(int i=0;i<3;++i){const wchar_t payload[]={wchar_t(L'A'+i),0,wchar_t(0xd800+i),L'Z'};
@@ -1184,7 +1199,7 @@ static void base_empty_lifecycle() {
         check(doc.Entries()==0&&doc.Segments()==0&&doc.NamedCount()==0&&doc.Screen()==CSize(0,0),"Empty clears only owned collections/screen");
         check(same_identity(doc.Name(),name)&&same_identity(doc.Path(),path)&&same_metadata(doc.Metadata(),metadata)
             &&doc.Mode()==mode&&doc.Type()==type&&doc.Encoding()==encoding&&doc.Wrap()==wrap&&doc.Collisions()==collisions&&doc.Scaled()==scaled
-            &&doc.m_simple==simple&&doc.LCIDValue()==lcid&&doc.LayoutSize()==layout,"Empty retains initialized identity/metadata");
+            &&doc.Simple()==simple&&doc.LCIDValue()==lcid&&doc.LayoutSize()==layout,"Empty retains initialized identity/metadata");
         STSStyle actual=doc.DefaultValue();check(actual==defaultValue&&same_identity(actual.fontName,defaultValue.fontName),"Empty retains complete default");
         uint64_t bits;std::memcpy(&bits,&actual.fontSize,8);check(bits==UINT64_C(0x8000000000000000),"Empty preserves default signedzero");
         printf("empty-stage %s\n",stage);doc.Dump(stage);
@@ -1198,6 +1213,41 @@ static void base_empty_lifecycle() {
     printf("empty-stage empty-reused\n");doc.Dump("empty-reused");
     doc.Empty();cleared("empty-final");
     check(empty_events[0]==empties+3&&change_events[0]==notifications+1,"Final Empty no notification");
+}
+static void rendered_simple_lifecycle() {
+    CCritSec lock;
+    CRenderedTextSubtitle renderer(&lock);
+    CStringA positioned=ass_fixture("PlayResX: 320\r\nPlayResY: 180\r\n");
+    positioned.Replace("ordinary layout","{\\pos(32,40)}positioned");
+    const CStringA plain=ass_fixture("PlayResX: 320\r\nPlayResY: 180\r\n");
+    const CStringA srt("1\r\n00:00:00,000 --> 00:00:01,000\r\nsimple movement\r\n\r\n");
+    for(int phase=0;phase<4;++phase) {
+        const CStringA input=phase%2?srt:phase==0?positioned:plain;
+        check(renderer.Open(reinterpret_cast<BYTE*>(const_cast<char*>(input.GetString())),input.GetLength(),ANSI_CHARSET,CString()),"renderer opens simple-state fixture");
+        check(renderer.IsSimple()==(phase%2!=0),"public renderer simple flag follows selected parser");
+        CComPtr<IXySubRenderFrame> frame;
+        const RECT rect={0,0,320,180};const SIZE size={320,180};
+        const HRESULT hr=renderer.RenderEx(&frame,MSP_RGBA,rect,rect,size,5000000,25.0);
+        check(hr==S_OK&&frame,"renderer simple-state frame succeeds");
+        check(renderer.IsMovable()==(phase>=2),"simple parser retains prior movement; ASS recalculates it");
+        printf("simple-render phase=%d simple=%d movable=%d\n",phase,renderer.IsSimple(),renderer.IsMovable());
+    }
+}
+static void simple_lifecycle() {
+    for(int value=0;value<2;++value) {
+        TraceDocument source(0),destination(1);
+        source.Simple(value==0);destination.Simple(value!=0);
+        destination.Copy(source);
+        check(destination.Simple()==(value!=0),"Copy retains destination simplicity");
+        destination.Copy(destination);
+        check(destination.Simple()==(value!=0),"self Copy retains simplicity");
+        destination.RemoveAllEntries();destination.Empty();destination.Empty();
+        check(destination.Simple()==(value!=0),"clear and Empty retain simplicity");
+        check(!destination.Open(static_cast<BYTE*>(NULL),-1,ANSI_CHARSET,CString()),"negative input fails before parsing");
+        check(destination.Simple()==(value!=0),"failed Open retains supplied simplicity");
+        check(source.Simple()==(value==0),"source simplicity unaffected");
+        printf("simple-retained destination=%d source=%d\n",destination.Simple(),source.Simple());
+    }
 }
 static void lcid_lifecycle() {
     TraceDocument source(0),destination(1);
@@ -1410,6 +1460,8 @@ int main() {
         copy_styles_session_lifecycle();
         base_empty_lifecycle();
         lcid_lifecycle();
+        simple_lifecycle();
+        rendered_simple_lifecycle();
         resolution_lifecycle();
         layout_size_lifecycle();
         unknown_style_lifecycle();

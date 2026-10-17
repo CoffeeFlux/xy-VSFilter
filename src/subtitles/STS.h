@@ -180,7 +180,9 @@ protected:
     virtual void OnChanged() {}
 
 public:
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     bool           m_simple;
+#endif
 #ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     CString        m_name;
 #endif
@@ -327,6 +329,9 @@ public:
     void OrSegmentAnimated(int iSegment, bool animated);
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    // No default before successful Open; unresolved reads are explicit.
+    bool GetDocumentSimple() const;
+    void SetDocumentSimple(bool value);
     LCID GetDocumentLCID() const;
     void SetDocumentLCID(LCID value);
     bool GetDocumentForcedDefaultStyle() const;

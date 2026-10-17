@@ -256,6 +256,7 @@ pub struct RetiredEmpty {
 pub struct Document {
     layout: [Option<i32>; 2],
     lcid: Option<u32>,
+    simple: Option<bool>,
     metadata: [Option<i32>; 3],
     forced_default: Option<bool>,
     par_bits: Option<u64>,
@@ -304,6 +305,14 @@ impl Document {
     }
     pub fn replace_lcid(&mut self, value: u32) -> Option<u32> {
         self.lcid.replace(value)
+    }
+    /// No constructor default: native Open initializes this only after success.
+    /// Native Copy and Empty deliberately retain the destination's value.
+    pub fn simple(&self) -> Option<bool> {
+        self.simple
+    }
+    pub fn replace_simple(&mut self, value: bool) -> Option<bool> {
+        self.simple.replace(value)
     }
     pub fn metadata(&self, field: MetadataField) -> Option<i32> {
         self.metadata[field.index()]
@@ -1510,6 +1519,29 @@ mod tests {
         source.set_script_size(0, 0);
         assert_eq!(source.script_field(ScriptField::Collisions), Some(i32::MIN));
         assert_eq!(source.scaled_bas(), Some(true));
+    }
+    #[test]
+    fn simple_is_supplied_only_and_native_copy_empty_retain_destination() {
+        for initial in [None, Some(false), Some(true)] {
+            let mut destination = Document::default();
+            if let Some(value) = initial {
+                destination.replace_simple(value);
+            }
+            for source_value in [false, true] {
+                let mut source = Document::default();
+                assert_eq!(source.simple(), None);
+                source.replace_simple(source_value);
+                let cloned = source.clone();
+                source.replace_simple(!source_value);
+                assert_eq!(cloned.simple(), Some(source_value));
+                destination.replace_selected_state(source.selected_state());
+                destination.copy_storage_from(&source);
+                destination.remove_all_entries();
+                destination.clear_entries_and_segments();
+                drop(destination.empty());
+                assert_eq!(destination.simple(), initial);
+            }
+        }
     }
     #[test]
     fn supplied_render_metadata_bits_clone_and_storage_retention() {

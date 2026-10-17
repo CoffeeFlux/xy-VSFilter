@@ -487,5 +487,17 @@ class NativeLifecycleEvidenceTests(unittest.TestCase):
             compare_traces([TRACE, changed, TRACE, TRACE], 64)
 
 
+
+
+class SimpleRetentionTests(unittest.TestCase):
+    def test_missing_duplicate_and_changed_retention_rows_fail(self):
+        rows = b"simple-retained destination=0 source=1\nsimple-retained destination=1 source=0\n"
+        rows += b"".join(f"simple-render phase={phase} simple={phase%2} movable={int(phase>=2)}\n".encode() for phase in range(4))
+        lifecycle.validate_simple_rows(rows)
+        for bad in (b"", rows.splitlines()[0], rows + rows, rows.replace(b"destination=1", b"destination=0"), rows.replace(b"phase=1 simple=1 movable=0", b"phase=1 simple=1 movable=1")):
+            with self.assertRaises(ValueError):
+                lifecycle.validate_simple_rows(bad)
+
+
 if __name__ == "__main__":
     unittest.main()

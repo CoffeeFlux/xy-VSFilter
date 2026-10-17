@@ -909,12 +909,14 @@ fn metadata_field(field: u32) -> Result<MetadataField, u32> {
 }
 #[no_mangle]
 pub extern "C" fn xy_vsfilter_document_set_metadata_v1(owner: u64, field: u32, value: i32) -> u32 {
-    if field > 4 || (field == 3 && value != 0 && value != 1) {
+    if field > 5 || (matches!(field, 3 | 5) && value != 0 && value != 1) {
         return INVALID_INPUT;
     }
     status(admitted(|registry| {
         let document = registry.document_mut(owner).map_err(registry_error)?;
-        if field == 4 {
+        if field == 5 {
+            document.replace_simple(value != 0);
+        } else if field == 4 {
             document.replace_lcid(value as u32);
         } else if field == 3 {
             document.replace_forced_default(value != 0);
@@ -934,12 +936,14 @@ pub unsafe extern "C" fn xy_vsfilter_document_get_metadata_v1(
     capacity: usize,
 ) -> u32 {
     required!(output_capacity(output, capacity, 4));
-    if field > 4 {
+    if field > 5 {
         return INVALID_INPUT;
     }
     let value = required!(admitted(|registry| {
         let document = registry.document(owner).map_err(registry_error)?;
-        if field == 4 {
+        if field == 5 {
+            document.simple().map(i32::from)
+        } else if field == 4 {
             document.lcid().map(|bits| bits as i32)
         } else if field == 3 {
             document.forced_default().map(i32::from)
@@ -2150,6 +2154,86 @@ mod tests {
         // SAFETY: allocated byte ranges below are valid for each supplied size;
         // explicit null/oversized checks are rejected before raw accesses.
         unsafe {
+            // Supplied-only simplicity uses the existing checked metadata boundary.
+            let simple_owner = create();
+            let mut simple_out = [0xa5; 4];
+            assert_eq!(
+                xy_vsfilter_document_get_metadata_v1(simple_owner, 5, simple_out.as_mut_ptr(), 4),
+                UNRESOLVED_REFERENCE
+            );
+            assert_eq!(simple_out, [0xa5; 4]);
+            for invalid in [-1, 2, i32::MIN, i32::MAX] {
+                assert_eq!(
+                    xy_vsfilter_document_set_metadata_v1(simple_owner, 5, invalid),
+                    INVALID_INPUT
+                );
+                assert_eq!(state(simple_owner).simple(), None);
+            }
+            for value in [1, 0, 1] {
+                assert_eq!(
+                    xy_vsfilter_document_set_metadata_v1(simple_owner, 5, value),
+                    OK
+                );
+                assert_eq!(
+                    xy_vsfilter_document_get_metadata_v1(
+                        simple_owner,
+                        5,
+                        simple_out.as_mut_ptr(),
+                        4
+                    ),
+                    OK
+                );
+                assert_eq!(simple_out, value.to_le_bytes());
+                simple_out.fill(0xa5);
+                assert_eq!(
+                    xy_vsfilter_document_get_metadata_v1(
+                        simple_owner,
+                        5,
+                        simple_out.as_mut_ptr(),
+                        3
+                    ),
+                    INVALID_INPUT
+                );
+                assert_eq!(
+                    xy_vsfilter_document_get_metadata_v1(simple_owner, 5, core::ptr::null_mut(), 4),
+                    INVALID_INPUT
+                );
+                assert_eq!(
+                    DOCUMENTS
+                        .try_with(|_| xy_vsfilter_document_set_metadata_v1(
+                            simple_owner,
+                            5,
+                            1 - value
+                        ))
+                        .unwrap(),
+                    BUSY
+                );
+                assert_eq!(
+                    DOCUMENTS
+                        .try_with(|_| xy_vsfilter_document_get_metadata_v1(
+                            simple_owner,
+                            5,
+                            simple_out.as_mut_ptr(),
+                            4
+                        ))
+                        .unwrap(),
+                    BUSY
+                );
+                assert_eq!(simple_out, [0xa5; 4]);
+                assert_eq!(state(simple_owner).simple(), Some(value != 0));
+            }
+            let simple_snapshot = open_snapshot(simple_owner, 5);
+            assert_eq!(
+                xy_vsfilter_document_set_metadata_v1(simple_snapshot, 5, 0),
+                BAD_HANDLE
+            );
+            assert_eq!(xy_vsfilter_document_destroy_v1(simple_owner), OK);
+            assert_eq!(
+                xy_vsfilter_document_get_metadata_v1(simple_owner, 5, simple_out.as_mut_ptr(), 4),
+                BAD_HANDLE
+            );
+            assert_eq!(simple_out, [0xa5; 4]);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(simple_snapshot), OK);
             let mut suffix_entry = wire::decode_entry(&entry(0, 10)).unwrap();
             suffix_entry.text = vec![0xd800, 13, 10, 0, 10];
             suffix_entry.style = vec![42, 42, 0, 0xdc00, 42];
@@ -2654,7 +2738,9 @@ mod tests {
                 UNRESOLVED_REFERENCE
             );
             assert_eq!(sentinel, [0xa5; 8]);
-            assert_eq!(state(open_owner), before);
+            let mut after_header = before.clone();
+            after_header.replace_simple(false);
+            assert_eq!(state(open_owner), after_header);
             assert_eq!(&peek(open_run)[..4], &10u32.to_le_bytes());
             assert_eq!(
                 xy_vsfilter_document_set_script_size_v1(open_owner, 0, 0),
@@ -4419,18 +4505,18 @@ mod tests {
                 assert_eq!(state(owner), before);
             }
             assert_eq!(
-                xy_vsfilter_document_set_metadata_v1(owner, 5, 0),
+                xy_vsfilter_document_set_metadata_v1(owner, 6, 0),
                 INVALID_INPUT
             );
             assert_eq!(
-                xy_vsfilter_document_get_metadata_v1(owner, 5, output.as_mut_ptr(), 4),
+                xy_vsfilter_document_get_metadata_v1(owner, 6, output.as_mut_ptr(), 4),
                 INVALID_INPUT
             );
             assert_eq!(
                 DOCUMENTS
                     .try_with(|_| xy_vsfilter_document_get_metadata_v1(
                         owner,
-                        5,
+                        6,
                         output.as_mut_ptr(),
                         4
                     ))
@@ -4439,7 +4525,7 @@ mod tests {
             );
             assert_eq!(output, [0xa5; 8]);
             assert_eq!(
-                xy_vsfilter_document_get_metadata_v1(0, 5, output.as_mut_ptr(), 4),
+                xy_vsfilter_document_get_metadata_v1(0, 6, output.as_mut_ptr(), 4),
                 INVALID_INPUT
             );
             assert_eq!(output, [0xa5; 8]);
