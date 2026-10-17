@@ -2363,6 +2363,19 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 
             try
             {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                XyRust::AssStyle fields(buff,sver);
+                for(unsigned field;(field=fields.Next())!=0;) {
+                    if(field==27)continue;
+                    buff=fields.Text<CStringW>();
+                    if(field==1 || field==2)fields.StringValue(field,GetStr(buff));
+                    else if(field==3 || (field>=12 && field<=15) || field==17 || field==18)fields.Real(field,GetFloat(buff));
+                    else fields.Integer(field,GetInt(buff));
+                    fields.Accept(buff);
+                }
+                *style=XyRust::DocumentDetail::StyleValue(fields.Finish());
+                const CString StyleName=fields.Name<CString>();
+#else
                 CString StyleName;
                 int alpha;
                 int encoding;
@@ -2467,6 +2480,7 @@ if(sver <= 4)   style->scrAlignment = (style->scrAlignment&4) ? ((style->scrAlig
 
                 StyleName.TrimLeft(_T('*'));
 
+#endif
                 ret.AddStyle(StyleName, style);
             }
             catch(...)

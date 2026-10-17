@@ -11,7 +11,7 @@ from document_native_lifecycle import ROOT, PIN, LIBRARIES, SYSTEM_LIBRARIES, fi
 
 SOURCE = ROOT / "tools/compat/ass_document_native.cpp"
 OBSERVER = ROOT / "tools/compat/document_native_lifecycle.cpp"
-CASES = 1565
+CASES = 2644
 
 
 def validate(data, bits):

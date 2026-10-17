@@ -40,9 +40,16 @@ records now stay in the typed Rust session through numeric token exchange,
 effect-prefix removal, star/default normalization, timestamp construction and
 entry-only append. Only CRT numeric conversion, the locale-sensitive Default
 comparison and FastTrim remain native obligations for that record path.
+Style defaults, field assignment, color/alpha/charset/alignment normalization,
+floating clamps and style-name preparation now execute in Rust as well. A
+bounded style value crosses back to the transitional native AddStyle adapter;
+the existing Rust style-map policy owns its canonical storage.
 
 The first header comparison at `0ee2e4ee` passed 157 cases twice on each side on
 both x86 and x64, including integer extremes and partial numeric-error updates.
+The dialogue increment at `2e2c611d` then passed 1,565 direct parser cases per
+architecture, with repeated runs on both sides. Those tests include raw code
+units, prefix effects, missing fields, truncation and signed timestamp overflow.
 Expanded validation is in progress against cleanup `67da07cd`, using a probe that
 includes the actual reference/candidate STS.cpp and observes partial parser
 state, exceptions and byte consumption directly. No production switch or full

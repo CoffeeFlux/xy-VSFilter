@@ -86,6 +86,21 @@ int main() {
             for(int pos=0;pos<16;++pos) {CStringW raw=base;raw.SetAt(pos*3,0);ass_case(index++,raw,CSize(0,0));}
             for(int tail=0;tail<20;++tail) ass_case(index++,base.Left(base.GetLength()-tail),CSize(0,0));
         }
+        const wchar_t* styleValues[]={L"",L"junk",L"0",L"-0",L"-1",L"1.5",L"nan",L"inf",L"-inf",L"2147483647",L"&Hffffffff",L"**Default",L"\xd800"};
+        for(int version=3;version<=6;++version) {
+            auto enabled=[&](int field) {return !((field>=10 && field<=15 && version<5) || (field==16 && version<4) || ((field==23 || field==26) && version<6) || (field==24 && version>4));};
+            for(int changed=1;changed<=26;++changed) if(enabled(changed)) for(auto value:styleValues) {
+                const wchar_t* fields[]={L"*Default",L"Arial",L"20",L"4294967295",L"0",L"0",L"2147483648",L"-1",L"0",L"0",L"0",L"100",L"100",L"0",L"0",L"1",L"2",L"3",L"2",L"1",L"2",L"3",L"4",L"0",L"1",L"2"};
+                CStringW text;text.Format(L"[Script Info]\r\nScriptType: v4.00%s\r\nStyle: ",version==3?L"unknown":version==4?L"":version==5?L"+":L"++");
+                bool first=true;
+                for(int field=1;field<=26;++field) if(enabled(field)) {
+                    if(!first)text+=L",";first=false;
+                    text+=field==changed?value:fields[field-1];
+                }
+                text+=L"\r\nPlayResX: 1280\r\n";
+                ass_case(index++,text,CSize(0,0));
+            }
+        }
         printf("ass-complete cases=%u\n",index);
         return 0;
     } catch(const std::exception& error) {fprintf(stderr,"unresolved: %s\n",error.what());return 1;}
