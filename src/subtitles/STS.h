@@ -400,6 +400,9 @@ public:
 #  define GetStr GetStrW
 
     friend bool OpenMicroDVD(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet);
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    friend bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet);
+#endif
 private:
 #ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     bool CopyStyles(const CSTSStyleMap& styles, bool fAppend = false);

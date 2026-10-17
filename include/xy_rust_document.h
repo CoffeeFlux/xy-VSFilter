@@ -260,6 +260,18 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_search_drop_v1(uint64_t run);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_open_lifecycle_begin_v1(uint64_t owner,uint32_t parser_count,uint8_t*,size_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_open_lifecycle_step_v1(uint64_t run,int32_t ack,uint8_t*,size_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_open_lifecycle_drop_v1(uint64_t run);
+// ASS header run binds a document and initializes BT601/TV at Begin. Step
+// commands:0 lowered key,1 GetInt result,2 GetInt failure,3 detected script
+// version(0,4,5,6),4 extracted/lowered value. Text is raw UTF-16LE bytes;
+// scalar commands require empty text and text commands require scalar zero.
+// Reply: kind/version/style-version/accepted as four LE i32. A numeric parse
+// failure commits the legacy size/wrap reset and makes the run terminal.
+// Invalid protocol/capacity leaves the run, document and output untouched;
+// absent opposite screen axis reports UNRESOLVED_REFERENCE. No native loans
+// or callbacks survive a call. Drop remains valid after document destruction.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_begin_v1(uint64_t owner,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_step_v1(uint64_t run,uint32_t command,int32_t value,const uint8_t*,size_t,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_drop_v1(uint64_t run);
 // CopyStyles typed run binds destination and source. Open performs no mutation;
 // first step initializes/clears and returns Advanced before reading source rows.
 // Step output8 is snapshot ID; packet16: action:u32(0Done/1Advanced/2NeedSuffix),

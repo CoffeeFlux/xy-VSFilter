@@ -269,6 +269,92 @@ pub extern "C" fn xy_vsfilter_document_search_drop_v1(id: u64) -> u32 {
     )
 }
 
+/// # Safety
+/// Output is an eight-byte writable run ID. Capacity is checked before the
+/// initial BT601/TV document mutation; the run binds a validated document ID.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_ass_begin_v1(
+    owner: u64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let id = required!(admitted(|registry| {
+        registry.document(owner).map_err(registry_error)?;
+        let id = registry.reserve_insert().map_err(registry_error)?;
+        let run = xy_vsfilter_compat::ass_document::Run::begin(
+            registry.document_mut(owner).map_err(registry_error)?,
+        );
+        registry.insert_reserved(id, Resource::AssRun { owner, run });
+        Ok(id)
+    }));
+    // SAFETY: output validated before mutation; registry loans have ended.
+    unsafe { write_output(output, &id.to_le_bytes()) };
+    OK
+}
+
+/// # Safety
+/// Input is a readable UTF-16LE byte span, copied before admission. Output is
+/// 16 writable bytes (kind/version/style-version/accepted, all LE i32), may
+/// overlap input, and is unchanged on error. Neither buffer is retained.
+/// Commands: 0 classify lowered key, 1 successful GetInt, 2 failed GetInt,
+/// 3 detected script version, 4 extracted/lowered text value. Scalar commands
+/// take empty text; text commands take scalar zero.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_ass_step_v1(
+    id: u64,
+    command: u32,
+    value: i32,
+    input: *const u8,
+    length: usize,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 16));
+    if command > 4
+        || (matches!(command, 0 | 4) && value != 0)
+        || (matches!(command, 1..=3) && length != 0)
+        || (command == 2 && value != 0)
+        || length % 2 != 0
+    {
+        return INVALID_INPUT;
+    }
+    // SAFETY: bounded native input is copied before any document/session loan.
+    let bytes = required!(unsafe { copy_input(input, length) });
+    let text: Vec<u16> = bytes
+        .chunks_exact(2)
+        .map(|b| u16::from_le_bytes([b[0], b[1]]))
+        .collect();
+    let state = required!(admitted(|registry| {
+        let (document, run) = registry.ass_pair(id).map_err(registry_error)?;
+        match command {
+            0 => run.classify(&text),
+            1 => run.number(document, Some(value)),
+            2 => run.number(document, None),
+            3 => run.script_version(value),
+            4 => run.text(document, &text),
+            _ => unreachable!(),
+        }
+        .map_err(|error| match error {
+            xy_vsfilter_compat::ass_document::Error::Protocol => INVALID_INPUT,
+            xy_vsfilter_compat::ass_document::Error::UnsuppliedScreen => UNRESOLVED_REFERENCE,
+        })?;
+        Ok(run.state())
+    }));
+    let mut bytes = [0; 16];
+    for (chunk, value) in bytes.chunks_exact_mut(4).zip(state) {
+        chunk.copy_from_slice(&value.to_le_bytes());
+    }
+    // SAFETY: capacity checked before mutations; no registry borrow escapes.
+    unsafe { write_output(output, &bytes) };
+    OK
+}
+
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_ass_drop_v1(id: u64) -> u32 {
+    status(DOCUMENTS.destroy(id, Kind::AssRun).map_err(registry_error))
+}
+
 fn open_error(error: xy_vsfilter_compat::document_open::Error) -> u32 {
     use xy_vsfilter_compat::document_open::Error;
     match error {
@@ -2155,6 +2241,146 @@ mod tests {
         // explicit null/oversized checks are rejected before raw accesses.
         unsafe {
             // Supplied-only simplicity uses the existing checked metadata boundary.
+            let ass_owner = create();
+            let mut out = [0xa5; 16];
+            let before = state(ass_owner);
+            assert_eq!(
+                xy_vsfilter_document_ass_begin_v1(ass_owner, out.as_mut_ptr(), 7),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_ass_begin_v1(ass_owner, ptr::null_mut(), 8),
+                INVALID_INPUT
+            );
+            assert_eq!(state(ass_owner), before);
+            assert_eq!(out, [0xa5; 16]);
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_ass_begin_v1(ass_owner, out.as_mut_ptr(), 8))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                xy_vsfilter_document_ass_begin_v1(ass_owner, out.as_mut_ptr(), 8),
+                OK
+            );
+            let ass_run = u64::from_le_bytes(out[..8].try_into().unwrap());
+            assert_eq!(
+                state(ass_owner).metadata(MetadataField::ColorMatrix),
+                Some(0)
+            );
+            assert_eq!(
+                state(ass_owner).metadata(MetadataField::ColorRange),
+                Some(1)
+            );
+            let key: Vec<u8> = "playresx"
+                .encode_utf16()
+                .flat_map(u16::to_le_bytes)
+                .collect();
+            out.fill(0xa5);
+            for (id, command, value, length, capacity, expected) in [
+                (ass_run, 0, 0, key.len(), 15, INVALID_INPUT),
+                (ass_run, 0, 0, 1, 16, INVALID_INPUT),
+                (ass_run, 0, 1, key.len(), 16, INVALID_INPUT),
+                (ass_run, 9, 0, 0, 16, INVALID_INPUT),
+                (ass_owner, 0, 0, key.len(), 16, BAD_HANDLE),
+                (ass_run, 1, 10, 0, 16, INVALID_INPUT),
+            ] {
+                assert_eq!(
+                    xy_vsfilter_document_ass_step_v1(
+                        id,
+                        command,
+                        value,
+                        key.as_ptr(),
+                        length,
+                        out.as_mut_ptr(),
+                        capacity
+                    ),
+                    expected
+                );
+                assert_eq!(out, [0xa5; 16]);
+            }
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_ass_step_v1(
+                        ass_run,
+                        0,
+                        0,
+                        key.as_ptr(),
+                        key.len(),
+                        out.as_mut_ptr(),
+                        16
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(out, [0xa5; 16]);
+            // Same native range can be input and output: copying precedes loans.
+            out.copy_from_slice(&key);
+            assert_eq!(
+                xy_vsfilter_document_ass_step_v1(
+                    ass_run,
+                    0,
+                    0,
+                    out.as_ptr(),
+                    16,
+                    out.as_mut_ptr(),
+                    16
+                ),
+                OK
+            );
+            assert_eq!(
+                out.chunks_exact(4)
+                    .map(|b| i32::from_le_bytes(b.try_into().unwrap()))
+                    .collect::<Vec<_>>(),
+                vec![4, 3, 3, 0]
+            );
+            out.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_document_ass_step_v1(
+                    ass_run,
+                    1,
+                    1280,
+                    ptr::null(),
+                    0,
+                    out.as_mut_ptr(),
+                    16
+                ),
+                UNRESOLVED_REFERENCE
+            );
+            assert_eq!(out, [0xa5; 16]);
+            assert_eq!(xy_vsfilter_document_set_script_size_v1(ass_owner, 0, 0), OK);
+            assert_eq!(
+                xy_vsfilter_document_ass_step_v1(
+                    ass_run,
+                    1,
+                    1280,
+                    ptr::null(),
+                    0,
+                    out.as_mut_ptr(),
+                    16
+                ),
+                OK
+            );
+            assert_eq!(state(ass_owner).script_size(), Some([1280, 1024]));
+            assert_eq!(xy_vsfilter_document_ass_drop_v1(ass_owner), BAD_HANDLE);
+            assert_eq!(xy_vsfilter_document_destroy_v1(ass_owner), OK);
+            out.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_document_ass_step_v1(
+                    ass_run,
+                    0,
+                    0,
+                    key.as_ptr(),
+                    key.len(),
+                    out.as_mut_ptr(),
+                    16
+                ),
+                BAD_HANDLE
+            );
+            assert_eq!(out, [0xa5; 16]);
+            assert_eq!(xy_vsfilter_document_ass_drop_v1(ass_run), OK);
+            assert_eq!(xy_vsfilter_document_ass_drop_v1(ass_run), BAD_HANDLE);
             let simple_owner = create();
             let mut simple_out = [0xa5; 4];
             assert_eq!(

@@ -2229,20 +2229,18 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 
     int version = 3, sver = 3;
 #ifdef XY_VSFILTER_RUST_TEXT
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    XyRust::AssDocument headers(*ret.m_document);
+#else
     XyRust::AssHeaders headers;
+#endif
 #define XY_ASS_HEADER(key, id) (entryKind == (id))
 #else
 #define XY_ASS_HEADER(key, id) (entry == (key))
 #endif
 
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    ret.SetDocumentColorMatrix(CSimpleTextSubtitle::YCbCrMatrix_BT601);
-#else
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     ret.m_eYCbCrMatrix = CSimpleTextSubtitle::YCbCrMatrix_BT601;
-#endif
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    ret.SetDocumentColorRange(CSimpleTextSubtitle::YCbCrRange_TV);
-#else
     ret.m_eYCbCrRange = CSimpleTextSubtitle::YCbCrRange_TV;
 #endif
 
@@ -2267,7 +2265,7 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
         fRet = headers.Field(2) != 0;
 #endif
 
-        if(entry == L"dialogue")
+        if(XY_ASS_HEADER(L"dialogue", 1))
         {
             try
             {
@@ -2341,7 +2339,7 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
                 return(false);
             }
         }
-        else if(entry == L"style")
+        else if(XY_ASS_HEADER(L"style", 2))
         {
             STSStyle* style = DEBUG_NEW STSStyle;
             if(!style) return(false);
@@ -2460,6 +2458,33 @@ if(sver <= 4)   style->scrAlignment = (style->scrAlignment&4) ? ((style->scrAlig
                 return(false);
             }
         }
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        else if(entryKind >= 4 && entryKind <= 8)
+        {
+            int value;
+            try {value = GetInt(buff);}
+            catch(...) {headers.NumberFailed(); return false;}
+            headers.Number(value);
+        }
+        else if(entryKind == 9)
+        {
+            int detected = 0;
+            if(buff.GetLength() >= 4 && !buff.Right(4).CompareNoCase(L"4.00")) detected = 4;
+            else if(buff.GetLength() >= 5 && !buff.Right(5).CompareNoCase(L"4.00+")) detected = 5;
+            else if(buff.GetLength() >= 6 && !buff.Right(6).CompareNoCase(L"4.00++")) detected = 6;
+            headers.ScriptVersion(detected);
+        }
+        else if(entryKind == 10 || entryKind == 11 || entryKind == 17)
+        {
+            buff = GetStr(buff);
+            buff.MakeLower();
+            headers.Text(buff);
+        }
+        else if(entryKind == 16)
+        {
+            LoadUUEFont(file);
+        }
+#else
         else if(entry == L"[script info]")
         {
             fRet = true;
@@ -2770,6 +2795,7 @@ if(sver <= 4)   style->scrAlignment = (style->scrAlignment&4) ? ((style->scrAlig
             }
 #endif
         }
+#endif
         if(fEOF) break;
     }
 //    ret.Sort();

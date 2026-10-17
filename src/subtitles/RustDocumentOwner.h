@@ -236,6 +236,7 @@ template<class Style = STSStyle> inline Style StyleValue(const Bytes& bytes) {
 class DocumentOwner;
 class TranslatedDocumentSearch;
 class OpenLifecycle;
+class AssDocument;
 class UnknownStylesPass;
 class StyleAddition;
 class NamedStyleCopy;
@@ -279,6 +280,7 @@ struct DocumentTextOperation {
 class DocumentOwner {
     friend class TranslatedDocumentSearch;
     friend class OpenLifecycle;
+    friend class AssDocument;
     friend class UnknownStylesPass;
     friend class StyleAddition;
     friend class NamedStyleCopy;
@@ -725,6 +727,36 @@ public:
 };
 // Each operation is fully owned scalar policy state. Native file services,
 // virtual callbacks and parsers execute after registry admission has ended.
+// Scoped ASS policy. Native conversions run with no registry guard or Rust
+// borrow held. All script metadata updates are committed by the safe session.
+class AssDocument {
+    uint64_t id_ = 0;
+    std::array<uint8_t,16> state_{};
+    void Step(uint32_t command, int32_t value, const CStringW& text = CStringW()) {
+        const size_t length = DocumentDetail::MulSize(static_cast<size_t>(text.GetLength()),sizeof(WCHAR));
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_ass_step_v1(
+            id_,command,value,reinterpret_cast<const uint8_t*>(static_cast<LPCWSTR>(text)),length,state_.data(),state_.size());}));
+        DocumentDetail::Shape(DocumentDetail::Load(state_,0,4)<=17 && DocumentDetail::Load(state_,12,4)<=1);
+    }
+public:
+    explicit AssDocument(const DocumentOwner& owner) {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_ass_begin_v1(owner.id_,out.data(),out.size());}));
+        id_=DocumentDetail::Load(out,0,8);
+    }
+    AssDocument(const AssDocument&)=delete;
+    AssDocument& operator=(const AssDocument&)=delete;
+    ~AssDocument() noexcept {
+        if(id_) {const uint64_t id=id_;id_=0;
+            DocumentDetail::Release(DocumentDetail::Invoke([&]{return xy_vsfilter_document_ass_drop_v1(id);}));}
+    }
+    unsigned Classify(const CStringW& key) {Step(0,0,key);return static_cast<unsigned>(DocumentDetail::Load(state_,0,4));}
+    int Field(unsigned field) const {DocumentDetail::Shape(field<3);return static_cast<int>(DocumentDetail::Load(state_,4+4*field,4));}
+    void Number(int value) {Step(1,value);}
+    void NumberFailed() {Step(2,0);}
+    void ScriptVersion(int value) {Step(3,value);}
+    void Text(const CStringW& value) {Step(4,0,value);}
+};
 class OpenLifecycle {
     uint64_t id_ = 0;
     uint32_t count_;

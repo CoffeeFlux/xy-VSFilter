@@ -27,7 +27,23 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: document simplicity (2026-10-16)
+## Active port: ASS/SSA parser control (2026-10-17)
+
+The whole repository remains the target. The experimental document configuration
+now routes ASS/SSA header dispatch, independent script/style versions, acceptance,
+color initialization and updates, numeric failure resets, and live resolution
+inference through a safe Rust session bound to the canonical document. Native
+file reading, trim/lowercase, CRT numeric conversion, style/dialogue actions and
+font loading remain explicit transitional adapters. The session retains no
+native pointer and releases admission before each adapter operation.
+
+Validation is in progress against cleanup `67da07cd`, including a new probe that
+includes the actual reference/candidate STS.cpp and observes partial parser
+state, exceptions and byte consumption directly. No production switch or full
+ASS/frontend closure is claimed. The uninitialized embedded-stream simplicity
+contract remains unresolved; it does not block migration of defined parser paths.
+
+## Previous port: document simplicity (2026-10-16)
 
 The experimental document owner now stores the remaining `m_simple` flag in
 safe Rust. Rust Open control selects it after successful header assignments and

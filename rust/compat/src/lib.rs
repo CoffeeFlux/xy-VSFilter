@@ -8,6 +8,7 @@
 
 extern crate alloc;
 
+pub mod ass_document;
 pub mod ass_tags;
 pub mod be_blur;
 pub mod be_filter;
