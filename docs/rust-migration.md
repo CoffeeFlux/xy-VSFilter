@@ -42,12 +42,32 @@ Open. Their native uninitialized flag has no established compatibility result;
 Rust reports it unresolved. This remains a blocker to default enablement and
 full host closure. See [the scoped caller inventory](rust-document-simple-inventory.json).
 
-Validation is in progress for this increment. Earlier cleanup evidence below
-belongs to the preceding code and is not evidence for this change. The document
-owner remains opt-in; host adapters and broader native orchestration remain to
-be ported.
+Fresh x86/x64 validation against cleanup `67da07cd` passes: all three DLL
+builds; 814 corpus cases / 8,586 exact frames and 72 distinct-frame controls per
+architecture; 32 mutation cases / 224 frames per architecture; DLL exports and
+declared dependencies; and 10 scoped COM contract cases plus two candidate-only
+pin-ID controls per architecture. The corpus was partitioned into eight disjoint
+batches with every distinct-frame pair kept together.
 
-## Cleanup rebase: current status
+Linked native traces match in 3,693 lines on both architectures, including
+Copy/Empty/failure retention and public IsSimple/RenderEx behavior on repeated
+ASS/SRT loads. The positioned-ASS -> SRT sequence retains `movable=false`;
+unpositioned ASS recalculates it to true, and a subsequent SRT retains true.
+This is legacy behavior, not a new movement policy. Compile probes pass in
+reference/native-document/Rust-document modes (nine objects per architecture).
+Rust tests pass (243 safe-core + 123 FFI per architecture), as do formatting,
+Clippy including native-runtime, corpus generation and 149 Python tests (one
+skipped). See [the evidence index](rust-document-simple-local-evidence.json).
+
+The first native run exposed an adapter bound that still rejected field 5;
+it was fixed before these passing comparisons. Failed/interrupted artifacts
+are retained separately and are not passes. The document owner remains opt-in;
+this does not establish pre-Open embedded-stream compatibility, real host
+playback, non-Windows behavior, or full migration completion. Next work is to
+resolve the embedded-stream initialization contract and continue moving native
+parsing/orchestration into Rust.
+
+## Cleanup rebase evidence before the simplicity port
 
 The user requested rebasing onto the fork's cleanup, rather than continuing from
 upstream. All 203 migration commits have been replayed onto `67da07cd`; the
@@ -107,11 +127,11 @@ locations, hashes, tested commits, DLL hashes and scoped results. Raw reports
 remain under `artifacts/cleanup-*`; earlier failed and interrupted attempts
 are retained separately and are not passes. A transient MSVC incremental-link
 failure was resolved by a serial full-LTCG relink, with no behavior change.
-No remote branch has been rewritten.
+The original migration branch is retained on the fork; subsequent work is
+published on `rust/cleanup-document-simplicity`.
 
-Next: inventory the cleanup's remaining live document callers and move the
-remaining `m_simple` state and native orchestration into Rust, preserving these
-checks. Keep the document owner opt-in until the remaining ownership review
+At this earlier checkpoint, the next step was the remaining `m_simple` state
+and native orchestration. The current simplicity increment is recorded above. Keep the document owner opt-in until the remaining ownership review
 and real Aegisub/player lifecycle validation are complete. Do not spend closure
 work reimplementing deleted export, editing or conversion methods. The older
 progress ledger below predates the cleanup and must be read with these scope

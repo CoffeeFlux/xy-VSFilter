@@ -55,5 +55,32 @@
     "C ABI strict booleans, absent state, buffer atomicity, busy gate and stale/wrong handles.",
     "Paired linked native lifecycle, public IsSimple and RenderEx movement across ASS-positioned/SRT/ASS-plain/SRT reloads.",
     "Paired final x86/x64 DLL rendering corpus, mutations, exports/dependencies and scoped COM checks."
-  ]
+  ],
+  "validation": {
+    "candidate_commit": "f2cd1bff791ad6330a197b725f787b26eacbee8a",
+    "native_lifecycle": "Both x64 and x86: 3693 identical lines across two reference and two candidate runs; required simple retention and renderer movement markers checked.",
+    "render_reload_observations": [
+      {
+        "format": "positioned ASS",
+        "simple": false,
+        "movable": false
+      },
+      {
+        "format": "SRT",
+        "simple": true,
+        "movable": false
+      },
+      {
+        "format": "unpositioned ASS",
+        "simple": false,
+        "movable": true
+      },
+      {
+        "format": "SRT",
+        "simple": true,
+        "movable": true
+      }
+    ],
+    "pre_open_absence": "Tested as UNRESOLVED_REFERENCE in the C ABI; no native uninitialized bool read is counted as parity."
+  }
 }

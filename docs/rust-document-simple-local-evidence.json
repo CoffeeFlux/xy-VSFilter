@@ -1,0 +1,333 @@
+{
+  "schema": 1,
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "candidate_code_commit": "f2cd1bff791ad6330a197b725f787b26eacbee8a",
+  "prior_increment": "0104d0d9",
+  "configuration": {
+    "native": "Release, RustTextDecoder=true, RustDocumentOwnerExperimental=true",
+    "rust": "1.85.0; native-runtime with +crt-static",
+    "msvc": "14.44.35207",
+    "sdk": "10.0.26100.0"
+  },
+  "scope": "Supplied/initialized simplicity ownership and Open selection; not a default enablement or full-document closure.",
+  "limits": [
+    "Native pre-Open simplicity is uninitialized; embedded paths that omit successful Open remain unresolved, not passing results.",
+    "No Aegisub/player playback or full graph integration; COM probes are disconnected and omit custom interface method behavior.",
+    "No non-Windows or Miri run for this increment.",
+    "Default native-document configuration has compile-only probes, not new runtime parity.",
+    "Original failed adapter-bound runs and interrupted builds are retained separately and excluded from passing evidence."
+  ],
+  "architectures": {
+    "x64": {
+      "corpus": {
+        "report": "artifacts/simple-csri-v2-x64/summary.json",
+        "sha256": "7613be2f7419f5512aa9af373d94989d0c5fafcfb1dc9da3fab5e1336ad01375",
+        "complete": true,
+        "frames": 8586,
+        "distinct_controls": 72,
+        "partition_exact": true,
+        "shards": [
+          {
+            "report": "artifacts/simple-csri-v2-x64/shard-0/report.json",
+            "sha256": "7fc97c46c62f6f0fef4f81fa26ba648cb00a3202e9267344e3f9bc5ecba728d9",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1103,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/simple-csri-v2-x64/shard-1/report.json",
+            "sha256": "cfe8781f6942c8a14e6ceb6f620c6fb720ddc87dc503e47574b7444069f43175",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1103,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/simple-csri-v2-x64/shard-2/report.json",
+            "sha256": "fdb1f0b2a74257483a1b3d00c0f2e2ada5f91f510388873873283f9915d6e6a0",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1071,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/simple-csri-v2-x64/shard-3/report.json",
+            "sha256": "d36b06391fcf9d229155e4ee65b457edfb34b7e435a85ee69b2a8c27f8eeeec4",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1071,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/simple-csri-v2-x64/shard-4/report.json",
+            "sha256": "86481a7bd8e810bd16ae9235c0e7373ea0117197c7b76a3434d5201be5b5646a",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1051,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/simple-csri-v2-x64/shard-5/report.json",
+            "sha256": "50ea44b93c31b9b690469f373da06c6f4ab1d2193164ad68290bb523851839ec",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1051,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/simple-csri-v2-x64/shard-6/report.json",
+            "sha256": "d550661dc88dad67f9bd4f19e08bde67cf0e7d8ff3bfa2ab29c0cc6e88e407a9",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1068,
+            "cases": 101
+          },
+          {
+            "report": "artifacts/simple-csri-v2-x64/shard-7/report.json",
+            "sha256": "ed5a5c51f217c237b14abd9ad0aad8e34130d78b4b76ae70d238aedd316962cb",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1068,
+            "cases": 101
+          }
+        ],
+        "cases": 814,
+        "rendered_frames": 8586,
+        "source_manifest_sha256": "2e197b56427d6b94bb389a8e25e73e8910ea3c71ddf89ebd11658b369b48cd07",
+        "partition_driver_sha256": "756b3c53608d670e4e8f76b05fdee2764bad42c828ec21cd0c03dc629becebcf"
+      },
+      "mutations": {
+        "report": "artifacts/simple-mutations-x64/report.json",
+        "sha256": "47efb95886f74d64b4e24e1db37095f4799ae97beda06317ea46ef41e164e51c",
+        "complete": true,
+        "passed": true,
+        "rendered_frames": 224,
+        "cases": 32
+      },
+      "lifecycle": {
+        "report": "artifacts/simple-lifecycle-v2-x64/report.json",
+        "sha256": "0f1ce60c95155ea5b0b2a6bb015bdcd51896c64ed543603bc818857fea0fc88e",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "f2cd1bff791ad6330a197b725f787b26eacbee8a",
+        "trace_lines": 3693,
+        "dialog_count": 3,
+        "inputs_unchanged": true
+      },
+      "compile": {
+        "report": "artifacts/simple-compile-x64/report.json",
+        "sha256": "f150ae4e0505eeafd7e5dd4917a4562d1d95e0bdbf0affd7d4d58aadb196d99f",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "f2cd1bff791ad6330a197b725f787b26eacbee8a",
+        "inputs_unchanged": true,
+        "scope": "Compile-only actual style helper/lifecycle sources and headers; no link, execution or parity claim"
+      },
+      "com": {
+        "report": "artifacts/simple-contracts-x64/com/report.json",
+        "sha256": "a09e1dfdc538c7c4afc48c7e0bf4a74284ead9729c620fee53281ae6bbc8fcc1",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "f2cd1bff791ad6330a197b725f787b26eacbee8a",
+        "inputs_unchanged": true,
+        "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "2d254068a40e5f59cf191c3c6bbfc984b548193b668c4decac21dc1e94e02169",
+          "candidate_sha256": "2c6b66ac2ed06911b44c18369970e8f9e91f38201f6d9b301102a294722f6aed",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "858b557df4643353cc2b7f7a4faf24fb20fc571f39dc8929949a8b9d80276024"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "32b7c2cd6eb817120414db53b3c3005e719ae4b993c4a69d0d66c7f6ac363d5a",
+          "candidate_sha256": "a62c58186349bbf67d505d3c8a3ec0757cf2185b4f1cc9b18e04810dfe6b0e98",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "09623cbd08a08a70ca726d32f1ac7a80358fe93589dfe22d814f7c9544f6d751"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "f1165742064181b7fb73bacb16017d8e202c8bb0be90ed8c2eb812ac282c2df8",
+          "candidate_sha256": "97b38e931851f95dbc2f9b9fa42511b9d0606bb89d3400e42f4619b9c3d9c760",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "b0b48a3cf2bf2ecbbac4ecca863a815ab4a0c1137277a9b7d5830d9d1beca5c9"
+        }
+      }
+    },
+    "x86": {
+      "corpus": {
+        "report": "artifacts/simple-csri-v2-x86/summary.json",
+        "sha256": "91599d704584620ecd704e278e28e4e0bca631f07a0c0d5bf8e3f8d37c16b7a1",
+        "complete": true,
+        "frames": 8586,
+        "distinct_controls": 72,
+        "partition_exact": true,
+        "shards": [
+          {
+            "report": "artifacts/simple-csri-v2-x86/shard-0/report.json",
+            "sha256": "6a666bc994e02abd0d38be8b5157f4eb6c5210609e92cd5fb93c34441916865a",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1103,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/simple-csri-v2-x86/shard-1/report.json",
+            "sha256": "615d03930c722a0e33951f3e4053da94b3d5d4deb3d7aabdcbcb455cfae47c6b",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1103,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/simple-csri-v2-x86/shard-2/report.json",
+            "sha256": "950a3be7a27391c1d92033949544beae6b18a73b2715edf9795a8a3e3283b15f",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1071,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/simple-csri-v2-x86/shard-3/report.json",
+            "sha256": "e57eb98680f9e0c6da345aee0bed573946f22db976133edb74d72e85f1d17089",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1071,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/simple-csri-v2-x86/shard-4/report.json",
+            "sha256": "3243c1d9fab2591c703fa07274da7728cf95e64ed6bc9f8a514541305d59f669",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1051,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/simple-csri-v2-x86/shard-5/report.json",
+            "sha256": "e7c1c2848b9014f8bcb9c633ffab9605e0cb402a4a64f16aa7da64905245c8fe",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1051,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/simple-csri-v2-x86/shard-6/report.json",
+            "sha256": "eabf5af9f6f23aacf7e16c76f286cdfbaded4696e9c58048d7b02a7c4dc566b1",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1068,
+            "cases": 101
+          },
+          {
+            "report": "artifacts/simple-csri-v2-x86/shard-7/report.json",
+            "sha256": "2cd5db182646b0f0c86e5a903600dfb962efee16166e53efade0e5b24f7653da",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1068,
+            "cases": 101
+          }
+        ],
+        "cases": 814,
+        "rendered_frames": 8586,
+        "source_manifest_sha256": "2e197b56427d6b94bb389a8e25e73e8910ea3c71ddf89ebd11658b369b48cd07",
+        "partition_driver_sha256": "756b3c53608d670e4e8f76b05fdee2764bad42c828ec21cd0c03dc629becebcf"
+      },
+      "mutations": {
+        "report": "artifacts/simple-mutations-x86/report.json",
+        "sha256": "a5fe89cb2850642e956c4ff5c534f7c49e8710f4ca091bf85bb04912af8c7cf5",
+        "complete": true,
+        "passed": true,
+        "rendered_frames": 224,
+        "cases": 32
+      },
+      "lifecycle": {
+        "report": "artifacts/simple-lifecycle-v2-x86/report.json",
+        "sha256": "1f14e8b47e0e6edb31c3e1a4466602da878a17f4c6b1b016cb649f7360ff4901",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "f2cd1bff791ad6330a197b725f787b26eacbee8a",
+        "trace_lines": 3693,
+        "dialog_count": 3,
+        "inputs_unchanged": true
+      },
+      "compile": {
+        "report": "artifacts/simple-compile-x86/report.json",
+        "sha256": "764d7c3c45867af8422ecc2a09d59a9b20029e6f2af9fbaa0bdd5fa9b057490a",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "f2cd1bff791ad6330a197b725f787b26eacbee8a",
+        "inputs_unchanged": true,
+        "scope": "Compile-only actual style helper/lifecycle sources and headers; no link, execution or parity claim"
+      },
+      "com": {
+        "report": "artifacts/simple-contracts-x86/com/report.json",
+        "sha256": "a480968fda22794acbb9c9a798a450d9ad7b66a6562be42a043dc99efbd9e27d",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "f2cd1bff791ad6330a197b725f787b26eacbee8a",
+        "inputs_unchanged": true,
+        "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "69faa2d5f90f35fe4184e9e9bd892adb76fee60295701988f61ab7af0664d9eb",
+          "candidate_sha256": "9dda6750d6c0a6e5751a12716dd0f93eb83babb1606c1018fc14bdc0a7392049",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "dbd365316d54d5a3d590b63604fbbc5ea6849a912eb7660e52d8df4bdd6b2120"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "2c3b904d7f91902ef456e07b648c5d6351878318c235397eeb9b39eb3fffa34f",
+          "candidate_sha256": "6cb267f6e8d8995347b7b97621d09092be3d65993d6443460c09d0bef1726acb",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "8821591e5f42e83c8361380a00b4869b748312f9374da70041ad829e381b6bbc"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "3e7c20a4d6c42457d92eb56c42e4fd9f3bddb93276f2c1cd28bfb73edd06484c",
+          "candidate_sha256": "727b59f8751d5ef8bf9d6c1301d33db31ecf5c6d98237866a5265c307082bde3",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "bee8a1d975859e0ab8a9b6843e14f813df818b8538e6501927e792bb180eb7c1"
+        }
+      }
+    }
+  },
+  "rust_tests": {
+    "core_per_architecture": 243,
+    "ffi_per_architecture": 123,
+    "fmt": true,
+    "clippy_all_targets": true,
+    "clippy_native_runtime": true,
+    "logs": {
+      "artifacts/simple-rust-tests.log": "a23ae3227cd5ff5ae31b2816c2d0439af0e70593e384d3ad39410308a77d1050",
+      "artifacts/simple-checks.log": "210e88f78ddbfeec7a0f6aaca2269afc51e656c497ee33672a6a37fffd7fe65e"
+    }
+  },
+  "python_harness_tests": {
+    "count": 149,
+    "skipped": 1,
+    "failures": 0,
+    "corpus_generation_checked": true,
+    "log": "artifacts/simple-checks.log"
+  }
+}
