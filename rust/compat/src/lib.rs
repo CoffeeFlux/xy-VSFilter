@@ -141,3 +141,5 @@ pub mod document_open;
 pub mod document_search;
 
 pub mod document_export;
+
+pub mod xombie;

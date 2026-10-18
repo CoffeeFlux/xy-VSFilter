@@ -237,6 +237,7 @@ class DocumentOwner;
 class TranslatedDocumentSearch;
 class OpenLifecycle;
 class AssDocument;
+class XombieDocument;
 class UnknownStylesPass;
 class StyleAddition;
 class NamedStyleCopy;
@@ -244,6 +245,7 @@ class DocumentReply {
     uint64_t id_ = 0;
     explicit DocumentReply(uint64_t id) : id_(id) {}
     friend class AssDocument;
+    friend class XombieDocument;
     friend class DocumentOwner;
     friend class UnknownStylesPass;
     friend class StyleAddition;
@@ -282,6 +284,7 @@ class DocumentOwner {
     friend class TranslatedDocumentSearch;
     friend class OpenLifecycle;
     friend class AssDocument;
+    friend class XombieDocument;
     friend class UnknownStylesPass;
     friend class StyleAddition;
     friend class NamedStyleCopy;
@@ -831,6 +834,45 @@ public:
         separator=static_cast<WCHAR>(DocumentDetail::Load(bytes,4,4));
         size_t offset=8;text=DocumentDetail::String(bytes,offset,DocumentDetail::Count((bytes.size()-8)/2));
         return DocumentDetail::Load(bytes,0,4)!=0;
+    }
+};
+class XombieDocument {
+    uint64_t id_=0;
+public:
+    explicit XombieDocument(const DocumentOwner& owner) {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_xombie_begin_v1(owner.id_,out.data(),out.size());}));
+        id_=DocumentDetail::Load(out,0,8);
+    }
+    XombieDocument(const XombieDocument&)=delete;
+    XombieDocument& operator=(const XombieDocument&)=delete;
+    ~XombieDocument() noexcept {if(id_){const auto id=id_;id_=0;DocumentDetail::Release(DocumentDetail::Invoke([&]{return xy_vsfilter_document_xombie_drop_v1(id);}));}}
+    void Read(const CStringW& text,bool eof) {
+        const auto bytes=DocumentDetail::Units(text);std::vector<uint8_t> spaces(text.GetLength());
+        for(int i=0;i<text.GetLength();++i)spaces[i]=CStringW::StrTraits::IsSpace(text[i])?1:0;
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_xombie_read_v1(id_,eof?1:0,bytes.data(),bytes.size(),spaces.data(),spaces.size());}));
+    }
+    void Step(unsigned command,uint64_t bits=0,const CStringW& text=CStringW(),const CStringW& remainder=CStringW()) {
+        const auto input=DocumentDetail::Units(text),rest=DocumentDetail::Units(remainder);
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_xombie_step_v1(id_,command,bits,input.data(),input.size(),rest.data(),rest.size());}));
+    }
+    DocumentDetail::Bytes Part(unsigned group) const {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_xombie_part_v1(id_,group,out.data(),out.size());}));
+        DocumentReply snapshot(DocumentDetail::Load(out,0,8));return snapshot.Read();
+    }
+    unsigned Next(CStringW& text,WCHAR& separator,unsigned& kind,bool& accepted) const {
+        const auto bytes=Part(0);
+        DocumentDetail::Shape(bytes.size()>=16 && (bytes.size()-16)%2==0 && DocumentDetail::Load(bytes,0,4)<=10 && DocumentDetail::Load(bytes,4,4)<=0xffff && DocumentDetail::Load(bytes,8,4)<=6 && DocumentDetail::Load(bytes,12,4)<=1);
+        size_t offset=16;text=DocumentDetail::String(bytes,offset,DocumentDetail::Count((bytes.size()-16)/2));
+        separator=static_cast<WCHAR>(DocumentDetail::Load(bytes,4,4));kind=static_cast<unsigned>(DocumentDetail::Load(bytes,8,4));accepted=DocumentDetail::Load(bytes,12,4)!=0;
+        return static_cast<unsigned>(DocumentDetail::Load(bytes,0,4));
+    }
+    void Real(double value,const CStringW& rest) {uint64_t bits;std::memcpy(&bits,&value,sizeof bits);Step(3,bits,CStringW(),rest);}
+    void Style(STSStyle& style,CString& name) {
+        style=DocumentDetail::StyleValue(Part(1));const auto bytes=Part(2);DocumentDetail::Shape(bytes.size()%2==0);
+        size_t offset=0;name=DocumentDetail::String(bytes,offset,DocumentDetail::Count(bytes.size()/2));
+        Step(4); // release before AddStyle consumes its native temporary
     }
 };
 class OpenLifecycle {

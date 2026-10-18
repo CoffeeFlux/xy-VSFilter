@@ -30,6 +30,7 @@ pub(crate) enum Kind {
     StyleCopyRun,
     OpenRun,
     AssRun,
+    XombieRun,
     SearchRun,
 }
 
@@ -61,6 +62,10 @@ pub(crate) enum Resource {
         owner: Handle,
         run: xy_vsfilter_compat::ass_document::Run,
     },
+    XombieRun {
+        owner: Handle,
+        run: xy_vsfilter_compat::xombie::Run,
+    },
     SearchRun {
         owner: Handle,
         run: xy_vsfilter_compat::document_search::Run,
@@ -76,6 +81,7 @@ impl Resource {
             Self::StyleCopyRun { .. } => Kind::StyleCopyRun,
             Self::OpenRun { .. } => Kind::OpenRun,
             Self::AssRun { .. } => Kind::AssRun,
+            Self::XombieRun { .. } => Kind::XombieRun,
             Self::SearchRun { .. } => Kind::SearchRun,
         }
     }
@@ -342,6 +348,32 @@ impl Registry {
         };
         match (document_resource, run_resource) {
             (Resource::Document(document), Resource::AssRun { run, .. }) => Ok((document, run)),
+            _ => Err(Error::TypeMismatch),
+        }
+    }
+
+    pub(crate) fn xombie_pair(
+        &mut self,
+        id: Handle,
+    ) -> Result<(&mut Document, &mut xy_vsfilter_compat::xombie::Run), Error> {
+        let run_index = self.position(id)?;
+        let owner = match &self.slots[run_index].1 {
+            Resource::XombieRun { owner, .. } => *owner,
+            _ => return Err(Error::TypeMismatch),
+        };
+        let owner_index = self.position(owner)?;
+        if owner_index == run_index {
+            return Err(Error::TypeMismatch);
+        }
+        let (document_resource, run_resource) = if owner_index < run_index {
+            let (before, after) = self.slots.split_at_mut(run_index);
+            (&mut before[owner_index].1, &mut after[0].1)
+        } else {
+            let (before, after) = self.slots.split_at_mut(owner_index);
+            (&mut after[0].1, &mut before[run_index].1)
+        };
+        match (document_resource, run_resource) {
+            (Resource::Document(document), Resource::XombieRun { run, .. }) => Ok((document, run)),
             _ => Err(Error::TypeMismatch),
         }
     }

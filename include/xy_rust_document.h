@@ -271,6 +271,16 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_open_lifecycle_drop_v1(uint64_t 
 // Invalid protocol/capacity leaves the run, document and output untouched;
 // absent opposite screen axis reports UNRESOLVED_REFERENCE. No native loans
 // or callbacks survive a call. Drop remains valid after document destruction.
+// Checked XombieSub session; all byte buffers follow the common contract.
+// Step0 classify,1 text,2 i32 bits,3 f64 bits,4 acknowledge,5 numeric failure.
+// Read supplies EOF=!ReadString, raw UTF16LE and one strict-bool whitespace flag
+// per unit. Part0: op/sep/kind/accepted:u32[4],raw UTF16LE;1 style wire;
+// 2 raw style name;3 entry wire;4 decoded font bytes. Callbacks occur after copy-out.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_xombie_begin_v1(uint64_t,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_xombie_drop_v1(uint64_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_xombie_read_v1(uint64_t,uint32_t,const uint8_t*,size_t,const uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_xombie_step_v1(uint64_t,uint32_t,uint64_t,const uint8_t*,size_t,const uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_xombie_part_v1(uint64_t,uint32_t,uint8_t*,size_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_begin_v1(uint64_t owner,uint8_t*,size_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_step_v1(uint64_t run,uint32_t command,int32_t value,const uint8_t*,size_t,uint8_t*,size_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_drop_v1(uint64_t run);

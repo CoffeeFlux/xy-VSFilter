@@ -270,6 +270,132 @@ pub extern "C" fn xy_vsfilter_document_search_drop_v1(id: u64) -> u32 {
 }
 
 /// # Safety
+/// Output receives a validated, document-bound run ID in eight writable bytes.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_xombie_begin_v1(
+    owner: u64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let id = required!(admitted(|registry| {
+        registry.document(owner).map_err(registry_error)?;
+        let id = registry.reserve_insert().map_err(registry_error)?;
+        registry.insert_reserved(
+            id,
+            Resource::XombieRun {
+                owner,
+                run: Default::default(),
+            },
+        );
+        Ok(id)
+    }));
+    // SAFETY: preflighted output, no registry loan remains.
+    unsafe { write_output(output, &id.to_le_bytes()) };
+    OK
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_xombie_drop_v1(id: u64) -> u32 {
+    status(
+        DOCUMENTS
+            .destroy(id, Kind::XombieRun)
+            .map_err(registry_error),
+    )
+}
+/// # Safety
+/// Raw UTF16LE and one strict-bool whitespace byte per unit are initialized
+/// immutable spans. Both are copied before admission; no native loan escapes.
+/// EOF is !ReadString result, including its discarded nonempty final fragment.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_xombie_read_v1(
+    id: u64,
+    eof: u32,
+    input: *const u8,
+    length: usize,
+    spaces: *const u8,
+    space_length: usize,
+) -> u32 {
+    if eof > 1 || length % 2 != 0 || length / 2 != space_length {
+        return INVALID_INPUT;
+    }
+    // SAFETY: bounded initialized caller buffers are copied before admission.
+    let bytes = required!(unsafe { copy_input(input, length) });
+    // SAFETY: same caller-buffer contract for supplied native predicates.
+    let spaces = required!(unsafe { copy_input(spaces, space_length) });
+    let text = units(&bytes);
+    status(admitted(|registry| {
+        let (doc, run) = registry.xombie_pair(id).map_err(registry_error)?;
+        run.read(doc, &text, &spaces, eof != 0).map_err(ass_error)
+    }))
+}
+/// # Safety
+/// Commands0 classify,1 text,2 i32 bits,3 f64 bits,4 acknowledge,5 numeric failure.
+/// Text and remainder are copied raw UTF16LE before admission. Commands0/1 use
+/// zero bits, commands2/3 empty text, commands4/5 empty spans and zero bits.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_xombie_step_v1(
+    id: u64,
+    command: u32,
+    bits: u64,
+    input: *const u8,
+    length: usize,
+    remainder: *const u8,
+    remainder_length: usize,
+) -> u32 {
+    if command > 5
+        || length % 2 != 0
+        || remainder_length % 2 != 0
+        || (matches!(command, 0 | 1 | 4 | 5) && bits != 0)
+        || (command >= 2 && length != 0)
+        || (matches!(command, 0 | 4 | 5) && remainder_length != 0)
+        || (command == 2 && bits > u32::MAX as u64)
+    {
+        return INVALID_INPUT;
+    }
+    // SAFETY: bounded initialized text spans, copied before registry loans.
+    let text = units(&required!(unsafe { copy_input(input, length) }));
+    // SAFETY: disjoint ownership of copied remainder even if caller spans overlap.
+    let rest = units(&required!(unsafe {
+        copy_input(remainder, remainder_length)
+    }));
+    status(admitted(|registry| {
+        let (doc, run) = registry.xombie_pair(id).map_err(registry_error)?;
+        match command {
+            0 => run.classify(&text),
+            1..=3 => run.supply(doc, command + 1, bits, &text, &rest),
+            4 => run.acknowledge(),
+            5 => run.failed(doc),
+            _ => unreachable!(),
+        }
+        .map_err(ass_error)
+    }))
+}
+/// # Safety
+/// Output receives an immutable snapshot ID in eight writable bytes. Groups:
+/// 0 op/sep/kind/accepted:u32[4] then raw UTF16LE,1 style wire,2 raw style name,
+/// 3 entry wire (Unicode supplied later by native file),4 decoded font bytes.
+/// Only group0 is available in every phase; snapshots survive owner/run release.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_xombie_part_v1(
+    id: u64,
+    group: u32,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let bytes = required!(admitted(|registry| registry
+        .xombie_pair(id)
+        .map_err(registry_error)?
+        .1
+        .part(group)
+        .map_err(ass_error)));
+    let snapshot = required!(insert(Resource::Snapshot(bytes)));
+    // SAFETY: preflighted output; independently owned snapshot has no run loan.
+    unsafe { write_output(output, &snapshot.to_le_bytes()) };
+    OK
+}
+
+/// # Safety
 /// Output is an eight-byte writable run ID. Capacity is checked before the
 /// initial BT601/TV document mutation; the run binds a validated document ID.
 #[no_mangle]
@@ -3274,6 +3400,142 @@ mod tests {
             assert_eq!(read_snapshot(font_snapshot), [1, 0, 0, 0, 0, 0, 0, 0, 0]);
             assert_eq!(xy_vsfilter_document_ass_drop_v1(font_run), OK);
             assert_eq!(xy_vsfilter_document_snapshot_drop_v1(font_snapshot), OK);
+            let xowner = create();
+            out.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_document_xombie_begin_v1(xowner, out.as_mut_ptr(), 7),
+                INVALID_INPUT
+            );
+            assert_eq!(out, [0xa5; 16]);
+            assert_eq!(
+                xy_vsfilter_document_xombie_begin_v1(xowner, out.as_mut_ptr(), 8),
+                OK
+            );
+            let xrun = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let mut line: Vec<u8> = "version=1"
+                .encode_utf16()
+                .flat_map(u16::to_le_bytes)
+                .collect();
+            assert_eq!(
+                xy_vsfilter_document_xombie_read_v1(
+                    xrun,
+                    2,
+                    line.as_ptr(),
+                    line.len(),
+                    [0; 9].as_ptr(),
+                    9
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_xombie_read_v1(
+                    xrun,
+                    0,
+                    line.as_ptr(),
+                    line.len(),
+                    [0; 8].as_ptr(),
+                    8
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_xombie_read_v1(
+                        xrun,
+                        0,
+                        line.as_ptr(),
+                        line.len(),
+                        [0; 9].as_ptr(),
+                        9
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                xy_vsfilter_document_xombie_read_v1(
+                    xowner,
+                    0,
+                    line.as_ptr(),
+                    line.len(),
+                    [0; 9].as_ptr(),
+                    9
+                ),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                xy_vsfilter_document_xombie_read_v1(
+                    xrun,
+                    0,
+                    line.as_ptr(),
+                    line.len(),
+                    [0; 9].as_ptr(),
+                    9
+                ),
+                OK
+            );
+            line.fill(0);
+            assert_eq!(
+                xy_vsfilter_document_xombie_part_v1(xrun, 0, out.as_mut_ptr(), 8),
+                OK
+            );
+            let xsnapshot = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let retained = read_snapshot(xsnapshot);
+            assert_eq!(
+                &retained[16..],
+                &"version"
+                    .encode_utf16()
+                    .flat_map(u16::to_le_bytes)
+                    .collect::<Vec<_>>()
+            );
+            assert_eq!(
+                xy_vsfilter_document_xombie_part_v1(xrun, 1, out.as_mut_ptr(), 8),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_xombie_step_v1(xrun, 4, 0, ptr::null(), 0, ptr::null(), 0),
+                INVALID_INPUT
+            );
+            let key: Vec<u8> = "version"
+                .encode_utf16()
+                .flat_map(u16::to_le_bytes)
+                .collect();
+            assert_eq!(
+                xy_vsfilter_document_xombie_step_v1(
+                    xrun,
+                    0,
+                    0,
+                    key.as_ptr(),
+                    key.len(),
+                    ptr::null(),
+                    0
+                ),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_xombie_step_v1(xrun, 2, 0, ptr::null(), 0, ptr::null(), 0),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_xombie_step_v1(
+                    xrun,
+                    3,
+                    1f64.to_bits(),
+                    ptr::null(),
+                    0,
+                    ptr::null(),
+                    0
+                ),
+                OK
+            );
+            assert_eq!(xy_vsfilter_document_destroy_v1(xowner), OK);
+            assert_eq!(
+                xy_vsfilter_document_xombie_part_v1(xrun, 0, out.as_mut_ptr(), 8),
+                BAD_HANDLE
+            );
+            assert_eq!(read_snapshot(xsnapshot), retained);
+            assert_eq!(xy_vsfilter_document_xombie_drop_v1(xrun), OK);
+            assert_eq!(xy_vsfilter_document_xombie_drop_v1(xrun), BAD_HANDLE);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(xsnapshot), OK);
             let simple_owner = create();
             let mut simple_out = [0xa5; 4];
             assert_eq!(

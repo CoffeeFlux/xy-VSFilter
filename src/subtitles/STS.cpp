@@ -2887,6 +2887,43 @@ if(sver <= 4)   style->scrAlignment = (style->scrAlignment&4) ? ((style->scrAlig
 
 static bool OpenXombieSub(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    XyRust::XombieDocument parser(*ret.m_document);
+    for(;;)
+    {
+        CStringW text;WCHAR separator;unsigned kind;bool accepted;
+        const unsigned op=parser.Next(text,separator,kind,accepted);
+        if(op==9) return accepted;
+        if(op==10) return false;
+        if(op==0 || op==7) {CStringW line;const bool eof=!file->ReadString(line);parser.Read(line,eof);continue;}
+        if(op==1) {text.MakeLower();parser.Step(0,0,text);continue;}
+        if(op==8) {
+            auto font=parser.Part(4);XyRust::DocumentDetail::Shape(!font.empty() && font.size()<=MAXDWORD);
+            DWORD count;AddFontMemResourceEx(font.data(),static_cast<DWORD>(font.size()),NULL,&count);parser.Step(4);continue;
+        }
+        if(op>=2 && op<=4) {
+            // Version conversion was outside the reference parser's catch scope.
+            if(kind==1) {parser.Real(GetFloat(text),text);continue;}
+            try {
+                if(op==2) {const CStringW value=GetStr(text);parser.Step(1,0,value,text);}
+                else if(op==3) {const int value=GetInt(text,separator);parser.Step(2,static_cast<uint32_t>(value),CStringW(),text);}
+                else {const double value=GetFloat(text);parser.Real(value,text);}
+            } catch(...) {parser.Step(5);return false;}
+        } else if(op==5) {
+            STSStyle* style=DEBUG_NEW STSStyle;
+            if(!style)return false;
+            try {CString name;parser.Style(*style,name);ret.AddStyle(name,style);}
+            catch(...) {delete style;return false;}
+        } else if(op==6) {
+            try {
+                const STSEntry value=XyRust::DocumentDetail::EntryValue(parser.Part(3));
+                CString style=value.style;if(!style.CompareNoCase(_T("Default")))style=_T("Default");
+                ret.Add(value.str,file->IsUnicode(),value.start,value.end,style,value.actor,_T(""),value.marginRect,value.layer);
+                parser.Step(4);
+            } catch(...) {return false;}
+        }
+    }
+#else
     float version = 0;
 
 //  CMapStringToPtr stylemap;
@@ -3071,6 +3108,7 @@ static bool OpenXombieSub(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
     }
 
     return(!ret.IsEmpty());
+#endif
 }
 
 #include "USFSubtitles.h"

@@ -27,7 +27,17 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: embedded ASS font lifecycle (2026-10-18)
+## Active port: XombieSub parser ownership (2026-10-18)
+
+The experimental XombieSub path now uses a checked Rust session for line/EOF
+sequencing, key dispatch, screen inference/reset, ordered style and dialogue
+assembly, timestamps and embedded-font lifecycle. Native CString/CRT services,
+AddStyle and Add remain explicit transitional callbacks. The reference probe
+first established 1,242 unchanged-parser cases on both architectures, including
+the MSVC reversal of two mutating style-name operands. Fresh implementation
+comparisons are in progress; no production switch or format closure is claimed.
+
+## Previous port: embedded ASS font lifecycle (2026-10-18)
 
 The experimental ASS session now owns embedded-font record accumulation,
 whitespace trimming, marker/section/EOF sequencing, and decoded font bytes.
