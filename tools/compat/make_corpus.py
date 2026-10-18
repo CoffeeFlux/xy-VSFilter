@@ -808,6 +808,25 @@ def microdvd_parser_variants():
         yield "microdvd-parser-"+name+".sub", data
 
 
+def sami_parser_variants():
+    first="<SYNC START=1000>First caption\r\n"
+    end="<SYNC START=14000>&nbsp;\r\n"
+    for name, text in {
+        "control":"<sami>\r\n"+first+end,
+        "title-skip":"<sami>\r\n<TITLE>hidden</TITLE>"+first+end,
+        "fixed-column":"<sami>\r\n0000000000001"+first+end,
+        "overflow":"<sami>\r\n"+first.replace("1000","4294968296")+end,
+        "letters":"<sami>\r\n"+first.replace("1000","1a0b0c0ms")+end,
+        "comment-close":"<sami>\r\n"+first+"<!--\r\n<SYNC START=2000>hidden-->\r\n<SYNC START=4000>Last caption\r\n"+end,
+        "final-fragment":"<sami>\r\n"+first+"<SYNC START=2000>ignored",
+        "raw-units":"<sami>\r\n<SYNC START=1000>First\x00\ud800discarded\r\n"+end,
+        "dbcs":"<sami>\r\n<SYNC START=1000>{\\fe128}A\x81|B<br>C\r\n"+end,
+        "inline-marker":"<sami>"+first+end,
+    }.items():
+        data=(b"\xff\xfe"+text.encode("utf-16le","surrogatepass") if "\x00" in text else text.encode("latin1"))
+        yield "sami-parser-"+name+".smi", data
+
+
 def timestamps(data):
     matches = re.findall(rb"Dialogue:[^,]*,(\d+):(\d+):(\d+(?:\.\d+)?),(\d+):(\d+):(\d+(?:\.\d+)?)", data)
     if not matches:
@@ -846,6 +865,8 @@ def make_cases(files):
             if path.stem.startswith("microdvd-parser-"):
                 # Reference MS2RT(frame) then FRAME conversion inflates time by 10000.
                 cases[-1]["times"] = ["0", "9999.9999999", "10000", "19999.9999999", "20000", "24000", "30000", "39999.9999999", "40000", "59999.9999999", "60000", "30000", "10000"]
+            if path.stem.startswith("sami-parser-"):
+                cases[-1]["times"] = ["0", "0.9999999", "1", "1.0000001", "2", "3.9999999", "4", "10.9999999", "11", "12", "13.9999999", "14", "2", "12"]
             warning_styles = {"field-tab-prefixes": "\tDefault", "field-unicode-style-space": "\u2003Default"}
             if path.stem in warning_styles:
                 cases[-1]["dialog_actions"] = [{"title": "Warning",
@@ -874,6 +895,8 @@ def make_cases(files):
                                                     ("legacy-parser-vp-caption-space", "legacy-parser-vp-control"),
                                                     ("microdvd-parser-style-sticky", "microdvd-parser-control"),
                                                     ("microdvd-parser-missing-brace", "microdvd-parser-brace-control"),
+                                                    ("sami-parser-title-skip", "sami-parser-control"),
+                                                    ("sami-parser-fixed-column", "sami-parser-control"),
                                                     ("xombie-italic", "xombie-control"),
                                                     ("xombie-font-attached", "xombie-font-control"),
                                                     ("drawing-state-spline-close-twice", "drawing-state-control"),
@@ -958,6 +981,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in text_parser_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in legacy_parser_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in microdvd_parser_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in sami_parser_variants()]
     manifest = json.dumps(make_cases(files + generated), indent=2) + "\n"
     expected = generated + [(DEST / "cases.json", manifest.encode("utf-8"))]
     for path, data in expected:

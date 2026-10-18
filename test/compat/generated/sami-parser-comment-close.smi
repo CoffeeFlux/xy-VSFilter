@@ -1,0 +1,6 @@
+<sami>
+<SYNC START=1000>First caption
+<!--
+<SYNC START=2000>hidden-->
+<SYNC START=4000>Last caption
+<SYNC START=14000>&nbsp;
