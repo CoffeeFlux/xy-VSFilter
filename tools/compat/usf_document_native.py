@@ -14,6 +14,8 @@ OBSERVER = ROOT / "tools/compat/document_native_lifecycle.cpp"
 LEGACY_CASES = 1212
 RELOAD_CASES = 128
 CASES = LEGACY_CASES + RELOAD_CASES
+SCALAR_VALUES = 1885
+SCALAR_CASES = 20735
 
 
 def validate(data, bits):
@@ -38,6 +40,16 @@ def validate(data, bits):
     for offset, row in enumerate(reloads):
         if not re.fullmatch(f"usf-reload index={LEGACY_CASES + offset} before=".encode() + rb"[01] after=[01]", row):
             raise ValueError("invalid reload outcomes")
+    scalars = [line for line in lines if line.startswith(b"usf-scalar ")]
+    if len(scalars) != SCALAR_CASES:
+        raise ValueError("missing or duplicate USF scalar case")
+    scalar_pattern = re.compile(rb"usf-scalar index=(\d+) kind=[1-4] argument=-?\d+ result=-?\d+ errno=\d+ units=(\d+) data=([0-9a-f]*)")
+    for index, row in enumerate(scalars):
+        match = scalar_pattern.fullmatch(row)
+        if not match or int(match[1]) != index or int(match[2]) * 4 != len(match[3]):
+            raise ValueError("invalid USF scalar input/outcome")
+    if lines[-2] != f"usf-scalars-complete cases={SCALAR_CASES} values={SCALAR_VALUES}".encode():
+        raise ValueError("missing USF scalar completion marker")
     if lines[-1] != f"usf-complete cases={CASES}".encode():
         raise ValueError("missing USF completion marker")
     if not any(b"outcome=0 " in row for row in rows) or not any(b"outcome=1 " in row for row in rows):
@@ -66,7 +78,7 @@ def main():
     out.mkdir(parents=True, exist_ok=False)
     roots = (args.reference_root.resolve(), ROOT)
     report = dict(complete=False, equal=False, reference_commit=PIN, platform=args.platform,
-                  kind="actual-usf-parser-document-control", cases=CASES, builds={},
+                  kind="actual-usf-parser-document-control", cases=CASES, scalar_cases=SCALAR_CASES, scalar_values=SCALAR_VALUES, builds={},
                   probe_sha256=sha(SOURCE.read_bytes()), observer_sha256=sha(OBSERVER.read_bytes()),
                   runner_sha256=sha(Path(__file__).read_bytes()),
                   environment={key:os.environ.get(key) for key in ("VCToolsVersion","WindowsSDKVersion","VSCMD_ARG_TGT_ARCH")},
