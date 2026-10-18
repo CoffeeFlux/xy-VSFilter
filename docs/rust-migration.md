@@ -27,15 +27,43 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Active port: embedded ASS font lifecycle (2026-10-18)
+## Current port: embedded ASS font lifecycle (2026-10-18)
 
 The experimental ASS session now owns embedded-font record accumulation,
 whitespace trimming, marker/section/EOF sequencing, and decoded font bytes.
 CString's per-fragment NUL truncation is modeled explicitly. Installation remains
 a Windows service called after Rust registry loans end; its ignored return value
 and process-exit resource lifetime are preserved. Other parser paths still use
-the transitional FontRecords adapter. Fresh x86/x64 direct and rendering
-comparisons are in progress; the prior validated increment is recorded below.
+the transitional FontRecords adapter.
+
+Candidate `71fbf4b3` (implementation `d3fb5be8`) passes fresh comparisons against
+cleanup `67da07cd` on **each** Windows architecture (x86 and x64):
+
+* 3,266 actual parser cases, including 410 new font cases, repeated twice for
+  reference and candidate: 22,286 identical trace lines, including all decoded
+  bytes and order for 281 font-installation requests. The probe intercepts the
+  Windows call and alternates synthetic failure/success replies to check that
+  results do not change parser behavior.
+* All 814 rendering cases and 8,586 frames, with 72 distinct-frame controls.
+  These exercise real Windows installation, including attached-font/control
+  pairs through file and memory opening that must render differently.
+* 3,693 linked lifecycle trace lines, all three DLLs' exports/dependencies,
+  10 scoped COM cases plus two candidate pin-ID controls, and compile probes
+  for reference, native-document and experimental configurations.
+* 260 safe-core and 123 FFI tests, formatting, Clippy and 150 Python harness
+  tests (one skip). The safe core continues to forbid unsafe code.
+
+The [source and boundary inventory](rust-ass-font-inventory.json) and
+[local evidence manifest](rust-ass-font-local-evidence.json) preserve source,
+report and binary hashes, including the MSVC CString implementation relevant to
+NUL handling. No production default, package closure, non-Windows parity or real
+player/Aegisub graph integration is claimed. Pre-Open simplicity and allocation
+failure/reentry remain unresolved. Earlier evidence keeps its own attribution.
+
+Next work includes dialogue trimming, remaining locale/CRT/file adapters, and
+consolidating the other font-loader callers into checked Rust ownership. The
+remaining format, rendering and host packages stay in scope; the complete-library
+goal remains active.
 
 ## Previous port: owned ASS input and checked style sessions (2026-10-18)
 

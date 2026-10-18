@@ -1,0 +1,356 @@
+{
+  "schema": 1,
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "candidate_code_commit": "71fbf4b38d68c6eab8e883c1c39187cd8bfd0852",
+  "prior_increment": "99a38b68",
+  "configuration": {
+    "native": "Release, RustTextDecoder=true, RustDocumentOwnerExperimental=true",
+    "rust": "1.85.0; native-runtime with +crt-static",
+    "msvc": "14.44.35207",
+    "sdk": "10.0.26100.0"
+  },
+  "scope": "Owned ASS embedded font lifecycle and decoded installation payloads; no full-library, package or default-enablement claim.",
+  "limits": [
+    "Native pre-Open simplicity is uninitialized; embedded paths that omit successful Open remain unresolved, not passing results.",
+    "No Aegisub/player playback or full graph integration; COM probes are disconnected and omit custom interface method behavior.",
+    "No non-Windows or Miri run for this increment.",
+    "Default native-document configuration has compile-only probes, not new runtime parity.",
+    "The initial d3fb5be8 probe retains its own reports; final parser evidence uses 71fbf4b3 with explicit font installation scope metadata. Production sources are identical between these commits."
+  ],
+  "architectures": {
+    "x64": {
+      "corpus": {
+        "report": "artifacts/font-csri-x64/summary.json",
+        "sha256": "828e27e4726feb87a6ae2044f0567cf56ee9e14cf9240695a7808856b46bb88e",
+        "complete": true,
+        "frames": 8586,
+        "distinct_controls": 72,
+        "partition_exact": true,
+        "shards": [
+          {
+            "report": "artifacts/font-csri-x64/shard-0/report.json",
+            "sha256": "e6cc4dd51e8d3d06f4338c27a0ddd32483a888672293a06797f9560e113467d9",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1103,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/font-csri-x64/shard-1/report.json",
+            "sha256": "115ef636af087a15f3cb2990214c20f6f43fff37eab738d02bfe94cb9f77d7ed",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1103,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/font-csri-x64/shard-2/report.json",
+            "sha256": "7ad2ec2dd6e93259ef8792554faf1d738071b7dcbbab1812c2009c30ceda03d6",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1071,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/font-csri-x64/shard-3/report.json",
+            "sha256": "a7ac03041113671561c015d621c1fc4f5229253d964e13cd5acf76410bd7f818",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1071,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/font-csri-x64/shard-4/report.json",
+            "sha256": "946069b4994ebdec881c465c0e91082390d97db544e79f033a26d6824a3b2f33",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1051,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/font-csri-x64/shard-5/report.json",
+            "sha256": "eee821897d54b7ef0544784db8668c12fc8a842c2543ba554b4c03a52e1ccbaa",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1051,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/font-csri-x64/shard-6/report.json",
+            "sha256": "4d5ee8f8c44a374227421884fc8c616d97985f4d4498e0d66e1f99cf609e78f0",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1068,
+            "cases": 101
+          },
+          {
+            "report": "artifacts/font-csri-x64/shard-7/report.json",
+            "sha256": "2490bf12a2a12858fd0253a059c90b79197687d5074f91c6500fac6b72b8bb5f",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1068,
+            "cases": 101
+          }
+        ],
+        "cases": 814,
+        "rendered_frames": 8586,
+        "source_manifest_sha256": "2e197b56427d6b94bb389a8e25e73e8910ea3c71ddf89ebd11658b369b48cd07",
+        "partition_driver_sha256": "3492cb00e0ca351d85f9c81c4d78e3decc42b9dca57516a88b9730323f8bdf07"
+      },
+      "lifecycle": {
+        "report": "artifacts/font-lifecycle-x64/report.json",
+        "sha256": "2a1f4860e11f72f1c7645dae45907f008dc14b0c30b1f42fbf4555cfdd8abe97",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "71fbf4b38d68c6eab8e883c1c39187cd8bfd0852",
+        "trace_lines": 3693,
+        "dialog_count": 3,
+        "inputs_unchanged": true
+      },
+      "parser": {
+        "report": "artifacts/font-probe-v3-x64/report.json",
+        "sha256": "a91db2aa539719baee326238d31178216d99687211c50216a5ac8efe30972e02",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "71fbf4b38d68c6eab8e883c1c39187cd8bfd0852",
+        "trace_lines": 22286,
+        "inputs_unchanged": true,
+        "cases": 3266,
+        "font_installation_requests": 281
+      },
+      "compile": {
+        "report": "artifacts/font-compile-x64/report.json",
+        "sha256": "9cd7e9ca8f312441e8f960c7e32b9bd7131c3ecf171a2a5d9ccad9a9246ad5e7",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "71fbf4b38d68c6eab8e883c1c39187cd8bfd0852",
+        "inputs_unchanged": true,
+        "scope": "Compile-only actual style helper/lifecycle sources and headers; no link, execution or parity claim"
+      },
+      "com": {
+        "report": "artifacts/font-contracts-x64/com/report.json",
+        "sha256": "5fd6b7205ba57bcc6254b5ecb4d824b21b0cf7e311ededb6c7a0da164e9fe453",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "71fbf4b38d68c6eab8e883c1c39187cd8bfd0852",
+        "inputs_unchanged": true,
+        "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "2d254068a40e5f59cf191c3c6bbfc984b548193b668c4decac21dc1e94e02169",
+          "candidate_sha256": "db28faad51116f5e002301187f79f151458aa3f17f8f4dd30a2b5b35f5fe300f",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "858b557df4643353cc2b7f7a4faf24fb20fc571f39dc8929949a8b9d80276024"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "32b7c2cd6eb817120414db53b3c3005e719ae4b993c4a69d0d66c7f6ac363d5a",
+          "candidate_sha256": "5f5c2e770eddb6f548d88ed4701a095c3c8ddf00a1bb826ef4604b5f2a52a69e",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "09623cbd08a08a70ca726d32f1ac7a80358fe93589dfe22d814f7c9544f6d751"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "f1165742064181b7fb73bacb16017d8e202c8bb0be90ed8c2eb812ac282c2df8",
+          "candidate_sha256": "0e84e27c18e84abe768d972804e729773bc76918752a24fd148de4f7a94fa08b",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "b0b48a3cf2bf2ecbbac4ecca863a815ab4a0c1137277a9b7d5830d9d1beca5c9"
+        }
+      }
+    },
+    "x86": {
+      "corpus": {
+        "report": "artifacts/font-csri-x86/summary.json",
+        "sha256": "5ddde5d74093cfdba98086075372cb01fb7a002977e9a4ee83175f092ae73baa",
+        "complete": true,
+        "frames": 8586,
+        "distinct_controls": 72,
+        "partition_exact": true,
+        "shards": [
+          {
+            "report": "artifacts/font-csri-x86/shard-0/report.json",
+            "sha256": "c795ccc2fb95219544f6d8988407ba0475d3c73b8320b466eefda80102a5b613",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1103,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/font-csri-x86/shard-1/report.json",
+            "sha256": "eb36c58055f8ca77c98c1afaf3db940ae88f3e68221c26c66e9d1342ab63e746",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1103,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/font-csri-x86/shard-2/report.json",
+            "sha256": "b38f24b4a64e6b188866fb5a8f55561505e7afec9134538f3147c2c80266dde8",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1071,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/font-csri-x86/shard-3/report.json",
+            "sha256": "d343b2a4903be6a43fdf61055f42d303170aec7b608bb0819b9363a1e7cebdb0",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1071,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/font-csri-x86/shard-4/report.json",
+            "sha256": "bb16ee3486ced6ecec9dad4d280bfcb03e4ad70be3e71fd12a22fcc4c2f299d0",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1051,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/font-csri-x86/shard-5/report.json",
+            "sha256": "2ed98c57b67ee3f78335deff101748175a2177e136d3309ad0fd1478742809a4",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1051,
+            "cases": 102
+          },
+          {
+            "report": "artifacts/font-csri-x86/shard-6/report.json",
+            "sha256": "cd7b4eefc644ac364918ce26196810e356f912b8554acc9514183ddc42e7bb73",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1068,
+            "cases": 101
+          },
+          {
+            "report": "artifacts/font-csri-x86/shard-7/report.json",
+            "sha256": "423d58c7af7e788ec5a80e94a6ffeddea5eec822f9e0e00fb4749e500767f360",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1068,
+            "cases": 101
+          }
+        ],
+        "cases": 814,
+        "rendered_frames": 8586,
+        "source_manifest_sha256": "2e197b56427d6b94bb389a8e25e73e8910ea3c71ddf89ebd11658b369b48cd07",
+        "partition_driver_sha256": "3492cb00e0ca351d85f9c81c4d78e3decc42b9dca57516a88b9730323f8bdf07"
+      },
+      "lifecycle": {
+        "report": "artifacts/font-lifecycle-x86/report.json",
+        "sha256": "f46396ffa0b964d69ff0dffa42fc578a2458130298d01a9b25a78b5d2f615193",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "71fbf4b38d68c6eab8e883c1c39187cd8bfd0852",
+        "trace_lines": 3693,
+        "dialog_count": 3,
+        "inputs_unchanged": true
+      },
+      "parser": {
+        "report": "artifacts/font-probe-v3-x86/report.json",
+        "sha256": "7aa7096f1900f7db19e62af99000f425012d85cf03468af852d6e5d02054c918",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "71fbf4b38d68c6eab8e883c1c39187cd8bfd0852",
+        "trace_lines": 22286,
+        "inputs_unchanged": true,
+        "cases": 3266,
+        "font_installation_requests": 281
+      },
+      "compile": {
+        "report": "artifacts/font-compile-x86/report.json",
+        "sha256": "59ea62b1e0941da3c459dc04753a1e77baf698ed53c43d330b34b406e2539143",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "71fbf4b38d68c6eab8e883c1c39187cd8bfd0852",
+        "inputs_unchanged": true,
+        "scope": "Compile-only actual style helper/lifecycle sources and headers; no link, execution or parity claim"
+      },
+      "com": {
+        "report": "artifacts/font-contracts-x86/com/report.json",
+        "sha256": "8cc77499af0b773bffdfd79c7b987b75802d6fc29cb9701438c69c0736021810",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "71fbf4b38d68c6eab8e883c1c39187cd8bfd0852",
+        "inputs_unchanged": true,
+        "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "69faa2d5f90f35fe4184e9e9bd892adb76fee60295701988f61ab7af0664d9eb",
+          "candidate_sha256": "17ec54a68f18140e1ca36c75a54c13d751abae4fbd2098df9a6069c15bbf66e4",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "dbd365316d54d5a3d590b63604fbbc5ea6849a912eb7660e52d8df4bdd6b2120"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "2c3b904d7f91902ef456e07b648c5d6351878318c235397eeb9b39eb3fffa34f",
+          "candidate_sha256": "ae866d9e94ced555c52a2438613a5be53c431ed22fdc305d1bb156d77af09948",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "8821591e5f42e83c8361380a00b4869b748312f9374da70041ad829e381b6bbc"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "3e7c20a4d6c42457d92eb56c42e4fd9f3bddb93276f2c1cd28bfb73edd06484c",
+          "candidate_sha256": "a0ba8b78d4c5107660382d79fc9104763a6e3b913922887aa245bbe988267c64",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "bee8a1d975859e0ab8a9b6843e14f813df818b8538e6501927e792bb180eb7c1"
+        }
+      }
+    }
+  },
+  "source_inventory": {
+    "path": "docs/rust-ass-font-inventory.json",
+    "sha256": "e99a797f20f55f08903e883affee76d512df91cdf864e3738d246ba78154f22f"
+  },
+  "unsafe_lexical_inventory": {
+    "report": "artifacts/font-unsafe-inventory.json",
+    "sha256": "11b99f66937432641017646734e3e0f580bf96f3a808db89176d5f385a1813a3",
+    "safe_core_unsafe_sites": 0,
+    "limits": "Lexical inventory only, not a soundness proof."
+  },
+  "build_logs": {
+    "artifacts/font-build-v2-x64.log": "fffdf25caf03390084ccb953b099af56397d70999416c2c86d67e92bee8ac256",
+    "artifacts/font-build-v2-x86.log": "515f5a37ce1f54b3d072cce7493b3044d2d991c065b905f454207f2a738f49e4",
+    "artifacts/font-build-v2-rust-x64.log": "5a632b5022afd948a89a28667e0924147098d472ca068f3450b79e7d0e57d1b7",
+    "artifacts/font-build-v2-rust-x86.log": "fbdcfe9def41082d3ab3eef4f09d18fe226b5062cd79a5922f79663964503c26"
+  },
+  "rust_tests": {
+    "core_per_architecture": 260,
+    "ffi_per_architecture": 123,
+    "fmt": true,
+    "clippy_all_targets": true,
+    "clippy_native_runtime": true,
+    "logs": {
+      "artifacts/font-checks.log": "0391f216db723a93a019f6b04d49d8ad20fc21895af22efff72f158862f1af83"
+    }
+  },
+  "python_harness_tests": {
+    "count": 150,
+    "skipped": 1,
+    "failures": 0,
+    "corpus_generation_checked": true,
+    "log": "artifacts/font-checks.log"
+  }
+}

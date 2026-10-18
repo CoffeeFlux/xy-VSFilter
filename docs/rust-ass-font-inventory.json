@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "candidate_code_commit": "71fbf4b38d68c6eab8e883c1c39187cd8bfd0852",
+  "implementation_commit": "d3fb5be8d9e4bc57263ac037e6293ce7772ba393",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "ASS embedded font lifecycle within experimental document owner; full library remains in scope.",
+  "reference_sources": {
+    "src/subtitles/STS.cpp": "2616b67db84f7329ac6e2363a3f03d61977fa07c37ed9c04d32ec2b1197f31e0",
+    "src/subtitles/TextFile.cpp": "71c00071f9ceb466c539fda26103a4a94b802a4a01f4b807852e159563772f2f",
+    "src/dsutil/text.h": "92efdac94644006b4559d868631c27c841811327af9eedc408b817631e09d249"
+  },
+  "operations": [
+    {
+      "operation": "Owned record loop and decoded installation payload",
+      "source": {
+        "path": "rust/compat/src/ass_fonts.rs",
+        "line": 17,
+        "sha256": "4a792aae47583aa42d5b2ecd7383b03c5e33ec793b3e2b3ac24e97bbc388622e"
+      },
+      "behavior": "Safe Rust trims using supplied CString predicates, recognizes exactly the six case-sensitive section prefixes, consumes stopping section lines, flushes on fontname markers, skips invalid encoded lengths and ignores a false ReadString fragment while flushing accumulated input. Native CString Append StringLengthN behavior is modeled by truncating each appended fragment at NUL. The existing permissive wrapping decoder owns the output bytes."
+    },
+    {
+      "operation": "Document-bound font session sequencing",
+      "source": {
+        "path": "rust/compat/src/ass_document.rs",
+        "line": 88,
+        "sha256": "eaa0bd8adf6f73cfef92aaf7d1a06fd558fd97484e3646e73437cf0d228e4f2e"
+      },
+      "behavior": "Pending font record blocks outer input/classification/record completion. Begin, read, installation acknowledgement and finish are phase checked. Immutable byte snapshots survive session or owner release. Installation result is deliberately not accepted as a branch input."
+    },
+    {
+      "operation": "Transitional Windows installation adapter",
+      "source": {
+        "path": "src/subtitles/STS.cpp",
+        "line": 2543,
+        "sha256": "b361bd16bc7d9a47d88de68acb2454294be5955e2ae39d0768b075ffc4e1814f"
+      },
+      "behavior": "Native ReadString and IsSpace remain adapters. AddFontMemResourceEx runs after snapshot copy-out and after all registry loans end, with a live decoded byte vector. The reference ignores return/count and keeps the process-private installed font until process exit. Other LoadUUEFont callers and default native-document configuration still use the previous raw FontRecords adapter."
+    }
+  ],
+  "boundary_review": [
+    {
+      "exports": [
+        "xy_vsfilter_document_ass_font_read_v1",
+        "xy_vsfilter_document_ass_font_part_v1"
+      ],
+      "source": {
+        "path": "rust/ffi/src/document.rs",
+        "line": 389,
+        "sha256": "a827b2a2f6ccebb4a001c40acc1850d3b2746ca4593eff092243d6350469be14"
+      },
+      "contract": "Checked integer run IDs resolve a live parent document. Preflight output size, EOF bool, even raw UTF16LE length and one strict-bool predicate per unit; copy native spans before registry admission. Read mutates only while awaiting input. Snapshot copy-out holds no registry loan; inputs may overlap output. BUSY, invalid/stale handles and malformed inputs produce no output writes. No raw native object pointer is owned or retained."
+    },
+    {
+      "exports": [
+        "xy_vsfilter_document_ass_step_v1"
+      ],
+      "source": {
+        "path": "rust/ffi/src/document.rs",
+        "line": 307,
+        "sha256": "a827b2a2f6ccebb4a001c40acc1850d3b2746ca4593eff092243d6350469be14"
+      },
+      "contract": "Commands9/10/11 begin/acknowledge/end fonts, requiring zero value and empty text. Invalid phase cannot advance the loop."
+    }
+  ],
+  "toolchain_behavior": {
+    "path": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\atlmfc\\include\\atlsimpstr.h",
+    "sha256": "73b81faef80dff5bec2e663617da11ddcb942b51dddf5aa8228727bdc1e519db",
+    "detail": "CSimpleStringT::Append applies StringLengthN even to counted fragments; direct Windows reference comparisons validate raw NUL cases. Evidence is specific to recorded MSVC/ATL configuration."
+  },
+  "direct_probe": {
+    "source": {
+      "path": "tools/compat/ass_document_native.cpp",
+      "line": 10,
+      "sha256": "ded20a6431f734627f3ef8388037abbb13b50f4d3f07041978e3e362fb2ee6b0"
+    },
+    "cases": 3266,
+    "added_cases": 410,
+    "font_installation_requests_per_run": 281,
+    "trace_lines_per_run": 22286,
+    "method": "Include actual reference/candidate STS.cpp with initialized document observer. Intercept only AddFontMemResourceEx and emit every decoded byte and call order; alternate synthetic failure/success with font-count writes. Repeat each executable twice. Compare exact document trace, file positions and all installation requests. Full renderer comparisons separately exercise real Windows font installation."
+  },
+  "limits": [
+    "Finite corpus, no whole-renderer or host closure, no default enablement.",
+    "No new non-Windows, Miri, allocation failure or allocator-reentry evidence. Encoded record counts above INT32_MAX are refused by the private boundary; native allocation/exception behavior at that size is not validated.",
+    "Native pre-Open simplicity remains unresolved; no invented default.",
+    "Default native-document runtime and other format font paths retain earlier evidence only.",
+    "The lexical unsafe inventory is not a soundness proof."
+  ],
+  "next_work": [
+    "Move dialogue trimming into owned Rust parser state.",
+    "Replace remaining locale/CRT/file adapters, preserving conversion and error behavior.",
+    "Consolidate other font-loader callers into checked Rust ownership and retire the raw FontRecords boundary.",
+    "Continue the complete format/render/host migration; retained C++ remains transitional."
+  ]
+}
