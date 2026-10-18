@@ -1,0 +1,6 @@
+Version=1.0
+ScreenHorizontal=640
+ScreenVertical=360
+Style=Primary,Caption,Arial,36,16777215,255,0,0,0,0,0,128,0,0,0,0,0,100,100,0,0,0,0,1,2,1,2,10,10,10,1
+Line=D,id,0,0:00:01.234,0:00:04.345,Primary,Caption,Actor,0,0,0,Xombie compatibility
+Line=D,id2,1,0:00:01.234,0:00:04.345,Primary,Caption,Actor,0,0,0,Xombie compatibility

@@ -727,6 +727,32 @@ def document_layout_variants():
         yield "document-layout-" + name + ".ass", data.replace(b"COMPAT_TEXT", b"Layout pair sample")
 
 
+def xombie_variants():
+    style = "Primary,Caption,Arial,36,16777215,255,0,0,0,0,0,128,0,0,0,0,0,100,100,0,0,0,0,1,2,1,2,10,10,10,1"
+    header = "Version=1.0\r\nScreenHorizontal=640\r\nScreenVertical=360\r\n"
+    line = "Line=D,id,0,0:00:01.234,0:00:04.345,Primary,Caption,Actor,0,0,0,Xombie compatibility\r\n"
+    def script(fields=style, body=line):
+        return (header + "Style=" + fields + "\r\n" + body).encode("ascii")
+    yield "xombie-control.xss", script()
+    for name, field, value in (("italic",13,"1"),("blur",16,"1"),("angles",22,"12"),("scale",17,"75")):
+        fields=style.split(",");fields[field]=value
+        yield "xombie-"+name+".xss",script(",".join(fields))
+    yield "xombie-final-fragment.xss",script(body=line+line.replace("id,0,","id2,1,").rstrip("\r\n"))
+    yield "xombie-reversed-lines.xss",script(body=line.replace("01.234","02.234").replace("id,0,","id2,1,")+line)
+    text=script().decode("ascii").replace("Xombie compatibility","before\ud800\x00after")
+    yield "xombie-raw-units.xss",b"\xff\xfe"+text.encode("utf-16le","surrogatepass")
+    font=(DEST/"fonts/Abel-Regular.ttf").read_bytes()
+    if hashlib.sha256(font).hexdigest()!="8809dcad25318225052f88333e208c5aad4adcb7b2c934c135735ec19aa410b4":raise ValueError("pinned test font has changed")
+    encoded=bytearray()
+    for start in range(0,len(font),3):
+        block=font[start:start+3];bits=int.from_bytes(block.ljust(3,b"\0"),"big")
+        encoded.extend(((bits>>shift)&63)+33 for shift in (18,12,6,0)[:len(block)+1])
+    attached=b"fontname=Abel-Regular.ttf\r\n"+b"\r\n".join(encoded[i:i+80] for i in range(0,len(encoded),80))+b"\r\n\r\n"
+    control=script(style.replace(",Arial,",",Abel,"))
+    yield "xombie-font-control.xss",control
+    yield "xombie-font-attached.xss",attached+control
+
+
 def timestamps(data):
     matches = re.findall(rb"Dialogue:[^,]*,(\d+):(\d+):(\d+(?:\.\d+)?),(\d+):(\d+):(\d+(?:\.\d+)?)", data)
     if not matches:
@@ -756,6 +782,8 @@ def make_cases(files):
                 cases[-1]["times"] = ["0", "0.9999999", "1", "1.0000001", "1.125", "1.25", "1.5", "1.75", "2", "2.5", "3.9999999", "4", "4.0000001", "1.25", "2.5", "1"]
             if path.stem.startswith("layout-rect-"):
                 cases[-1]["times"] = ["0", "0.9999999", "1", "1.5", "1.9999999", "2", "2.5", "3", "3.5", "4", "4.5", "5", "4", "3", "2", "1", "0", "2", "1", "3"]
+            if path.stem.startswith("xombie-"):
+                cases[-1]["times"] = ["0", "1.2339999", "1.234", "1.2340001", "2", "3", "4.3449999", "4.345", "4.3450001", "2", "1.234", "0"]
             warning_styles = {"field-tab-prefixes": "\tDefault", "field-unicode-style-space": "\u2003Default"}
             if path.stem in warning_styles:
                 cases[-1]["dialog_actions"] = [{"title": "Warning",
@@ -778,6 +806,8 @@ def make_cases(files):
     return {"schema": 1, "description": "Starter differential corpus; not exhaustive compatibility evidence.",
             "expect_distinct_frames": [[a + "-" + mode, b + "-" + mode]
                                        for a, b in (("font-valid-attached", "font-valid-control"),
+                                                    ("xombie-italic", "xombie-control"),
+                                                    ("xombie-font-attached", "xombie-font-control"),
                                                     ("drawing-state-spline-close-twice", "drawing-state-control"),
                                                     ("raster-be-one", "raster-control"),
                                                     ("raster-be-fraction-high", "raster-control"),
@@ -856,6 +886,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in mpl2_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in sami_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in sami_file_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in xombie_variants()]
     manifest = json.dumps(make_cases(files + generated), indent=2) + "\n"
     expected = generated + [(DEST / "cases.json", manifest.encode("utf-8"))]
     for path, data in expected:
