@@ -27,6 +27,7 @@
 #include <msxml.h>
 #include <atlsafe.h>
 
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 #define DeclareNameAndValue(pNode, name, val) \
     CComBSTR name; \
     pNode->get_nodeName(&name); \
@@ -93,6 +94,8 @@ static CStringW GetAttrib(CStringW attrib, CComPtr<IXMLDOMNode> pNode)
 	return(ret);
 }
 
+
+#endif // native DOM helpers
 static int TimeToInt(CStringW str)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
@@ -201,11 +204,18 @@ CUSFSubtitles::~CUSFSubtitles()
 
 bool CUSFSubtitles::Read(LPCTSTR fn)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return m_source->ReadPath(fn);
+#else
 	return Load(CComVariant(fn));
+#endif
 }
 
 bool CUSFSubtitles::Read(const BYTE* data, size_t len)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return m_source->ReadBytes(data,len);
+#else
 	// MSXML loads a VT_ARRAY|VT_UI1 source as a document in memory,
 	// detecting its encoding the same way as for a file.
 	CComSafeArray<BYTE> bytes;
@@ -215,8 +225,10 @@ bool CUSFSubtitles::Read(const BYTE* data, size_t len)
 		memcpy(bytes.m_psa->pvData, data, len);
 
 	return Load(CComVariant(bytes.m_psa));
+#endif
 }
 
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 bool CUSFSubtitles::Load(const VARIANT& source)
 {
 	VARIANT_BOOL vb;
@@ -226,32 +238,6 @@ bool CUSFSubtitles::Load(const VARIANT& source)
 	|| FAILED(pDoc->load(source, &vb)) || vb != VARIANT_TRUE)
 		return(false);
 
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    // Only this adapter holds COM pointers. Rust receives bounded node IDs.
-    std::vector<CComPtr<IXMLDOMNode>> nodes(2);nodes[1]=CComQIPtr<IXMLDOMNode>(pDoc);
-    m_source->Begin();
-    for(;;){
-        unsigned index;bool accepted;CStringW text;
-        const unsigned op=m_source->Next(index,accepted,text);
-        if(op==11)return accepted;
-        if(op>=7){
-            const int value=op==7?TimeToInt(text):op==8?wcstol(text,NULL,10):op==9?static_cast<int32_t>(ColorToDWORD(text)):text.CompareNoCase(L"Default");
-            m_source->Step(op,value);continue;
-        }
-        XyRust::DocumentDetail::Shape(index>0 && index<nodes.size() && nodes[index]!=NULL);
-        // Copy before any push_back can invalidate vector elements.
-        const CComPtr<IXMLDOMNode> node=nodes[index];
-        if(op==1){DeclareNameAndValue(node,name,val);m_source->Step(op,0,CStringW(name));}
-        else if(op==2 || op==3){
-            CComPtr<IXMLDOMNode> child;if(op==2)node->get_firstChild(&child);else node->get_nextSibling(&child);
-            unsigned id=0;if(child){id=XyRust::DocumentDetail::Count(nodes.size());nodes.push_back(child);}
-            m_source->Step(op,static_cast<int>(id));
-        }
-        else if(op==4)m_source->Step(op,0,GetAttrib(text,node));
-        else if(op==5)m_source->Step(op,0,GetText(node));
-        else if(op==6){CComBSTR xml;node->get_xml(&xml);m_source->Step(op,0,CStringW(xml));}
-    }
-#else
 	styles.RemoveAll();
 	effects.RemoveAll();
 	texts.RemoveAll();
@@ -308,8 +294,9 @@ bool CUSFSubtitles::Load(const VARIANT& source)
 	}
 
 	return(true);
-#endif
 }
+
+#endif // native MSXML loader
 
 bool CUSFSubtitles::ConvertToSTS(CSimpleTextSubtitle& sts)
 {

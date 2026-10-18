@@ -297,6 +297,13 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_usf_scalar_drop_v1(uint64_t);
 // carry either value:i32 or raw u16, never pointers. Group1 snapshots all model
 // fields in probe order. Source and destination lifetimes are checked on every
 // conversion step. Failed native XML loads do not clear or replace this source.
+// Windows synchronous MSXML load: kind0 bytes,1 raw UTF16 path,2 null path.
+// Output12bytes: accepted,throwHRESULT,HRESULT (u32/u32/i32). Normal COM/XML
+// rejection preserves the prior source. Native allocation HRESULT exceptions
+// are relayed for AtlThrow. Gate callbacks are balanced around each individual
+// registry access; they must not unwind. No native gate is held across COM.
+typedef void (XY_DOCUMENT_CDECL *xy_document_usf_gate_v1)(void);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_usf_source_load_v1(uint64_t,uint32_t,const uint8_t*,size_t,uint8_t*,size_t,xy_document_usf_gate_v1,xy_document_usf_gate_v1);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_usf_source_create_v1(uint8_t*,size_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_usf_source_drop_v1(uint64_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_usf_source_begin_v1(uint64_t);

@@ -376,7 +376,31 @@ pub struct State {
     pub model: Model,
     parse: Option<Parse>,
 }
+/// Detached request for platform drivers; contains no borrowed model state.
+pub struct ServiceRequest {
+    pub op: u32,
+    pub node: u32,
+    pub accepted: bool,
+    pub text: Vec<u16>,
+}
 impl State {
+    pub fn service_request(&self) -> Result<ServiceRequest, Error> {
+        let p = self.parse.as_ref().ok_or(Error::Protocol)?;
+        Ok(match &p.pending {
+            Some(q) => ServiceRequest {
+                op: q.op,
+                node: q.node,
+                accepted: false,
+                text: q.text.clone(),
+            },
+            None => ServiceRequest {
+                op: 11,
+                node: 0,
+                accepted: p.found,
+                text: Vec::new(),
+            },
+        })
+    }
     /// Called only after MSXML load succeeds. A failed load never enters here.
     pub fn begin(&mut self) -> Result<(), Error> {
         if self.parse.as_ref().is_some_and(|p| p.pending.is_some()) {

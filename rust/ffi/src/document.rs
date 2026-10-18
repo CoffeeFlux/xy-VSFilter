@@ -378,6 +378,172 @@ pub unsafe extern "C" fn xy_vsfilter_document_usf_begin_v1(
     unsafe { write_output(output, &id.to_le_bytes()) };
     OK
 }
+#[cfg(windows)]
+fn usf_windows_error(error: crate::windows_usf::Error) -> u32 {
+    match error {
+        crate::windows_usf::Error::Protocol => INVALID_INPUT,
+        crate::windows_usf::Error::CountOverflow => COUNT_OVERFLOW,
+        crate::windows_usf::Error::NativeException(_) | crate::windows_usf::Error::Unresolved => {
+            UNRESOLVED_REFERENCE
+        }
+    }
+}
+#[cfg(windows)]
+type UsfGateCall = unsafe extern "C" fn();
+#[cfg(windows)]
+struct UsfAdmission {
+    enter: Option<UsfGateCall>,
+    leave: Option<UsfGateCall>,
+}
+#[cfg(windows)]
+impl UsfAdmission {
+    fn with<T>(
+        &self,
+        operation: impl for<'a> FnOnce(&'a mut Registry) -> Result<T, u32>,
+    ) -> Result<T, u32> {
+        struct Leave(Option<UsfGateCall>);
+        impl Drop for Leave {
+            fn drop(&mut self) {
+                if let Some(leave) = self.0 {
+                    // SAFETY: load's callback contract supplies a balanced same-thread
+                    // nonunwinding gate pair, retained only for this synchronous call.
+                    unsafe {
+                        leave();
+                    }
+                }
+            }
+        }
+        if let Some(enter) = self.enter {
+            // SAFETY: same callback contract. Enter happens before Rust admission;
+            // the guard is dropped before any system COM/CRT service is invoked.
+            unsafe {
+                enter();
+            }
+        }
+        let _leave = Leave(self.leave);
+        admitted(operation)
+    }
+}
+#[cfg(windows)]
+fn usf_windows_load(
+    id: u64,
+    kind: u32,
+    bytes: &[u8],
+    gate: &UsfAdmission,
+) -> Result<(bool, Option<i32>), u32> {
+    use crate::windows_usf::{Error, Input, Xml};
+    let result = (|| -> Result<Option<Xml>, Error> {
+        let input = match kind {
+            0 => Input::bytes(bytes)?,
+            1 => Some(Input::path(Some(&units(bytes)))?),
+            2 => Some(Input::path(None)?),
+            _ => return Err(Error::Protocol),
+        };
+        match input {
+            Some(input) => Xml::load(input),
+            None => Ok(None),
+        }
+    })();
+    let mut xml = match result {
+        Ok(Some(xml)) => xml,
+        Ok(None) => return Ok((false, None)),
+        Err(Error::NativeException(hr)) => return Ok((false, Some(hr))),
+        Err(error) => return Err(usf_windows_error(error)),
+    };
+    gate.with(|registry| {
+        if registry.usf_source_in_use(id) {
+            return Err(INVALID_INPUT);
+        }
+        registry
+            .usf_source_mut(id)
+            .map_err(registry_error)?
+            .begin()
+            .map_err(ass_error)
+    })?;
+    loop {
+        let request = gate.with(|registry| {
+            registry
+                .usf_source(id)
+                .map_err(registry_error)?
+                .service_request()
+                .map_err(ass_error)
+        })?;
+        if request.op == 11 {
+            return Ok((request.accepted, None));
+        }
+        // System COM/CRT work happens with no registry guard or model loan live.
+        let (value, text) = xml
+            .service(request.op, request.node, &request.text)
+            .map_err(usf_windows_error)?;
+        gate.with(|registry| {
+            registry
+                .usf_source_mut(id)
+                .map_err(registry_error)?
+                .step(request.op, value, &text)
+                .map_err(ass_error)
+        })?;
+    }
+}
+/// # Safety
+/// Windows-only synchronous MSXML loading. Kind0 copies initialized byte input,
+/// kind1 copies raw UTF-16 path bytes, kind2 is the original null-path case and
+/// requires length0. Oversized byte lengths (>ULONG_MAX) are refused without
+/// reading input, matching Read(bytes). Twelve writable output bytes receive
+/// accepted/throw-HRESULT/HRESULT:i32. No COM object or pointer escapes the call.
+/// Gate callbacks must be both absent (nonblocking direct caller) or a valid
+/// nonunwinding, same-thread enter/leave pair. They surround only individual
+/// registry acquisitions, never COM/CRT calls, and are not retained after return.
+#[cfg(windows)]
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_usf_source_load_v1(
+    id: u64,
+    kind: u32,
+    input: *const u8,
+    length: usize,
+    output: *mut u8,
+    capacity: usize,
+    enter: Option<UsfGateCall>,
+    leave: Option<UsfGateCall>,
+) -> u32 {
+    required!(output_capacity(output, capacity, 12));
+    if kind > 2
+        || kind == 1 && length % 2 != 0
+        || kind == 2 && length != 0
+        || enter.is_some() != leave.is_some()
+    {
+        return INVALID_INPUT;
+    }
+    let gate = UsfAdmission { enter, leave };
+    let oversized = kind == 0 && length > u32::MAX as usize;
+    // SAFETY: bounded caller bytes copied before registry admission or external
+    // calls. The original oversized-byte rejection does not touch the pointer.
+    let bytes = if oversized {
+        Vec::new()
+    } else {
+        required!(unsafe { copy_input(input, length) })
+    };
+    required!(gate.with(|registry| {
+        let source = registry.usf_source(id).map_err(registry_error)?;
+        if !source.ready() || registry.usf_source_in_use(id) {
+            return Err(INVALID_INPUT);
+        }
+        Ok(())
+    }));
+    let (accepted, exception) = if oversized {
+        (false, None)
+    } else {
+        required!(usf_windows_load(id, kind, &bytes, &gate))
+    };
+    let mut reply = [0u8; 12];
+    reply[..4].copy_from_slice(&u32::from(accepted).to_le_bytes());
+    reply[4..8].copy_from_slice(&u32::from(exception.is_some()).to_le_bytes());
+    reply[8..].copy_from_slice(&exception.unwrap_or(0).to_le_bytes());
+    // SAFETY: preflighted output; every registry loan and local COM owner has
+    // ended. Staged output may overlap caller input without affecting loading.
+    unsafe { write_output(output, &reply) };
+    OK
+}
+
 /// # Safety
 /// Eight writable bytes receive a standalone typed USF source ID.
 #[no_mangle]
@@ -5481,6 +5647,159 @@ mod tests {
             assert_eq!(read_snapshot(scalar_request), request);
             assert_eq!(xy_vsfilter_document_snapshot_drop_v1(scalar_result), OK);
             assert_eq!(xy_vsfilter_document_snapshot_drop_v1(scalar_request), OK);
+            #[cfg(windows)]
+            {
+                use core::sync::atomic::{AtomicUsize, Ordering};
+                static ENTERS: AtomicUsize = AtomicUsize::new(0);
+                static LEAVES: AtomicUsize = AtomicUsize::new(0);
+                unsafe extern "C" fn enter() {
+                    ENTERS.fetch_add(1, Ordering::SeqCst);
+                }
+                unsafe extern "C" fn leave() {
+                    LEAVES.fetch_add(1, Ordering::SeqCst);
+                }
+                let _apartment = crate::windows_usf::TestApartment::sta();
+                assert_eq!(
+                    xy_vsfilter_document_usf_source_create_v1(out.as_mut_ptr(), 8),
+                    OK
+                );
+                let source = u64::from_le_bytes(out[..8].try_into().unwrap());
+                let mut xml = b"<USFSubtitles><metadata><language>Loaded</language></metadata></USFSubtitles>".to_vec();
+                out.fill(0xa5);
+                for (kind, length, capacity) in
+                    [(0, xml.len(), 11), (3, 0, 12), (1, 1, 12), (2, 1, 12)]
+                {
+                    assert_eq!(
+                        xy_vsfilter_document_usf_source_load_v1(
+                            source,
+                            kind,
+                            xml.as_ptr(),
+                            length,
+                            out.as_mut_ptr(),
+                            capacity,
+                            None,
+                            None
+                        ),
+                        INVALID_INPUT
+                    );
+                    assert!(out.iter().all(|&b| b == 0xa5));
+                }
+                assert_eq!(
+                    xy_vsfilter_document_usf_source_load_v1(
+                        source,
+                        0,
+                        xml.as_ptr(),
+                        xml.len(),
+                        out.as_mut_ptr(),
+                        12,
+                        Some(enter),
+                        None
+                    ),
+                    INVALID_INPUT
+                );
+                DOCUMENTS
+                    .try_with(|_| {
+                        assert_eq!(
+                            xy_vsfilter_document_usf_source_load_v1(
+                                source,
+                                0,
+                                xml.as_ptr(),
+                                xml.len(),
+                                out.as_mut_ptr(),
+                                12,
+                                Some(enter),
+                                Some(leave)
+                            ),
+                            BUSY
+                        );
+                    })
+                    .unwrap();
+                assert!(out.iter().all(|&b| b == 0xa5));
+                assert_eq!(ENTERS.load(Ordering::SeqCst), LEAVES.load(Ordering::SeqCst));
+                // Input is copied before the overlapping output is written.
+                assert_eq!(
+                    xy_vsfilter_document_usf_source_load_v1(
+                        source,
+                        0,
+                        xml.as_ptr(),
+                        xml.len(),
+                        xml.as_mut_ptr(),
+                        12,
+                        Some(enter),
+                        Some(leave)
+                    ),
+                    OK
+                );
+                assert_eq!(&xml[..12], &[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+                assert!(ENTERS.load(Ordering::SeqCst) > 3);
+                assert_eq!(ENTERS.load(Ordering::SeqCst), LEAVES.load(Ordering::SeqCst));
+                assert_eq!(
+                    xy_vsfilter_document_usf_source_part_v1(source, 1, out.as_mut_ptr(), 8),
+                    OK
+                );
+                let snapshot = u64::from_le_bytes(out[..8].try_into().unwrap());
+                let saved = read_snapshot(snapshot);
+                let malformed = b"<USFSubtitles>";
+                for (kind, input, length) in [
+                    (0, malformed.as_ptr(), malformed.len()),
+                    (2, ptr::null(), 0),
+                ] {
+                    out.fill(0xa5);
+                    assert_eq!(
+                        xy_vsfilter_document_usf_source_load_v1(
+                            source,
+                            kind,
+                            input,
+                            length,
+                            out.as_mut_ptr(),
+                            12,
+                            None,
+                            None
+                        ),
+                        OK
+                    );
+                    assert_eq!(&out[..12], &[0; 12]);
+                    assert_eq!(
+                        xy_vsfilter_document_usf_source_part_v1(source, 1, out.as_mut_ptr(), 8),
+                        OK
+                    );
+                    let after = u64::from_le_bytes(out[..8].try_into().unwrap());
+                    assert_eq!(read_snapshot(after), saved);
+                    assert_eq!(xy_vsfilter_document_snapshot_drop_v1(after), OK);
+                }
+                #[cfg(target_pointer_width = "64")]
+                assert_eq!(
+                    xy_vsfilter_document_usf_source_load_v1(
+                        source,
+                        0,
+                        ptr::null(),
+                        u32::MAX as usize + 1,
+                        out.as_mut_ptr(),
+                        12,
+                        None,
+                        None
+                    ),
+                    OK
+                );
+                assert_eq!(xy_vsfilter_document_usf_source_drop_v1(source), OK);
+                out.fill(0xa5);
+                assert_eq!(
+                    xy_vsfilter_document_usf_source_load_v1(
+                        source,
+                        2,
+                        ptr::null(),
+                        0,
+                        out.as_mut_ptr(),
+                        12,
+                        None,
+                        None
+                    ),
+                    BAD_HANDLE
+                );
+                assert!(out.iter().all(|&b| b == 0xa5));
+                assert_eq!(read_snapshot(snapshot), saved);
+                assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
+            }
             // WebVTT: copies, phase errors, typed IDs, BUSY, and detached snapshots.
             let vtt_owner = create();
             out.fill(0xa5);

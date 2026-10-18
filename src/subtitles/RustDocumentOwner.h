@@ -944,17 +944,21 @@ public:
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_usf_source_create_v1(out.data(),out.size());}));id_=DocumentDetail::Load(out,0,8);}
     UsfSource(const UsfSource&)=delete;UsfSource& operator=(const UsfSource&)=delete;
     ~UsfSource() noexcept {if(id_){const auto id=id_;id_=0;DocumentDetail::Release(DocumentDetail::Invoke([&]{return xy_vsfilter_document_usf_source_drop_v1(id);}));}}
-    void Begin() {DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_usf_source_begin_v1(id_);}));}
-    void Step(unsigned op,int value,const CStringW& text=CStringW()) {
-        const auto bytes=DocumentDetail::Units(text);
-        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_usf_source_step_v1(id_,op,value,bytes.data(),bytes.size());}));
+    bool Read(unsigned kind,const uint8_t* input,size_t length) {
+        std::array<uint8_t,12> out{};
+        // Rust enters this same native gate only for individual registry calls.
+        // The system COM loader and all getters run with the gate released.
+        DocumentDetail::Check(xy_vsfilter_document_usf_source_load_v1(id_,kind,input,length,out.data(),out.size(),
+            [](){DocumentDetail::SharedGate().Enter();},[](){DocumentDetail::SharedGate().Leave();}));
+        const auto accepted=DocumentDetail::Load(out,0,4),throws=DocumentDetail::Load(out,4,4);
+        DocumentDetail::Shape(accepted<=1 && throws<=1);
+        if(throws)AtlThrow(DocumentDetail::I32(DocumentDetail::Load(out,8,4)));
+        return accepted!=0;
     }
-    unsigned Next(unsigned& node,bool& accepted,CStringW& text) const {
-        const auto bytes=Part(0);DocumentDetail::Shape(bytes.size()>=16);
-        const auto op=DocumentDetail::Load(bytes,0,4);DocumentDetail::Shape(op>=1 && op<=11);
-        node=DocumentDetail::Count(DocumentDetail::Load(bytes,4,4));accepted=DocumentDetail::Load(bytes,8,4)!=0;
-        size_t offset=16;text=DocumentDetail::String(bytes,offset,DocumentDetail::Count(DocumentDetail::Load(bytes,12,4)));
-        DocumentDetail::Shape(offset==bytes.size());return static_cast<unsigned>(op);
+    bool ReadBytes(const BYTE* input,size_t length) {return Read(0,input,length);}
+    bool ReadPath(LPCTSTR path) {
+        if(path==NULL)return Read(2,NULL,0);
+        const auto bytes=DocumentDetail::Units(CStringW(path));return Read(1,bytes.data(),bytes.size());
     }
     DocumentDetail::Bytes ParsedState() const {return Part(1);}
 };

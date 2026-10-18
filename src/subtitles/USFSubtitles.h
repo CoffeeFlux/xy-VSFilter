@@ -47,10 +47,10 @@ typedef struct {int start, stop; CStringW effect, style, str; posattriblist_t pa
 
 class CUSFSubtitles
 {
-	bool Load(const VARIANT& source);
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     std::unique_ptr<XyRust::UsfSource> m_source;
 #else
+	bool Load(const VARIANT& source);
 	bool ParseUSFSubtitles(CComPtr<IXMLDOMNode> pNode);
 	 void ParseMetadata(CComPtr<IXMLDOMNode> pNode, metadata_t& m);
 	 void ParseStyle(CComPtr<IXMLDOMNode> pNode, style_t* s);
