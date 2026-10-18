@@ -27,7 +27,46 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: MicroDVD parser ownership (2026-10-18)
+## Current port: SAMI parser ownership (2026-10-18)
+
+The experimental document path now owns SAMI's discovery/rewind sequence, saved
+file position, raw input and uppercase copies, comment/caption state, timestamp
+scan and final-emission decisions in safe Rust. This replaces the active parser's
+raw SamiFile owner and per-unit output queries with a checked document-bound
+session. Native ReadString/Seek, CString predicates/case mapping, iswdigit,
+SMI2SSA and Add remain transitional services outside registry loans.
+
+The port preserves discovery's extra read before rewind, discarded EOF fragments,
+same-line title/comment suppression and caption concatenation without newlines.
+Timestamp scanning begins at absolute code-unit 12, regardless of where the sync
+tag was found; letters are skipped, uppercase M stops the scan and i32 overflow
+wraps. Final emission ends at LONGLONG_MAX, and recognized SAMI succeeds even when
+no caption survives Add.
+
+Candidate `054c1463` (production implementation `76658111`) passes fresh cleanup
+`67da07cd` comparisons on **each** Windows architecture (x86 and x64):
+
+* 2,836 direct SAMI cases and 26,992 identical trace lines, repeated twice for
+  reference and candidate. Checkpoint `8f04fe70` established the same probe before
+  implementation changes, including nonzero starting positions.
+* All 914 rendering cases and 9,866 frames, with 92 distinct-frame controls.
+  The 20 added file/memory cases contribute 280 frames and four controls.
+* Regression probes for 5,692 text-parser, 4,588 MicroDVD, 3,266 ASS and 1,242
+  XombieSub cases; 3,693 linked lifecycle trace lines; nine reference/native/
+  experimental compile probes; all three DLLs' exports/dependencies; and 10
+  scoped COM cases plus two candidate pin-ID controls.
+* 279 safe-core and 123 FFI tests, formatting and Clippy per architecture;
+  154 Python harness tests with one skip. The six checked SAMI entry points add
+  four unsafe marshalling functions and five unsafe blocks, with no new raw-slice
+  constructors or Rust owners of native pointers. The core forbids unsafe code.
+
+See the [source/boundary inventory](rust-sami-parser-inventory.json) and
+[local evidence manifest](rust-sami-parser-local-evidence.json). Per-read I/O
+failures and real host integration are not established by these probes. No
+production switch or format closure is claimed. The raw fallback, remaining
+parsers, renderer, hosts and vendored code remain in the full Rust migration scope.
+
+## Previous port: MicroDVD parser ownership (2026-10-18)
 
 The experimental document path now owns MicroDVD's raw line/current style name,
 charset, scan/recovery decisions, frame arithmetic, EOF acceptance and provisional

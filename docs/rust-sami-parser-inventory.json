@@ -1,0 +1,122 @@
+{
+  "schema": 1,
+  "candidate_commit": "054c14632939771650108c0b398f8b8ebc2563f3",
+  "implementation_commit": "76658111440dedb0b874b3ee3c0eb2662cae2ed6",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "Owned SAMI format discovery, rewind and caption lifecycle in the experimental document path. Full library Rust migration remains active.",
+  "production_sources": {
+    "rust/compat/src/sami_document.rs": "a61fff325c55e98b219c54d29e475bc3ce553cc27dc5414af4d660b028ffd146",
+    "rust/compat/src/sami_file.rs": "8bf9e1e75a536b35f48a13525103aeaa71809f79a58462fea33f4bbbf6b6aff4",
+    "rust/compat/src/lib.rs": "d24b231cb126970462e8ff7c01c7dcfc7035283ad156322ef8aff8fcb728ffd4",
+    "rust/ffi/src/document.rs": "dbc20b93e583799e5ecf4d9e73c49d5275e556c75030c1ecb9cc75a65842ae66",
+    "rust/ffi/src/document_registry.rs": "ec13f062374179e7fd14046d79fee111bca021f8ec375df72a860fd967e0639f",
+    "include/xy_rust_document.h": "f721bea8373f7fe5e3780ac3fb2f9a3f1d9abcfd7283598e80de5ea2430d3fdc",
+    "src/subtitles/RustDocumentOwner.h": "3330d7261d63fc9006eb0926a4a9e40a45f61f4dc75efe49b4d50509292c6505",
+    "src/subtitles/STS.cpp": "566933650f7e57f9f69e7c9e53c90fe4fbaf9b3834fa077ba4f2754bb043a31e",
+    "src/subtitles/STS.h": "8a14e6016e986139845b9fa94445ed0c6914eff9f97539d604ed63be9225e437"
+  },
+  "reference_sources": {
+    "src/subtitles/STS.cpp": "2616b67db84f7329ac6e2363a3f03d61977fa07c37ed9c04d32ec2b1197f31e0",
+    "src/subtitles/TextFile.cpp": "71c00071f9ceb466c539fda26103a4a94b802a4a01f4b807852e159563772f2f",
+    "src/dsutil/text.h": "92efdac94644006b4559d868631c27c841811327af9eedc408b817631e09d249"
+  },
+  "operations": [
+    {
+      "operation": "Discovery, input, caption and timestamp lifecycle",
+      "source": {
+        "path": "rust/compat/src/sami_document.rs",
+        "line": 23,
+        "sha256": "a61fff325c55e98b219c54d29e475bc3ce553cc27dc5414af4d660b028ffd146"
+      },
+      "behavior": "Rust owns the captured file position, detection/read/rewind phases, raw trimmed lines and uppercase copies, comment state, caption accumulation and timestamp scan index/arithmetic. Discovery reads one extra line after finding SAMI because ReadString is the left operand of the native while condition. EOF fragments are discarded. Timestamp scanning begins at absolute code-unit12, stops at > or uppercase M, and performs wrapping i32 arithmetic using supplied iswdigit decisions. Caption append stops at source NUL and inserts no newlines. Final Add uses i64::MAX and successful return does not require a nonempty document."
+    },
+    {
+      "operation": "Safe shared SAMI comment state",
+      "source": {
+        "path": "rust/compat/src/sami_file.rs",
+        "line": 6,
+        "sha256": "8bf9e1e75a536b35f48a13525103aeaa71809f79a58462fea33f4bbbf6b6aff4"
+      },
+      "behavior": "The checked session reuses File caption/comment logic. Classification can be inspected without mutation to preflight bounded caption growth. Existing raw fallback begin behavior is preserved; title/comment opening and closing on the same line still suppress the entire line."
+    },
+    {
+      "operation": "Native services and active-path boundary retirement",
+      "source": {
+        "path": "src/subtitles/STS.cpp",
+        "line": 1978,
+        "sha256": "566933650f7e57f9f69e7c9e53c90fe4fbaf9b3834fa077ba4f2754bb043a31e"
+      },
+      "behavior": "Experimental OpenSami delegates all parser state to the checked session. The native service loop supplies GetPosition/ReadString/Seek, CString whitespace/uppercase, one iswdigit result per requested unit, SMI2SSA and Add outside registry loans. It replaces the raw SamiFile pointer and per-code-unit output queries on this path. The older raw adapter remains reachable in the native-document fallback and is not claimed removed from the repository."
+    }
+  ],
+  "boundary_review": {
+    "source": {
+      "path": "rust/ffi/src/document.rs",
+      "line": 276,
+      "sha256": "dbc20b93e583799e5ecf4d9e73c49d5275e556c75030c1ecb9cc75a65842ae66"
+    },
+    "registry": {
+      "path": "rust/ffi/src/document_registry.rs",
+      "line": 459,
+      "sha256": "ec13f062374179e7fd14046d79fee111bca021f8ec375df72a860fd967e0639f"
+    },
+    "exports": [
+      "xy_vsfilter_document_sami_begin_v1",
+      "xy_vsfilter_document_sami_read_v1",
+      "xy_vsfilter_document_sami_upper_v1",
+      "xy_vsfilter_document_sami_step_v1",
+      "xy_vsfilter_document_sami_part_v1",
+      "xy_vsfilter_document_sami_drop_v1"
+    ],
+    "contract": "Typed never-reused document-bound IDs under nonblocking registry admission. Raw UTF16LE, whitespace predicates and uppercase copies are copied before borrowing state. Predicate booleans, lengths, uppercased counted length, command values and phase transitions are checked. Output capacities precede handle publication. Rewind/digit/Add replies use scalars only. Snapshots are immutable, own all bytes and survive parent/session destruction. No native file, buffer or callback pointer is retained.",
+    "unsafe_delta": {
+      "extern_unsafe_functions": 4,
+      "unsafe_blocks": 5,
+      "raw_slice_constructors": 0,
+      "rust_native_pointer_owners": 0
+    },
+    "tests": "Invalid flags, shapes, phase/counts, wrong/stale IDs, BUSY, output preflight, copied lines, native uppercase results, extra discovery read, scalar digit replies and snapshot lifetime are covered in safe-core tests and the serialized registry test."
+  },
+  "direct_probe": {
+    "source": {
+      "path": "tools/compat/sami_document_native.cpp",
+      "line": 7,
+      "sha256": "92f07d0abbd6b1df50bb368f7f3c8bf1c67fc1ab9291ff461ca0c025e400056b"
+    },
+    "cases": 2836,
+    "trace_lines": 26992,
+    "baseline": {
+      "commit": "8f04fe70a7c18dbf28753f09569a94d45f3edc26",
+      "cases": 2836,
+      "trace_lines": 26992
+    },
+    "method": "Actual selected STS.cpp implementations with initialized document observer. Two reference and two candidate executions compare outcomes, complete document state and final byte position. Empty/preloaded documents, nonzero initial seek position, marker casing/placement, missing markers, comment/title ordering, absolute-column scans, overflowing and non-ASCII digits, ANSI/DBCS, raw units and false-read fragments are included. Per-read I/O failure injection remains outside this direct probe."
+  },
+  "rendering": {
+    "generator": {
+      "path": "tools/compat/make_corpus.py",
+      "line": 811,
+      "sha256": "bc042b680bb7de19b1fc081caa8595fd33b19ae3efca2ad98676080c7f8dfb92"
+    },
+    "new_files": 10,
+    "new_cases": 20,
+    "new_frames": 280,
+    "new_distinct_controls": 4,
+    "behavior": "File/memory opens, exact millisecond boundaries, repeated/reverse seeks, title-line suppression, absolute-column timestamp behavior, wrapping timestamps, letters inside numbers, comment closes, discarded final fragments, inline discovery marker, NUL and DBCS. Title-skip/control and fixed-column/control images must differ."
+  },
+  "limits": [
+    "No production default switch, format closure, real player/Aegisub graph integration or library completion.",
+    "Native file, CString locale/case, digit classification, SMI2SSA markup/font conversion and Add adapters remain transitional.",
+    "Finite local MSVC14.44 Windows evidence. File I/O failures, pre-Open native simplicity and allocation failure/reentry remain unresolved.",
+    "No new non-Windows/Miri/default native-document runtime parity; default paths have compile evidence only.",
+    "No crash, hang or nondeterministic reference outcome is treated as equality. Existing raw fallback adapters remain in the final migration scope."
+  ],
+  "next_work": [
+    "Continue moving the remaining text-format parser control and ownership into safe Rust.",
+    "Replace native numeric, encoding, formatting and file adapters with audited system boundaries and safe policy.",
+    "Continue complete rendering, public host/ABI and vendored native replacement; retire fallback/raw adapters as callers move."
+  ]
+}

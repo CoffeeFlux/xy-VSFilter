@@ -1,0 +1,481 @@
+{
+  "schema": 1,
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "candidate_commit": "054c14632939771650108c0b398f8b8ebc2563f3",
+  "implementation_commit": "76658111440dedb0b874b3ee3c0eb2662cae2ed6",
+  "prior_increment": "d19f27e0",
+  "configuration": {
+    "native": "Release, RustTextDecoder=true, RustDocumentOwnerExperimental=true",
+    "rust": "1.85.0; native-runtime with +crt-static",
+    "msvc": "14.44.35207",
+    "sdk": "10.0.26100.0"
+  },
+  "scope": "SAMI owned parser lifecycles and malformed-input controls; no format, frontend, host or library closure.",
+  "architectures": {
+    "x64": {
+      "corpus": {
+        "report": "artifacts/sami-csri-x64/summary.json",
+        "sha256": "893f4ae124b536cc064d660172ae53880016b4126dee66f706045c770d575be5",
+        "complete": true,
+        "frames": 9866,
+        "distinct_controls": 92,
+        "partition_exact": true,
+        "shards": [
+          {
+            "report": "artifacts/sami-csri-x64/shard-0/report.json",
+            "sha256": "de47eaff5abf97a4bf9781560ea516adfc9ff8d89e17392d57157770ef89b881",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1246,
+            "cases": 115
+          },
+          {
+            "report": "artifacts/sami-csri-x64/shard-1/report.json",
+            "sha256": "af676ed353bd82f525f170a9bcf127c71edef379e311b26f3f048d13ef5ee468",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1246,
+            "cases": 115
+          },
+          {
+            "report": "artifacts/sami-csri-x64/shard-2/report.json",
+            "sha256": "ecbf6abbe66ed709d4ed05e5509a6ace6ab9222ea8c5618d89423dc6bf07f615",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1195,
+            "cases": 114
+          },
+          {
+            "report": "artifacts/sami-csri-x64/shard-3/report.json",
+            "sha256": "87bfa55c617e0752a1442ba25fa171fd9173feb62dba1c89b46a77999671cac3",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1195,
+            "cases": 114
+          },
+          {
+            "report": "artifacts/sami-csri-x64/shard-4/report.json",
+            "sha256": "67327a1c79ad9b24ea72b394ba3aaed4650dbf3fda4e61c59f1468b55a3bda66",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1234,
+            "cases": 114
+          },
+          {
+            "report": "artifacts/sami-csri-x64/shard-5/report.json",
+            "sha256": "962ccab29ade0f74004dff5470f52d9f3a6e5030805e30524d885ffaffeb9137",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1234,
+            "cases": 114
+          },
+          {
+            "report": "artifacts/sami-csri-x64/shard-6/report.json",
+            "sha256": "61d10da1d706e6eee2fa894804fdd74dda86df6e5d2351a6a4e3f675f59c0631",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1258,
+            "cases": 114
+          },
+          {
+            "report": "artifacts/sami-csri-x64/shard-7/report.json",
+            "sha256": "a5972f1f847e957e8bb853f364c928e385f946de88e6d843b12fee8195cbbf90",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1258,
+            "cases": 114
+          }
+        ],
+        "cases": 914,
+        "rendered_frames": 9866,
+        "source_manifest_sha256": "e139720102f980849e3eb692a2efc1eb91f066db25e40102a5ea8a18c38a053b",
+        "partition_driver_sha256": "9a1f8a56ca2d8dc7be29a24df0633db5b6346a707864b2beaae700c65ae19b18"
+      },
+      "new_rendering": {
+        "report": "artifacts/sami-new-x64/report.json",
+        "sha256": "5e53289a1c597c2beef8991c750dbf700e1debb3abfc663b6f54f570a66a1cee",
+        "complete": true,
+        "passed": true,
+        "rendered_frames": 280,
+        "cases": 20
+      },
+      "parser": {
+        "report": "artifacts/sami-final-probe-x64/report.json",
+        "sha256": "9fe351badeaa4b629b038ddf3dfa0b2a72fcf9dc7125f80e7b363b1556144389",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "054c14632939771650108c0b398f8b8ebc2563f3",
+        "trace_lines": 26992,
+        "inputs_unchanged": true,
+        "cases": 2836
+      },
+      "baseline_parser": {
+        "report": "artifacts/sami-baseline-x64/report.json",
+        "sha256": "fe0e7ebdebb9ee660673bb290508927d12b4f6787125ffa79b7baccb4f6c7158",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "8f04fe70a7c18dbf28753f09569a94d45f3edc26",
+        "trace_lines": 26992,
+        "inputs_unchanged": true,
+        "cases": 2836
+      },
+      "baseline_prefix_preserved": true,
+      "text_regression": {
+        "report": "artifacts/sami-text-regression-x64/report.json",
+        "sha256": "4603ba559056cb0d7cdaf9297df19e1f8e0cc94d397a42eee3824900d1b3f553",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "054c14632939771650108c0b398f8b8ebc2563f3",
+        "trace_lines": 44404,
+        "inputs_unchanged": true,
+        "cases": 5692
+      },
+      "microdvd_regression": {
+        "report": "artifacts/sami-microdvd-regression-x64/report.json",
+        "sha256": "98f35702aac2fdd0efda156e62c3edb4ca415266e9a49e90501e85ef132e4d8e",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "054c14632939771650108c0b398f8b8ebc2563f3",
+        "trace_lines": 41491,
+        "inputs_unchanged": true,
+        "cases": 4588
+      },
+      "ass_regression": {
+        "report": "artifacts/sami-ass-probe-x64/report.json",
+        "sha256": "8826262c019fe09f753aa35a5e57002c04306adac5f1eaff6b91c5a0a431d313",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "054c14632939771650108c0b398f8b8ebc2563f3",
+        "trace_lines": 22286,
+        "inputs_unchanged": true,
+        "cases": 3266
+      },
+      "xombie_regression": {
+        "report": "artifacts/sami-xombie-probe-x64/report.json",
+        "sha256": "f8049ddce938ccb6065c122e461a546207b29b7f9a284c93f47365353c6c1e69",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "054c14632939771650108c0b398f8b8ebc2563f3",
+        "trace_lines": 10441,
+        "inputs_unchanged": true,
+        "cases": 1242
+      },
+      "lifecycle": {
+        "report": "artifacts/sami-lifecycle-x64/report.json",
+        "sha256": "89da561e1f27e9dba38b2ad9c1e051f936c0b2c0f8fa4e304cfa1101fb2c6b01",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "054c14632939771650108c0b398f8b8ebc2563f3",
+        "trace_lines": 3693,
+        "inputs_unchanged": true
+      },
+      "compile": {
+        "report": "artifacts/sami-compile-x64/report.json",
+        "sha256": "043972284a5534bce2103fac93cc9e0c8be516d521689c3bc7ad61c06c484f8c",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "054c14632939771650108c0b398f8b8ebc2563f3",
+        "inputs_unchanged": true,
+        "scope": "Compile-only actual style helper/lifecycle sources and headers; no link, execution or parity claim"
+      },
+      "com": {
+        "report": "artifacts/sami-contracts-x64/com/report.json",
+        "sha256": "48b4e3e06aff20898b37d2cfef126351cf4f19644eea81c2bee8fe05e62fbea7",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "054c14632939771650108c0b398f8b8ebc2563f3",
+        "inputs_unchanged": true,
+        "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "2d254068a40e5f59cf191c3c6bbfc984b548193b668c4decac21dc1e94e02169",
+          "candidate_sha256": "f0d4e046b517d22c446a8802d072ccf23465b75c532e0c74c800ab9e4e62cddd",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "858b557df4643353cc2b7f7a4faf24fb20fc571f39dc8929949a8b9d80276024"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "32b7c2cd6eb817120414db53b3c3005e719ae4b993c4a69d0d66c7f6ac363d5a",
+          "candidate_sha256": "2cb4f70378471595b00d860c8254391bb06ee98ed3d19f04e632bdeb6cc8234e",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "09623cbd08a08a70ca726d32f1ac7a80358fe93589dfe22d814f7c9544f6d751"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "f1165742064181b7fb73bacb16017d8e202c8bb0be90ed8c2eb812ac282c2df8",
+          "candidate_sha256": "850de84fa8ae232501d93004c838e0992349c1e1423caea9a2db41b0ce628412",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "b0b48a3cf2bf2ecbbac4ecca863a815ab4a0c1137277a9b7d5830d9d1beca5c9"
+        }
+      }
+    },
+    "x86": {
+      "corpus": {
+        "report": "artifacts/sami-csri-x86/summary.json",
+        "sha256": "bafd37d0593462b0ba077961441f70638de255053631ced2a36d8bdbbcd35da4",
+        "complete": true,
+        "frames": 9866,
+        "distinct_controls": 92,
+        "partition_exact": true,
+        "shards": [
+          {
+            "report": "artifacts/sami-csri-x86/shard-0/report.json",
+            "sha256": "f2b2e121fbd2d88afe506e65241dcf1a856e90421e55ba4c34c0db864a5859ae",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1246,
+            "cases": 115
+          },
+          {
+            "report": "artifacts/sami-csri-x86/shard-1/report.json",
+            "sha256": "1cba206d94b13814e040a1e123685e9c7082e9ee6b45a7db11aea30cb61d4abf",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1246,
+            "cases": 115
+          },
+          {
+            "report": "artifacts/sami-csri-x86/shard-2/report.json",
+            "sha256": "dc0eb4217a2f07c95e9003d8e623755c11ec63ebce87ffa567b3d8c42fc1d387",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1195,
+            "cases": 114
+          },
+          {
+            "report": "artifacts/sami-csri-x86/shard-3/report.json",
+            "sha256": "fa73d3d507cf6e9096e02edc7807893d4f9fc5cb619653617001413953920ec0",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1195,
+            "cases": 114
+          },
+          {
+            "report": "artifacts/sami-csri-x86/shard-4/report.json",
+            "sha256": "0b9bdf79a9c67349f86aed95633619ac7c472368a5c0139ff28d58912fcbe8d2",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1234,
+            "cases": 114
+          },
+          {
+            "report": "artifacts/sami-csri-x86/shard-5/report.json",
+            "sha256": "9081045cceecfa73583e41ad31d8ad6a5640c4d93be7581a6bb48eac1a950fc9",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1234,
+            "cases": 114
+          },
+          {
+            "report": "artifacts/sami-csri-x86/shard-6/report.json",
+            "sha256": "652344f2e9c80272ac3ee06fb5637e2865ddc8611567e3108f421225712b6d25",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1258,
+            "cases": 114
+          },
+          {
+            "report": "artifacts/sami-csri-x86/shard-7/report.json",
+            "sha256": "bfdbaa6cdda978a097773fc3db91e72aefd4acf6b79b38f03cd0712cbd231720",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1258,
+            "cases": 114
+          }
+        ],
+        "cases": 914,
+        "rendered_frames": 9866,
+        "source_manifest_sha256": "e139720102f980849e3eb692a2efc1eb91f066db25e40102a5ea8a18c38a053b",
+        "partition_driver_sha256": "9a1f8a56ca2d8dc7be29a24df0633db5b6346a707864b2beaae700c65ae19b18"
+      },
+      "new_rendering": {
+        "report": "artifacts/sami-new-x86/report.json",
+        "sha256": "7c98cd06b276620edf592634c67554f2cc4a7e32670313f10ba3fd68b39310ac",
+        "complete": true,
+        "passed": true,
+        "rendered_frames": 280,
+        "cases": 20
+      },
+      "parser": {
+        "report": "artifacts/sami-final-probe-x86/report.json",
+        "sha256": "3d6d996dfa954c3aebd8ce68a9dedba404e11faadf6d31977984e62b1641810a",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "054c14632939771650108c0b398f8b8ebc2563f3",
+        "trace_lines": 26992,
+        "inputs_unchanged": true,
+        "cases": 2836
+      },
+      "baseline_parser": {
+        "report": "artifacts/sami-baseline-x86/report.json",
+        "sha256": "0bb84e15a4e8cb26fd4c61519e30ee4e065a3a8b552a11ffdea34e40eb08ee0a",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "8f04fe70a7c18dbf28753f09569a94d45f3edc26",
+        "trace_lines": 26992,
+        "inputs_unchanged": true,
+        "cases": 2836
+      },
+      "baseline_prefix_preserved": true,
+      "text_regression": {
+        "report": "artifacts/sami-text-regression-x86/report.json",
+        "sha256": "4758bcbad57c92e5ca3f289e2fe126a53ca471aa8d821b4005789a68ca5688ee",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "054c14632939771650108c0b398f8b8ebc2563f3",
+        "trace_lines": 44404,
+        "inputs_unchanged": true,
+        "cases": 5692
+      },
+      "microdvd_regression": {
+        "report": "artifacts/sami-microdvd-regression-x86/report.json",
+        "sha256": "a870275b67a3b4448047731f01bf3b8f35c940de55bcb8b1f05e2dc0c0822775",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "054c14632939771650108c0b398f8b8ebc2563f3",
+        "trace_lines": 41491,
+        "inputs_unchanged": true,
+        "cases": 4588
+      },
+      "ass_regression": {
+        "report": "artifacts/sami-ass-probe-x86/report.json",
+        "sha256": "ddd8eadf72d0a4a48ca8c7801e43a960748de774070e615f82db9f8dc0f7a209",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "054c14632939771650108c0b398f8b8ebc2563f3",
+        "trace_lines": 22286,
+        "inputs_unchanged": true,
+        "cases": 3266
+      },
+      "xombie_regression": {
+        "report": "artifacts/sami-xombie-probe-x86/report.json",
+        "sha256": "9280e1306440523dde0ab5f57bbb75ea2a9d8b46d6a9c117954ca5e3266c2be8",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "054c14632939771650108c0b398f8b8ebc2563f3",
+        "trace_lines": 10441,
+        "inputs_unchanged": true,
+        "cases": 1242
+      },
+      "lifecycle": {
+        "report": "artifacts/sami-lifecycle-x86/report.json",
+        "sha256": "54dfd762bc548eef9e13e483fc61b1f84dd9b893ce025c4c58172cfd5f081ebb",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "054c14632939771650108c0b398f8b8ebc2563f3",
+        "trace_lines": 3693,
+        "inputs_unchanged": true
+      },
+      "compile": {
+        "report": "artifacts/sami-compile-x86/report.json",
+        "sha256": "7f37c162e09b2bba809d9cf464064644e5f213676462a5be2bb2bfd4a0e3bf92",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "054c14632939771650108c0b398f8b8ebc2563f3",
+        "inputs_unchanged": true,
+        "scope": "Compile-only actual style helper/lifecycle sources and headers; no link, execution or parity claim"
+      },
+      "com": {
+        "report": "artifacts/sami-contracts-x86/com/report.json",
+        "sha256": "bc5f2e15f35aed6ec6918a9017433e33f27b53e7c5118c371980815dc413b6c6",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "054c14632939771650108c0b398f8b8ebc2563f3",
+        "inputs_unchanged": true,
+        "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "69faa2d5f90f35fe4184e9e9bd892adb76fee60295701988f61ab7af0664d9eb",
+          "candidate_sha256": "a5e12d513462769a0af01354a31c3f06c91811cdbe7baadde63c46d05b3208de",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "dbd365316d54d5a3d590b63604fbbc5ea6849a912eb7660e52d8df4bdd6b2120"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "2c3b904d7f91902ef456e07b648c5d6351878318c235397eeb9b39eb3fffa34f",
+          "candidate_sha256": "5d4f5d7e8bfadda8e05b8da6c59448627e0299b1d832da73dcece620c6a97fd4",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "8821591e5f42e83c8361380a00b4869b748312f9374da70041ad829e381b6bbc"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "3e7c20a4d6c42457d92eb56c42e4fd9f3bddb93276f2c1cd28bfb73edd06484c",
+          "candidate_sha256": "25581ad6a1f2d254e46014f1e69f65fa699607232a6a20c7738fa3a521d68bf6",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "bee8a1d975859e0ab8a9b6843e14f813df818b8538e6501927e792bb180eb7c1"
+        }
+      }
+    }
+  },
+  "limits": [
+    "No production default switch, format closure, real player/Aegisub graph integration or library completion.",
+    "Native file, CString locale/case, digit classification, SMI2SSA markup/font conversion and Add adapters remain transitional.",
+    "Finite local MSVC14.44 Windows evidence. File I/O failures, pre-Open native simplicity and allocation failure/reentry remain unresolved.",
+    "No new non-Windows/Miri/default native-document runtime parity; default paths have compile evidence only.",
+    "No crash, hang or nondeterministic reference outcome is treated as equality. Existing raw fallback adapters remain in the final migration scope."
+  ],
+  "source_inventory": {
+    "path": "docs/rust-sami-parser-inventory.json",
+    "sha256": "6d72bc15b9beab636829db1f2597fe6c241342d075e4e9ad04e8f14c45409e17"
+  },
+  "unsafe_lexical_inventory": {
+    "report": "artifacts/sami-unsafe-inventory.json",
+    "sha256": "ffd491249288825983719901a9ee1cb401d512f2f11292ac1c3180043fc45bb4",
+    "safe_core_unsafe_sites": 0,
+    "limits": "Lexical inventory only, not a soundness proof."
+  },
+  "rust_tests": {
+    "core_per_architecture": 279,
+    "ffi_per_architecture": 123,
+    "fmt": true,
+    "clippy_all_targets": true,
+    "clippy_native_runtime": true,
+    "log": "artifacts/sami-checks.log",
+    "log_sha256": "27b9d72b5b60b5ac14e4fd4666622c927498a59d3d15eb0e6c0af2b6135f7024"
+  },
+  "python_harness_tests": {
+    "count": 154,
+    "skipped": 1,
+    "failures": 0,
+    "log": "artifacts/sami-harness.log",
+    "log_sha256": "db5d8051d6f5ff88bbbd98d85a62c08e9f58b4567c897551152945f7b566fac7",
+    "corpus_check_included": true
+  },
+  "build_logs": {
+    "artifacts/sami-build-x64.log": "1153102343083ad33c1002f0bb5135824819d07e2806a5f54904cb1a82202637",
+    "artifacts/sami-build-x86.log": "9ed04fb1bbf7de1202379d4fe510e9c469a7503070fa600405b3390954379090",
+    "artifacts/sami-build-rust-x64.log": "7f1d5eedff6498624735de8ce2ee419f7c06504b16d59fcb42234193eb157e42",
+    "artifacts/sami-build-rust-x86.log": "2db49e214d693be4c46fc74147c2a5a5add978dc2b19d86b02c6b650b6efdede"
+  }
+}
