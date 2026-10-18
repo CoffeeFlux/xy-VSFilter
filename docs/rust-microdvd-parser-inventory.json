@@ -1,0 +1,118 @@
+{
+  "schema": 1,
+  "candidate_commit": "75796d0550c1426807647f3e348348b8b1f2d794",
+  "implementation_commit": "b740d2a20db565bd96c1b15a0db5027d7d549125",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "Owned MicroDVD input, style selection and provisional timestamp lifecycle in the experimental document path. Full library migration remains active.",
+  "production_sources": {
+    "rust/compat/src/microdvd_document.rs": "b476fe28e843dab07c0c52b9f1ae0097c9ce4bf063760825ecfbd268a7d41d3b",
+    "rust/compat/src/lib.rs": "a7df74149b8956a6039c2595b697bd8fd7b491b02c3f8c8bbdac3f06eff2f0d8",
+    "rust/ffi/src/document.rs": "565b438df5c3b8506a29599a54e44f7e1b4b730aa6c095b2458d88ad83faa0e6",
+    "rust/ffi/src/document_registry.rs": "92406a739eec821ff04b51c54ac3fd0098b7972ece719f0f5f3c5c71ce4bf057",
+    "include/xy_rust_document.h": "0df49a1b10690c65ebb1403786847fefd0903767b7b39b8bd173c97508fbf3a6",
+    "src/subtitles/RustDocumentOwner.h": "08d84af4c99bb62a9940168de0012345fc9cd07c9cc113e0ca57ab1b6f090416",
+    "src/subtitles/STS.cpp": "77b95ca47c750df566294c9e184a80e1e62f1a711822e935074d4bacf6dee346",
+    "src/subtitles/STS.h": "1ad616dc8dc43c70ed73f442f219056ca40f77530647d541850ef336e9f9795b"
+  },
+  "reference_sources": {
+    "src/subtitles/STS.cpp": "2616b67db84f7329ac6e2363a3f03d61977fa07c37ed9c04d32ec2b1197f31e0",
+    "src/subtitles/TextFile.cpp": "71c00071f9ceb466c539fda26103a4a94b802a4a01f4b807852e159563772f2f",
+    "src/dsutil/text.h": "92efdac94644006b4559d868631c27c841811327af9eedc408b817631e09d249"
+  },
+  "operations": [
+    {
+      "operation": "Parser lifecycle and live document correction",
+      "source": {
+        "path": "rust/compat/src/microdvd_document.rs",
+        "line": 19,
+        "sha256": "b476fe28e843dab07c0c52b9f1ae0097c9ce4bf063760825ecfbd268a7d41d3b"
+      },
+      "behavior": "Rust owns raw lines, current/candidate style names, charset, primary/fallback scan decisions, end-correction flags, frame arithmetic, repeated-brace caption extraction and EOF acceptance. The fallback adds 60 with observed i32 wrapping before widening to reference ticks. Style declarations preserve the fallback flag: a later complete caption can become eligible for correction. Correction targets the last stored entry and can precede its start; it does not rebuild segments. An empty Add leaves pending correction active when no document entry exists."
+    },
+    {
+      "operation": "Initialized callbacks and style transfer",
+      "source": {
+        "path": "src/subtitles/STS.cpp",
+        "line": 1684,
+        "sha256": "77b95ca47c750df566294c9e184a80e1e62f1a711822e935074d4bacf6dee346"
+      },
+      "behavior": "ReadString/IsSpace, primary and fallback scanf, GetMicroDVDStyle, CString case mapping, MicroDVD2SSA and Add/AddStyle remain transitional services. Primary values cross only at count2; fallback start only at count1. The old unused uninitialized fallback end is never evaluated in Rust. Native style adapters use unique_ptr until transfer; charset is captured before AddStyle can retire the adapter. All callbacks occur outside registry loans."
+    }
+  ],
+  "boundary_review": {
+    "source": {
+      "path": "rust/ffi/src/document.rs",
+      "line": 275,
+      "sha256": "565b438df5c3b8506a29599a54e44f7e1b4b730aa6c095b2458d88ad83faa0e6"
+    },
+    "registry": {
+      "path": "rust/ffi/src/document_registry.rs",
+      "line": 419,
+      "sha256": "92406a739eec821ff04b51c54ac3fd0098b7972ece719f0f5f3c5c71ce4bf057"
+    },
+    "exports": [
+      "xy_vsfilter_document_microdvd_begin_v1",
+      "xy_vsfilter_document_microdvd_read_v1",
+      "xy_vsfilter_document_microdvd_step_v1",
+      "xy_vsfilter_document_microdvd_style_v1",
+      "xy_vsfilter_document_microdvd_part_v1",
+      "xy_vsfilter_document_microdvd_drop_v1"
+    ],
+    "contract": "Document-bound never-reused typed IDs under nonblocking registry admission. Constructor/part output capacities are checked before publication. Raw UTF16LE and predicates are copied before registry borrowing; strict booleans, lengths, command/count/phase and required zero scalars are checked. Primary/fallback/ack steps contain scalars only. Snapshots independently own both line and name results, survive run/parent destruction, and carry no native pointer. MicroDVD uses a separate safe session rather than extending unrelated parser phases.",
+    "unsafe_delta": {
+      "extern_unsafe_functions": 4,
+      "unsafe_blocks": 5,
+      "raw_slice_constructors": 0,
+      "native_pointer_owners": 0
+    },
+    "tests": "Malformed packet/phase/count/flag, wrong/stale IDs, BUSY, copied input, independent name/line snapshots and parent destruction; all in the existing serialized registry test."
+  },
+  "direct_probe": {
+    "source": {
+      "path": "tools/compat/microdvd_document_native.cpp",
+      "line": 7,
+      "sha256": "6b28073b49a275bb595f5482c0430313fb7483b3cec3823cabcc7a0e1e3a82b8"
+    },
+    "cases": 4588,
+    "trace_lines": 41491,
+    "baseline": {
+      "commit": "1c0c4cdadb23ea149b1e704896eb2576887b4726",
+      "cases": 4588,
+      "trace_lines": 41491
+    },
+    "method": "Actual STS.cpp and initialized document observer; both empty and preloaded documents, repeated reference/candidate execution. Covers fallback scans and integer extrema, missing braces, provisional end correction, dropped empty captions, style-only and repeated style declarations, native case mapping, charset transitions, ANSI/DBCS, raw code units, errors and final fragments. Complete documents/outcomes/byte positions must match and be deterministic."
+  },
+  "rendering": {
+    "generator": {
+      "path": "tools/compat/make_corpus.py",
+      "line": 793,
+      "sha256": "6bee444439a4073543908b0e579612c721c23a05f1a79f1163c5430cf0ea73e9"
+    },
+    "coverage_verifier": {
+      "path": "tools/compat/microdvd_render_coverage.py",
+      "line": 16,
+      "sha256": "481369a667d7734268c5c44ff61dc2cd5ae45f7b7baa7e7dacf883362739f10e"
+    },
+    "new_files": 10,
+    "new_cases": 20,
+    "new_frames": 260,
+    "new_distinct_controls": 4,
+    "behavior": "File/memory opening; actual 25fps CSRI reference boundaries after MicroDVD frame indices are multiplied by10000; repeated/reverse seeks; style-induced correction; provisional/empty captions; missing braces; discarded final fragments; NUL and DBCS. Style-sticky/control and missing-brace/control pairs must render differently.",
+    "corrected_control": "Initial samples at ordinary seconds produced equal images for the style-correction pair. The reference stores frame50 as500000, then translates that index to20000seconds at25fps. Corrected cases sample those actual times. Initial reports remain failed controls. Coverage reuses874 unchanged full-corpus cases and replaces all20 timing cases and4 controls with the corrected focused comparison; source definitions, fixture hashes, DLL hashes and canonical control membership are checked."
+  },
+  "limits": [
+    "No production default switch, full format closure, real player/Aegisub graph integration or library completion.",
+    "Numeric conversion, native style/font tag formatting, CString case mapping, file/encoding and Add/AddStyle adapters remain transitional.",
+    "Finite local MSVC14.44 Windows evidence. Malformed native formatter scans and unsafe reference operations beyond this corpus remain open; no crash/hang/nondeterministic result is accepted as parity.",
+    "Pre-Open native simplicity, allocation failure/reentry, non-Windows parity and Miri remain unresolved.",
+    "Direct probes initialize observer metadata; default native-document configurations have compile evidence only."
+  ],
+  "next_work": [
+    "Continue moving the remaining text-format parser control and ownership into safe Rust.",
+    "Replace native numeric, encoding, formatting and file adapters with audited system boundaries and safe policy.",
+    "Continue complete rendering, public host/ABI and vendored native replacement; retire fallback/raw adapters as callers move."
+  ]
+}

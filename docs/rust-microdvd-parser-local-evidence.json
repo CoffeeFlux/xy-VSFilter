@@ -1,0 +1,344 @@
+{
+  "schema": 1,
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "candidate_commit": "75796d0550c1426807647f3e348348b8b1f2d794",
+  "implementation_commit": "b740d2a20db565bd96c1b15a0db5027d7d549125",
+  "prior_increment": "0c69a5b2",
+  "configuration": {
+    "native": "Release, RustTextDecoder=true, RustDocumentOwnerExperimental=true",
+    "rust": "1.85.0; native-runtime with +crt-static",
+    "msvc": "14.44.35207",
+    "sdk": "10.0.26100.0"
+  },
+  "scope": "MicroDVD owned parser lifecycles and malformed-input controls; no format, frontend, host or library closure.",
+  "architectures": {
+    "x64": {
+      "corpus": {
+        "report": "artifacts/microdvd-csri-x64/coverage.json",
+        "sha256": "1c5a8757892071cf3ae87567e62a4cbdca22728f75a06fb961ed9dbb4d5ca11c",
+        "complete": true,
+        "passed": true,
+        "frames": 9586,
+        "distinct_controls": 88,
+        "partition_exact": true,
+        "cases": 894,
+        "coverage_driver_sha256": "481369a667d7734268c5c44ff61dc2cd5ae45f7b7baa7e7dacf883362739f10e"
+      },
+      "new_rendering": {
+        "report": "artifacts/microdvd-new-v2-x64/report.json",
+        "sha256": "0504484443566e14cbd0fe5b350642d7ea829ce1ddf0d7d0ff7d255a94ebacbf",
+        "complete": true,
+        "passed": true,
+        "rendered_frames": 260,
+        "cases": 20
+      },
+      "initial_invalid_control": {
+        "report": "artifacts/microdvd-new-x64/report.json",
+        "sha256": "84a7d95b4c2c0af11862094342272280724d4e1653e6514fc1639d7c9027e8ad",
+        "complete": true,
+        "passed": false,
+        "rendered_frames": 260,
+        "cases": 20,
+        "disposition": "Not passing evidence. Initial style-timing controls sampled ordinary seconds; reference MicroDVD frame values are first multiplied by10000, then treated as frame indices. Corrected samples test actual reference times (frame50 at20000seconds at CSRI25fps). No production-source change. Full-corpus reports also retain their initial failed controls; coverage.json selects only unchanged cases and replaces all20 timing cases and4 controls from the corrected run."
+      },
+      "parser": {
+        "report": "artifacts/microdvd-final-probe-x64/report.json",
+        "sha256": "8ca3e7fab992de6b2b516c6c7518ae72f63de0a83e1f8f77644251fcccfa1866",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "8ce94a8761523974c3a84bd4c9b62dea8d15d2be",
+        "trace_lines": 41491,
+        "inputs_unchanged": true,
+        "cases": 4588
+      },
+      "baseline_parser": {
+        "report": "artifacts/microdvd-baseline-x64/report.json",
+        "sha256": "e2fe70f01b2ed55211e1f9cf057287d8b4a8638e2caa85871d9c1a1330f31f82",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "1c0c4cdadb23ea149b1e704896eb2576887b4726",
+        "trace_lines": 41491,
+        "inputs_unchanged": true,
+        "cases": 4588
+      },
+      "baseline_prefix_preserved": true,
+      "text_regression": {
+        "report": "artifacts/microdvd-text-regression-x64/report.json",
+        "sha256": "5eaa732373382672c184f9e29379c51425672ca4a3a91838a810ab8ffdaf6465",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "8ce94a8761523974c3a84bd4c9b62dea8d15d2be",
+        "trace_lines": 44404,
+        "inputs_unchanged": true,
+        "cases": 5692
+      },
+      "ass_regression": {
+        "report": "artifacts/microdvd-ass-probe-x64/report.json",
+        "sha256": "0791566d181fc99215b37b5cbae42dc31cb223979d69df8a4f702a30132d802c",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "8ce94a8761523974c3a84bd4c9b62dea8d15d2be",
+        "trace_lines": 22286,
+        "inputs_unchanged": true,
+        "cases": 3266
+      },
+      "xombie_regression": {
+        "report": "artifacts/microdvd-xombie-probe-x64/report.json",
+        "sha256": "5b6db4aedab9aa635b768bcb40cac8c5e376532643a819b0b1fa2c6c40226188",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "8ce94a8761523974c3a84bd4c9b62dea8d15d2be",
+        "trace_lines": 10441,
+        "inputs_unchanged": true,
+        "cases": 1242
+      },
+      "lifecycle": {
+        "report": "artifacts/microdvd-lifecycle-x64/report.json",
+        "sha256": "075862ca8e66bced5df9b98fbb0a39aaf1d3cbab0d6c76e51f80d0360bebb746",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "8ce94a8761523974c3a84bd4c9b62dea8d15d2be",
+        "trace_lines": 3693,
+        "inputs_unchanged": true
+      },
+      "compile": {
+        "report": "artifacts/microdvd-compile-x64/report.json",
+        "sha256": "3ea20b3fa042070e758106a376d4c97022105c735822371130d4e6572741ff96",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "8ce94a8761523974c3a84bd4c9b62dea8d15d2be",
+        "inputs_unchanged": true,
+        "scope": "Compile-only actual style helper/lifecycle sources and headers; no link, execution or parity claim"
+      },
+      "com": {
+        "report": "artifacts/microdvd-contracts-x64/com/report.json",
+        "sha256": "926de3787cb579db5e97987b90bceb72888d636862d14fa8cd46e94ebed57cb1",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "8ce94a8761523974c3a84bd4c9b62dea8d15d2be",
+        "inputs_unchanged": true,
+        "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "2d254068a40e5f59cf191c3c6bbfc984b548193b668c4decac21dc1e94e02169",
+          "candidate_sha256": "9c90fcc9319c2e0379b5ead56546c078eb7237d38baf24c1f80947350121df03",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "858b557df4643353cc2b7f7a4faf24fb20fc571f39dc8929949a8b9d80276024"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "32b7c2cd6eb817120414db53b3c3005e719ae4b993c4a69d0d66c7f6ac363d5a",
+          "candidate_sha256": "9238038e6541241859754fc1c09df15b07ddd677aefd2a240e8cf54d4cef12e4",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "09623cbd08a08a70ca726d32f1ac7a80358fe93589dfe22d814f7c9544f6d751"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "f1165742064181b7fb73bacb16017d8e202c8bb0be90ed8c2eb812ac282c2df8",
+          "candidate_sha256": "f0a0065a27570b232d46b916e83a091fe4c9ba8c7f2a3aed60cbfa17a8979921",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "b0b48a3cf2bf2ecbbac4ecca863a815ab4a0c1137277a9b7d5830d9d1beca5c9"
+        }
+      }
+    },
+    "x86": {
+      "corpus": {
+        "report": "artifacts/microdvd-csri-x86/coverage.json",
+        "sha256": "38ab035f6546f2d915dfb26cfb8e877312241fd6ddbd9f54fd55cc1ff3698dc0",
+        "complete": true,
+        "passed": true,
+        "frames": 9586,
+        "distinct_controls": 88,
+        "partition_exact": true,
+        "cases": 894,
+        "coverage_driver_sha256": "481369a667d7734268c5c44ff61dc2cd5ae45f7b7baa7e7dacf883362739f10e"
+      },
+      "new_rendering": {
+        "report": "artifacts/microdvd-new-v2-x86/report.json",
+        "sha256": "cf765780c5c4015cfd127147529c5ec1eb0027fca68374701af3c658a5419425",
+        "complete": true,
+        "passed": true,
+        "rendered_frames": 260,
+        "cases": 20
+      },
+      "initial_invalid_control": {
+        "report": "artifacts/microdvd-new-x86/report.json",
+        "sha256": "69b11250056d3f2839ccd5751061baea32c2d3eb7d2821cf22b7961e5c3d18cc",
+        "complete": true,
+        "passed": false,
+        "rendered_frames": 260,
+        "cases": 20,
+        "disposition": "Not passing evidence. Initial style-timing controls sampled ordinary seconds; reference MicroDVD frame values are first multiplied by10000, then treated as frame indices. Corrected samples test actual reference times (frame50 at20000seconds at CSRI25fps). No production-source change. Full-corpus reports also retain their initial failed controls; coverage.json selects only unchanged cases and replaces all20 timing cases and4 controls from the corrected run."
+      },
+      "parser": {
+        "report": "artifacts/microdvd-final-probe-x86/report.json",
+        "sha256": "52da2d9f64de62f7f662a8d58654cf90eeb847d02e1b3774be8948339d44e4fd",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "8ce94a8761523974c3a84bd4c9b62dea8d15d2be",
+        "trace_lines": 41491,
+        "inputs_unchanged": true,
+        "cases": 4588
+      },
+      "baseline_parser": {
+        "report": "artifacts/microdvd-baseline-x86/report.json",
+        "sha256": "ee6c2d7798400797e66355bf84d538c05831b8d1fa3d97b6a68ab39647372f2b",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "1c0c4cdadb23ea149b1e704896eb2576887b4726",
+        "trace_lines": 41491,
+        "inputs_unchanged": true,
+        "cases": 4588
+      },
+      "baseline_prefix_preserved": true,
+      "text_regression": {
+        "report": "artifacts/microdvd-text-regression-x86/report.json",
+        "sha256": "7c5dd492f08ecd6e30aec0a303257232d5d6bfa931fa6d95b0b8ae78f12129fd",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "8ce94a8761523974c3a84bd4c9b62dea8d15d2be",
+        "trace_lines": 44404,
+        "inputs_unchanged": true,
+        "cases": 5692
+      },
+      "ass_regression": {
+        "report": "artifacts/microdvd-ass-probe-x86/report.json",
+        "sha256": "8bf80aa1e0aa7c80d032b2bbd3a373b0eb87832167ae21618190352a89065a60",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "8ce94a8761523974c3a84bd4c9b62dea8d15d2be",
+        "trace_lines": 22286,
+        "inputs_unchanged": true,
+        "cases": 3266
+      },
+      "xombie_regression": {
+        "report": "artifacts/microdvd-xombie-probe-x86/report.json",
+        "sha256": "fdf21a25683cb3529cb94393145baf84b7c1b98e38597d9ca17005d47654cf0a",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "8ce94a8761523974c3a84bd4c9b62dea8d15d2be",
+        "trace_lines": 10441,
+        "inputs_unchanged": true,
+        "cases": 1242
+      },
+      "lifecycle": {
+        "report": "artifacts/microdvd-lifecycle-x86/report.json",
+        "sha256": "687e93ad640c7811eb10c848d999ddaba01261ada5754420e0e0386c780e0133",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "8ce94a8761523974c3a84bd4c9b62dea8d15d2be",
+        "trace_lines": 3693,
+        "inputs_unchanged": true
+      },
+      "compile": {
+        "report": "artifacts/microdvd-compile-x86/report.json",
+        "sha256": "d8da4386dac709bc6a837ed75894892cc7e4b1be569b91f81bc5052421e9a9e7",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "8ce94a8761523974c3a84bd4c9b62dea8d15d2be",
+        "inputs_unchanged": true,
+        "scope": "Compile-only actual style helper/lifecycle sources and headers; no link, execution or parity claim"
+      },
+      "com": {
+        "report": "artifacts/microdvd-contracts-x86/com/report.json",
+        "sha256": "88b470b96c716dc010b3c78996ada804e3b12970d3dc62c68e5083500ec00624",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "8ce94a8761523974c3a84bd4c9b62dea8d15d2be",
+        "inputs_unchanged": true,
+        "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "69faa2d5f90f35fe4184e9e9bd892adb76fee60295701988f61ab7af0664d9eb",
+          "candidate_sha256": "b8b24a4f6b40dcce1db3b2f16d3cf0656ff25d23fb7748d75cf90a2cb36e85ce",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "dbd365316d54d5a3d590b63604fbbc5ea6849a912eb7660e52d8df4bdd6b2120"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "2c3b904d7f91902ef456e07b648c5d6351878318c235397eeb9b39eb3fffa34f",
+          "candidate_sha256": "8c443b417e37e0f7f775264c2372459d913902777b6f371657040edd7e655ec8",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "8821591e5f42e83c8361380a00b4869b748312f9374da70041ad829e381b6bbc"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "3e7c20a4d6c42457d92eb56c42e4fd9f3bddb93276f2c1cd28bfb73edd06484c",
+          "candidate_sha256": "466b4482c9bbd5697948fa38d4a044de844506204966c82d983dc83462cb12b7",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "bee8a1d975859e0ab8a9b6843e14f813df818b8538e6501927e792bb180eb7c1"
+        }
+      }
+    }
+  },
+  "limits": [
+    "No production default switch, full format closure, real player/Aegisub graph integration or library completion.",
+    "Numeric conversion, native style/font tag formatting, CString case mapping, file/encoding and Add/AddStyle adapters remain transitional.",
+    "Finite local MSVC14.44 Windows evidence. Malformed native formatter scans and unsafe reference operations beyond this corpus remain open; no crash/hang/nondeterministic result is accepted as parity.",
+    "Pre-Open native simplicity, allocation failure/reentry, non-Windows parity and Miri remain unresolved.",
+    "Direct probes initialize observer metadata; default native-document configurations have compile evidence only."
+  ],
+  "source_inventory": {
+    "path": "docs/rust-microdvd-parser-inventory.json",
+    "sha256": "1b61436e533944514bf11b82892a302229d5121f1eaaef730aa20dfe8168375d"
+  },
+  "unsafe_lexical_inventory": {
+    "report": "artifacts/microdvd-unsafe-inventory.json",
+    "sha256": "4596d384e2eef6903624fdd8bfd50837102e78f916944b01c543b8ee1e31499d",
+    "safe_core_unsafe_sites": 0,
+    "limits": "Lexical inventory only, not a soundness proof."
+  },
+  "rust_tests": {
+    "core_per_architecture": 275,
+    "ffi_per_architecture": 123,
+    "fmt": true,
+    "clippy_all_targets": true,
+    "clippy_native_runtime": true,
+    "log": "artifacts/microdvd-checks.log",
+    "log_sha256": "9c6c58f59b961277379a7d47446a44f72a7a30452cbe7180762b5bf74c6ce991"
+  },
+  "python_harness_tests": {
+    "count": 153,
+    "skipped": 1,
+    "failures": 0,
+    "log": "artifacts/microdvd-harness.log",
+    "log_sha256": "3eb4956c7c0c9d102b259438b857a6b20617399ba33d6237aeb52be1ffd76fe1",
+    "corpus_check_included": true,
+    "final_corpus_check_sha256": "b6044038baa9a07eab82a40e807875e4fe2977700235324c90120ef9e42d18fb"
+  },
+  "build_logs": {
+    "artifacts/microdvd-build-x64.log": "9f0dc39b5c1f2c38b2d69ba31ce965422507445a22e085f7fedad46d73018bf8",
+    "artifacts/microdvd-build-x86.log": "9a8b73ec0ab7e32e88470015ec8c6ba172c5467c08fff3b1928fd9fed2826da2",
+    "artifacts/microdvd-build-rust-x64.log": "bebe1629321f6fbd4be05b495cbe6fedf3fc75b459dfec8d6384d6f571b42782",
+    "artifacts/microdvd-build-rust-x86.log": "ff3117d910432715964305b6c14d736e5b864368e3f823ac2b7a490f5de096b4"
+  }
+}

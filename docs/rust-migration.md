@@ -27,7 +27,55 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: Old SubRip and VPlayer parser ownership (2026-10-18)
+## Current port: MicroDVD parser ownership (2026-10-18)
+
+The experimental document path now owns MicroDVD's raw line/current style name,
+charset, scan/recovery decisions, frame arithmetic, EOF acceptance and provisional
+end-correction state in safe Rust. Previous-caption correction now executes
+directly against the canonical Rust document. Native file/CRT, style conversion,
+case mapping, formatting and Add services remain transitional callbacks outside
+registry loans. Partial native scan locals are never serialized.
+
+The port preserves a subtle state carry: a style declaration leaves the fallback
+flag set, so a later caption with an explicit end can still be shortened by the
+following caption. Empty captions can leave correction pending. Corrections may
+move an end before its start and do not rebuild segments. Missing braces and
+32-bit fallback-end overflow retain the measured reference behavior. The legacy
+path multiplies frame indices by 10,000 before frame-to-time conversion: at CSRI's
+25 fps, frame 50 appears at 20,000 seconds. This visible quirk is preserved.
+
+Candidate `75796d05` (production implementation `b740d2a2`) passes fresh cleanup
+`67da07cd` comparisons on **each** Windows architecture (x86 and x64):
+
+* 4,588 direct MicroDVD cases and 41,491 identical trace lines, repeated twice
+  for reference and candidate. Checkpoint `1c0c4cda` established the same probe
+  before implementation changes.
+* All 894 rendering cases and 9,586 frames, with 88 distinct-frame controls.
+  The 20 added cases contribute 260 frames and four controls, including the
+  style-induced timing correction and missing closing brace.
+* Regression probes for 5,692 text-parser, 3,266 ASS and 1,242 XombieSub cases;
+  3,693 linked lifecycle trace lines; nine reference/native/experimental compile
+  probes; all three DLLs' exports/dependencies; and 10 scoped COM cases plus two
+  candidate pin-ID controls.
+* 275 safe-core and 123 FFI tests, formatting and Clippy per architecture;
+  153 Python harness tests with one skip. The six checked MicroDVD entry points
+  add four unsafe marshalling functions and five unsafe blocks, with no new
+  raw-slice constructors or native pointer owners. The core forbids unsafe code.
+
+See the [source/boundary inventory](rust-microdvd-parser-inventory.json) and
+[local evidence manifest](rust-microdvd-parser-local-evidence.json). These finite
+results do not close the format or its native formatting services. No production
+switch or real host integration is claimed. Remaining parsers, rendering, hosts
+and vendored code stay in scope; the complete-library Rust migration is active.
+
+The first style-timing image control failed because its samples used ordinary
+seconds. Both renderers matched. Corrected samples target the actual reference
+times; the earlier reports remain failed controls. Coverage combines 874
+unchanged full-corpus cases with the 20 corrected timing cases and checks every
+selected case/control against the current manifest. Direct probes use `8ce94a87`;
+the later commit changes fixture sampling only, with production blobs unchanged.
+
+## Previous port: Old SubRip and VPlayer parser ownership (2026-10-18)
 
 The experimental document path now owns Old SubRip and VPlayer parser loops in
 safe Rust, extending the checked SubRip/MPL2 session. This moves raw line storage,
