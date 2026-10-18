@@ -4,12 +4,16 @@
 #include "document_native_lifecycle.cpp"
 #undef main
 #include <STS.cpp>
-static void text_case(unsigned index,unsigned mode,const CStringW& input,bool preload) {
+static void text_case(unsigned index,unsigned mode,const CStringW& input,bool preload,int charset=ANSI_CHARSET,bool ansi=false) {
  TraceDocument document(0);document.Screen(CSize(0,0));
  if(preload)document.Add(L"existing",true,0,10000000,L"Default",L"",L"",CRect(0,0,0,0),0);
  const CStringW encoded=CStringW(L"\xfeff")+input;CTextFile file;
- if(!file.OpenMemory(static_cast<LPCWSTR>(encoded),encoded.GetLength()*sizeof(WCHAR)))throw std::runtime_error("fixture open failed");
- int outcome;try{outcome=(mode==0?OpenSubRipper(&file,document,ANSI_CHARSET):OpenMPL2(&file,document,ANSI_CHARSET))?1:0;}catch(int value){outcome=-100-value;}
+ std::vector<BYTE> bytes;
+ if(ansi){for(int i=0;i<input.GetLength();++i)bytes.push_back(static_cast<BYTE>(input[i]));}
+ const void* data=ansi?static_cast<const void*>(bytes.data()):static_cast<LPCWSTR>(encoded);
+ const size_t size=ansi?bytes.size():encoded.GetLength()*sizeof(WCHAR);
+ if(!file.OpenMemory(data,size))throw std::runtime_error("fixture open failed");
+ int outcome;try{outcome=(mode==0?OpenSubRipper(&file,document,charset):mode==1?OpenMPL2(&file,document,charset):mode==2?OpenOldSubRipper(&file,document,charset):OpenVPlayer(&file,document,charset))?1:0;}catch(int value){outcome=-100-value;}
  printf("text-case index=%u outcome=%d position=%llu\n",index,outcome,file.GetPosition());document.Dump("text-result");
 }
 int main(){try{
@@ -30,5 +34,28 @@ int main(){try{
  for(auto start:values)for(auto end:values)for(auto tail:tails)for(int newline=0;newline<2;++newline){CStringW text;text.Format(L"[%s][%s%s%s",start,end,tail,newline?L"\r\n":L"");emit(1,text);}
  CStringW mplraw(L"[10][40] raw |/italic\r\n[41][50]tail\r\n");
  for(auto unit:{0,9,13,32,0xa0,0x2003,0xd800,0xffff})for(int pos=0;pos<12;++pos){CStringW raw=mplraw;raw.SetAt(pos*2,static_cast<WCHAR>(unit));emit(1,raw);}
+
+ // Each new format exercises partial scans, missing final punctuation, overflow,
+ // raw code units, false-read fragments, and pre-existing document acceptance.
+ const wchar_t* oldheads[]={L"",L"junk",L"{0:0:1}{0:0:4}",L"{0:0:1}{0:0:4",L"{0:0:1}{0:0:",L"{0:0:1}0:0:4}",L"{0:0:4}{0:0:1}",L"{0:0:1|}{0:0:4}"};
+ const wchar_t* vpheads[]={L"",L"junk",L"0:0:1:",L"0:0:1",L"0:0:",L"0:0:1 :",L"-1:-2:-3:",L"0:0:1|:"};
+ const wchar_t* captions[]={L"",L"caption",L" |one||two| ",L"\t caption \t",L"{\\fe128}pipe|text",L" caption\r\nbad",L" :extra}text",L"\r\n\r\n"};
+ for(unsigned mode=2;mode<=3;++mode){
+  for(int hi=0;hi<8;++hi)for(auto caption:captions)for(int newline=0;newline<2;++newline){CStringW text((mode==2?oldheads:vpheads)[hi]);text+=caption;if(newline)text+=L"\r\n";emit(mode,text);}
+  for(int field=0;field<(mode==2?6:3);++field)for(auto value:values){
+   const wchar_t* fields[]={L"0",L"0",L"1",L"0",L"0",L"4"};fields[field]=value;
+   CStringW text;
+   if(mode==2)text.Format(L"{%s:%s:%s}{%s:%s:%s}caption|tail\r\n",fields[0],fields[1],fields[2],fields[3],fields[4],fields[5]);
+   else text.Format(L"%s:%s:%s:caption|tail\r\n",fields[0],fields[1],fields[2]);
+   emit(mode,text);
+  }
+  CStringW rawbase=mode==2?L"{0:0:1}{0:0:4} raw||tail\r\n":L"0:0:1: raw||tail\r\n";
+  for(auto unit:{0,9,13,32,0x81,0x7c,0xa0,0x2003,0xd800,0xffff})for(int pos=0;pos<rawbase.GetLength()-2;++pos){CStringW raw=rawbase;raw.SetAt(pos,static_cast<WCHAR>(unit));emit(mode,raw);}
+  const wchar_t* prefixes[]={L"",L"{\\fe128}",L"{\\fe0}",L"{\\fe}",L"{\\fe128}{\\fe0}",L"{\\fe0}{\\fe128}"};
+  for(auto charset:{ANSI_CHARSET,SHIFTJIS_CHARSET,GB2312_CHARSET})for(auto prefix:prefixes)for(int preload=0;preload<2;++preload){
+   CStringW text=mode==2?L"{0:0:1}{0:0:4}":L"0:0:1:";text+=prefix;text+=L"A\x81|B|C\r\n";
+   text_case(index++,mode,text,preload!=0,charset,true);
+  }
+ }
  printf("text-complete cases=%u\n",index);return 0;
 }catch(const std::exception& error){fprintf(stderr,"unresolved: %s\n",error.what());return 1;}catch(...){fprintf(stderr,"unresolved exception\n");return 2;}}

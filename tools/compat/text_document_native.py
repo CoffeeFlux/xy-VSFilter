@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare actual cleanup SubRip/MPL2 parser state, failures and byte consumption."""
+"""Compare actual cleanup SubRip/MPL2/OldSubRip/VPlayer parser state, failures and byte consumption."""
 import argparse
 import json
 import os
@@ -11,21 +11,21 @@ from document_native_lifecycle import ROOT, PIN, LIBRARIES, SYSTEM_LIBRARIES, fi
 
 SOURCE = ROOT / "tools/compat/text_document_native.cpp"
 OBSERVER = ROOT / "tools/compat/document_native_lifecycle.cpp"
-CASES = 4128
+CASES = 5692
 
 
 def validate(data, bits):
     lines = data.splitlines()
     if not lines or not re.fullmatch(rb"text-provenance pointer_bits=" + str(bits).encode() + rb" ansi=\d+ oem=\d+", lines[0]):
-        raise ValueError("missing SubRip/MPL2 probe architecture/environment")
+        raise ValueError("missing SubRip/MPL2/OldSubRip/VPlayer probe architecture/environment")
     rows = [line for line in lines if line.startswith(b"text-case ")]
     if len(rows) != CASES:
-        raise ValueError("missing or duplicate SubRip/MPL2 parser case")
+        raise ValueError("missing or duplicate SubRip/MPL2/OldSubRip/VPlayer parser case")
     for index, row in enumerate(rows):
         if not re.fullmatch(f"text-case index={index} outcome=".encode() + rb"(?:0|1|-101) position=\d+", row):
-            raise ValueError("incorrect SubRip/MPL2 case order/outcome/position")
+            raise ValueError("incorrect SubRip/MPL2/OldSubRip/VPlayer case order/outcome/position")
     if lines[-1] != f"text-complete cases={CASES}".encode():
-        raise ValueError("missing SubRip/MPL2 completion marker")
+        raise ValueError("missing SubRip/MPL2/OldSubRip/VPlayer completion marker")
     if not any(b"outcome=0 " in row for row in rows) or not any(b"outcome=1 " in row for row in rows):
         raise ValueError("missing successful and rejected parser controls")
 
@@ -37,7 +37,7 @@ def compare(traces, bits):
     for trace in traces:
         validate(trace, bits)
     if any(trace != traces[0] for trace in traces[1:]):
-        raise ValueError("SubRip/MPL2 traces differ or are nondeterministic")
+        raise ValueError("SubRip/MPL2/OldSubRip/VPlayer traces differ or are nondeterministic")
 
 
 def main():
@@ -110,7 +110,7 @@ def main():
             for repeat in (1,2):
                 result=run([str(exe)],work,f"{label}-trace-{repeat}",30)
                 if result.stderr:
-                    raise ValueError("unexpected SubRip/MPL2 probe stderr")
+                    raise ValueError("unexpected SubRip/MPL2/OldSubRip/VPlayer probe stderr")
                 validate(result.stdout,bits);traces.append(result.stdout)
             for path,digest in {**headers,**build["library_sha256"],str(exe):build["binary_sha256"]}.items():
                 if sha(Path(path).read_bytes())!=digest:
@@ -131,3 +131,4 @@ def main():
 
 if __name__=="__main__":
     main()
+
