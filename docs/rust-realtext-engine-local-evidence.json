@@ -1,0 +1,684 @@
+{
+  "schema": 1,
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "candidate_commit": "7f6bcaeff542429ac37189667dbb523d3ea38735",
+  "prior_increment": "a4162b1f",
+  "scope": "RealText owned helper engine in the experimental document path; no production, format, host or full-library closure.",
+  "configuration": {
+    "native": "Release, RustTextDecoder=true, RustDocumentOwnerExperimental=true",
+    "rust": "1.85.0; native-runtime with +crt-static",
+    "msvc": "14.44.35207",
+    "sdk": "10.0.26100.0"
+  },
+  "architectures": {
+    "x64": {
+      "initial_full_corpus": {
+        "report": "artifacts/rt-engine-final-csri-x64/summary.json",
+        "sha256": "311fa59a2961b8af96df631973c70c83d12fb1acb366e3b156d3ebf1048b86bd",
+        "complete": false,
+        "frames": 10586,
+        "distinct_controls": 104,
+        "partition_exact": true,
+        "cases": 974,
+        "shards": [
+          {
+            "report": "artifacts/rt-engine-final-csri-x64/shard-0/report.json",
+            "sha256": "b73f2120b465aae462dd003c43ba1ebf52f4d186c3fc69f256dad168859042d6",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1322,
+            "cases": 122
+          },
+          {
+            "report": "artifacts/rt-engine-final-csri-x64/shard-1/report.json",
+            "sha256": "5c37e236bf86e0c6f5412a2ad41fd9fdf547dbdf4dfd00ec1d47b72542107acc",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1322,
+            "cases": 122
+          },
+          {
+            "report": "artifacts/rt-engine-final-csri-x64/shard-2/report.json",
+            "sha256": "ff026fa2a1251ca1128adeb492831aa5259fc8d8ad4ca3819e94b8acd4b46b0f",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1320,
+            "cases": 122
+          },
+          {
+            "report": "artifacts/rt-engine-final-csri-x64/shard-3/report.json",
+            "sha256": "ad9828aa11896be0a22056e53c147cc26edf5f0919fbbc32c790bdc201a5e781",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1320,
+            "cases": 122
+          },
+          {
+            "report": "artifacts/rt-engine-final-csri-x64/shard-4/report.json",
+            "sha256": "afb571ebc84177deb7bbfae66f42cc66d63992043c5656e8364644b6fc8662ea",
+            "complete": true,
+            "passed": false,
+            "rendered_frames": 1344,
+            "cases": 122
+          },
+          {
+            "report": "artifacts/rt-engine-final-csri-x64/shard-5/report.json",
+            "sha256": "095f3e7c33e23249db065eccbcf5b15d3ce44d1ab01cac71280829bbad608199",
+            "complete": true,
+            "passed": false,
+            "rendered_frames": 1344,
+            "cases": 122
+          },
+          {
+            "report": "artifacts/rt-engine-final-csri-x64/shard-6/report.json",
+            "sha256": "1d2dfb346b859de4fb15d09010f4c3f88ce17b41855fcb6c882469ce8272f78b",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1307,
+            "cases": 121
+          },
+          {
+            "report": "artifacts/rt-engine-final-csri-x64/shard-7/report.json",
+            "sha256": "fe859894dee0bd0ef3427b61a57272e98f51b4e0b18cc38699860a9a2aed102c",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1307,
+            "cases": 121
+          }
+        ],
+        "invalid_distinct_control_expectations": [
+          {
+            "candidate": false,
+            "cases": [
+              "realtext-parser-helper-bold-file",
+              "realtext-parser-helper-control-file"
+            ],
+            "reference-0": false
+          },
+          {
+            "candidate": false,
+            "cases": [
+              "realtext-parser-helper-bold-memory",
+              "realtext-parser-helper-control-memory"
+            ],
+            "reference-0": false
+          }
+        ],
+        "all_individual_cases_equal": true,
+        "not_a_passing_gate": true
+      },
+      "corrected_targeted_controls": {
+        "report": "artifacts/rt-engine-controls-x64/report.json",
+        "sha256": "697e4eb13a57b742da4398ba4a609efdbc2ae08f06abb8d5a281b9654f6a178f",
+        "complete": true,
+        "passed": true,
+        "rendered_frames": 240,
+        "cases": 20
+      },
+      "corpus": {
+        "complete": true,
+        "passed": true,
+        "cases": 974,
+        "unique_rendered_frames": 10586,
+        "distinct_controls": 104,
+        "source_manifest_sha256": "c89a2eab9706e7fbd5256b7626ab645856795e6c7dc172f548ad19347fae9f99",
+        "method": "The original complete 974-case execution matched every reference/candidate outcome and pixel, but failed two invalid bold-versus-default controls because the default style is already bold. Only those two expectations change to fractional-time-versus-control; all 974 case definitions/bytes/times are unchanged. A targeted 20-case/240-frame rerun on the same DLLs passes all four helper controls. Union of 102 valid original controls and the targeted controls equals the revised 104-control manifest exactly. Original failed reports retained; no fresh full-run claim.",
+        "case_definitions_unchanged": true,
+        "targeted_repeat_frames_not_added_to_unique_total": 240,
+        "all_revised_controls_passed": true,
+        "partition_driver_sha256": "f3305809fb6cd63cbf8af071decce469317eda325bbdf5ab117d036c626cfaa9"
+      },
+      "new_rendering": {
+        "included_in_full_corpus": true,
+        "cases": 20,
+        "frames": 240,
+        "distinct_controls": 4,
+        "ids": [
+          "realtext-parser-helper-bold-file",
+          "realtext-parser-helper-bold-memory",
+          "realtext-parser-helper-control-file",
+          "realtext-parser-helper-control-memory",
+          "realtext-parser-helper-duplicate-file",
+          "realtext-parser-helper-duplicate-memory",
+          "realtext-parser-helper-fractions-file",
+          "realtext-parser-helper-fractions-memory",
+          "realtext-parser-helper-large-file",
+          "realtext-parser-helper-large-memory",
+          "realtext-parser-helper-mixed-quotes-file",
+          "realtext-parser-helper-mixed-quotes-memory",
+          "realtext-parser-helper-negative-file",
+          "realtext-parser-helper-negative-memory",
+          "realtext-parser-helper-red-file",
+          "realtext-parser-helper-red-memory",
+          "realtext-parser-helper-small-file",
+          "realtext-parser-helper-small-memory",
+          "realtext-parser-helper-unquoted-file",
+          "realtext-parser-helper-unquoted-memory"
+        ]
+      },
+      "parser": {
+        "report": "artifacts/rt-engine-final-probe-x64/report.json",
+        "sha256": "f928bb6410a96c8c29330e0d87e4a8e281a1c2a059fe79e5a9b2d80698056442",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "7f6bcaeff542429ac37189667dbb523d3ea38735",
+        "trace_lines": 37887,
+        "inputs_unchanged": true,
+        "cases": 4532
+      },
+      "baseline_parser": {
+        "report": "artifacts/rt-engine-baseline-valid-x64/report.json",
+        "sha256": "17589dad4c88712af8dc151bd24df882934ace607e2dbf1629bfdd65802e45f7",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "248e9b150623947fa7236bb617bf8858b3589851",
+        "trace_lines": 37887,
+        "inputs_unchanged": true,
+        "cases": 4532
+      },
+      "baseline_traces_preserved": true,
+      "prior_3932_case_prefix_preserved": true,
+      "initial_baseline_compile_error": {
+        "directory": "artifacts/rt-engine-baseline-x64",
+        "cause": "Invalid C++ universal-character surrogate literal, fixed to a raw hex code-unit escape in248e9b15. No reference execution or passing gate claimed."
+      },
+      "vtt_regression": {
+        "report": "artifacts/rt-engine-vtt-regression-x64/report.json",
+        "sha256": "207fb1e4bd46618d8c6733af2dcd9228354f3d749acd08e348f0053cecce93fd",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "7f6bcaeff542429ac37189667dbb523d3ea38735",
+        "trace_lines": 21939,
+        "inputs_unchanged": true,
+        "cases": 2292
+      },
+      "sami_regression": {
+        "report": "artifacts/rt-engine-sami-regression-x64/report.json",
+        "sha256": "fa92b4f313b161d78bbdd6f003cd561c6f0268e55b41a154d00a08dba4aaaddd",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "7f6bcaeff542429ac37189667dbb523d3ea38735",
+        "trace_lines": 26992,
+        "inputs_unchanged": true,
+        "cases": 2836
+      },
+      "text_regression": {
+        "report": "artifacts/rt-engine-text-regression-x64/report.json",
+        "sha256": "07f70305242523d21ef71ce1db0cca3d208dfc95fee9b59d93a45489f31b10c0",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "7f6bcaeff542429ac37189667dbb523d3ea38735",
+        "trace_lines": 44404,
+        "inputs_unchanged": true,
+        "cases": 5692
+      },
+      "microdvd_regression": {
+        "report": "artifacts/rt-engine-microdvd-regression-x64/report.json",
+        "sha256": "ececb790cd197f07556ee9488106cd386531d263cf7fe6c5dbfab1af36b92cd2",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "7f6bcaeff542429ac37189667dbb523d3ea38735",
+        "trace_lines": 41491,
+        "inputs_unchanged": true,
+        "cases": 4588
+      },
+      "ass_regression": {
+        "report": "artifacts/rt-engine-ass-probe-x64/report.json",
+        "sha256": "83dfd276764e59edab0a9f2511fdd194810aa173d2244c094361e453a0127dcd",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "7f6bcaeff542429ac37189667dbb523d3ea38735",
+        "trace_lines": 22286,
+        "inputs_unchanged": true,
+        "cases": 3266
+      },
+      "xombie_regression": {
+        "report": "artifacts/rt-engine-xombie-probe-x64/report.json",
+        "sha256": "a14b476ed221dae5dbffc3c658a066c7ef56b1d2d4209319cb66657e18cac2f5",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "7f6bcaeff542429ac37189667dbb523d3ea38735",
+        "trace_lines": 10441,
+        "inputs_unchanged": true,
+        "cases": 1242
+      },
+      "lifecycle": {
+        "report": "artifacts/rt-engine-lifecycle-x64/report.json",
+        "sha256": "8ddf4246b8ed4ff29ef06482e36e24ff76729f333abda1db156cca1bf2fc518a",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "7f6bcaeff542429ac37189667dbb523d3ea38735",
+        "trace_lines": 3693,
+        "inputs_unchanged": true
+      },
+      "compile": {
+        "report": "artifacts/rt-engine-compile-x64/report.json",
+        "sha256": "87c8ff336d14d83188d899444cbbaebabbfcc47c967d5914f557d397fc592bae",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "7f6bcaeff542429ac37189667dbb523d3ea38735",
+        "inputs_unchanged": true,
+        "scope": "Compile-only actual style helper/lifecycle sources and headers; no link, execution or parity claim"
+      },
+      "com": {
+        "report": "artifacts/rt-engine-contracts-x64/com/report.json",
+        "sha256": "ae94d65befff9e00191f1996d1a34696f11351e54119b47b7094bafec88cc6ca",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "7f6bcaeff542429ac37189667dbb523d3ea38735",
+        "inputs_unchanged": true,
+        "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "2d254068a40e5f59cf191c3c6bbfc984b548193b668c4decac21dc1e94e02169",
+          "candidate_sha256": "7b60523bda1fdc1eb06d63d94b17ba02d43442c3c1cab2e024bf40f8cfeb483b",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "858b557df4643353cc2b7f7a4faf24fb20fc571f39dc8929949a8b9d80276024"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "32b7c2cd6eb817120414db53b3c3005e719ae4b993c4a69d0d66c7f6ac363d5a",
+          "candidate_sha256": "b6cfef6dd6b912c33ee0cf7c1e9f9eef3812793f5b5419e33b599409c84cc358",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "09623cbd08a08a70ca726d32f1ac7a80358fe93589dfe22d814f7c9544f6d751"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "f1165742064181b7fb73bacb16017d8e202c8bb0be90ed8c2eb812ac282c2df8",
+          "candidate_sha256": "843636cc0515fbdf12b557be302ba5582f9a4bc23032729363b051522f0616e5",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "b0b48a3cf2bf2ecbbac4ecca863a815ab4a0c1137277a9b7d5830d9d1beca5c9"
+        }
+      }
+    },
+    "x86": {
+      "initial_full_corpus": {
+        "report": "artifacts/rt-engine-final-csri-x86/summary.json",
+        "sha256": "aa6dcb7acc3a3c31ebc8c8882bde951cbf3d4b0dcf9e7bfff392ef8eba5a13e7",
+        "complete": false,
+        "frames": 10586,
+        "distinct_controls": 104,
+        "partition_exact": true,
+        "cases": 974,
+        "shards": [
+          {
+            "report": "artifacts/rt-engine-final-csri-x86/shard-0/report.json",
+            "sha256": "b23de8ae1781ce851ee9ff7691295b198861a6698a7b8b956f9470849def0798",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1322,
+            "cases": 122
+          },
+          {
+            "report": "artifacts/rt-engine-final-csri-x86/shard-1/report.json",
+            "sha256": "b68b3c3bdc0357bd209db59368ccdcf4ae21f6515ab5e2fea0b35b5a297e10ec",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1322,
+            "cases": 122
+          },
+          {
+            "report": "artifacts/rt-engine-final-csri-x86/shard-2/report.json",
+            "sha256": "ace669d3d78969e997ef7b066dacf47e1bc4f92dd938257412099d7b14e3f380",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1320,
+            "cases": 122
+          },
+          {
+            "report": "artifacts/rt-engine-final-csri-x86/shard-3/report.json",
+            "sha256": "59edcaf78a0c0c14e759141b98bbf6c86f628d5db0b8ee9e6541c7b519f51840",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1320,
+            "cases": 122
+          },
+          {
+            "report": "artifacts/rt-engine-final-csri-x86/shard-4/report.json",
+            "sha256": "ba45fc11b8edb2f998a3af860505ad8769902df576349f8439487e433db76c40",
+            "complete": true,
+            "passed": false,
+            "rendered_frames": 1344,
+            "cases": 122
+          },
+          {
+            "report": "artifacts/rt-engine-final-csri-x86/shard-5/report.json",
+            "sha256": "1d5589e1a9803784e0751d38085430c44fa7efa012423ad8d74e8a32d624de3b",
+            "complete": true,
+            "passed": false,
+            "rendered_frames": 1344,
+            "cases": 122
+          },
+          {
+            "report": "artifacts/rt-engine-final-csri-x86/shard-6/report.json",
+            "sha256": "78fff7bcb6df9ba7032d168e9310f1d9c8a6d317562ef02cae0349a4018d27e0",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1307,
+            "cases": 121
+          },
+          {
+            "report": "artifacts/rt-engine-final-csri-x86/shard-7/report.json",
+            "sha256": "ffdcd97742fb17d4926783b8988b019b87b01e022ebb6941d865a805f48c4c3a",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1307,
+            "cases": 121
+          }
+        ],
+        "invalid_distinct_control_expectations": [
+          {
+            "candidate": false,
+            "cases": [
+              "realtext-parser-helper-bold-file",
+              "realtext-parser-helper-control-file"
+            ],
+            "reference-0": false
+          },
+          {
+            "candidate": false,
+            "cases": [
+              "realtext-parser-helper-bold-memory",
+              "realtext-parser-helper-control-memory"
+            ],
+            "reference-0": false
+          }
+        ],
+        "all_individual_cases_equal": true,
+        "not_a_passing_gate": true
+      },
+      "corrected_targeted_controls": {
+        "report": "artifacts/rt-engine-controls-x86/report.json",
+        "sha256": "00cdff1aacced30b50b2a10879fc0377ce5ee4110d30d57b1db81762463e1d70",
+        "complete": true,
+        "passed": true,
+        "rendered_frames": 240,
+        "cases": 20
+      },
+      "corpus": {
+        "complete": true,
+        "passed": true,
+        "cases": 974,
+        "unique_rendered_frames": 10586,
+        "distinct_controls": 104,
+        "source_manifest_sha256": "c89a2eab9706e7fbd5256b7626ab645856795e6c7dc172f548ad19347fae9f99",
+        "method": "The original complete 974-case execution matched every reference/candidate outcome and pixel, but failed two invalid bold-versus-default controls because the default style is already bold. Only those two expectations change to fractional-time-versus-control; all 974 case definitions/bytes/times are unchanged. A targeted 20-case/240-frame rerun on the same DLLs passes all four helper controls. Union of 102 valid original controls and the targeted controls equals the revised 104-control manifest exactly. Original failed reports retained; no fresh full-run claim.",
+        "case_definitions_unchanged": true,
+        "targeted_repeat_frames_not_added_to_unique_total": 240,
+        "all_revised_controls_passed": true,
+        "partition_driver_sha256": "f3305809fb6cd63cbf8af071decce469317eda325bbdf5ab117d036c626cfaa9"
+      },
+      "new_rendering": {
+        "included_in_full_corpus": true,
+        "cases": 20,
+        "frames": 240,
+        "distinct_controls": 4,
+        "ids": [
+          "realtext-parser-helper-bold-file",
+          "realtext-parser-helper-bold-memory",
+          "realtext-parser-helper-control-file",
+          "realtext-parser-helper-control-memory",
+          "realtext-parser-helper-duplicate-file",
+          "realtext-parser-helper-duplicate-memory",
+          "realtext-parser-helper-fractions-file",
+          "realtext-parser-helper-fractions-memory",
+          "realtext-parser-helper-large-file",
+          "realtext-parser-helper-large-memory",
+          "realtext-parser-helper-mixed-quotes-file",
+          "realtext-parser-helper-mixed-quotes-memory",
+          "realtext-parser-helper-negative-file",
+          "realtext-parser-helper-negative-memory",
+          "realtext-parser-helper-red-file",
+          "realtext-parser-helper-red-memory",
+          "realtext-parser-helper-small-file",
+          "realtext-parser-helper-small-memory",
+          "realtext-parser-helper-unquoted-file",
+          "realtext-parser-helper-unquoted-memory"
+        ]
+      },
+      "parser": {
+        "report": "artifacts/rt-engine-final-probe-x86/report.json",
+        "sha256": "e7843633588381e26af6b344de4baea00c12cfe2d86761e0dd72eb71c96972d4",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "7f6bcaeff542429ac37189667dbb523d3ea38735",
+        "trace_lines": 37887,
+        "inputs_unchanged": true,
+        "cases": 4532
+      },
+      "baseline_parser": {
+        "report": "artifacts/rt-engine-baseline-valid-x86/report.json",
+        "sha256": "f3ac74582366807caef7c0b778c008eebca55d07f260514abb4606ea54eb4fd2",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "248e9b150623947fa7236bb617bf8858b3589851",
+        "trace_lines": 37887,
+        "inputs_unchanged": true,
+        "cases": 4532
+      },
+      "baseline_traces_preserved": true,
+      "prior_3932_case_prefix_preserved": true,
+      "initial_baseline_compile_error": {
+        "directory": "artifacts/rt-engine-baseline-x86",
+        "cause": "Invalid C++ universal-character surrogate literal, fixed to a raw hex code-unit escape in248e9b15. No reference execution or passing gate claimed."
+      },
+      "vtt_regression": {
+        "report": "artifacts/rt-engine-vtt-regression-x86/report.json",
+        "sha256": "924e9939413387863e30cbd93c1357bf582ebc747e9fd6556f7ec1e092203324",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "7f6bcaeff542429ac37189667dbb523d3ea38735",
+        "trace_lines": 21939,
+        "inputs_unchanged": true,
+        "cases": 2292
+      },
+      "sami_regression": {
+        "report": "artifacts/rt-engine-sami-regression-x86/report.json",
+        "sha256": "d53e6c3690a3a3aa6a6258af482257833f0eeea0767de49f9ef0f902720741ef",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "7f6bcaeff542429ac37189667dbb523d3ea38735",
+        "trace_lines": 26992,
+        "inputs_unchanged": true,
+        "cases": 2836
+      },
+      "text_regression": {
+        "report": "artifacts/rt-engine-text-regression-x86/report.json",
+        "sha256": "76bd7565ba4d73619a7caea3ca5bdf1b43137c1a1873d07e01963d2b340df8ae",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "7f6bcaeff542429ac37189667dbb523d3ea38735",
+        "trace_lines": 44404,
+        "inputs_unchanged": true,
+        "cases": 5692
+      },
+      "microdvd_regression": {
+        "report": "artifacts/rt-engine-microdvd-regression-x86/report.json",
+        "sha256": "444761201058643c172363eb91d644c7bd180219bcf10f727fc972885b4191e7",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "7f6bcaeff542429ac37189667dbb523d3ea38735",
+        "trace_lines": 41491,
+        "inputs_unchanged": true,
+        "cases": 4588
+      },
+      "ass_regression": {
+        "report": "artifacts/rt-engine-ass-probe-x86/report.json",
+        "sha256": "b604594c4e30dfc4177fa4bacafe077de282bc59f437923f5a2d3ecc73c45844",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "7f6bcaeff542429ac37189667dbb523d3ea38735",
+        "trace_lines": 22286,
+        "inputs_unchanged": true,
+        "cases": 3266
+      },
+      "xombie_regression": {
+        "report": "artifacts/rt-engine-xombie-probe-x86/report.json",
+        "sha256": "9ef52b3ef87564ffd043390783e2fbef91a61a792a7578dd25eee0dfb5051c3f",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "7f6bcaeff542429ac37189667dbb523d3ea38735",
+        "trace_lines": 10441,
+        "inputs_unchanged": true,
+        "cases": 1242
+      },
+      "lifecycle": {
+        "report": "artifacts/rt-engine-lifecycle-x86/report.json",
+        "sha256": "88d36177d4b841600aaba01dcc57b86f5a0a9f0c7a40433c8925fba7dc2fbff7",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "7f6bcaeff542429ac37189667dbb523d3ea38735",
+        "trace_lines": 3693,
+        "inputs_unchanged": true
+      },
+      "compile": {
+        "report": "artifacts/rt-engine-compile-x86/report.json",
+        "sha256": "289751b2cc082290617d1adad65bb088176f7c14938feabce698b929ed4bc530",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "7f6bcaeff542429ac37189667dbb523d3ea38735",
+        "inputs_unchanged": true,
+        "scope": "Compile-only actual style helper/lifecycle sources and headers; no link, execution or parity claim"
+      },
+      "com": {
+        "report": "artifacts/rt-engine-contracts-x86/com/report.json",
+        "sha256": "8d0a0c8a9e089a8e5d6bc6850eaac8016761312cce5410d9d7b1d6480e7f3d0e",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "7f6bcaeff542429ac37189667dbb523d3ea38735",
+        "inputs_unchanged": true,
+        "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "69faa2d5f90f35fe4184e9e9bd892adb76fee60295701988f61ab7af0664d9eb",
+          "candidate_sha256": "4b8d894091fa85284eec7abe089d0cf963b2732bdb8ff921547b98f7fcba690e",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "dbd365316d54d5a3d590b63604fbbc5ea6849a912eb7660e52d8df4bdd6b2120"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "2c3b904d7f91902ef456e07b648c5d6351878318c235397eeb9b39eb3fffa34f",
+          "candidate_sha256": "9a5a1c5d2fedeeeee6a2a4b2ffb93ac8a4a0b1b3484fa37591ff7cce0aa27759",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "8821591e5f42e83c8361380a00b4869b748312f9374da70041ad829e381b6bbc"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "3e7c20a4d6c42457d92eb56c42e4fd9f3bddb93276f2c1cd28bfb73edd06484c",
+          "candidate_sha256": "6ea42bb7ce54d19dac70743fb06d2c993056228a0023504afcd9b08c4770daf4",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "bee8a1d975859e0ab8a9b6843e14f813df818b8538e6501927e792bb180eb7c1"
+        }
+      }
+    }
+  },
+  "limits": [
+    "Experimental document path only; no production switch, RealText format closure or full-library completion.",
+    "ReadString/CString trimming and comparison, CRT character predicates/case/integer conversion, SubRipper2SSA and Add remain native services. All C++ host adapters and fallback raw RealText APIs remain transitional and in scope.",
+    "Finite Windows MSVC 14.44 x86/x64 evidence against the pinned cleanup. No allocation failure/reentry, file-I/O fault injection, locale mutation or bounds-exception parity claim; no Miri or non-Windows whole-renderer evidence.",
+    "SubViewer missing-style outcomes remain unresolved as recorded in rust-subviewer-reference-outcomes.json. This increment neither changes its fallback nor selects arbitrary defaults.",
+    "Crashes, hangs and nondeterminism are unresolved, never equality. Remaining formats, renderer, all public hosts and vendored code remain part of the full migration."
+  ],
+  "control_manifest_commit": "0ffce87431457f512d674ab2ae4b75aabfd72b39",
+  "source_inventory": {
+    "path": "docs/rust-realtext-engine-inventory.json",
+    "sha256": "d3620c6e6b91e96bb156f9a3edaf84ded870da2a7ccc3cc60d7958bbc1f99813"
+  },
+  "unsafe_lexical_inventory": {
+    "report": "artifacts/rt-engine-unsafe-inventory.json",
+    "sha256": "1efd0a0c0870daf1c2e4ff020305d3ae4624fd91a2a67d06f5c7800f2a9fd084",
+    "safe_core_files": 101,
+    "safe_core_unsafe_sites": 0,
+    "ffi_unsafe_functions": 350,
+    "ffi_unsafe_blocks": 428,
+    "ffi_raw_shared_slice_constructors": 62,
+    "delta": {
+      "ffi_unsafe_functions": -1,
+      "ffi_unsafe_blocks": -1,
+      "ffi_raw_shared_slice_constructors": 0
+    },
+    "limits": "Lexical inventory only, not a soundness proof or completion percentage."
+  },
+  "rust_tests": {
+    "core_per_architecture": 292,
+    "ffi_per_architecture": 123,
+    "fmt": true,
+    "clippy_all_targets": true,
+    "clippy_native_runtime": true,
+    "log": "artifacts/rt-engine-checks.log",
+    "log_sha256": "559f0e83437916f1bb02ff2599c584607b036663f20786e3c7b5d39e607981ee"
+  },
+  "python_harness_tests": {
+    "count": 157,
+    "skipped": 1,
+    "failures": 0,
+    "log": "artifacts/rt-engine-final-harness.log",
+    "log_sha256": "ff7ce19babc1067df5dc40cff13f0a9ceadd7d1c8bb59792ed12f78005fc8491",
+    "corpus_check_included": true,
+    "after_control_manifest_correction": true
+  },
+  "build_logs": {
+    "artifacts/rt-engine-build-x64.log": "d71d62a34fd5275ba6e334c39536a818d0a616b4e332b41ebedf0ce1cfd1a6d7",
+    "artifacts/rt-engine-build-x86.log": "4fccb47b04720e59ff777bb79f5f782aecfd8456fc207abd3e3f74b0e73ba955",
+    "artifacts/rt-engine-build-rust-x64.log": "b2399ef143c66aecbac97bb1f6e06c5a3205bed59d5e91c0b149939b1bcba278",
+    "artifacts/rt-engine-build-rust-x86.log": "25065d900af66b81ca3d24f2166aec8bb962441a384d9502f487aef7fbb3d5f0"
+  },
+  "subviewer_reference_investigation": {
+    "path": "docs/rust-subviewer-reference-outcomes.json",
+    "sha256": "9cd5e22c6e894051966451dad661bf7cc1cd5e4b99f76fd118d61220b08be882",
+    "new_parity_claimed": false
+  }
+}

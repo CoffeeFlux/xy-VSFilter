@@ -27,7 +27,56 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: RealText parser and subtitle-map ownership (2026-10-18)
+## Current port: RealText helper engine (2026-10-18)
+
+The experimental RealText path now keeps tag/text extraction, attribute parsing,
+case-folded key assembly, time folding and tag rendering inside the checked
+safe-Rust engine. It no longer constructs a CRealTextParser or uses its six raw
+helper owners. The prior input, timeline, formatting lists and subtitle map
+remain Rust-owned. Native file/CString services, Windows CRT scalar conversions,
+SubRipper2SSA and Add remain transitional, as do the fallback implementations.
+
+The internal v2 protocol replaces extraction/render packets with checked scalar
+replies and copied snapshots. It removes one unsafe marshalling function and one
+unsafe block; the portable core still forbids unsafe code. Raw UTF16 code units,
+duplicate folded attributes, permissive quotes, private font-filter defaults,
+fractional right-padding and wrapping time arithmetic retain reference behavior.
+
+Candidate `7f6bcaef` passes cleanup `67da07cd` checks on **each** Windows
+architecture (x86 and x64):
+
+* 4,532 RealText cases / 37,887 identical trace lines, with two executions of each
+  implementation. These also equal the valid pre-engine baseline `248e9b15`.
+* 974 rendering cases / 10,586 frames / 104 distinct-frame controls. The new
+  helper fixtures add 20 file/memory cases, 240 frames and four controls.
+  Coverage combines the full run and a corrected targeted control run below.
+* WebVTT, SAMI, text-parser, MicroDVD, ASS and XombieSub regression probes;
+  3,693 lifecycle trace lines; nine compile probes; all three DLLs' exports and
+  dependencies; 10 scoped COM cases plus two candidate-only controls.
+* 292 safe-core and 123 FFI tests, formatting and Clippy on both architectures;
+  157 Python harness tests with one skip.
+
+The expanded baseline initially failed to compile because a C++ universal
+character literal cannot contain an unpaired surrogate. The probe now supplies
+the same raw code unit through a hex escape. The failed build is not counted as
+reference execution or compatibility evidence.
+
+All individual cases matched in the initial full rendering run, but two new
+bold-versus-control expectations failed: the default style is already bold in
+both DLLs. The corrected manifest compares fractional timing instead; case
+bytes, timestamps and all 974 case definitions are unchanged. A targeted rerun
+of all 20 helper cases passes four controls on the same DLLs. Those controls
+and the 102 valid original controls cover the corrected 104-control manifest.
+The original failed reports remain recorded; no fresh full rerun is claimed.
+
+See the [engine source/boundary inventory](rust-realtext-engine-inventory.json)
+and [local evidence manifest](rust-realtext-engine-local-evidence.json).
+Earlier RealText evidence and the unresolved SubViewer investigation remain
+attributed to their original commits below. No production switch, full format
+closure or whole-library completion is claimed. The remaining formats, renderer,
+all host adapters and vendored code are still required parts of the Rust port.
+
+## Previous port: RealText parser and subtitle-map ownership (2026-10-18)
 
 The experimental document path now owns RealText's assembled input, remaining
 text, extracted tags/attributes, open formatting, window/center metadata, timing

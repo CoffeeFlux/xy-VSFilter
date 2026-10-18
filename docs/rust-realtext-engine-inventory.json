@@ -1,0 +1,166 @@
+{
+  "schema": 1,
+  "candidate_commit": "7f6bcaeff542429ac37189667dbb523d3ea38735",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "RealText extraction, attributes, lowercase assembly, time folding and tag rendering are owned safe Rust under the checked document registry.",
+  "production_sources": {
+    "rust/compat/src/realtext_session.rs": "da48d795bbcd0bb393b65fb4bf719aa722c3fe3434c315f5031d59fcc232ae72",
+    "rust/compat/src/realtext_document.rs": "f5823865f37addadb4f011139b2ff9350cd31001ed559b60a02b038209c53ecf",
+    "rust/compat/src/realtext_lists.rs": "2e55207d914ae8e7ec689b2efe34d5aad7f77997ce0dbb2f29814ae14789bd0c",
+    "rust/compat/src/realtext_timeline.rs": "0447e4cfd52a9e2227dd6c104cb1db6ef9114a4fa3f63854ed34e348b081228b",
+    "rust/compat/src/lib.rs": "bed74e39bbbd399dc25f8aac3c5de5dd07c44254d4b71e048b395d8d4fb7b5f2",
+    "rust/ffi/src/document.rs": "59746265939180a41dd85a699c33c73605007b032728972a3a2b122813d66716",
+    "rust/ffi/src/document_registry.rs": "4e0cb1c4fa428c51881fa7e86b02b90bda8934cb8503cd32a0b93197818c0482",
+    "include/xy_rust_document.h": "d137d84ad7e4408dad7ef8f1b3ccf3ce32bdaf4571c1f8e579a7023b7aeba8d6",
+    "src/subtitles/RustDocumentOwner.h": "f3a2cbce785e0fe15fa03416d4d96dd91a370aa1744d0772559c701ea7e7db1e",
+    "src/subtitles/STS.cpp": "0ea9ed8e3a2ad04994675587978b5dae8b830ed27f1ea741c624627f4063cc54",
+    "src/subtitles/STS.h": "8d752098a513ffb7646d70cdd37cb06ce900a0d0e7e1ba5e309c448c97b1f93e",
+    "src/subtitles/RealTextParser.h": "53600d57e777cb4d06d90a7de88bd1035ea0538885e1175cc749ad84a0def781",
+    "src/subtitles/RealTextParser.cpp": "58a9a4acd45cde3f9a8a4b6ad87390cef4624cbc6c0de3e8eb9e8c5f4890bd04",
+    "rust/compat/src/realtext_engine.rs": "657b926c113f4059afb61548aa35aceaa9847115246150724bfb893120db8f7e",
+    "rust/compat/src/realtext_tag.rs": "08668cdbf940dcd69d4db30a209c71acad9fc8ce64feb1073486bec1e37a41ec",
+    "rust/compat/src/realtext_text.rs": "863e6b4a2345d89d850bded4ec6f84df9c105de0db600e739313025e61f48199",
+    "rust/compat/src/realtext_attributes.rs": "50d65600fc2a0c444ea7ea5e0d5f3f0a80050bdabc048ced32ed5bb660cca10a",
+    "rust/compat/src/realtext_lower.rs": "0567f567cf8dd8ea82a6ff7b5b936bb6f7874dd9e73d4fe67ff95990964327c0",
+    "rust/compat/src/realtext_timecode.rs": "6a2ba39c830c35bde4c28df3ecad88b373eed270c952fadca21aa5f28b91dbea",
+    "rust/compat/src/realtext.rs": "8239c21c4aefabd4e9dcef92ad971ae05bd1340fb8d36f05828bfac01d9f37d6"
+  },
+  "reference_sources": {
+    "src/subtitles/STS.cpp": "2616b67db84f7329ac6e2363a3f03d61977fa07c37ed9c04d32ec2b1197f31e0",
+    "src/subtitles/TextFile.cpp": "71c00071f9ceb466c539fda26103a4a94b802a4a01f4b807852e159563772f2f",
+    "src/dsutil/text.h": "92efdac94644006b4559d868631c27c841811327af9eedc408b817631e09d249",
+    "src/subtitles/RealTextParser.cpp": "de4db6bceb42992e6dd0014dea25bfafa7665725b3e17b422641daae0be5aaeb",
+    "src/subtitles/RealTextParser.h": "53600d57e777cb4d06d90a7de88bd1035ea0538885e1175cc749ad84a0def781"
+  },
+  "operations": [
+    {
+      "operation": "Tag and text extraction",
+      "source": {
+        "path": "rust/compat/src/realtext_engine.rs",
+        "line": 63,
+        "sha256": "657b926c113f4059afb61548aa35aceaa9847115246150724bfb893120db8f7e"
+      },
+      "behavior": "Owned input, output tag, cursor, flag patches, text extraction and partial attribute state use existing safe leaf state machines directly. Prefix consumption, comment-at-end failure, permissive mismatched quotes/slashes, repeated case-folded attributes and partial commits retain reference behavior. No native tag/list/string pointer or raw helper handle enters the engine."
+    },
+    {
+      "operation": "Case folding and attributes",
+      "source": {
+        "path": "rust/compat/src/realtext_engine.rs",
+        "line": 178,
+        "sha256": "657b926c113f4059afb61548aa35aceaa9847115246150724bfb893120db8f7e"
+      },
+      "behavior": "Each raw u16 goes to the native towlower callback and returns a checked u16. Attributes remain sorted by raw code units and later equal folded keys replace earlier values. There is no Rust Unicode scalar normalization or lossy decoding."
+    },
+    {
+      "operation": "Time folding",
+      "source": {
+        "path": "rust/compat/src/realtext_engine.rs",
+        "line": 199,
+        "sha256": "657b926c113f4059afb61548aa35aceaa9847115246150724bfb893120db8f7e"
+      },
+      "behavior": "Reverse field extraction, fractional right-padding and multiplier updates are Rust-owned. Each detached field retains native _wtoi conversion, then signed i32 multiplication/addition wrap explicitly. Long fields and more than three separators are covered directly against the cleanup."
+    },
+    {
+      "operation": "Tag rendering and private defaults",
+      "source": {
+        "path": "rust/compat/src/realtext_engine.rs",
+        "line": 251,
+        "sha256": "657b926c113f4059afb61548aa35aceaa9847115246150724bfb893120db8f7e"
+      },
+      "behavior": "Rust iterates ordered tags/attributes and builds raw UTF16 output. It preserves fresh CRealTextParser defaults: duration4000ms, no font ignore flags, minimum14/maximum25, permissive parsing. Only nonempty size attributes request iswdigit, then _wtoi if numeric; original filtering retains zero and negative/nonnumeric size text. Formatting-only output remains empty."
+    },
+    {
+      "operation": "Checked engine pump",
+      "source": {
+        "path": "rust/compat/src/realtext_engine.rs",
+        "line": 349,
+        "sha256": "657b926c113f4059afb61548aa35aceaa9847115246150724bfb893120db8f7e"
+      },
+      "behavior": "The engine drives the prior owned parser session and helpers until a native scalar/file/Add service is needed. Native callbacks run after registry admission ends. Input is immutable across helper callbacks. Bounds-fault requests preserve the original checked std::wstring access; exception compatibility is not established by these finite tests."
+    },
+    {
+      "operation": "Native dispatch",
+      "source": {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3399,
+        "sha256": "0ea9ed8e3a2ad04994675587978b5dae8b830ed27f1ea741c624627f4063cc54"
+      },
+      "behavior": "OpenRealText uses the checked session directly, without constructing CRealTextParser or calling its extraction/time/render methods. Native services are ReadString, CString whitespace/CompareNoCase, iswspace/towlower/_wtoi/iswdigit, final SubRipper2SSA and Add. Final c_str truncation remains at the original export boundary."
+    }
+  ],
+  "boundary_review": {
+    "source": {
+      "path": "rust/ffi/src/document.rs",
+      "line": 275,
+      "sha256": "59746265939180a41dd85a699c33c73605007b032728972a3a2b122813d66716"
+    },
+    "registry": {
+      "path": "rust/ffi/src/document_registry.rs",
+      "line": 471,
+      "sha256": "4e0cb1c4fa428c51881fa7e86b02b90bda8934cb8503cd32a0b93197818c0482"
+    },
+    "exports": [
+      "xy_vsfilter_document_realtext_begin_v2",
+      "xy_vsfilter_document_realtext_read_v2",
+      "xy_vsfilter_document_realtext_step_v2",
+      "xy_vsfilter_document_realtext_part_v2",
+      "xy_vsfilter_document_realtext_drop_v2"
+    ],
+    "retired_private_protocol": "Six RealText v1 static-library entries, including arbitrary extraction/render packets, are replaced by five v2 entries. These are internal, not public DLL exports.",
+    "contract": "Typed never-reused document-bound IDs; nonblocking registry admission; bounded copied UTF16LE/strict-bool spaces; scalar command must equal pending op; bools0/1, lower0..65535, Add ack0; output preflight; immutable snapshots outlive run and parent. Group0: op/accepted:u32,start/end:i64,unit/index:u32,raw payload. Groups1..3 preserve tag/map/window snapshots.",
+    "unsafe_entry_counts": {
+      "extern_unsafe_functions": 3,
+      "unsafe_blocks": 4,
+      "new_raw_slice_constructors": 0,
+      "native_pointer_owners_in_engine": 0
+    },
+    "delta_from_prior_increment": {
+      "extern_unsafe_functions": -1,
+      "unsafe_blocks": -1
+    },
+    "active_raw_helper_owners_retired": [
+      "RealTextTag",
+      "RealTextText",
+      "RealTextAttributes",
+      "RealTextLower",
+      "RealTextTimecode",
+      "RealTextTags"
+    ],
+    "prior_active_owners_already_retired": [
+      "RealTextDocument",
+      "RealTextTimeline",
+      "RealTextLists"
+    ],
+    "fallback_api_deletion_claimed": false,
+    "tests": "Caller-buffer mutation, unpaired surrogate, malformed input lengths/flags, strict scalar replies, wrong phase/kind, BUSY, output capacity, parent destruction, stale IDs, detached map/input/emission snapshots; core tests for duplicate folded attributes, size filtering, formatting restore, wrapping time fold and trailing-text/comment failure."
+  },
+  "direct_probe": {
+    "source": {
+      "path": "tools/compat/realtext_document_native.cpp",
+      "line": 7,
+      "sha256": "b5a4aa783b3b9be7106785d8fdd7368563b01a7fde56100c2b40fdd4c8111385"
+    },
+    "cases": 4532,
+    "trace_lines": 37887,
+    "baseline_commit": "248e9b150623947fa7236bb617bf8858b3589851",
+    "baseline_cases": 4532,
+    "method": "Actual OpenRealText and initialized document observer; two reference and two candidate executions per architecture. Full state/outcome/byte-position traces must match and be stable. Valid baseline and post-engine traces are byte-identical.",
+    "new_coverage": "600 cases added to the retained 3932-case prefix: duplicate/case-folded attributes, size boundaries, raw surrogates, Unicode unit predicates, mismatched quotes, slash termination, missing equals, unterminated values and long time fields.",
+    "baseline_harness_correction": "Commit20c4a784 used a forbidden C++ universal-character surrogate literal and did not compile. Commit248e9b15 uses a raw hex code-unit escape; only its successfully executed baseline is parity evidence."
+  },
+  "limits": [
+    "Experimental document path only; no production switch, RealText format closure or full-library completion.",
+    "ReadString/CString trimming and comparison, CRT character predicates/case/integer conversion, SubRipper2SSA and Add remain native services. All C++ host adapters and fallback raw RealText APIs remain transitional and in scope.",
+    "Finite Windows MSVC 14.44 x86/x64 evidence against the pinned cleanup. No allocation failure/reentry, file-I/O fault injection, locale mutation or bounds-exception parity claim; no Miri or non-Windows whole-renderer evidence.",
+    "SubViewer missing-style outcomes remain unresolved as recorded in rust-subviewer-reference-outcomes.json. This increment neither changes its fallback nor selects arbitrary defaults.",
+    "Crashes, hangs and nondeterminism are unresolved, never equality. Remaining formats, renderer, all public hosts and vendored code remain part of the full migration."
+  ],
+  "next_work": [
+    "Continue USF ownership and SubViewer reference investigation; retain unresolved no-style behavior without invented defaults.",
+    "Replace remaining native file/CRT/conversion services and retire fallback raw parser APIs once both paths are covered.",
+    "Continue renderer, public host/ABI and vendored implementation migration; all remain required for the final Rust replacement."
+  ]
+}
