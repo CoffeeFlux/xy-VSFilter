@@ -270,6 +270,72 @@ pub extern "C" fn xy_vsfilter_document_search_drop_v1(id: u64) -> u32 {
 }
 
 /// # Safety
+/// Bounded initialized USF packet is copied and decoded before registry admission.
+/// Eight writable output bytes receive a document-bound conversion ID. Begin
+/// applies original metadata defaults only after packet and output preflight.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_usf_begin_v1(
+    owner: u64,
+    input: *const u8,
+    length: usize,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    // SAFETY: initialized bounded caller bytes, copied before registry borrowing.
+    let bytes = required!(unsafe { copy_input(input, length) });
+    let mut run =
+        required!(xy_vsfilter_compat::usf_conversion::Run::decode(&bytes).map_err(ass_error));
+    let id = required!(admitted(|registry| {
+        registry.document(owner).map_err(registry_error)?;
+        let id = registry.reserve_insert().map_err(registry_error)?;
+        run.begin(registry.document_mut(owner).map_err(registry_error)?)
+            .map_err(ass_error)?;
+        registry.insert_reserved(id, Resource::UsfRun { owner, run });
+        Ok(id)
+    }));
+    // SAFETY: preflighted writable output; all registry loans have ended.
+    unsafe { write_output(output, &id.to_le_bytes()) };
+    OK
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_usf_drop_v1(id: u64) -> u32 {
+    status(DOCUMENTS.destroy(id, Kind::UsfRun).map_err(registry_error))
+}
+/// Scalar command must match the pending request; AddStyle/Add acknowledgements
+/// require zero. Native comparisons/conversions run outside admitted calls.
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_usf_step_v1(id: u64, command: u32, value: i32) -> u32 {
+    status(admitted(|registry| {
+        let (doc, run) = registry.usf_pair(id).map_err(registry_error)?;
+        run.step(doc, command, value).map_err(ass_error)
+    }))
+}
+/// # Safety
+/// Eight writable output bytes receive a detached immutable snapshot ID.
+/// Group0 is op/argument/index/a-length/b-length:u32 followed by raw strings;
+/// group1 is the existing style wire at AddStyle, group2 the entry wire at Add.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_usf_part_v1(
+    id: u64,
+    group: u32,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let bytes = required!(admitted(|registry| registry
+        .usf_pair(id)
+        .map_err(registry_error)?
+        .1
+        .snapshot(group)
+        .map_err(ass_error)));
+    let snapshot = required!(insert(Resource::Snapshot(bytes)));
+    // SAFETY: preflighted output; snapshot owns bytes independently of the run.
+    unsafe { write_output(output, &snapshot.to_le_bytes()) };
+    OK
+}
+
+/// # Safety
 /// Output receives a document-bound RealText session ID in eight writable bytes.
 #[no_mangle]
 pub unsafe extern "C" fn xy_vsfilter_document_realtext_begin_v2(
@@ -4828,6 +4894,128 @@ mod tests {
             for id in [rt_map, rt_emit, input_snapshot] {
                 assert_eq!(xy_vsfilter_document_snapshot_drop_v1(id), OK);
             }
+            // USF conversion import, scalar protocol, output preflight and
+            // snapshot lifetime. Raw UTF16 is copied before registry admission.
+            let usf_owner = create();
+            let mut packet = Vec::new();
+            let put = |b: &mut Vec<u8>, s: &[u16]| {
+                b.extend_from_slice(&(s.len() as u32).to_le_bytes());
+                b.extend(s.iter().flat_map(|u| u.to_le_bytes()));
+            };
+            put(&mut packet, &[69, 78]);
+            packet.extend_from_slice(&0u32.to_le_bytes());
+            packet.extend_from_slice(&1u32.to_le_bytes());
+            packet.extend_from_slice(&1i32.to_le_bytes());
+            packet.extend_from_slice(&5i32.to_le_bytes());
+            put(&mut packet, &[]);
+            put(&mut packet, &"Default".encode_utf16().collect::<Vec<_>>());
+            put(&mut packet, &[65, 0, 0xd800]);
+            for _ in 0..7 {
+                put(&mut packet, &[]);
+            }
+            out.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_document_usf_begin_v1(
+                    usf_owner,
+                    packet.as_ptr(),
+                    packet.len(),
+                    out.as_mut_ptr(),
+                    7
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_begin_v1(
+                    usf_owner,
+                    packet.as_ptr(),
+                    packet.len() - 1,
+                    out.as_mut_ptr(),
+                    8
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_usf_begin_v1(
+                        usf_owner,
+                        packet.as_ptr(),
+                        packet.len(),
+                        out.as_mut_ptr(),
+                        8
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert!(out.iter().all(|&b| b == 0xa5));
+            assert_eq!(
+                xy_vsfilter_document_usf_begin_v1(
+                    usf_owner,
+                    packet.as_ptr(),
+                    packet.len(),
+                    out.as_mut_ptr(),
+                    8
+                ),
+                OK
+            );
+            let usf_run = u64::from_le_bytes(out[..8].try_into().unwrap());
+            packet.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_document_usf_step_v1(usf_owner, 2, 0),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_step_v1(usf_run, 1, 0),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_usf_step_v1(usf_run, 2, 0))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_part_v1(usf_run, 0, out.as_mut_ptr(), 7),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_part_v1(usf_run, 1, out.as_mut_ptr(), 8),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_part_v1(usf_run, 3, out.as_mut_ptr(), 8),
+                INVALID_INPUT
+            );
+            for _ in 0..3 {
+                assert_eq!(xy_vsfilter_document_usf_step_v1(usf_run, 2, 0), OK);
+            }
+            assert_eq!(xy_vsfilter_document_usf_step_v1(usf_run, 1, 0), OK);
+            assert_eq!(
+                xy_vsfilter_document_usf_part_v1(usf_run, 2, out.as_mut_ptr(), 8),
+                OK
+            );
+            let usf_snapshot = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let saved = read_snapshot(usf_snapshot);
+            let usf_entry = wire::decode_entry(&saved).unwrap();
+            assert_eq!(usf_entry.text, [65, 0, 0xd800]);
+            assert_eq!((usf_entry.start, usf_entry.end), (1, 5));
+            assert_eq!(
+                xy_vsfilter_document_usf_step_v1(usf_run, 7, 1),
+                INVALID_INPUT
+            );
+            assert_eq!(xy_vsfilter_document_usf_step_v1(usf_run, 7, 0), OK);
+            assert_eq!(
+                xy_vsfilter_document_usf_step_v1(usf_run, 7, 0),
+                INVALID_INPUT
+            );
+            assert_eq!(xy_vsfilter_document_destroy_v1(usf_owner), OK);
+            assert_eq!(
+                xy_vsfilter_document_usf_part_v1(usf_run, 0, out.as_mut_ptr(), 8),
+                BAD_HANDLE
+            );
+            assert_eq!(read_snapshot(usf_snapshot), saved);
+            assert_eq!(xy_vsfilter_document_usf_drop_v1(usf_run), OK);
+            assert_eq!(xy_vsfilter_document_usf_drop_v1(usf_run), BAD_HANDLE);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(usf_snapshot), OK);
             // WebVTT: copies, phase errors, typed IDs, BUSY, and detached snapshots.
             let vtt_owner = create();
             out.fill(0xa5);

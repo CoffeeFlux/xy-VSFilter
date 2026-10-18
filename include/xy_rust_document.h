@@ -271,6 +271,18 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_open_lifecycle_drop_v1(uint64_t 
 // Invalid protocol/capacity leaves the run, document and output untouched;
 // absent opposite screen axis reports UNRESOLVED_REFERENCE. No native loans
 // or callbacks survive a call. Drop remains valid after document destruction.
+// Checked USF conversion. Begin packet: counted raw UTF16 language; style/text
+// counts:u32; styles: name,13 font strings(face,size,color[4],weight,italic,
+// underline,alpha,outline,shadow,wrap),7 position strings(alignment,relative-to,
+// horizontal/vertical margins,rotate z/x/y); texts: start/stop:i32,effect/style/
+// text,7 position strings. Each string is count:u32 then raw u16 units.
+// Step command equals op:1 CompareNoCase,2 wcstol10,3 ColorToDWORD,4 Margin,
+// 5 Alignment,6 AddStyle ack0,7 Add ack0. Done8. Group0 op/arg/index/aLen/bLen:u32
+// and raw strings; group1 existing style wire; group2 existing entry wire.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_usf_begin_v1(uint64_t,const uint8_t*,size_t,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_usf_drop_v1(uint64_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_usf_step_v1(uint64_t,uint32_t,int32_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_usf_part_v1(uint64_t,uint32_t,uint8_t*,size_t);
 // Checked RealText engine. Begin retains CRealTextParser's private defaults.
 // Read copies UTF16LE and strict-bool spaces. Step command equals pending op:
 // 1 CompareNoCase(i32),2 iswspace(bool),3 towlower(u16),4 _wtoi(i32),

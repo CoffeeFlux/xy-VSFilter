@@ -883,6 +883,25 @@ def realtext_parser_variants():
         yield "realtext-parser-"+name+".rt",data
 
 
+def usf_conversion_variants():
+    font='<fontstyle face="Arial" size="36" color="#ffffff" weight="normal" outline-level="2" shadow-level="1"/>'
+    default='<style name="Default">'+font+'</style>'
+    for name,(styles,attributes,caption) in {
+        "control":(default,"","First caption"),
+        "italic":(default,"","<i>First caption</i>"),
+        "alpha":('<style name="Default">'+font.replace('weight="normal"','weight="normal" alpha="300"')+'</style>',"","First caption"),
+        "margin":(default,'alignment="TopLeft" horizontal-margin="10%" vertical-margin="20"',"First caption"),
+        "rotation":(default,'rotate-z="30" rotate-x="-2" rotate-y="3"',"First caption"),
+        "named-wrap":(default.replace('size="36"','size="36" wrap="no"')+'<style name="Named"><fontstyle wrap="auto"/></style>','style="Named"',"A long caption with enough text to wrap across the subtitle screen more than once"),
+        "inheritance":(default+'<style name="Named"><fontstyle color="red"/></style>','style="Named"',"First caption"),
+        "duplicate-default":(default.replace('size="36"','size="20" wrap="no"')+default,"","First caption"),
+        "inline-font":(default,"",'<font color="red" size="25">First</font> caption'),
+        "xml-text":(default,"","  First &amp; second\r\n caption <b>bold <i>italic</i></b>"),
+    }.items():
+        text='<USFSubtitles><metadata><language code="en">English</language></metadata><styles>'+styles+'</styles><subtitles><subtitle start="0:00:01.000" stop="0:00:05.000"><text '+attributes+'>'+caption+'</text></subtitle></subtitles></USFSubtitles>\r\n'
+        yield 'usf-conversion-'+name+'.usf',text.encode('ascii')
+
+
 def timestamps(data):
     matches = re.findall(rb"Dialogue:[^,]*,(\d+):(\d+):(\d+(?:\.\d+)?),(\d+):(\d+):(\d+(?:\.\d+)?)", data)
     if not matches:
@@ -927,6 +946,9 @@ def make_cases(files):
                 cases[-1]["times"] = ["0", "0.9999999", "1", "1.0000001", "2", "2.9999999", "3", "3.0000001", "4", "4.9999999", "5", "2"]
             if path.stem.startswith("realtext-parser-"):
                 cases[-1]["times"] = ["0", "0.9999999", "1", "1.0000001", "2", "2.9999999", "3", "4", "4.9999999", "5", "2", "1"]
+            if path.stem.startswith("usf-conversion-"):
+                # Cleanup USF passes millisecond counts directly as 100ns ticks.
+                cases[-1]["times"] = ["0", "0.0000999", "0.0001", "0.0001001", "0.0002", "0.0003", "0.0004", "0.0004999", "0.0005", "0.0005001", "0.0002", "0.0001"]
             warning_styles = {"field-tab-prefixes": "\tDefault", "field-unicode-style-space": "\u2003Default"}
             if path.stem in warning_styles:
                 cases[-1]["dialog_actions"] = [{"title": "Warning",
@@ -959,6 +981,9 @@ def make_cases(files):
                                                     ("realtext-parser-italic", "realtext-parser-control"),
                                                     ("realtext-parser-helper-red", "realtext-parser-helper-control"),
                                                     ("realtext-parser-helper-fractions", "realtext-parser-helper-control"),
+                                                    ("usf-conversion-italic", "usf-conversion-control"),
+                                                    ("usf-conversion-margin", "usf-conversion-control"),
+                                                    ("usf-conversion-rotation", "usf-conversion-control"),
                                                     ("vtt-parser-color-replace", "vtt-parser-control"),
                                                     ("vtt-parser-alignment", "vtt-parser-control"),
                                                     ("sami-parser-title-skip", "sami-parser-control"),
@@ -1050,6 +1075,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in sami_parser_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in vtt_parser_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in realtext_parser_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in usf_conversion_variants()]
     manifest = json.dumps(make_cases(files + generated), indent=2) + "\n"
     expected = generated + [(DEST / "cases.json", manifest.encode("utf-8"))]
     for path, data in expected:

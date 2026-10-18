@@ -21,6 +21,9 @@
 
 #include "StdAfx.h"
 #include "usfsubtitles.h"
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+#include "RustDocumentOwner.h"
+#endif
 #include <msxml.h>
 #include <atlsafe.h>
 
@@ -262,6 +265,30 @@ bool CUSFSubtitles::Load(const VARIANT& source)
 bool CUSFSubtitles::ConvertToSTS(CSimpleTextSubtitle& sts)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    XyRust::UsfConversion conversion(*sts.m_document,*this);
+    for(;;){
+        CStringW a,b;int argument;unsigned index;const unsigned op=conversion.Next(a,b,argument,index);
+        if(op==8)return true;
+        if(op==1)conversion.Step(op,a.CompareNoCase(b));
+        else if(op==2)conversion.Step(op,wcstol(a,NULL,10));
+        else if(op==3)conversion.Step(op,static_cast<int32_t>(ColorToDWORD(a)));
+        else if(op==4)conversion.Step(op,TranslateMargin(a,argument));
+        else if(op==5)conversion.Step(op,TranslateAlignment(a));
+        else if(op==6){
+            std::unique_ptr<STSStyle> value(new STSStyle(conversion.Style()));
+            sts.AddStyle(a,value.release());conversion.Step(op);
+        }
+        else if(op==7){
+            const STSEntry entry=conversion.Entry();
+            // Original conversion mutates the stored text before Add. Retain
+            // that state for repeated ConvertToSTS calls and failed XML reloads.
+            const POSITION pos=texts.FindIndex(index);XyRust::DocumentDetail::Shape(pos!=NULL);
+            texts.GetAt(pos)->str=entry.str;
+            sts.Add(entry.str,true,entry.start,entry.end,entry.style,_T(""),_T(""),entry.marginRect);conversion.Step(op);
+        }
+    }
+#else
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 	sts.SetDocumentName(metadata.language.text);
 #else
 	sts.m_name = metadata.language.text;
@@ -444,6 +471,7 @@ bool CUSFSubtitles::ConvertToSTS(CSimpleTextSubtitle& sts)
 	}
 
 	return(true);
+#endif
 }
 
 bool CUSFSubtitles::ParseUSFSubtitles(CComPtr<IXMLDOMNode> pNode)

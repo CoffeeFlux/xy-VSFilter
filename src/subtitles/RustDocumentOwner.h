@@ -244,6 +244,7 @@ class MicroDvdDocument;
 class SamiDocument;
 class VttDocument;
 class RealTextSession;
+class UsfConversion;
 class UnknownStylesPass;
 class StyleAddition;
 class NamedStyleCopy;
@@ -257,6 +258,7 @@ class DocumentReply {
     friend class SamiDocument;
     friend class VttDocument;
     friend class RealTextSession;
+    friend class UsfConversion;
     friend class DocumentOwner;
     friend class UnknownStylesPass;
     friend class StyleAddition;
@@ -301,6 +303,7 @@ class DocumentOwner {
     friend class SamiDocument;
     friend class VttDocument;
     friend class RealTextSession;
+    friend class UsfConversion;
     friend class UnknownStylesPass;
     friend class StyleAddition;
     friend class NamedStyleCopy;
@@ -890,6 +893,49 @@ public:
         size_t offset=0;name=DocumentDetail::String(bytes,offset,DocumentDetail::Count(bytes.size()/2));
         Step(4); // release before AddStyle consumes its native temporary
     }
+};
+class UsfConversion {
+    uint64_t id_=0;
+    static void String(DocumentDetail::Bytes& bytes,const CStringW& text) {
+        DocumentDetail::Append(bytes,DocumentDetail::Count(text.GetLength()),4);
+        const auto raw=DocumentDetail::Units(text);bytes.insert(bytes.end(),raw.begin(),raw.end());
+    }
+    template<class Pal> static void Position(DocumentDetail::Bytes& bytes,const Pal& p) {
+        for(const auto* value:{&p.alignment,&p.relativeto,&p.horizontal_margin,&p.vertical_margin,&p.rotate[0],&p.rotate[1],&p.rotate[2]})String(bytes,*value);
+    }
+    DocumentDetail::Bytes Part(unsigned group) const {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_usf_part_v1(id_,group,out.data(),out.size());}));
+        DocumentReply snapshot(DocumentDetail::Load(out,0,8));return snapshot.Read();
+    }
+public:
+    template<class Source> UsfConversion(const DocumentOwner& owner,const Source& source) {
+        DocumentDetail::Bytes bytes;String(bytes,source.metadata.language.text);
+        DocumentDetail::Append(bytes,DocumentDetail::Count(source.styles.GetCount()),4);DocumentDetail::Append(bytes,DocumentDetail::Count(source.texts.GetCount()),4);
+        POSITION pos=source.styles.GetHeadPosition();
+        while(pos){const auto& s=source.styles.GetNext(pos);String(bytes,s->name);const auto& f=s->fontstyle;
+            for(const auto* value:{&f.face,&f.size,&f.color[0],&f.color[1],&f.color[2],&f.color[3],&f.weight,&f.italic,&f.underline,&f.alpha,&f.outline,&f.shadow,&f.wrap})String(bytes,*value);
+            Position(bytes,s->pal);
+        }
+        pos=source.texts.GetHeadPosition();
+        while(pos){const auto& t=source.texts.GetNext(pos);DocumentDetail::Append(bytes,static_cast<uint32_t>(t->start),4);DocumentDetail::Append(bytes,static_cast<uint32_t>(t->stop),4);
+            String(bytes,t->effect);String(bytes,t->style);String(bytes,t->str);Position(bytes,t->pal);
+        }
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_usf_begin_v1(owner.id_,bytes.data(),bytes.size(),out.data(),out.size());}));id_=DocumentDetail::Load(out,0,8);
+    }
+    UsfConversion(const UsfConversion&)=delete;UsfConversion& operator=(const UsfConversion&)=delete;
+    ~UsfConversion() noexcept {if(id_){const auto id=id_;id_=0;DocumentDetail::Release(DocumentDetail::Invoke([&]{return xy_vsfilter_document_usf_drop_v1(id);}));}}
+    void Step(unsigned op,int value=0) {DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_usf_step_v1(id_,op,value);}));}
+    unsigned Next(CStringW& a,CStringW& b,int& argument,unsigned& index) const {
+        const auto bytes=Part(0);DocumentDetail::Shape(bytes.size()>=20);
+        const auto op=DocumentDetail::Load(bytes,0,4);DocumentDetail::Shape(op>=1 && op<=8);
+        argument=DocumentDetail::I32(DocumentDetail::Load(bytes,4,4));index=DocumentDetail::Count(DocumentDetail::Load(bytes,8,4));
+        const auto alen=DocumentDetail::Count(DocumentDetail::Load(bytes,12,4)),blen=DocumentDetail::Count(DocumentDetail::Load(bytes,16,4));
+        size_t offset=20;a=DocumentDetail::String(bytes,offset,alen);b=DocumentDetail::String(bytes,offset,blen);DocumentDetail::Shape(offset==bytes.size());return static_cast<unsigned>(op);
+    }
+    STSStyle Style() const {return DocumentDetail::StyleValue(Part(1));}
+    STSEntry Entry() const {return DocumentDetail::EntryValue(Part(2));}
 };
 class RealTextSession {
     uint64_t id_=0;
