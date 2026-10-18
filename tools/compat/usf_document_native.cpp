@@ -5,6 +5,7 @@
 #undef main
 #include <STS.cpp>
 #include <USFSubtitles.cpp>
+#include "legacy_color_names.h"
 
 
 static void usf_u32(std::vector<BYTE>& bytes,unsigned value) {
@@ -89,7 +90,7 @@ static unsigned usf_scalars() {
     std::vector<CStringW> values;
     const wchar_t* literals[]={L"",L"0",L"1",L"-1",L"+1",L"1x",L"x1",L" 1 ",L"\t-2%",L"%2",L"2%tail",L"2tail%",L"2147483647",L"2147483648",L"-2147483648",L"-2147483649",L"4294967295",L"999999999999999999999",L"-999999999999999999999",L"0x1234",L"#",L"##",L"#123456",L"##123456",L"#80112233",L"#ffffffff",L"#-1",L"#7fffffff",L"#80000000",L"# 0x123456",L"##+1234tail",L"aqua",L"purple",L"fuchsia",L"paleturqoise",L"paleturquoise",L"comflowerblue",L"cornflowerblue",L"transparent",L"red",L"RED",L"Red",L" red",L"red ",L"BottomLeft",L"BottomCenter",L"BottomRight",L"MiddleLeft",L"MiddleCenter",L"MiddleRight",L"TopLeft",L"TopCenter",L"TopRight",L"tOpLeFt",L"top left",L"topcenter ",L"\u0130",L"\uff11",L"\u20031",L"\u00a01",L"\xd800",L"\xdfff",L"\ufffe",L"\uffff"};
     for(auto value:literals)values.push_back(CStringW(value));
-    for(auto& color:htmlcolors){CStringW value(color.name);values.push_back(value);value.MakeUpper();values.push_back(value);}
+    for(auto name:legacy_color_names){CStringW value(name);values.push_back(value);value.MakeUpper();values.push_back(value);}
     const wchar_t* parts[]={L"",L"1",L"-2",L"0",L"x",L"2x",L"2147483647",L"2147483648",L"-2147483649",L" 2",L"+3",L"4%",L"1:2",L"1:2:3",L"1:2:3:4",L"1::2"};
     for(auto a:parts)for(auto b:parts)for(auto sep:{L":",L".",L",",L"::"})values.push_back(CStringW(a)+sep+b);
     for(unsigned u=0;u<256;++u){
