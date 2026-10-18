@@ -28,5 +28,7 @@ int main(){try{
  for(auto unit:{0,9,13,32,0xa0,0x2003,0xd800,0xffff})for(int pos=0;pos<12;++pos){CStringW raw=rawbase;raw.SetAt(pos*4,static_cast<WCHAR>(unit));emit(0,raw);}
  const wchar_t* tails[]={L"]caption",L"]",L"]|/italic",L"caption",L"",L" ]caption",L"]caption\r\n[2][4]second",L"]caption\r\nbad"};
  for(auto start:values)for(auto end:values)for(auto tail:tails)for(int newline=0;newline<2;++newline){CStringW text;text.Format(L"[%s][%s%s%s",start,end,tail,newline?L"\r\n":L"");emit(1,text);}
+ CStringW mplraw(L"[10][40] raw |/italic\r\n[41][50]tail\r\n");
+ for(auto unit:{0,9,13,32,0xa0,0x2003,0xd800,0xffff})for(int pos=0;pos<12;++pos){CStringW raw=mplraw;raw.SetAt(pos*2,static_cast<WCHAR>(unit));emit(1,raw);}
  printf("text-complete cases=%u\n",index);return 0;
 }catch(const std::exception& error){fprintf(stderr,"unresolved: %s\n",error.what());return 1;}catch(...){fprintf(stderr,"unresolved exception\n");return 2;}}

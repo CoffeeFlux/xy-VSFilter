@@ -27,7 +27,16 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: XombieSub parser ownership (2026-10-18)
+## Active port: SubRip and MPL2 parser ownership (2026-10-18)
+
+The experimental document path now uses a checked Rust session for SubRip and
+MPL2 line/cue ownership, trimming, EOF handling, boundary decisions, timestamp
+arithmetic and MPL2 caption extraction. Native scanf, formatting and Add remain
+transitional services outside registry loans. A 3,936-case unchanged-parser
+baseline passed on both architectures before replacement; the implementation
+probe adds raw MPL2 cases. Fresh implementation comparisons are in progress.
+
+## Previous port: XombieSub parser ownership (2026-10-18)
 
 The experimental XombieSub path now uses a checked Rust session for line/EOF
 sequencing, key dispatch, screen inference/reset, ordered style and dialogue

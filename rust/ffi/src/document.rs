@@ -270,6 +270,127 @@ pub extern "C" fn xy_vsfilter_document_search_drop_v1(id: u64) -> u32 {
 }
 
 /// # Safety
+/// Output receives a document-bound text parser run ID in eight writable bytes.
+/// Format0 is SubRip,1 MPL2. No constructor document mutation.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_text_parser_begin_v1(
+    owner: u64,
+    format: u32,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let format = match format {
+        0 => xy_vsfilter_compat::text_document::Format::SubRip,
+        1 => xy_vsfilter_compat::text_document::Format::Mpl2,
+        _ => return INVALID_INPUT,
+    };
+    let id = required!(admitted(|registry| {
+        registry.document(owner).map_err(registry_error)?;
+        let id = registry.reserve_insert().map_err(registry_error)?;
+        registry.insert_reserved(
+            id,
+            Resource::TextRun {
+                owner,
+                run: xy_vsfilter_compat::text_document::Run::new(format),
+            },
+        );
+        Ok(id)
+    }));
+    // SAFETY: validated output; no registry borrow remains.
+    unsafe { write_output(output, &id.to_le_bytes()) };
+    OK
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_text_parser_drop_v1(id: u64) -> u32 {
+    status(DOCUMENTS.destroy(id, Kind::TextRun).map_err(registry_error))
+}
+/// # Safety
+/// Initialized raw UTF16LE plus one strict-bool CString whitespace flag per unit.
+/// Both native spans are copied before admission; EOF is !ReadString result.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_text_parser_read_v1(
+    id: u64,
+    eof: u32,
+    input: *const u8,
+    length: usize,
+    spaces: *const u8,
+    space_length: usize,
+) -> u32 {
+    if eof > 1 || length % 2 != 0 || space_length != length / 2 {
+        return INVALID_INPUT;
+    }
+    // SAFETY: bounded initialized caller buffers, copied before registry loans.
+    let text = units(&required!(unsafe { copy_input(input, length) }));
+    // SAFETY: same caller-buffer contract for predicate bytes.
+    let spaces = required!(unsafe { copy_input(spaces, space_length) });
+    status(admitted(|registry| {
+        let (doc, run) = registry.text_pair(id).map_err(registry_error)?;
+        run.read(doc, &text, &spaces, eof != 0).map_err(ass_error)
+    }))
+}
+/// # Safety
+/// Command0 supplies scanf count plus exactly eight initialized i32 LE values;
+/// SubRip uses all8 only when count>=11, MPL2 uses first2 only when count==2.
+/// Command1 supplies strict-bool numeric-only caption result with empty input;
+/// command2 acknowledges Add completion with value0 and empty input. Never copy
+/// uninitialized native scan locals for a partial conversion.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_text_parser_step_v1(
+    id: u64,
+    command: u32,
+    value: i32,
+    input: *const u8,
+    length: usize,
+) -> u32 {
+    if command > 2
+        || (command == 0 && length != 32)
+        || (command != 0 && length != 0)
+        || (command == 1 && !(0..=1).contains(&value))
+        || (command == 2 && value != 0)
+    {
+        return INVALID_INPUT;
+    }
+    // SAFETY: initialized byte packet is copied before registry admission.
+    let bytes = required!(unsafe { copy_input(input, length) });
+    let mut values = [0; 8];
+    for (chunk, number) in bytes.chunks_exact(4).zip(&mut values) {
+        *number = i32::from_le_bytes(chunk.try_into().unwrap());
+    }
+    status(admitted(|registry| {
+        let (_, run) = registry.text_pair(id).map_err(registry_error)?;
+        match command {
+            0 => run.header(value, values),
+            1 => run.caption(value != 0),
+            2 => run.acknowledge(),
+            _ => unreachable!(),
+        }
+        .map_err(ass_error)
+    }))
+}
+/// # Safety
+/// Output receives immutable snapshot ID in eight writable bytes. Snapshot:
+/// op:u32(ReadHeader0/ScanHeader1/ReadCaption2/ScanCaption3/Emit4/Done5/Failed6),
+/// accepted:bool32,start:i64,end:i64, then raw UTF16LE. No native/run loan escapes.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_text_parser_part_v1(
+    id: u64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let bytes = required!(admitted(|registry| Ok(registry
+        .text_pair(id)
+        .map_err(registry_error)?
+        .1
+        .snapshot())));
+    let snapshot = required!(insert(Resource::Snapshot(bytes)));
+    // SAFETY: validated output; independent snapshot survives owner/run release.
+    unsafe { write_output(output, &snapshot.to_le_bytes()) };
+    OK
+}
+
+/// # Safety
 /// Output receives a validated, document-bound run ID in eight writable bytes.
 #[no_mangle]
 pub unsafe extern "C" fn xy_vsfilter_document_xombie_begin_v1(
@@ -3536,6 +3657,160 @@ mod tests {
             assert_eq!(xy_vsfilter_document_xombie_drop_v1(xrun), OK);
             assert_eq!(xy_vsfilter_document_xombie_drop_v1(xrun), BAD_HANDLE);
             assert_eq!(xy_vsfilter_document_snapshot_drop_v1(xsnapshot), OK);
+            // Text parser packets copy their input before admission and retain
+            // decoded snapshots independently of both session and parent owner.
+            let text_owner = create();
+            out.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_document_text_parser_begin_v1(text_owner, 2, out.as_mut_ptr(), 8),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_text_parser_begin_v1(text_owner, 0, out.as_mut_ptr(), 7),
+                INVALID_INPUT
+            );
+            assert_eq!(out, [0xa5; 16]);
+            assert_eq!(
+                xy_vsfilter_document_text_parser_begin_v1(text_owner, 1, out.as_mut_ptr(), 8),
+                OK
+            );
+            let text_run = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let mut raw: Vec<u8> = "[1][2]raw\0tail"
+                .encode_utf16()
+                .flat_map(u16::to_le_bytes)
+                .collect();
+            let spaces = alloc::vec![0;raw.len()/2];
+            assert_eq!(
+                xy_vsfilter_document_text_parser_read_v1(
+                    text_run,
+                    2,
+                    raw.as_ptr(),
+                    raw.len(),
+                    spaces.as_ptr(),
+                    spaces.len()
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_text_parser_read_v1(
+                    text_run,
+                    0,
+                    raw.as_ptr(),
+                    raw.len(),
+                    spaces.as_ptr(),
+                    spaces.len() - 1
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_text_parser_read_v1(
+                    text_owner,
+                    0,
+                    raw.as_ptr(),
+                    raw.len(),
+                    spaces.as_ptr(),
+                    spaces.len()
+                ),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_text_parser_read_v1(
+                        text_run,
+                        0,
+                        raw.as_ptr(),
+                        raw.len(),
+                        spaces.as_ptr(),
+                        spaces.len()
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                xy_vsfilter_document_text_parser_read_v1(
+                    text_run,
+                    0,
+                    raw.as_ptr(),
+                    raw.len(),
+                    spaces.as_ptr(),
+                    spaces.len()
+                ),
+                OK
+            );
+            raw.fill(0);
+            let values: Vec<u8> = [1i32, 2, 0, 0, 0, 0, 0, 0]
+                .into_iter()
+                .flat_map(i32::to_le_bytes)
+                .collect();
+            assert_eq!(
+                xy_vsfilter_document_text_parser_step_v1(text_run, 0, 2, values.as_ptr(), 31),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_text_parser_step_v1(text_run, 1, 1, ptr::null(), 0),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_text_parser_step_v1(text_run, 0, 3, values.as_ptr(), 32),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_text_parser_step_v1(
+                        text_run,
+                        0,
+                        2,
+                        values.as_ptr(),
+                        32
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                xy_vsfilter_document_text_parser_step_v1(text_run, 0, 2, values.as_ptr(), 32),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_text_parser_part_v1(text_run, out.as_mut_ptr(), 7),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_text_parser_part_v1(text_run, out.as_mut_ptr(), 8),
+                OK
+            );
+            let text_snapshot = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let retained = read_snapshot(text_snapshot);
+            assert_eq!(
+                &retained[24..],
+                &"raw\0tail"
+                    .encode_utf16()
+                    .flat_map(u16::to_le_bytes)
+                    .collect::<Vec<_>>()
+            );
+            assert_eq!(
+                i64::from_le_bytes(retained[8..16].try_into().unwrap()),
+                1_000_000
+            );
+            assert_eq!(
+                xy_vsfilter_document_text_parser_step_v1(text_run, 2, 1, ptr::null(), 0),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_text_parser_step_v1(text_run, 2, 0, ptr::null(), 0),
+                OK
+            );
+            assert_eq!(xy_vsfilter_document_destroy_v1(text_owner), OK);
+            assert_eq!(
+                xy_vsfilter_document_text_parser_part_v1(text_run, out.as_mut_ptr(), 8),
+                BAD_HANDLE
+            );
+            assert_eq!(read_snapshot(text_snapshot), retained);
+            assert_eq!(xy_vsfilter_document_text_parser_drop_v1(text_run), OK);
+            assert_eq!(
+                xy_vsfilter_document_text_parser_drop_v1(text_run),
+                BAD_HANDLE
+            );
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(text_snapshot), OK);
             let simple_owner = create();
             let mut simple_out = [0xa5; 4];
             assert_eq!(

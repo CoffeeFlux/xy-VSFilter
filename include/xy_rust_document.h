@@ -271,6 +271,16 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_open_lifecycle_drop_v1(uint64_t 
 // Invalid protocol/capacity leaves the run, document and output untouched;
 // absent opposite screen axis reports UNRESOLVED_REFERENCE. No native loans
 // or callbacks survive a call. Drop remains valid after document destruction.
+// Checked text-parser session, format0 SubRip/1 MPL2. Read supplies EOF,
+// raw UTF16LE and strict-bool CString predicates. Step0 supplies scanf count
+// and eight initialized i32 LE values; step1 numeric-only bool; step2 Add ack.
+// Never serialize uninitialized native locals on partial scanf conversion.
+// Part: op:u32(0..6),accepted:bool32,start:i64,end:i64,raw UTF16LE.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_text_parser_begin_v1(uint64_t,uint32_t,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_text_parser_drop_v1(uint64_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_text_parser_read_v1(uint64_t,uint32_t,const uint8_t*,size_t,const uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_text_parser_step_v1(uint64_t,uint32_t,int32_t,const uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_text_parser_part_v1(uint64_t,uint8_t*,size_t);
 // Checked XombieSub session; all byte buffers follow the common contract.
 // Step0 classify,1 text,2 i32 bits,3 f64 bits,4 acknowledge,5 numeric failure.
 // Read supplies EOF=!ReadString, raw UTF16LE and one strict-bool whitespace flag

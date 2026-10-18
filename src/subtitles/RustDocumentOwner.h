@@ -238,6 +238,7 @@ class TranslatedDocumentSearch;
 class OpenLifecycle;
 class AssDocument;
 class XombieDocument;
+class TextDocument;
 class UnknownStylesPass;
 class StyleAddition;
 class NamedStyleCopy;
@@ -246,6 +247,7 @@ class DocumentReply {
     explicit DocumentReply(uint64_t id) : id_(id) {}
     friend class AssDocument;
     friend class XombieDocument;
+    friend class TextDocument;
     friend class DocumentOwner;
     friend class UnknownStylesPass;
     friend class StyleAddition;
@@ -285,6 +287,7 @@ class DocumentOwner {
     friend class OpenLifecycle;
     friend class AssDocument;
     friend class XombieDocument;
+    friend class TextDocument;
     friend class UnknownStylesPass;
     friend class StyleAddition;
     friend class NamedStyleCopy;
@@ -873,6 +876,35 @@ public:
         style=DocumentDetail::StyleValue(Part(1));const auto bytes=Part(2);DocumentDetail::Shape(bytes.size()%2==0);
         size_t offset=0;name=DocumentDetail::String(bytes,offset,DocumentDetail::Count(bytes.size()/2));
         Step(4); // release before AddStyle consumes its native temporary
+    }
+};
+class TextDocument {
+    uint64_t id_=0;
+public:
+    explicit TextDocument(const DocumentOwner& owner,unsigned format) {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_text_parser_begin_v1(owner.id_,format,out.data(),out.size());}));id_=DocumentDetail::Load(out,0,8);
+    }
+    TextDocument(const TextDocument&)=delete;TextDocument& operator=(const TextDocument&)=delete;
+    ~TextDocument() noexcept {if(id_){const auto id=id_;id_=0;DocumentDetail::Release(DocumentDetail::Invoke([&]{return xy_vsfilter_document_text_parser_drop_v1(id);}));}}
+    void Read(const CStringW& text,bool eof) {
+        const auto bytes=DocumentDetail::Units(text);std::vector<uint8_t> spaces(text.GetLength());
+        for(int i=0;i<text.GetLength();++i)spaces[i]=CStringW::StrTraits::IsSpace(text[i])?1:0;
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_text_parser_read_v1(id_,eof?1:0,bytes.data(),bytes.size(),spaces.data(),spaces.size());}));
+    }
+    void Step(unsigned command,int value,const DocumentDetail::Bytes& bytes=DocumentDetail::Bytes()) {
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_text_parser_step_v1(id_,command,value,bytes.data(),bytes.size());}));
+    }
+    void Header(int count,const std::array<int32_t,8>& numbers) {
+        DocumentDetail::Bytes bytes;for(auto n:numbers)DocumentDetail::Append(bytes,static_cast<uint32_t>(n),4);Step(0,count,bytes);
+    }
+    unsigned Next(CStringW& text,int64_t& start,int64_t& end,bool& accepted) const {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_text_parser_part_v1(id_,out.data(),out.size());}));
+        DocumentReply snapshot(DocumentDetail::Load(out,0,8));const auto bytes=snapshot.Read();
+        DocumentDetail::Shape(bytes.size()>=24 && (bytes.size()-24)%2==0 && DocumentDetail::Load(bytes,0,4)<=6 && DocumentDetail::Load(bytes,4,4)<=1);
+        start=DocumentDetail::I64(DocumentDetail::Load(bytes,8,8));end=DocumentDetail::I64(DocumentDetail::Load(bytes,16,8));accepted=DocumentDetail::Load(bytes,4,4)!=0;
+        size_t offset=24;text=DocumentDetail::String(bytes,offset,DocumentDetail::Count((bytes.size()-24)/2));return static_cast<unsigned>(DocumentDetail::Load(bytes,0,4));
     }
 };
 class OpenLifecycle {
