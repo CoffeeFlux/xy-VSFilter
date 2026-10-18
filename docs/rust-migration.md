@@ -27,7 +27,56 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: USF style and subtitle conversion (2026-10-18)
+## Current port: USF parsed state and DOM traversal (2026-10-18)
+
+The experimental USF path now keeps its canonical metadata, styles, effects,
+keyframes and captions in safe Rust. Rust controls DOM traversal, style
+inheritance, inline text assembly and mutation across repeated conversions.
+The source exists independently of a destination subtitle document. C++ holds
+temporary MSXML node references and supplies individual getter/scalar services;
+no COM pointer enters the portable core.
+
+The port preserves metadata across reloads, clears parsed lists only after XML
+loading succeeds, and retains earlier captions after failed XML loading. A valid
+XML document without a recognized USF root clears lists while retaining metadata.
+Keyframe children remain ignored, whole font/position blocks replace prior
+values, and only the first Default supplies inheritance. Conversion updates
+canonical Rust caption text before Add, retaining prefix accumulation even when
+the same source is converted into another destination.
+
+Implementation `3ba8fcba` passes cleanup `67da07cd` checks on **each** Windows
+architecture (x86 and x64):
+
+* 1,340 direct USF cases / 15,655 identical trace lines, with two executions per
+  implementation. All traces equal pre-port baseline `b3885359`. The original
+  1,212-case trace prefix is unchanged. Added reload sequences include 640 full
+  parsed-state snapshots covering fields that rendering does not expose.
+* 1,034 rendering cases / 11,066 frames / 116 distinct-frame controls. The full
+  corpus is unchanged; USF retains 20 no-COM rejections and 40 successful STA/MTA
+  file/memory cases with 480 rendered frames and 12 controls.
+* RealText, WebVTT, SAMI, text-parser, MicroDVD, ASS and XombieSub regressions;
+  3,693 lifecycle trace lines; nine compile probes; all three DLLs' exports and
+  dependencies; 10 scoped COM cases plus two candidate-only controls.
+* 298 safe-core and 123 FFI tests, formatting and Clippy on both architectures;
+  163 Python tests with one skip. The 103-file portable core has zero unsafe
+  sites. Six private entries add four unsafe marshalling functions and four
+  blocks, with no new raw-slice constructors.
+
+See the [USF state/boundary inventory](rust-usf-state-inventory.json) and
+[local evidence manifest](rust-usf-state-local-evidence.json). MSXML creation,
+loading/getters, attribute lookup, CRT/color/margin/alignment services and final
+native AddStyle/Add calls remain transitional. Allocation/reentry, injected COM
+failures and concurrent mutation still need evidence. No production switch or
+whole-format/host/library completion is claimed.
+
+Next: move the remaining USF scalar helper algorithms into Rust while retaining
+Windows conversion behavior, then replace the native MSXML adapter with audited
+Rust COM FFI. The full renderer, every format and host adapter, options/interfaces
+and vendored code remain in the complete-library goal. Earlier conversion and
+SubViewer evidence below retains its original provenance.
+
+
+## Previous port: USF style and subtitle conversion (2026-10-18)
 
 The experimental USF converter now imports ordered raw style/text values into a
 checked safe-Rust session. Rust owns style construction, color/alpha composition,
