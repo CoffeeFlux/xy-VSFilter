@@ -21763,7 +21763,7 @@
     {
       "id": "realtext-parser-control-file",
       "script": "test/compat/generated/realtext-parser-control.rt",
-      "sha256": "ce722583141d0820094e25136ed7677c122eabebc5c8418d110f0e592f3960a9",
+      "sha256": "92edd90c807bf9f8b887d5ac52ba943be4af20d30b68f18fa46f1af5d050e2e5",
       "open": "file",
       "width": 1280,
       "height": 720,
@@ -21787,7 +21787,7 @@
     {
       "id": "realtext-parser-control-memory",
       "script": "test/compat/generated/realtext-parser-control.rt",
-      "sha256": "ce722583141d0820094e25136ed7677c122eabebc5c8418d110f0e592f3960a9",
+      "sha256": "92edd90c807bf9f8b887d5ac52ba943be4af20d30b68f18fa46f1af5d050e2e5",
       "open": "memory",
       "width": 1280,
       "height": 720,
@@ -21811,7 +21811,7 @@
     {
       "id": "realtext-parser-map-replace-file",
       "script": "test/compat/generated/realtext-parser-map-replace.rt",
-      "sha256": "ffa55a48f58cd4d50d41e912511ff79bcef4c0e33155ad733d9be228264a6c34",
+      "sha256": "c2c9d4a037fcb51fc6a024f118d9c3af768bceeced016528df36accb51c575f3",
       "open": "file",
       "width": 1280,
       "height": 720,
@@ -21835,7 +21835,7 @@
     {
       "id": "realtext-parser-map-replace-memory",
       "script": "test/compat/generated/realtext-parser-map-replace.rt",
-      "sha256": "ffa55a48f58cd4d50d41e912511ff79bcef4c0e33155ad733d9be228264a6c34",
+      "sha256": "c2c9d4a037fcb51fc6a024f118d9c3af768bceeced016528df36accb51c575f3",
       "open": "memory",
       "width": 1280,
       "height": 720,
@@ -21859,7 +21859,7 @@
     {
       "id": "realtext-parser-italic-file",
       "script": "test/compat/generated/realtext-parser-italic.rt",
-      "sha256": "0ebe37c977aa428acfc567e4e18e63334ef073fd6114afaf6a691dd21e65afc8",
+      "sha256": "48c55a954667777c04095dbc1894e74b6e8bd57c7bb5f56ec096bdc25aff6da8",
       "open": "file",
       "width": 1280,
       "height": 720,
@@ -21883,7 +21883,7 @@
     {
       "id": "realtext-parser-italic-memory",
       "script": "test/compat/generated/realtext-parser-italic.rt",
-      "sha256": "0ebe37c977aa428acfc567e4e18e63334ef073fd6114afaf6a691dd21e65afc8",
+      "sha256": "48c55a954667777c04095dbc1894e74b6e8bd57c7bb5f56ec096bdc25aff6da8",
       "open": "memory",
       "width": 1280,
       "height": 720,
@@ -21907,7 +21907,7 @@
     {
       "id": "realtext-parser-map-order-file",
       "script": "test/compat/generated/realtext-parser-map-order.rt",
-      "sha256": "215bce249e78e714b7568f630c64770ae74061789c652c5cd8c17f0e5f28b700",
+      "sha256": "b8a83d72ad34602e1ccf39476c01f9d32528f10d2958d8008e12b4ec2ba096ca",
       "open": "file",
       "width": 1280,
       "height": 720,
@@ -21931,7 +21931,7 @@
     {
       "id": "realtext-parser-map-order-memory",
       "script": "test/compat/generated/realtext-parser-map-order.rt",
-      "sha256": "215bce249e78e714b7568f630c64770ae74061789c652c5cd8c17f0e5f28b700",
+      "sha256": "b8a83d72ad34602e1ccf39476c01f9d32528f10d2958d8008e12b4ec2ba096ca",
       "open": "memory",
       "width": 1280,
       "height": 720,
@@ -21955,7 +21955,7 @@
     {
       "id": "realtext-parser-missing-end-file",
       "script": "test/compat/generated/realtext-parser-missing-end.rt",
-      "sha256": "949e28813413b6172f0b368bbd396890840921a1f407de150ff017b6bee06c44",
+      "sha256": "4a14dc08586b7388076792636eaaa8f5ff77a57d7507a4a684c9e7a4fe5f1e2f",
       "open": "file",
       "width": 1280,
       "height": 720,
@@ -21979,7 +21979,7 @@
     {
       "id": "realtext-parser-missing-end-memory",
       "script": "test/compat/generated/realtext-parser-missing-end.rt",
-      "sha256": "949e28813413b6172f0b368bbd396890840921a1f407de150ff017b6bee06c44",
+      "sha256": "4a14dc08586b7388076792636eaaa8f5ff77a57d7507a4a684c9e7a4fe5f1e2f",
       "open": "memory",
       "width": 1280,
       "height": 720,
@@ -22003,7 +22003,7 @@
     {
       "id": "realtext-parser-restore-file",
       "script": "test/compat/generated/realtext-parser-restore.rt",
-      "sha256": "8be1d751526ba5cb3c618fedc9170a99a4155643a7b11e26c783f56def89bdf3",
+      "sha256": "e6ac7c1da841fa0531bbd36a696d276bfd2721d2250f7fc18a88d7cf27b0914e",
       "open": "file",
       "width": 1280,
       "height": 720,
@@ -22027,7 +22027,7 @@
     {
       "id": "realtext-parser-restore-memory",
       "script": "test/compat/generated/realtext-parser-restore.rt",
-      "sha256": "8be1d751526ba5cb3c618fedc9170a99a4155643a7b11e26c783f56def89bdf3",
+      "sha256": "e6ac7c1da841fa0531bbd36a696d276bfd2721d2250f7fc18a88d7cf27b0914e",
       "open": "memory",
       "width": 1280,
       "height": 720,
@@ -22051,7 +22051,7 @@
     {
       "id": "realtext-parser-final-fragment-file",
       "script": "test/compat/generated/realtext-parser-final-fragment.rt",
-      "sha256": "0ce0edf5e2c25944b57bca0c7be81dc8d900bf73c0df7bdc23455563832f607b",
+      "sha256": "982d77a7cf852a4651fd30c01ec052ada9710c8336f8fdf2c1faf2b36ae22d65",
       "open": "file",
       "width": 1280,
       "height": 720,
@@ -22075,7 +22075,7 @@
     {
       "id": "realtext-parser-final-fragment-memory",
       "script": "test/compat/generated/realtext-parser-final-fragment.rt",
-      "sha256": "0ce0edf5e2c25944b57bca0c7be81dc8d900bf73c0df7bdc23455563832f607b",
+      "sha256": "982d77a7cf852a4651fd30c01ec052ada9710c8336f8fdf2c1faf2b36ae22d65",
       "open": "memory",
       "width": 1280,
       "height": 720,
@@ -22099,7 +22099,7 @@
     {
       "id": "realtext-parser-first-line-file",
       "script": "test/compat/generated/realtext-parser-first-line.rt",
-      "sha256": "9f23c08cdaa584400b9dcbcec4321f4e0c6f72184b1b9b6250272b105b477379",
+      "sha256": "7edd5b89dc48d95f5f547d8fc5704c06fa540fdbe61e35f47065b171ac063635",
       "open": "file",
       "width": 1280,
       "height": 720,
@@ -22123,7 +22123,7 @@
     {
       "id": "realtext-parser-first-line-memory",
       "script": "test/compat/generated/realtext-parser-first-line.rt",
-      "sha256": "9f23c08cdaa584400b9dcbcec4321f4e0c6f72184b1b9b6250272b105b477379",
+      "sha256": "7edd5b89dc48d95f5f547d8fc5704c06fa540fdbe61e35f47065b171ac063635",
       "open": "memory",
       "width": 1280,
       "height": 720,
@@ -22147,7 +22147,7 @@
     {
       "id": "realtext-parser-raw-units-file",
       "script": "test/compat/generated/realtext-parser-raw-units.rt",
-      "sha256": "95b0de0467f2c31c8479f3db5abb4cdf5caddd599240951f231dd3b7f4b5e770",
+      "sha256": "f2ae8038c8b16176e33e1eb811b0aa70e184770ae152fad09288dfedf079e507",
       "open": "file",
       "width": 1280,
       "height": 720,
@@ -22171,7 +22171,7 @@
     {
       "id": "realtext-parser-raw-units-memory",
       "script": "test/compat/generated/realtext-parser-raw-units.rt",
-      "sha256": "95b0de0467f2c31c8479f3db5abb4cdf5caddd599240951f231dd3b7f4b5e770",
+      "sha256": "f2ae8038c8b16176e33e1eb811b0aa70e184770ae152fad09288dfedf079e507",
       "open": "memory",
       "width": 1280,
       "height": 720,
@@ -22195,7 +22195,7 @@
     {
       "id": "realtext-parser-overflow-file",
       "script": "test/compat/generated/realtext-parser-overflow.rt",
-      "sha256": "d065935984909247e49d26002dfe02fed80c4825e869e0d791c9826266d25f66",
+      "sha256": "8bd2042e4093fc42a15d00dfe04ed7e4161644e4ada918b9a5d8cd1ab490221f",
       "open": "file",
       "width": 1280,
       "height": 720,
@@ -22219,7 +22219,7 @@
     {
       "id": "realtext-parser-overflow-memory",
       "script": "test/compat/generated/realtext-parser-overflow.rt",
-      "sha256": "d065935984909247e49d26002dfe02fed80c4825e869e0d791c9826266d25f66",
+      "sha256": "8bd2042e4093fc42a15d00dfe04ed7e4161644e4ada918b9a5d8cd1ab490221f",
       "open": "memory",
       "width": 1280,
       "height": 720,

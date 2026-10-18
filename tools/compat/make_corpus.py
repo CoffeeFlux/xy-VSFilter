@@ -862,7 +862,13 @@ def realtext_parser_variants():
         "raw-units":cue.replace('First caption','First\x00\ud800discarded'),
         "overflow":cue.replace('"1"','"4294967297"').replace('"5"','"4294967301"'),
     }.items():
-        text='<window>\r\n'+text+('' if name=='final-fragment' else '\r\n')
+        # ExtractString rejects unterminated trailing text. Keep the closing tag
+        # on a separate line so raw-NUL fixtures retain it after line truncation.
+        if name=='final-fragment':
+            text=text.replace('\r\nignored','\r\n</window>\r\nignored')
+        else:
+            text+='\r\n</window>\r\n'
+        text='<window>\r\n'+text
         data=(b"\xff\xfe"+text.encode("utf-16le","surrogatepass") if "\x00" in text else text.encode("ascii"))
         yield "realtext-parser-"+name+".rt",data
 

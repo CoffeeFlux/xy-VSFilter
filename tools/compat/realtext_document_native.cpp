@@ -37,5 +37,10 @@ int main(){try{
  for(auto charset:{ANSI_CHARSET,SHIFTJIS_CHARSET,GB2312_CHARSET})for(auto body:ansi)for(int preload=0;preload<2;++preload){CStringW text;text.Format(L"<window>\r\n<time begin=\"1\" end=\"2\"/>%s\r\n",body);realtext_case(index++,text,preload!=0,charset,true);}
  const wchar_t* eof[]={L"",L"<window>",L"<window>\r\n",L"<window>\r\nfragment",L"<window>\r\n<time begin=\"1\"/>first\r\nfragment",L"<window>\r\n<time begin=\"1\"/>first\r\n",L"<window>\r\n \t\r\n<time begin=\"1\"/>a\r\n",L"<window>\r\n<time begin=\"1\"/>   a   \r\n",L"<window>\r\n<time begin=\"1\"/>a\r\n<time begin=\"2\"/>b",L"<window>\r\n<time begin=\"1\"/>a\r\n<time begin=\"2\"/>b\r\n",L"<window>\r\n<time begin=\"1\"/>a\r\n</window>\r\n",L"<window>\r\n<time begin=\"1\"/>a\r\n<!--open\r\n"};
  for(auto t:eof)emit(t);
+ // Keep the original 2,212-case prefix. Explicit terminators exercise successful
+ // map insertion/export alongside the original trailing-text rejection cases.
+ for(auto a:times)for(auto b:times){CStringW text;text.Format(L"<window>\r\n<time begin=\"%s\" end=\"%s\"/>first<time begin=\"3\"/>last</window>\r\n",a,b);emit(text);}
+ for(auto t:tags)for(auto q:sequences){CStringW text;text.Format(L"<window>\r\n%s%s</window>\r\n",t,q);emit(text);}
+ for(auto unit:{0,9,13,32,0xa0,0x2003,0x0661,0xff11,0xd800,0xffff})for(int pos=0;pos<44;++pos){CStringW raw=rawbase;raw.SetAt(pos*2,static_cast<WCHAR>(unit));raw+=L"</window>\r\n";emit(raw);}
  printf("realtext-complete cases=%u\n",index);return 0;
 }catch(const std::exception& error){fprintf(stderr,"unresolved: %s\n",error.what());return 1;}catch(...){fprintf(stderr,"unresolved exception\n");return 2;}}
