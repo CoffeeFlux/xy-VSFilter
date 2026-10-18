@@ -63,7 +63,8 @@ def main():
                   runner_sha256=sha(Path(__file__).read_bytes()),
                   environment={key:os.environ.get(key) for key in ("VCToolsVersion","WindowsSDKVersion","VSCMD_ARG_TGT_ARCH")},
                   limits=["Initialized document fields; no uninitialized simplicity reads",
-                          "Finite input set, no font installation or allocator/reentry failures",
+                          "Font installation requests are intercepted; alternating failure/success replies are synthetic, real Windows installation is covered by rendering comparisons",
+                          "Finite input set; no allocator/reentry failures",
                           "No claim of host or whole-renderer closure"])
     def save():
         (out/"report.json").write_text(json.dumps(report,indent=2)+"\n",encoding="utf-8")
@@ -128,7 +129,8 @@ def main():
             if sha(path.read_bytes())!=report[key]:
                 raise ValueError("probe or observer changed during comparison")
         report.update(complete=True,equal=True,repeat_equal=True,inputs_unchanged=True,
-                      trace_sha256=[sha(trace) for trace in traces],trace_lines=len(traces[0].splitlines()))
+                      trace_sha256=[sha(trace) for trace in traces],trace_lines=len(traces[0].splitlines()),
+                      font_installation_requests=sum(line.startswith(b"ass-font ") for line in traces[0].splitlines()))
     except Exception as error:
         report["unresolved"]=str(error);save();raise
     save()
