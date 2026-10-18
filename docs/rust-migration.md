@@ -27,7 +27,62 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: USF MSXML boundary (2026-10-18)
+## Current port: shared color handling (2026-10-18)
+
+The experimental path now uses safe Rust for the shared 138-entry named-color
+table, HTML/SAMI numeric fallback, channel conversion and complete SSA color-tag
+formatting. USF uses the same table while retaining its different rules. The
+native global color map and its constructor/destructor are excluded; symbol
+inspection confirms they are absent from both experimental subtitle libraries.
+
+Compatibility depends on distinctions the port preserves: named black remains
+black, but numeric zero and nonnumeric unknown names resolve to white in HTML/SAMI. Only
+the renderer's HTML path strips leading hashes. HTML/SAMI discard alpha, while
+USF retains it. Names use exact case-sensitive first-NUL lookup, including the
+cleanup table's unusual values and misspellings. Formatting emits exactly six
+lowercase hex digits and retains raw tag code units.
+
+One stateless private FFI entry copies inputs before Windows CRT work and output
+writes. It permits overlapping input/output buffers, never reads uninitialized
+output, checks metadata/capacity and retains no native pointers. Existing CRT
+bindings are centralized in `windows_crt.rs`; no registry or native gate is held
+during numeric conversion.
+
+Implementation `8300fa00` passes cleanup `67da07cd` checks on **each** Windows
+architecture (x86 and x64):
+
+* 8,896 actual helper/renderer calls across 1,112 raw inputs, with 3,336 complete
+  renderer style snapshots. All 12,234 trace lines match across two executions
+  per implementation and equal pre-port baseline `7d849163`, including errno.
+  The probe invokes actual SSAColorTag, SSAColorTagCS, SMI2SSA and the linked
+  private ParseHtmlTag method without copying their implementations.
+* Expanded rendering corpus: 1,066 cases / 11,338 frames / 128 distinct-frame
+  controls. The previous 1,034 cases are unchanged. Sixteen new scripts add
+  32 file/memory cases, 272 frames and 12 controls for HTML text/outline/shadow,
+  SAMI and WebVTT colors, including black versus numeric zero.
+* The complete 40,517-line USF trace is unchanged, including 20,735 scalar calls
+  and 348 MSXML load cases. RealText, WebVTT, SAMI, text-parser, MicroDVD, ASS and
+  XombieSub regressions pass, along with 3,693 lifecycle trace lines, nine compile
+  probes, all three DLLs' exports/dependencies and scoped COM checks.
+* 305 safe-core and 127 FFI tests, formatting and Clippy on both architectures;
+  165 Python tests with one skip. The 105-file portable core has zero unsafe
+  sites. The new boundary adds two unsafe functions, three unsafe blocks, one
+  bounded input-slice copy and one write into caller-owned output storage.
+
+See the [shared-color inventory](rust-shared-colors-inventory.json) and
+[local evidence manifest](rust-shared-colors-local-evidence.json). CString
+marshaling, SAMI insertion dispatch, WebVTT class/regex handling, renderer HTML
+tokenization and other native adapters remain transitional. Allocation/reentry
+and injected failures remain unclosed. No production switch or whole-library
+completion is claimed.
+
+Next: port the renderer's complete HTML tag parser, including style mutations
+and karaoke state, using the actual-method observation harness. Continue the
+renderer, remaining document/host adapters, all formats/options/interfaces and
+vendored implementation. Earlier evidence retains its original provenance.
+
+
+## Previous port: USF MSXML boundary (2026-10-18)
 
 The experimental USF path now creates, loads and traverses system MSXML through
 audited Rust FFI. Rust owns the temporary COM interfaces, BSTRs, VARIANTs and

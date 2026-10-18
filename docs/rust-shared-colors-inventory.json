@@ -1,0 +1,129 @@
+{
+  "schema": 1,
+  "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "Shared named-color lookup, HTML/SAMI numeric fallback, low24bit channel conversion and complete SSA color-tag formatting in safe Rust; removal of experimental native global color map/constructor.",
+  "production_sources": {
+    "rust/compat/src/colors.rs": "2c53cc4e5860372d08357ab021e4c708f72cfc22c611be1677685004c386365b",
+    "rust/compat/src/usf_scalar.rs": "1fbb9841d05fdf75552735c0a1ba6d9373d9cce0c99bbf446264692b3ce30446",
+    "rust/compat/src/lib.rs": "c12d62c4096448d6b7a4bd17cb4e05b0f939e7346dd66d21dc4b4d82c9a31bc6",
+    "rust/ffi/src/colors.rs": "1f9e75c33aeadc43ef5f4e5d7a2c1c5c1577f09a137b5a5fc433f36e879b366c",
+    "rust/ffi/src/windows_crt.rs": "bef7b5dbd0163fa5e2eabb1b2c5067e16620220296768e48096e227a442602d7",
+    "rust/ffi/src/windows_usf.rs": "cf7994e0f7b769c9b31a24b76c8b29c1fecd65637ddf766ab9f2dad280075025",
+    "rust/ffi/src/lib.rs": "eeca3fa0d6e801534b2832636e12b23bc6bb956b831982ac51cff1d643309c2c",
+    "include/xy_rust_colors.h": "69bff9a25882685b8e2eb3c344447573f50b06d9f8a74cd28545d6fd38b91dfb",
+    "src/subtitles/STS.cpp": "bab27e6890b344fa64e6e33814e1945c2aab1d5585913aeec5ca1489a9ae0b16",
+    "src/subtitles/STS.h": "b81ad7dbd535c2fb2de6d23069d7160c27db5ade7b3761d9540bb7628f790110",
+    "src/subtitles/RTS.cpp": "144ea7c6647657dc694244a4b2fc5c5a91de9525d6225ed4f04c7c8682877223"
+  },
+  "reference_sources": {
+    "src/subtitles/STS.cpp": "2616b67db84f7329ac6e2363a3f03d61977fa07c37ed9c04d32ec2b1197f31e0",
+    "src/subtitles/STS.h": "57dc87a3de9470ca04adc007c175956bd4acfddcb720324886bb4a2c7699080b",
+    "src/subtitles/RTS.cpp": "ef6aae1b68accd3da5cc9093377a118cf11f5754c597cec68173b06c80f71454"
+  },
+  "operations": [
+    {
+      "operation": "Shared exact table",
+      "source": {
+        "path": "rust/compat/src/colors.rs",
+        "line": 6,
+        "sha256": "2c53cc4e5860372d08357ab021e4c708f72cfc22c611be1677685004c386365b"
+      },
+      "behavior": "One safe138entry cleanup table is shared by USF and HTML/SAMI. Exact case-sensitive first-NUL lookup returns Option, distinguishing namedblack(0) from unknown. Legacy misspellings/values unchanged. Probe names are independent fixed cleanup inputs, allowing the production C++ map/table to be excluded."
+    },
+    {
+      "operation": "HTML/SAMI resolution",
+      "source": {
+        "path": "rust/compat/src/colors.rs",
+        "line": 14,
+        "sha256": "2c53cc4e5860372d08357ab021e4c708f72cfc22c611be1677685004c386365b"
+      },
+      "behavior": "Only renderer HTML mode trims all leading hashes. Name lookup occurs first; only a miss calls Windows wcstol16. Numeric0 becomes white, while namedblack remainsblack. R/B swap keeps only low24bits, unlike USF which retains alpha and has different unknown/zero behavior."
+    },
+    {
+      "operation": "SSA tag formatting",
+      "source": {
+        "path": "rust/compat/src/colors.rs",
+        "line": 32,
+        "sha256": "2c53cc4e5860372d08357ab021e4c708f72cfc22c611be1677685004c386365b"
+      },
+      "behavior": "Safe Rust emits prefix, rawctag, &H, exactly6lowercase hex digits and &}. Rawctag units including NUL/surrogates are retained. Native SSAColorTagCS still performs its original first-NUL std::wstring/CString conversion. SAMI inserts the returned complete13unit c-tag, preserving insertion length."
+    },
+    {
+      "operation": "System CRT boundary",
+      "source": {
+        "path": "rust/ffi/src/windows_crt.rs",
+        "line": 14,
+        "sha256": "bef7b5dbd0163fa5e2eabb1b2c5067e16620220296768e48096e227a442602d7"
+      },
+      "behavior": "wcstol/_wcsicmp bindings previously in Windows USF module are centralized with unchanged copied terminated rawUTF16 inputs and exact Windows32bit long results. Color calls do not hold registry admission or native gates across CRT work."
+    }
+  ],
+  "color_table": {
+    "entries": 138,
+    "ordered_entries_equal_to_pinned_source": true,
+    "probe_names_equal_to_pinned_source": true
+  },
+  "boundary_review": {
+    "source": {
+      "path": "rust/ffi/src/colors.rs",
+      "line": 26,
+      "sha256": "1f9e75c33aeadc43ef5f4e5d7a2c1c5c1577f09a137b5a5fc433f36e879b366c"
+    },
+    "native_adapter": {
+      "path": "include/xy_rust_colors.h",
+      "line": 9,
+      "sha256": "69bff9a25882685b8e2eb3c344447573f50b06d9f8a74cd28545d6fd38b91dfb"
+    },
+    "new_private_entries": [
+      "xy_vsfilter_html_color_v1"
+    ],
+    "contract": "Mode0 resolves HTML color into2u16words; mode1 emits complete SSA tag into ctag_length+12units. Preflight mode, null/count consistency, output capacity and representation bounds; copy both input spans before CRT or final writes. Input/output overlap allowed, output may be uninitialized. Stateless call has no registry/opaque owner/retained native pointers. Invalid metadata refuses without output mutation.",
+    "unsafe_delta": {
+      "unsafe_functions": 2,
+      "unsafe_blocks": 3,
+      "new_raw_shared_slice_constructors": 1,
+      "new_raw_nonoverlapping_copies": 1,
+      "note": "Moving2CRT unsafe blocks between modules adds no sites."
+    },
+    "tests": "Namedblack versus numericzero, exact table quirks, name case and firstNUL, leadinghash policy, signedalpha truncation, exacttagdigits/rawctag, caller buffer overlap, source aliasing, invalidmode/count/capacity, overflow refusal and output atomicity."
+  },
+  "direct_probe": {
+    "baseline_commit": "7d84916395a459c458507559f312a1d1183a562d",
+    "source": {
+      "path": "tools/compat/shared_color_native.cpp",
+      "line": 24,
+      "sha256": "32bf9b652626b802bc0c170317f5ee65857406f3168c24c5e986152c418c0dd1"
+    },
+    "runner": {
+      "path": "tools/compat/shared_color_native.py",
+      "line": 17,
+      "sha256": "4b21f92eef7f476680612dbb394f384169ca08d34c6dc13395df6cbbe5995399"
+    },
+    "values": 1112,
+    "cases": 8896,
+    "style_snapshots": 3336,
+    "trace_lines": 12234,
+    "coverage": "40literal values +138names x4forms(original/hash/doublehash/uppercase) +256codeunits x2injectionforms +8explicit raw/NUL/surrogate fixtures. Each exercises SSAColorTag3ctags, SSAColorTagCS, actual SMI2SSA and actual linked renderer ParseHtmlTag for text/outline/shadow color. Full initialized style snapshots and errno1234 captured.",
+    "method": "Actual selected cleanup STS.cpp helpers included; renderer private method invoked through a probe-local explicitly instantiated member address without changing class layout or copying implementation. Actual linked reference/candidate subtitles libraries,2executions each per architecture. Missing/duplicate/truncated records, architecture differences or nondeterministic output refuse parity."
+  },
+  "native_map_removal": {
+    "report": "artifacts/colors-native-symbols.json",
+    "sha256": "c8ef5327b51849b651aa8edf3ef0729e1d5095bc1c7eab78d5cd35dfb589bff2",
+    "result": "CHtmlColorMap constructor/destructor and g_colors symbols present in cleanup subtitlesR.lib, absent from candidate Release experimental libraries on x86/x64."
+  },
+  "limits": [
+    "Experimental document-owner configuration only. No production switch or complete renderer/host/library claim.",
+    "Windows wcstol remains a system CRT dependency through audited Rust FFI. CString marshaling, SAMI insertion dispatch, WebVTT regex/class handling, renderer HTML tag tokenization and remaining native adapters are transitional.",
+    "Finite Windows Unicode MSVC14.44 x86/x64 evidence. No claim for allocator/new-handler reentry, injected faults, arbitrary locale/global mutation, non-Unicode builds or non-Windows whole-renderer behavior.",
+    "Caller pointer validity, initialized input spans and writable output spans remain unsafe FFI preconditions. Metadata/representation bounds are checked; allocation failure and reentry remain open.",
+    "Lexical unsafe counts inventory source sites rather than prove soundness or measure migration completion. Crashes, hangs and nondeterminism remain unresolved; earlier evidence retains provenance."
+  ],
+  "next_work": [
+    "Port complete renderer ParseHtmlTag tokenization, style mutations and karaoke state to safe Rust using the actual private-method observation harness.",
+    "Continue renderer/style ownership, document/host adapters, all remaining formats/options/interfaces and vendored implementation. Preserve unresolved reference outcomes."
+  ]
+}

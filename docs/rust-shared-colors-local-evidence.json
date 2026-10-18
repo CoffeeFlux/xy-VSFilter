@@ -1,0 +1,686 @@
+{
+  "schema": 1,
+  "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+  "baseline_commit": "7d84916395a459c458507559f312a1d1183a562d",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "Shared named-color lookup, HTML/SAMI numeric fallback, low24bit channel conversion and complete SSA color-tag formatting in safe Rust; removal of experimental native global color map/constructor.",
+  "limits": [
+    "Experimental document-owner configuration only. No production switch or complete renderer/host/library claim.",
+    "Windows wcstol remains a system CRT dependency through audited Rust FFI. CString marshaling, SAMI insertion dispatch, WebVTT regex/class handling, renderer HTML tag tokenization and remaining native adapters are transitional.",
+    "Finite Windows Unicode MSVC14.44 x86/x64 evidence. No claim for allocator/new-handler reentry, injected faults, arbitrary locale/global mutation, non-Unicode builds or non-Windows whole-renderer behavior.",
+    "Caller pointer validity, initialized input spans and writable output spans remain unsafe FFI preconditions. Metadata/representation bounds are checked; allocation failure and reentry remain open.",
+    "Lexical unsafe counts inventory source sites rather than prove soundness or measure migration completion. Crashes, hangs and nondeterminism remain unresolved; earlier evidence retains provenance."
+  ],
+  "configuration": {
+    "native": "Release; RustTextDecoder=true; RustDocumentOwnerExperimental=true",
+    "rust": "1.85.0; native-runtime; +crt-static",
+    "msvc": "14.44.35207",
+    "sdk": "10.0.26100.0"
+  },
+  "architectures": {
+    "x64": {
+      "baseline_colors": {
+        "report": "artifacts/colors-baseline-x64/report.json",
+        "sha256": "4f3cf3793b1c02ec44a1c1ab02dc5f10c634d1fb32cf1b3834be989d3d92948a",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 12234,
+        "candidate_commit": "7d84916395a459c458507559f312a1d1183a562d",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "values": 1112,
+        "cases": 8896
+      },
+      "final_colors": {
+        "report": "artifacts/colors-shared-final-x64/report.json",
+        "sha256": "8f9600328c7658d08e16513e22349a0d06e08f284453ff22a0c998a67681e9a3",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 12234,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "values": 1112,
+        "cases": 8896
+      },
+      "preport_color_traces_preserved": true,
+      "usf_regression": {
+        "report": "artifacts/colors-final-x64/report.json",
+        "sha256": "c1094797575f2469dc5d0557745e1e1eb2bce84573e198912d823a023bcb22e6",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 40517,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "scalar_cases": 20735,
+        "scalar_values": 1885,
+        "load_cases": 348,
+        "load_inputs": 28,
+        "cases": 1340
+      },
+      "previous_usf_traces_preserved": true,
+      "corpus": {
+        "report": "artifacts/colors-csri-x64/summary.json",
+        "sha256": "c9829b82071c3c51940d5e72b7156bb4f2de87ef84431f3bf911d74431355da6",
+        "complete": true,
+        "frames": 11338,
+        "distinct_controls": 128,
+        "cases": 1066,
+        "shards": [
+          {
+            "report": "artifacts/colors-csri-x64/shard-0/report.json",
+            "sha256": "7da6c70529c5bcf5135479815fea789ee77df4adacfdbaa18eccf85ce0aa0465",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1398,
+            "cases": 134
+          },
+          {
+            "report": "artifacts/colors-csri-x64/shard-1/report.json",
+            "sha256": "91a317fbb2e409bcf3c36b7ca6182956a400bca0f434bda36e65eb651c7813df",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1398,
+            "cases": 134
+          },
+          {
+            "report": "artifacts/colors-csri-x64/shard-2/report.json",
+            "sha256": "f919fc8fcb1b5b798d73284b2e70fe19b41348ad6142c5145b7c99c8c6b1cbec",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1419,
+            "cases": 133
+          },
+          {
+            "report": "artifacts/colors-csri-x64/shard-3/report.json",
+            "sha256": "75946ca20e5dc28eb7d388811289b103d07df594a3bfd5cda992750716e972cb",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1431,
+            "cases": 133
+          },
+          {
+            "report": "artifacts/colors-csri-x64/shard-4/report.json",
+            "sha256": "49c8d948deea3c5fc08442815e97da5cb0ac968bfc94bc67fd00f1f7b5fdcfe0",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1426,
+            "cases": 133
+          },
+          {
+            "report": "artifacts/colors-csri-x64/shard-5/report.json",
+            "sha256": "7fb5d8717aa0a67fd5a4b1b9dfdb21988c6c178c76794412488f358c54ccb737",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1426,
+            "cases": 133
+          },
+          {
+            "report": "artifacts/colors-csri-x64/shard-6/report.json",
+            "sha256": "ec7de2faaf74dbff9766a2abaac1224b9218e3fc9f4f4e38a34c71c012981c44",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1426,
+            "cases": 133
+          },
+          {
+            "report": "artifacts/colors-csri-x64/shard-7/report.json",
+            "sha256": "b4470a8682aa87d6760ede6849921de58df9ab36d370bf0ae6add14605f8efe2",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1414,
+            "cases": 133
+          }
+        ]
+      },
+      "new_color_rendering": {
+        "cases": 32,
+        "frames": 272,
+        "distinct_controls": 12,
+        "included_in_full_corpus": true
+      },
+      "realtext_regression": {
+        "report": "artifacts/colors-final-probe-x64/report.json",
+        "sha256": "621f741804c252578a571af0a12cd207092447b11b367ae7708ee8123cadcc3a",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 37887,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 4532
+      },
+      "vtt_regression": {
+        "report": "artifacts/colors-vtt-regression-x64/report.json",
+        "sha256": "5d10e158100d7a717213d6295de9502be03f86cae59b2e2c2e6f793a2c4e7e05",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 21939,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 2292
+      },
+      "sami_regression": {
+        "report": "artifacts/colors-sami-regression-x64/report.json",
+        "sha256": "a087778ca3c99380000c5b310238b9ffd0114f3ef8f4c615f8fa357bd4b87f5b",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 26992,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 2836
+      },
+      "text_regression": {
+        "report": "artifacts/colors-text-regression-x64/report.json",
+        "sha256": "b267d9c6027d70ba72dc9e77eba11d14fb786a81ac245d0d5972140a49edd019",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 44404,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 5692
+      },
+      "microdvd_regression": {
+        "report": "artifacts/colors-microdvd-regression-x64/report.json",
+        "sha256": "7cf0c5a9665f7719f1ba0e350d53025994b9eb164286b8629dac2a5a95004ddd",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 41491,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 4588
+      },
+      "ass_regression": {
+        "report": "artifacts/colors-ass-probe-x64/report.json",
+        "sha256": "9c34f606f20de85d0fb4296df35a3b572f8effe9c2259141e0ec7855d2417a6f",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 22286,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 3266
+      },
+      "xombie_regression": {
+        "report": "artifacts/colors-xombie-probe-x64/report.json",
+        "sha256": "46791a874a0aea643a7c84408cdc57f65417f9d12d64aa0ddcf4c6e8f1b23b23",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 10441,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 1242
+      },
+      "lifecycle": {
+        "report": "artifacts/colors-lifecycle-x64/report.json",
+        "sha256": "eee8798f2a5d5f9f03e0209e8c459a4901241a6257d4a2c64443c345e8723276",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 3693,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+      },
+      "compile": {
+        "report": "artifacts/colors-compile-x64/report.json",
+        "sha256": "4dbc08ce043907dbd17038449f6511c5b498e0cc18e83a2ec59774af9d6be9c8",
+        "complete": true,
+        "inputs_unchanged": true,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+      },
+      "com": {
+        "report": "artifacts/colors-contracts-x64/com/report.json",
+        "sha256": "cc05caef0c3345c0285d844f992adbfc81e7ffaf9bc06049c6febde970502b00",
+        "complete": true,
+        "passed": true,
+        "inputs_unchanged": true,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "2d254068a40e5f59cf191c3c6bbfc984b548193b668c4decac21dc1e94e02169",
+          "candidate_sha256": "4baca8b144b3a4c092a820ab0dedd2258707c6233ab469aeb4155dd958a381be",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "805d7d7481b2774c2612b7cd7dd7fdaa4dd04a35111f3726a6704acf88c4a0d2"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "32b7c2cd6eb817120414db53b3c3005e719ae4b993c4a69d0d66c7f6ac363d5a",
+          "candidate_sha256": "516903ea73f8b1a22f67e0b78b4cb9f83a7f6815b40bfbb1455a0634c13b2640",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "2ce278d6be4d85c557490e59cb33e78ca53faf3e38061e9ca3eb225897be359a"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "f1165742064181b7fb73bacb16017d8e202c8bb0be90ed8c2eb812ac282c2df8",
+          "candidate_sha256": "43ac5e7cc4f00210ec27f08ac4bc220fcb27a0087c7a172108259a5d20966012",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "b0b48a3cf2bf2ecbbac4ecca863a815ab4a0c1137277a9b7d5830d9d1beca5c9"
+        }
+      }
+    },
+    "x86": {
+      "baseline_colors": {
+        "report": "artifacts/colors-baseline-x86/report.json",
+        "sha256": "0d16dcb1bac82bc3994ef946f9aea69826b7c4483192c0e13825e8b167133a01",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 12234,
+        "candidate_commit": "7d84916395a459c458507559f312a1d1183a562d",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "values": 1112,
+        "cases": 8896
+      },
+      "final_colors": {
+        "report": "artifacts/colors-shared-final-x86/report.json",
+        "sha256": "1de9680133330831c8d02558902e5ac0c441902a801c9e51a89d9eeb64256a3f",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 12234,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "values": 1112,
+        "cases": 8896
+      },
+      "preport_color_traces_preserved": true,
+      "usf_regression": {
+        "report": "artifacts/colors-final-x86/report.json",
+        "sha256": "5a52c41c7be0c6f118ad264d68400e1f6df13720362615fb370fa825e2a6698d",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 40517,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "scalar_cases": 20735,
+        "scalar_values": 1885,
+        "load_cases": 348,
+        "load_inputs": 28,
+        "cases": 1340
+      },
+      "previous_usf_traces_preserved": true,
+      "corpus": {
+        "report": "artifacts/colors-csri-x86/summary.json",
+        "sha256": "8760d7d3db770edcf29b85751bda687b80db4caa019007de62d720e62a91d9f0",
+        "complete": true,
+        "frames": 11338,
+        "distinct_controls": 128,
+        "cases": 1066,
+        "shards": [
+          {
+            "report": "artifacts/colors-csri-x86/shard-0/report.json",
+            "sha256": "b2c254d8c5e33b75783b89b09dabc8902c42c1ea55dd49c15c55c1755edebb8e",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1398,
+            "cases": 134
+          },
+          {
+            "report": "artifacts/colors-csri-x86/shard-1/report.json",
+            "sha256": "04d310bf007749c5b3c31964ae5e8d440d6ddd9039474097811ef24eb05b576a",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1398,
+            "cases": 134
+          },
+          {
+            "report": "artifacts/colors-csri-x86/shard-2/report.json",
+            "sha256": "9c30231a0e82820d0e2745a98f3aae95f0d346d0ba25042727663fa0bbfd49eb",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1419,
+            "cases": 133
+          },
+          {
+            "report": "artifacts/colors-csri-x86/shard-3/report.json",
+            "sha256": "c2f13893e448cbf34643eb1ca46b7c9dfffdcad4c86974c78c99c4d58ee4aa47",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1431,
+            "cases": 133
+          },
+          {
+            "report": "artifacts/colors-csri-x86/shard-4/report.json",
+            "sha256": "83e4c773debe6a301a11781b47a21507b39e17e7a8acc150ab800b35794b5fad",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1426,
+            "cases": 133
+          },
+          {
+            "report": "artifacts/colors-csri-x86/shard-5/report.json",
+            "sha256": "f75c6196e55f72907a001119bd704058f619680cfdf9e2891c82da3ee9970209",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1426,
+            "cases": 133
+          },
+          {
+            "report": "artifacts/colors-csri-x86/shard-6/report.json",
+            "sha256": "c66f63aaad6fdaedf4e73f060fc2310872ffa47d0b6cccd3433ebbff6d3e51eb",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1426,
+            "cases": 133
+          },
+          {
+            "report": "artifacts/colors-csri-x86/shard-7/report.json",
+            "sha256": "2eb6660e6d6d596b40d2e00a33099a0772b84b80bf96ca5448802492c26c7b82",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1414,
+            "cases": 133
+          }
+        ]
+      },
+      "new_color_rendering": {
+        "cases": 32,
+        "frames": 272,
+        "distinct_controls": 12,
+        "included_in_full_corpus": true
+      },
+      "realtext_regression": {
+        "report": "artifacts/colors-final-probe-x86/report.json",
+        "sha256": "55ec9a65fb6d718fa0bb4ebf1c94dd62bf69800ee70e2211fb11fb9b96ba288e",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 37887,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 4532
+      },
+      "vtt_regression": {
+        "report": "artifacts/colors-vtt-regression-x86/report.json",
+        "sha256": "114e66d8e6c590325b37114b9fbcc2f4a4eb2805a8f07a41a696c43addf148b3",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 21939,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 2292
+      },
+      "sami_regression": {
+        "report": "artifacts/colors-sami-regression-x86/report.json",
+        "sha256": "4d0f3c86a757780265438440861f786151a017d8580bfaa89b5681652091cbdf",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 26992,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 2836
+      },
+      "text_regression": {
+        "report": "artifacts/colors-text-regression-x86/report.json",
+        "sha256": "8e9ee653af941a302552a575a3c35ef149be7c1b0760b93eb58a3c4f7e8b4694",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 44404,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 5692
+      },
+      "microdvd_regression": {
+        "report": "artifacts/colors-microdvd-regression-x86/report.json",
+        "sha256": "063ddb64bc87e6842915238b343577fc78504b548dcde882db51bc4d727ed193",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 41491,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 4588
+      },
+      "ass_regression": {
+        "report": "artifacts/colors-ass-probe-x86/report.json",
+        "sha256": "c78164df11358eb92c5bb8841ef04ddf7d6e694dd64972841926622f9c4c4a7f",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 22286,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 3266
+      },
+      "xombie_regression": {
+        "report": "artifacts/colors-xombie-probe-x86/report.json",
+        "sha256": "9d4e9c58febbb7b7aa7e50d2508f595d9102262729144c58c97cb497517247ce",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 10441,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 1242
+      },
+      "lifecycle": {
+        "report": "artifacts/colors-lifecycle-x86/report.json",
+        "sha256": "dde81035f0a17b9b6ff8942b51885ab08544fe5299918c9279a5e873a7726434",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 3693,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+      },
+      "compile": {
+        "report": "artifacts/colors-compile-x86/report.json",
+        "sha256": "4167682924293608218c4cf0ea19f02d074a994dc7397b1857cda18670f3f628",
+        "complete": true,
+        "inputs_unchanged": true,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+      },
+      "com": {
+        "report": "artifacts/colors-contracts-x86/com/report.json",
+        "sha256": "55906ee5ef97be980781231650010da326c8a2e14023c2c3390f30306206c380",
+        "complete": true,
+        "passed": true,
+        "inputs_unchanged": true,
+        "candidate_commit": "8300fa00c84c086198b33d827e6de05ae8b8edc3",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "69faa2d5f90f35fe4184e9e9bd892adb76fee60295701988f61ab7af0664d9eb",
+          "candidate_sha256": "3c40472f0c8d538a6b5890427e8e279cb2025c0dae07bc249edc8b7f3ffa802e",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "8b0365bd8b1fa8ea13b65d8681836b85d870a46781d0a3cbfb851b1000a21ae7"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "2c3b904d7f91902ef456e07b648c5d6351878318c235397eeb9b39eb3fffa34f",
+          "candidate_sha256": "7c92506e83e93b904c18763f15f03984971357f372f33a66279e9733dd6bfb98",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "2a22ef471924cc53ea843b14cb2fb5e1dc765f9e308e8ed316172476b0696dd5"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "3e7c20a4d6c42457d92eb56c42e4fd9f3bddb93276f2c1cd28bfb73edd06484c",
+          "candidate_sha256": "87beafe91052e9ed08696256e78683fcb6fd0fab2c1669b4ce18d4f790a0b394",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "bee8a1d975859e0ab8a9b6843e14f813df818b8538e6501927e792bb180eb7c1"
+        }
+      }
+    }
+  },
+  "corpus_growth": {
+    "old_cases": 1034,
+    "added_cases": 32,
+    "total_cases": 1066,
+    "added_scripts": 16,
+    "prior_cases_unchanged": true,
+    "old_controls_retained": true,
+    "added_controls": 12,
+    "manifest_sha256": "7426f67cc8cf1d2a70c417973e93d46dc65872901d9b15e4e74b922d2f6763ce"
+  },
+  "native_color_map_removal": {
+    "report": "artifacts/colors-native-symbols.json",
+    "sha256": "c8ef5327b51849b651aa8edf3ef0729e1d5095bc1c7eab78d5cd35dfb589bff2",
+    "results": {
+      "x64": {
+        "reference": {
+          "library": "artifacts/cleanup-reference/bin/lib_17.0/x64/subtitlesR.lib",
+          "sha256": "d6d48a179e28d70404ff870f6c6b640b9c768940065a95039695f7684689e50d",
+          "command": [
+            "dumpbin",
+            "/linkermember:1",
+            "artifacts/cleanup-reference/bin/lib_17.0/x64/subtitlesR.lib"
+          ],
+          "output": "artifacts/colors-symbols-x64-reference.txt",
+          "output_sha256": "9eeac1af18fa501f6afa03d89addd2597e7551200ef44620534d8e664ed3db3d",
+          "native_color_map_symbols": [
+            "512272 ??0CHtmlColorMap@@QEAA@XZ",
+            "512272 ??1CHtmlColorMap@@QEAA@XZ",
+            "512272 ?g_colors@@3VCHtmlColorMap@@A"
+          ]
+        },
+        "candidate": {
+          "library": "bin/lib_17.0/x64/subtitlesR.lib",
+          "sha256": "f4801d3bf48b4ae5aec0f86ca74c0122b0258226cfea9a24bc69ff35bb240680",
+          "command": [
+            "dumpbin",
+            "/linkermember:1",
+            "bin/lib_17.0/x64/subtitlesR.lib"
+          ],
+          "output": "artifacts/colors-symbols-x64-candidate.txt",
+          "output_sha256": "da81ab220cb735e4f85d0da53d68932b3e74f56085fb2907531119106a491d11",
+          "native_color_map_symbols": []
+        }
+      },
+      "x86": {
+        "reference": {
+          "library": "artifacts/cleanup-reference/bin/lib_17.0/Win32/subtitlesR.lib",
+          "sha256": "46495e9e54830b1ee76e90021b0cd688be766a46fc9d354b52958651f3888f59",
+          "command": [
+            "dumpbin",
+            "/linkermember:1",
+            "artifacts/cleanup-reference/bin/lib_17.0/Win32/subtitlesR.lib"
+          ],
+          "output": "artifacts/colors-symbols-x86-reference.txt",
+          "output_sha256": "e14984a6f8544115672c93193f90e0f9d6b898c2b330cd064fcc52e7c333924a",
+          "native_color_map_symbols": [
+            "4FB606 ??0CHtmlColorMap@@QAE@XZ",
+            "4FB606 ??1CHtmlColorMap@@QAE@XZ",
+            "4FB606 ?g_colors@@3VCHtmlColorMap@@A"
+          ]
+        },
+        "candidate": {
+          "library": "bin/lib_17.0/Win32/subtitlesR.lib",
+          "sha256": "4df57c74bfde3de561e76e1826062f84ac20b336fb9bd1a21d39c0229cb9c860",
+          "command": [
+            "dumpbin",
+            "/linkermember:1",
+            "bin/lib_17.0/Win32/subtitlesR.lib"
+          ],
+          "output": "artifacts/colors-symbols-x86-candidate.txt",
+          "output_sha256": "18fc37a6628ed5ebf7acce56ed6355f36cd921c09bfebe472a78135cdca9b892",
+          "native_color_map_symbols": []
+        }
+      }
+    }
+  },
+  "unsafe_lexical_inventory": {
+    "report": "artifacts/colors-unsafe-inventory.json",
+    "sha256": "07ad48fabb6459be74a1e0da0997f2e14efafa746cc99d1b5936edb05502a51b",
+    "safe_core_files": 105,
+    "safe_core_unsafe_sites": 0,
+    "ffi_unsafe_functions": 371,
+    "ffi_unsafe_blocks": 479,
+    "ffi_raw_shared_slice_constructors": 64,
+    "delta": {
+      "unsafe_functions": 2,
+      "unsafe_blocks": 3,
+      "new_raw_shared_slice_constructors": 1,
+      "new_raw_nonoverlapping_copies": 1,
+      "note": "Moving2CRT unsafe blocks between modules adds no sites."
+    }
+  },
+  "checks": {
+    "core_per_architecture": 305,
+    "ffi_per_architecture": 127,
+    "fmt": true,
+    "clippy_all_targets": true,
+    "clippy_native_runtime": true,
+    "python_tests": 165,
+    "python_skipped": 1,
+    "corpus_check": true,
+    "log": "artifacts/colors-checks.log",
+    "log_sha256": "eb7890a5af079a098b864e7ce0ab1f04d319244708ae3077fba0f853ed3a2a23",
+    "corpus_check_log_sha256": "a50dd0121b8252f75c0f4833bc6891f68a68651e6bcc215b93c639c5b720f446"
+  },
+  "harness_sources": {
+    "tools/compat/shared_color_native.cpp": "32bf9b652626b802bc0c170317f5ee65857406f3168c24c5e986152c418c0dd1",
+    "tools/compat/shared_color_native.py": "4b21f92eef7f476680612dbb394f384169ca08d34c6dc13395df6cbbe5995399",
+    "tools/compat/test_shared_color_native.py": "88458cfae2bfd5852496b7c08bebfc975ba15ecce96419f6f1518e24c1ad4dbf",
+    "tools/compat/legacy_color_names.h": "cb645ae555f1e4d5c9c9a034f190e2f15155e098d7d77c1545813c607e80a3cc",
+    "tools/compat/usf_document_native.cpp": "54b67d73b57bf8f53f5239230ec3612d5ec671790a8507ba9e09160bf094ea27",
+    "tools/compat/csri_compare.py": "9f71f1bc0426ca96b47ae35d798ef7b86f17e52d213c67730e122384d85a3b7a",
+    "tools/compat/make_corpus.py": "90884120c2dbe6d96f22a2bdfc3983ee9c81ce46ba26aac068776dffe329c06d",
+    "test/compat/cases.json": "7426f67cc8cf1d2a70c417973e93d46dc65872901d9b15e4e74b922d2f6763ce",
+    "artifacts/run-colors-host-corpus.py": "ac69df9377ee71a7bc8d6d84f481fc6077cd879ba1dc6a2a9c9be3b20655a4f6"
+  },
+  "build_logs": {
+    "artifacts/colors-build-x64.log": "8cc892a9052a4321438ac761480b20bcae287ff545755ae4d5378b15ad3c4b4e",
+    "artifacts/colors-build-x86.log": "bd24e00971a1ed1e93a7f4a9447623f0cd68b6536b4d0254a51762cef13fb80a",
+    "artifacts/colors-build-rust-x64.log": "ff4536e59022d16e6cb252ae24ec2abb6109898a5386c28782f6a49e08eecacb",
+    "artifacts/colors-build-rust-x86.log": "2b01a4a73bcb518e25678c566e616a3853c033e9ae56d10b9814dfe15ec5e356"
+  },
+  "source_inventory": {
+    "path": "docs/rust-shared-colors-inventory.json",
+    "sha256": "3715ef168490b59625074dc1ed39bf753ac0705a658db5b8a829e4c8381368f4"
+  },
+  "prior_evidence": {
+    "docs/rust-usf-msxml-local-evidence.json": "14850168fa5a9c8595fe40560d86884147065dffecbabb1e3951591f43ceb568",
+    "docs/rust-usf-scalar-local-evidence.json": "cebf60fb4bcec453e613d87738cef83e7b58e8faf83fc984bb1c753a653b7965",
+    "docs/rust-subviewer-reference-outcomes.json": "9cd5e22c6e894051966451dad661bf7cc1cd5e4b99f76fd118d61220b08be882"
+  }
+}
