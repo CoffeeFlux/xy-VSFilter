@@ -1,0 +1,13 @@
+WEBVTT
+STYLE
+::cue(.red) {color:lime;}
+
+Style:
+::cue(.red) {background:blue;}
+
+00:01.000 --> 00:03.000
+<c.red>First caption</c>
+
+00:03.000 --> 00:05.000
+Last caption
+

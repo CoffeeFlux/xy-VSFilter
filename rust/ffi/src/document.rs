@@ -4647,7 +4647,7 @@ mod tests {
             assert_eq!(xy_vsfilter_document_vtt_time_v1(vtt_run, 5, 1, 2, 3, 0), OK);
             assert_eq!(xy_vsfilter_document_vtt_time_v1(vtt_run, 5, 1, 3, 4, 0), OK);
             vtt_read("caption");
-            let mut caption = vec![65, 0, 0, 0, 0, 0xd8];
+            let mut caption = [65, 0, 0, 0, 0, 0xd8];
             assert_eq!(
                 xy_vsfilter_document_vtt_packet_v1(vtt_run, 1, 0, caption.as_ptr(), caption.len()),
                 OK

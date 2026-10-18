@@ -827,6 +827,26 @@ def sami_parser_variants():
         yield "sami-parser-"+name+".smi", data
 
 
+
+def vtt_parser_variants():
+    cue="00:01.000 --> 00:03.000\r\n<c.red>First caption</c>\r\n\r\n"
+    tail="00:03.000 --> 00:05.000\r\nLast caption\r\n\r\n"
+    for name,text in {
+        "control":"WEBVTT\r\n"+cue+tail,
+        "color-replace":"WEBVTT\r\nSTYLE\r\n::cue(.red) {color:lime;}\r\n\r\n"+cue+tail,
+        "alignment":"WEBVTT\r\n"+cue.replace("00:03.000\r\n","00:03.000 align:start\r\n")+tail,
+        "style-arrow":"WEBVTT\r\nSTYLE\r\n::cue {color:rgb(256,257,258);}\r\n"+cue+tail,
+        "style-replace":"WEBVTT\r\nSTYLE\r\n::cue(.red) {color:lime;}\r\n\r\nStyle:\r\n::cue(.red) {background:blue;}\r\n\r\n"+cue+tail,
+        "comment":"WEBVTT\r\nSTYLE\r\n/*closed*/::cue {/*inside*/color:yellow;}\r\n\r\n"+cue+tail,
+        "duplicate":"WEBVTT\r\n"+cue+cue+tail,
+        "style-after-cue":"WEBVTT\r\n"+cue+"STYLE\r\n::cue {color:lime;}\r\n\r\n"+tail,
+        "final-fragment":"WEBVTT\r\n"+cue+"00:03.000 --> 00:05.000\r\nignored",
+        "raw-units":"WEBVTT\r\n"+cue.replace("First caption","First\x00\ud800discarded")+tail,
+    }.items():
+        data=(b"\xff\xfe"+text.encode("utf-16le","surrogatepass") if "\x00" in text else text.encode("ascii"))
+        yield "vtt-parser-"+name+".vtt",data
+
+
 def timestamps(data):
     matches = re.findall(rb"Dialogue:[^,]*,(\d+):(\d+):(\d+(?:\.\d+)?),(\d+):(\d+):(\d+(?:\.\d+)?)", data)
     if not matches:
@@ -867,6 +887,8 @@ def make_cases(files):
                 cases[-1]["times"] = ["0", "9999.9999999", "10000", "19999.9999999", "20000", "24000", "30000", "39999.9999999", "40000", "59999.9999999", "60000", "30000", "10000"]
             if path.stem.startswith("sami-parser-"):
                 cases[-1]["times"] = ["0", "0.9999999", "1", "1.0000001", "2", "3.9999999", "4", "10.9999999", "11", "12", "13.9999999", "14", "2", "12"]
+            if path.stem.startswith("vtt-parser-"):
+                cases[-1]["times"] = ["0", "0.9999999", "1", "1.0000001", "2", "2.9999999", "3", "3.0000001", "4", "4.9999999", "5", "2"]
             warning_styles = {"field-tab-prefixes": "\tDefault", "field-unicode-style-space": "\u2003Default"}
             if path.stem in warning_styles:
                 cases[-1]["dialog_actions"] = [{"title": "Warning",
@@ -895,6 +917,8 @@ def make_cases(files):
                                                     ("legacy-parser-vp-caption-space", "legacy-parser-vp-control"),
                                                     ("microdvd-parser-style-sticky", "microdvd-parser-control"),
                                                     ("microdvd-parser-missing-brace", "microdvd-parser-brace-control"),
+                                                    ("vtt-parser-color-replace", "vtt-parser-control"),
+                                                    ("vtt-parser-alignment", "vtt-parser-control"),
                                                     ("sami-parser-title-skip", "sami-parser-control"),
                                                     ("sami-parser-fixed-column", "sami-parser-control"),
                                                     ("xombie-italic", "xombie-control"),
@@ -982,6 +1006,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in legacy_parser_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in microdvd_parser_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in sami_parser_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in vtt_parser_variants()]
     manifest = json.dumps(make_cases(files + generated), indent=2) + "\n"
     expected = generated + [(DEST / "cases.json", manifest.encode("utf-8"))]
     for path, data in expected:
