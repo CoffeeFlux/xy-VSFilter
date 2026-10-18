@@ -19203,7 +19203,7 @@
     {
       "id": "text-parser-srt-control-file",
       "script": "test/compat/generated/text-parser-srt-control.srt",
-      "sha256": "93432de8e37d7edb6912bb16662edb763f10e0306da782c65fe16252930b629c",
+      "sha256": "121fc61395a72cce9909447425d9be9f37fe7e53e3e11b1646a4e4b9493158c0",
       "open": "file",
       "width": 1280,
       "height": 720,
@@ -19227,7 +19227,7 @@
     {
       "id": "text-parser-srt-control-memory",
       "script": "test/compat/generated/text-parser-srt-control.srt",
-      "sha256": "93432de8e37d7edb6912bb16662edb763f10e0306da782c65fe16252930b629c",
+      "sha256": "121fc61395a72cce9909447425d9be9f37fe7e53e3e11b1646a4e4b9493158c0",
       "open": "memory",
       "width": 1280,
       "height": 720,

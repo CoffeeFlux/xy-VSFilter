@@ -756,7 +756,7 @@ def xombie_variants():
 def text_parser_variants():
     timing="1\r\n0:0:1,234 --> 0:0:4,567\r\n"
     for name,text in {
-        "srt-control":timing+"Visible\r\nsecond\r\n",
+        "srt-control":timing+"Visiblediscarded\r\nsecond\r\n",
         "srt-nul":timing+"Visible\x00discarded\r\nsecond\r\n",
         "srt-separators":timing.replace("0:0:1,234 --> 0:0:4,567","0x0x1.234 --> 0x0x4.567")+"Visible\r\nsecond\r\n",
         "srt-numeric-eof":timing+"Visible\r\n\r\n2",
