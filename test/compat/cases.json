@@ -513,6 +513,70 @@
     [
       "usf-conversion-alpha-memory-mta",
       "usf-conversion-control-memory-mta"
+    ],
+    [
+      "html-tag-bold-file",
+      "html-tag-control-file"
+    ],
+    [
+      "html-tag-bold-memory",
+      "html-tag-control-memory"
+    ],
+    [
+      "html-tag-italic-file",
+      "html-tag-control-file"
+    ],
+    [
+      "html-tag-italic-memory",
+      "html-tag-control-memory"
+    ],
+    [
+      "html-tag-underline-file",
+      "html-tag-control-file"
+    ],
+    [
+      "html-tag-underline-memory",
+      "html-tag-control-memory"
+    ],
+    [
+      "html-tag-strike-file",
+      "html-tag-control-file"
+    ],
+    [
+      "html-tag-strike-memory",
+      "html-tag-control-memory"
+    ],
+    [
+      "html-tag-negative-size-file",
+      "html-tag-control-file"
+    ],
+    [
+      "html-tag-negative-size-memory",
+      "html-tag-control-memory"
+    ],
+    [
+      "html-tag-face-file",
+      "html-tag-control-file"
+    ],
+    [
+      "html-tag-face-memory",
+      "html-tag-control-memory"
+    ],
+    [
+      "html-tag-closing-font-file",
+      "html-tag-control-file"
+    ],
+    [
+      "html-tag-closing-font-memory",
+      "html-tag-control-memory"
+    ],
+    [
+      "html-tag-karaoke-file",
+      "html-tag-control-file"
+    ],
+    [
+      "html-tag-karaoke-memory",
+      "html-tag-control-memory"
     ]
   ],
   "cases": [
@@ -24964,6 +25028,834 @@
         "3.9999999",
         "4",
         "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-control-file",
+      "script": "test/compat/generated/html-tag-control.ass",
+      "sha256": "77f258693cf315894a793f31c21c584491e9631bd63c165dae5b0980af3b7e1e",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-control-memory",
+      "script": "test/compat/generated/html-tag-control.ass",
+      "sha256": "77f258693cf315894a793f31c21c584491e9631bd63c165dae5b0980af3b7e1e",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-bold-file",
+      "script": "test/compat/generated/html-tag-bold.ass",
+      "sha256": "da7febc445a0de32bcb4de6fbc92de1ccecfece9dcffb8dd17b545cabd304717",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-bold-memory",
+      "script": "test/compat/generated/html-tag-bold.ass",
+      "sha256": "da7febc445a0de32bcb4de6fbc92de1ccecfece9dcffb8dd17b545cabd304717",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-italic-file",
+      "script": "test/compat/generated/html-tag-italic.ass",
+      "sha256": "49e81420bd446210d00464a4b67961abc052726dd7b3d3baf2ce0d544e5f807d",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-italic-memory",
+      "script": "test/compat/generated/html-tag-italic.ass",
+      "sha256": "49e81420bd446210d00464a4b67961abc052726dd7b3d3baf2ce0d544e5f807d",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-underline-file",
+      "script": "test/compat/generated/html-tag-underline.ass",
+      "sha256": "08b15cc347a118a837bfe36b0d0489cdd267a8fc79869c2619c44bdae46a3b25",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-underline-memory",
+      "script": "test/compat/generated/html-tag-underline.ass",
+      "sha256": "08b15cc347a118a837bfe36b0d0489cdd267a8fc79869c2619c44bdae46a3b25",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-strike-file",
+      "script": "test/compat/generated/html-tag-strike.ass",
+      "sha256": "0c80728863514dab58e8ed7612841518affe2e0697b70280c256cba708e8eeeb",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-strike-memory",
+      "script": "test/compat/generated/html-tag-strike.ass",
+      "sha256": "0c80728863514dab58e8ed7612841518affe2e0697b70280c256cba708e8eeeb",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-negative-size-file",
+      "script": "test/compat/generated/html-tag-negative-size.ass",
+      "sha256": "1309dd559a3dcb8a080bf7c50874df0b7f8e427f2531b9545f5eeb7d823e3776",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-negative-size-memory",
+      "script": "test/compat/generated/html-tag-negative-size.ass",
+      "sha256": "1309dd559a3dcb8a080bf7c50874df0b7f8e427f2531b9545f5eeb7d823e3776",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-positive-size-file",
+      "script": "test/compat/generated/html-tag-positive-size.ass",
+      "sha256": "60a518442e30581c25c8b0ff3dcd22349e0b710300956742712fbbf67b417fdb",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-positive-size-memory",
+      "script": "test/compat/generated/html-tag-positive-size.ass",
+      "sha256": "60a518442e30581c25c8b0ff3dcd22349e0b710300956742712fbbf67b417fdb",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-duplicate-size-file",
+      "script": "test/compat/generated/html-tag-duplicate-size.ass",
+      "sha256": "037b57efecdcaa27e1c4e50a7b4e44c322e70af0bbef5bbdc8e04f5fbaebc93d",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-duplicate-size-memory",
+      "script": "test/compat/generated/html-tag-duplicate-size.ass",
+      "sha256": "037b57efecdcaa27e1c4e50a7b4e44c322e70af0bbef5bbdc8e04f5fbaebc93d",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-face-file",
+      "script": "test/compat/generated/html-tag-face.ass",
+      "sha256": "c003de35e27a48d6b3eb62bb78b7761bd526547963bc6a44a970ef13fed46434",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-face-memory",
+      "script": "test/compat/generated/html-tag-face.ass",
+      "sha256": "c003de35e27a48d6b3eb62bb78b7761bd526547963bc6a44a970ef13fed46434",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-closing-font-file",
+      "script": "test/compat/generated/html-tag-closing-font.ass",
+      "sha256": "451dcf2e8bf6a0598a25e56cc014890e586c3761705464475e6d976732853d5c",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-closing-font-memory",
+      "script": "test/compat/generated/html-tag-closing-font.ass",
+      "sha256": "451dcf2e8bf6a0598a25e56cc014890e586c3761705464475e6d976732853d5c",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-closing-flags-file",
+      "script": "test/compat/generated/html-tag-closing-flags.ass",
+      "sha256": "1e16ca95c14437cfa1c4748febb88ec04af7bb03178c4956ccd95cb3b3fa8a2a",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-closing-flags-memory",
+      "script": "test/compat/generated/html-tag-closing-flags.ass",
+      "sha256": "1e16ca95c14437cfa1c4748febb88ec04af7bb03178c4956ccd95cb3b3fa8a2a",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-spaced-close-file",
+      "script": "test/compat/generated/html-tag-spaced-close.ass",
+      "sha256": "68ef6de811e80a5c6db7ade65824143c31d4b98fbc05a626dcf4045c4c23b3b6",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-spaced-close-memory",
+      "script": "test/compat/generated/html-tag-spaced-close.ass",
+      "sha256": "68ef6de811e80a5c6db7ade65824143c31d4b98fbc05a626dcf4045c4c23b3b6",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-comment-file",
+      "script": "test/compat/generated/html-tag-comment.ass",
+      "sha256": "31bea7eabdfc7a15051f6c8ab26f56803a0198ebca5c3fd91faa6464b233f85d",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-comment-memory",
+      "script": "test/compat/generated/html-tag-comment.ass",
+      "sha256": "31bea7eabdfc7a15051f6c8ab26f56803a0198ebca5c3fd91faa6464b233f85d",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-unknown-file",
+      "script": "test/compat/generated/html-tag-unknown.ass",
+      "sha256": "738e8f3e70c6b2695ac5467705418021e1fc6811b17b1a18d0207712144d6673",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-unknown-memory",
+      "script": "test/compat/generated/html-tag-unknown.ass",
+      "sha256": "738e8f3e70c6b2695ac5467705418021e1fc6811b17b1a18d0207712144d6673",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-unclosed-quote-file",
+      "script": "test/compat/generated/html-tag-unclosed-quote.ass",
+      "sha256": "2cb020c38d702722d21c7127833ae5e44b4c94c47f235caf16c9a2d4d87212b9",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-unclosed-quote-memory",
+      "script": "test/compat/generated/html-tag-unclosed-quote.ass",
+      "sha256": "2cb020c38d702722d21c7127833ae5e44b4c94c47f235caf16c9a2d4d87212b9",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-karaoke-file",
+      "script": "test/compat/generated/html-tag-karaoke.ass",
+      "sha256": "4c25cb500facfe00ea334272888e3f29832dc6150c31ffaa5f77868ae4ecb44a",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-karaoke-memory",
+      "script": "test/compat/generated/html-tag-karaoke.ass",
+      "sha256": "4c25cb500facfe00ea334272888e3f29832dc6150c31ffaa5f77868ae4ecb44a",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-karaoke-negative-file",
+      "script": "test/compat/generated/html-tag-karaoke-negative.ass",
+      "sha256": "a1137fe9b18114b4d15a0f8c5fbc5e8b7f41b18444cae489ad70f1a232b6749e",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-karaoke-negative-memory",
+      "script": "test/compat/generated/html-tag-karaoke-negative.ass",
+      "sha256": "a1137fe9b18114b4d15a0f8c5fbc5e8b7f41b18444cae489ad70f1a232b6749e",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-karaoke-duplicate-file",
+      "script": "test/compat/generated/html-tag-karaoke-duplicate.ass",
+      "sha256": "01d548e8c86219db6b58c7a7c8f315aaccab8af81d9a198e12f6f27ccda795e6",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "html-tag-karaoke-duplicate-memory",
+      "script": "test/compat/generated/html-tag-karaoke-duplicate.ass",
+      "sha256": "01d548e8c86219db6b58c7a7c8f315aaccab8af81d9a198e12f6f27ccda795e6",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.005",
+        "1.015",
+        "1.025",
+        "1.05",
+        "2",
+        "3.9999999",
+        "4",
+        "1.005"
       ],
       "stride_padding": 16,
       "fill_seed": 31

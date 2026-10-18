@@ -20,6 +20,8 @@ mod fields;
 mod fill;
 mod golomb;
 mod hdmv;
+#[cfg(windows)]
+mod html_tag;
 mod mask;
 mod realtext;
 #[cfg(all(windows, any(feature = "native-runtime", test)))]

@@ -5,11 +5,27 @@ use core::ptr;
 extern "C" {
     fn wcstol(text: *const u16, end: *mut *mut u16, base: i32) -> i32;
     fn _wcsicmp(a: *const u16, b: *const u16) -> i32;
+    fn _wcslwr_s(text: *mut u16, capacity: usize) -> i32;
+    fn iswspace(unit: u16) -> i32;
 }
 fn terminated(input: &[u16]) -> Vec<u16> {
     let mut out = input.to_vec();
     out.push(0);
     out
+}
+pub(crate) fn space(unit: u16) -> bool {
+    // SAFETY: Windows wint_t is unsigned16bits, as CString's CRT traits use.
+    unsafe { iswspace(unit) != 0 }
+}
+pub(crate) fn lower(input: &mut [u16]) {
+    let mut buffer = terminated(input);
+    // SAFETY: owned writable terminated buffer; capacity includes the final
+    // NUL. Like CString MakeLower, ignore the return and retain original length.
+    // Embedded NUL terminates conversion but leaves the remaining units intact.
+    unsafe {
+        _wcslwr_s(buffer.as_mut_ptr(), buffer.len());
+    }
+    input.copy_from_slice(&buffer[..input.len()]);
 }
 pub(crate) fn number(input: &[u16], base: i32) -> (i32, u32) {
     let input = terminated(input);

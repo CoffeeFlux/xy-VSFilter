@@ -25,6 +25,7 @@
 #include "RTS.h"
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 #include "xy_rust_colors.h"
+#include "xy_rust_html_tag.h"
 #endif
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_ass.h"
@@ -2957,6 +2958,9 @@ bool CRenderedTextSubtitle::ParseSSATag(CSubtitle* sub, const CStringW& str, STS
 
 bool CRenderedTextSubtitle::ParseHtmlTag(CSubtitle* sub, CStringW str, STSStyle& style, STSStyle& org)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return XyRust::HtmlTag(str,style,org,m_ktype,m_kstart,m_kend);
+#else
     if(str.Find(L"!--") == 0)
         return(true);
     bool fClosing = str[0] == L'/';
@@ -3061,6 +3065,7 @@ bool CRenderedTextSubtitle::ParseHtmlTag(CSubtitle* sub, CStringW str, STSStyle&
     else
         return(false);
     return(true);
+#endif
 }
 
 double CRenderedTextSubtitle::CalcAnimation(double dst, double src, bool fAnimate)

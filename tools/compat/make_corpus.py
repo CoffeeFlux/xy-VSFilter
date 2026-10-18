@@ -883,6 +883,28 @@ def realtext_parser_variants():
         yield "realtext-parser-"+name+".rt",data
 
 
+def html_tag_variants():
+    for name,text in {
+        'control':'First caption','bold':'<strong>First caption</strong>',
+        'italic':'<em>First caption</em>','underline':'<u>First caption</u>',
+        'strike':'<del>First caption</del>',
+        'negative-size':'<font size="-12">First caption</font>',
+        'positive-size':'<font size="+12">First caption</font>',
+        'duplicate-size':'<font size="12" size="-12">First caption</font>',
+        'face':'<font face="Courier New">First caption</font>',
+        'closing-font':'<font outline-level="8">First</font> caption',
+        'closing-flags':'<b><i>First</b> caption</i>',
+        'spaced-close':'<b>First< /b> caption',
+        'comment':'<!--font size=80-->First caption',
+        'unknown':'<unknown x=1>First caption',
+        'unclosed-quote':'<font face="Arial>First caption',
+        'karaoke':'<k t="10">First<k t="20"> caption',
+        'karaoke-negative':'<k t="-10">First<k t="20"> caption',
+        'karaoke-duplicate':'<k t="10" t="20">First caption',
+    }.items():
+        yield 'html-tag-'+name+'.ass',SEED.replace(b'COMPAT_TEXT',text.encode('ascii'))
+
+
 def shared_color_variants():
     for name,attributes in {
         "control":'color="white"', "black":'color="black"',
@@ -972,6 +994,8 @@ def make_cases(files):
                 for apartment in ("sta", "mta"):
                     cases.append({**uninitialized, "id": uninitialized["id"] + "-" + apartment,
                                   "com_apartment": apartment})
+            if path.stem.startswith("html-tag-"):
+                cases[-1]["times"] = ["0", "0.9999999", "1", "1.005", "1.015", "1.025", "1.05", "2", "3.9999999", "4", "1.005"]
             warning_styles = {"field-tab-prefixes": "\tDefault", "field-unicode-style-space": "\u2003Default"}
             if path.stem in warning_styles:
                 cases[-1]["dialog_actions"] = [{"title": "Warning",
@@ -1054,7 +1078,10 @@ def make_cases(files):
                                        for mode in ("file", "memory")]
                     + [[f"usf-conversion-{name}-{mode}-{apartment}", f"usf-conversion-control-{mode}-{apartment}"]
                        for name in ("italic", "margin", "alpha") for mode in ("file", "memory")
-                       for apartment in ("sta", "mta")], "cases": cases}
+                       for apartment in ("sta", "mta")]
+                    + [[f"html-tag-{name}-{mode}",f"html-tag-control-{mode}"]
+                       for name in ("bold","italic","underline","strike","negative-size","face","closing-font","karaoke")
+                       for mode in ("file","memory")], "cases": cases}
 
 
 def main():
@@ -1106,6 +1133,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in realtext_parser_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in usf_conversion_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in shared_color_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in html_tag_variants()]
     manifest = json.dumps(make_cases(files + generated), indent=2) + "\n"
     expected = generated + [(DEST / "cases.json", manifest.encode("utf-8"))]
     for path, data in expected:

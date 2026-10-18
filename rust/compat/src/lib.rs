@@ -161,3 +161,4 @@ pub mod usf_model;
 pub mod usf_scalar;
 
 pub mod colors;
+pub mod html_tag;
