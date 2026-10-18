@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "candidate_commit": "7e5440d56c3b46a2d1b1026812e194468eaa15d1",
+  "implementation_commit": "b8864098921d8aa0d8b80ff8286db76089a7879b",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "Owned SubRip and MPL2 parser lifecycles in experimental document configuration; full-library goal remains active.",
+  "unchanged_production_sources": {
+    "rust/compat/src/text_document.rs": "3b55197e3be1c25f732b9211bc7ed11bde3a55611badc38ba2f95f925f91d36a",
+    "rust/compat/src/lib.rs": "217dea71f87c14912322adae311ac8c03b419b106d80b872096820814627b122",
+    "rust/ffi/src/document.rs": "759ab92d1e957037b553069a5da9581d4bb7a592bd5e469646a899fc04c93632",
+    "rust/ffi/src/document_registry.rs": "b9efaa49c56c76065fc0d5b8418a929b84a5719e4deb01428da26ec9b1d053cb",
+    "include/xy_rust_document.h": "ba1bc7d56b6cc5097f3c5b36da09257ab16817ad4b277582d89f6bf778ffae05",
+    "src/subtitles/RustDocumentOwner.h": "3628841984e3f4b85eec79a58b1b12e7e8769313471ac55b44afe8c8eddf5216",
+    "src/subtitles/STS.cpp": "441b8ed4c81e95ffd5e2d4d9107c479a6039ea800b951a064754cfdb52ed708f",
+    "src/subtitles/STS.h": "1ad616dc8dc43c70ed73f442f219056ca40f77530647d541850ef336e9f9795b"
+  },
+  "reference_sources": {
+    "src/subtitles/STS.cpp": "2616b67db84f7329ac6e2363a3f03d61977fa07c37ed9c04d32ec2b1197f31e0",
+    "src/subtitles/TextFile.cpp": "71c00071f9ceb466c539fda26103a4a94b802a4a01f4b807852e159563772f2f",
+    "src/dsutil/text.h": "92efdac94644006b4559d868631c27c841811327af9eedc408b817631e09d249"
+  },
+  "operations": [
+    {
+      "operation": "Owned file/caption lifecycle and timestamp policy",
+      "source": {
+        "path": "rust/compat/src/text_document.rs",
+        "line": 25,
+        "sha256": "3b55197e3be1c25f732b9211bc7ed11bde3a55611badc38ba2f95f925f91d36a"
+      },
+      "behavior": "Raw UTF16 ownership, supplied CString whitespace predicates, header rejection, persistent SubRip blank-line boundary state, numeric boundary consumption, inner versus outer EOF policy, caption accumulation, full-millisecond wrapping SRT times, MPL2 decisecond times and second-bracket/Mid extraction. Live document nonemptiness decides success at outer EOF; explicit format rejection remains false even with preloaded entries."
+    },
+    {
+      "operation": "Raw input and CString behavior",
+      "source": {
+        "path": "rust/compat/src/text_document.rs",
+        "line": 149,
+        "sha256": "3b55197e3be1c25f732b9211bc7ed11bde3a55611badc38ba2f95f925f91d36a"
+      },
+      "behavior": "The session models tmp+newline followed by CString append: a supplied embedded NUL truncates the fragment and suppresses its appended newline. Actual pinned ReadString uses CString Append earlier and already truncates each file line at NUL, so file-level rendering checks observe discarded suffix text, not that unreachable inner-fragment newline distinction. No Unicode scalar normalization."
+    },
+    {
+      "operation": "Initialized native conversion and callback boundary",
+      "source": {
+        "path": "src/subtitles/STS.cpp",
+        "line": 1098,
+        "sha256": "441b8ed4c81e95ffd5e2d4d9107c479a6039ea800b951a064754cfdb52ed708f"
+      },
+      "behavior": "ReadString, IsSpace, scanf_s, SubRipper2SSA/MPL22SSA and Add remain services outside all registry loans. SubRip count>=11 is required before serializing h/m/s locals; each secondary millisecond parse defaults to0 if count!=2. MPL2 copies only its two successful conversions. All unused transport slots are initialized zero. No native partial-scan uninitialized value is inspected."
+    }
+  ],
+  "boundary_review": {
+    "source": {
+      "path": "rust/ffi/src/document.rs",
+      "line": 276,
+      "sha256": "759ab92d1e957037b553069a5da9581d4bb7a592bd5e469646a899fc04c93632"
+    },
+    "registry": {
+      "path": "rust/ffi/src/document_registry.rs",
+      "line": 387,
+      "sha256": "369c13cbe0aac76f15cca2ee5044d5d074e51deb9d87a166f12650763f0a1510"
+    },
+    "exports": [
+      "xy_vsfilter_document_text_parser_begin_v1",
+      "xy_vsfilter_document_text_parser_read_v1",
+      "xy_vsfilter_document_text_parser_step_v1",
+      "xy_vsfilter_document_text_parser_part_v1",
+      "xy_vsfilter_document_text_parser_drop_v1"
+    ],
+    "contract": "Document-bound never-reused integer IDs under nonblocking admission. All raw input, predicates and i32 packets copied before mutation; strict bools/format/count/phase/packet shapes checked. Snapshot and begin output preflight precedes publication. Immutable snapshots survive run/document destruction; no native pointer retained. Native conversion/formatting/Add occur outside registry admission. Busy handling, allocation timing/failure and allocator reentry remain outside compatibility closure."
+  },
+  "direct_probe": {
+    "source": {
+      "path": "tools/compat/text_document_native.cpp",
+      "line": 7,
+      "sha256": "bfa6d5aeb6cd79d9ac9f7d80d6c577eadb1f4cfe886d521f40bdeb382cf141da"
+    },
+    "cases": 4128,
+    "trace_lines": 32015,
+    "baseline": {
+      "commit": "12b58a4a",
+      "cases": 3936,
+      "trace_lines": 30141
+    },
+    "method": "Actual STS.cpp with initialized linked document observer; empty/pre-populated document variants, partial scans, extreme integers, malformed separators/brackets, final fragments, raw units, persistent caption boundaries. Two reference and two candidate executions per architecture compare complete documents, exceptions and byte positions."
+  },
+  "rendering": {
+    "generator": {
+      "path": "tools/compat/make_corpus.py",
+      "line": 756,
+      "sha256": "1042422aa825fc02583a302db4f62a24680702bc9b7a52ee5be5608a9179e8dd"
+    },
+    "new_files": 10,
+    "new_cases": 20,
+    "new_frames": 240,
+    "new_distinct_controls": 4,
+    "corrected_control": "Initial text-new reports had matching output in all20 cases but failed the SRT NUL distinct-image assertion because the reader truncated the tail before parsing, making the selected images identical. Commit7e5440d5 corrected the non-NUL control to contain the visible suffix. Initial failed control reports remain separate and are not passing evidence."
+  },
+  "limits": [
+    "No production default switch or full format/frontend/host closure.",
+    "Remaining scanf, formatter, encoding, Add and file adapters are transitional native code.",
+    "Native pre-Open simplicity, allocation failure/reentry and real player/Aegisub integration remain unresolved.",
+    "No new non-Windows, Miri or default native-document runtime parity; default configuration has compile probes only.",
+    "Finite MSVC14.44 local Windows evidence; no crash, timeout or unstable outcome is treated as equality."
+  ],
+  "next_work": [
+    "Continue moving the remaining text-format parser control and ownership into safe Rust.",
+    "Replace native numeric, encoding, formatting and file adapters with audited system boundaries and safe policy.",
+    "Continue complete rendering, public host/ABI and vendored native replacement; retire fallback/raw adapters as callers move."
+  ]
+}

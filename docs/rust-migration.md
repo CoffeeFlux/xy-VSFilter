@@ -27,14 +27,50 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Active port: SubRip and MPL2 parser ownership (2026-10-18)
+## Current port: SubRip and MPL2 parser ownership (2026-10-18)
 
 The experimental document path now uses a checked Rust session for SubRip and
 MPL2 line/cue ownership, trimming, EOF handling, boundary decisions, timestamp
-arithmetic and MPL2 caption extraction. Native scanf, formatting and Add remain
-transitional services outside registry loans. A 3,936-case unchanged-parser
-baseline passed on both architectures before replacement; the implementation
-probe adds raw MPL2 cases. Fresh implementation comparisons are in progress.
+arithmetic and MPL2 caption extraction. Raw UTF-16 remains raw. Native scanf,
+formatting and Add are transitional services outside registry loans; partially
+initialized scan locals are never copied into Rust.
+
+The port preserves SubRip's persistent blank-line boundary flag and consumed
+number lines, its differing inner/outer EOF rules, and MPL2's acceptance of
+partially matched timestamp syntax. If a second closing bracket is absent,
+MPL2 can pass the entire line to its formatter. Successful EOF acceptance still
+uses the live document's nonemptiness, including pre-existing entries.
+
+Candidate `7e5440d5` (production implementation `b8864098`) passes fresh cleanup
+`67da07cd` comparisons on **each** Windows architecture (x86 and x64):
+
+* 4,128 direct SubRip/MPL2 cases with 32,015 identical trace lines, repeated
+  twice for reference and candidate. Checkpoint `12b58a4a` first established
+  3,936 unchanged-parser cases; the final probe adds raw MPL2 cases.
+* All 854 rendering cases and 9,066 frames, with 80 distinct-frame controls.
+  The 20 added cases cover file/memory opening, millisecond/decisecond boundaries,
+  repeated/reverse seeks, final fragments, malformed delimiters and raw units.
+* Regression comparisons for 3,266 ASS cases and 1,242 XombieSub cases;
+  3,693 linked lifecycle trace lines; all three DLLs' exports/dependencies;
+  10 scoped COM cases plus two candidate pin-ID controls; and reference,
+  native-document and experimental compile probes.
+* 268 safe-core and 123 FFI tests, formatting and Clippy; 152 Python harness
+  tests with one skip. The portable core still forbids unsafe code.
+
+The initial SRT NUL distinct-image control failed because ReadString itself
+truncates the line at NUL, making the selected images identical. Both renderers
+matched. The corrected control includes the suffix in the non-NUL input so the
+reader's visible truncation is tested. Initial failed control reports remain
+separate; they are not passing evidence. Direct parser reports use `b2cc546b`;
+only rendering fixtures changed in `7e5440d5`, with production blobs verified
+identical to `b8864098`.
+
+See the [source/boundary inventory](rust-text-parser-inventory.json) and
+[local evidence manifest](rust-text-parser-local-evidence.json). No production
+switch, format closure, non-Windows parity or real player/Aegisub graph integration
+is claimed. Pre-Open simplicity and allocation failure/reentry remain unresolved.
+Remaining format, renderer, host and vendored-native packages stay in scope; the
+complete-library migration goal remains active.
 
 ## Previous port: XombieSub parser ownership (2026-10-18)
 
