@@ -1,0 +1,639 @@
+{
+  "schema": 1,
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+  "baseline_commit": "4d7fdc55a66d6e1cff268f02afbd9ee89300f56b",
+  "scope": "Safe Rust USF TimeToInt, ColorToDWORD, TranslateMargin and TranslateAlignment algorithms, including the exact cleanup named-color table and raw UTF16 token behavior.",
+  "configuration": {
+    "native": "Release; RustTextDecoder=true; RustDocumentOwnerExperimental=true",
+    "rust": "1.85.0; native-runtime; +crt-static",
+    "msvc": "14.44.35207",
+    "sdk": "10.0.26100.0"
+  },
+  "architectures": {
+    "x64": {
+      "baseline_usf": {
+        "report": "artifacts/usf-scalar-baseline-x64/report.json",
+        "sha256": "79c3e5d11da0b89a79d8be926480584e3e57b9f1a39b782fcec1a407ac182796",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4d7fdc55a66d6e1cff268f02afbd9ee89300f56b",
+        "trace_lines": 36391,
+        "scalar_cases": 20735,
+        "scalar_values": 1885,
+        "inputs_unchanged": true,
+        "cases": 1340
+      },
+      "final_usf": {
+        "report": "artifacts/usf-scalar-final-x64/report.json",
+        "sha256": "5041a2046cbda386d73154d5eed1e24b385b1dfaccf3b6209b23b475c25d6fdd",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+        "trace_lines": 36391,
+        "scalar_cases": 20735,
+        "scalar_values": 1885,
+        "inputs_unchanged": true,
+        "cases": 1340
+      },
+      "baseline_traces_preserved": true,
+      "previous_1340_case_trace_prefix_preserved": true,
+      "corpus": {
+        "report": "artifacts/usf-scalar-csri-x64/summary.json",
+        "sha256": "63c9476578b2c0fc511e5df8862891599d23e5571da9a4001ae436c79adffb70",
+        "complete": true,
+        "frames": 11066,
+        "distinct_controls": 116,
+        "partition_exact": true,
+        "cases": 1034,
+        "shards": [
+          {
+            "report": "artifacts/usf-scalar-csri-x64/shard-0/report.json",
+            "sha256": "4f69421e747d2a75bf4bace7e90c55ac81cc99d8b7a78d0d158444c9975f0012",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1410,
+            "cases": 130
+          },
+          {
+            "report": "artifacts/usf-scalar-csri-x64/shard-1/report.json",
+            "sha256": "3d0c1713b006087dede874e4c0a9abb0550f6ed94b7089bdc77e654470525a37",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1410,
+            "cases": 130
+          },
+          {
+            "report": "artifacts/usf-scalar-csri-x64/shard-2/report.json",
+            "sha256": "5b57f3e7203c0aa237210f687bc5eefcd166aac2eb8c34cdef5c05cae47445ea",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1381,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-scalar-csri-x64/shard-3/report.json",
+            "sha256": "42263be7f2d639ebe4d65f957669cf7200d796ca936e739498264d544b22855c",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1369,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-scalar-csri-x64/shard-4/report.json",
+            "sha256": "f76998293d7c5ceb42f4128b6908173bfeb6ff06a8cb8aa0d17a10da127acb3a",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1370,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-scalar-csri-x64/shard-5/report.json",
+            "sha256": "0a73ef0ea724f3bf6e21f8489e274c18cbc51a8d2591c2b13f937924ba2979d5",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1370,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-scalar-csri-x64/shard-6/report.json",
+            "sha256": "54f9460cc623f70dc62d71d7c7124f05012f94fb1aec79c71b2ab511ad967ffd",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1372,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-scalar-csri-x64/shard-7/report.json",
+            "sha256": "78e62b51ea96e31fe7a8711214541a9bc0d7cd5fb3100d55426944f1e7d9cafa",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1384,
+            "cases": 129
+          }
+        ]
+      },
+      "usf_rendering": {
+        "cases": 60,
+        "statuses": {
+          "ok": 40,
+          "open_rejected": 20
+        },
+        "frames": 480,
+        "distinct_controls": 12,
+        "included_in_full_corpus": true
+      },
+      "realtext_regression": {
+        "report": "artifacts/usf-scalar-final-probe-x64/report.json",
+        "sha256": "f88e229af4053bb589ede6721a32701825e0c251682c7884664057f812f06195",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+        "trace_lines": 37887,
+        "inputs_unchanged": true,
+        "cases": 4532
+      },
+      "vtt_regression": {
+        "report": "artifacts/usf-scalar-vtt-regression-x64/report.json",
+        "sha256": "56c70c0a7bc3ad4bbb271eda15700c1a34c98461822e9e3112b7327a3df61f0c",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+        "trace_lines": 21939,
+        "inputs_unchanged": true,
+        "cases": 2292
+      },
+      "sami_regression": {
+        "report": "artifacts/usf-scalar-sami-regression-x64/report.json",
+        "sha256": "8fc0a420bb21cdd53973da59aa0be3958e53d5408cc954160e1a9c704ef57791",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+        "trace_lines": 26992,
+        "inputs_unchanged": true,
+        "cases": 2836
+      },
+      "text_regression": {
+        "report": "artifacts/usf-scalar-text-regression-x64/report.json",
+        "sha256": "c00f041d7fd0d838899bde42605bef24691b61b7108391926e80dce4452ca8c6",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+        "trace_lines": 44404,
+        "inputs_unchanged": true,
+        "cases": 5692
+      },
+      "microdvd_regression": {
+        "report": "artifacts/usf-scalar-microdvd-regression-x64/report.json",
+        "sha256": "0644b1cbc719996442a0362739936cf1f8f0416468af16b33af403b365adb204",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+        "trace_lines": 41491,
+        "inputs_unchanged": true,
+        "cases": 4588
+      },
+      "ass_regression": {
+        "report": "artifacts/usf-scalar-ass-probe-x64/report.json",
+        "sha256": "2a4d1e503238ca061c2b37cb800856e1bf56199af145d0ecf8097ac700fa5a63",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+        "trace_lines": 22286,
+        "inputs_unchanged": true,
+        "cases": 3266
+      },
+      "xombie_regression": {
+        "report": "artifacts/usf-scalar-xombie-probe-x64/report.json",
+        "sha256": "813a0cb29d85218b9d33c0af708bdf4d0c4c15b8ac2399aff674d6a10ab9e418",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+        "trace_lines": 10441,
+        "inputs_unchanged": true,
+        "cases": 1242
+      },
+      "lifecycle": {
+        "report": "artifacts/usf-scalar-lifecycle-x64/report.json",
+        "sha256": "c85ec154d18322137ac6357b783f0c21ad81e877a2bed7c29605115783866b5a",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+        "trace_lines": 3693,
+        "inputs_unchanged": true
+      },
+      "compile": {
+        "report": "artifacts/usf-scalar-compile-x64/report.json",
+        "sha256": "a1c3d06eb88a134826d992d7e3e25aef1b7a3455338e6c1d5a3d37a9085d1895",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+        "inputs_unchanged": true
+      },
+      "com": {
+        "report": "artifacts/usf-scalar-contracts-x64/com/report.json",
+        "sha256": "8c3f5ed2c5c709972f8dd55789c6dc4484cda6ca892378a9ee8809999e6c6987",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+        "inputs_unchanged": true,
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "2d254068a40e5f59cf191c3c6bbfc984b548193b668c4decac21dc1e94e02169",
+          "candidate_sha256": "37dc7b1ab83f31e500e4d963fefe40ca71e89bcb8ad49a885294889913cf2a5c",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "805d7d7481b2774c2612b7cd7dd7fdaa4dd04a35111f3726a6704acf88c4a0d2"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "32b7c2cd6eb817120414db53b3c3005e719ae4b993c4a69d0d66c7f6ac363d5a",
+          "candidate_sha256": "ea1047360d7eb7a53c27dc12652aae20317828b55f88ebc3778b84cf97c24c71",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "2ce278d6be4d85c557490e59cb33e78ca53faf3e38061e9ca3eb225897be359a"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "f1165742064181b7fb73bacb16017d8e202c8bb0be90ed8c2eb812ac282c2df8",
+          "candidate_sha256": "5015c0893a70de8ef17a645075cbf57d12b5102fabf55cb104ea8722fae5cd94",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "b0b48a3cf2bf2ecbbac4ecca863a815ab4a0c1137277a9b7d5830d9d1beca5c9"
+        }
+      }
+    },
+    "x86": {
+      "baseline_usf": {
+        "report": "artifacts/usf-scalar-baseline-x86/report.json",
+        "sha256": "fb27136aa30ef2d7206f21eeda98a1aa9a78448cdf24b6f331d0e5b24fce8b82",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4d7fdc55a66d6e1cff268f02afbd9ee89300f56b",
+        "trace_lines": 36391,
+        "scalar_cases": 20735,
+        "scalar_values": 1885,
+        "inputs_unchanged": true,
+        "cases": 1340
+      },
+      "final_usf": {
+        "report": "artifacts/usf-scalar-final-x86/report.json",
+        "sha256": "ea79e4a3fdf7d598e7dc665f60f6ba90967af2434a27d9cacc79676bd784c85e",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+        "trace_lines": 36391,
+        "scalar_cases": 20735,
+        "scalar_values": 1885,
+        "inputs_unchanged": true,
+        "cases": 1340
+      },
+      "baseline_traces_preserved": true,
+      "previous_1340_case_trace_prefix_preserved": true,
+      "corpus": {
+        "report": "artifacts/usf-scalar-csri-x86/summary.json",
+        "sha256": "caa566e4447f6225d7509efadb722083220e0c1b3071de48fd41c9c2171879f1",
+        "complete": true,
+        "frames": 11066,
+        "distinct_controls": 116,
+        "partition_exact": true,
+        "cases": 1034,
+        "shards": [
+          {
+            "report": "artifacts/usf-scalar-csri-x86/shard-0/report.json",
+            "sha256": "f375e8b38458c86c23398881ce4d7ff3c51e3031d31e056e1757e2d4a4ebc5db",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1410,
+            "cases": 130
+          },
+          {
+            "report": "artifacts/usf-scalar-csri-x86/shard-1/report.json",
+            "sha256": "6d4430880c63e139357fcd9342b2e27bc567b435259e3c7ac99d3bb0dc6f3c09",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1410,
+            "cases": 130
+          },
+          {
+            "report": "artifacts/usf-scalar-csri-x86/shard-2/report.json",
+            "sha256": "7ef5d9337a0c0794781358e40133c3d91b02793e071585c7be7bc68541654692",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1381,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-scalar-csri-x86/shard-3/report.json",
+            "sha256": "be01f8b0bf1d4eaff55043c19eb068b8e827c759ee3141a825e399f5318a4b31",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1369,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-scalar-csri-x86/shard-4/report.json",
+            "sha256": "2b98879bb36b60614b8d0753fe5903432eacb0c68b178d6fe588d3cc0f254fe6",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1370,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-scalar-csri-x86/shard-5/report.json",
+            "sha256": "dc39240b9985f1e0846f96075257f6b55f110a1f8ec5b8131af919ca135c1ccc",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1370,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-scalar-csri-x86/shard-6/report.json",
+            "sha256": "43461b58befa448e18092aa357dbf231f25a66c0f81f5700c44046e499e78e38",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1372,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-scalar-csri-x86/shard-7/report.json",
+            "sha256": "a64a66f1a576f9d332a9dda5990070ebdafb9fbc5c21563304543149f8036a65",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1384,
+            "cases": 129
+          }
+        ]
+      },
+      "usf_rendering": {
+        "cases": 60,
+        "statuses": {
+          "ok": 40,
+          "open_rejected": 20
+        },
+        "frames": 480,
+        "distinct_controls": 12,
+        "included_in_full_corpus": true
+      },
+      "realtext_regression": {
+        "report": "artifacts/usf-scalar-final-probe-x86/report.json",
+        "sha256": "67c66acaaa237eec462f0c8e4ab0336e6ae0eb201dd3a354d7276e3a71a922e1",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+        "trace_lines": 37887,
+        "inputs_unchanged": true,
+        "cases": 4532
+      },
+      "vtt_regression": {
+        "report": "artifacts/usf-scalar-vtt-regression-x86/report.json",
+        "sha256": "2a2a669df6ab1a7c49e6e3a0882658daf4927dc8083bc81d183a54c641333eab",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+        "trace_lines": 21939,
+        "inputs_unchanged": true,
+        "cases": 2292
+      },
+      "sami_regression": {
+        "report": "artifacts/usf-scalar-sami-regression-x86/report.json",
+        "sha256": "5496316b83c53dd711343dc53e71096cc1f7c83914aa2b26d65ed2a309e2c5a1",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+        "trace_lines": 26992,
+        "inputs_unchanged": true,
+        "cases": 2836
+      },
+      "text_regression": {
+        "report": "artifacts/usf-scalar-text-regression-x86/report.json",
+        "sha256": "6769133ddf0afefdcd5c2f67533d413de3eed22af084babdc245c5799416b4fc",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+        "trace_lines": 44404,
+        "inputs_unchanged": true,
+        "cases": 5692
+      },
+      "microdvd_regression": {
+        "report": "artifacts/usf-scalar-microdvd-regression-x86/report.json",
+        "sha256": "97786051ff74e50fa90d50a0a3c671619fe2741b77e1081534c7ea0273bd074d",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+        "trace_lines": 41491,
+        "inputs_unchanged": true,
+        "cases": 4588
+      },
+      "ass_regression": {
+        "report": "artifacts/usf-scalar-ass-probe-x86/report.json",
+        "sha256": "f20c535cfef506d9a27c0d9667b892d8af7d21f8d86ccf684532ea69aec7ab02",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+        "trace_lines": 22286,
+        "inputs_unchanged": true,
+        "cases": 3266
+      },
+      "xombie_regression": {
+        "report": "artifacts/usf-scalar-xombie-probe-x86/report.json",
+        "sha256": "b89ad705c190692ea68b5e5ca24957144731ab88a912ef9b8ae9f7bd2d65f649",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+        "trace_lines": 10441,
+        "inputs_unchanged": true,
+        "cases": 1242
+      },
+      "lifecycle": {
+        "report": "artifacts/usf-scalar-lifecycle-x86/report.json",
+        "sha256": "9c034916c066077233af08dbc9880207c22aa48f9a8066dbb299f171840e5c14",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+        "trace_lines": 3693,
+        "inputs_unchanged": true
+      },
+      "compile": {
+        "report": "artifacts/usf-scalar-compile-x86/report.json",
+        "sha256": "7915ead3a3fd7d42d92b60e279f6a1ff649755bfeb6253ab372ac9cc423cb281",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+        "inputs_unchanged": true
+      },
+      "com": {
+        "report": "artifacts/usf-scalar-contracts-x86/com/report.json",
+        "sha256": "21ab7507cbb1b0c0d0d3f8c909e7aad67fbef1259961a5bc4f8944f3e8d65ffd",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+        "inputs_unchanged": true,
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "69faa2d5f90f35fe4184e9e9bd892adb76fee60295701988f61ab7af0664d9eb",
+          "candidate_sha256": "4b658b7ce36111d00b73f67a7bb097cde9a76767d61f4ecb70a399a944bbdf4e",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "8b0365bd8b1fa8ea13b65d8681836b85d870a46781d0a3cbfb851b1000a21ae7"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "2c3b904d7f91902ef456e07b648c5d6351878318c235397eeb9b39eb3fffa34f",
+          "candidate_sha256": "6b4d93571e374b10e36a9effc8a4037083a4be075971706052be313f5363a25d",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "2a22ef471924cc53ea843b14cb2fb5e1dc765f9e308e8ed316172476b0696dd5"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "3e7c20a4d6c42457d92eb56c42e4fd9f3bddb93276f2c1cd28bfb73edd06484c",
+          "candidate_sha256": "ec4d5c6145f978ca86349abcfff74dacce1d9258aebfb194a5b89abcd8cece0c",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "bee8a1d975859e0ab8a9b6843e14f813df818b8538e6501927e792bb180eb7c1"
+        }
+      }
+    }
+  },
+  "limits": [
+    "Experimental document-owner path only; no production switch, whole-format/host closure or complete-library claim.",
+    "Windows wcstol and CString CompareNoCase remain native scalar services. MSXML construction/load/getters/attribute enumeration and AddStyle/Add remain transitional native adapters; the final endpoint requires audited Rust FFI to Windows and host ABIs.",
+    "The Rust color table serves USF only. Other STS/RTS consumers still use native g_colors and remain migration work. The pinned table is read-only in repository use; arbitrary external mutation of the unexported internal global is not claimed.",
+    "Finite Windows MSVC14.44 x86/x64, Unicode-build evidence. No claim for allocation/new-handler reentry, injected service faults, locale mutation, arbitrary concurrent edits, uninitialized document fields, non-Unicode builds or non-Windows whole-renderer behavior.",
+    "Scalar sessions and snapshots use typed nonreused IDs and nonblocking admission; caller buffer validity remains an audited FFI precondition. Lexical unsafe counts are an inventory, not a soundness proof or migration percentage.",
+    "Crashes, hangs and nondeterminism remain unresolved. Earlier USF visibility-control failures and SubViewer missing-style outcomes retain their original evidence and are not relabeled by this increment."
+  ],
+  "unsafe_lexical_inventory": {
+    "report": "artifacts/usf-scalar-unsafe-inventory.json",
+    "sha256": "2acfac8bb9ff62f29695ffc44512eeabd5545979e5aee51d4baa4da934d7ec1a",
+    "safe_core_files": 104,
+    "safe_core_unsafe_sites": 0,
+    "ffi_unsafe_functions": 358,
+    "ffi_unsafe_blocks": 438,
+    "ffi_raw_shared_slice_constructors": 62,
+    "delta": {
+      "extern_unsafe_functions": 2,
+      "unsafe_blocks": 3,
+      "new_raw_slice_constructors": 0
+    },
+    "limits": "Lexical inventory, not a soundness proof or completion percentage."
+  },
+  "checks": {
+    "core_per_architecture": 302,
+    "ffi_per_architecture": 123,
+    "fmt": true,
+    "clippy_all_targets": true,
+    "clippy_native_runtime": true,
+    "python_tests": 163,
+    "python_skipped": 1,
+    "corpus_check": true,
+    "log": "artifacts/usf-scalar-checks.log",
+    "log_sha256": "23e14f5107335f8ac0b5190a084cb88e4156a9947b48b12688db374c13ea18f2"
+  },
+  "harness_sources": {
+    "tools/compat/usf_document_native.cpp": "f7c762c331d4d12aa2078e5c223e0c351ec485b6aa81500a808d812b8d1c0efb",
+    "tools/compat/usf_document_native.py": "44e277e13f41032b969bf97125f17b2165fbea45d9111196d45e106e619b7626",
+    "tools/compat/test_usf_document_native.py": "9de0c48ff503e3eb39e05e731ccc5a5797894a4d804a5af6f52a43b6ee590a3f",
+    "tools/compat/csri_compare.py": "9f71f1bc0426ca96b47ae35d798ef7b86f17e52d213c67730e122384d85a3b7a",
+    "test/compat/cases.json": "978c916d653a72dc94b8ee558c26da645a68475fe211c9b00c90c7a597ebb84a",
+    "artifacts/run-usf-scalar-host-corpus.py": "7128b4bcb5a517aa29d0e9d73a87f6131dd78dfa03b515bdd78333da34b4f1ab"
+  },
+  "build_logs": {
+    "artifacts/usf-scalar-build-x64.log": "617a56f982b7f297e1cc8c7c842314f9c64f43a410fe73ddb0ab76d0d0bba831",
+    "artifacts/usf-scalar-build-x86.log": "c4f99c0dcd6670c27787574b4310c3ab69086732c0e5d570bfb2478dd9bcfb0e",
+    "artifacts/usf-scalar-build-rust-x64.log": "831398e32dbb791f27a2fbddbbd5169ad8a3206bfba1537d78431770afaa7135",
+    "artifacts/usf-scalar-build-rust-x86.log": "c380a854683c37f179b5590bbea7b13bca1c61dbfb937531451a6e85f383d549"
+  },
+  "source_inventory": {
+    "path": "docs/rust-usf-scalar-inventory.json",
+    "sha256": "0ee88c44c6557749aa29b30f88e6417ff244f44ff57a0af48803db7a0215a270"
+  },
+  "decoded_state_checks": {
+    "report": "artifacts/usf-scalar-packet-checks.json",
+    "sha256": "8c351e764b5d30422bfefdaffd1a6447e7a6b9f702fd1a2001e8df7840e4d722",
+    "driver_sha256": "8041e24c6890a18e55eff26aa87205e6bcba79f5968921040e50548ded195bdf",
+    "results": {
+      "x64": {
+        "decoded_packets": 640,
+        "all_packets_consumed_exactly": true,
+        "retained_metadata": true,
+        "failed_reload_retained_converted_source": true,
+        "keyframe_children_ignored": true,
+        "repeated_conversion_accumulated_prefixes": true
+      },
+      "x86": {
+        "decoded_packets": 640,
+        "all_packets_consumed_exactly": true,
+        "retained_metadata": true,
+        "failed_reload_retained_converted_source": true,
+        "keyframe_children_ignored": true,
+        "repeated_conversion_accumulated_prefixes": true
+      }
+    }
+  },
+  "prior_evidence": {
+    "docs/rust-usf-state-local-evidence.json": "6771f0efbf460eb35510f7c7ac4c1ce75c7f4d97d33ac7a434f2346ed4886b7c",
+    "docs/rust-usf-conversion-local-evidence.json": "7990c397380916b135ed10d57164f364b013dce498cc246f8e4a391b5f12c5f2",
+    "docs/rust-subviewer-reference-outcomes.json": "9cd5e22c6e894051966451dad661bf7cc1cd5e4b99f76fd118d61220b08be882"
+  },
+  "system_xml_registration": {
+    "clsid": "{2933BF90-7B36-11d2-B20E-00C04F983E60}",
+    "method": "Read-only COM registration and system-file snapshot after direct comparisons; this is not an observed loaded-module trace.",
+    "registrations": [
+      {
+        "architecture": "x64",
+        "server": "%SystemRoot%\\System32\\msxml3.dll",
+        "threading_model": "Both"
+      },
+      {
+        "architecture": "x86",
+        "server": "%SystemRoot%\\System32\\msxml3.dll",
+        "threading_model": "Both"
+      }
+    ],
+    "system_files": [
+      {
+        "architecture": "x64",
+        "path": "C:\\Windows\\System32\\msxml3.dll",
+        "sha256": "dbebbda0c3f26ef348d239c5180d2559129944092095cd1764db0f197b1fbc9d"
+      },
+      {
+        "architecture": "x86",
+        "path": "C:\\Windows\\SysWOW64\\msxml3.dll",
+        "sha256": "67c6147fe647f8a9800bf7fd8d5da98aaeb6d5898bc9f97d7f772fa546f0d675"
+      }
+    ]
+  }
+}

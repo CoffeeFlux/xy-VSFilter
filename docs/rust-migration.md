@@ -27,7 +27,54 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: USF parsed state and DOM traversal (2026-10-18)
+## Current port: USF scalar helpers (2026-10-18)
+
+The experimental USF path now runs TimeToInt, ColorToDWORD, TranslateMargin and
+TranslateAlignment in safe Rust. Rust owns tokenization, conversion sequencing,
+wrapping arithmetic, hash-prefix trimming, the exact 138-entry cleanup color
+table, channel swapping and ordered alignment selection. The temporary native
+service adapter supplies Windows wcstol and CString CompareNoCase results.
+
+Raw-string evidence exposed an important CString quirk: after returning a
+nonempty token terminated by an embedded NUL, Tokenize advances past that NUL
+and can resume parsing. A NUL at the next token's start instead ends parsing.
+The port preserves both cases, reversed time-token conversion, early failure,
+errno, overflow, first-NUL percent searches and named-color lookup. Cleanup
+misspellings and unusual color values remain unchanged.
+
+Implementation `4742820d` passes cleanup `67da07cd` checks on **each** Windows
+architecture (x86 and x64):
+
+* 20,735 direct helper calls across 1,885 raw inputs, plus the existing 1,340 USF
+  document/reload cases and 640 complete state snapshots. All 36,391 trace lines
+  match across two executions per implementation and equal pre-port baseline
+  `4d7fdc55`, including errno. The previous 1,340-case trace prefix is unchanged.
+* 1,034 rendering cases / 11,066 frames / 116 distinct-frame controls, including
+  USF's no-COM rejections and STA/MTA file/memory rendering. Corpus unchanged.
+* RealText, WebVTT, SAMI, text-parser, MicroDVD, ASS and XombieSub regressions;
+  3,693 lifecycle trace lines; nine compile probes; all three DLLs' exports and
+  dependencies; 10 scoped COM cases plus two candidate-only controls.
+* 302 safe-core and 123 FFI tests, formatting and Clippy on both architectures;
+  163 Python tests with one skip. The 104-file portable core has zero unsafe
+  sites. Four private entries add two unsafe marshalling functions and three
+  blocks, with no new raw-slice constructors.
+
+See the [USF helper/boundary inventory](rust-usf-scalar-inventory.json) and
+[local evidence manifest](rust-usf-scalar-local-evidence.json). The shared native
+color map still serves other STS/RTS consumers; this increment replaces USF's
+lookup. Windows CRT services, MSXML creation/load/getters/attribute enumeration
+and final native AddStyle/Add remain transitional. Allocation/reentry and
+injected service failures remain unclosed. No production switch or whole-format,
+host or library completion is claimed.
+
+Next: replace the native MSXML adapter with audited Rust COM FFI and port the
+remaining shared color consumers while preserving their distinct fallback
+rules. All formats/options/interfaces, renderer, host adapters and vendored
+implementation remain in the complete-library goal. Earlier evidence keeps its
+original provenance.
+
+
+## Previous port: USF parsed state and DOM traversal (2026-10-18)
 
 The experimental USF path now keeps its canonical metadata, styles, effects,
 keyframes and captions in safe Rust. Rust controls DOM traversal, style

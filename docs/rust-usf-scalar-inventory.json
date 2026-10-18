@@ -1,0 +1,137 @@
+{
+  "schema": 1,
+  "candidate_commit": "4742820df577b6c5a22cceebea4e82758ce00c57",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "Safe Rust USF TimeToInt, ColorToDWORD, TranslateMargin and TranslateAlignment algorithms, including the exact cleanup named-color table and raw UTF16 token behavior.",
+  "production_sources": {
+    "rust/compat/src/usf_scalar.rs": "aab9c4a6cc3dfd03a23dc4ac87419cebc4a7e226fc8d3c6a305edcea1fd739c6",
+    "rust/compat/src/usf_model.rs": "a7dacde8eef36f476ade24cccdb8f7699999dc1fb8d6a411c1e02558cf9d428a",
+    "rust/compat/src/usf_conversion.rs": "a72d81d25225998d171e70a56c059b0b237730dbf751e096a92bb4293d2a446b",
+    "rust/compat/src/lib.rs": "50345e058873b4c88c0b5743d861527c246f31d28ef15a09d8535738e14c6055",
+    "rust/ffi/src/document.rs": "b99dac138d31cee833e24f1481fcfa6ad1f39657ddd7cec97474f0282fcff440",
+    "rust/ffi/src/document_registry.rs": "f8d61018942929dbca37fab3b328f6a18bdb9294add4cc75e60f8a0978c74890",
+    "include/xy_rust_document.h": "f4d1e85c38224b7ffe43a74094fd8aa82633d2eb6983f6dbfa13d80bdd254a3a",
+    "src/subtitles/RustDocumentOwner.h": "c5f77f193f04dbfb42f2b3b8cbaaf98d7d5b322a1df149a6e96a3a9614b1221e",
+    "src/subtitles/USFSubtitles.cpp": "7eb562e1e4d36668a75dc7e9bb30e0d0cf317bf67c86648d454e9747232dca6a"
+  },
+  "reference_sources": {
+    "src/subtitles/USFSubtitles.cpp": "85df63bd57900a62a4900058f02affdefe388834b5b4ac4cc95b5fd7f95873c6",
+    "src/subtitles/STS.cpp": "2616b67db84f7329ac6e2363a3f03d61977fa07c37ed9c04d32ec2b1197f31e0",
+    "src/subtitles/STS.h": "57dc87a3de9470ca04adc007c175956bd4acfddcb720324886bb4a2c7699080b"
+  },
+  "operations": [
+    {
+      "operation": "Time tokenization and conversion order",
+      "source": {
+        "path": "rust/compat/src/usf_scalar.rs",
+        "line": 26,
+        "sha256": "aab9c4a6cc3dfd03a23dc4ac87419cebc4a7e226fc8d3c6a305edcea1fd739c6"
+      },
+      "behavior": "CString-style raw-unit tokenization skips colon/dot/comma delimiters. A nonempty token advances one unit past its terminator, including embedded NUL; a NUL at the next token start returns an empty token and ends tokenization. Tokens reverse before conversion. More than4 tokens returns -1 without CRT conversion, empty input returns0, first nonconsuming wcstol returns -1 and suppresses earlier-token conversions. Multipliers1/1000/60000/3600000 and sums use explicit wrapping i32 arithmetic."
+    },
+    {
+      "operation": "Named and hexadecimal colors",
+      "source": {
+        "path": "rust/compat/src/usf_scalar.rs",
+        "line": 50,
+        "sha256": "aab9c4a6cc3dfd03a23dc4ac87419cebc4a7e226fc8d3c6a305edcea1fd739c6"
+      },
+      "behavior": "USF uses a safe copy of all138 cleanup STS.cpp htmlcolors entries. Lookup is exact and case-sensitive on the first-NUL prefix, matching CStringElementTraits hash/compare. Unusual values and misspellings remain: aqua00ff80, fuchsiaff00ee, purple9370db, paleturqoise and comflowerblue. Leading hash signs are removed before native wcstol16; its i32 result is interpreted as u32 bits, then red/blue swap preserves alpha. Unknown names and empty input yield0."
+    },
+    {
+      "operation": "Margin arithmetic",
+      "source": {
+        "path": "rust/compat/src/usf_scalar.rs",
+        "line": 160,
+        "sha256": "aab9c4a6cc3dfd03a23dc4ac87419cebc4a7e226fc8d3c6a305edcea1fd739c6"
+      },
+      "behavior": "Empty input avoids wcstol. Otherwise native wcstol10 provides the integer; a percent found before the first NUL selects wrapping i32 multiplication by the window dimension followed by signed division by100. Percent signs after a NUL do not select scaling."
+    },
+    {
+      "operation": "Alignment comparisons",
+      "source": {
+        "path": "rust/compat/src/usf_scalar.rs",
+        "line": 9,
+        "sha256": "aab9c4a6cc3dfd03a23dc4ac87419cebc4a7e226fc8d3c6a305edcea1fd739c6"
+      },
+      "behavior": "The same9 Bottom/Middle/Top Left/Center/Right names request ordered native CompareNoCase calls. The first match yields1..9; no match yields2. No Rust Unicode casing or trimming is substituted."
+    }
+  ],
+  "boundary_review": {
+    "source": {
+      "path": "rust/ffi/src/document.rs",
+      "line": 276,
+      "sha256": "b99dac138d31cee833e24f1481fcfa6ad1f39657ddd7cec97474f0282fcff440"
+    },
+    "registry": {
+      "path": "rust/ffi/src/document_registry.rs",
+      "line": 484,
+      "sha256": "f8d61018942929dbca37fab3b328f6a18bdb9294add4cc75e60f8a0978c74890"
+    },
+    "native_adapter": {
+      "path": "src/subtitles/RustDocumentOwner.h",
+      "line": 903,
+      "sha256": "c5f77f193f04dbfb42f2b3b8cbaaf98d7d5b322a1df149a6e96a3a9614b1221e"
+    },
+    "new_private_entries": [
+      "xy_vsfilter_document_usf_scalar_begin_v1",
+      "xy_vsfilter_document_usf_scalar_step_v1",
+      "xy_vsfilter_document_usf_scalar_part_v1",
+      "xy_vsfilter_document_usf_scalar_drop_v1"
+    ],
+    "contract": "Input length/shape and writable output preflight precede copying/admission. Raw units are copied into an independent checked scalar session. Request replies validate op and consumed flag; native CRT work runs between admitted calls. Detached snapshots contain copied data and survive session drop. No native pointer is retained; no raw-slice constructor added.",
+    "unsafe_delta": {
+      "extern_unsafe_functions": 2,
+      "unsafe_blocks": 3,
+      "new_raw_slice_constructors": 0
+    },
+    "tests": "Raw caller-buffer mutation, NUL/surrogate handling, reverse conversion and failure order, overflow folding, percent after NUL, exact named-color quirks, full alpha bits, ordered comparisons, invalid phase/consumed flag/kind/argument, odd byte lengths, BUSY, wrong-kind/stale IDs, output atomicity and detached snapshots."
+  },
+  "direct_probe": {
+    "baseline_commit": "4d7fdc55a66d6e1cff268f02afbd9ee89300f56b",
+    "source": {
+      "path": "tools/compat/usf_document_native.cpp",
+      "line": 88,
+      "sha256": "f7c762c331d4d12aa2078e5c223e0c351ec485b6aa81500a808d812b8d1c0efb"
+    },
+    "cases": 1340,
+    "scalar_cases": 20735,
+    "scalar_values": 1885,
+    "trace_lines": 36391,
+    "coverage": "Existing1340 document/reload cases and640 full state snapshots retained as a byte-identical prefix. Added64 named literals,138 color names in original/uppercase forms,16x16 time-part pairs with4 separators,256 code-unit injections at2 positions and9 explicit NUL cases. Each input exercises time/color/alignment and margins at8 dimensions including both i32 extremes. Input units, result bits and errno initialized1234 are observed.",
+    "method": "Actual selected cleanup USF helpers and initialized document observer. Two reference and two candidate executions per Windows architecture; all trace bytes must match pre-port baseline, including errno."
+  },
+  "limits": [
+    "Experimental document-owner path only; no production switch, whole-format/host closure or complete-library claim.",
+    "Windows wcstol and CString CompareNoCase remain native scalar services. MSXML construction/load/getters/attribute enumeration and AddStyle/Add remain transitional native adapters; the final endpoint requires audited Rust FFI to Windows and host ABIs.",
+    "The Rust color table serves USF only. Other STS/RTS consumers still use native g_colors and remain migration work. The pinned table is read-only in repository use; arbitrary external mutation of the unexported internal global is not claimed.",
+    "Finite Windows MSVC14.44 x86/x64, Unicode-build evidence. No claim for allocation/new-handler reentry, injected service faults, locale mutation, arbitrary concurrent edits, uninitialized document fields, non-Unicode builds or non-Windows whole-renderer behavior.",
+    "Scalar sessions and snapshots use typed nonreused IDs and nonblocking admission; caller buffer validity remains an audited FFI precondition. Lexical unsafe counts are an inventory, not a soundness proof or migration percentage.",
+    "Crashes, hangs and nondeterminism remain unresolved. Earlier USF visibility-control failures and SubViewer missing-style outcomes retain their original evidence and are not relabeled by this increment."
+  ],
+  "next_work": [
+    "Replace native MSXML and remaining host adapters with audited Rust COM/ABI boundaries while preserving system XML and host COM initialization behavior.",
+    "Move shared STS/RTS named-color consumers to safe Rust without changing their distinct fallback/formatting rules.",
+    "Continue full renderer, all formats/options/hosts and vendored migration; preserve unresolved SubViewer outcomes."
+  ],
+  "color_table": {
+    "entries": 138,
+    "ordered_entries_equal_to_pinned_source": true,
+    "reference_sha256": "2616b67db84f7329ac6e2363a3f03d61977fa07c37ed9c04d32ec2b1197f31e0"
+  },
+  "cstring_evidence": {
+    "path": "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/atlmfc/include/cstringt.h",
+    "sha256": "946be7ebc817f7d3214920af5a57d4f71175444f78c5bc408fae3ff5019e127d",
+    "methods": [
+      "CStringT::Tokenize",
+      "CStringT::TrimLeft(XCHAR)",
+      "CStringT::Find(XCHAR)",
+      "CStringElementTraits::Hash",
+      "CStringElementTraits::CompareElements"
+    ],
+    "note": "Read local VS headers to establish code-unit, terminator and lookup behavior; direct reference probes govern compatibility."
+  }
+}
