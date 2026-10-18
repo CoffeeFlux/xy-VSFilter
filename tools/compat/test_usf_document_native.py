@@ -1,6 +1,6 @@
 import unittest
 
-from usf_document_native import CASES, LEGACY_CASES, SCALAR_CASES, SCALAR_VALUES, compare, validate
+from usf_document_native import CASES, LEGACY_CASES, SCALAR_CASES, SCALAR_VALUES, LOAD_INPUTS, LOAD_CASES, compare, validate
 
 
 class USFTraceControls(unittest.TestCase):
@@ -12,6 +12,12 @@ class USFTraceControls(unittest.TestCase):
             rows += [f"usf-reload index={i} before=1 after=0".encode()]
         rows += [f"usf-scalar index={i} kind=1 argument=0 result=-1 errno=1234 units=0 data=".encode() for i in range(SCALAR_CASES)]
         rows += [f"usf-scalars-complete cases={SCALAR_CASES} values={SCALAR_VALUES}".encode()]
+        for i in range(LOAD_CASES):
+            rows += [f"usf-load-state index={i} phase={p} bytes=52 data={'00' * 52}".encode() for p in range(3)]
+            rows += [f"usf-load index={i} mode=0 apartment=0 preload=0 outcome=0 bytes=0".encode()]
+        rows += [f"usf-bstr index={i} length=0 constructed=0 assigned=0 lower=00000000 data=".encode() for i in range(5)]
+        rows += [b"usf-array vt=8209 original_locks=1 copied_locks=0 original_features=128 copied_features=128", b"usf-msxml-desktop value=1"]
+        rows += [f"usf-loads-complete cases={LOAD_CASES} inputs={LOAD_INPUTS}".encode()]
         rows += [f"usf-complete cases={CASES}".encode()]
         return b"\n".join(rows) + b"\n"
 
@@ -34,7 +40,9 @@ class USFTraceControls(unittest.TestCase):
                     good.replace(b"usf-reload ", b"missing-reload "),
                     good.replace(b"usf-state ", b"missing-state "),
                     good.replace(b"usf-scalar ", b"missing-scalar "),
-                    good.replace(b"units=0", b"units=1")):
+                    good.replace(b"units=0", b"units=1"),
+                    good.replace(b"apartment=0 preload=0 outcome=0", b"apartment=0 preload=0 outcome=1"),
+                    good.replace(b"usf-load-state ", b"missing-load-state ")):
             with self.assertRaises(ValueError):
                 compare([bad] * 4, 64)
 

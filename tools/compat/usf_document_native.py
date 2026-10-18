@@ -16,6 +16,8 @@ RELOAD_CASES = 128
 CASES = LEGACY_CASES + RELOAD_CASES
 SCALAR_VALUES = 1885
 SCALAR_CASES = 20735
+LOAD_INPUTS = 28
+LOAD_CASES = 348
 
 
 def validate(data, bits):
@@ -48,8 +50,27 @@ def validate(data, bits):
         match = scalar_pattern.fullmatch(row)
         if not match or int(match[1]) != index or int(match[2]) * 4 != len(match[3]):
             raise ValueError("invalid USF scalar input/outcome")
-    if lines[-2] != f"usf-scalars-complete cases={SCALAR_CASES} values={SCALAR_VALUES}".encode():
+    if lines.count(f"usf-scalars-complete cases={SCALAR_CASES} values={SCALAR_VALUES}".encode()) != 1:
         raise ValueError("missing USF scalar completion marker")
+    loads = [line for line in lines if line.startswith(b"usf-load ")]
+    load_states = [line for line in lines if line.startswith(b"usf-load-state ")]
+    if len(loads) != LOAD_CASES or len(load_states) != LOAD_CASES * 3:
+        raise ValueError("missing MSXML load outcomes/state")
+    load_pattern = re.compile(rb"usf-load index=(\d+) mode=([0-3]) apartment=([0-2]) preload=([01]) outcome=([01]) bytes=\d+")
+    for index, row in enumerate(loads):
+        match = load_pattern.fullmatch(row)
+        if not match or int(match[1]) != index or match[3] == b"0" and match[5] != b"0":
+            raise ValueError("invalid MSXML load outcome or missing COM refusal")
+    state_pattern = re.compile(rb"usf-load-state index=(\d+) phase=([0-2]) bytes=(\d+) data=([0-9a-f]+)")
+    for offset, row in enumerate(load_states):
+        match = state_pattern.fullmatch(row)
+        if not match or int(match[1]) != offset // 3 or int(match[2]) != offset % 3 or int(match[3]) * 2 != len(match[4]):
+            raise ValueError("invalid MSXML load state packet")
+    bstrs = [line for line in lines if line.startswith(b"usf-bstr ")]
+    if len(bstrs) != 5 or not any(line.startswith(b"usf-array ") for line in lines) or b"usf-msxml-desktop value=1" not in lines:
+        raise ValueError("missing BSTR/SAFEARRAY/desktop evidence")
+    if lines[-2] != f"usf-loads-complete cases={LOAD_CASES} inputs={LOAD_INPUTS}".encode():
+        raise ValueError("missing MSXML load completion marker")
     if lines[-1] != f"usf-complete cases={CASES}".encode():
         raise ValueError("missing USF completion marker")
     if not any(b"outcome=0 " in row for row in rows) or not any(b"outcome=1 " in row for row in rows):
@@ -78,7 +99,7 @@ def main():
     out.mkdir(parents=True, exist_ok=False)
     roots = (args.reference_root.resolve(), ROOT)
     report = dict(complete=False, equal=False, reference_commit=PIN, platform=args.platform,
-                  kind="actual-usf-parser-document-control", cases=CASES, scalar_cases=SCALAR_CASES, scalar_values=SCALAR_VALUES, builds={},
+                  kind="actual-usf-parser-document-control", cases=CASES, scalar_cases=SCALAR_CASES, scalar_values=SCALAR_VALUES, load_cases=LOAD_CASES, load_inputs=LOAD_INPUTS, builds={},
                   probe_sha256=sha(SOURCE.read_bytes()), observer_sha256=sha(OBSERVER.read_bytes()),
                   runner_sha256=sha(Path(__file__).read_bytes()),
                   environment={key:os.environ.get(key) for key in ("VCToolsVersion","WindowsSDKVersion","VSCMD_ARG_TGT_ARCH")},

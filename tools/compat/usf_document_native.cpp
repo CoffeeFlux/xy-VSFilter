@@ -22,7 +22,7 @@ static void usf_font(std::vector<BYTE>& bytes,const fontstyle_t& f) {
 static void usf_pal(std::vector<BYTE>& bytes,const posattriblist_t& p) {
     for(const CStringW* v:{&p.alignment,&p.relativeto,&p.horizontal_margin,&p.vertical_margin,&p.rotate[0],&p.rotate[1],&p.rotate[2]})usf_string(bytes,*v);
 }
-static void usf_state(const CUSFSubtitles& source,unsigned index,unsigned phase) {
+static void usf_state(const CUSFSubtitles& source,unsigned index,unsigned phase,const char* label="usf-state") {
     std::vector<BYTE> bytes;
 #ifdef XY_VSFILTER_RUST_USF_STATE
     bytes=source.ParsedState();
@@ -38,7 +38,7 @@ static void usf_state(const CUSFSubtitles& source,unsigned index,unsigned phase)
     usf_u32(bytes,static_cast<unsigned>(source.texts.GetCount()));pos=source.texts.GetHeadPosition();
     while(pos){const auto& t=source.texts.GetNext(pos);usf_u32(bytes,t->start);usf_u32(bytes,t->stop);usf_string(bytes,t->effect);usf_string(bytes,t->style);usf_string(bytes,t->str);usf_pal(bytes,t->pal);}
 #endif
-    printf("usf-state index=%u phase=%u bytes=%zu data=",index,phase,bytes.size());
+    printf("%s index=%u phase=%u bytes=%zu data=",label,index,phase,bytes.size());
     for(auto byte:bytes)printf("%02x",byte);printf("\n");
 }
 static bool usf_read(CUSFSubtitles& source,const wchar_t* text) {
@@ -118,6 +118,66 @@ static unsigned usf_scalars() {
     printf("usf-scalars-complete cases=%u values=%zu\n",index,values.size());return index;
 }
 
+
+static std::vector<BYTE> usf_utf8(const CStringW& input) {
+    const int count=WideCharToMultiByte(CP_UTF8,0,input,input.GetLength(),NULL,0,NULL,NULL);
+    std::vector<BYTE> out(count);if(count)check(WideCharToMultiByte(CP_UTF8,0,input,input.GetLength(),reinterpret_cast<char*>(out.data()),count,NULL,NULL)==count,"UTF8 fixture failed");return out;
+}
+static std::vector<std::vector<BYTE>> usf_load_inputs() {
+    std::vector<std::vector<BYTE>> all;
+    const CStringW xml=L"<USFSubtitles><metadata><title>\u0130\u00e9\uff11</title><language code='en'>English</language></metadata><styles><style name='Default'><fontstyle face='Arial' size='20'/></style></styles><subtitles><subtitle start='1' stop='5'><text>A &amp; B</text></subtitle></subtitles></USFSubtitles>";
+    const auto utf8=usf_utf8(xml);all.push_back(utf8);
+    std::vector<BYTE> bom={0xef,0xbb,0xbf};bom.insert(bom.end(),utf8.begin(),utf8.end());all.push_back(bom);
+    for(bool big:{false,true})for(bool marker:{false,true}){
+        std::vector<BYTE> data;if(marker){data.push_back(big?0xfe:0xff);data.push_back(big?0xff:0xfe);}
+        for(int i=0;i<xml.GetLength();++i){const unsigned u=xml[i];data.push_back(static_cast<BYTE>(big?u>>8:u));data.push_back(static_cast<BYTE>(big?u:u>>8));}all.push_back(data);
+    }
+    for(bool big:{false,true}){
+        std::vector<BYTE> data=big?std::vector<BYTE>{0,0,0xfe,0xff}:std::vector<BYTE>{0xff,0xfe,0,0};
+        for(int i=0;i<xml.GetLength();++i){unsigned u=xml[i];for(unsigned n=0;n<4;++n)data.push_back(static_cast<BYTE>(u>>(8*(big?3-n:n))));}all.push_back(data);
+    }
+    const char* docs[]={"","<","<wrong/>","<USFSubtitles/>","<usfsubtitles/>","<USFSubtitles><broken>",
+        "<?xml version='1.0' encoding='UTF-8'?><USFSubtitles><metadata><title>\xc3\xa9</title></metadata></USFSubtitles>",
+        "<?xml version='1.0' encoding='ISO-8859-1'?><USFSubtitles><metadata><title>\xe9</title></metadata></USFSubtitles>",
+        "<!DOCTYPE USFSubtitles [<!ENTITY word 'Entity'>]><USFSubtitles><metadata><title>&word;</title></metadata></USFSubtitles>",
+        "<USFSubtitles xmlns='urn:local'><metadata><language>Namespace</language></metadata></USFSubtitles>",
+        "<x:USFSubtitles xmlns:x='urn:local'><metadata><title>Ignored</title></metadata></x:USFSubtitles>",
+        "<USFSubtitles><styles><style name='A' name='B'/></styles></USFSubtitles>"};
+    for(auto text:docs)all.push_back(std::vector<BYTE>(text,text+strlen(text)));
+    for(size_t count:{size_t(0),size_t(1),size_t(2),size_t(3),size_t(4),size_t(7),size_t(23),utf8.size()-1})all.push_back(std::vector<BYTE>(utf8.begin(),utf8.begin()+count));
+    return all;
+}
+static void usf_load_case(unsigned index,const std::vector<BYTE>& bytes,unsigned mode,unsigned apartment,bool preload) {
+    CUSFSubtitles source;TraceDocument document(0);document.Screen(CSize(0,0));
+    if(preload){check(usf_read(source,L"<USFSubtitles><metadata><language>Before</language></metadata><styles><style name='Default'><fontstyle wrap='no'/></style></styles><subtitles><subtitle start='1' stop='5'><text alignment='TopLeft'>Previous</text></subtitle></subtitles></USFSubtitles>"),"USF preload failed");check(source.ConvertToSTS(document),"USF preload conversion failed");}
+    usf_state(source,index,0,"usf-load-state");
+    const wchar_t* path=L"usf-load-input-\u00e9.xml";
+    if(mode==1){HANDLE file=CreateFileW(path,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);check(file!=INVALID_HANDLE_VALUE,"USF fixture create failed");DWORD written=0;const BOOL ok=WriteFile(file,bytes.data(),static_cast<DWORD>(bytes.size()),&written,NULL);CloseHandle(file);check(ok && written==bytes.size(),"USF fixture write failed");}
+    if(apartment!=1){CoUninitialize();if(apartment==2)check(SUCCEEDED(CoInitializeEx(NULL,COINIT_MULTITHREADED)),"MTA setup failed");}
+    const bool accepted=mode==0?source.Read(bytes.data(),bytes.size()):mode==1?source.Read(path):mode==2?source.Read(static_cast<LPCTSTR>(NULL)):source.Read(L"missing-usf-load-input.xml");
+    if(apartment!=1){if(apartment==2)CoUninitialize();check(SUCCEEDED(CoInitializeEx(NULL,COINIT_APARTMENTTHREADED)),"STA restore failed");}
+    if(mode==1)check(DeleteFileW(path)!=FALSE,"USF fixture delete failed");
+    usf_state(source,index,1,"usf-load-state");check(source.ConvertToSTS(document),"USF post-load conversion failed");usf_state(source,index,2,"usf-load-state");document.Dump("usf-loaded-document");
+    printf("usf-load index=%u mode=%u apartment=%u preload=%u outcome=%u bytes=%zu\n",index,mode,apartment,preload?1:0,accepted?1:0,bytes.size());
+}
+static void usf_loads() {
+    unsigned index=0;const auto inputs=usf_load_inputs();
+    for(const auto& input:inputs)for(unsigned mode=0;mode<2;++mode)for(unsigned apartment=0;apartment<3;++apartment)for(unsigned preload=0;preload<2;++preload)usf_load_case(index++,input,mode,apartment,preload!=0);
+    for(unsigned mode=2;mode<4;++mode)for(unsigned apartment=0;apartment<3;++apartment)for(unsigned preload=0;preload<2;++preload)usf_load_case(index++,{},mode,apartment,preload!=0);
+    const WCHAR raw[][5]={{0},{L'A',0,L'B'},{0,L'I',L'Z'},{0x130,L'I',0,0x3a3},{0xd800,L'A',0xdfff}};const int lengths[]={0,3,3,4,3};
+    for(unsigned i=0;i<countof(raw);++i){CComBSTR value(lengths[i],raw[i]);CStringW constructed(value),assigned;assigned=value.m_str;
+        const HRESULT hr=value.ToLower();printf("usf-bstr index=%u length=%u constructed=%d assigned=%d lower=%08x data=",i,SysStringLen(value),constructed.GetLength(),assigned.GetLength(),static_cast<unsigned>(hr));
+        for(unsigned n=0;n<SysStringLen(value);++n)printf("%04x",static_cast<unsigned>(value[n]));printf("\n");}
+    CComSafeArray<BYTE> array;check(SUCCEEDED(array.Create(3)),"array creation failed");CComVariant variant(array.m_psa);
+    printf("usf-array vt=%u original_locks=%lu copied_locks=%lu original_features=%u copied_features=%u\n",variant.vt,array.m_psa->cLocks,variant.parray->cLocks,array.m_psa->fFeatures,variant.parray->fFeatures);
+#ifdef _ATL_USE_WINAPI_FAMILY_DESKTOP_APP
+    printf("usf-msxml-desktop value=1\n");
+#else
+    printf("usf-msxml-desktop value=0\n");
+#endif
+    printf("usf-loads-complete cases=%u inputs=%zu\n",index,inputs.size());
+}
+
 int main(){try{
     check(AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0)!=FALSE,"MFC initialization failed");
     check(SUCCEEDED(CoInitializeEx(NULL,COINIT_APARTMENTTHREADED)),"COM initialization failed");
@@ -150,5 +210,6 @@ int main(){try{
     };
     for(auto first:reloads)for(auto second:reloads)for(int preload=0;preload<2;++preload)usf_reload(index++,first,second,preload!=0);
     usf_scalars();
+    usf_loads();
     printf("usf-complete cases=%u\n",index);CoUninitialize();return 0;
 }catch(const std::exception& e){fprintf(stderr,"unresolved: %s\n",e.what());return 1;}catch(...){fprintf(stderr,"unresolved exception\n");return 2;}}
