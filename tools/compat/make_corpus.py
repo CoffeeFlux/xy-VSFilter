@@ -847,6 +847,26 @@ def vtt_parser_variants():
         yield "vtt-parser-"+name+".vtt",data
 
 
+
+def realtext_parser_variants():
+    cue='<time begin="1" end="5"/>First caption'
+    for name,text in {
+        "control":cue,
+        "map-replace":cue+'<time begin="1" end="5"/><clear/>Replacement caption',
+        "italic":'<i>'+cue+'</i>',
+        "map-order":'<time begin="3" end="5"/>Later<time begin="1" end="3"/><clear/>Earlier',
+        "missing-end":'<time begin="3"/>First<time begin="1"/><clear/>Last',
+        "restore":'<i>'+cue+'<clear/>Last caption</i>',
+        "final-fragment":cue+'\r\nignored',
+        "first-line":'Leading caption'+cue,
+        "raw-units":cue.replace('First caption','First\x00\ud800discarded'),
+        "overflow":cue.replace('"1"','"4294967297"').replace('"5"','"4294967301"'),
+    }.items():
+        text='<window>\r\n'+text+('' if name=='final-fragment' else '\r\n')
+        data=(b"\xff\xfe"+text.encode("utf-16le","surrogatepass") if "\x00" in text else text.encode("ascii"))
+        yield "realtext-parser-"+name+".rt",data
+
+
 def timestamps(data):
     matches = re.findall(rb"Dialogue:[^,]*,(\d+):(\d+):(\d+(?:\.\d+)?),(\d+):(\d+):(\d+(?:\.\d+)?)", data)
     if not matches:
@@ -889,6 +909,8 @@ def make_cases(files):
                 cases[-1]["times"] = ["0", "0.9999999", "1", "1.0000001", "2", "3.9999999", "4", "10.9999999", "11", "12", "13.9999999", "14", "2", "12"]
             if path.stem.startswith("vtt-parser-"):
                 cases[-1]["times"] = ["0", "0.9999999", "1", "1.0000001", "2", "2.9999999", "3", "3.0000001", "4", "4.9999999", "5", "2"]
+            if path.stem.startswith("realtext-parser-"):
+                cases[-1]["times"] = ["0", "0.9999999", "1", "1.0000001", "2", "2.9999999", "3", "4", "4.9999999", "5", "2", "1"]
             warning_styles = {"field-tab-prefixes": "\tDefault", "field-unicode-style-space": "\u2003Default"}
             if path.stem in warning_styles:
                 cases[-1]["dialog_actions"] = [{"title": "Warning",
@@ -917,6 +939,8 @@ def make_cases(files):
                                                     ("legacy-parser-vp-caption-space", "legacy-parser-vp-control"),
                                                     ("microdvd-parser-style-sticky", "microdvd-parser-control"),
                                                     ("microdvd-parser-missing-brace", "microdvd-parser-brace-control"),
+                                                    ("realtext-parser-map-replace", "realtext-parser-control"),
+                                                    ("realtext-parser-italic", "realtext-parser-control"),
                                                     ("vtt-parser-color-replace", "vtt-parser-control"),
                                                     ("vtt-parser-alignment", "vtt-parser-control"),
                                                     ("sami-parser-title-skip", "sami-parser-control"),
@@ -1007,6 +1031,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in microdvd_parser_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in sami_parser_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in vtt_parser_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in realtext_parser_variants()]
     manifest = json.dumps(make_cases(files + generated), indent=2) + "\n"
     expected = generated + [(DEST / "cases.json", manifest.encode("utf-8"))]
     for path, data in expected:
