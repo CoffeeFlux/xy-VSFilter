@@ -1,0 +1,412 @@
+{
+  "schema": 1,
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "candidate_code_commit": "495412edcfdd2cf622136e8db15c3008568d1350",
+  "prior_increment": "b40e8b4c",
+  "configuration": {
+    "native": "Release, RustTextDecoder=true, RustDocumentOwnerExperimental=true",
+    "rust": "1.85.0; native-runtime with +crt-static",
+    "msvc": "14.44.35207",
+    "sdk": "10.0.26100.0"
+  },
+  "scope": "Owned XombieSub parser and record assembly; no full-library, package or default-enablement claim.",
+  "limits": [
+    "Native pre-Open simplicity is uninitialized; embedded paths that omit successful Open remain unresolved, not passing results.",
+    "No Aegisub/player playback or full graph integration; COM probes are disconnected and omit custom interface method behavior.",
+    "No non-Windows or Miri run for this increment.",
+    "Default native-document configuration has compile-only probes, not new runtime parity.",
+    "Unchanged-parser baseline 90c3543f and initial implementation 0b516041 retain their own reports; final comparisons include 495412ed rendering fixtures. Production source is unchanged from 0b516041."
+  ],
+  "architectures": {
+    "x64": {
+      "corpus": {
+        "report": "artifacts/xombie-csri-x64/summary.json",
+        "sha256": "6475fbe237d6a0c0f99728e70733f020d759a90e53b885b995e9945940f3d467",
+        "complete": true,
+        "frames": 8826,
+        "distinct_controls": 76,
+        "partition_exact": true,
+        "shards": [
+          {
+            "report": "artifacts/xombie-csri-x64/shard-0/report.json",
+            "sha256": "79cb0bf09b784721c5e496e189578bddae5276889ed415eabbfb835d7ec55bed",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1139,
+            "cases": 105
+          },
+          {
+            "report": "artifacts/xombie-csri-x64/shard-1/report.json",
+            "sha256": "f739e5bc911d2c9e4bff319e787d4f47a47a20ec882242cdd6c9215cd4754ef9",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1139,
+            "cases": 105
+          },
+          {
+            "report": "artifacts/xombie-csri-x64/shard-2/report.json",
+            "sha256": "0451657be52d18759f65017a1e9900018dea1067a61f4f0442943f09f0b73be7",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1102,
+            "cases": 104
+          },
+          {
+            "report": "artifacts/xombie-csri-x64/shard-3/report.json",
+            "sha256": "beceeebef274600b4ec604dafe4a05b5bf4580ec11511fda956355d81de6e6d4",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1102,
+            "cases": 104
+          },
+          {
+            "report": "artifacts/xombie-csri-x64/shard-4/report.json",
+            "sha256": "7d127d89e699122eb505234d579d09c7228ec4200b04bcdb2fefebbb66abe320",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1071,
+            "cases": 104
+          },
+          {
+            "report": "artifacts/xombie-csri-x64/shard-5/report.json",
+            "sha256": "42e1b593d6cfd38e11defc08b96197bf37c6da96912bb8caa54f78b88fa6f515",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1071,
+            "cases": 104
+          },
+          {
+            "report": "artifacts/xombie-csri-x64/shard-6/report.json",
+            "sha256": "f7fa1a59491612174d6c9e51088460c82a882052531b95fc64fd4c0cd5850add",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1101,
+            "cases": 104
+          },
+          {
+            "report": "artifacts/xombie-csri-x64/shard-7/report.json",
+            "sha256": "c2de13bbd1c1bbad829bb910b1f11d28455e7373985483dafe1854ff44e31af9",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1101,
+            "cases": 104
+          }
+        ],
+        "cases": 834,
+        "rendered_frames": 8826,
+        "source_manifest_sha256": "7b31d7fecab3fc107d99889a580c2ad97b900c32a61c55cf6b5136074a893a3d",
+        "partition_driver_sha256": "b2bcc79e236d1940f16be7e90c2ad1d3947138cc8737b60c5198a0bccd10ea94"
+      },
+      "lifecycle": {
+        "report": "artifacts/xombie-lifecycle-x64/report.json",
+        "sha256": "2ce2d675033df859d44f1af1690448e15ca48140b04696f9c17de7b32582cc99",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "495412edcfdd2cf622136e8db15c3008568d1350",
+        "trace_lines": 3693,
+        "dialog_count": 3,
+        "inputs_unchanged": true
+      },
+      "parser": {
+        "report": "artifacts/xombie-final-probe-x64/report.json",
+        "sha256": "4a2c0b7669f4bf9c221352b0f607c75009f9b22c2efdcda11228ad79a077433d",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "495412edcfdd2cf622136e8db15c3008568d1350",
+        "trace_lines": 10441,
+        "inputs_unchanged": true,
+        "cases": 1242,
+        "font_installation_requests": 4
+      },
+      "baseline_parser": {
+        "report": "artifacts/xombie-baseline-x64/report.json",
+        "sha256": "fa07bf9024f14b5bcc10562a2b3b16b2af7cda46540dc5df66d73cdc959a6bd7",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "90c3543fd1a79e724be3755b1da0f215a7fc79b6",
+        "trace_lines": 10441,
+        "inputs_unchanged": true
+      },
+      "ass_regression": {
+        "report": "artifacts/xombie-ass-probe-x64/report.json",
+        "sha256": "e6e93365c61a6ec2a5892fc86b07c90f4603899425a901e69a18d30a7ee32a1e",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "495412edcfdd2cf622136e8db15c3008568d1350",
+        "trace_lines": 22286,
+        "inputs_unchanged": true
+      },
+      "new_rendering": {
+        "report": "artifacts/xombie-new-x64/report.json",
+        "sha256": "6247aba901715a7ca1f2bb167456bc47c72f9ba8f60372ab3ae50bb76b3701de",
+        "complete": true,
+        "passed": true,
+        "rendered_frames": 240,
+        "cases": 20
+      },
+      "compile": {
+        "report": "artifacts/xombie-compile-x64/report.json",
+        "sha256": "29f0e50e70e7c83aa1501cdc7b2d5592bb3ed9fe40a3462c7583c311de5ba0d6",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "495412edcfdd2cf622136e8db15c3008568d1350",
+        "inputs_unchanged": true,
+        "scope": "Compile-only actual style helper/lifecycle sources and headers; no link, execution or parity claim"
+      },
+      "com": {
+        "report": "artifacts/xombie-contracts-x64/com/report.json",
+        "sha256": "9021951cdddf5ec9f35e58d8ae968f863c5939a909ade272fab1be10871997db",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "495412edcfdd2cf622136e8db15c3008568d1350",
+        "inputs_unchanged": true,
+        "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "2d254068a40e5f59cf191c3c6bbfc984b548193b668c4decac21dc1e94e02169",
+          "candidate_sha256": "bca6ff702c1fa4aa63414b0d82c8725c3329d91e1b9f749a251000681478cfff",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "858b557df4643353cc2b7f7a4faf24fb20fc571f39dc8929949a8b9d80276024"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "32b7c2cd6eb817120414db53b3c3005e719ae4b993c4a69d0d66c7f6ac363d5a",
+          "candidate_sha256": "ae0af88afccffb7d9e3f8f2071b57f8490616b02a04003277a0f21d1a102d28f",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "09623cbd08a08a70ca726d32f1ac7a80358fe93589dfe22d814f7c9544f6d751"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "f1165742064181b7fb73bacb16017d8e202c8bb0be90ed8c2eb812ac282c2df8",
+          "candidate_sha256": "9b1c886a9f2fe3247c04690954d87b93440153f2b19e9f6db0992fb62b5af8db",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "b0b48a3cf2bf2ecbbac4ecca863a815ab4a0c1137277a9b7d5830d9d1beca5c9"
+        }
+      }
+    },
+    "x86": {
+      "corpus": {
+        "report": "artifacts/xombie-csri-x86/summary.json",
+        "sha256": "decaae7d9818095039cef015274ea4f228ac7304b52325f37dd2badaab8c9fff",
+        "complete": true,
+        "frames": 8826,
+        "distinct_controls": 76,
+        "partition_exact": true,
+        "shards": [
+          {
+            "report": "artifacts/xombie-csri-x86/shard-0/report.json",
+            "sha256": "a891e9c042ea85e3d1fd610fc784701f09a15c1393efae46c8a9bdf1fa9f3d0e",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1139,
+            "cases": 105
+          },
+          {
+            "report": "artifacts/xombie-csri-x86/shard-1/report.json",
+            "sha256": "524171861231a98f43d2c844889c269f7679e27192899cba937c0b4617046723",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1139,
+            "cases": 105
+          },
+          {
+            "report": "artifacts/xombie-csri-x86/shard-2/report.json",
+            "sha256": "6ee0dcccb096a04309ecf67a20542591ff65e8d43c06738313dba62da2a690e1",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1102,
+            "cases": 104
+          },
+          {
+            "report": "artifacts/xombie-csri-x86/shard-3/report.json",
+            "sha256": "806e6bcecf594bffa7663af76a9c8f5c341f91a003daed70b0732bb44fbd2bfd",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1102,
+            "cases": 104
+          },
+          {
+            "report": "artifacts/xombie-csri-x86/shard-4/report.json",
+            "sha256": "3f7d82eaa55b65f8d852c67533f9134c507065ca4cb8796d219119923c9d0cc2",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1071,
+            "cases": 104
+          },
+          {
+            "report": "artifacts/xombie-csri-x86/shard-5/report.json",
+            "sha256": "7c48ba1acdc431ad27384332ce537b710db3c5ffa56cf87317730c12edc16411",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1071,
+            "cases": 104
+          },
+          {
+            "report": "artifacts/xombie-csri-x86/shard-6/report.json",
+            "sha256": "6b3c2299d5281e5fb54e7e0df89c8d049727c9a72051b4f0ee6ec191d633319a",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1101,
+            "cases": 104
+          },
+          {
+            "report": "artifacts/xombie-csri-x86/shard-7/report.json",
+            "sha256": "483d7f18571bc56ed22adacbba03ef209dd75c6e8fd7132d24717fa5d24e51e4",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1101,
+            "cases": 104
+          }
+        ],
+        "cases": 834,
+        "rendered_frames": 8826,
+        "source_manifest_sha256": "7b31d7fecab3fc107d99889a580c2ad97b900c32a61c55cf6b5136074a893a3d",
+        "partition_driver_sha256": "b2bcc79e236d1940f16be7e90c2ad1d3947138cc8737b60c5198a0bccd10ea94"
+      },
+      "lifecycle": {
+        "report": "artifacts/xombie-lifecycle-x86/report.json",
+        "sha256": "f6f9e709ec530cdebd6137200fed9c679a98d45d3bfc0462cc16d9f8b8088a53",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "495412edcfdd2cf622136e8db15c3008568d1350",
+        "trace_lines": 3693,
+        "dialog_count": 3,
+        "inputs_unchanged": true
+      },
+      "parser": {
+        "report": "artifacts/xombie-final-probe-x86/report.json",
+        "sha256": "ed1cd9472764d9f01bd994d7448979c77f0cf0888ada588110a9f47fa45fa549",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "495412edcfdd2cf622136e8db15c3008568d1350",
+        "trace_lines": 10441,
+        "inputs_unchanged": true,
+        "cases": 1242,
+        "font_installation_requests": 4
+      },
+      "baseline_parser": {
+        "report": "artifacts/xombie-baseline-x86/report.json",
+        "sha256": "24372392e7561e44451a955871b1229d97bcdb3577cdf51389cfb9aef358f66f",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "90c3543fd1a79e724be3755b1da0f215a7fc79b6",
+        "trace_lines": 10441,
+        "inputs_unchanged": true
+      },
+      "ass_regression": {
+        "report": "artifacts/xombie-ass-probe-x86/report.json",
+        "sha256": "fdfc69fe1efba33a143e890374eb717c40288de64af756f22528ef08edaa9e8a",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "495412edcfdd2cf622136e8db15c3008568d1350",
+        "trace_lines": 22286,
+        "inputs_unchanged": true
+      },
+      "new_rendering": {
+        "report": "artifacts/xombie-new-x86/report.json",
+        "sha256": "e9a9b7493b143d488cef238cac115a4cfcd5ea6da8b6f56d9e17945e2fdc30a6",
+        "complete": true,
+        "passed": true,
+        "rendered_frames": 240,
+        "cases": 20
+      },
+      "compile": {
+        "report": "artifacts/xombie-compile-x86/report.json",
+        "sha256": "052b2deb1d32dd5dbd2d28edc49840eb39b8ee0cb0b573cd8ed091f78917aeb2",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "495412edcfdd2cf622136e8db15c3008568d1350",
+        "inputs_unchanged": true,
+        "scope": "Compile-only actual style helper/lifecycle sources and headers; no link, execution or parity claim"
+      },
+      "com": {
+        "report": "artifacts/xombie-contracts-x86/com/report.json",
+        "sha256": "e5ab3183a5b4e1997da0a639ec3ba8d6fd377ed9bcb614f6627a2041f06c39e2",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "495412edcfdd2cf622136e8db15c3008568d1350",
+        "inputs_unchanged": true,
+        "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "69faa2d5f90f35fe4184e9e9bd892adb76fee60295701988f61ab7af0664d9eb",
+          "candidate_sha256": "c06f3e04a63d979c03f37f0fac45b9d78126d315b1319addd5f8a4dc8256ace2",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "dbd365316d54d5a3d590b63604fbbc5ea6849a912eb7660e52d8df4bdd6b2120"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "2c3b904d7f91902ef456e07b648c5d6351878318c235397eeb9b39eb3fffa34f",
+          "candidate_sha256": "ed99f8031bfa271801371f0ebed7b0a310472ef59bf5dd4eaaac3210b0d905ea",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "8821591e5f42e83c8361380a00b4869b748312f9374da70041ad829e381b6bbc"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "3e7c20a4d6c42457d92eb56c42e4fd9f3bddb93276f2c1cd28bfb73edd06484c",
+          "candidate_sha256": "0b3477a392c6ac07b6a0b401f130d354f22d2b8167b10c69fb446b2f8718e250",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "bee8a1d975859e0ab8a9b6843e14f813df818b8538e6501927e792bb180eb7c1"
+        }
+      }
+    }
+  },
+  "source_inventory": {
+    "path": "docs/rust-xombie-inventory.json",
+    "sha256": "73338714c9e353be38a0140360b413648e4bf87d810cf03dbd9a9d941ca7b01f"
+  },
+  "unsafe_lexical_inventory": {
+    "report": "artifacts/xombie-unsafe-inventory.json",
+    "sha256": "08e725bd5c479d783b25bbfae9049262dd25211584c66125d9531cc94fd11657",
+    "safe_core_unsafe_sites": 0,
+    "limits": "Lexical inventory only, not a soundness proof."
+  },
+  "build_logs": {
+    "artifacts/xombie-build-x64.log": "fd247db774d12e5ace9e885a6a3ffcb2b7240442157595033d233f284c58b075",
+    "artifacts/xombie-build-x86.log": "d2aafa0d0ea4bf8818619d89145f15f5bee61bf356e666b4b9263f4426d000cc",
+    "artifacts/xombie-build-rust-x64.log": "c9f1c98ba820522a7ee6c7a9ed0f63460fc27596b6aaeb240c491d3e76473887",
+    "artifacts/xombie-build-rust-x86.log": "c9f1c98ba820522a7ee6c7a9ed0f63460fc27596b6aaeb240c491d3e76473887"
+  },
+  "rust_tests": {
+    "core_per_architecture": 264,
+    "ffi_per_architecture": 123,
+    "fmt": true,
+    "clippy_all_targets": true,
+    "clippy_native_runtime": true,
+    "logs": {
+      "artifacts/xombie-checks.log": "dd1c1cd40132ee205bb9b9ba4306a496b6495f33f04b44fcf1eddbd155cee851"
+    }
+  },
+  "python_harness_tests": {
+    "count": 151,
+    "skipped": 1,
+    "failures": 0,
+    "corpus_generation_checked": true,
+    "log": "artifacts/xombie-harness.log"
+  }
+}

@@ -27,15 +27,49 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Active port: XombieSub parser ownership (2026-10-18)
+## Current port: XombieSub parser ownership (2026-10-18)
 
 The experimental XombieSub path now uses a checked Rust session for line/EOF
 sequencing, key dispatch, screen inference/reset, ordered style and dialogue
-assembly, timestamps and embedded-font lifecycle. Native CString/CRT services,
-AddStyle and Add remain explicit transitional callbacks. The reference probe
-first established 1,242 unchanged-parser cases on both architectures, including
-the MSVC reversal of two mutating style-name operands. Fresh implementation
-comparisons are in progress; no production switch or format closure is claimed.
+assembly, full-millisecond timestamps and embedded-font lifecycle. It retains
+raw UTF-16 throughout. Native CString/CRT services, Default comparison, AddStyle
+and Add remain explicit transitional callbacks outside registry loans.
+
+The actual MSVC reference evaluates the two mutating style-name operands in
+reverse order: input fields First,Second produce Second_First. Rust preserves
+that behavior for both named styles and dialogue references, along with
+XombieSub-specific alpha, blur, angles, clamps, error scopes and final-fragment
+handling. Acceptance still depends on the live document's nonemptiness, including
+entries supplied before parsing.
+
+Candidate `495412ed` (implementation `0b516041`) passes fresh comparisons against
+cleanup `67da07cd` on **each** Windows architecture (x86 and x64):
+
+* 1,242 direct XombieSub cases with 10,441 identical trace lines, repeated twice
+  for reference and candidate. This includes all decoded bytes/order of four
+  intercepted font requests, thrown errors and file positions. Unchanged-parser
+  checkpoint `90c3543f` established the probe before implementation changes.
+* All 834 rendering cases and 8,826 frames, with 76 distinct-frame controls.
+  The 20 new XombieSub cases cover file/memory loading, precise timing and seeks,
+  styling, malformed text and real Windows font installation. Italic/control
+  and attached-font/control pairs must render differently.
+* Regression comparisons for all 3,266 ASS parser cases (22,286 trace lines),
+  3,693 linked lifecycle trace lines, all three DLLs' exports/dependencies,
+  10 scoped COM cases plus two candidate pin-ID controls, and compile probes
+  for reference/native-document/experimental configurations.
+* 264 safe-core and 123 FFI tests, formatting and Clippy; 151 Python harness
+  tests with one skip. The safe core still forbids unsafe code.
+
+See the [source and boundary inventory](rust-xombie-inventory.json) and
+[local evidence manifest](rust-xombie-local-evidence.json) for provenance and
+scope. No default production switch, format closure, non-Windows parity or real
+player/Aegisub graph integration is claimed. Native pre-Open simplicity and
+allocation failure/reentry remain unresolved. Earlier evidence keeps its own
+candidate and reference attribution.
+
+Remaining parser preparation/conversion adapters, other format parsers, rendering,
+all public hosts and vendored native code remain in scope. The complete-library
+migration goal stays active; retained C++ remains transitional.
 
 ## Previous port: embedded ASS font lifecycle (2026-10-18)
 

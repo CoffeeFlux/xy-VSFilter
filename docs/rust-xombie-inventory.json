@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "candidate_commit": "495412edcfdd2cf622136e8db15c3008568d1350",
+  "implementation_commit": "0b516041f1dc7f3103e8dff3df3e40ea4626edda",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "XombieSub parser policy and record assembly in safe Rust through the experimental document owner; complete library migration remains active.",
+  "reference_sources": {
+    "src/subtitles/STS.cpp": "2616b67db84f7329ac6e2363a3f03d61977fa07c37ed9c04d32ec2b1197f31e0",
+    "src/subtitles/STS.h": "57dc87a3de9470ca04adc007c175956bd4acfddcb720324886bb4a2c7699080b",
+    "src/subtitles/TextFile.cpp": "71c00071f9ceb466c539fda26103a4a94b802a4a01f4b807852e159563772f2f",
+    "src/dsutil/text.h": "92efdac94644006b4559d868631c27c841811327af9eedc408b817631e09d249"
+  },
+  "operations": [
+    {
+      "operation": "Owned XombieSub state, style and dialogue assembly",
+      "source": {
+        "path": "rust/compat/src/xombie.rs",
+        "line": 26,
+        "sha256": "f91c36867a8919c20c63584a82137e738d6578f8e9ec630faffd01f39a3ea299"
+      },
+      "behavior": "Raw UTF16 line/key/remainder storage, supplied-predicate trimming, false-ReadString fragment discard, comment handling, equals-key split, key dispatch, screen inference and failure reset, ordered typed fields, style defaults/normalization, full-millisecond wrapping timestamps, discarded id, D-only records, star stripping, embedded font lifecycle, acceptance from live document nonemptiness."
+    },
+    {
+      "operation": "Source-observed name construction",
+      "source": {
+        "path": "rust/compat/src/xombie.rs",
+        "line": 85,
+        "sha256": "f91c36867a8919c20c63584a82137e738d6578f8e9ec630faffd01f39a3ea299"
+      },
+      "behavior": "Actual pinned parser compiled with MSVC14.44 evaluates the right mutating GetStr operand first. Two input fields First,Second become Second_First for both named styles and dialogues. Safe Rust explicitly reproduces that order and counted CString concatenation including embedded NUL tails. Do not generalize this result to a different toolchain without direct evidence."
+    },
+    {
+      "operation": "Native platform and document callbacks",
+      "source": {
+        "path": "src/subtitles/STS.cpp",
+        "line": 2891,
+        "sha256": "e52eb3882a090b4e19119fdc75a08c68426c4574944eb66755919abdc517d520"
+      },
+      "behavior": "Native ReadString, CString IsSpace/MakeLower, GetStr/GetInt/GetFloat, Default CompareNoCase and Add/AddStyle still execute outside registry admission. The version conversion remains outside numeric-error catches. AddFontMemResourceEx receives owned decoded bytes, ignoring return/count and preserving process lifetime. The existing Add path retains final trimming, charset, callbacks and timeline policy."
+    }
+  ],
+  "boundary_review": {
+    "source": {
+      "path": "rust/ffi/src/document.rs",
+      "line": 275,
+      "sha256": "a9a7057c5d6d9e4ea06a5548c7df5d52e15da6b9a89eb2098e5677332a64e5ec"
+    },
+    "exports": [
+      "xy_vsfilter_document_xombie_begin_v1",
+      "xy_vsfilter_document_xombie_read_v1",
+      "xy_vsfilter_document_xombie_step_v1",
+      "xy_vsfilter_document_xombie_part_v1",
+      "xy_vsfilter_document_xombie_drop_v1"
+    ],
+    "registry": {
+      "path": "rust/ffi/src/document_registry.rs",
+      "line": 355,
+      "sha256": "713b4ad50bd60b1ebb3e3762ce8c5304a4964a6d1f12061af0e546abc1e6792f"
+    },
+    "contract": "Typed never-reused run ID resolves a live document under nonblocking admission. Copy all raw input/remainder/predicate bytes before registry loans; validate command/type/shape/bools. Preflight output capacities before snapshot/run publication; immutable snapshots survive run/document release. No caller pointer, native object or callback is retained. AddStyle receives its temporary only after style snapshot copies and session acknowledgement complete. Invalid/stale IDs, BUSY and malformed protocol inputs are rejected; allocation/reentry compatibility remains unresolved."
+  },
+  "probe": {
+    "source": {
+      "path": "tools/compat/xombie_document_native.cpp",
+      "line": 23,
+      "sha256": "37a9c3a052df3046ffe4b38dd55a6d5144d7ee89b1f5d1d96c91efbfea6c60d0"
+    },
+    "cases": 1242,
+    "trace_lines": 10441,
+    "font_installation_requests": 4,
+    "repeat": "Two reference and two candidate runs per architecture, actual STS.cpp with initialized document observer. Includes pre-populated documents, field errors/NaN/extremes, raw code units, truncation, key case, EOF and fonts. Exact output, exceptions, file positions and intercepted installation bytes compared. Baseline90c3543f ran unchanged native parser in both checkouts before the port."
+  },
+  "renderer_additions": {
+    "generator": {
+      "path": "tools/compat/make_corpus.py",
+      "line": 730,
+      "sha256": "b2ff7a0367e21b08e3e82e9ccd592566cb5377db6fd91fabcc02b1f5a5a0d30d"
+    },
+    "files": 10,
+    "cases": 20,
+    "frames": 240,
+    "distinct_frame_controls": 4,
+    "behavior": "File and memory opening; exact 1.234/4.345 second boundaries and repeat/reverse seeks; styling, raw NUL/surrogate text, final-fragment discard and embedded Abel font. Italic/control and font-attached/control must render differently."
+  },
+  "limits": [
+    "No whole-format/frontend/host closure or default production switch.",
+    "Finite local Windows x86/x64 MSVC14.44/SDK10.0.26100.0 evidence, not non-Windows parity.",
+    "Native pre-Open simplicity remains unresolved.",
+    "No allocation failure, allocator reentry, native UI/player graph integration or Miri evidence.",
+    "Default native-document fallback retains the C++ parser; only compile probes are new for that configuration.",
+    "CString/CRT/file/encoding and Add/AddStyle adapters remain transitional native code; public hosts and vendored code remain in scope."
+  ],
+  "next_work": [
+    "Continue removing native parser preparation and conversion adapters with direct source/binary comparisons.",
+    "Migrate remaining format parsers and their owned storage, then complete rendering and all host/ABI packages.",
+    "Retire obsolete raw boundaries as their native-document fallback callers are replaced."
+  ]
+}
