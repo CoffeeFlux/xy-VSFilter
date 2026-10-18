@@ -7,6 +7,7 @@ This is a crash-isolation harness, not a security sandbox for hostile binaries.
 """
 import argparse
 import ctypes as C
+from contextlib import contextmanager
 import hashlib
 import json
 import locale
@@ -78,6 +79,8 @@ def load_library(path):
 def validate_case(case):
     # Validate harness configuration, NEVER the subtitle contents.
     validate_actions(case.get("dialog_actions", []))
+    if case.get("com_apartment") not in (None, "sta", "mta"):
+        raise ValueError("com_apartment must be absent, sta or mta")
     if not isinstance(case.get("id"), str) or not case["id"]:
         raise ValueError("each case needs a nonempty id")
     for field in ("width", "height"):
@@ -208,13 +211,38 @@ def capture(dll, case, destination):
     return result
 
 
+@contextmanager
+def com_apartment(mode):
+    """Explicit host setup; the default preserves the uninitialized COM case."""
+    if mode is None:
+        yield None
+        return
+    if mode not in ("sta", "mta") or os.name != "nt":
+        raise ValueError("COM apartment requires Windows and sta/mta")
+    ole = C.WinDLL("ole32")
+    ole.CoInitializeEx.argtypes = [C.c_void_p, C.c_ulong]
+    ole.CoInitializeEx.restype = C.c_long
+    ole.CoUninitialize.argtypes = []
+    ole.CoUninitialize.restype = None
+    status = ole.CoInitializeEx(None, 2 if mode == "sta" else 0)
+    if status not in (0, 1):
+        raise RuntimeError(f"CoInitializeEx failed: {status:#x}")
+    try:
+        yield {"apartment": mode, "initialize_hresult": status}
+    finally:
+        ole.CoUninitialize()
+
+
 def worker(dll, case_path, destination):
     destination = Path(destination)
     destination.mkdir(parents=True, exist_ok=True)
     try:
         case = read_json(case_path)
-        with DialogCapture(case.get("dialog_actions", []), destination) as dialogs:
+        validate_case(case)
+        with com_apartment(case.get("com_apartment")) as com, DialogCapture(case.get("dialog_actions", []), destination) as dialogs:
             result = capture(dll, case, destination)
+        if com is not None:
+            result["com_initialization"] = com
         result["dialogs"] = dialogs.events
         if dialogs.error:
             result.update(status="harness_error", error=dialogs.error)
@@ -326,7 +354,7 @@ def compare(args):
         if not isinstance(pair, list) or len(pair) != 2 or any(name not in ids for name in pair):
             raise ValueError("invalid distinct-frame control")
         left, right = (by_id[name] for name in pair)
-        for field in ("width", "height", "times", "open", "stride_padding", "bottom_up", "fill_seed"):
+        for field in ("width", "height", "times", "open", "stride_padding", "bottom_up", "fill_seed", "com_apartment"):
             if left.get(field) != right.get(field):
                 raise ValueError("distinct-frame controls must use the same rendering configuration")
     reference, candidate = Path(args.reference).resolve(), Path(args.candidate).resolve()

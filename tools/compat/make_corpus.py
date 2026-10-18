@@ -949,6 +949,12 @@ def make_cases(files):
             if path.stem.startswith("usf-conversion-"):
                 # Cleanup USF passes millisecond counts directly as 100ns ticks.
                 cases[-1]["times"] = ["0", "0.0000999", "0.0001", "0.0001001", "0.0002", "0.0003", "0.0004", "0.0004999", "0.0005", "0.0005001", "0.0002", "0.0001"]
+                # Keep the original no-COM rejection case, and exercise both
+                # explicit host apartment configurations with the same bytes.
+                uninitialized = cases[-1]
+                for apartment in ("sta", "mta"):
+                    cases.append({**uninitialized, "id": uninitialized["id"] + "-" + apartment,
+                                  "com_apartment": apartment})
             warning_styles = {"field-tab-prefixes": "\tDefault", "field-unicode-style-space": "\u2003Default"}
             if path.stem in warning_styles:
                 cases[-1]["dialog_actions"] = [{"title": "Warning",
@@ -981,9 +987,6 @@ def make_cases(files):
                                                     ("realtext-parser-italic", "realtext-parser-control"),
                                                     ("realtext-parser-helper-red", "realtext-parser-helper-control"),
                                                     ("realtext-parser-helper-fractions", "realtext-parser-helper-control"),
-                                                    ("usf-conversion-italic", "usf-conversion-control"),
-                                                    ("usf-conversion-margin", "usf-conversion-control"),
-                                                    ("usf-conversion-rotation", "usf-conversion-control"),
                                                     ("vtt-parser-color-replace", "vtt-parser-control"),
                                                     ("vtt-parser-alignment", "vtt-parser-control"),
                                                     ("sami-parser-title-skip", "sami-parser-control"),
@@ -1025,7 +1028,10 @@ def make_cases(files):
         ("clip-fade-scroll-control", "clip-fade-scroll-up"),
         ("clip-mask-normal", "clip-mask-inverse"),
         ("gauss-planes-body-light", "gauss-planes-body-wide"))
-                                       for mode in ("file", "memory")], "cases": cases}
+                                       for mode in ("file", "memory")]
+                    + [[f"usf-conversion-{name}-{mode}-{apartment}", f"usf-conversion-control-{mode}-{apartment}"]
+                       for name in ("italic", "margin", "alpha") for mode in ("file", "memory")
+                       for apartment in ("sta", "mta")], "cases": cases}
 
 
 def main():

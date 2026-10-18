@@ -91,30 +91,6 @@
       "realtext-parser-helper-control-memory"
     ],
     [
-      "usf-conversion-italic-file",
-      "usf-conversion-control-file"
-    ],
-    [
-      "usf-conversion-italic-memory",
-      "usf-conversion-control-memory"
-    ],
-    [
-      "usf-conversion-margin-file",
-      "usf-conversion-control-file"
-    ],
-    [
-      "usf-conversion-margin-memory",
-      "usf-conversion-control-memory"
-    ],
-    [
-      "usf-conversion-rotation-file",
-      "usf-conversion-control-file"
-    ],
-    [
-      "usf-conversion-rotation-memory",
-      "usf-conversion-control-memory"
-    ],
-    [
       "vtt-parser-color-replace-file",
       "vtt-parser-control-file"
     ],
@@ -441,6 +417,54 @@
     [
       "gauss-planes-body-light-memory",
       "gauss-planes-body-wide-memory"
+    ],
+    [
+      "usf-conversion-italic-file-sta",
+      "usf-conversion-control-file-sta"
+    ],
+    [
+      "usf-conversion-italic-file-mta",
+      "usf-conversion-control-file-mta"
+    ],
+    [
+      "usf-conversion-italic-memory-sta",
+      "usf-conversion-control-memory-sta"
+    ],
+    [
+      "usf-conversion-italic-memory-mta",
+      "usf-conversion-control-memory-mta"
+    ],
+    [
+      "usf-conversion-margin-file-sta",
+      "usf-conversion-control-file-sta"
+    ],
+    [
+      "usf-conversion-margin-file-mta",
+      "usf-conversion-control-file-mta"
+    ],
+    [
+      "usf-conversion-margin-memory-sta",
+      "usf-conversion-control-memory-sta"
+    ],
+    [
+      "usf-conversion-margin-memory-mta",
+      "usf-conversion-control-memory-mta"
+    ],
+    [
+      "usf-conversion-alpha-file-sta",
+      "usf-conversion-control-file-sta"
+    ],
+    [
+      "usf-conversion-alpha-file-mta",
+      "usf-conversion-control-file-mta"
+    ],
+    [
+      "usf-conversion-alpha-memory-sta",
+      "usf-conversion-control-memory-sta"
+    ],
+    [
+      "usf-conversion-alpha-memory-mta",
+      "usf-conversion-control-memory-mta"
     ]
   ],
   "cases": [
@@ -22785,6 +22809,56 @@
       "fill_seed": 31
     },
     {
+      "id": "usf-conversion-control-file-sta",
+      "script": "test/compat/generated/usf-conversion-control.usf",
+      "sha256": "d8d2c6d6aab793b01cf8f638271cdd770c99f4c1252902b6b749a4f4b95f185f",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "sta"
+    },
+    {
+      "id": "usf-conversion-control-file-mta",
+      "script": "test/compat/generated/usf-conversion-control.usf",
+      "sha256": "d8d2c6d6aab793b01cf8f638271cdd770c99f4c1252902b6b749a4f4b95f185f",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "mta"
+    },
+    {
       "id": "usf-conversion-control-memory",
       "script": "test/compat/generated/usf-conversion-control.usf",
       "sha256": "d8d2c6d6aab793b01cf8f638271cdd770c99f4c1252902b6b749a4f4b95f185f",
@@ -22807,6 +22881,56 @@
       ],
       "stride_padding": 16,
       "fill_seed": 31
+    },
+    {
+      "id": "usf-conversion-control-memory-sta",
+      "script": "test/compat/generated/usf-conversion-control.usf",
+      "sha256": "d8d2c6d6aab793b01cf8f638271cdd770c99f4c1252902b6b749a4f4b95f185f",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "sta"
+    },
+    {
+      "id": "usf-conversion-control-memory-mta",
+      "script": "test/compat/generated/usf-conversion-control.usf",
+      "sha256": "d8d2c6d6aab793b01cf8f638271cdd770c99f4c1252902b6b749a4f4b95f185f",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "mta"
     },
     {
       "id": "usf-conversion-italic-file",
@@ -22833,6 +22957,56 @@
       "fill_seed": 31
     },
     {
+      "id": "usf-conversion-italic-file-sta",
+      "script": "test/compat/generated/usf-conversion-italic.usf",
+      "sha256": "1ddcb85000327ecc9f8779481a104a08ffaaf551946764819af675834563b734",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "sta"
+    },
+    {
+      "id": "usf-conversion-italic-file-mta",
+      "script": "test/compat/generated/usf-conversion-italic.usf",
+      "sha256": "1ddcb85000327ecc9f8779481a104a08ffaaf551946764819af675834563b734",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "mta"
+    },
+    {
       "id": "usf-conversion-italic-memory",
       "script": "test/compat/generated/usf-conversion-italic.usf",
       "sha256": "1ddcb85000327ecc9f8779481a104a08ffaaf551946764819af675834563b734",
@@ -22855,6 +23029,56 @@
       ],
       "stride_padding": 16,
       "fill_seed": 31
+    },
+    {
+      "id": "usf-conversion-italic-memory-sta",
+      "script": "test/compat/generated/usf-conversion-italic.usf",
+      "sha256": "1ddcb85000327ecc9f8779481a104a08ffaaf551946764819af675834563b734",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "sta"
+    },
+    {
+      "id": "usf-conversion-italic-memory-mta",
+      "script": "test/compat/generated/usf-conversion-italic.usf",
+      "sha256": "1ddcb85000327ecc9f8779481a104a08ffaaf551946764819af675834563b734",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "mta"
     },
     {
       "id": "usf-conversion-alpha-file",
@@ -22881,6 +23105,56 @@
       "fill_seed": 31
     },
     {
+      "id": "usf-conversion-alpha-file-sta",
+      "script": "test/compat/generated/usf-conversion-alpha.usf",
+      "sha256": "04a403b1dcaf6f315817bb2421ff577cf76b825cd380b2ad08b039d2289e0be7",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "sta"
+    },
+    {
+      "id": "usf-conversion-alpha-file-mta",
+      "script": "test/compat/generated/usf-conversion-alpha.usf",
+      "sha256": "04a403b1dcaf6f315817bb2421ff577cf76b825cd380b2ad08b039d2289e0be7",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "mta"
+    },
+    {
       "id": "usf-conversion-alpha-memory",
       "script": "test/compat/generated/usf-conversion-alpha.usf",
       "sha256": "04a403b1dcaf6f315817bb2421ff577cf76b825cd380b2ad08b039d2289e0be7",
@@ -22903,6 +23177,56 @@
       ],
       "stride_padding": 16,
       "fill_seed": 31
+    },
+    {
+      "id": "usf-conversion-alpha-memory-sta",
+      "script": "test/compat/generated/usf-conversion-alpha.usf",
+      "sha256": "04a403b1dcaf6f315817bb2421ff577cf76b825cd380b2ad08b039d2289e0be7",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "sta"
+    },
+    {
+      "id": "usf-conversion-alpha-memory-mta",
+      "script": "test/compat/generated/usf-conversion-alpha.usf",
+      "sha256": "04a403b1dcaf6f315817bb2421ff577cf76b825cd380b2ad08b039d2289e0be7",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "mta"
     },
     {
       "id": "usf-conversion-margin-file",
@@ -22929,6 +23253,56 @@
       "fill_seed": 31
     },
     {
+      "id": "usf-conversion-margin-file-sta",
+      "script": "test/compat/generated/usf-conversion-margin.usf",
+      "sha256": "662858cc4843903e78f3ad16e9bebe2fab92f852b0e1c8df6f23b93c67ccb4ac",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "sta"
+    },
+    {
+      "id": "usf-conversion-margin-file-mta",
+      "script": "test/compat/generated/usf-conversion-margin.usf",
+      "sha256": "662858cc4843903e78f3ad16e9bebe2fab92f852b0e1c8df6f23b93c67ccb4ac",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "mta"
+    },
+    {
       "id": "usf-conversion-margin-memory",
       "script": "test/compat/generated/usf-conversion-margin.usf",
       "sha256": "662858cc4843903e78f3ad16e9bebe2fab92f852b0e1c8df6f23b93c67ccb4ac",
@@ -22951,6 +23325,56 @@
       ],
       "stride_padding": 16,
       "fill_seed": 31
+    },
+    {
+      "id": "usf-conversion-margin-memory-sta",
+      "script": "test/compat/generated/usf-conversion-margin.usf",
+      "sha256": "662858cc4843903e78f3ad16e9bebe2fab92f852b0e1c8df6f23b93c67ccb4ac",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "sta"
+    },
+    {
+      "id": "usf-conversion-margin-memory-mta",
+      "script": "test/compat/generated/usf-conversion-margin.usf",
+      "sha256": "662858cc4843903e78f3ad16e9bebe2fab92f852b0e1c8df6f23b93c67ccb4ac",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "mta"
     },
     {
       "id": "usf-conversion-rotation-file",
@@ -22977,6 +23401,56 @@
       "fill_seed": 31
     },
     {
+      "id": "usf-conversion-rotation-file-sta",
+      "script": "test/compat/generated/usf-conversion-rotation.usf",
+      "sha256": "b5f75bfdbed17aae411e96d1a262f3622fa449ba5bd727d3b5be504cdccf53bf",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "sta"
+    },
+    {
+      "id": "usf-conversion-rotation-file-mta",
+      "script": "test/compat/generated/usf-conversion-rotation.usf",
+      "sha256": "b5f75bfdbed17aae411e96d1a262f3622fa449ba5bd727d3b5be504cdccf53bf",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "mta"
+    },
+    {
       "id": "usf-conversion-rotation-memory",
       "script": "test/compat/generated/usf-conversion-rotation.usf",
       "sha256": "b5f75bfdbed17aae411e96d1a262f3622fa449ba5bd727d3b5be504cdccf53bf",
@@ -22999,6 +23473,56 @@
       ],
       "stride_padding": 16,
       "fill_seed": 31
+    },
+    {
+      "id": "usf-conversion-rotation-memory-sta",
+      "script": "test/compat/generated/usf-conversion-rotation.usf",
+      "sha256": "b5f75bfdbed17aae411e96d1a262f3622fa449ba5bd727d3b5be504cdccf53bf",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "sta"
+    },
+    {
+      "id": "usf-conversion-rotation-memory-mta",
+      "script": "test/compat/generated/usf-conversion-rotation.usf",
+      "sha256": "b5f75bfdbed17aae411e96d1a262f3622fa449ba5bd727d3b5be504cdccf53bf",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "mta"
     },
     {
       "id": "usf-conversion-named-wrap-file",
@@ -23025,6 +23549,56 @@
       "fill_seed": 31
     },
     {
+      "id": "usf-conversion-named-wrap-file-sta",
+      "script": "test/compat/generated/usf-conversion-named-wrap.usf",
+      "sha256": "713927626fea5f08be28d901d52b25b756d0bd722fd81e1d853154d454dc65fb",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "sta"
+    },
+    {
+      "id": "usf-conversion-named-wrap-file-mta",
+      "script": "test/compat/generated/usf-conversion-named-wrap.usf",
+      "sha256": "713927626fea5f08be28d901d52b25b756d0bd722fd81e1d853154d454dc65fb",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "mta"
+    },
+    {
       "id": "usf-conversion-named-wrap-memory",
       "script": "test/compat/generated/usf-conversion-named-wrap.usf",
       "sha256": "713927626fea5f08be28d901d52b25b756d0bd722fd81e1d853154d454dc65fb",
@@ -23047,6 +23621,56 @@
       ],
       "stride_padding": 16,
       "fill_seed": 31
+    },
+    {
+      "id": "usf-conversion-named-wrap-memory-sta",
+      "script": "test/compat/generated/usf-conversion-named-wrap.usf",
+      "sha256": "713927626fea5f08be28d901d52b25b756d0bd722fd81e1d853154d454dc65fb",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "sta"
+    },
+    {
+      "id": "usf-conversion-named-wrap-memory-mta",
+      "script": "test/compat/generated/usf-conversion-named-wrap.usf",
+      "sha256": "713927626fea5f08be28d901d52b25b756d0bd722fd81e1d853154d454dc65fb",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "mta"
     },
     {
       "id": "usf-conversion-inheritance-file",
@@ -23073,6 +23697,56 @@
       "fill_seed": 31
     },
     {
+      "id": "usf-conversion-inheritance-file-sta",
+      "script": "test/compat/generated/usf-conversion-inheritance.usf",
+      "sha256": "50395ad12ac13c05316a23b62c55f219a691da8f4a3464c592d18e92332dd518",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "sta"
+    },
+    {
+      "id": "usf-conversion-inheritance-file-mta",
+      "script": "test/compat/generated/usf-conversion-inheritance.usf",
+      "sha256": "50395ad12ac13c05316a23b62c55f219a691da8f4a3464c592d18e92332dd518",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "mta"
+    },
+    {
       "id": "usf-conversion-inheritance-memory",
       "script": "test/compat/generated/usf-conversion-inheritance.usf",
       "sha256": "50395ad12ac13c05316a23b62c55f219a691da8f4a3464c592d18e92332dd518",
@@ -23095,6 +23769,56 @@
       ],
       "stride_padding": 16,
       "fill_seed": 31
+    },
+    {
+      "id": "usf-conversion-inheritance-memory-sta",
+      "script": "test/compat/generated/usf-conversion-inheritance.usf",
+      "sha256": "50395ad12ac13c05316a23b62c55f219a691da8f4a3464c592d18e92332dd518",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "sta"
+    },
+    {
+      "id": "usf-conversion-inheritance-memory-mta",
+      "script": "test/compat/generated/usf-conversion-inheritance.usf",
+      "sha256": "50395ad12ac13c05316a23b62c55f219a691da8f4a3464c592d18e92332dd518",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "mta"
     },
     {
       "id": "usf-conversion-duplicate-default-file",
@@ -23121,6 +23845,56 @@
       "fill_seed": 31
     },
     {
+      "id": "usf-conversion-duplicate-default-file-sta",
+      "script": "test/compat/generated/usf-conversion-duplicate-default.usf",
+      "sha256": "c71098ea0817c7074015e0e7b0b28de79685d4f34353286dbfc6f9a2e0fc7718",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "sta"
+    },
+    {
+      "id": "usf-conversion-duplicate-default-file-mta",
+      "script": "test/compat/generated/usf-conversion-duplicate-default.usf",
+      "sha256": "c71098ea0817c7074015e0e7b0b28de79685d4f34353286dbfc6f9a2e0fc7718",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "mta"
+    },
+    {
       "id": "usf-conversion-duplicate-default-memory",
       "script": "test/compat/generated/usf-conversion-duplicate-default.usf",
       "sha256": "c71098ea0817c7074015e0e7b0b28de79685d4f34353286dbfc6f9a2e0fc7718",
@@ -23143,6 +23917,56 @@
       ],
       "stride_padding": 16,
       "fill_seed": 31
+    },
+    {
+      "id": "usf-conversion-duplicate-default-memory-sta",
+      "script": "test/compat/generated/usf-conversion-duplicate-default.usf",
+      "sha256": "c71098ea0817c7074015e0e7b0b28de79685d4f34353286dbfc6f9a2e0fc7718",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "sta"
+    },
+    {
+      "id": "usf-conversion-duplicate-default-memory-mta",
+      "script": "test/compat/generated/usf-conversion-duplicate-default.usf",
+      "sha256": "c71098ea0817c7074015e0e7b0b28de79685d4f34353286dbfc6f9a2e0fc7718",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "mta"
     },
     {
       "id": "usf-conversion-inline-font-file",
@@ -23169,6 +23993,56 @@
       "fill_seed": 31
     },
     {
+      "id": "usf-conversion-inline-font-file-sta",
+      "script": "test/compat/generated/usf-conversion-inline-font.usf",
+      "sha256": "4fc4d3df5eaa036b26c75caa14961c878db695c970ffe2d9ee7091f232695661",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "sta"
+    },
+    {
+      "id": "usf-conversion-inline-font-file-mta",
+      "script": "test/compat/generated/usf-conversion-inline-font.usf",
+      "sha256": "4fc4d3df5eaa036b26c75caa14961c878db695c970ffe2d9ee7091f232695661",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "mta"
+    },
+    {
       "id": "usf-conversion-inline-font-memory",
       "script": "test/compat/generated/usf-conversion-inline-font.usf",
       "sha256": "4fc4d3df5eaa036b26c75caa14961c878db695c970ffe2d9ee7091f232695661",
@@ -23191,6 +24065,56 @@
       ],
       "stride_padding": 16,
       "fill_seed": 31
+    },
+    {
+      "id": "usf-conversion-inline-font-memory-sta",
+      "script": "test/compat/generated/usf-conversion-inline-font.usf",
+      "sha256": "4fc4d3df5eaa036b26c75caa14961c878db695c970ffe2d9ee7091f232695661",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "sta"
+    },
+    {
+      "id": "usf-conversion-inline-font-memory-mta",
+      "script": "test/compat/generated/usf-conversion-inline-font.usf",
+      "sha256": "4fc4d3df5eaa036b26c75caa14961c878db695c970ffe2d9ee7091f232695661",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "mta"
     },
     {
       "id": "usf-conversion-xml-text-file",
@@ -23217,6 +24141,56 @@
       "fill_seed": 31
     },
     {
+      "id": "usf-conversion-xml-text-file-sta",
+      "script": "test/compat/generated/usf-conversion-xml-text.usf",
+      "sha256": "7cf488a923c7eaa58715aafe1dad5897d52d17e7cccbeca904180b1769efb8fd",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "sta"
+    },
+    {
+      "id": "usf-conversion-xml-text-file-mta",
+      "script": "test/compat/generated/usf-conversion-xml-text.usf",
+      "sha256": "7cf488a923c7eaa58715aafe1dad5897d52d17e7cccbeca904180b1769efb8fd",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "mta"
+    },
+    {
       "id": "usf-conversion-xml-text-memory",
       "script": "test/compat/generated/usf-conversion-xml-text.usf",
       "sha256": "7cf488a923c7eaa58715aafe1dad5897d52d17e7cccbeca904180b1769efb8fd",
@@ -23239,6 +24213,56 @@
       ],
       "stride_padding": 16,
       "fill_seed": 31
+    },
+    {
+      "id": "usf-conversion-xml-text-memory-sta",
+      "script": "test/compat/generated/usf-conversion-xml-text.usf",
+      "sha256": "7cf488a923c7eaa58715aafe1dad5897d52d17e7cccbeca904180b1769efb8fd",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "sta"
+    },
+    {
+      "id": "usf-conversion-xml-text-memory-mta",
+      "script": "test/compat/generated/usf-conversion-xml-text.usf",
+      "sha256": "7cf488a923c7eaa58715aafe1dad5897d52d17e7cccbeca904180b1769efb8fd",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.0000999",
+        "0.0001",
+        "0.0001001",
+        "0.0002",
+        "0.0003",
+        "0.0004",
+        "0.0004999",
+        "0.0005",
+        "0.0005001",
+        "0.0002",
+        "0.0001"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31,
+      "com_apartment": "mta"
     },
     {
       "id": "geometry-641-359",

@@ -6,7 +6,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from dialog_capture import DialogCapture
 
@@ -61,6 +61,48 @@ class NativeHarnessTests(unittest.TestCase):
         self.assertEqual([frame["changed"] for frame in left["frames"]], [True] * 4)
         self.assertEqual([(ld / frame["file"]).read_bytes()[0] for frame in left["frames"]], [11, 32, 13, 14])
         self.assertTrue(all(frame["guards_intact"] for frame in left["frames"]))
+
+    @unittest.skipUnless(os.name == "nt", "Windows COM host setup")
+    def test_explicit_com_apartments_and_uninitialized_default_are_separate(self):
+        for mode in ("sta", "mta"):
+            self.case["com_apartment"] = mode
+            harness.write_json(self.case_path, self.case)
+            result, _ = self.run_variant("normal", mode)
+            self.assertEqual(result["status"], "ok")
+            self.assertEqual(result["com_initialization"], {"apartment": mode, "initialize_hresult": 0})
+        del self.case["com_apartment"]
+        harness.write_json(self.case_path, self.case)
+        result, _ = self.run_variant("normal", "uninitialized")
+        self.assertNotIn("com_initialization", result)
+
+    @unittest.skipUnless(os.name == "nt", "Windows COM host setup")
+    def test_com_initialization_balances_success_and_never_uninitializes_failure(self):
+        for status in (0, 1):
+            ole = Mock()
+            ole.CoInitializeEx.return_value = status
+            with patch.object(harness.C, "WinDLL", return_value=ole):
+                with self.assertRaisesRegex(RuntimeError, "capture failed"):
+                    with harness.com_apartment("sta") as info:
+                        self.assertEqual(info["initialize_hresult"], status)
+                        raise RuntimeError("capture failed")
+            ole.CoInitializeEx.assert_called_once_with(None, 2)
+            ole.CoUninitialize.assert_called_once_with()
+        ole = Mock()
+        ole.CoInitializeEx.return_value = -2147417850
+        with patch.object(harness.C, "WinDLL", return_value=ole):
+            with self.assertRaisesRegex(RuntimeError, "CoInitializeEx failed"):
+                with harness.com_apartment("mta"):
+                    self.fail("failed COM initialization must not enter capture")
+        ole.CoUninitialize.assert_not_called()
+
+    def test_invalid_com_configuration_is_not_silently_ignored(self):
+        for mode in ("STA", 2, True, "unknown"):
+            with self.assertRaises(ValueError):
+                harness.validate_case({**self.case, "com_apartment": mode})
+        with patch.object(harness.C, "WinDLL", create=True) as load:
+            with harness.com_apartment(None) as info:
+                self.assertIsNone(info)
+            load.assert_not_called()
 
     def test_byte_mismatch_has_location(self):
         left, ld = self.run_variant("normal", "left")
