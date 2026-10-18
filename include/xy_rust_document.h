@@ -279,6 +279,20 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_open_lifecycle_drop_v1(uint64_t 
 // Step command equals op:1 CompareNoCase,2 wcstol10,3 ColorToDWORD,4 Margin,
 // 5 Alignment,6 AddStyle ack0,7 Add ack0. Done8. Group0 op/arg/index/aLen/bLen:u32
 // and raw strings; group1 existing style wire; group2 existing entry wire.
+// Persistent USF source. Only successful XML loads begin a new traversal.
+// Request: op,node,result,text-length:u32 + raw u16. Services: 1 lower name
+// plus nodeValue access; 2 firstChild; 3 nextSibling; 4 attribute; 5 text;
+// 6 raw XML; 7 TimeToInt; 8 wcstol10; 9 ColorToDWORD; 10 CompareNoCase(Default);
+// 11 done (result=accepted). Node1 is the loaded DOM, node0 is null. Replies
+// carry either value:i32 or raw u16, never pointers. Group1 snapshots all model
+// fields in probe order. Source and destination lifetimes are checked on every
+// conversion step. Failed native XML loads do not clear or replace this source.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_usf_source_create_v1(uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_usf_source_drop_v1(uint64_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_usf_source_begin_v1(uint64_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_usf_source_step_v1(uint64_t,uint32_t,int32_t,const uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_usf_source_part_v1(uint64_t,uint32_t,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_usf_begin_v2(uint64_t,uint64_t,uint8_t*,size_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_usf_begin_v1(uint64_t,const uint8_t*,size_t,uint8_t*,size_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_usf_drop_v1(uint64_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_usf_step_v1(uint64_t,uint32_t,int32_t);

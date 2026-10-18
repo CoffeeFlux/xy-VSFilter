@@ -6,16 +6,7 @@ use crate::document::{Document, IdentityField, InterpretationField, PreparedEntr
 use crate::document_style::StyleValue;
 use alloc::{format, vec::Vec};
 
-type Units = Vec<u16>;
-#[derive(Default)]
-struct RawStyle {
-    name: Units,
-    // face,size,color[4],weight,italic,underline,alpha,outline,shadow,wrap
-    font: [Units; 13],
-    // alignment,relative-to,horizontal-margin,vertical-margin,rotate[3]
-    pal: [Units; 7],
-}
-
+use crate::usf_model::{Model, RawStyle, RawText, Units};
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -38,7 +29,7 @@ mod tests {
         for t in texts {
             b.extend_from_slice(&t.start.to_le_bytes());
             b.extend_from_slice(&t.stop.to_le_bytes());
-            for v in [&t._effect, &t.style, &t.text]
+            for v in [&t.effect, &t.style, &t.text]
                 .into_iter()
                 .chain(t.pal.iter())
             {
@@ -85,7 +76,7 @@ mod tests {
             stop: 5,
             style: ascii("Named"),
             text: vec![65, 0, 0xd800],
-            _effect: ascii("ignored"),
+            effect: ascii("ignored"),
             ..Default::default()
         };
         t.pal[0] = ascii("TopLeft");
@@ -201,15 +192,6 @@ mod tests {
         huge[offset..offset + 4].copy_from_slice(&u32::MAX.to_le_bytes());
         assert!(matches!(Run::decode(&huge), Err(Error::CountOverflow)));
     }
-}
-#[derive(Default)]
-struct RawText {
-    start: i32,
-    stop: i32,
-    _effect: Units,
-    style: Units,
-    text: Units,
-    pal: [Units; 7],
 }
 struct Reader<'a> {
     bytes: &'a [u8],
@@ -338,7 +320,7 @@ impl Run {
             let mut t = RawText {
                 start: r.word()? as i32,
                 stop: r.word()? as i32,
-                _effect: r.text()?,
+                effect: r.text()?,
                 style: r.text()?,
                 text: r.text()?,
                 ..Default::default()
@@ -351,7 +333,17 @@ impl Run {
         if r.offset != bytes.len() {
             return Err(Error::Protocol);
         }
-        Ok(Self {
+        Ok(Self::new(language, styles, texts))
+    }
+    pub fn from_model(model: &Model) -> Self {
+        Self::new(
+            model.metadata[7].clone(),
+            model.styles.clone(),
+            model.texts.clone(),
+        )
+    }
+    fn new(language: Units, styles: Vec<RawStyle>, texts: Vec<RawText>) -> Self {
+        Self {
             language,
             styles,
             texts,
@@ -363,7 +355,10 @@ impl Run {
             wrap: Vec::new(),
             request: None,
             entry: None,
-        })
+        }
+    }
+    pub fn pending_text(&self) -> Option<(usize, &[u16])> {
+        self.entry.as_ref().map(|e| (self.index, e.text.as_slice()))
     }
     pub fn begin(&mut self, doc: &mut Document) -> Result<(), Error> {
         doc.replace_identity(IdentityField::Name, self.language.clone());

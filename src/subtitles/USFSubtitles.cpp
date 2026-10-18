@@ -170,8 +170,14 @@ static int TranslateMargin(CStringW margin, int wndsize)
 ////////////////
 
 CUSFSubtitles::CUSFSubtitles()
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    :m_source(new XyRust::UsfSource)
+#endif
 {
 }
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+std::vector<BYTE> CUSFSubtitles::ParsedState() const {return m_source->ParsedState();}
+#endif
 
 CUSFSubtitles::~CUSFSubtitles()
 {
@@ -204,6 +210,32 @@ bool CUSFSubtitles::Load(const VARIANT& source)
 	|| FAILED(pDoc->load(source, &vb)) || vb != VARIANT_TRUE)
 		return(false);
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    // Only this adapter holds COM pointers. Rust receives bounded node IDs.
+    std::vector<CComPtr<IXMLDOMNode>> nodes(2);nodes[1]=CComQIPtr<IXMLDOMNode>(pDoc);
+    m_source->Begin();
+    for(;;){
+        unsigned index;bool accepted;CStringW text;
+        const unsigned op=m_source->Next(index,accepted,text);
+        if(op==11)return accepted;
+        if(op>=7){
+            const int value=op==7?TimeToInt(text):op==8?wcstol(text,NULL,10):op==9?static_cast<int32_t>(ColorToDWORD(text)):text.CompareNoCase(L"Default");
+            m_source->Step(op,value);continue;
+        }
+        XyRust::DocumentDetail::Shape(index>0 && index<nodes.size() && nodes[index]!=NULL);
+        // Copy before any push_back can invalidate vector elements.
+        const CComPtr<IXMLDOMNode> node=nodes[index];
+        if(op==1){DeclareNameAndValue(node,name,val);m_source->Step(op,0,CStringW(name));}
+        else if(op==2 || op==3){
+            CComPtr<IXMLDOMNode> child;if(op==2)node->get_firstChild(&child);else node->get_nextSibling(&child);
+            unsigned id=0;if(child){id=XyRust::DocumentDetail::Count(nodes.size());nodes.push_back(child);}
+            m_source->Step(op,static_cast<int>(id));
+        }
+        else if(op==4)m_source->Step(op,0,GetAttrib(text,node));
+        else if(op==5)m_source->Step(op,0,GetText(node));
+        else if(op==6){CComBSTR xml;node->get_xml(&xml);m_source->Step(op,0,CStringW(xml));}
+    }
+#else
 	styles.RemoveAll();
 	effects.RemoveAll();
 	texts.RemoveAll();
@@ -260,12 +292,13 @@ bool CUSFSubtitles::Load(const VARIANT& source)
 	}
 
 	return(true);
+#endif
 }
 
 bool CUSFSubtitles::ConvertToSTS(CSimpleTextSubtitle& sts)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    XyRust::UsfConversion conversion(*sts.m_document,*this);
+    XyRust::UsfConversion conversion(*sts.m_document,*m_source);
     for(;;){
         CStringW a,b;int argument;unsigned index;const unsigned op=conversion.Next(a,b,argument,index);
         if(op==8)return true;
@@ -280,10 +313,7 @@ bool CUSFSubtitles::ConvertToSTS(CSimpleTextSubtitle& sts)
         }
         else if(op==7){
             const STSEntry entry=conversion.Entry();
-            // Original conversion mutates the stored text before Add. Retain
-            // that state for repeated ConvertToSTS calls and failed XML reloads.
-            const POSITION pos=texts.FindIndex(index);XyRust::DocumentDetail::Shape(pos!=NULL);
-            texts.GetAt(pos)->str=entry.str;
+            // Rust updates the canonical source text before this native Add.
             sts.Add(entry.str,true,entry.start,entry.end,entry.style,_T(""),_T(""),entry.marginRect);conversion.Step(op);
         }
     }
@@ -474,6 +504,8 @@ bool CUSFSubtitles::ConvertToSTS(CSimpleTextSubtitle& sts)
 #endif
 }
 
+
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 bool CUSFSubtitles::ParseUSFSubtitles(CComPtr<IXMLDOMNode> pNode)
 {
 	DeclareNameAndValue(pNode, name, val);
@@ -856,3 +888,5 @@ void CUSFSubtitles::ParseText(CComPtr<IXMLDOMNode> pNode, CStringW& str)
 	str = prefix + str + postfix;
 }
 
+
+#endif // native fallback parser

@@ -157,3 +157,4 @@ pub mod realtext_session;
 pub mod realtext_engine;
 
 pub mod usf_conversion;
+pub mod usf_model;

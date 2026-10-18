@@ -35,6 +35,7 @@ pub(crate) enum Kind {
     MicroDvdRun,
     RealTextRun,
     UsfRun,
+    UsfSource,
     VttRun,
     SamiRun,
     SearchRun,
@@ -80,8 +81,10 @@ pub(crate) enum Resource {
         owner: Handle,
         run: xy_vsfilter_compat::microdvd_document::Run,
     },
+    UsfSource(xy_vsfilter_compat::usf_model::State),
     UsfRun {
         owner: Handle,
+        source: Option<Handle>,
         run: xy_vsfilter_compat::usf_conversion::Run,
     },
     RealTextRun {
@@ -116,6 +119,7 @@ impl Resource {
             Self::MicroDvdRun { .. } => Kind::MicroDvdRun,
             Self::RealTextRun { .. } => Kind::RealTextRun,
             Self::UsfRun { .. } => Kind::UsfRun,
+            Self::UsfSource(_) => Kind::UsfSource,
             Self::VttRun { .. } => Kind::VttRun,
             Self::SamiRun { .. } => Kind::SamiRun,
             Self::SearchRun { .. } => Kind::SearchRun,
@@ -474,10 +478,43 @@ impl Registry {
         }
     }
 
+    pub(crate) fn usf_source(
+        &self,
+        id: Handle,
+    ) -> Result<&xy_vsfilter_compat::usf_model::State, Error> {
+        match &self.slots[self.position(id)?].1 {
+            Resource::UsfSource(s) => Ok(s),
+            _ => Err(Error::TypeMismatch),
+        }
+    }
+    pub(crate) fn usf_source_mut(
+        &mut self,
+        id: Handle,
+    ) -> Result<&mut xy_vsfilter_compat::usf_model::State, Error> {
+        let i = self.position(id)?;
+        match &mut self.slots[i].1 {
+            Resource::UsfSource(s) => Ok(s),
+            _ => Err(Error::TypeMismatch),
+        }
+    }
+    pub(crate) fn usf_source_in_use(&self, id: Handle) -> bool {
+        self.slots
+            .iter()
+            .any(|(_, r)| matches!(r, Resource::UsfRun{source:Some(s),..} if *s==id))
+    }
+    pub(crate) fn usf_source_id(&self, id: Handle) -> Result<Option<Handle>, Error> {
+        match &self.slots[self.position(id)?].1 {
+            Resource::UsfRun { source, .. } => Ok(*source),
+            _ => Err(Error::TypeMismatch),
+        }
+    }
     pub(crate) fn usf_pair(
         &mut self,
         id: Handle,
     ) -> Result<(&mut Document, &mut xy_vsfilter_compat::usf_conversion::Run), Error> {
+        if let Some(source) = self.usf_source_id(id)? {
+            self.usf_source(source)?;
+        }
         let run_index = self.position(id)?;
         let owner = match &self.slots[run_index].1 {
             Resource::UsfRun { owner, .. } => *owner,

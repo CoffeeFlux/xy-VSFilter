@@ -291,10 +291,145 @@ pub unsafe extern "C" fn xy_vsfilter_document_usf_begin_v1(
         let id = registry.reserve_insert().map_err(registry_error)?;
         run.begin(registry.document_mut(owner).map_err(registry_error)?)
             .map_err(ass_error)?;
-        registry.insert_reserved(id, Resource::UsfRun { owner, run });
+        registry.insert_reserved(
+            id,
+            Resource::UsfRun {
+                owner,
+                source: None,
+                run,
+            },
+        );
         Ok(id)
     }));
     // SAFETY: preflighted writable output; all registry loans have ended.
+    unsafe { write_output(output, &id.to_le_bytes()) };
+    OK
+}
+/// # Safety
+/// Eight writable bytes receive a standalone typed USF source ID.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_usf_source_create_v1(
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let id = required!(insert(Resource::UsfSource(Default::default())));
+    // SAFETY: preflighted output; no registry loan escapes.
+    unsafe { write_output(output, &id.to_le_bytes()) };
+    OK
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_usf_source_drop_v1(id: u64) -> u32 {
+    status(
+        DOCUMENTS
+            .destroy(id, Kind::UsfSource)
+            .map_err(registry_error),
+    )
+}
+/// Start traversal only after successful MSXML loading. Failed loading does not
+/// call this entry and therefore retains all earlier source state.
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_usf_source_begin_v1(id: u64) -> u32 {
+    status(admitted(|registry| {
+        registry.usf_source(id).map_err(registry_error)?;
+        if registry.usf_source_in_use(id) {
+            return Err(INVALID_INPUT);
+        }
+        registry
+            .usf_source_mut(id)
+            .map_err(registry_error)?
+            .begin()
+            .map_err(ass_error)
+    }))
+}
+/// # Safety
+/// Initialized bounded raw-u16 reply bytes are copied before registry admission.
+/// String replies require value0; scalar replies require an empty byte buffer.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_usf_source_step_v1(
+    id: u64,
+    op: u32,
+    value: i32,
+    input: *const u8,
+    length: usize,
+) -> u32 {
+    if length % 2 != 0 {
+        return INVALID_INPUT;
+    }
+    // SAFETY: caller supplies initialized bounded bytes; copied before borrowing.
+    let text = units(&required!(unsafe { copy_input(input, length) }));
+    status(admitted(|registry| {
+        registry
+            .usf_source_mut(id)
+            .map_err(registry_error)?
+            .step(op, value, &text)
+            .map_err(ass_error)
+    }))
+}
+/// # Safety
+/// Eight writable bytes receive an immutable snapshot. Group0 is the pending
+/// DOM request; group1 is complete parsed state, available only outside parsing.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_usf_source_part_v1(
+    id: u64,
+    group: u32,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let bytes = required!(admitted(|registry| {
+        let source = registry.usf_source(id).map_err(registry_error)?;
+        match group {
+            0 => source.request().map_err(ass_error),
+            1 if source.ready() => source.model.snapshot().map_err(ass_error),
+            _ => Err(INVALID_INPUT),
+        }
+    }));
+    let id = required!(insert(Resource::Snapshot(bytes)));
+    // SAFETY: preflighted output; snapshot owns its bytes independently.
+    unsafe { write_output(output, &id.to_le_bytes()) };
+    OK
+}
+/// # Safety
+/// Eight writable bytes receive a conversion ID bound to both document and USF
+/// source. Native callers cannot reload the source until this run is dropped.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_usf_begin_v2(
+    owner: u64,
+    source: u64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let id = required!(admitted(|registry| {
+        registry.document(owner).map_err(registry_error)?;
+        let state = registry.usf_source(source).map_err(registry_error)?;
+        if !state.ready() || registry.usf_source_in_use(source) {
+            return Err(INVALID_INPUT);
+        }
+        let mut run = xy_vsfilter_compat::usf_conversion::Run::from_model(&state.model);
+        let id = registry.reserve_insert().map_err(registry_error)?;
+        run.begin(registry.document_mut(owner).map_err(registry_error)?)
+            .map_err(ass_error)?;
+        if let Some((i, text)) = run.pending_text() {
+            registry
+                .usf_source_mut(source)
+                .map_err(registry_error)?
+                .model
+                .replace_converted_text(i, text)
+                .map_err(ass_error)?;
+        }
+        registry.insert_reserved(
+            id,
+            Resource::UsfRun {
+                owner,
+                source: Some(source),
+                run,
+            },
+        );
+        Ok(id)
+    }));
+    // SAFETY: preflighted output after all registry loans end.
     unsafe { write_output(output, &id.to_le_bytes()) };
     OK
 }
@@ -308,7 +443,19 @@ pub extern "C" fn xy_vsfilter_document_usf_drop_v1(id: u64) -> u32 {
 pub extern "C" fn xy_vsfilter_document_usf_step_v1(id: u64, command: u32, value: i32) -> u32 {
     status(admitted(|registry| {
         let (doc, run) = registry.usf_pair(id).map_err(registry_error)?;
-        run.step(doc, command, value).map_err(ass_error)
+        run.step(doc, command, value).map_err(ass_error)?;
+        let pending = run.pending_text().map(|(i, t)| (i, t.to_vec()));
+        if let (Some(source), Some((i, text))) =
+            (registry.usf_source_id(id).map_err(registry_error)?, pending)
+        {
+            registry
+                .usf_source_mut(source)
+                .map_err(registry_error)?
+                .model
+                .replace_converted_text(i, &text)
+                .map_err(ass_error)?;
+        }
+        Ok(())
     }))
 }
 /// # Safety
@@ -5016,6 +5163,110 @@ mod tests {
             assert_eq!(xy_vsfilter_document_usf_drop_v1(usf_run), OK);
             assert_eq!(xy_vsfilter_document_usf_drop_v1(usf_run), BAD_HANDLE);
             assert_eq!(xy_vsfilter_document_snapshot_drop_v1(usf_snapshot), OK);
+            // Persistent USF source: typed IDs, busy admission, source/destination
+            // lifetime independence and detached raw state across destruction.
+            out.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_document_usf_source_create_v1(out.as_mut_ptr(), 7),
+                INVALID_INPUT
+            );
+            assert!(out.iter().all(|&b| b == 0xa5));
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_usf_source_create_v1(out.as_mut_ptr(), 8))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_source_create_v1(out.as_mut_ptr(), 8),
+                OK
+            );
+            let source = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let destination = create();
+            assert_eq!(
+                xy_vsfilter_document_usf_source_begin_v1(destination),
+                BAD_HANDLE
+            );
+            assert_eq!(xy_vsfilter_document_usf_source_begin_v1(source), OK);
+            assert_eq!(
+                xy_vsfilter_document_usf_source_begin_v1(source),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_begin_v2(destination, source, out.as_mut_ptr(), 8),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_source_part_v1(source, 1, out.as_mut_ptr(), 8),
+                INVALID_INPUT
+            );
+            let raw: Vec<u8> = "wrong".encode_utf16().flat_map(u16::to_le_bytes).collect();
+            assert_eq!(
+                xy_vsfilter_document_usf_source_step_v1(source, 1, 0, raw.as_ptr(), raw.len() - 1),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_source_step_v1(source, 1, 1, raw.as_ptr(), raw.len()),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_usf_source_step_v1(
+                        source,
+                        1,
+                        0,
+                        raw.as_ptr(),
+                        raw.len()
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_source_step_v1(source, 1, 0, raw.as_ptr(), raw.len()),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_source_step_v1(source, 2, -1, ptr::null(), 0),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_source_step_v1(source, 2, 0, ptr::null(), 0),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_source_part_v1(source, 1, out.as_mut_ptr(), 8),
+                OK
+            );
+            let state_snapshot = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let state_bytes = read_snapshot(state_snapshot);
+            assert_eq!(state_bytes, vec![0; 52]);
+            assert_eq!(
+                xy_vsfilter_document_usf_begin_v2(destination, source, out.as_mut_ptr(), 8),
+                OK
+            );
+            let conversion = u64::from_le_bytes(out[..8].try_into().unwrap());
+            assert_eq!(
+                xy_vsfilter_document_usf_source_begin_v1(source),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_begin_v2(destination, source, out.as_mut_ptr(), 8),
+                INVALID_INPUT
+            );
+            assert_eq!(xy_vsfilter_document_usf_source_drop_v1(source), OK);
+            assert_eq!(
+                xy_vsfilter_document_usf_part_v1(conversion, 0, out.as_mut_ptr(), 8),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_step_v1(conversion, 7, 0),
+                BAD_HANDLE
+            );
+            assert_eq!(xy_vsfilter_document_usf_source_drop_v1(source), BAD_HANDLE);
+            assert_eq!(read_snapshot(state_snapshot), state_bytes);
+            assert_eq!(xy_vsfilter_document_usf_drop_v1(conversion), OK);
+            assert_eq!(xy_vsfilter_document_destroy_v1(destination), OK);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(state_snapshot), OK);
             // WebVTT: copies, phase errors, typed IDs, BUSY, and detached snapshots.
             let vtt_owner = create();
             out.fill(0xa5);

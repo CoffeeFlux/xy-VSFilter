@@ -24,6 +24,13 @@
 #include <atlcoll.h>
 #include "STS.h"
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+#define XY_VSFILTER_RUST_USF_STATE
+#include <memory>
+#include <vector>
+namespace XyRust {class UsfSource;}
+#endif
+
 // metadata
 typedef struct {CStringW name, email, url;} author_t;
 typedef struct {CStringW code, text;} language_t;
@@ -41,6 +48,9 @@ typedef struct {int start, stop; CStringW effect, style, str; posattriblist_t pa
 class CUSFSubtitles
 {
 	bool Load(const VARIANT& source);
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    std::unique_ptr<XyRust::UsfSource> m_source;
+#else
 	bool ParseUSFSubtitles(CComPtr<IXMLDOMNode> pNode);
 	 void ParseMetadata(CComPtr<IXMLDOMNode> pNode, metadata_t& m);
 	 void ParseStyle(CComPtr<IXMLDOMNode> pNode, style_t* s);
@@ -51,6 +61,7 @@ class CUSFSubtitles
 	 void ParseSubtitle(CComPtr<IXMLDOMNode> pNode, int start, int stop);
 	  void ParseText(CComPtr<IXMLDOMNode> pNode, CStringW& assstr);
 
+#endif
 public:
 	CUSFSubtitles();
 	virtual ~CUSFSubtitles();
@@ -59,10 +70,14 @@ public:
 	bool Read(const BYTE* data, size_t len);
 //	bool Write(LPCTSTR fn); // TODO
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    std::vector<BYTE> ParsedState() const;
+#else
 	metadata_t metadata;
 	CAutoPtrList<style_t> styles;
 	CAutoPtrList<effect_t> effects;
 	CAutoPtrList<text_t> texts;
+#endif
 
 	bool ConvertToSTS(CSimpleTextSubtitle& sts);
 //	bool ConvertFromSTS(CSimpleTextSubtitle& sts); // TODO

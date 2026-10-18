@@ -245,6 +245,7 @@ class SamiDocument;
 class VttDocument;
 class RealTextSession;
 class UsfConversion;
+class UsfSource;
 class UnknownStylesPass;
 class StyleAddition;
 class NamedStyleCopy;
@@ -259,6 +260,7 @@ class DocumentReply {
     friend class VttDocument;
     friend class RealTextSession;
     friend class UsfConversion;
+    friend class UsfSource;
     friend class DocumentOwner;
     friend class UnknownStylesPass;
     friend class StyleAddition;
@@ -304,6 +306,7 @@ class DocumentOwner {
     friend class VttDocument;
     friend class RealTextSession;
     friend class UsfConversion;
+    friend class UsfSource;
     friend class UnknownStylesPass;
     friend class StyleAddition;
     friend class NamedStyleCopy;
@@ -894,35 +897,44 @@ public:
         Step(4); // release before AddStyle consumes its native temporary
     }
 };
+class UsfSource {
+    uint64_t id_=0;
+    friend class UsfConversion;
+    DocumentDetail::Bytes Part(unsigned group) const {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_usf_source_part_v1(id_,group,out.data(),out.size());}));
+        DocumentReply snapshot(DocumentDetail::Load(out,0,8));return snapshot.Read();
+    }
+public:
+    UsfSource() {std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_usf_source_create_v1(out.data(),out.size());}));id_=DocumentDetail::Load(out,0,8);}
+    UsfSource(const UsfSource&)=delete;UsfSource& operator=(const UsfSource&)=delete;
+    ~UsfSource() noexcept {if(id_){const auto id=id_;id_=0;DocumentDetail::Release(DocumentDetail::Invoke([&]{return xy_vsfilter_document_usf_source_drop_v1(id);}));}}
+    void Begin() {DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_usf_source_begin_v1(id_);}));}
+    void Step(unsigned op,int value,const CStringW& text=CStringW()) {
+        const auto bytes=DocumentDetail::Units(text);
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_usf_source_step_v1(id_,op,value,bytes.data(),bytes.size());}));
+    }
+    unsigned Next(unsigned& node,bool& accepted,CStringW& text) const {
+        const auto bytes=Part(0);DocumentDetail::Shape(bytes.size()>=16);
+        const auto op=DocumentDetail::Load(bytes,0,4);DocumentDetail::Shape(op>=1 && op<=11);
+        node=DocumentDetail::Count(DocumentDetail::Load(bytes,4,4));accepted=DocumentDetail::Load(bytes,8,4)!=0;
+        size_t offset=16;text=DocumentDetail::String(bytes,offset,DocumentDetail::Count(DocumentDetail::Load(bytes,12,4)));
+        DocumentDetail::Shape(offset==bytes.size());return static_cast<unsigned>(op);
+    }
+    DocumentDetail::Bytes ParsedState() const {return Part(1);}
+};
 class UsfConversion {
     uint64_t id_=0;
-    static void String(DocumentDetail::Bytes& bytes,const CStringW& text) {
-        DocumentDetail::Append(bytes,DocumentDetail::Count(text.GetLength()),4);
-        const auto raw=DocumentDetail::Units(text);bytes.insert(bytes.end(),raw.begin(),raw.end());
-    }
-    template<class Pal> static void Position(DocumentDetail::Bytes& bytes,const Pal& p) {
-        for(const auto* value:{&p.alignment,&p.relativeto,&p.horizontal_margin,&p.vertical_margin,&p.rotate[0],&p.rotate[1],&p.rotate[2]})String(bytes,*value);
-    }
     DocumentDetail::Bytes Part(unsigned group) const {
         std::array<uint8_t,8> out{};
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_usf_part_v1(id_,group,out.data(),out.size());}));
         DocumentReply snapshot(DocumentDetail::Load(out,0,8));return snapshot.Read();
     }
 public:
-    template<class Source> UsfConversion(const DocumentOwner& owner,const Source& source) {
-        DocumentDetail::Bytes bytes;String(bytes,source.metadata.language.text);
-        DocumentDetail::Append(bytes,DocumentDetail::Count(source.styles.GetCount()),4);DocumentDetail::Append(bytes,DocumentDetail::Count(source.texts.GetCount()),4);
-        POSITION pos=source.styles.GetHeadPosition();
-        while(pos){const auto& s=source.styles.GetNext(pos);String(bytes,s->name);const auto& f=s->fontstyle;
-            for(const auto* value:{&f.face,&f.size,&f.color[0],&f.color[1],&f.color[2],&f.color[3],&f.weight,&f.italic,&f.underline,&f.alpha,&f.outline,&f.shadow,&f.wrap})String(bytes,*value);
-            Position(bytes,s->pal);
-        }
-        pos=source.texts.GetHeadPosition();
-        while(pos){const auto& t=source.texts.GetNext(pos);DocumentDetail::Append(bytes,static_cast<uint32_t>(t->start),4);DocumentDetail::Append(bytes,static_cast<uint32_t>(t->stop),4);
-            String(bytes,t->effect);String(bytes,t->style);String(bytes,t->str);Position(bytes,t->pal);
-        }
+    UsfConversion(const DocumentOwner& owner,const UsfSource& source) {
         std::array<uint8_t,8> out{};
-        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_usf_begin_v1(owner.id_,bytes.data(),bytes.size(),out.data(),out.size());}));id_=DocumentDetail::Load(out,0,8);
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_usf_begin_v2(owner.id_,source.id_,out.data(),out.size());}));id_=DocumentDetail::Load(out,0,8);
     }
     UsfConversion(const UsfConversion&)=delete;UsfConversion& operator=(const UsfConversion&)=delete;
     ~UsfConversion() noexcept {if(id_){const auto id=id_;id_=0;DocumentDetail::Release(DocumentDetail::Invoke([&]{return xy_vsfilter_document_usf_drop_v1(id);}));}}
