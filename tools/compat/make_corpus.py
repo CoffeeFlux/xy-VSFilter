@@ -861,6 +861,16 @@ def realtext_parser_variants():
         "first-line":'Leading caption'+cue,
         "raw-units":cue.replace('First caption','First\x00\ud800discarded'),
         "overflow":cue.replace('"1"','"4294967297"').replace('"5"','"4294967301"'),
+        "helper-control":'<time begin="1" end="5"/><font size="20">First caption</font>',
+        "helper-red":'<time begin="1" end="5"/><font color="red" size="20">First caption</font>',
+        "helper-bold":'<time begin="1" end="5"/><font size="20"><b>First caption</b></font>',
+        "helper-small":'<time begin="1" end="5"/><font size="13">First caption</font>',
+        "helper-large":'<time begin="1" end="5"/><font size="26">First caption</font>',
+        "helper-negative":'<time begin="1" end="5"/><font size="-1">First caption</font>',
+        "helper-duplicate":'<time begin="1" end="5"/><FONT SIZE="13" SiZe="20">First caption</FONT>',
+        "helper-unquoted":'<time begin=1 end=5/><font color=red size=20>First caption</font>',
+        "helper-mixed-quotes":'<time begin="1\' end=\'5"/><font size="20\'>First caption</font>',
+        "helper-fractions":'<time begin="0:1.25" end="0:4.75"/><font size="20">First caption</font>',
     }.items():
         # ExtractString rejects unterminated trailing text. Keep the closing tag
         # on a separate line so raw-NUL fixtures retain it after line truncation.
@@ -947,6 +957,8 @@ def make_cases(files):
                                                     ("microdvd-parser-missing-brace", "microdvd-parser-brace-control"),
                                                     ("realtext-parser-map-replace", "realtext-parser-control"),
                                                     ("realtext-parser-italic", "realtext-parser-control"),
+                                                    ("realtext-parser-helper-red", "realtext-parser-helper-control"),
+                                                    ("realtext-parser-helper-bold", "realtext-parser-helper-control"),
                                                     ("vtt-parser-color-replace", "vtt-parser-control"),
                                                     ("vtt-parser-alignment", "vtt-parser-control"),
                                                     ("sami-parser-title-skip", "sami-parser-control"),

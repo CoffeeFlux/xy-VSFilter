@@ -3399,25 +3399,26 @@ static
 bool OpenRealText(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    CRealTextParser services;
-    XyRust::RealTextSession parser(*ret.m_document,services.m_iDefaultSubtitleDurationInMillisecs);
+    XyRust::RealTextSession parser(*ret.m_document);
     for(;;) {
-        CStringW text;int64_t start,end;bool accepted;
-        const unsigned op=parser.Next(text,start,end,accepted);
-        if(op==8)return accepted;
-        if(op==9)return false;
+        CStringW text;int64_t start,end;bool accepted;unsigned unit,index;
+        const unsigned op=parser.Next(text,start,end,accepted,unit,index);
+        if(op==7)return accepted;
+        if(op==8)return false;
         if(op==0){CStringW line;const bool eof=!file->ReadString(line);parser.Read(line,eof);}
-        else if(op==1)parser.Step(0,text.CompareNoCase(L"<window"));
-        else if(op==2 || op==3){
-            std::wstring remaining(text,text.GetLength());CRealTextParser::Tag tag;
-            const bool response=op==2?services.ExtractTag(remaining,tag):services.ExtractTextTag(remaining,tag);
-            parser.Extracted(response,remaining,tag);
-        }
-        else if(op==4 || op==5)parser.Step(1,services.GetTimecode(std::wstring(text,text.GetLength())));
-        else if(op==6)parser.Rendered(services.RenderTags(parser.Tags<CRealTextParser::Tag>()));
-        else if(op==7){
+        else if(op==1)parser.Step(op,text.CompareNoCase(L"<window"));
+        else if(op==2)parser.Step(op,iswspace(static_cast<wchar_t>(unit))?1:0);
+        else if(op==3)parser.Step(op,static_cast<wchar_t>(towlower(static_cast<wchar_t>(unit))));
+        else if(op==4)parser.Step(op,_wtoi(text));
+        else if(op==5)parser.Step(op,iswdigit(static_cast<wchar_t>(unit))?1:0);
+        else if(op==6){
             // Original map export passes c_str(): truncate only at this boundary.
-            ret.Add(SubRipper2SSA(static_cast<LPCWSTR>(text),CharSet),file->IsUnicode(),start,end);parser.Step(2);
+            ret.Add(SubRipper2SSA(static_cast<LPCWSTR>(text),CharSet),file->IsUnicode(),start,end);parser.Step(op);
+        }
+        else if(op==9){
+            // Preserve the original checked string access and its exception.
+            std::wstring(text,text.GetLength()).at(index);
+            XyRust::DocumentDetail::Shape(false);
         }
     }
 #else

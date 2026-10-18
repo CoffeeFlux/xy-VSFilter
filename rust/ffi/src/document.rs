@@ -272,9 +272,8 @@ pub extern "C" fn xy_vsfilter_document_search_drop_v1(id: u64) -> u32 {
 /// # Safety
 /// Output receives a document-bound RealText session ID in eight writable bytes.
 #[no_mangle]
-pub unsafe extern "C" fn xy_vsfilter_document_realtext_begin_v1(
+pub unsafe extern "C" fn xy_vsfilter_document_realtext_begin_v2(
     owner: u64,
-    duration: i32,
     output: *mut u8,
     capacity: usize,
 ) -> u32 {
@@ -286,7 +285,7 @@ pub unsafe extern "C" fn xy_vsfilter_document_realtext_begin_v1(
             id,
             Resource::RealTextRun {
                 owner,
-                run: xy_vsfilter_compat::realtext_session::Run::new(duration),
+                run: xy_vsfilter_compat::realtext_engine::Run::new(),
             },
         );
         Ok(id)
@@ -296,7 +295,7 @@ pub unsafe extern "C" fn xy_vsfilter_document_realtext_begin_v1(
     OK
 }
 #[no_mangle]
-pub extern "C" fn xy_vsfilter_document_realtext_drop_v1(id: u64) -> u32 {
+pub extern "C" fn xy_vsfilter_document_realtext_drop_v2(id: u64) -> u32 {
     status(
         DOCUMENTS
             .destroy(id, Kind::RealTextRun)
@@ -308,7 +307,7 @@ pub extern "C" fn xy_vsfilter_document_realtext_drop_v1(id: u64) -> u32 {
 /// preserve CString FastTrim without Unicode scalar conversion.
 /// EOF is !ReadString. Both spans are copied before registry admission.
 #[no_mangle]
-pub unsafe extern "C" fn xy_vsfilter_document_realtext_read_v1(
+pub unsafe extern "C" fn xy_vsfilter_document_realtext_read_v2(
     id: u64,
     eof: u32,
     input: *const u8,
@@ -328,72 +327,23 @@ pub unsafe extern "C" fn xy_vsfilter_document_realtext_read_v1(
         run.read(doc, &text, &spaces, eof != 0).map_err(ass_error)
     }))
 }
-/// # Safety
-/// Command0 supplies a strict-bool extraction result and exact remaining-input/
-/// tag packet (see realtext_session::decode_extraction). Command1 supplies raw
-/// rendered UTF16LE with value0. Input is copied before registry admission.
+/// Command equals the pending operation: 1 CompareNoCase, 2 iswspace,
+/// 3 towlower, 4 _wtoi, 5 iswdigit, 6 Add acknowledgement. No native loan survives.
 #[no_mangle]
-pub unsafe extern "C" fn xy_vsfilter_document_realtext_packet_v1(
-    id: u64,
-    command: u32,
-    value: u32,
-    input: *const u8,
-    length: usize,
-) -> u32 {
-    if command > 1 || (command == 0 && value > 1) || (command == 1 && value != 0) || length % 2 != 0
-    {
-        return INVALID_INPUT;
-    }
-    // SAFETY: initialized readable caller buffer; copied before any state loan.
-    let bytes = required!(unsafe { copy_input(input, length) });
-    let extracted = if command == 0 {
-        Some(required!(
-            xy_vsfilter_compat::realtext_session::decode_extraction(&bytes).map_err(ass_error)
-        ))
-    } else {
-        None
-    };
-    let rendered = if command == 1 {
-        units(&bytes)
-    } else {
-        Vec::new()
-    };
+pub extern "C" fn xy_vsfilter_document_realtext_step_v2(id: u64, command: u32, value: i32) -> u32 {
     status(admitted(|registry| {
         let (doc, run) = registry.realtext_pair(id).map_err(registry_error)?;
-        if let Some((remaining, tag)) = extracted {
-            run.extracted(doc, value != 0, remaining, tag)
-        } else {
-            run.rendered(doc, &rendered)
-        }
-        .map_err(ass_error)
-    }))
-}
-/// Command0 is the initial CompareNoCase result; command1 is a time conversion;
-/// command2 acknowledges Add and requires value0. No native loan survives.
-#[no_mangle]
-pub extern "C" fn xy_vsfilter_document_realtext_step_v1(id: u64, command: u32, value: i32) -> u32 {
-    if command > 2 || (command == 2 && value != 0) {
-        return INVALID_INPUT;
-    }
-    status(admitted(|registry| {
-        let (doc, run) = registry.realtext_pair(id).map_err(registry_error)?;
-        match command {
-            0 => run.check_start(value),
-            1 => run.time(doc, value),
-            2 => run.acknowledge(doc),
-            _ => unreachable!(),
-        }
-        .map_err(ass_error)
+        run.step(doc, command, value).map_err(ass_error)
     }))
 }
 /// # Safety
 /// Output receives an immutable snapshot ID in eight writable bytes. Group0:
-/// op/accepted:u32,start/end:i64,raw UTF16LE payload. Group1: tag count and tags;
+/// op/accepted:u32,start/end:i64,unit/index:u32,raw UTF16LE payload. Group1: tags;
 /// Group2: interval count then start/end:i32,length:u32,units; Group3: center:u32
 /// and window tag. Tag wire is flags/name length/attribute count:u32, name units,
 /// then sorted attribute key/value lengths:u32 and raw units.
 #[no_mangle]
-pub unsafe extern "C" fn xy_vsfilter_document_realtext_part_v1(
+pub unsafe extern "C" fn xy_vsfilter_document_realtext_part_v2(
     id: u64,
     group: u32,
     output: *mut u8,
@@ -4633,231 +4583,248 @@ mod tests {
             for snapshot in [micro_snapshot, name_snapshot, current_name] {
                 assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
             }
-            // RealText input, tag/map snapshots, copied replies and ownership refusal.
+            // RealText engine: copied raw input, strict scalar protocol, detached
+            // snapshots and document-bound lifetime. All helper state is Rust.
             let rt_owner = create();
             out.fill(0xa5);
             assert_eq!(
-                xy_vsfilter_document_realtext_begin_v1(rt_owner, 4000, out.as_mut_ptr(), 7),
+                xy_vsfilter_document_realtext_begin_v2(rt_owner, out.as_mut_ptr(), 7),
                 INVALID_INPUT
             );
             assert!(out.iter().all(|&b| b == 0xa5));
             assert_eq!(
-                xy_vsfilter_document_realtext_begin_v1(rt_owner, 4000, out.as_mut_ptr(), 8),
+                xy_vsfilter_document_realtext_begin_v2(rt_owner, out.as_mut_ptr(), 8),
                 OK
             );
             let rt_run = u64::from_le_bytes(out[..8].try_into().unwrap());
-            let raw: Vec<u8> = "<window>"
-                .encode_utf16()
-                .flat_map(u16::to_le_bytes)
-                .collect();
-            let spaces = [0u8; 8];
+            let mut raw: Vec<u8> =
+                "<window><time begin='1' end='2'/><FONT SIZE='20'>A\u{d7ff}</FONT></window>"
+                    .encode_utf16()
+                    .flat_map(u16::to_le_bytes)
+                    .collect();
+            // Substitute an unpaired surrogate without Rust Unicode conversion.
+            let surrogate = raw.windows(2).position(|b| b == [0xff, 0xd7]).unwrap();
+            raw[surrogate..surrogate + 2].copy_from_slice(&[0, 0xd8]);
+            let spaces = vec![0u8; raw.len() / 2];
             assert_eq!(
-                xy_vsfilter_document_realtext_read_v1(
+                xy_vsfilter_document_realtext_read_v2(
                     rt_owner,
                     0,
                     raw.as_ptr(),
                     raw.len(),
                     spaces.as_ptr(),
-                    8
+                    spaces.len()
                 ),
                 BAD_HANDLE
             );
             assert_eq!(
-                xy_vsfilter_document_realtext_read_v1(
+                xy_vsfilter_document_realtext_read_v2(
                     rt_run,
                     2,
                     raw.as_ptr(),
                     raw.len(),
                     spaces.as_ptr(),
-                    8
+                    spaces.len()
                 ),
                 INVALID_INPUT
             );
             assert_eq!(
-                xy_vsfilter_document_realtext_read_v1(
+                xy_vsfilter_document_realtext_read_v2(
                     rt_run,
                     0,
                     raw.as_ptr(),
                     raw.len() - 1,
                     spaces.as_ptr(),
-                    8
+                    spaces.len()
+                ),
+                INVALID_INPUT
+            );
+            let bad_spaces = vec![2u8; spaces.len()];
+            assert_eq!(
+                xy_vsfilter_document_realtext_read_v2(
+                    rt_run,
+                    0,
+                    raw.as_ptr(),
+                    raw.len(),
+                    bad_spaces.as_ptr(),
+                    bad_spaces.len()
                 ),
                 INVALID_INPUT
             );
             assert_eq!(
                 DOCUMENTS
-                    .try_with(|_| xy_vsfilter_document_realtext_read_v1(
+                    .try_with(|_| xy_vsfilter_document_realtext_read_v2(
                         rt_run,
                         0,
                         raw.as_ptr(),
                         raw.len(),
                         spaces.as_ptr(),
-                        8
+                        spaces.len()
                     ))
                     .unwrap(),
                 BUSY
             );
             assert_eq!(
-                xy_vsfilter_document_realtext_read_v1(
+                xy_vsfilter_document_realtext_read_v2(
                     rt_run,
                     0,
                     raw.as_ptr(),
                     raw.len(),
                     spaces.as_ptr(),
-                    8
+                    spaces.len()
                 ),
                 OK
             );
+            let original = raw.clone();
+            raw.fill(0xa5);
             assert_eq!(
-                xy_vsfilter_document_realtext_step_v1(rt_run, 1, 1000),
-                INVALID_INPUT
-            );
-            assert_eq!(xy_vsfilter_document_realtext_step_v1(rt_run, 0, 1), OK);
-            assert_eq!(
-                xy_vsfilter_document_realtext_read_v1(rt_run, 1, ptr::null(), 0, ptr::null(), 0),
-                OK
-            );
-            let rt_packet =
-                |remaining: &str, name: &str, flags: u32, attributes: &[(&str, &str)]| {
-                    let mut bytes = Vec::new();
-                    let raw: Vec<u16> = remaining.encode_utf16().collect();
-                    bytes.extend_from_slice(&(raw.len() as u32).to_le_bytes());
-                    bytes.extend(raw.iter().flat_map(|u| u.to_le_bytes()));
-                    let name: Vec<u16> = name.encode_utf16().collect();
-                    bytes.extend_from_slice(&flags.to_le_bytes());
-                    bytes.extend_from_slice(&(name.len() as u32).to_le_bytes());
-                    bytes.extend_from_slice(&(attributes.len() as u32).to_le_bytes());
-                    bytes.extend(name.iter().flat_map(|u| u.to_le_bytes()));
-                    for (key, value) in attributes {
-                        let key: Vec<u16> = key.encode_utf16().collect();
-                        let value: Vec<u16> = value.encode_utf16().collect();
-                        bytes.extend_from_slice(&(key.len() as u32).to_le_bytes());
-                        bytes.extend_from_slice(&(value.len() as u32).to_le_bytes());
-                        bytes.extend(key.iter().flat_map(|u| u.to_le_bytes()));
-                        bytes.extend(value.iter().flat_map(|u| u.to_le_bytes()));
-                    }
-                    bytes
-                };
-            let mut reply = rt_packet("<window>", "\n", 8, &[]);
-            assert_eq!(
-                xy_vsfilter_document_realtext_packet_v1(rt_run, 0, 2, reply.as_ptr(), reply.len()),
-                INVALID_INPUT
-            );
-            assert_eq!(
-                xy_vsfilter_document_realtext_packet_v1(
-                    rt_run,
-                    0,
-                    1,
-                    reply.as_ptr(),
-                    reply.len() - 2
-                ),
-                INVALID_INPUT
-            );
-            assert_eq!(
-                DOCUMENTS
-                    .try_with(|_| xy_vsfilter_document_realtext_packet_v1(
-                        rt_run,
-                        0,
-                        1,
-                        reply.as_ptr(),
-                        reply.len()
-                    ))
-                    .unwrap(),
-                BUSY
-            );
-            assert_eq!(
-                xy_vsfilter_document_realtext_packet_v1(rt_run, 0, 1, reply.as_ptr(), reply.len()),
-                OK
-            );
-            reply.fill(0xa5);
-            assert_eq!(
-                xy_vsfilter_document_realtext_part_v1(rt_run, 0, out.as_mut_ptr(), 8),
+                xy_vsfilter_document_realtext_part_v2(rt_run, 0, out.as_mut_ptr(), 8),
                 OK
             );
             let input_snapshot = u64::from_le_bytes(out[..8].try_into().unwrap());
-            assert_eq!(&read_snapshot(input_snapshot)[24..], raw);
-            let reply = rt_packet("<time>", "window", 1, &[]);
+            assert_eq!(&read_snapshot(input_snapshot)[32..], original);
             assert_eq!(
-                xy_vsfilter_document_realtext_packet_v1(rt_run, 0, 1, reply.as_ptr(), reply.len()),
-                OK
-            );
-            let invalid = rt_packet("next", "time", 3, &[("end", "2"), ("begin", "1")]);
-            assert_eq!(
-                xy_vsfilter_document_realtext_packet_v1(
-                    rt_run,
-                    0,
-                    1,
-                    invalid.as_ptr(),
-                    invalid.len()
-                ),
+                xy_vsfilter_document_realtext_step_v2(rt_run, 4, 1000),
                 INVALID_INPUT
             );
-            let reply = rt_packet("next", "time", 3, &[("begin", "1"), ("end", "2")]);
+            assert_eq!(xy_vsfilter_document_realtext_step_v2(rt_run, 1, 1), OK);
             assert_eq!(
-                xy_vsfilter_document_realtext_packet_v1(rt_run, 0, 1, reply.as_ptr(), reply.len()),
+                xy_vsfilter_document_realtext_read_v2(rt_run, 1, ptr::null(), 0, ptr::null(), 0),
                 OK
             );
-            assert_eq!(xy_vsfilter_document_realtext_step_v1(rt_run, 1, 1000), OK);
-            assert_eq!(xy_vsfilter_document_realtext_step_v1(rt_run, 1, 2000), OK);
+            let mut emitted = false;
+            let mut seen = [false; 7];
+            let expected: Vec<u8> = "<font size=\"20\">A"
+                .encode_utf16()
+                .chain([0xd800])
+                .chain("</font>".encode_utf16())
+                .flat_map(u16::to_le_bytes)
+                .collect();
+            let mut rt_emit = 0;
+            for _ in 0..1000 {
+                assert_eq!(
+                    xy_vsfilter_document_realtext_part_v2(rt_run, 0, out.as_mut_ptr(), 8),
+                    OK
+                );
+                let snapshot = u64::from_le_bytes(out[..8].try_into().unwrap());
+                let bytes = read_snapshot(snapshot);
+                let op = u32::from_le_bytes(bytes[..4].try_into().unwrap());
+                let unit = u32::from_le_bytes(bytes[24..28].try_into().unwrap());
+                if op == 7 {
+                    assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
+                    break;
+                }
+                assert!((2..=6).contains(&op));
+                seen[op as usize] = true;
+                // Refusals and reentry cannot consume a pending request.
+                assert_eq!(
+                    xy_vsfilter_document_realtext_step_v2(rt_run, 0, 0),
+                    INVALID_INPUT
+                );
+                assert_eq!(
+                    DOCUMENTS
+                        .try_with(|_| xy_vsfilter_document_realtext_step_v2(rt_run, op, 0))
+                        .unwrap(),
+                    BUSY
+                );
+                if matches!(op, 2 | 5) {
+                    assert_eq!(
+                        xy_vsfilter_document_realtext_step_v2(rt_run, op, 2),
+                        INVALID_INPUT
+                    );
+                }
+                if op == 3 {
+                    assert_eq!(
+                        xy_vsfilter_document_realtext_step_v2(rt_run, op, -1),
+                        INVALID_INPUT
+                    );
+                    assert_eq!(
+                        xy_vsfilter_document_realtext_step_v2(rt_run, op, 65536),
+                        INVALID_INPUT
+                    );
+                }
+                if op == 6 {
+                    assert_eq!(
+                        xy_vsfilter_document_realtext_step_v2(rt_run, op, 1),
+                        INVALID_INPUT
+                    );
+                }
+                assert_eq!(
+                    xy_vsfilter_document_realtext_part_v2(rt_run, 0, out.as_mut_ptr(), 8),
+                    OK
+                );
+                let unchanged = u64::from_le_bytes(out[..8].try_into().unwrap());
+                assert_eq!(read_snapshot(unchanged), bytes);
+                assert_eq!(xy_vsfilter_document_snapshot_drop_v1(unchanged), OK);
+                let value = match op {
+                    2 => i32::from([9, 10, 13, 32].contains(&unit)),
+                    3 => {
+                        if (65..=90).contains(&unit) {
+                            unit as i32 + 32
+                        } else {
+                            unit as i32
+                        }
+                    }
+                    4 => {
+                        let units: Vec<u16> = bytes[32..]
+                            .chunks_exact(2)
+                            .map(|b| u16::from_le_bytes([b[0], b[1]]))
+                            .collect();
+                        String::from_utf16(&units)
+                            .unwrap()
+                            .parse::<i32>()
+                            .unwrap_or(0)
+                    }
+                    5 => i32::from((48..=57).contains(&unit)),
+                    6 => {
+                        assert!(!emitted);
+                        emitted = true;
+                        rt_emit = snapshot;
+                        assert_eq!(&bytes[32..], expected);
+                        assert_eq!(&bytes[8..16], &10000000i64.to_le_bytes());
+                        assert_eq!(&bytes[16..24], &20000000i64.to_le_bytes());
+                        0
+                    }
+                    _ => unreachable!(),
+                };
+                assert_eq!(xy_vsfilter_document_realtext_step_v2(rt_run, op, value), OK);
+                if op != 6 {
+                    assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
+                }
+            }
+            assert!(emitted && seen[2..].iter().all(|&x| x));
+            out.fill(0xa5);
             assert_eq!(
-                xy_vsfilter_document_realtext_packet_v1(rt_run, 1, 0, ptr::null(), 0),
-                OK
-            );
-            let reply = rt_packet("", "caption", 8, &[]);
-            assert_eq!(
-                xy_vsfilter_document_realtext_packet_v1(rt_run, 0, 1, reply.as_ptr(), reply.len()),
-                OK
-            );
-            let mut rendered = [65u8, 0, 0, 0, 0, 0xd8];
-            assert_eq!(
-                xy_vsfilter_document_realtext_packet_v1(
-                    rt_run,
-                    1,
-                    0,
-                    rendered.as_ptr(),
-                    rendered.len()
-                ),
-                OK
-            );
-            rendered.fill(0xa5);
-            assert_eq!(
-                xy_vsfilter_document_realtext_part_v1(rt_run, 2, out.as_mut_ptr(), 7),
+                xy_vsfilter_document_realtext_part_v2(rt_run, 2, out.as_mut_ptr(), 7),
                 INVALID_INPUT
             );
             assert_eq!(
-                xy_vsfilter_document_realtext_part_v1(rt_run, 4, out.as_mut_ptr(), 8),
+                xy_vsfilter_document_realtext_part_v2(rt_run, 4, out.as_mut_ptr(), 8),
                 INVALID_INPUT
             );
+            assert!(out.iter().all(|&b| b == 0xa5));
             assert_eq!(
-                xy_vsfilter_document_realtext_part_v1(rt_run, 2, out.as_mut_ptr(), 8),
+                xy_vsfilter_document_realtext_part_v2(rt_run, 2, out.as_mut_ptr(), 8),
                 OK
             );
             let rt_map = u64::from_le_bytes(out[..8].try_into().unwrap());
             let map_bytes = read_snapshot(rt_map);
             assert_eq!(&map_bytes[..4], &1u32.to_le_bytes());
-            assert_eq!(&map_bytes[16..], &[65, 0, 0, 0, 0, 0xd8]);
-            assert_eq!(
-                xy_vsfilter_document_realtext_part_v1(rt_run, 0, out.as_mut_ptr(), 8),
-                OK
-            );
-            let rt_emit = u64::from_le_bytes(out[..8].try_into().unwrap());
+            assert_eq!(&map_bytes[16..], expected);
             let emit_bytes = read_snapshot(rt_emit);
-            assert_eq!(&emit_bytes[..4], &7u32.to_le_bytes());
-            assert_eq!(&emit_bytes[8..16], &10000000i64.to_le_bytes());
-            assert_eq!(
-                xy_vsfilter_document_realtext_step_v1(rt_run, 2, 1),
-                INVALID_INPUT
-            );
-            assert_eq!(xy_vsfilter_document_realtext_step_v1(rt_run, 2, 0), OK);
             assert_eq!(xy_vsfilter_document_destroy_v1(rt_owner), OK);
             assert_eq!(
-                xy_vsfilter_document_realtext_part_v1(rt_run, 0, out.as_mut_ptr(), 8),
+                xy_vsfilter_document_realtext_part_v2(rt_run, 0, out.as_mut_ptr(), 8),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                xy_vsfilter_document_realtext_step_v2(rt_run, 6, 0),
                 BAD_HANDLE
             );
             assert_eq!(read_snapshot(rt_map), map_bytes);
             assert_eq!(read_snapshot(rt_emit), emit_bytes);
-            assert_eq!(xy_vsfilter_document_realtext_drop_v1(rt_run), OK);
-            assert_eq!(xy_vsfilter_document_realtext_drop_v1(rt_run), BAD_HANDLE);
+            assert_eq!(xy_vsfilter_document_realtext_drop_v2(rt_run), OK);
+            assert_eq!(xy_vsfilter_document_realtext_drop_v2(rt_run), BAD_HANDLE);
             for id in [rt_map, rt_emit, input_snapshot] {
                 assert_eq!(xy_vsfilter_document_snapshot_drop_v1(id), OK);
             }

@@ -893,59 +893,30 @@ public:
 };
 class RealTextSession {
     uint64_t id_=0;
-    static void Units(DocumentDetail::Bytes& bytes,const std::wstring& text) {
-        DocumentDetail::Count(text.size());for(auto unit:text)DocumentDetail::Append(bytes,static_cast<uint16_t>(unit),2);
-    }
-    static std::wstring String(const DocumentDetail::Bytes& bytes,size_t& offset,uint32_t length) {
-        const auto text=DocumentDetail::String(bytes,offset,length);return std::wstring(text,text.GetLength());
-    }
-    void Packet(unsigned command,unsigned value,const DocumentDetail::Bytes& bytes) {
-        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_realtext_packet_v1(id_,command,value,bytes.data(),bytes.size());}));
-    }
     DocumentDetail::Bytes Part(unsigned group) const {
         std::array<uint8_t,8> out{};
-        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_realtext_part_v1(id_,group,out.data(),out.size());}));
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_realtext_part_v2(id_,group,out.data(),out.size());}));
         DocumentReply snapshot(DocumentDetail::Load(out,0,8));return snapshot.Read();
     }
 public:
-    RealTextSession(const DocumentOwner& owner,int duration) {
+    explicit RealTextSession(const DocumentOwner& owner) {
         std::array<uint8_t,8> out{};
-        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_realtext_begin_v1(owner.id_,duration,out.data(),out.size());}));id_=DocumentDetail::Load(out,0,8);
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_realtext_begin_v2(owner.id_,out.data(),out.size());}));id_=DocumentDetail::Load(out,0,8);
     }
     RealTextSession(const RealTextSession&)=delete;RealTextSession& operator=(const RealTextSession&)=delete;
-    ~RealTextSession() noexcept {if(id_){const auto id=id_;id_=0;DocumentDetail::Release(DocumentDetail::Invoke([&]{return xy_vsfilter_document_realtext_drop_v1(id);}));}}
+    ~RealTextSession() noexcept {if(id_){const auto id=id_;id_=0;DocumentDetail::Release(DocumentDetail::Invoke([&]{return xy_vsfilter_document_realtext_drop_v2(id);}));}}
     void Read(const CStringW& text,bool eof) {
         const auto bytes=DocumentDetail::Units(text);std::vector<uint8_t> spaces(text.GetLength());
         for(int i=0;i<text.GetLength();++i)spaces[i]=CStringW::StrTraits::IsSpace(text[i])?1:0;
-        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_realtext_read_v1(id_,eof?1:0,bytes.data(),bytes.size(),spaces.data(),spaces.size());}));
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_realtext_read_v2(id_,eof?1:0,bytes.data(),bytes.size(),spaces.data(),spaces.size());}));
     }
-    template<class Tag> void Extracted(bool response,const std::wstring& remaining,const Tag& tag) {
-        DocumentDetail::Bytes bytes;DocumentDetail::Append(bytes,DocumentDetail::Count(remaining.size()),4);Units(bytes,remaining);
-        const unsigned flags=(tag.m_bOpen?1:0)|(tag.m_bClose?2:0)|(tag.m_bComment?4:0)|(tag.m_bText?8:0);
-        DocumentDetail::Append(bytes,flags,4);DocumentDetail::Append(bytes,DocumentDetail::Count(tag.m_szName.size()),4);
-        DocumentDetail::Append(bytes,DocumentDetail::Count(tag.m_mapAttributes.size()),4);Units(bytes,tag.m_szName);
-        for(const auto& item:tag.m_mapAttributes){DocumentDetail::Append(bytes,DocumentDetail::Count(item.first.size()),4);DocumentDetail::Append(bytes,DocumentDetail::Count(item.second.size()),4);Units(bytes,item.first);Units(bytes,item.second);}
-        Packet(0,response?1:0,bytes);
-    }
-    void Rendered(const std::wstring& text) {DocumentDetail::Bytes bytes;Units(bytes,text);Packet(1,0,bytes);}
-    void Step(unsigned command,int value=0) {DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_realtext_step_v1(id_,command,value);}));}
-    template<class Tag> std::list<Tag> Tags() const {
-        const auto bytes=Part(1);size_t offset=4;const auto count=DocumentDetail::Load(bytes,0,4);std::list<Tag> tags;
-        for(uint64_t i=0;i<count;++i){
-            const auto flags=DocumentDetail::Load(bytes,offset,4);const auto length=DocumentDetail::Count(DocumentDetail::Load(bytes,offset+4,4));const auto attributes=DocumentDetail::Load(bytes,offset+8,4);offset+=12;
-            DocumentDetail::Shape(flags<=15);Tag tag;tag.m_szName=String(bytes,offset,length);
-            tag.m_bOpen=(flags&1)!=0;tag.m_bClose=(flags&2)!=0;tag.m_bComment=(flags&4)!=0;tag.m_bText=(flags&8)!=0;
-            for(uint64_t j=0;j<attributes;++j){const auto k=DocumentDetail::Count(DocumentDetail::Load(bytes,offset,4));const auto v=DocumentDetail::Count(DocumentDetail::Load(bytes,offset+4,4));offset+=8;
-                const auto key=String(bytes,offset,k);const auto value=String(bytes,offset,v);tag.m_mapAttributes[key]=value;}
-            tags.push_back(std::move(tag));
-        }
-        DocumentDetail::Shape(offset==bytes.size());return tags;
-    }
-    unsigned Next(CStringW& text,int64_t& start,int64_t& end,bool& accepted) const {
+    void Step(unsigned command,int value=0) {DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_realtext_step_v2(id_,command,value);}));}
+    unsigned Next(CStringW& text,int64_t& start,int64_t& end,bool& accepted,unsigned& unit,unsigned& index) const {
         const auto bytes=Part(0);
-        DocumentDetail::Shape(bytes.size()>=24 && (bytes.size()-24)%2==0 && DocumentDetail::Load(bytes,0,4)<=9 && DocumentDetail::Load(bytes,4,4)<=1);
+        DocumentDetail::Shape(bytes.size()>=32 && (bytes.size()-32)%2==0 && DocumentDetail::Load(bytes,0,4)<=9 && DocumentDetail::Load(bytes,4,4)<=1);
         accepted=DocumentDetail::Load(bytes,4,4)!=0;start=DocumentDetail::I64(DocumentDetail::Load(bytes,8,8));end=DocumentDetail::I64(DocumentDetail::Load(bytes,16,8));
-        size_t offset=24;text=DocumentDetail::String(bytes,offset,DocumentDetail::Count((bytes.size()-24)/2));return static_cast<unsigned>(DocumentDetail::Load(bytes,0,4));
+        unit=static_cast<unsigned>(DocumentDetail::Load(bytes,24,4));index=static_cast<unsigned>(DocumentDetail::Load(bytes,28,4));DocumentDetail::Shape(unit<=65535);
+        size_t offset=32;text=DocumentDetail::String(bytes,offset,DocumentDetail::Count((bytes.size()-32)/2));return static_cast<unsigned>(DocumentDetail::Load(bytes,0,4));
     }
 };
 class VttDocument {

@@ -81,7 +81,7 @@ pub(crate) enum Resource {
     },
     RealTextRun {
         owner: Handle,
-        run: xy_vsfilter_compat::realtext_session::Run,
+        run: xy_vsfilter_compat::realtext_engine::Run,
     },
     VttRun {
         owner: Handle,
@@ -471,13 +471,7 @@ impl Registry {
     pub(crate) fn realtext_pair(
         &mut self,
         id: Handle,
-    ) -> Result<
-        (
-            &mut Document,
-            &mut xy_vsfilter_compat::realtext_session::Run,
-        ),
-        Error,
-    > {
+    ) -> Result<(&mut Document, &mut xy_vsfilter_compat::realtext_engine::Run), Error> {
         let run_index = self.position(id)?;
         let owner = match &self.slots[run_index].1 {
             Resource::RealTextRun { owner, .. } => *owner,

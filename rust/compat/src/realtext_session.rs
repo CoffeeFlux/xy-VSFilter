@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-//! Cleanup OpenRealText/ParseRealText ownership. Native tag/text extraction,
-//! time conversion, tag rendering and Add are detached services. All persistent
-//! input, tags, attributes, timeline and interval-map values stay in safe Rust.
+//! Cleanup OpenRealText/ParseRealText ownership. The realtext_engine module
+//! supplies extraction, time folding and tag rendering using safe Rust helpers.
+//! Input, tags, attributes, timeline and interval-map values stay in safe Rust.
 use crate::ass_document::Error;
 use crate::document::Document;
 use crate::realtext_lists::{Lists, StoredTag};
@@ -151,6 +151,18 @@ pub fn decode_extraction(bytes: &[u8]) -> Result<(Vec<u16>, StoredTag), Error> {
     Ok((input, tag))
 }
 impl Run {
+    pub(crate) fn operation(&self) -> Op {
+        self.op
+    }
+    pub(crate) fn input(&self) -> &[u16] {
+        &self.input
+    }
+    pub(crate) fn token(&self) -> &[u16] {
+        &self.token
+    }
+    pub(crate) fn tags(&self) -> &[StoredTag] {
+        &self.lists.tags
+    }
     pub fn new(duration: i32) -> Self {
         Self {
             op: Op::Read,
