@@ -27,7 +27,7 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Active port: ASS line lifecycle (2026-10-18)
+## Current port: owned ASS input and checked style sessions (2026-10-18)
 
 The experimental ASS session now owns line storage, FastTrim ordering, key and
 payload splitting, read/dispatch sequencing, and final-record/final-comment EOF
@@ -36,11 +36,40 @@ lowercase and file reads remain explicit platform adapters. This removes the
 native mutable line preparation and EOF policy from this parser path.
 The line checkpoint `7714d991` passes 2,856 direct parser cases on each Windows
 architecture, including expanded raw-unit, whitespace, empty-key and EOF cases.
-Style assembly is now being consolidated into the same checked document-bound
-session, replacing the four raw-pointer value-building exports from the prior
-increment with typed commands and independently owned snapshots. Validation of
-the combined candidate is in progress. The complete-library goal remains active;
-no package closure or production enablement is claimed.
+Style assembly now uses the same checked document-bound session, replacing four
+raw-pointer value-building exports from the prior increment with typed commands
+and independently owned snapshots. The experimental parser no longer includes
+the legacy style adapter header. Native numeric conversions, temporary STSStyle
+allocation and AddStyle remain transitional boundaries; the native-document
+fallback still uses its existing style adapter.
+
+Final code `1582f7c1` passes fresh comparisons against cleanup `67da07cd` on
+**each** Windows architecture (x86 and x64):
+
+* 2,856 direct parser cases, repeated twice for reference and candidate, with
+  19,544 identical trace lines. The added cases exercise raw code units,
+  whitespace, empty keys and EOF handling.
+* All 814 rendering cases and 8,586 frames, with 72 distinct-frame controls;
+  another 32 mutation cases and 224 frames also match exactly.
+* 3,693 linked lifecycle trace lines, repeated comparisons, all three DLLs'
+  exports/dependencies, and 10 scoped COM cases plus two candidate pin-ID
+  controls.
+* 256 safe-core and 123 FFI tests, formatting and Clippy. The Python harness
+  passes 150 tests with one skip. Compile probes cover reference,
+  native-document and experimental configurations.
+
+The [source and boundary inventory](rust-ass-input-inventory.json) and
+[local evidence manifest](rust-ass-input-local-evidence.json) record source,
+binary and report hashes. Earlier evidence retains its original candidate and
+reference attribution. These checks do not establish full player/Aegisub graph
+integration, non-Windows parity, or runtime parity for the default native-document
+configuration. Native pre-Open simplicity remains an unresolved reference state.
+
+Next work includes moving dialogue trimming and embedded-font record lifecycle
+into owned Rust state, then replacing the remaining file, locale, numeric and
+platform adapters. Rendering and host-interface packages remain in scope. The
+complete-library goal remains active; no package closure or production enablement
+is claimed.
 
 ## Previous port: ASS/SSA parser control (2026-10-17)
 

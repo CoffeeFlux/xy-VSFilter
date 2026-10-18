@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "candidate_code_commit": "1582f7c1dc6a97331bdb560e134516286e0442c2",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "Owned ASS line/EOF lifecycle and checked style parser sessions; full library goal remains active.",
+  "reference_sources": {
+    "src/subtitles/STS.cpp": "2616b67db84f7329ac6e2363a3f03d61977fa07c37ed9c04d32ec2b1197f31e0",
+    "src/subtitles/TextFile.cpp": "71c00071f9ceb466c539fda26103a4a94b802a4a01f4b807852e159563772f2f",
+    "src/dsutil/text.h": "92efdac94644006b4559d868631c27c841811327af9eedc408b817631e09d249"
+  },
+  "operations": [
+    {
+      "operation": "Raw line ownership, trim and key/remainder split",
+      "source": {
+        "path": "rust/compat/src/ass_input.rs",
+        "line": 18,
+        "sha256": "793c154504b4c22c969be550e528bd9edb9730ab8009bfd6fc1482ff069e8ad3"
+      },
+      "behavior": "Rust owns UTF-16 key/remainder. FastTrimRight scans explicit length past NUL; TrimLeft stops at NUL. Predicate flags use CStringW::StrTraits::IsSpace. Colon search stops at NUL and absent separator leaves the full remainder intact. No Unicode scalar strings introduced."
+    },
+    {
+      "operation": "Read/dispatch/EOF decisions",
+      "source": {
+        "path": "rust/compat/src/ass_document.rs",
+        "line": 58,
+        "sha256": "86a657144f8c17982bae053701bad38494a19599f218a13d80fe9165a167064e"
+      },
+      "behavior": "ReadString false plus raw empty stops before trimming. A final comment/trimmed blank requests another read. A final processed record stops. Pending fields prevent next line; malformed numeric headers retain modeled reset and failure. ReadString always empties/replaces its output in both reference and candidate; no previous native buffer is an input dependency."
+    },
+    {
+      "operation": "Checked style state lifetime",
+      "source": {
+        "path": "rust/compat/src/ass_document.rs",
+        "line": 78,
+        "sha256": "86a657144f8c17982bae053701bad38494a19599f218a13d80fe9165a167064e"
+      },
+      "behavior": "Style cursor, raw remainder, builder, field acceptance and result are owned by the validated document-bound ASS run. Supplied type must match current field. Final name/value snapshots are independent and native copies complete before the session is released and native AddStyle consumes its temporary STSStyle."
+    }
+  ],
+  "boundary_review": [
+    {
+      "exports": [
+        "xy_vsfilter_document_ass_read_v1",
+        "xy_vsfilter_document_ass_input_part_v1"
+      ],
+      "source": {
+        "path": "rust/ffi/src/document.rs",
+        "line": 383,
+        "sha256": "17879ccf8bbd41e48fa3ca380e0e859beaefe01501c54dfeef00e105c80ade29"
+      },
+      "contract": "Check output, EOF, raw UTF-16 byte length and predicate count before state mutation. Copy caller buffers before registry admission. Predicates must be strict bools. Input/output may overlap. Invalid phase/type/stale run or owner is rejected. Snapshots are copied out after loans end and survive run/document release."
+    },
+    {
+      "exports": [
+        "xy_vsfilter_document_ass_style_v1",
+        "xy_vsfilter_document_ass_style_part_v1"
+      ],
+      "source": {
+        "path": "rust/ffi/src/document.rs",
+        "line": 475,
+        "sha256": "17879ccf8bbd41e48fa3ca380e0e859beaefe01501c54dfeef00e105c80ade29"
+      },
+      "contract": "Typed integer run ID binds a live document. Copy both raw text and remainder before admission. Exact integer/f64 bit results are supplied by native conversion after all Rust loans end. Validate command/type/shape/capacity. Independently owned snapshots reuse the existing style wire; no native object address or writable view is stored in Rust."
+    }
+  ],
+  "removed_exports": [
+    "xy_vsfilter_ass_style_integer",
+    "xy_vsfilter_ass_style_float_bits",
+    "xy_vsfilter_ass_style_text",
+    "xy_vsfilter_ass_style_finish"
+  ],
+  "retirement_evidence": "No declarations/implementations of the four value-building exports remain; final experimental native parser compile include traces on x86/x64 do not include xy_rust_ass_style.h. Legacy raw helpers remain for the native-document fallback, which is not the final target.",
+  "retained_boundaries": [
+    "CTextFile read/file/encoding adapters and font installation remain native.",
+    "Native CString-trait whitespace classification, lowercase and numeric CRT conversion remain explicit adapters.",
+    "Dialogue FastTrim and locale Default comparison remain native.",
+    "Native temporary STSStyle conversion and AddStyle wrapper remain; canonical style storage and policy are Rust.",
+    "Default native-document fallback and public host implementations remain transitional C++."
+  ],
+  "limits": [
+    "No default enablement or full document/frontend/host closure.",
+    "Pre-Open embedded m_simple remains unresolved; no invented default.",
+    "No allocator/reentry, Miri, non-Windows or real-player graph evidence in this increment.",
+    "Finite raw-unit/malformed-input corpus; no crash or unstable outcome counted as passing."
+  ],
+  "next_work": [
+    "Move dialogue text preparation and font-record dispatch/lifetimes into the checked parser session.",
+    "Replace remaining numeric/text adapters with audited Rust-to-system boundaries while preserving CRT/locale behavior.",
+    "Continue document host lifetime closure and the full rendering/format/host work-package plan."
+  ]
+}
