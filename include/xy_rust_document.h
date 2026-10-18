@@ -278,6 +278,15 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_drop_v1(uint64_t run);
 // raw UTF-16LE. Groups:0 next numeric token or completion,1 stripped style,
 // 4 text before native FastTrim. Groups1/4 require completed numeric parsing.
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_dialogue_part_v1(uint64_t run,uint32_t group,uint8_t*,size_t);
+// Line ownership/dispatch: ReadString result supplies EOF(strict0/1), raw UTF-16LE
+// and one strict-bool whitespace byte per unit. Both buffers are copied before
+// admission. Input-part returns a snapshot: action:u32 (Read0,LowerKey1,Record2,
+// Done3),reserved:u32=0,raw UTF-16LE. Group0 is key when LowerKey (otherwise empty);
+// group1 is payload in Record only. Step command8 acknowledges a record with
+// scalar0=failure/1=success and empty text. A final blank/comment requests another
+// read; a final completed record stops. Invalid protocol leaves output unchanged.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_read_v1(uint64_t run,uint32_t eof,const uint8_t*,size_t,const uint8_t*,size_t,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_input_part_v1(uint64_t run,uint32_t group,uint8_t*,size_t);
 // CopyStyles typed run binds destination and source. Open performs no mutation;
 // first step initializes/clears and returns Advanced before reading source rows.
 // Step output8 is snapshot ID; packet16: action:u32(0Done/1Advanced/2NeedSuffix),

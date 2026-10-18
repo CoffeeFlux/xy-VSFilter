@@ -27,7 +27,18 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: ASS/SSA parser control (2026-10-17)
+## Active port: ASS line lifecycle (2026-10-18)
+
+The experimental ASS session now owns line storage, FastTrim ordering, key and
+payload splitting, read/dispatch sequencing, and final-record/final-comment EOF
+decisions. It receives raw UTF-16 and native CString-trait whitespace flags;
+lowercase and file reads remain explicit platform adapters. This removes the
+native mutable line preparation and EOF policy from this parser path.
+Validation against the cleanup is in progress, including expanded raw-unit,
+whitespace, empty-key and EOF cases. The complete-library goal remains active;
+no package closure or production enablement is claimed.
+
+## Previous port: ASS/SSA parser control (2026-10-17)
 
 The full repository replacement remains the goal. This milestone moves three
 connected parts of ASS/SSA ingestion into safe Rust in the experimental document

@@ -101,6 +101,15 @@ int main() {
                 ass_case(index++,text,CSize(0,0));
             }
         }
+        const wchar_t boundaries[]={0,9,10,11,12,13,32,0x85,0xa0,0x1680,0x180e,0x2003,0x2028,0x2029,0x3000,0xd800,0xffff};
+        const wchar_t* cores[]={L"[Events]",L"; comment",L":",L"PlayResX: 1280",L"[Script Info]\r\nScaledBorderAndShadow: yes",L"Unknown"};
+        for(auto boundary:boundaries) for(auto core:cores) for(int newline=0;newline<2;++newline) {
+            CStringW text;text.AppendChar(boundary);text+=core;text.AppendChar(boundary);
+            if(newline)text+=L"\r\n";
+            ass_case(index++,text,CSize(0,0));
+        }
+        for(auto tail:{L"",L" ",L"\t",L"; tail",L"\r\n",L"\r\n;tail",L"[Events]\r\n;tail",L"[Events]\r\n "})
+            ass_case(index++,CStringW(tail),CSize(0,0));
         printf("ass-complete cases=%u\n",index);
         return 0;
     } catch(const std::exception& error) {fprintf(stderr,"unresolved: %s\n",error.what());return 1;}

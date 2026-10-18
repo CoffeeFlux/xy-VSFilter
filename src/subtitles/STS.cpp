@@ -2247,6 +2247,23 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
     CStringW buff;
     while(true)
     {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        const unsigned action=headers.InputPart(0,buff);
+        if(action==0) {
+            const bool eof=!file->ReadString(buff);
+            headers.ReadLine(buff,eof);
+            continue;
+        }
+        if(action==1) {
+            buff.MakeLower();
+            headers.Classify(buff);
+            continue;
+        }
+        if(action==3)return headers.Field(2)!=0;
+        headers.InputPart(1,buff);
+        const unsigned entryKind=headers.EntryKind();
+        version=headers.Field(0);sver=headers.Field(1);
+#else
     	bool fEOF = !file->ReadString(buff);
     	if(fEOF && buff.IsEmpty()) break;
 
@@ -2265,6 +2282,7 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
         fRet = headers.Field(2) != 0;
 #endif
 
+#endif
         if(XY_ASS_HEADER(L"dialogue", 1))
         {
             try
@@ -2353,6 +2371,9 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
             {
                 //                ASSERT(0);
                 //                throw;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                headers.EndRecord(false);
+#endif
                 return(false);
             }
         }
@@ -2486,6 +2507,9 @@ if(sver <= 4)   style->scrAlignment = (style->scrAlignment&4) ? ((style->scrAlig
             catch(...)
             {
                 delete style;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                headers.EndRecord(false);
+#endif
                 return(false);
             }
         }
@@ -2494,7 +2518,7 @@ if(sver <= 4)   style->scrAlignment = (style->scrAlignment&4) ? ((style->scrAlig
         {
             int value;
             try {value = GetInt(buff);}
-            catch(...) {headers.NumberFailed(); return false;}
+            catch(...) {headers.NumberFailed(); headers.EndRecord(false); return false;}
             headers.Number(value);
         }
         else if(entryKind == 9)
@@ -2827,7 +2851,11 @@ if(sver <= 4)   style->scrAlignment = (style->scrAlignment&4) ? ((style->scrAlig
 #endif
         }
 #endif
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        headers.EndRecord();
+#else
         if(fEOF) break;
+#endif
     }
 //    ret.Sort();
 #undef XY_ASS_HEADER

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 //! ASS/SSA header state and document mutations from cleanup STS.cpp.
 //!
-//! Native adapters still read/trim/lowercase code units, perform CRT numeric
-//! conversion and suffix comparison, and execute dialogue/style/font actions.
+//! Native adapters read lines/classify whitespace, lowercase keys, perform CRT
+//! numeric conversion and suffix comparison, and execute style/font actions.
 //! No file, native object, or caller buffer is retained by this session.
 use crate::ass_headers::{self, Headers};
 use crate::document::{Document, LayoutField, MetadataField, ScriptField};
@@ -22,6 +22,7 @@ pub struct Run {
     pending: bool,
     failed: bool,
     dialogue: Option<crate::ass_dialogue::Dialogue>,
+    input: crate::ass_input::Input,
 }
 
 impl Run {
@@ -42,11 +43,32 @@ impl Run {
     }
 
     pub fn classify(&mut self, lowered_key: &[u16]) -> Result<(), Error> {
-        if self.pending || self.failed {
+        if self.pending || self.failed || !self.input.can_classify() {
             return Err(Error::Protocol);
         }
         self.kind = self.headers.classify(lowered_key);
         self.pending = matches!(self.kind, 1 | 4..=11 | 17);
+        self.input.classified();
+        Ok(())
+    }
+
+    pub fn read_line(&mut self, raw: &[u16], spaces: &[u8], eof: bool) -> Result<(), Error> {
+        if self.pending || self.failed || !self.input.read(raw, spaces, eof) {
+            return Err(Error::Protocol);
+        }
+        Ok(())
+    }
+    pub fn input_part(&self, group: u32) -> Result<alloc::vec::Vec<u8>, Error> {
+        self.input.part(group).ok_or(Error::Protocol)
+    }
+    pub fn end_record(&mut self, success: bool) -> Result<(), Error> {
+        if !self.input.can_finish() || (success && (self.pending || self.failed)) {
+            return Err(Error::Protocol);
+        }
+        if !success {
+            self.failed = true;
+        }
+        self.input.finish(success);
         Ok(())
     }
 
@@ -224,6 +246,31 @@ impl Run {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn owned_input_requires_classification_and_completed_record_before_next_read() {
+        let mut doc = Document::default();
+        let mut run = Run::begin(&mut doc);
+        let line = units("[Events]");
+        run.read_line(&line, &alloc::vec![0;line.len()], false)
+            .unwrap();
+        assert_eq!(run.end_record(true), Err(Error::Protocol));
+        classify(&mut run, "[events]");
+        assert_eq!(run.classify(&units("dialogue")), Err(Error::Protocol));
+        assert_eq!(run.read_line(&[], &[], true), Err(Error::Protocol));
+        run.end_record(true).unwrap();
+        let line = units("PlayResX: bad");
+        let spaces = alloc::vec![0;line.len()];
+        run.read_line(&line, &spaces, true).unwrap();
+        classify(&mut run, "playresx");
+        assert_eq!(run.end_record(true), Err(Error::Protocol));
+        run.number(&mut doc, None).unwrap();
+        assert_eq!(run.end_record(true), Err(Error::Protocol));
+        run.end_record(false).unwrap();
+        assert_eq!(&run.input_part(0).unwrap()[..4], &3u32.to_le_bytes());
+        assert_eq!(run.state()[3], 0);
+        assert_eq!(doc.script_size(), Some([0, 0]));
+        assert_eq!(run.read_line(&[], &[], true), Err(Error::Protocol));
+    }
     fn units(text: &str) -> alloc::vec::Vec<u16> {
         text.encode_utf16().collect()
     }

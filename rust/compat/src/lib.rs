@@ -9,6 +9,7 @@
 extern crate alloc;
 
 pub mod ass_document;
+pub mod ass_input;
 pub mod ass_style_value;
 pub mod ass_tags;
 pub mod be_blur;
