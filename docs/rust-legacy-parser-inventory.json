@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "candidate_commit": "37365d44e249d79506161c701a70ddddfac9a90f",
+  "implementation_commit": "62354562055362a1c675eaad1159cf2d1b534f2b",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "Old SubRip and VPlayer parser ownership in the experimental document configuration. Whole-library Rust migration remains active.",
+  "production_sources": {
+    "rust/compat/src/text_document.rs": "b4f90d0c7743300b5a993e0957abbf9873c482cc0501c538950570f2f64f17d2",
+    "rust/compat/src/lib.rs": "37808aefffcb284a2c84a9c2f72911aba8c6afcd50a61903e447042b57c78a1a",
+    "rust/ffi/src/document.rs": "523221abd386e589720fcae2368b7dbf53ab7e1297e16b3a77dc035988bd61db",
+    "rust/ffi/src/document_registry.rs": "369c13cbe0aac76f15cca2ee5044d5d074e51deb9d87a166f12650763f0a1510",
+    "include/xy_rust_document.h": "2c07c0c1795a0a3b50326881b52fa4ad9e1084de139e1b905d18a59a6f5954c8",
+    "src/subtitles/RustDocumentOwner.h": "08d2eaed5c0aed1d367f03e2ab1b062025e2b179a36d253cd9155ce99dbf341c",
+    "src/subtitles/STS.cpp": "aa9659d9f9a2f50a1c0046871243c140c7630c4a2ec80d140ae36b942442857a",
+    "src/subtitles/STS.h": "1ad616dc8dc43c70ed73f442f219056ca40f77530647d541850ef336e9f9795b"
+  },
+  "reference_sources": {
+    "src/subtitles/STS.cpp": "2616b67db84f7329ac6e2363a3f03d61977fa07c37ed9c04d32ec2b1197f31e0",
+    "src/subtitles/TextFile.cpp": "71c00071f9ceb466c539fda26103a4a94b802a4a01f4b807852e159563772f2f",
+    "src/dsutil/text.h": "92efdac94644006b4559d868631c27c841811327af9eedc408b817631e09d249"
+  },
+  "operations": [
+    {
+      "operation": "Owned line, pipe iteration, timestamp and caption lifecycle",
+      "source": {
+        "path": "rust/compat/src/text_document.rs",
+        "line": 28,
+        "sha256": "b4f90d0c7743300b5a993e0957abbf9873c482cc0501c538950570f2f64f17d2"
+      },
+      "behavior": "OldSubRip/VPlayer share the checked parser session. Rust trims using CString predicates, discards outer false-read fragments, replaces charset-selected pipes, validates callback positions, dispatches scan outcomes, extracts captions through repeated CString-style delimiter searches and computes wrapping times. Missing delimiter results reset the next search or final Mid to zero. VPlayer duration uses counted extracted caption length before Add trimming; raw code units remain raw. Successful outer EOF acceptance uses the live document, including preloaded entries."
+    },
+    {
+      "operation": "Native callbacks outside registry loans",
+      "source": {
+        "path": "src/subtitles/STS.cpp",
+        "line": 1098,
+        "sha256": "aa9659d9f9a2f50a1c0046871243c140c7630c4a2ec80d140ae36b942442857a"
+      },
+      "behavior": "ReadString, whitespace classification, charset-aware FindChar, CRT scanf and Add remain transitional native services. OldSubRip copies six scan values only at count6; VPlayer copies three only at count3. All eight transport slots are initialized; partial scan locals are never read. Experimental OpenOldSubRipper/OpenVPlayer delegate to this helper, replacing their former native line and PipeLine iteration."
+    }
+  ],
+  "boundary_review": {
+    "source": {
+      "path": "rust/ffi/src/document.rs",
+      "line": 276,
+      "sha256": "523221abd386e589720fcae2368b7dbf53ab7e1297e16b3a77dc035988bd61db"
+    },
+    "exports": [
+      "xy_vsfilter_document_text_parser_begin_v1",
+      "xy_vsfilter_document_text_parser_read_v1",
+      "xy_vsfilter_document_text_parser_step_v1",
+      "xy_vsfilter_document_text_parser_part_v1",
+      "xy_vsfilter_document_text_parser_drop_v1"
+    ],
+    "contract": "Document-bound never-reused integer IDs under nonblocking admission. All raw input, predicates and i32 packets copied before mutation; strict bools/format/count/phase/packet shapes checked. Snapshot and begin output preflight precedes publication. Immutable snapshots survive run/document destruction; no native pointer retained. Native conversion/formatting/Add occur outside registry admission. Busy handling, allocation timing/failure and allocator reentry remain outside compatibility closure. Formats2/3 extend the session; command3 supplies the charset-aware pipe index. Op7 snapshot payload prefixes UTF16LE with a u32 position; existing op0..6 snapshots retain their layout. Invalid backward, out-of-range or non-pipe indices fail without mutation. No new unsafe entry point, raw-slice constructor or native pointer owner."
+  },
+  "direct_probe": {
+    "source": {
+      "path": "tools/compat/text_document_native.cpp",
+      "line": 7,
+      "sha256": "fd5b83e72d181be13a886c5c9d61cd10b4e939b37ecbec7f50964c425ab7ea13"
+    },
+    "cases": 5692,
+    "trace_lines": 44404,
+    "baseline": {
+      "commit": "34dbc732e247a6766669985480e7292d9a6490c4",
+      "cases": 5692,
+      "trace_lines": 44404
+    },
+    "method": "Actual selected STS.cpp implementations and initialized native observer. Complete document state, return outcomes, thrown integers and consumed byte positions compared across two reference and two candidate executions per architecture. Includes 1,564 added OldSubRip/VPlayer cases: partial scans, missing delimiters, integer extrema, pipe replacement order, ANSI/DBCS and inline charset transitions, NUL/raw units, final fragments, and preloaded entries. Prior 4,128 SubRip/MPL2 cases remain an identical trace prefix."
+  },
+  "rendering": {
+    "generator": {
+      "path": "tools/compat/make_corpus.py",
+      "line": 775,
+      "sha256": "b20b25d621c722c01ee3e0c12c8d1bcf1d4b34c550e85dc3b3d77497c907732c"
+    },
+    "new_files": 10,
+    "new_cases": 20,
+    "new_frames": 260,
+    "new_distinct_controls": 4,
+    "behavior": "File/memory opens, repeat/reverse seeks, missing delimiters, pipe inside timestamp, false-read final fragments, raw NUL, DBCS and VPlayer caption-length boundaries. Missing-brace text and leading-caption-space duration have distinct-frame controls."
+  },
+  "limits": [
+    "No production default switch or full format/frontend/host closure.",
+    "Remaining scanf, charset, formatter, encoding, Add and file adapters are transitional native code.",
+    "Native pre-Open simplicity, allocation failure/reentry and real player/Aegisub integration remain unresolved.",
+    "No new non-Windows, Miri or default native-document runtime parity; default configuration has compile probes only.",
+    "Finite MSVC14.44 local Windows evidence; no crash, timeout or unstable outcome is treated as equality."
+  ],
+  "next_work": [
+    "Continue moving the remaining text-format parser control and ownership into safe Rust.",
+    "Replace native numeric, encoding, formatting and file adapters with audited system boundaries and safe policy.",
+    "Continue complete rendering, public host/ABI and vendored native replacement; retire fallback/raw adapters as callers move."
+  ]
+}

@@ -27,7 +27,44 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: SubRip and MPL2 parser ownership (2026-10-18)
+## Current port: Old SubRip and VPlayer parser ownership (2026-10-18)
+
+The experimental document path now owns Old SubRip and VPlayer parser loops in
+safe Rust, extending the checked SubRip/MPL2 session. This moves raw line storage,
+pipe replacement/iteration, scan-result decisions, caption extraction, timestamp
+arithmetic and EOF acceptance out of the native loops. Charset-aware FindChar,
+ReadString, CString predicates, CRT conversion and Add remain transitional native
+services outside registry loans. Only initialized successful scan values cross
+the boundary; the portable core continues to forbid unsafe code.
+
+The port preserves missing-delimiter search resets, accepted incomplete timestamp
+punctuation, DBCS trail pipes and inline charset changes. VPlayer duration uses
+the extracted caption's counted length before Add trims it: a leading caption
+space extends display time even when the rendered caption looks the same.
+
+Candidate `37365d44` (production implementation `62354562`) passes fresh cleanup
+`67da07cd` comparisons on **each** Windows architecture (x86 and x64):
+
+* 5,692 direct text-parser cases and 44,404 identical trace lines, repeated twice
+  for reference and candidate. Checkpoint `34dbc732` established the same probe
+  before implementation changes; the earlier SubRip/MPL2 trace prefix is intact.
+* All 874 rendering cases and 9,326 frames, with 84 distinct-frame controls.
+  The 20 new file/memory cases contribute 260 frames and four controls.
+* 3,266 ASS and 1,242 XombieSub regression cases; 3,693 linked lifecycle trace
+  lines; nine reference/native/experimental compile probes; exports/dependencies
+  for all three DLLs; and 10 scoped COM cases plus two candidate pin-ID controls.
+* 271 safe-core and 123 FFI tests, formatting and Clippy on each architecture;
+  152 Python harness tests with one skip. Unsafe FFI site counts are unchanged;
+  the lexical audit is an inventory, not a soundness proof.
+
+See the [source/boundary inventory](rust-legacy-parser-inventory.json) and
+[local evidence manifest](rust-legacy-parser-local-evidence.json). No production
+default switch, format closure or real player/Aegisub integration is claimed.
+Remaining text parsers, native services, rendering, hosts and vendored code stay
+in scope. The complete-library Rust migration remains active; native adapters
+are transitional.
+
+## Previous port: SubRip and MPL2 parser ownership (2026-10-18)
 
 The experimental document path now uses a checked Rust session for SubRip and
 MPL2 line/cue ownership, trimming, EOF handling, boundary decisions, timestamp
