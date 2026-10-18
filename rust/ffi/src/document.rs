@@ -270,6 +270,163 @@ pub extern "C" fn xy_vsfilter_document_search_drop_v1(id: u64) -> u32 {
 }
 
 /// # Safety
+/// Output receives a document-bound WebVTT session ID in eight writable bytes.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_vtt_begin_v1(
+    owner: u64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let id = required!(admitted(|registry| {
+        registry.document(owner).map_err(registry_error)?;
+        let id = registry.reserve_insert().map_err(registry_error)?;
+        registry.insert_reserved(
+            id,
+            Resource::VttRun {
+                owner,
+                run: xy_vsfilter_compat::vtt_document::Run::new(),
+            },
+        );
+        Ok(id)
+    }));
+    // SAFETY: preflighted output; registry borrowing has ended.
+    unsafe { write_output(output, &id.to_le_bytes()) };
+    OK
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_vtt_drop_v1(id: u64) -> u32 {
+    status(DOCUMENTS.destroy(id, Kind::VttRun).map_err(registry_error))
+}
+/// # Safety
+/// Initialized raw UTF16LE and one strict-bool whitespace flag per unit. Flags
+/// preserve CString FastTrimRight without Unicode scalar conversion.
+/// EOF is !ReadString. Both spans are copied before registry admission.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_vtt_read_v1(
+    id: u64,
+    eof: u32,
+    input: *const u8,
+    length: usize,
+    spaces: *const u8,
+    space_length: usize,
+) -> u32 {
+    if eof > 1 || length % 2 != 0 || space_length != length / 2 {
+        return INVALID_INPUT;
+    }
+    // SAFETY: initialized bounded caller buffer, copied before borrowing state.
+    let text = units(&required!(unsafe { copy_input(input, length) }));
+    // SAFETY: same caller-buffer contract for predicate flags.
+    let spaces = required!(unsafe { copy_input(spaces, space_length) });
+    status(admitted(|registry| {
+        let (doc, run) = registry.vtt_pair(id).map_err(registry_error)?;
+        run.read(doc, &text, &spaces, eof != 0).map_err(ass_error)
+    }))
+}
+/// # Safety
+/// Command0 supplies header scanf count and a three-string packet only for
+/// count2/3 (otherwise empty). Command1 supplies converted raw UTF16LE with
+/// value0. Command2 supplies a key/foreground/background packet with value0.
+/// Three-string packets are three LE u32 unit counts followed by raw spans.
+/// All input is copied and decoded before registry admission.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_vtt_packet_v1(
+    id: u64,
+    command: u32,
+    value: i32,
+    input: *const u8,
+    length: usize,
+) -> u32 {
+    if command > 2
+        || (command != 0 && value != 0)
+        || length % 2 != 0
+        || (command == 0 && !(-1..=3).contains(&value))
+    {
+        return INVALID_INPUT;
+    }
+    // SAFETY: caller supplies initialized readable bytes; no native loan retained.
+    let bytes = required!(unsafe { copy_input(input, length) });
+    let parts = if command == 2 || (command == 0 && value >= 2) {
+        required!(xy_vsfilter_compat::vtt_document::decode_three(&bytes).map_err(ass_error))
+    } else {
+        if command == 0 && !bytes.is_empty() {
+            return INVALID_INPUT;
+        }
+        Default::default()
+    };
+    let text = if command == 1 {
+        units(&bytes)
+    } else {
+        Vec::new()
+    };
+    status(admitted(|registry| {
+        let (_, run) = registry.vtt_pair(id).map_err(registry_error)?;
+        match command {
+            0 => run.header(value, parts),
+            1 => run.converted(&text),
+            2 => run.color(parts),
+            _ => unreachable!(),
+        }
+        .map_err(ass_error)
+    }))
+}
+/// Initialized CRT time values: count5 uses first three and a zero fourth;
+/// count7 uses all four; every other count requires four zeros.
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_vtt_time_v1(
+    id: u64,
+    count: i32,
+    h: i32,
+    m: i32,
+    s: i32,
+    ms: i32,
+) -> u32 {
+    status(admitted(|registry| {
+        registry
+            .vtt_pair(id)
+            .map_err(registry_error)?
+            .1
+            .time(count, [h, m, s, ms])
+            .map_err(ass_error)
+    }))
+}
+/// Command0 acknowledges style extraction; command1 acknowledges completed Add.
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_vtt_step_v1(id: u64, command: u32) -> u32 {
+    status(admitted(|registry| {
+        registry
+            .vtt_pair(id)
+            .map_err(registry_error)?
+            .1
+            .acknowledge(command)
+            .map_err(ass_error)
+    }))
+}
+/// # Safety
+/// Output receives an independent snapshot ID in eight writable bytes. Group0:
+/// op/accepted:u32[2],start/end:i64,raw UTF16LE payload. Group1: raw cue tags.
+/// Group2: map count:u32 then key/foreground/background three-string packets.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_vtt_part_v1(
+    id: u64,
+    group: u32,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let bytes = required!(admitted(|registry| registry
+        .vtt_pair(id)
+        .map_err(registry_error)?
+        .1
+        .snapshot(group)
+        .map_err(ass_error)));
+    let snapshot = required!(insert(Resource::Snapshot(bytes)));
+    // SAFETY: preflighted writable output; snapshot owns all bytes independently.
+    unsafe { write_output(output, &snapshot.to_le_bytes()) };
+    OK
+}
+
+/// # Safety
 /// Output receives a document-bound SAMI session ID in eight writable bytes.
 /// Position is the native file position captured before format discovery.
 #[no_mangle]
@@ -4333,6 +4490,202 @@ mod tests {
             for snapshot in [micro_snapshot, name_snapshot, current_name] {
                 assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
             }
+            // WebVTT: copies, phase errors, typed IDs, BUSY, and detached snapshots.
+            let vtt_owner = create();
+            out.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_document_vtt_begin_v1(vtt_owner, out.as_mut_ptr(), 7),
+                INVALID_INPUT
+            );
+            assert!(out.iter().all(|&b| b == 0xa5));
+            assert_eq!(
+                xy_vsfilter_document_vtt_begin_v1(vtt_owner, out.as_mut_ptr(), 8),
+                OK
+            );
+            let vtt_run = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let magic: Vec<u8> = "WEBVTT".encode_utf16().flat_map(u16::to_le_bytes).collect();
+            let spaces = [0u8; 6];
+            assert_eq!(
+                xy_vsfilter_document_vtt_read_v1(
+                    vtt_owner,
+                    0,
+                    magic.as_ptr(),
+                    magic.len(),
+                    spaces.as_ptr(),
+                    6
+                ),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                xy_vsfilter_document_vtt_read_v1(
+                    vtt_run,
+                    2,
+                    magic.as_ptr(),
+                    magic.len(),
+                    spaces.as_ptr(),
+                    6
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_vtt_read_v1(
+                    vtt_run,
+                    0,
+                    magic.as_ptr(),
+                    magic.len() - 1,
+                    spaces.as_ptr(),
+                    6
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_vtt_read_v1(
+                        vtt_run,
+                        0,
+                        magic.as_ptr(),
+                        magic.len(),
+                        spaces.as_ptr(),
+                        6
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                xy_vsfilter_document_vtt_read_v1(
+                    vtt_run,
+                    1,
+                    magic.as_ptr(),
+                    magic.len(),
+                    spaces.as_ptr(),
+                    6
+                ),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_vtt_part_v1(vtt_run, 2, out.as_mut_ptr(), 8),
+                OK
+            );
+            let vtt_colors = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let colors_before = read_snapshot(vtt_colors);
+            assert_eq!(&colors_before[..4], &16u32.to_le_bytes());
+            let vtt_read = |text: &str| {
+                let bytes: Vec<u8> = text.encode_utf16().flat_map(u16::to_le_bytes).collect();
+                let spaces = vec![0; bytes.len() / 2];
+                assert_eq!(
+                    xy_vsfilter_document_vtt_read_v1(
+                        vtt_run,
+                        0,
+                        bytes.as_ptr(),
+                        bytes.len(),
+                        spaces.as_ptr(),
+                        spaces.len()
+                    ),
+                    OK
+                );
+            };
+            vtt_read("STYLE");
+            vtt_read("body");
+            vtt_read("");
+            let three = |a: &str, b: &str, c: &str| {
+                let parts = [
+                    a.encode_utf16().collect::<Vec<_>>(),
+                    b.encode_utf16().collect(),
+                    c.encode_utf16().collect(),
+                ];
+                let mut bytes = Vec::new();
+                for p in &parts {
+                    bytes.extend_from_slice(&(p.len() as u32).to_le_bytes());
+                }
+                for p in &parts {
+                    bytes.extend(p.iter().flat_map(|u| u.to_le_bytes()));
+                }
+                bytes
+            };
+            let mut color = three(".red", "", "ff00ff");
+            assert_eq!(
+                xy_vsfilter_document_vtt_packet_v1(vtt_run, 2, 0, color.as_ptr(), color.len() - 2),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_vtt_packet_v1(vtt_run, 2, 1, color.as_ptr(), color.len()),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_vtt_packet_v1(
+                        vtt_run,
+                        2,
+                        0,
+                        color.as_ptr(),
+                        color.len()
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                xy_vsfilter_document_vtt_packet_v1(vtt_run, 2, 0, color.as_ptr(), color.len()),
+                OK
+            );
+            color.fill(0xa5);
+            assert_eq!(xy_vsfilter_document_vtt_step_v1(vtt_run, 1), INVALID_INPUT);
+            assert_eq!(xy_vsfilter_document_vtt_step_v1(vtt_run, 0), OK);
+            vtt_read("header");
+            let header = three("1:2.3", "1:3.4", "");
+            assert_eq!(
+                xy_vsfilter_document_vtt_packet_v1(vtt_run, 0, 0, header.as_ptr(), header.len()),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_vtt_packet_v1(vtt_run, 0, 2, header.as_ptr(), header.len()),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_vtt_time_v1(vtt_run, 5, 1, 2, 3, 4),
+                INVALID_INPUT
+            );
+            assert_eq!(xy_vsfilter_document_vtt_time_v1(vtt_run, 5, 1, 2, 3, 0), OK);
+            assert_eq!(xy_vsfilter_document_vtt_time_v1(vtt_run, 5, 1, 3, 4, 0), OK);
+            vtt_read("caption");
+            let mut caption = vec![65, 0, 0, 0, 0, 0xd8];
+            assert_eq!(
+                xy_vsfilter_document_vtt_packet_v1(vtt_run, 1, 0, caption.as_ptr(), caption.len()),
+                OK
+            );
+            caption.fill(0xa5);
+            vtt_read("");
+            assert_eq!(
+                xy_vsfilter_document_vtt_part_v1(vtt_run, 0, out.as_mut_ptr(), 7),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_vtt_part_v1(vtt_run, 3, out.as_mut_ptr(), 8),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_vtt_part_v1(vtt_run, 0, out.as_mut_ptr(), 8),
+                OK
+            );
+            let vtt_snapshot = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let retained = read_snapshot(vtt_snapshot);
+            assert_eq!(&retained[..4], &9u32.to_le_bytes());
+            assert_eq!(&retained[24..], &[65, 0]);
+            assert_eq!(xy_vsfilter_document_vtt_step_v1(vtt_run, 1), OK);
+            assert_eq!(xy_vsfilter_document_destroy_v1(vtt_owner), OK);
+            assert_eq!(
+                xy_vsfilter_document_vtt_part_v1(vtt_run, 0, out.as_mut_ptr(), 8),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                xy_vsfilter_document_vtt_time_v1(vtt_run, 5, 1, 2, 3, 0),
+                BAD_HANDLE
+            );
+            assert_eq!(read_snapshot(vtt_snapshot), retained);
+            assert_eq!(read_snapshot(vtt_colors), colors_before);
+            assert_eq!(xy_vsfilter_document_vtt_drop_v1(vtt_run), OK);
+            assert_eq!(xy_vsfilter_document_vtt_drop_v1(vtt_run), BAD_HANDLE);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(vtt_snapshot), OK);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(vtt_colors), OK);
             let sami_owner = create();
             out.fill(0xa5);
             assert_eq!(

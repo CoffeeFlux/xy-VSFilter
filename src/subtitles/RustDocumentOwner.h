@@ -241,6 +241,7 @@ class XombieDocument;
 class TextDocument;
 class MicroDvdDocument;
 class SamiDocument;
+class VttDocument;
 class UnknownStylesPass;
 class StyleAddition;
 class NamedStyleCopy;
@@ -252,6 +253,7 @@ class DocumentReply {
     friend class TextDocument;
     friend class MicroDvdDocument;
     friend class SamiDocument;
+    friend class VttDocument;
     friend class DocumentOwner;
     friend class UnknownStylesPass;
     friend class StyleAddition;
@@ -294,6 +296,7 @@ class DocumentOwner {
     friend class TextDocument;
     friend class MicroDvdDocument;
     friend class SamiDocument;
+    friend class VttDocument;
     friend class UnknownStylesPass;
     friend class StyleAddition;
     friend class NamedStyleCopy;
@@ -882,6 +885,67 @@ public:
         style=DocumentDetail::StyleValue(Part(1));const auto bytes=Part(2);DocumentDetail::Shape(bytes.size()%2==0);
         size_t offset=0;name=DocumentDetail::String(bytes,offset,DocumentDetail::Count(bytes.size()/2));
         Step(4); // release before AddStyle consumes its native temporary
+    }
+};
+class VttDocument {
+    uint64_t id_=0;
+    void Packet(unsigned command,int value,const DocumentDetail::Bytes& bytes) {
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_vtt_packet_v1(id_,command,value,bytes.data(),bytes.size());}));
+    }
+    static DocumentDetail::Bytes Three(const CStringW& a,const CStringW& b,const CStringW& c) {
+        DocumentDetail::Bytes bytes;
+        for(const auto* part:{&a,&b,&c})DocumentDetail::Append(bytes,part->GetLength(),4);
+        for(const auto* part:{&a,&b,&c}){const auto units=DocumentDetail::Units(*part);bytes.insert(bytes.end(),units.begin(),units.end());}
+        return bytes;
+    }
+    DocumentDetail::Bytes Part(unsigned group) const {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_vtt_part_v1(id_,group,out.data(),out.size());}));
+        DocumentReply snapshot(DocumentDetail::Load(out,0,8));return snapshot.Read();
+    }
+public:
+    explicit VttDocument(const DocumentOwner& owner) {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_vtt_begin_v1(owner.id_,out.data(),out.size());}));id_=DocumentDetail::Load(out,0,8);
+    }
+    VttDocument(const VttDocument&)=delete;VttDocument& operator=(const VttDocument&)=delete;
+    ~VttDocument() noexcept {if(id_){const auto id=id_;id_=0;DocumentDetail::Release(DocumentDetail::Invoke([&]{return xy_vsfilter_document_vtt_drop_v1(id);}));}}
+    void Read(const CStringW& text,bool eof) {
+        const auto bytes=DocumentDetail::Units(text);std::vector<uint8_t> spaces(text.GetLength());
+        for(int i=0;i<text.GetLength();++i)spaces[i]=CStringW::StrTraits::IsSpace(text[i])?1:0;
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_vtt_read_v1(id_,eof?1:0,bytes.data(),bytes.size(),spaces.data(),spaces.size());}));
+    }
+    void Header(int count,const CStringW& start,const CStringW& end,const CStringW& tags) {
+        Packet(0,count,count>=2?Three(start,end,count==3?tags:CStringW()):DocumentDetail::Bytes());
+    }
+    void Time(int count,int h,int m,int s,int ms) {
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_vtt_time_v1(id_,count,h,m,s,ms);}));
+    }
+    void Converted(const CStringW& text) {Packet(1,0,DocumentDetail::Units(text));}
+    void PutColor(const std::wstring& key,const std::wstring& foreground,const std::wstring& background) {
+        Packet(2,0,Three(CStringW(key.data(),DocumentDetail::Count(key.size())),CStringW(foreground.data(),DocumentDetail::Count(foreground.size())),CStringW(background.data(),DocumentDetail::Count(background.size()))));
+    }
+    void Step(unsigned command) {DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_vtt_step_v1(id_,command);}));}
+    CStringW Tags() const {
+        const auto bytes=Part(1);DocumentDetail::Shape(bytes.size()%2==0);size_t offset=0;
+        return DocumentDetail::String(bytes,offset,DocumentDetail::Count(bytes.size()/2));
+    }
+    template<class Apply> void Colors(Apply apply) const {
+        const auto bytes=Part(2);size_t offset=4;const auto count=DocumentDetail::Load(bytes,0,4);
+        for(uint64_t i=0;i<count;++i){
+            std::array<uint32_t,3> lengths{};
+            for(auto& n:lengths){n=DocumentDetail::Count(DocumentDetail::Load(bytes,offset,4));offset+=4;}
+            std::array<CStringW,3> strings;
+            for(size_t j=0;j<3;++j)strings[j]=DocumentDetail::String(bytes,offset,lengths[j]);
+            apply(std::wstring(strings[0],strings[0].GetLength()),std::wstring(strings[1],strings[1].GetLength()),std::wstring(strings[2],strings[2].GetLength()));
+        }
+        DocumentDetail::Shape(offset==bytes.size());
+    }
+    unsigned Next(CStringW& text,int64_t& start,int64_t& end,bool& accepted) const {
+        const auto bytes=Part(0);
+        DocumentDetail::Shape(bytes.size()>=24 && (bytes.size()-24)%2==0 && DocumentDetail::Load(bytes,0,4)<=11 && DocumentDetail::Load(bytes,4,4)<=1);
+        accepted=DocumentDetail::Load(bytes,4,4)!=0;start=DocumentDetail::I64(DocumentDetail::Load(bytes,8,8));end=DocumentDetail::I64(DocumentDetail::Load(bytes,16,8));
+        size_t offset=24;text=DocumentDetail::String(bytes,offset,DocumentDetail::Count((bytes.size()-24)/2));return static_cast<unsigned>(DocumentDetail::Load(bytes,0,4));
     }
 };
 class SamiDocument {

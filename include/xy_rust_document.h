@@ -271,6 +271,22 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_open_lifecycle_drop_v1(uint64_t 
 // Invalid protocol/capacity leaves the run, document and output untouched;
 // absent opposite screen axis reports UNRESOLVED_REFERENCE. No native loans
 // or callbacks survive a call. Drop remains valid after document destruction.
+// Checked WebVTT session. Read copies raw UTF16LE and strict-bool whitespace.
+// Packet0 header count and three strings only for count2/3; Packet1 converted
+// UTF16LE; Packet2 key/foreground/background (value0 for commands1/2).
+// Three strings: three LE u32 unit counts followed by the raw spans.
+// Time: count5 first three values plus zero; count7 all four; otherwise zeros.
+// Step0 style extraction ack,1 Add ack. Part0: op/accepted:u32,start/end:i64,
+// raw payload. Part1 raw cueTags; Part2 count:u32 then three-string packets.
+// Ops Magic0/Header1/StyleRead2/StyleParse3/HeaderScan4/Start5/End6/Caption7/
+// Convert8/Emit9/Done10/Failed11. Sessions retain no native pointers/callbacks.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_vtt_begin_v1(uint64_t,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_vtt_drop_v1(uint64_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_vtt_read_v1(uint64_t,uint32_t,const uint8_t*,size_t,const uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_vtt_packet_v1(uint64_t,uint32_t,int32_t,const uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_vtt_time_v1(uint64_t,int32_t,int32_t,int32_t,int32_t,int32_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_vtt_step_v1(uint64_t,uint32_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_vtt_part_v1(uint64_t,uint32_t,uint8_t*,size_t);
 // Checked SAMI discovery/rewind/caption session. Read/Upper copy raw UTF16LE.
 // Step0 rewind ack,1 strict-bool iswdigit,2 Add ack; acknowledgements use value0.
 // Part: op/accepted/digit-unit/reserved:u32[4],rewind-position:u64,start/end:i64,

@@ -923,7 +923,88 @@ static void WebVTT2SSA(CStringW& str) {
     WebVTT2SSA(str, discard, discardMap);
 }
 
-static bool OpenVTT(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet) {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+static void ParseVttStyle(const CStringW& styleStr,XyRust::VttDocument& parser) {
+            auto parseColor = [](std::wstring styles, std::wstring attr = L"color") {
+                //we only support color styles for now
+                std::wregex clrPat(attr + LR"(\s*:\s*#?([a-zA-Z0-9]*)\s*;)"); //e.g., 0xffffff or white
+                std::wregex rgbPat(attr + LR"(\s*:\s*rgb\s*\(\s*([0-9]+)\s*,\s*([0-9]+)\s*,\s*([0-9]+)\s*\)\s*;)");
+                std::wsmatch match;
+                std::wstring clrStr = L"";
+                if (std::regex_search(styles, match, clrPat)) {
+                    clrStr = match[1];
+                }
+                else if (std::regex_search(styles, match, rgbPat)) {
+                    int r = stoi(match[1]) & 0xff;
+                    int g = stoi(match[2]) & 0xff;
+                    int b = stoi(match[3]) & 0xff;
+                    DWORD clr = (r << 16) + (g << 8) + b;
+                    std::wstringstream hexClr;
+                    hexClr << std::hex << clr;
+                    clrStr = hexClr.str();
+                }
+                return clrStr;
+            };
+
+            RegexUtil::wregexResults results;
+            std::wregex cueDefPattern(LR"(::cue\s*\{([^}]*)\})"); //default cue style
+            RegexUtil::wstringMatch(cueDefPattern, (const wchar_t*)styleStr, results);
+            if (results.size() > 0) {
+                auto iter = results[results.size() - 1];
+                std::wstring clr, bgClr;
+                clr = parseColor(iter[0]);
+                bgClr = parseColor(iter[0], L"background");
+                if (clr != L"" || bgClr != L"") {
+                    parser.PutColor(L"::cue", clr, bgClr);
+                }
+            }
+
+            std::wregex cuePattern(LR"(::cue\(([^)]+)\)\s*\{([^}]*)\})");
+            RegexUtil::wstringMatch(cuePattern, (const wchar_t*)styleStr, results);
+            for (const auto& iter : results) {
+                std::wstring clr, bgClr;
+                clr = parseColor(iter[1]);
+                bgClr = parseColor(iter[1], L"background");
+                if (clr != L"" || bgClr != L"") {
+                    parser.PutColor(iter[0], clr, bgClr);
+                }
+            }
+}
+#endif
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+static
+#endif
+bool OpenVTT(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet) {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    XyRust::VttDocument parser(*ret.m_document);
+    for(;;) {
+        CStringW text;int64_t start,end;bool accepted;
+        const unsigned op=parser.Next(text,start,end,accepted);
+        if(op==10)return accepted;
+        if(op==11)return false;
+        if(op==0 || op==1 || op==2 || op==7){CStringW line;const bool eof=!file->ReadString(line);parser.Read(line,eof);}
+        else if(op==3){ParseVttStyle(text,parser);parser.Step(0);}
+        else if(op==4){
+            CStringW first,last,tags;const int len=text.GetLength();
+            const int c=swscanf_s(text,L"%s --> %s %[^\n]s",first.GetBuffer(len),len,last.GetBuffer(len),len,tags.GetBuffer(len),len);
+            first.ReleaseBuffer();last.ReleaseBuffer();tags.ReleaseBuffer();parser.Header(c,first,last,tags);
+        }
+        else if(op==5 || op==6){
+            int h=0,m=0,s=0,ms=0;WCHAR sep;
+            const int c=swscanf_s(text,L"%d%c%d%c%d%c%d",&h,&sep,1,&m,&sep,1,&s,&sep,1,&ms);
+            if(c==5)parser.Time(c,h,m,s,0);
+            else if(c==7)parser.Time(c,h,m,s,ms);
+            else parser.Time(c,0,0,0,0);
+        }
+        else if(op==8){
+            // Temporary conversion inputs only; Rust owns the persistent map.
+            auto tags=parser.Tags();WebVTTcolorMap colors;
+            parser.Colors([&](const std::wstring& key,const std::wstring& foreground,const std::wstring& background){colors[key]=WebVTTcolorData({foreground,background});});
+            WebVTT2SSA(text,tags,colors);parser.Converted(text);
+        }
+        else if(op==9){ret.Add(text,file->IsUnicode(),start,end);parser.Step(1);}
+    }
+#else
     CStringW buff, start, end, cueTags;
 
     file->ReadString(buff);
@@ -1090,6 +1171,7 @@ static bool OpenVTT(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet) {
     }
 
     return !ret.IsEmpty();
+#endif
 }
 
 

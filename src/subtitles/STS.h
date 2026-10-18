@@ -404,6 +404,7 @@ public:
     friend bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet);
     friend bool OpenXombieSub(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet);
     friend bool OpenSami(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet);
+    friend bool OpenVTT(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet);
     friend bool OpenTextDocument(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet, unsigned format);
 #endif
 private:
