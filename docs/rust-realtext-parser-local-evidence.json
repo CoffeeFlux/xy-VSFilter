@@ -1,0 +1,795 @@
+{
+  "schema": 1,
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "candidate_commit": "cb22238393b2e07a21e7992742fa47d54778a766",
+  "implementation_commit": "c6d862c563c1c92791cc82a1d301ffe4f6fe90ea",
+  "prior_increment": "b046f8bc",
+  "configuration": {
+    "native": "Release, RustTextDecoder=true, RustDocumentOwnerExperimental=true",
+    "rust": "1.85.0; native-runtime with +crt-static",
+    "msvc": "14.44.35207",
+    "sdk": "10.0.26100.0"
+  },
+  "scope": "RealText owned parser and subtitle map; no format, frontend, host or repository closure.",
+  "architectures": {
+    "x64": {
+      "corpus": {
+        "report": "artifacts/realtext-final-csri-x64/summary.json",
+        "sha256": "e5662bd5740f1121b96e1368074c891e0a937807f6d8557fdc3657c33ab5462c",
+        "complete": true,
+        "frames": 10346,
+        "distinct_controls": 100,
+        "partition_exact": true,
+        "cases": 954,
+        "shards": [
+          {
+            "report": "artifacts/realtext-final-csri-x64/shard-0/report.json",
+            "sha256": "28102d29a63a36ec2b2e03095bf3259836b2e1632f2bb8a11f83228ebfb2f81a",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1308,
+            "cases": 120
+          },
+          {
+            "report": "artifacts/realtext-final-csri-x64/shard-1/report.json",
+            "sha256": "dbc93d8fdf9a9e44a8a6d3923e45cd23231b7664758c6d2d4a96a24c9fe54023",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1308,
+            "cases": 120
+          },
+          {
+            "report": "artifacts/realtext-final-csri-x64/shard-2/report.json",
+            "sha256": "f6b82e3ec0a095dfbf2a67d102e7587a6406bbc1c800836a914c0cbea74a98fd",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1289,
+            "cases": 119
+          },
+          {
+            "report": "artifacts/realtext-final-csri-x64/shard-3/report.json",
+            "sha256": "9acd7b5587167c7fd93b6e0073e5df77429f19e40f15fe50f41e0f3433cfc31a",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1289,
+            "cases": 119
+          },
+          {
+            "report": "artifacts/realtext-final-csri-x64/shard-4/report.json",
+            "sha256": "77d4cd180b619ae9e0daba6b2414cc1d2179879ad851cf800945a28160e489cd",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1290,
+            "cases": 119
+          },
+          {
+            "report": "artifacts/realtext-final-csri-x64/shard-5/report.json",
+            "sha256": "b1e340c9ffc7006e57f2a1dc56dbaf7c8d8d3f325af2cb862952bb554e369971",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1290,
+            "cases": 119
+          },
+          {
+            "report": "artifacts/realtext-final-csri-x64/shard-6/report.json",
+            "sha256": "3eaab49df4a2f057af22dbc6cf4da12562d869980e475fb7c743b4478e6fa165",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1286,
+            "cases": 119
+          },
+          {
+            "report": "artifacts/realtext-final-csri-x64/shard-7/report.json",
+            "sha256": "0d8a089be1387df9e0618a32a2699bb9ef9413de0726d424af51557b6ebc0642",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1286,
+            "cases": 119
+          }
+        ],
+        "rendered_frames": 10346,
+        "source_manifest_sha256": "2fe76d24ee36881c478cd3e41f0da7178202be09c00044ebc3b6bae52cb10469",
+        "partition_driver_sha256": "68965c1e1768e61743401c1686d6fedb0ba7c0067715eddc5a93b13307b46ca8"
+      },
+      "new_rendering": {
+        "included_in_full_corpus": true,
+        "cases": 20,
+        "frames": 240,
+        "distinct_controls": 4,
+        "ids": [
+          "realtext-parser-control-file",
+          "realtext-parser-control-memory",
+          "realtext-parser-final-fragment-file",
+          "realtext-parser-final-fragment-memory",
+          "realtext-parser-first-line-file",
+          "realtext-parser-first-line-memory",
+          "realtext-parser-italic-file",
+          "realtext-parser-italic-memory",
+          "realtext-parser-map-order-file",
+          "realtext-parser-map-order-memory",
+          "realtext-parser-map-replace-file",
+          "realtext-parser-map-replace-memory",
+          "realtext-parser-missing-end-file",
+          "realtext-parser-missing-end-memory",
+          "realtext-parser-overflow-file",
+          "realtext-parser-overflow-memory",
+          "realtext-parser-raw-units-file",
+          "realtext-parser-raw-units-memory",
+          "realtext-parser-restore-file",
+          "realtext-parser-restore-memory"
+        ]
+      },
+      "parser": {
+        "report": "artifacts/realtext-expanded-probe-x64/report.json",
+        "sha256": "389d370b86d8c4f7db0056553c9b1839603bebb0feebaf4efc56550d1801e3f8",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "cb22238393b2e07a21e7992742fa47d54778a766",
+        "trace_lines": 32495,
+        "inputs_unchanged": true,
+        "cases": 3932
+      },
+      "baseline_parser": {
+        "report": "artifacts/realtext-baseline-x64/report.json",
+        "sha256": "c34d99292f55cda0fd463d6ab1a8bc012b644f21e82d0cb2c0de7e7cfcc1d7e4",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "d9634037a693f1444eb69cc26eaf6a68188ff0ba",
+        "trace_lines": 15599,
+        "inputs_unchanged": true,
+        "cases": 2212
+      },
+      "baseline_traces_preserved": true,
+      "initial_parser": {
+        "report": "artifacts/realtext-final-probe-x64/report.json",
+        "sha256": "ffe4814be0aab6c9f0b8b7028450fa9ca67f8cdf3f3a0930f36b953144a6ff6d",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "3e20ec46fb223df9f28775fda671a84dfcf19c2e",
+        "trace_lines": 15599,
+        "inputs_unchanged": true,
+        "cases": 2212
+      },
+      "initial_rendering_fixture_failure": {
+        "summary": "artifacts/realtext-csri-x64/summary.json",
+        "sha256": "1d29be56210631e2cdfd28508760b574d692af898874c5a7d4a0db9c8a79d7f6",
+        "manifest_sha256": "8b38a3b2c56f262ed4042ac8edd00d40f3f4ac34fb5c7185e46faa0cf87ea54d",
+        "all_individual_verdicts_equal": true,
+        "controls_passed": false,
+        "failed_control_count": 4,
+        "new_open_rejected_cases": [
+          "realtext-parser-control-file",
+          "realtext-parser-control-memory",
+          "realtext-parser-final-fragment-file",
+          "realtext-parser-final-fragment-memory",
+          "realtext-parser-first-line-file",
+          "realtext-parser-first-line-memory",
+          "realtext-parser-map-order-file",
+          "realtext-parser-map-order-memory",
+          "realtext-parser-map-replace-file",
+          "realtext-parser-map-replace-memory",
+          "realtext-parser-missing-end-file",
+          "realtext-parser-missing-end-memory",
+          "realtext-parser-overflow-file",
+          "realtext-parser-overflow-memory",
+          "realtext-parser-raw-units-file",
+          "realtext-parser-raw-units-memory"
+        ],
+        "shards": [
+          {
+            "report": "artifacts/realtext-csri-x64/shard-0/report.json",
+            "sha256": "516a07fa2647b6673eb0ab870cdb0ae1c07b59a2418b98199114089c30454096",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1284,
+            "cases": 120
+          },
+          {
+            "report": "artifacts/realtext-csri-x64/shard-1/report.json",
+            "sha256": "6eab81898b27d3eb190dcf9fbf948768c945944c5a66b2a821dcd5f6557115b5",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1284,
+            "cases": 120
+          },
+          {
+            "report": "artifacts/realtext-csri-x64/shard-2/report.json",
+            "sha256": "b2279986f885a80f0a42610ca42b7286d34f953210f1f2f08eb3deec75c032d9",
+            "complete": true,
+            "passed": false,
+            "rendered_frames": 1253,
+            "cases": 119
+          },
+          {
+            "report": "artifacts/realtext-csri-x64/shard-3/report.json",
+            "sha256": "104c8e267963aae3d5551404fba03cdc65da9232f454d3edc9700ac8a1b8556e",
+            "complete": true,
+            "passed": false,
+            "rendered_frames": 1253,
+            "cases": 119
+          },
+          {
+            "report": "artifacts/realtext-csri-x64/shard-4/report.json",
+            "sha256": "a517e7325475d479a6decee22af30f67a3bfab3977ae7eac9bfad3db2960ec9d",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1278,
+            "cases": 119
+          },
+          {
+            "report": "artifacts/realtext-csri-x64/shard-5/report.json",
+            "sha256": "eaa08e450a8fe761b5daa568cc759adc64b96c00b836b3909d61ccb27c2982cb",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1278,
+            "cases": 119
+          },
+          {
+            "report": "artifacts/realtext-csri-x64/shard-6/report.json",
+            "sha256": "a25eba114efb41a5b044d303fff4425ecf01686f3b55d40abfef6c4b7968661e",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1262,
+            "cases": 119
+          },
+          {
+            "report": "artifacts/realtext-csri-x64/shard-7/report.json",
+            "sha256": "e5f12813d914cfcdc63b421032f4e7f51be9b5660e01c47f1d49b34bc298199e",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1262,
+            "cases": 119
+          }
+        ],
+        "not_counted_as_passing_gate": true
+      },
+      "corrected_targeted_rendering": {
+        "report": "artifacts/realtext-fixed-x64/report.json",
+        "sha256": "c2e3dfb078f574382707caa76a33f0d86e80762965cf52e500e67d47e22f4201",
+        "complete": true,
+        "passed": true,
+        "rendered_frames": 240,
+        "cases": 20
+      },
+      "vtt_regression": {
+        "report": "artifacts/realtext-vtt-regression-x64/report.json",
+        "sha256": "6cbaad8c25f489166dd78bf6cfd7fae32cf2a450b7e4339c1b03b86e333e70eb",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "3e20ec46fb223df9f28775fda671a84dfcf19c2e",
+        "trace_lines": 21939,
+        "inputs_unchanged": true,
+        "cases": 2292
+      },
+      "sami_regression": {
+        "report": "artifacts/realtext-sami-regression-x64/report.json",
+        "sha256": "88bafb6989d6973c016543481eb24904ed112037c107f63c243775fab2213946",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "3e20ec46fb223df9f28775fda671a84dfcf19c2e",
+        "trace_lines": 26992,
+        "inputs_unchanged": true,
+        "cases": 2836
+      },
+      "text_regression": {
+        "report": "artifacts/realtext-text-regression-x64/report.json",
+        "sha256": "6d1a57ecec798b38bc92d6085533e8d10a3e858a55f7712d7a226f3821ac19a7",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "3e20ec46fb223df9f28775fda671a84dfcf19c2e",
+        "trace_lines": 44404,
+        "inputs_unchanged": true,
+        "cases": 5692
+      },
+      "microdvd_regression": {
+        "report": "artifacts/realtext-microdvd-regression-x64/report.json",
+        "sha256": "95f0f5b31cdfe092236ba992c5c9720ba418ace439a993a335970aff8bb91a60",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "3e20ec46fb223df9f28775fda671a84dfcf19c2e",
+        "trace_lines": 41491,
+        "inputs_unchanged": true,
+        "cases": 4588
+      },
+      "ass_regression": {
+        "report": "artifacts/realtext-ass-probe-x64/report.json",
+        "sha256": "50113f1c035b10c173afb656206291da19310fe574cff0d501caaac348780ccc",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "3e20ec46fb223df9f28775fda671a84dfcf19c2e",
+        "trace_lines": 22286,
+        "inputs_unchanged": true,
+        "cases": 3266
+      },
+      "xombie_regression": {
+        "report": "artifacts/realtext-xombie-probe-x64/report.json",
+        "sha256": "6fb80d165f656bc16d5cb8026e14c5a133109ceb3e36aa4e3d6357d4323d82a5",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "3e20ec46fb223df9f28775fda671a84dfcf19c2e",
+        "trace_lines": 10441,
+        "inputs_unchanged": true,
+        "cases": 1242
+      },
+      "lifecycle": {
+        "report": "artifacts/realtext-lifecycle-x64/report.json",
+        "sha256": "51427981e32720643d922ba91494d30ca695a9abd7cebee3b079f76db876ff49",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "3e20ec46fb223df9f28775fda671a84dfcf19c2e",
+        "trace_lines": 3693,
+        "inputs_unchanged": true
+      },
+      "compile": {
+        "report": "artifacts/realtext-compile-x64/report.json",
+        "sha256": "01ed15fbf6f2a82552cc55df9142148afa2fb0a6920e9d9ed7e31abe4ec34fb1",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "3e20ec46fb223df9f28775fda671a84dfcf19c2e",
+        "inputs_unchanged": true,
+        "scope": "Compile-only actual style helper/lifecycle sources and headers; no link, execution or parity claim"
+      },
+      "com": {
+        "report": "artifacts/realtext-contracts-x64/com/report.json",
+        "sha256": "25d5f23e6437a068e60dca73c9be15890942f7a3ab794d15581be42228c22b17",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "3e20ec46fb223df9f28775fda671a84dfcf19c2e",
+        "inputs_unchanged": true,
+        "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "2d254068a40e5f59cf191c3c6bbfc984b548193b668c4decac21dc1e94e02169",
+          "candidate_sha256": "3bcc5af46597fe74f5790e607e987ecc619967c32ab61a4548b14d3b614df8aa",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "858b557df4643353cc2b7f7a4faf24fb20fc571f39dc8929949a8b9d80276024"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "32b7c2cd6eb817120414db53b3c3005e719ae4b993c4a69d0d66c7f6ac363d5a",
+          "candidate_sha256": "8de842e171c239695c65d256af9a2841592f227ffa6f7273a6a9a334ac7db53e",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "09623cbd08a08a70ca726d32f1ac7a80358fe93589dfe22d814f7c9544f6d751"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "f1165742064181b7fb73bacb16017d8e202c8bb0be90ed8c2eb812ac282c2df8",
+          "candidate_sha256": "560ad3292c9661d89546399388c9f7ecd6571a94320a69a71f2b73ecc97ccae6",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "b0b48a3cf2bf2ecbbac4ecca863a815ab4a0c1137277a9b7d5830d9d1beca5c9"
+        }
+      }
+    },
+    "x86": {
+      "corpus": {
+        "report": "artifacts/realtext-final-csri-x86/summary.json",
+        "sha256": "f5c11f9797c772fff607ea82df896046eee8c93a642b5e6c35440159e6dcf66b",
+        "complete": true,
+        "frames": 10346,
+        "distinct_controls": 100,
+        "partition_exact": true,
+        "cases": 954,
+        "shards": [
+          {
+            "report": "artifacts/realtext-final-csri-x86/shard-0/report.json",
+            "sha256": "48ccb14c8babf86f1b547e4c164e4f1a5303a79aa10fcca78182b20fb3c9c859",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1308,
+            "cases": 120
+          },
+          {
+            "report": "artifacts/realtext-final-csri-x86/shard-1/report.json",
+            "sha256": "b07e8eccdc8b2ba0c18c66128c02866a670c1dd9646114397e91a07d9723d714",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1308,
+            "cases": 120
+          },
+          {
+            "report": "artifacts/realtext-final-csri-x86/shard-2/report.json",
+            "sha256": "4fb586137c2bfeb80303cc427b5d513b33b5bc66c3f4d2d042a808cb63b0463e",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1289,
+            "cases": 119
+          },
+          {
+            "report": "artifacts/realtext-final-csri-x86/shard-3/report.json",
+            "sha256": "65c02f59bad6ab2c73d5caf14b3408aae30da45d75b4bae4cfece5f16eacb11d",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1289,
+            "cases": 119
+          },
+          {
+            "report": "artifacts/realtext-final-csri-x86/shard-4/report.json",
+            "sha256": "f9ab0e780216dc7a3a6bb14a7600bd540306beb71b35611210bfb9d5f0c03268",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1290,
+            "cases": 119
+          },
+          {
+            "report": "artifacts/realtext-final-csri-x86/shard-5/report.json",
+            "sha256": "02e3052cc44cf45b7542c43d9de9e0701767e3b0c9020471e15ddab8e311d762",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1290,
+            "cases": 119
+          },
+          {
+            "report": "artifacts/realtext-final-csri-x86/shard-6/report.json",
+            "sha256": "4066347453dd104aee9a73de06e6176d52f14601eb8c03c157f559902e2bb779",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1286,
+            "cases": 119
+          },
+          {
+            "report": "artifacts/realtext-final-csri-x86/shard-7/report.json",
+            "sha256": "218b5e0c5664ac9ed5460a69e487bf940df6f6cc7f6e2a81270851c24983556f",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1286,
+            "cases": 119
+          }
+        ],
+        "rendered_frames": 10346,
+        "source_manifest_sha256": "2fe76d24ee36881c478cd3e41f0da7178202be09c00044ebc3b6bae52cb10469",
+        "partition_driver_sha256": "68965c1e1768e61743401c1686d6fedb0ba7c0067715eddc5a93b13307b46ca8"
+      },
+      "new_rendering": {
+        "included_in_full_corpus": true,
+        "cases": 20,
+        "frames": 240,
+        "distinct_controls": 4,
+        "ids": [
+          "realtext-parser-control-file",
+          "realtext-parser-control-memory",
+          "realtext-parser-final-fragment-file",
+          "realtext-parser-final-fragment-memory",
+          "realtext-parser-first-line-file",
+          "realtext-parser-first-line-memory",
+          "realtext-parser-italic-file",
+          "realtext-parser-italic-memory",
+          "realtext-parser-map-order-file",
+          "realtext-parser-map-order-memory",
+          "realtext-parser-map-replace-file",
+          "realtext-parser-map-replace-memory",
+          "realtext-parser-missing-end-file",
+          "realtext-parser-missing-end-memory",
+          "realtext-parser-overflow-file",
+          "realtext-parser-overflow-memory",
+          "realtext-parser-raw-units-file",
+          "realtext-parser-raw-units-memory",
+          "realtext-parser-restore-file",
+          "realtext-parser-restore-memory"
+        ]
+      },
+      "parser": {
+        "report": "artifacts/realtext-expanded-probe-x86/report.json",
+        "sha256": "9e89a194f250c436f0d2b652234a3e445dd48bcb365214a3c9ecb37e24b7627a",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "cb22238393b2e07a21e7992742fa47d54778a766",
+        "trace_lines": 32495,
+        "inputs_unchanged": true,
+        "cases": 3932
+      },
+      "baseline_parser": {
+        "report": "artifacts/realtext-baseline-x86/report.json",
+        "sha256": "e26d9605c3491a5473818ebb57a1e42e4ff056e6f527cb64a0d70fa50dba40f0",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "d9634037a693f1444eb69cc26eaf6a68188ff0ba",
+        "trace_lines": 15599,
+        "inputs_unchanged": true,
+        "cases": 2212
+      },
+      "baseline_traces_preserved": true,
+      "initial_parser": {
+        "report": "artifacts/realtext-final-probe-x86/report.json",
+        "sha256": "37837db7e2b302b2534c2ff1a24201926147e0a26d4b971b72ec804d6a9aa666",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "3e20ec46fb223df9f28775fda671a84dfcf19c2e",
+        "trace_lines": 15599,
+        "inputs_unchanged": true,
+        "cases": 2212
+      },
+      "initial_rendering_fixture_failure": {
+        "summary": "artifacts/realtext-csri-x86/summary.json",
+        "sha256": "4c68bff0a9121bb26bd0dc2688ef33b157a544de66ee73e82ec29a1f99131a67",
+        "manifest_sha256": "8b38a3b2c56f262ed4042ac8edd00d40f3f4ac34fb5c7185e46faa0cf87ea54d",
+        "all_individual_verdicts_equal": true,
+        "controls_passed": false,
+        "failed_control_count": 4,
+        "new_open_rejected_cases": [
+          "realtext-parser-control-file",
+          "realtext-parser-control-memory",
+          "realtext-parser-final-fragment-file",
+          "realtext-parser-final-fragment-memory",
+          "realtext-parser-first-line-file",
+          "realtext-parser-first-line-memory",
+          "realtext-parser-map-order-file",
+          "realtext-parser-map-order-memory",
+          "realtext-parser-map-replace-file",
+          "realtext-parser-map-replace-memory",
+          "realtext-parser-missing-end-file",
+          "realtext-parser-missing-end-memory",
+          "realtext-parser-overflow-file",
+          "realtext-parser-overflow-memory",
+          "realtext-parser-raw-units-file",
+          "realtext-parser-raw-units-memory"
+        ],
+        "shards": [
+          {
+            "report": "artifacts/realtext-csri-x86/shard-0/report.json",
+            "sha256": "cd8c0eb1802995c117fdc5f77677f5e0d36531b5a5279a5024d96610bad5734e",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1284,
+            "cases": 120
+          },
+          {
+            "report": "artifacts/realtext-csri-x86/shard-1/report.json",
+            "sha256": "4184ca0b3672fbf9137f0929fa9e02a3104bbf1a48ffd9d08d78ad4eec966427",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1284,
+            "cases": 120
+          },
+          {
+            "report": "artifacts/realtext-csri-x86/shard-2/report.json",
+            "sha256": "f7292ff313632234eca345b92bd61329e50968f873ceffc9ba6acfac19b0a3ba",
+            "complete": true,
+            "passed": false,
+            "rendered_frames": 1253,
+            "cases": 119
+          },
+          {
+            "report": "artifacts/realtext-csri-x86/shard-3/report.json",
+            "sha256": "5de3d6f06643ee405e6e6e573e5100c65cab79a6afbaf350c90ccdffeff6c2a7",
+            "complete": true,
+            "passed": false,
+            "rendered_frames": 1253,
+            "cases": 119
+          },
+          {
+            "report": "artifacts/realtext-csri-x86/shard-4/report.json",
+            "sha256": "ba7a7d636c4c0a0ca8f9ad23347e7054150fd04a389c6cc044b059eb9f949785",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1278,
+            "cases": 119
+          },
+          {
+            "report": "artifacts/realtext-csri-x86/shard-5/report.json",
+            "sha256": "cf407f18083890a232377572d8845ec8500f799303ee7d1d9652f1e8bc8232b6",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1278,
+            "cases": 119
+          },
+          {
+            "report": "artifacts/realtext-csri-x86/shard-6/report.json",
+            "sha256": "f6d79c3ba701c22d644e6fbad34190d92be51a79e4909ff65385dbbcea4447ce",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1262,
+            "cases": 119
+          },
+          {
+            "report": "artifacts/realtext-csri-x86/shard-7/report.json",
+            "sha256": "c621361811758b00a10e0c30c07496b11f8d7ad0720837877547ee17cba50859",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1262,
+            "cases": 119
+          }
+        ],
+        "not_counted_as_passing_gate": true
+      },
+      "corrected_targeted_rendering": {
+        "report": "artifacts/realtext-fixed-x86/report.json",
+        "sha256": "354c029bf923ee32dc4a07b4f9dd3032e69ccb90d574d19b97b1de0821bcea4a",
+        "complete": true,
+        "passed": true,
+        "rendered_frames": 240,
+        "cases": 20
+      },
+      "vtt_regression": {
+        "report": "artifacts/realtext-vtt-regression-x86/report.json",
+        "sha256": "16d5d5b75eee019ac0ad43b526e70b87eda70d45d5bb6537744614ed75593d07",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "3e20ec46fb223df9f28775fda671a84dfcf19c2e",
+        "trace_lines": 21939,
+        "inputs_unchanged": true,
+        "cases": 2292
+      },
+      "sami_regression": {
+        "report": "artifacts/realtext-sami-regression-x86/report.json",
+        "sha256": "ac2ac79a30c572fa46a9ed45b0b9858be4a49bcf4043d8e46f1f9911167b61ed",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "3e20ec46fb223df9f28775fda671a84dfcf19c2e",
+        "trace_lines": 26992,
+        "inputs_unchanged": true,
+        "cases": 2836
+      },
+      "text_regression": {
+        "report": "artifacts/realtext-text-regression-x86/report.json",
+        "sha256": "6a91f96006f0119c19176c51da7ff7e16907222025464ee1ac36fcb58a82f0b5",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "3e20ec46fb223df9f28775fda671a84dfcf19c2e",
+        "trace_lines": 44404,
+        "inputs_unchanged": true,
+        "cases": 5692
+      },
+      "microdvd_regression": {
+        "report": "artifacts/realtext-microdvd-regression-x86/report.json",
+        "sha256": "51a51b9574fb7a9bd9e62f8d651e1f5df4129745b9eb8fa056ba8a791e60a967",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "3e20ec46fb223df9f28775fda671a84dfcf19c2e",
+        "trace_lines": 41491,
+        "inputs_unchanged": true,
+        "cases": 4588
+      },
+      "ass_regression": {
+        "report": "artifacts/realtext-ass-probe-x86/report.json",
+        "sha256": "39698b7ae2ecaa319480ee5f122e1d84868b467532ee4f054e820d0d992bd947",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "3e20ec46fb223df9f28775fda671a84dfcf19c2e",
+        "trace_lines": 22286,
+        "inputs_unchanged": true,
+        "cases": 3266
+      },
+      "xombie_regression": {
+        "report": "artifacts/realtext-xombie-probe-x86/report.json",
+        "sha256": "1cc7f27c0ad9c0236dff9f3a496b612a688002e73a3b1a49eaec8b6400bbd697",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "3e20ec46fb223df9f28775fda671a84dfcf19c2e",
+        "trace_lines": 10441,
+        "inputs_unchanged": true,
+        "cases": 1242
+      },
+      "lifecycle": {
+        "report": "artifacts/realtext-lifecycle-x86/report.json",
+        "sha256": "b0b64ae11bd946e9edd7dac037e8b10e96020d985d1dc3e9df30c3397adddc60",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "3e20ec46fb223df9f28775fda671a84dfcf19c2e",
+        "trace_lines": 3693,
+        "inputs_unchanged": true
+      },
+      "compile": {
+        "report": "artifacts/realtext-compile-x86/report.json",
+        "sha256": "ad878b3361479e26352ee2173f905738ad321c087818e5bd0c2fa0cbe403ef60",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "3e20ec46fb223df9f28775fda671a84dfcf19c2e",
+        "inputs_unchanged": true,
+        "scope": "Compile-only actual style helper/lifecycle sources and headers; no link, execution or parity claim"
+      },
+      "com": {
+        "report": "artifacts/realtext-contracts-x86/com/report.json",
+        "sha256": "2078a393877576127d275b08facd899179b59900d00abe393dd4af7a534bd8d1",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "3e20ec46fb223df9f28775fda671a84dfcf19c2e",
+        "inputs_unchanged": true,
+        "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "69faa2d5f90f35fe4184e9e9bd892adb76fee60295701988f61ab7af0664d9eb",
+          "candidate_sha256": "fe8f49da7e4063e5338b4224d2bece9e99f768ad61f8f2eb7af2b559d92888d8",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "dbd365316d54d5a3d590b63604fbbc5ea6849a912eb7660e52d8df4bdd6b2120"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "2c3b904d7f91902ef456e07b648c5d6351878318c235397eeb9b39eb3fffa34f",
+          "candidate_sha256": "dbea046921d90609cdeac2d222e41b34193cd726aa488fa9ba9d316af874e837",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "8821591e5f42e83c8361380a00b4869b748312f9374da70041ad829e381b6bbc"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "3e7c20a4d6c42457d92eb56c42e4fd9f3bddb93276f2c1cd28bfb73edd06484c",
+          "candidate_sha256": "c0f87674da7a2dddec29f026fe591f491ad962c30fe4c695440f6aaedca2b1c6",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "bee8a1d975859e0ab8a9b6843e14f813df818b8538e6501927e792bb180eb7c1"
+        }
+      }
+    }
+  },
+  "limits": [
+    "No production default switch, format closure, real player/Aegisub graph integration or repository completion.",
+    "Native file, CString locale predicates, tag/text extraction, numeric conversion, tag rendering, SubRipper2SSA, Add and host adapters remain transitional.",
+    "Finite local MSVC14.44 Windows evidence. File I/O failure injection, exception behavior, pre-Open simplicity and allocation failure/reentry remain unresolved.",
+    "No new non-Windows/Miri/default native-document runtime parity; fallback paths have compile evidence only.",
+    "SubViewer missing-style reads remain unresolved: the actual-source probe varies across executions; finite stable pinned-DLL renders do not establish general safe emulation.",
+    "No crash, hang or nondeterministic reference outcome is treated as equality. Fallback adapters, remaining parsers, renderer, all public hosts and vendored code remain in the full migration scope."
+  ],
+  "source_inventory": {
+    "path": "docs/rust-realtext-parser-inventory.json",
+    "sha256": "47020530f4834501673c88a71f5212b63dc3f33f08ed3404013e8473e6a33377"
+  },
+  "unsafe_lexical_inventory": {
+    "report": "artifacts/realtext-unsafe-inventory.json",
+    "sha256": "a23d5dd27d435539b3852816b078d413b7d1ebf50a8bd18687a02cec757004d5",
+    "safe_core_unsafe_sites": 0,
+    "limits": "Lexical inventory only, not a soundness proof."
+  },
+  "rust_tests": {
+    "core_per_architecture": 288,
+    "ffi_per_architecture": 123,
+    "fmt": true,
+    "clippy_all_targets": true,
+    "clippy_native_runtime": true,
+    "log": "artifacts/realtext-checks.log",
+    "log_sha256": "7702472db8515ee4546619a5dc28963159ba3d35036ab4c7877c0ec0d54c0c6f"
+  },
+  "python_harness_tests": {
+    "count": 157,
+    "skipped": 1,
+    "failures": 0,
+    "log": "artifacts/realtext-final-harness.log",
+    "log_sha256": "8bf095a524b4a4c0683edd97bb0e2a0f0746c4f57d08f8c2401a802f0b6fd0d3",
+    "corpus_check_included": true
+  },
+  "build_logs": {
+    "artifacts/realtext-build-x64.log": "87e3f145f5b9284bbac6e23ddba5f842065cfd8180dbf2865cb49069e4cfbbb4",
+    "artifacts/realtext-build-x86.log": "c8f927ba11387cfd19a59625370d67870135608e7972b7fb8cdae4a413c217d5",
+    "artifacts/realtext-build-rust-x64.log": "34d45f61083714b402ecc8bcaf8154f07c7916a2763678abac6035b153ea36c2",
+    "artifacts/realtext-build-rust-x86.log": "91079c5ea7778e947d9695bf432f80ae5eeb38e066f2b8c7a5ed88e7a4f94469"
+  },
+  "subviewer_reference_investigation": {
+    "path": "docs/rust-subviewer-reference-outcomes.json",
+    "sha256": "9cd5e22c6e894051966451dad661bf7cc1cd5e4b99f76fd118d61220b08be882",
+    "compatibility_established": false
+  }
+}

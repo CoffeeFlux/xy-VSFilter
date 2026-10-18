@@ -1,0 +1,138 @@
+{
+  "schema": 1,
+  "candidate_commit": "cb22238393b2e07a21e7992742fa47d54778a766",
+  "implementation_commit": "c6d862c563c1c92791cc82a1d301ffe4f6fe90ea",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "Owned RealText input, parser lifecycle, tags/attributes, timing and subtitle map in the experimental document path. Full repository Rust migration remains active.",
+  "production_sources": {
+    "rust/compat/src/realtext_session.rs": "ee9ef7fb9d09fac81f5b44d00e86e053094560c2dbd77eb24b3ca49e3529be9a",
+    "rust/compat/src/realtext_document.rs": "f5823865f37addadb4f011139b2ff9350cd31001ed559b60a02b038209c53ecf",
+    "rust/compat/src/realtext_lists.rs": "2e55207d914ae8e7ec689b2efe34d5aad7f77997ce0dbb2f29814ae14789bd0c",
+    "rust/compat/src/realtext_timeline.rs": "0447e4cfd52a9e2227dd6c104cb1db6ef9114a4fa3f63854ed34e348b081228b",
+    "rust/compat/src/lib.rs": "28169b65e0e19a2872802bca9e3207ef68bfc9f803b31d9c6580480179fc5f47",
+    "rust/ffi/src/document.rs": "2252f303033d81f7a5265cb81d5e7eb2c3c24b562694212f89b8ab59506c6421",
+    "rust/ffi/src/document_registry.rs": "7778a7f1768f68f6c1c70fc4abd8b71bf0e1cc18619c05c6560d755f8cf23cdf",
+    "include/xy_rust_document.h": "250777ecb240875391da382f643e7b9ccff75890a30d4de7f7641d58a72fadbc",
+    "src/subtitles/RustDocumentOwner.h": "ae46d93a8613b7a882ffdbbc71a6e24dc0ffa49f8b4750841ac48787e83cba6a",
+    "src/subtitles/STS.cpp": "a4aff2f21c6b4d7a2ffb2a9431702a496dc92678fa576e0196840449f265da0b",
+    "src/subtitles/STS.h": "8d752098a513ffb7646d70cdd37cb06ce900a0d0e7e1ba5e309c448c97b1f93e",
+    "src/subtitles/RealTextParser.h": "32b6dd8068434d4316ee47ae4033b76cd64ed9da33b26584ec68a1b530708e7c",
+    "src/subtitles/RealTextParser.cpp": "58a9a4acd45cde3f9a8a4b6ad87390cef4624cbc6c0de3e8eb9e8c5f4890bd04"
+  },
+  "reference_sources": {
+    "src/subtitles/STS.cpp": "2616b67db84f7329ac6e2363a3f03d61977fa07c37ed9c04d32ec2b1197f31e0",
+    "src/subtitles/TextFile.cpp": "71c00071f9ceb466c539fda26103a4a94b802a4a01f4b807852e159563772f2f",
+    "src/dsutil/text.h": "92efdac94644006b4559d868631c27c841811327af9eedc408b817631e09d249",
+    "src/subtitles/RealTextParser.cpp": "de4db6bceb42992e6dd0014dea25bfafa7665725b3e17b422641daae0be5aaeb",
+    "src/subtitles/RealTextParser.h": "53600d57e777cb4d06d90a7de88bd1035ea0538885e1175cc749ad84a0def781"
+  },
+  "operations": [
+    {
+      "operation": "Input and parser control",
+      "source": {
+        "path": "rust/compat/src/realtext_session.rs",
+        "line": 26,
+        "sha256": "ee9ef7fb9d09fac81f5b44d00e86e053094560c2dbd77eb24b3ca49e3529be9a"
+      },
+      "behavior": "Rust owns trimmed raw file lines, assembled input, current/remaining input and extracted tag. ReadString EOF fragments are discarded. Initial format detection retains the native lexicographic CompareNoCase(<window) predicate, not a new tag validator. File concatenation inserts a newline and stops at source NUL. Native extraction results replace the input and tag with copied raw UTF16, retaining embedded NULs/surrogates in the checked protocol. All parsing completes before any Add; a later parse failure emits no accumulated entries."
+    },
+    {
+      "operation": "Tag lists, metadata and timing",
+      "source": {
+        "path": "rust/compat/src/realtext_session.rs",
+        "line": 308,
+        "sha256": "ee9ef7fb9d09fac81f5b44d00e86e053094560c2dbd77eb24b3ca49e3529be9a"
+      },
+      "behavior": "One checked session directly owns the existing safe document controller, tag lists and timing history. Current/open/line tags, sorted attributes, window tag and center flag are Rust values. Clear restores open formatting in order; a close removes only the last matching open tag. Missing begin/end lookup inserts empty attributes. Missing-end fallback uses wrapping i32 start+native-supplied default duration, preserving observed overflow."
+    },
+    {
+      "operation": "Canonical interval map and ordered emission",
+      "source": {
+        "path": "rust/compat/src/realtext_session.rs",
+        "line": 292,
+        "sha256": "ee9ef7fb9d09fac81f5b44d00e86e053094560c2dbd77eb24b3ca49e3529be9a"
+      },
+      "behavior": "A BTreeMap keyed by signed (start,end) owns rendered raw text. Equal interval keys overwrite earlier nonempty text; empty renders leave entries unchanged. Emission follows sorted key order, with Add acknowledgements after callbacks. The original c_str truncation is applied only at the final SubRipper2SSA boundary. Final acceptance inspects the live document, including preloaded entries."
+    },
+    {
+      "operation": "Transitional native services",
+      "source": {
+        "path": "src/subtitles/STS.cpp",
+        "line": 3399,
+        "sha256": "a4aff2f21c6b4d7a2ffb2a9431702a496dc92678fa576e0196840449f265da0b"
+      },
+      "behavior": "OpenRealText delegates all persistent state to the checked Rust session. It calls ReadString, CString predicates/CompareNoCase, ExtractTag, ExtractTextTag, GetTimecode, RenderTags, SubRipper2SSA and Add outside registry loans. The active path no longer creates the raw RealTextDocument/RealTextTimeline/RealTextLists owners or fills/copies a native subtitle map. Those raw APIs and the old ParseRealText implementation remain in fallback scope, and helper-specific raw adapters still serve extraction, numeric conversion and formatting."
+    }
+  ],
+  "boundary_review": {
+    "source": {
+      "path": "rust/ffi/src/document.rs",
+      "line": 275,
+      "sha256": "2252f303033d81f7a5265cb81d5e7eb2c3c24b562694212f89b8ab59506c6421"
+    },
+    "registry": {
+      "path": "rust/ffi/src/document_registry.rs",
+      "line": 471,
+      "sha256": "7778a7f1768f68f6c1c70fc4abd8b71bf0e1cc18619c05c6560d755f8cf23cdf"
+    },
+    "exports": [
+      "xy_vsfilter_document_realtext_begin_v1",
+      "xy_vsfilter_document_realtext_read_v1",
+      "xy_vsfilter_document_realtext_packet_v1",
+      "xy_vsfilter_document_realtext_step_v1",
+      "xy_vsfilter_document_realtext_part_v1",
+      "xy_vsfilter_document_realtext_drop_v1"
+    ],
+    "contract": "Typed never-reused document-bound IDs under nonblocking registry admission. Raw input and packets are copied/decoded before borrowing state. Counted spans, booleans, tag flag masks, strictly sorted distinct attribute keys, command values and request phases are checked. Output capacity is checked before publication. Immutable snapshots of input, tags, map or window metadata outlive sessions/parents. No native file, tag, map, buffer or callback pointer is retained.",
+    "unsafe_delta": {
+      "extern_unsafe_functions": 4,
+      "unsafe_blocks": 5,
+      "raw_slice_constructors": 0,
+      "rust_native_pointer_owners": 0
+    },
+    "tests": "Malformed/truncated/unsorted packets, raw NUL/surrogate values, phase errors, BUSY, typed/stale IDs, output preflight, caller-buffer mutation, parent-drop snapshot lifetime, map replacement/order, empty rendering, missing-end wrap, deferred emission on parse failure and formatting restore."
+  },
+  "direct_probe": {
+    "source": {
+      "path": "tools/compat/realtext_document_native.cpp",
+      "line": 7,
+      "sha256": "c15cfdd655a9a9421b246690799111f792dc39439b6059a1c242299efe317861"
+    },
+    "cases": 3932,
+    "trace_lines": 32495,
+    "baseline": {
+      "commit": "d9634037a693f1444eb69cc26eaf6a68188ff0ba",
+      "cases": 2212,
+      "trace_lines": 15599
+    },
+    "method": "Actual selected OpenRealText with initialized document observer and selected reference/candidate parser libraries. Two reference and two candidate runs compare outcomes, document state and byte position. Empty/preloaded documents, initial lexicographic marker check, times/overflow, formatting/open/close/clear, missing endpoints, duplicate keys, ANSI/DBCS, raw units and discarded EOF fragments are included. No crash, hang or nondeterministic run is accepted."
+  },
+  "rendering": {
+    "generator": {
+      "path": "tools/compat/make_corpus.py",
+      "line": 851,
+      "sha256": "bdb37002cf376d7af784687dac160e14764f0c2ddc19d6f9483b93761d2bd6b5"
+    },
+    "new_files": 10,
+    "new_cases": 20,
+    "new_frames": 240,
+    "new_distinct_controls": 4,
+    "behavior": "File/memory opens, timing boundaries, backward/repeated seeks, duplicate-key replacement, ordered intervals, missing ends, formatting restore, leading text, final fragments, NUL/surrogate input and numeric overflow. Replacement/control and italic/control must produce distinct images."
+  },
+  "limits": [
+    "No production default switch, format closure, real player/Aegisub graph integration or repository completion.",
+    "Native file, CString locale predicates, tag/text extraction, numeric conversion, tag rendering, SubRipper2SSA, Add and host adapters remain transitional.",
+    "Finite local MSVC14.44 Windows evidence. File I/O failure injection, exception behavior, pre-Open simplicity and allocation failure/reentry remain unresolved.",
+    "No new non-Windows/Miri/default native-document runtime parity; fallback paths have compile evidence only.",
+    "SubViewer missing-style reads remain unresolved: the actual-source probe varies across executions; finite stable pinned-DLL renders do not establish general safe emulation.",
+    "No crash, hang or nondeterministic reference outcome is treated as equality. Fallback adapters, remaining parsers, renderer, all public hosts and vendored code remain in the full migration scope."
+  ],
+  "next_work": [
+    "Continue SubViewer reference investigation, including host/open-mode dependence of uninitialized style flags, and USF ownership; no arbitrary flag defaults.",
+    "Replace remaining RealText tag/text/numeric/format helper raw owners and native services, then retire the fallback document/timeline/list APIs.",
+    "Continue complete renderer, public host/ABI and vendored native replacement; production closure still requires whole-surface evidence."
+  ]
+}

@@ -1,0 +1,237 @@
+{
+  "schema": 1,
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "classification": "unresolved-reference-uninitialized-style-flags",
+  "compatibility_established": false,
+  "source_probe": {
+    "path": "tools/compat/subviewer_reference_outcomes.cpp",
+    "sha256": "639a2cfecefbf0657bc969023b2ab283ebe1c17f0237fb8abd553ea539cdf73f",
+    "runner": "tools/compat/subviewer_reference_outcomes.py",
+    "runner_sha256": "c1bd73932cac0de4e7e730ea196538a2617edcb5c6ead266bcfa21d49b08d296"
+  },
+  "architectures": {
+    "x64": {
+      "actual_source_probe": {
+        "report": "artifacts/realtext-subviewer-x64/report.json",
+        "sha256": "a4e831d9022edad372ec3d68fda81984e26e88013b1f6ed8ae4e3300d74779cf",
+        "binary_sha256": "bc88456930731aa62d44de87f8df90019f8da3616f5c65853f2f45118c214ea6",
+        "trace_sha256": [
+          "36f5acae13a44f24b0b1e80fd2954bed91b9da07fe757ba0ac86dbdb48a888b7",
+          "621655cf24745074c5faa5afcb39b4099d09626b730286bbee572c29e7c7bdc5",
+          "36f5acae13a44f24b0b1e80fd2954bed91b9da07fe757ba0ac86dbdb48a888b7",
+          "36f5acae13a44f24b0b1e80fd2954bed91b9da07fe757ba0ac86dbdb48a888b7"
+        ],
+        "repeat_equal": false,
+        "explicit_style_controls_stable": true,
+        "variable_missing_style_cases": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13,
+          15,
+          17,
+          19,
+          21,
+          23,
+          25,
+          27,
+          29,
+          31
+        ],
+        "first_missing_style_text_by_execution": [
+          "{\\b1\\i1\\s1\\u1}caption",
+          "{\\i1\\s1\\u1}caption",
+          "{\\b1\\i1\\s1\\u1}caption",
+          "{\\b1\\i1\\s1\\u1}caption"
+        ]
+      },
+      "earlier_exploration": {
+        "log": "artifacts/subviewer-triage-x64.log",
+        "sha256": "d5d07e2a95a32b780b1eee292ff46fe6786b6981b84ca0118bb824dc1c8ede67",
+        "repeat_equal_in_that_invocation": true,
+        "compile_command_sha256": "0c1d7e390dc363bc3394620387c9d4167aab272f78d89d0fda8b89e2637fd4ff",
+        "trace_sha256": [
+          "36f5acae13a44f24b0b1e80fd2954bed91b9da07fe757ba0ac86dbdb48a888b7",
+          "36f5acae13a44f24b0b1e80fd2954bed91b9da07fe757ba0ac86dbdb48a888b7",
+          "36f5acae13a44f24b0b1e80fd2954bed91b9da07fe757ba0ac86dbdb48a888b7",
+          "36f5acae13a44f24b0b1e80fd2954bed91b9da07fe757ba0ac86dbdb48a888b7"
+        ]
+      },
+      "pinned_dll_reference_only": {
+        "report": "artifacts\\realtext-subviewer-csri-x64\\report.json",
+        "sha256": "4c0f4f3023bb180e8c8271ca8d3b8b0c00f1b3591ba83e56e035f49713f50a84",
+        "reference_dll_sha256": "2d254068a40e5f59cf191c3c6bbfc984b548193b668c4decac21dc1e94e02169",
+        "both_dll_arguments_are_pinned_reference": true,
+        "reference_repetitions": 4,
+        "cases": 4,
+        "frames_per_execution_set": 24,
+        "repeat_stable_for_tested_cases": true,
+        "missing_style_differs_from_explicit_style": {
+          "file": true,
+          "memory": true
+        },
+        "not_candidate_parity": true
+      }
+    },
+    "x86": {
+      "actual_source_probe": {
+        "report": "artifacts/realtext-subviewer-x86/report.json",
+        "sha256": "fdce2049cf67e6bc57ca87e47f465373840e0db374315145b662efbf3e8ad8ae",
+        "binary_sha256": "4fe3524695909aa87c3a515b88daed0aba0cb158d4351e14bd960e600ca692b9",
+        "trace_sha256": [
+          "a781a6abbdd657645134134a03a69eb772f972d7e21e8692d72db8a5d9afc034",
+          "a781a6abbdd657645134134a03a69eb772f972d7e21e8692d72db8a5d9afc034",
+          "9a0b9a0235f2e7e9db4434a97e5d2daf22aad5a50b2b13e9813e60e855c7a665",
+          "a781a6abbdd657645134134a03a69eb772f972d7e21e8692d72db8a5d9afc034"
+        ],
+        "repeat_equal": false,
+        "explicit_style_controls_stable": true,
+        "variable_missing_style_cases": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13,
+          15,
+          17,
+          19,
+          21,
+          23,
+          25,
+          27,
+          29,
+          31
+        ],
+        "first_missing_style_text_by_execution": [
+          "{\\i1\\s1}caption",
+          "{\\i1\\s1}caption",
+          "{\\i1\\s1\\u1}caption",
+          "{\\i1\\s1}caption"
+        ]
+      },
+      "earlier_exploration": {
+        "log": "artifacts/subviewer-triage-x86.log",
+        "sha256": "b934940da806d8a298cdf2236f7a561200978d16a932ce5a85bad0374958aa81",
+        "repeat_equal_in_that_invocation": true,
+        "compile_command_sha256": "aa8acba681639d96b117f51e97c678813ca2d430d497c5fb094b84763c91b23a",
+        "trace_sha256": [
+          "a781a6abbdd657645134134a03a69eb772f972d7e21e8692d72db8a5d9afc034",
+          "a781a6abbdd657645134134a03a69eb772f972d7e21e8692d72db8a5d9afc034",
+          "a781a6abbdd657645134134a03a69eb772f972d7e21e8692d72db8a5d9afc034",
+          "a781a6abbdd657645134134a03a69eb772f972d7e21e8692d72db8a5d9afc034"
+        ]
+      },
+      "pinned_dll_reference_only": {
+        "report": "artifacts\\realtext-subviewer-csri-x86\\report.json",
+        "sha256": "57ba58a3f014368b0d221d82b98414ba8ba10824019dd1aac30dba7e2ffa47ff",
+        "reference_dll_sha256": "69faa2d5f90f35fe4184e9e9bd892adb76fee60295701988f61ab7af0664d9eb",
+        "both_dll_arguments_are_pinned_reference": true,
+        "reference_repetitions": 4,
+        "cases": 4,
+        "frames_per_execution_set": 24,
+        "repeat_stable_for_tested_cases": true,
+        "missing_style_differs_from_explicit_style": {
+          "file": false,
+          "memory": true
+        },
+        "not_candidate_parity": true
+      }
+    }
+  },
+  "limits": [
+    "Actual-source probe instability is not treated as a passing comparison.",
+    "Pinned-DLL stability is finite, specific to this CSRI workload and does not establish safe emulation of all missing-style cases.",
+    "No arbitrary default or unsafe Rust read was introduced; SubViewer remains in full migration scope."
+  ],
+  "pinned_dll_fixture_manifest": {
+    "schema": 1,
+    "description": "Reference-only SubViewer nondeterminism investigation; not a port parity gate.",
+    "cases": [
+      {
+        "id": "subviewer-no-style-file",
+        "script": "artifacts/subviewer-no-style.sub",
+        "sha256": "68012641eeaa5a6ca3a9029aadeece4b6da554e55f1d0089b4ba6b8b597fecfd",
+        "open": "file",
+        "width": 640,
+        "height": 360,
+        "times": [
+          "0",
+          "1",
+          "2",
+          "2.9999999",
+          "3",
+          "2"
+        ],
+        "stride_padding": 16,
+        "fill_seed": 31
+      },
+      {
+        "id": "subviewer-no-style-memory",
+        "script": "artifacts/subviewer-no-style.sub",
+        "sha256": "68012641eeaa5a6ca3a9029aadeece4b6da554e55f1d0089b4ba6b8b597fecfd",
+        "open": "memory",
+        "width": 640,
+        "height": 360,
+        "times": [
+          "0",
+          "1",
+          "2",
+          "2.9999999",
+          "3",
+          "2"
+        ],
+        "stride_padding": 16,
+        "fill_seed": 31
+      },
+      {
+        "id": "subviewer-explicit-style-file",
+        "script": "artifacts/subviewer-explicit-style.sub",
+        "sha256": "ff092470cab35e69467014aee710d2cc27f86f008ea54e0a3fa78884deca3245",
+        "open": "file",
+        "width": 640,
+        "height": 360,
+        "times": [
+          "0",
+          "1",
+          "2",
+          "2.9999999",
+          "3",
+          "2"
+        ],
+        "stride_padding": 16,
+        "fill_seed": 31
+      },
+      {
+        "id": "subviewer-explicit-style-memory",
+        "script": "artifacts/subviewer-explicit-style.sub",
+        "sha256": "ff092470cab35e69467014aee710d2cc27f86f008ea54e0a3fa78884deca3245",
+        "open": "memory",
+        "width": 640,
+        "height": 360,
+        "times": [
+          "0",
+          "1",
+          "2",
+          "2.9999999",
+          "3",
+          "2"
+        ],
+        "stride_padding": 16,
+        "fill_seed": 31
+      }
+    ]
+  },
+  "pinned_dll_fixture_manifest_sha256": "9a8296525ccbe11226c316339513d8383b8bc780a62d4688af1c873c41c52d77",
+  "fixture_bytes_ascii": {
+    "artifacts/subviewer-no-style.sub": "00:00:01.00,00:00:03.00\r\ncaption\r\n",
+    "artifacts/subviewer-explicit-style.sub": "[STYLE]no\r\n00:00:01.00,00:00:03.00\r\ncaption\r\n"
+  }
+}

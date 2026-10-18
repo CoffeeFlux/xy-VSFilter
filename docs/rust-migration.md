@@ -27,7 +27,58 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: WebVTT parser and color ownership (2026-10-18)
+## Current port: RealText parser and subtitle-map ownership (2026-10-18)
+
+The experimental document path now owns RealText's assembled input, remaining
+text, extracted tags/attributes, open formatting, window/center metadata, timing
+history and subtitle map in one checked safe-Rust session. This replaces the
+active path's three raw document/timeline/list handles and native map copies.
+Tag/text extraction, numeric conversion, tag rendering, file services and Add
+remain transitional native services; their helper-specific raw adapters remain
+in scope alongside the fallback implementation.
+
+The port preserves the lexicographic initial marker check, discarded EOF
+fragments, missing-end wrapping, formatting restored after clear, nonempty
+duplicate-key replacement and signed interval sorting. Parsing finishes before
+any captions are added, so a later parse failure emits no accumulated entries.
+Raw NUL/surrogate values stay intact until the original c_str conversion boundary.
+
+Candidate `cb222383` (implementation `c6d862c5`) passes cleanup `67da07cd`
+comparisons on **each** Windows architecture (x86 and x64):
+
+* 3,932 direct RealText cases and 32,495 identical trace lines, repeated twice for
+  reference and candidate. Checkpoint `d9634037` captured the original 2,212-case
+  pre-port prefix; the expanded probe retains it and adds 1,720 terminated variants.
+* All 954 rendering cases and 10,346 frames, with 100 distinct-frame controls.
+  The 20 added file/memory cases contribute 240 frames and four controls.
+* Regression probes for WebVTT, SAMI, SubRip/MPL2/OldSubRip/VPlayer, MicroDVD,
+  ASS and XombieSub; 3,693 lifecycle trace lines; nine compile probes;
+  all three DLLs' exports/dependencies; and 10 scoped COM cases plus two controls.
+* 288 safe-core and 123 FFI tests, formatting and Clippy per architecture;
+  157 Python harness tests with one skip. Six checked entry points add four
+  unsafe marshalling functions and five blocks, with no new raw-slice constructors
+  or native pointer owners in Rust. The portable core forbids unsafe code.
+
+The first rendering-fixture run matched individual outcomes but failed four
+distinct-frame controls: unterminated trailing text made both DLLs reject 16 new
+cases. The corrected fixtures terminate text explicitly. Their targeted run and
+the fresh full runs pass; the failed original reports remain separately recorded.
+No production parser change was needed for this correction.
+
+The SubViewer investigation found changing missing-style formatting across four
+executions of the same actual-reference-source probe on both architectures.
+Explicit-style controls stayed stable. Separate pinned-DLL CSRI runs were stable
+for the four tested file/memory cases, but missing-style differences depended on
+architecture and open mode. These observations remain unresolved; no arbitrary
+style defaults or passing SubViewer migration claim have been introduced.
+
+See the [source/boundary inventory](rust-realtext-parser-inventory.json),
+[local evidence manifest](rust-realtext-parser-local-evidence.json) and
+[SubViewer reference investigation](rust-subviewer-reference-outcomes.json).
+No production switch, format closure or full-library completion is claimed.
+The renderer, every host adapter, all formats and vendored code remain in scope.
+
+## Previous port: WebVTT parser and color ownership (2026-10-18)
 
 The experimental document path now owns WebVTT's input/cue/style lifecycle,
 raw tokens, cue tags, current and previous captions, duplicate decisions, time
