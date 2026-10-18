@@ -27,7 +27,61 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: USF scalar helpers (2026-10-18)
+## Current port: USF MSXML boundary (2026-10-18)
+
+The experimental USF path now creates, loads and traverses system MSXML through
+audited Rust FFI. Rust owns the temporary COM interfaces, BSTRs, VARIANTs and
+SAFEARRAYs. The portable core still owns parsed state and traversal decisions
+without unsafe code. No COM pointer enters the core or document registry.
+
+The port preserves host-owned COM initialization, file/memory encoding detection,
+failed-load state retention, getter order, ignored getter HRESULTs, full-BSTR
+lowercasing followed by CString's first-NUL view, attribute enumeration and
+source-buffer lifetimes. Windows CRT services used during parsing now run through
+Rust FFI. A temporary paired native gate callback protects individual registry
+accesses; no registry borrow or gate remains held during COM/CRT calls.
+
+SDK probes record VARIANT/SAFEARRAY layouts and used vtable offsets on x86/x64.
+An x86 unit test caught a calling-convention bug during development: explicit
+Rust alignment made a layout-compatible VARIANT pass indirectly. Natural C
+layout fixes the by-value call. Both architectures now exercise actual MSXML
+loads in unit tests and direct legacy comparisons.
+
+Implementation `9a22603f` passes cleanup `67da07cd` checks on **each** Windows
+architecture (x86 and x64):
+
+* 1,340 existing USF document/reload cases and 20,735 scalar calls, plus 348 new
+  file/memory/null/missing-path load cases across no-COM, STA and MTA contexts,
+  with and without prior state. All 40,517 trace lines match across two runs per
+  implementation and equal pre-port baseline `335e241f`. The added cases include
+  1,044 complete state snapshots, encoding/BOM variants, malformed/truncated XML,
+  namespaces, entities and duplicate attributes. Existing trace coverage remains.
+* 1,034 rendering cases / 11,066 frames / 116 distinct-frame controls, including
+  USF's 20 no-COM refusals and 40 STA/MTA file/memory cases with 480 frames.
+* RealText, WebVTT, SAMI, text-parser, MicroDVD, ASS and XombieSub regressions;
+  3,693 lifecycle trace lines; nine compile probes; all three DLLs' exports and
+  dependencies; 10 scoped COM cases plus two candidate-only controls.
+* 302 safe-core and 126 FFI tests, formatting and Clippy on both architectures;
+  163 Python tests with one skip. The 104-file portable core has zero unsafe
+  sites. The Windows boundary adds 38 unsafe blocks and 11 lexical unsafe
+  function sites (including eight function-pointer signatures), one bounded
+  raw shared-slice copy and one nonoverlapping copy into owned array storage.
+
+See the [MSXML boundary inventory](rust-usf-msxml-inventory.json) and
+[local evidence manifest](rust-usf-msxml-local-evidence.json). System MSXML,
+automation, Windows and CRT libraries remain external dependencies. The shared
+native registry gate, conversion AddStyle/Add dispatch, remaining document/host
+adapters and shared STS/RTS color map still require migration. Allocation/reentry
+and injected service failures remain unclosed. No production switch or
+whole-format, host or library completion is claimed.
+
+Next: port the remaining shared color consumers, preserving their distinct
+numeric fallback and formatting rules, then continue document/host adapters and
+the renderer. All formats/options/interfaces and vendored implementation remain
+in scope. Earlier evidence retains its original provenance.
+
+
+## Previous port: USF scalar helpers (2026-10-18)
 
 The experimental USF path now runs TimeToInt, ColorToDWORD, TranslateMargin and
 TranslateAlignment in safe Rust. Rust owns tokenization, conversion sequencing,

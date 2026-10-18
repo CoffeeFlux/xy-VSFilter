@@ -1,0 +1,727 @@
+{
+  "schema": 1,
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+  "baseline_commit": "335e241f44c31dad31071d79849ccfb528cab534",
+  "scope": "Rust ownership and Windows system FFI for USF MSXML loading, DOM getters, attribute iteration, BSTR/VARIANT/SAFEARRAY lifetimes and parser scalar services.",
+  "configuration": {
+    "native": "Release; RustTextDecoder=true; RustDocumentOwnerExperimental=true",
+    "rust": "1.85.0; native-runtime; +crt-static",
+    "msvc": "14.44.35207",
+    "sdk": "10.0.26100.0"
+  },
+  "architectures": {
+    "x64": {
+      "baseline_usf": {
+        "report": "artifacts/usf-msxml-baseline-x64/report.json",
+        "sha256": "a069e7359a81f3de3f344437ffff70f713fb893241e1ba2a72ac8bf90e05fc61",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "335e241f44c31dad31071d79849ccfb528cab534",
+        "trace_lines": 40517,
+        "scalar_cases": 20735,
+        "scalar_values": 1885,
+        "load_cases": 348,
+        "load_inputs": 28,
+        "inputs_unchanged": true,
+        "cases": 1340
+      },
+      "final_usf": {
+        "report": "artifacts/usf-msxml-final-x64/report.json",
+        "sha256": "b8628545e784ad25b05496c80f37cbe711795a7e799795becefdb4f4a79cd56f",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+        "trace_lines": 40517,
+        "scalar_cases": 20735,
+        "scalar_values": 1885,
+        "load_cases": 348,
+        "load_inputs": 28,
+        "inputs_unchanged": true,
+        "cases": 1340
+      },
+      "baseline_traces_preserved": true,
+      "previous_1340_case_trace_prefix_preserved": true,
+      "corpus": {
+        "report": "artifacts/usf-msxml-csri-x64/summary.json",
+        "sha256": "943a5077fdc97bc0b61b2e1bb579a185465e811e8fa1efa84a3b0dfaa464b294",
+        "complete": true,
+        "frames": 11066,
+        "distinct_controls": 116,
+        "partition_exact": true,
+        "cases": 1034,
+        "shards": [
+          {
+            "report": "artifacts/usf-msxml-csri-x64/shard-0/report.json",
+            "sha256": "0ee84cce7f43be8533c200e3909ad255de9c02033164d99d432d1025fbf28129",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1410,
+            "cases": 130
+          },
+          {
+            "report": "artifacts/usf-msxml-csri-x64/shard-1/report.json",
+            "sha256": "5c45e8b1e8dac9616787508ecc3577c7d93cd5333a2dce09a493ad54496ab558",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1410,
+            "cases": 130
+          },
+          {
+            "report": "artifacts/usf-msxml-csri-x64/shard-2/report.json",
+            "sha256": "11ef3a83b94a40c8c5efdbd9469036ff1dbb0cd5026344306525ddaeb8798f2d",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1381,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-msxml-csri-x64/shard-3/report.json",
+            "sha256": "f24f7c8148028fabc4b01c38ef6e9d1d9dccb7d36b61fc22a8cad64b335ec926",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1369,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-msxml-csri-x64/shard-4/report.json",
+            "sha256": "5c29b157d8908a588046d674c104b2db05694abed3cf5781411f1a030b02ba61",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1370,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-msxml-csri-x64/shard-5/report.json",
+            "sha256": "d5da64399bf4ce133e58aae6294c7670baad115f1eade3da49f01e5826537b96",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1370,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-msxml-csri-x64/shard-6/report.json",
+            "sha256": "ab1dad1c539828810b6ca91c8dde3ab8caab3a2153025a38e5ac9372dbb4bf94",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1372,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-msxml-csri-x64/shard-7/report.json",
+            "sha256": "383dca4832c1d5d9e3e52548c23273ae76c7c990c28b241ebdd9a05956d70bd9",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1384,
+            "cases": 129
+          }
+        ]
+      },
+      "usf_rendering": {
+        "cases": 60,
+        "statuses": {
+          "ok": 40,
+          "open_rejected": 20
+        },
+        "frames": 480,
+        "distinct_controls": 12,
+        "included_in_full_corpus": true
+      },
+      "realtext_regression": {
+        "report": "artifacts/usf-msxml-final-probe-x64/report.json",
+        "sha256": "53ea5d31e3afcd6ebb0f0c0864481a6214f3ef3d913e5a88ebdc5a37dab1ef93",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+        "trace_lines": 37887,
+        "inputs_unchanged": true,
+        "cases": 4532
+      },
+      "vtt_regression": {
+        "report": "artifacts/usf-msxml-vtt-regression-x64/report.json",
+        "sha256": "de26f9b11023a3781cd11f7ff2fc1da5dd8b4887cffffd3d77663546893b2fd0",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+        "trace_lines": 21939,
+        "inputs_unchanged": true,
+        "cases": 2292
+      },
+      "sami_regression": {
+        "report": "artifacts/usf-msxml-sami-regression-x64/report.json",
+        "sha256": "3a569e27e96bfc79605f984de7c85e278b5de4534298410f716b795530961968",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+        "trace_lines": 26992,
+        "inputs_unchanged": true,
+        "cases": 2836
+      },
+      "text_regression": {
+        "report": "artifacts/usf-msxml-text-regression-x64/report.json",
+        "sha256": "620f9b6f28ee9baf09bcb9ef3f11906d03edd56fb98c81c4d7c4bc04d7ebda20",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+        "trace_lines": 44404,
+        "inputs_unchanged": true,
+        "cases": 5692
+      },
+      "microdvd_regression": {
+        "report": "artifacts/usf-msxml-microdvd-regression-x64/report.json",
+        "sha256": "6306e2128d145de4585994c37296d81a1b4af459d40d3f3658728564cbfa2437",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+        "trace_lines": 41491,
+        "inputs_unchanged": true,
+        "cases": 4588
+      },
+      "ass_regression": {
+        "report": "artifacts/usf-msxml-ass-probe-x64/report.json",
+        "sha256": "36208dc90cd1e490628367bf1d74d9e719c47f0f5df3ab2b0cf7af0f2188db08",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+        "trace_lines": 22286,
+        "inputs_unchanged": true,
+        "cases": 3266
+      },
+      "xombie_regression": {
+        "report": "artifacts/usf-msxml-xombie-probe-x64/report.json",
+        "sha256": "a5d035e4e0841d7b966dc806448d09727b2ba53b8b86f5c762b7dfebea049eac",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+        "trace_lines": 10441,
+        "inputs_unchanged": true,
+        "cases": 1242
+      },
+      "lifecycle": {
+        "report": "artifacts/usf-msxml-lifecycle-x64/report.json",
+        "sha256": "a258124b3e214fef6beed2249dac7c49850bd390f1fde34e642e1e34229287a4",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+        "trace_lines": 3693,
+        "inputs_unchanged": true
+      },
+      "compile": {
+        "report": "artifacts/usf-msxml-compile-x64/report.json",
+        "sha256": "f6b2f5e52558cf782bba6fe6aac824c9b034916b1249f31900afb41f99398b68",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+        "inputs_unchanged": true
+      },
+      "com": {
+        "report": "artifacts/usf-msxml-contracts-x64/com/report.json",
+        "sha256": "0ea4289795cb36a2f6a6cff1a3cef9a6d080d8e8eff74fa42cffff0a924164cf",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+        "inputs_unchanged": true,
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "2d254068a40e5f59cf191c3c6bbfc984b548193b668c4decac21dc1e94e02169",
+          "candidate_sha256": "8823f56aacd968dbd59c7ef50efe3f16b43ec924b03cac38b24176c48e15d90f",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "805d7d7481b2774c2612b7cd7dd7fdaa4dd04a35111f3726a6704acf88c4a0d2"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "32b7c2cd6eb817120414db53b3c3005e719ae4b993c4a69d0d66c7f6ac363d5a",
+          "candidate_sha256": "a680299d3e97625b8d5da3b5332fc605fe38e6edddd36ca8ddab636d92fe1e22",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "2ce278d6be4d85c557490e59cb33e78ca53faf3e38061e9ca3eb225897be359a"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "f1165742064181b7fb73bacb16017d8e202c8bb0be90ed8c2eb812ac282c2df8",
+          "candidate_sha256": "db976d2d92d596e96be898937e9089a355137020631ffdac0826b472669b1350",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "b0b48a3cf2bf2ecbbac4ecca863a815ab4a0c1137277a9b7d5830d9d1beca5c9"
+        }
+      }
+    },
+    "x86": {
+      "baseline_usf": {
+        "report": "artifacts/usf-msxml-baseline-x86/report.json",
+        "sha256": "b1e6a24bcb14dee2aeff3c619665ad00b634cc08a3ed72a3def147c843265190",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "335e241f44c31dad31071d79849ccfb528cab534",
+        "trace_lines": 40517,
+        "scalar_cases": 20735,
+        "scalar_values": 1885,
+        "load_cases": 348,
+        "load_inputs": 28,
+        "inputs_unchanged": true,
+        "cases": 1340
+      },
+      "final_usf": {
+        "report": "artifacts/usf-msxml-final-x86/report.json",
+        "sha256": "58e1e7b21c8a141c89636f0ba5675dd8edc0c000844d10a05ab4f1a3081cd1c4",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+        "trace_lines": 40517,
+        "scalar_cases": 20735,
+        "scalar_values": 1885,
+        "load_cases": 348,
+        "load_inputs": 28,
+        "inputs_unchanged": true,
+        "cases": 1340
+      },
+      "baseline_traces_preserved": true,
+      "previous_1340_case_trace_prefix_preserved": true,
+      "corpus": {
+        "report": "artifacts/usf-msxml-csri-x86/summary.json",
+        "sha256": "dfd8f5715cc5490fd475689934a2b5a55670ab243586b61f668a2f9a5a91ad95",
+        "complete": true,
+        "frames": 11066,
+        "distinct_controls": 116,
+        "partition_exact": true,
+        "cases": 1034,
+        "shards": [
+          {
+            "report": "artifacts/usf-msxml-csri-x86/shard-0/report.json",
+            "sha256": "00b162ff51058482bacf9cfe3cdb5625f0cac34810f676a053dd14b95d9b0979",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1410,
+            "cases": 130
+          },
+          {
+            "report": "artifacts/usf-msxml-csri-x86/shard-1/report.json",
+            "sha256": "1d4341f54f4948bad3ec0c3d9e034cdbd88c0bf0b9a3ce00cbc71517a6dd97d2",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1410,
+            "cases": 130
+          },
+          {
+            "report": "artifacts/usf-msxml-csri-x86/shard-2/report.json",
+            "sha256": "0ba745063a7583e0d1afa07465299e7d4ccac0b8db63e1add646420bc8aa72e9",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1381,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-msxml-csri-x86/shard-3/report.json",
+            "sha256": "bea5193a7736d5dcf60331622890b9564589ef484371cf26bb8bd25d88b3b351",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1369,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-msxml-csri-x86/shard-4/report.json",
+            "sha256": "85d55e3ec058a3d8928b43e7d89bc0b97e4018aeeab9e5bb3827fa29cfae1e2a",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1370,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-msxml-csri-x86/shard-5/report.json",
+            "sha256": "8ec7462008428b46c38ff49ec469ca74dd4ad047693eca37c2cfcae1590d3264",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1370,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-msxml-csri-x86/shard-6/report.json",
+            "sha256": "953f6232710c0b50094aef9b77f50ecfde619bba4ee26957aed63abbd5c801b0",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1372,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-msxml-csri-x86/shard-7/report.json",
+            "sha256": "7e188f654c8fbab9588710fee5865b1b2e86bc188bd68664691224e4b85b98dc",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1384,
+            "cases": 129
+          }
+        ]
+      },
+      "usf_rendering": {
+        "cases": 60,
+        "statuses": {
+          "ok": 40,
+          "open_rejected": 20
+        },
+        "frames": 480,
+        "distinct_controls": 12,
+        "included_in_full_corpus": true
+      },
+      "realtext_regression": {
+        "report": "artifacts/usf-msxml-final-probe-x86/report.json",
+        "sha256": "0d4e95cbcf6d2322e4b1002348134d2532a5b07b02b313b9817ffe06cadbb7d8",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+        "trace_lines": 37887,
+        "inputs_unchanged": true,
+        "cases": 4532
+      },
+      "vtt_regression": {
+        "report": "artifacts/usf-msxml-vtt-regression-x86/report.json",
+        "sha256": "c8de188c230dff5ab02de9ea7ce98fd357962e2d38f92082b0f616221b5fd114",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+        "trace_lines": 21939,
+        "inputs_unchanged": true,
+        "cases": 2292
+      },
+      "sami_regression": {
+        "report": "artifacts/usf-msxml-sami-regression-x86/report.json",
+        "sha256": "cb9f605c46b2bbf3189009a9226cf8d0424aa07d6ad6c577961b4fc9eb7edeca",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+        "trace_lines": 26992,
+        "inputs_unchanged": true,
+        "cases": 2836
+      },
+      "text_regression": {
+        "report": "artifacts/usf-msxml-text-regression-x86/report.json",
+        "sha256": "bbc73bc0a24006a35ca2c09d234f525981521a8f484dd0ed424f840b2a0c3523",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+        "trace_lines": 44404,
+        "inputs_unchanged": true,
+        "cases": 5692
+      },
+      "microdvd_regression": {
+        "report": "artifacts/usf-msxml-microdvd-regression-x86/report.json",
+        "sha256": "24c2595a5175f6bb721b231c961102abfe6f419e448faec0e2ae14f617f26140",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+        "trace_lines": 41491,
+        "inputs_unchanged": true,
+        "cases": 4588
+      },
+      "ass_regression": {
+        "report": "artifacts/usf-msxml-ass-probe-x86/report.json",
+        "sha256": "ed3c33cb297c0f60ca89c555ff1e7311a0d380441f3dc8b08e6994cca9eea43e",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+        "trace_lines": 22286,
+        "inputs_unchanged": true,
+        "cases": 3266
+      },
+      "xombie_regression": {
+        "report": "artifacts/usf-msxml-xombie-probe-x86/report.json",
+        "sha256": "a4e804ad0c1c79e4919c5320698a6178a28f2b10fa3dfa37c5140c514af83b5c",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+        "trace_lines": 10441,
+        "inputs_unchanged": true,
+        "cases": 1242
+      },
+      "lifecycle": {
+        "report": "artifacts/usf-msxml-lifecycle-x86/report.json",
+        "sha256": "d98bcca536ffb35116d1c4c75f2113ab13b86d77ef07e6719334265c028eb1a3",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+        "trace_lines": 3693,
+        "inputs_unchanged": true
+      },
+      "compile": {
+        "report": "artifacts/usf-msxml-compile-x86/report.json",
+        "sha256": "6373d6b8a27d06981b97c24a07b95d177b2ad14308c81bd8e640ab983b14e0b8",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+        "inputs_unchanged": true
+      },
+      "com": {
+        "report": "artifacts/usf-msxml-contracts-x86/com/report.json",
+        "sha256": "fcd1f1728cbbce2b50c4343b6466e52fcc9d85f65ef85c7883bb05b074f9d77c",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+        "inputs_unchanged": true,
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "69faa2d5f90f35fe4184e9e9bd892adb76fee60295701988f61ab7af0664d9eb",
+          "candidate_sha256": "a86a6d93895f8658226486b59cf48770c405be11907f9ec12d8db7fa01ccc0e8",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "8b0365bd8b1fa8ea13b65d8681836b85d870a46781d0a3cbfb851b1000a21ae7"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "2c3b904d7f91902ef456e07b648c5d6351878318c235397eeb9b39eb3fffa34f",
+          "candidate_sha256": "be1717f666358fd6b58b314be7778d11a35690b0e7ec3b3db5e8aa3908985e10",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "2a22ef471924cc53ea843b14cb2fb5e1dc765f9e308e8ed316172476b0696dd5"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "3e7c20a4d6c42457d92eb56c42e4fd9f3bddb93276f2c1cd28bfb73edd06484c",
+          "candidate_sha256": "0382ebd49e631aa9c38200cea466789d92f3687eaa7b9ec4115bae59b66deaee",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "bee8a1d975859e0ab8a9b6843e14f813df818b8538e6501927e792bb180eb7c1"
+        }
+      }
+    }
+  },
+  "limits": [
+    "Experimental document-owner path only; no production switch, whole-format/host closure or complete-library claim.",
+    "Windows MSXML/OleAut32/Ole32/User32/CRT remain system dependencies reached through Rust unsafe FFI. Rust now owns USF DOM construction/load/getters and their local COM resources. Native document serialization, shared critical-section gate, AddStyle/Add conversion dispatch and other host adapters remain transitional.",
+    "Finite Unicode Windows MSVC14.44 x86/x64 evidence. No claim for allocator/new-handler reentry, injected system failures, locale or registration mutation, arbitrary concurrent source edits, non-Unicode builds or non-Windows whole-renderer behavior.",
+    "Caller buffer validity and callback validity/nonunwinding remain unsafe FFI preconditions. System COM implementations must satisfy their SDK contracts. COM owners remain on the calling thread; the host must initialize COM. The library does not initialize COM for the host.",
+    "Unexpected null COM interfaces and representation overflows are unresolved or refused without reproducing unsafe reference behavior. Lexical unsafe counts include function-pointer types and are an inventory, not a soundness proof or migration percentage.",
+    "Crashes, hangs and nondeterminism remain unresolved. Earlier USF visibility-control failures and SubViewer missing-style outcomes retain original provenance."
+  ],
+  "unsafe_lexical_inventory": {
+    "report": "artifacts/usf-msxml-unsafe-inventory.json",
+    "sha256": "5a600d2ac62aac0ab4f2adbfb4b48f0d4d7f6033ade8bb43dd673810a9be62cf",
+    "safe_core_files": 104,
+    "safe_core_unsafe_sites": 0,
+    "ffi_unsafe_functions": 369,
+    "ffi_unsafe_blocks": 476,
+    "ffi_raw_shared_slice_constructors": 63,
+    "delta": {
+      "lexical_unsafe_function_sites": 11,
+      "unsafe_blocks": 38,
+      "new_raw_shared_slice_constructors": 1,
+      "new_raw_nonoverlapping_copies": 1,
+      "note": "Function sites include8 new function-pointer signatures,2 internal unsafe ownership/copy functions and1 exported unsafe entry. Test sites excluded."
+    },
+    "limits": "Lexical inventory, not a soundness proof or completion percentage."
+  },
+  "checks": {
+    "core_per_architecture": 302,
+    "ffi_per_architecture": 126,
+    "fmt": true,
+    "clippy_all_targets": true,
+    "clippy_native_runtime": true,
+    "python_tests": 163,
+    "python_skipped": 1,
+    "corpus_check": true,
+    "log": "artifacts/usf-msxml-checks.log",
+    "log_sha256": "bc68cf41db9f3b88575ca7849a78859a344cee5abeb27790a838bc9d4d084e72"
+  },
+  "harness_sources": {
+    "tools/compat/msxml_abi_native.cpp": "60de209ae3c7487d9a22da66addbf92e5a615a8874cb3a9e74731988e19ed4dd",
+    "tools/compat/msxml_abi_native.py": "1a401e1dc5c404f81007cc1db44f1f64cdfc63c7acfbd23df69a392414f4258b",
+    "tools/compat/usf_document_native.cpp": "fcf89ef5f84361df1899dd7cab6ca195c970f47cc85117e8935b9be969ac2870",
+    "tools/compat/usf_document_native.py": "d3067f88206db1f7b7585b29d8366963aa5beda8a8f70d84873007e8d33122b3",
+    "tools/compat/test_usf_document_native.py": "73dde67a6b53f56e76b594cd63676929b40f0197997486bead62836c8085ed0f",
+    "tools/compat/csri_compare.py": "9f71f1bc0426ca96b47ae35d798ef7b86f17e52d213c67730e122384d85a3b7a",
+    "test/compat/cases.json": "978c916d653a72dc94b8ee558c26da645a68475fe211c9b00c90c7a597ebb84a",
+    "artifacts/run-usf-msxml-host-corpus.py": "b6fa362637224f2502ac0713a81e6b38907855a0d423db46754fdc36fafb8e1a"
+  },
+  "build_logs": {
+    "artifacts/usf-msxml-build-x64.log": "97d0b7109306c5f7844dcf6bcba051ddc9345ff4855991dd2aece91a0adc9854",
+    "artifacts/usf-msxml-build-x86.log": "25d7875cf8a2b160b2562097ebdcd1a0e31806fbe431f944ba05677523b84dd9",
+    "artifacts/usf-msxml-build-rust-x64.log": "5640d1a3b76036aa7efe54ebf35dfc3441c2b6935cb50850e3787ba44dbc87df",
+    "artifacts/usf-msxml-build-rust-x86.log": "de48a68d01a96b94dffca6afe805f8695906df47bb8480f86d18a59b0f6cf865"
+  },
+  "source_inventory": {
+    "path": "docs/rust-usf-msxml-inventory.json",
+    "sha256": "ce921e502ca6c30ca5cac382bd2f948fbca0f83d12135ba761d18af09899b8a0"
+  },
+  "prior_evidence": {
+    "docs/rust-usf-scalar-local-evidence.json": "cebf60fb4bcec453e613d87738cef83e7b58e8faf83fc984bb1c753a653b7965",
+    "docs/rust-usf-state-local-evidence.json": "6771f0efbf460eb35510f7c7ac4c1ce75c7f4d97d33ac7a434f2346ed4886b7c",
+    "docs/rust-usf-conversion-local-evidence.json": "7990c397380916b135ed10d57164f364b013dce498cc246f8e4a391b5f12c5f2",
+    "docs/rust-subviewer-reference-outcomes.json": "9cd5e22c6e894051966451dad661bf7cc1cd5e4b99f76fd118d61220b08be882"
+  },
+  "system_xml_registration": {
+    "clsid": "{2933BF90-7B36-11d2-B20E-00C04F983E60}",
+    "method": "Read-only COM registration and system-file snapshot after direct comparisons; this is not an observed loaded-module trace.",
+    "registrations": [
+      {
+        "architecture": "x64",
+        "server": "%SystemRoot%\\System32\\msxml3.dll",
+        "threading_model": "Both"
+      },
+      {
+        "architecture": "x86",
+        "server": "%SystemRoot%\\System32\\msxml3.dll",
+        "threading_model": "Both"
+      }
+    ],
+    "system_files": [
+      {
+        "architecture": "x64",
+        "path": "C:\\Windows\\System32\\msxml3.dll",
+        "sha256": "dbebbda0c3f26ef348d239c5180d2559129944092095cd1764db0f197b1fbc9d"
+      },
+      {
+        "architecture": "x86",
+        "path": "C:\\Windows\\SysWOW64\\msxml3.dll",
+        "sha256": "67c6147fe647f8a9800bf7fd8d5da98aaeb6d5898bc9f97d7f772fa546f0d675"
+      }
+    ]
+  },
+  "sdk_abi_facts": {
+    "x64": {
+      "report": "artifacts/usf-msxml-abi-x64/report.json",
+      "sha256": "eeb7b69f7accfcfcfe40ed12f7e6f4972e82fd542ed623747d1ba2bbb1b28108",
+      "facts": {
+        "pointer_bits": 64,
+        "VARIANT.size": 24,
+        "VARIANT.align": 8,
+        "VARIANT.vt": 0,
+        "VARIANT.bstrVal": 8,
+        "VARIANT.parray": 8,
+        "VARIANT.pvRecord": 8,
+        "VARIANT.pRecInfo": 16,
+        "SAFEARRAY.size": 32,
+        "SAFEARRAY.align": 8,
+        "SAFEARRAY.cDims": 0,
+        "SAFEARRAY.fFeatures": 2,
+        "SAFEARRAY.cbElements": 4,
+        "SAFEARRAY.cLocks": 8,
+        "SAFEARRAY.pvData": 16,
+        "SAFEARRAY.rgsabound": 24,
+        "SAFEARRAYBOUND.size": 8,
+        "SAFEARRAYBOUND.align": 4,
+        "SAFEARRAYBOUND.cElements": 0,
+        "SAFEARRAYBOUND.lLbound": 4,
+        "GUID.size": 16,
+        "GUID.align": 4,
+        "IXMLDOMNodeVtbl.size": 344,
+        "IXMLDOMNodeVtbl.align": 8,
+        "IXMLDOMNodeVtbl.QueryInterface": 0,
+        "IXMLDOMNodeVtbl.AddRef": 8,
+        "IXMLDOMNodeVtbl.Release": 16,
+        "IXMLDOMNodeVtbl.get_nodeName": 56,
+        "IXMLDOMNodeVtbl.get_nodeValue": 64,
+        "IXMLDOMNodeVtbl.get_firstChild": 104,
+        "IXMLDOMNodeVtbl.get_nextSibling": 128,
+        "IXMLDOMNodeVtbl.get_attributes": 136,
+        "IXMLDOMNodeVtbl.get_text": 208,
+        "IXMLDOMNodeVtbl.get_xml": 272,
+        "IXMLDOMDocumentVtbl.size": 608,
+        "IXMLDOMDocumentVtbl.align": 8,
+        "IXMLDOMDocumentVtbl.load": 464,
+        "IXMLDOMDocumentVtbl.put_async": 504,
+        "IXMLDOMNamedNodeMapVtbl.size": 136,
+        "IXMLDOMNamedNodeMapVtbl.align": 8,
+        "IXMLDOMNamedNodeMapVtbl.nextNode": 112,
+        "complete": true
+      }
+    },
+    "x86": {
+      "report": "artifacts/usf-msxml-abi-x86/report.json",
+      "sha256": "dcd86d55a5d060b1bba9b0ab1d140d6d29f048898daa3feef3e81419fcf16bb4",
+      "facts": {
+        "pointer_bits": 32,
+        "VARIANT.size": 16,
+        "VARIANT.align": 8,
+        "VARIANT.vt": 0,
+        "VARIANT.bstrVal": 8,
+        "VARIANT.parray": 8,
+        "VARIANT.pvRecord": 8,
+        "VARIANT.pRecInfo": 12,
+        "SAFEARRAY.size": 24,
+        "SAFEARRAY.align": 4,
+        "SAFEARRAY.cDims": 0,
+        "SAFEARRAY.fFeatures": 2,
+        "SAFEARRAY.cbElements": 4,
+        "SAFEARRAY.cLocks": 8,
+        "SAFEARRAY.pvData": 12,
+        "SAFEARRAY.rgsabound": 16,
+        "SAFEARRAYBOUND.size": 8,
+        "SAFEARRAYBOUND.align": 4,
+        "SAFEARRAYBOUND.cElements": 0,
+        "SAFEARRAYBOUND.lLbound": 4,
+        "GUID.size": 16,
+        "GUID.align": 4,
+        "IXMLDOMNodeVtbl.size": 172,
+        "IXMLDOMNodeVtbl.align": 4,
+        "IXMLDOMNodeVtbl.QueryInterface": 0,
+        "IXMLDOMNodeVtbl.AddRef": 4,
+        "IXMLDOMNodeVtbl.Release": 8,
+        "IXMLDOMNodeVtbl.get_nodeName": 28,
+        "IXMLDOMNodeVtbl.get_nodeValue": 32,
+        "IXMLDOMNodeVtbl.get_firstChild": 52,
+        "IXMLDOMNodeVtbl.get_nextSibling": 64,
+        "IXMLDOMNodeVtbl.get_attributes": 68,
+        "IXMLDOMNodeVtbl.get_text": 104,
+        "IXMLDOMNodeVtbl.get_xml": 136,
+        "IXMLDOMDocumentVtbl.size": 304,
+        "IXMLDOMDocumentVtbl.align": 4,
+        "IXMLDOMDocumentVtbl.load": 232,
+        "IXMLDOMDocumentVtbl.put_async": 252,
+        "IXMLDOMNamedNodeMapVtbl.size": 68,
+        "IXMLDOMNamedNodeMapVtbl.align": 4,
+        "IXMLDOMNamedNodeMapVtbl.nextNode": 56,
+        "complete": true
+      }
+    }
+  }
+}

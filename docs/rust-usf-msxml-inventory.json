@@ -1,0 +1,232 @@
+{
+  "schema": 1,
+  "candidate_commit": "9a22603fdbe686a384032e550a75223e046bc9ef",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "Rust ownership and Windows system FFI for USF MSXML loading, DOM getters, attribute iteration, BSTR/VARIANT/SAFEARRAY lifetimes and parser scalar services.",
+  "production_sources": {
+    "rust/compat/src/usf_model.rs": "9ed42133501940609072bdd5db6acacb5f74c7acc9646a9046a59201ff6bb69d",
+    "rust/compat/src/usf_scalar.rs": "aab9c4a6cc3dfd03a23dc4ac87419cebc4a7e226fc8d3c6a305edcea1fd739c6",
+    "rust/compat/src/usf_conversion.rs": "a72d81d25225998d171e70a56c059b0b237730dbf751e096a92bb4293d2a446b",
+    "rust/ffi/src/windows_usf.rs": "8830d1379a6627e6d2790bc3b9d5bd0c4475e800d20a46d9643543436cb57049",
+    "rust/ffi/src/document.rs": "42dfe6d45d304f2982570c80bd96e462ef3cd81df6f36e24cbcc041b9b310769",
+    "rust/ffi/src/document_registry.rs": "f8d61018942929dbca37fab3b328f6a18bdb9294add4cc75e60f8a0978c74890",
+    "rust/ffi/src/lib.rs": "3b80bdb7b98001455d8ea7a138296c4756a71475734486abeba18a6054238a81",
+    "include/xy_rust_document.h": "d8a49f6a0e8761ff94f333d2be13831b0b9e144d4862cfc6e2aaa86b90afac4e",
+    "src/subtitles/RustDocumentOwner.h": "203a44c583a3d217a94508d4e69be8b35bf214e79db2786f3c44809503caf674",
+    "src/subtitles/USFSubtitles.cpp": "8da804a5e9d97753ffe427f5daa0e44e12601b25bb3d15476ed9408026890e26",
+    "src/subtitles/USFSubtitles.h": "c976694cb090380f12df79609a873639c8b8bdf8f3216cce62f1d4e08452d100"
+  },
+  "reference_sources": {
+    "src/subtitles/USFSubtitles.cpp": "85df63bd57900a62a4900058f02affdefe388834b5b4ac4cc95b5fd7f95873c6",
+    "src/subtitles/USFSubtitles.h": "4c120ac34c52c6dbf7c111492c32e4597080616a7f515d6341d4cf545f868036"
+  },
+  "operations": [
+    {
+      "operation": "Source automation ownership",
+      "source": {
+        "path": "rust/ffi/src/windows_usf.rs",
+        "line": 340,
+        "sha256": "8830d1379a6627e6d2790bc3b9d5bd0c4475e800d20a46d9643543436cb57049"
+      },
+      "behavior": "File sources use SysAllocString on raw terminated UTF16, including the distinct null-path case. Memory sources use UI1 SAFEARRAY creation, lock, initialized copy, SafeArrayCopy and GetVartype in ATL order. Copied VARIANT is retained through traversal, then cleared before original array unlock/destruction. Byte length above ULONG_MAX returns false before reading the pointer."
+    },
+    {
+      "operation": "COM load and lifetimes",
+      "source": {
+        "path": "rust/ffi/src/windows_usf.rs",
+        "line": 460,
+        "sha256": "8830d1379a6627e6d2790bc3b9d5bd0c4475e800d20a46d9643543436cb57049"
+      },
+      "behavior": "CoCreateInstance uses the pinned DOMDocument CLSID, IXMLDOMDocument IID and CLSCTX_ALL23. Host owns COM initialization. put_async(false) precedes by-value load(VARIANT), requiring VARIANT_TRUE. Failed loading preserves the source model. Successful load queries IXMLDOMNode and then begins traversal. All owned node references drop before the document, copied source VARIANT and original array. No COM pointer enters the portable core or registry."
+    },
+    {
+      "operation": "DOM services",
+      "source": {
+        "path": "rust/ffi/src/windows_usf.rs",
+        "line": 374,
+        "sha256": "8830d1379a6627e6d2790bc3b9d5bd0c4475e800d20a46d9643543436cb57049"
+      },
+      "behavior": "Preserve name/get_nodeValue order, including unused node values; lowercase full BSTR with CharLowerBuffW, then copy CString first-NUL view. Child/sibling/name/text/XML HRESULTs remain deliberately ignored where the reference ignores them. Attribute lookup gets a fresh map each time and returns the first matching lowercased name with VT_BSTR value. Typed vtable calls use probed SDK offsets without transmute."
+    },
+    {
+      "operation": "Parser scalar services",
+      "source": {
+        "path": "rust/ffi/src/windows_usf.rs",
+        "line": 575,
+        "sha256": "8830d1379a6627e6d2790bc3b9d5bd0c4475e800d20a46d9643543436cb57049"
+      },
+      "behavior": "Time and color still execute the safe core helper state machine. Rust directly calls Windows wcstol/_wcsicmp with copied terminated raw UTF16, preserving CRT locale/overflow/first-NUL behavior. Scalar calls occur outside registry admission. Native conversion/scalar wrappers for other call paths remain transitional."
+    },
+    {
+      "operation": "Registry and host gate",
+      "source": {
+        "path": "rust/ffi/src/document.rs",
+        "line": 394,
+        "sha256": "42dfe6d45d304f2982570c80bd96e462ef3cd81df6f36e24cbcc041b9b310769"
+      },
+      "behavior": "The synchronous load entry copies source bytes, preflights output, validates ready source/no conversion, then drives detached requests. Paired temporary native enter/leave callbacks serialize each individual registry access using the same existing shared gate as other document operations. Neither the native gate nor any Rust model loan survives into a COM/CRT call. Gate callbacks are never retained. Both absent supports direct nonblocking callers; unmatched callbacks are refused. Final12-byte reply is staged after COM destruction and may overlap input."
+    }
+  ],
+  "boundary_review": {
+    "source": {
+      "path": "rust/ffi/src/document.rs",
+      "line": 498,
+      "sha256": "42dfe6d45d304f2982570c80bd96e462ef3cd81df6f36e24cbcc041b9b310769"
+    },
+    "native_adapter": {
+      "path": "src/subtitles/RustDocumentOwner.h",
+      "line": 934,
+      "sha256": "203a44c583a3d217a94508d4e69be8b35bf214e79db2786f3c44809503caf674"
+    },
+    "new_private_entries": [
+      "xy_vsfilter_document_usf_source_load_v1"
+    ],
+    "unsafe_delta": {
+      "lexical_unsafe_function_sites": 11,
+      "unsafe_blocks": 38,
+      "new_raw_shared_slice_constructors": 1,
+      "new_raw_nonoverlapping_copies": 1,
+      "note": "Function sites include8 new function-pointer signatures,2 internal unsafe ownership/copy functions and1 exported unsafe entry. Test sites excluded."
+    },
+    "tests": "Real MSXML loads in Windows tests on both targets; BSTR first-NUL/full-length casing, independent SAFEARRAY copy and lock state, failed/wrong-root reload preservation, no implicit COM initialization, overlap input/output, invalid kind/path shape/capacity/callback pair, BUSY with balanced callbacks, oversized byte refusal, stale IDs and detached snapshot lifetime.",
+    "failure_policy": "Native SysAllocString/SafeArrayCopy/GetVartype HRESULT exceptions are returned in a flag/HRESULT reply, then raised with AtlThrow after all Rust owners drop. Unexpected COM contracts remain unresolved. Allocation/reentry/injected faults are not closed."
+  },
+  "abi": {
+    "probe": {
+      "path": "tools/compat/msxml_abi_native.cpp",
+      "line": 11,
+      "sha256": "60de209ae3c7487d9a22da66addbf92e5a615a8874cb3a9e74731988e19ed4dd"
+    },
+    "facts": {
+      "x64": {
+        "report": "artifacts/usf-msxml-abi-x64/report.json",
+        "sha256": "eeb7b69f7accfcfcfe40ed12f7e6f4972e82fd542ed623747d1ba2bbb1b28108",
+        "facts": {
+          "pointer_bits": 64,
+          "VARIANT.size": 24,
+          "VARIANT.align": 8,
+          "VARIANT.vt": 0,
+          "VARIANT.bstrVal": 8,
+          "VARIANT.parray": 8,
+          "VARIANT.pvRecord": 8,
+          "VARIANT.pRecInfo": 16,
+          "SAFEARRAY.size": 32,
+          "SAFEARRAY.align": 8,
+          "SAFEARRAY.cDims": 0,
+          "SAFEARRAY.fFeatures": 2,
+          "SAFEARRAY.cbElements": 4,
+          "SAFEARRAY.cLocks": 8,
+          "SAFEARRAY.pvData": 16,
+          "SAFEARRAY.rgsabound": 24,
+          "SAFEARRAYBOUND.size": 8,
+          "SAFEARRAYBOUND.align": 4,
+          "SAFEARRAYBOUND.cElements": 0,
+          "SAFEARRAYBOUND.lLbound": 4,
+          "GUID.size": 16,
+          "GUID.align": 4,
+          "IXMLDOMNodeVtbl.size": 344,
+          "IXMLDOMNodeVtbl.align": 8,
+          "IXMLDOMNodeVtbl.QueryInterface": 0,
+          "IXMLDOMNodeVtbl.AddRef": 8,
+          "IXMLDOMNodeVtbl.Release": 16,
+          "IXMLDOMNodeVtbl.get_nodeName": 56,
+          "IXMLDOMNodeVtbl.get_nodeValue": 64,
+          "IXMLDOMNodeVtbl.get_firstChild": 104,
+          "IXMLDOMNodeVtbl.get_nextSibling": 128,
+          "IXMLDOMNodeVtbl.get_attributes": 136,
+          "IXMLDOMNodeVtbl.get_text": 208,
+          "IXMLDOMNodeVtbl.get_xml": 272,
+          "IXMLDOMDocumentVtbl.size": 608,
+          "IXMLDOMDocumentVtbl.align": 8,
+          "IXMLDOMDocumentVtbl.load": 464,
+          "IXMLDOMDocumentVtbl.put_async": 504,
+          "IXMLDOMNamedNodeMapVtbl.size": 136,
+          "IXMLDOMNamedNodeMapVtbl.align": 8,
+          "IXMLDOMNamedNodeMapVtbl.nextNode": 112,
+          "complete": true
+        }
+      },
+      "x86": {
+        "report": "artifacts/usf-msxml-abi-x86/report.json",
+        "sha256": "dcd86d55a5d060b1bba9b0ab1d140d6d29f048898daa3feef3e81419fcf16bb4",
+        "facts": {
+          "pointer_bits": 32,
+          "VARIANT.size": 16,
+          "VARIANT.align": 8,
+          "VARIANT.vt": 0,
+          "VARIANT.bstrVal": 8,
+          "VARIANT.parray": 8,
+          "VARIANT.pvRecord": 8,
+          "VARIANT.pRecInfo": 12,
+          "SAFEARRAY.size": 24,
+          "SAFEARRAY.align": 4,
+          "SAFEARRAY.cDims": 0,
+          "SAFEARRAY.fFeatures": 2,
+          "SAFEARRAY.cbElements": 4,
+          "SAFEARRAY.cLocks": 8,
+          "SAFEARRAY.pvData": 12,
+          "SAFEARRAY.rgsabound": 16,
+          "SAFEARRAYBOUND.size": 8,
+          "SAFEARRAYBOUND.align": 4,
+          "SAFEARRAYBOUND.cElements": 0,
+          "SAFEARRAYBOUND.lLbound": 4,
+          "GUID.size": 16,
+          "GUID.align": 4,
+          "IXMLDOMNodeVtbl.size": 172,
+          "IXMLDOMNodeVtbl.align": 4,
+          "IXMLDOMNodeVtbl.QueryInterface": 0,
+          "IXMLDOMNodeVtbl.AddRef": 4,
+          "IXMLDOMNodeVtbl.Release": 8,
+          "IXMLDOMNodeVtbl.get_nodeName": 28,
+          "IXMLDOMNodeVtbl.get_nodeValue": 32,
+          "IXMLDOMNodeVtbl.get_firstChild": 52,
+          "IXMLDOMNodeVtbl.get_nextSibling": 64,
+          "IXMLDOMNodeVtbl.get_attributes": 68,
+          "IXMLDOMNodeVtbl.get_text": 104,
+          "IXMLDOMNodeVtbl.get_xml": 136,
+          "IXMLDOMDocumentVtbl.size": 304,
+          "IXMLDOMDocumentVtbl.align": 4,
+          "IXMLDOMDocumentVtbl.load": 232,
+          "IXMLDOMDocumentVtbl.put_async": 252,
+          "IXMLDOMNamedNodeMapVtbl.size": 68,
+          "IXMLDOMNamedNodeMapVtbl.align": 4,
+          "IXMLDOMNamedNodeMapVtbl.nextNode": 56,
+          "complete": true
+        }
+      }
+    },
+    "calling_convention": "IUnknown/MSXML and system APIs use extern system; CRT and private entry/gate callbacks use extern C. VARIANT uses natural C layout with i64 union alignment8. Explicit repr(align(8)) caused x86 indirect aggregate passing and E_INVALIDARG in development tests despite matching offsets; it was removed. Both actual x86/x64 load paths now pass unit and direct reference comparisons."
+  },
+  "direct_probe": {
+    "baseline_commit": "335e241f44c31dad31071d79849ccfb528cab534",
+    "source": {
+      "path": "tools/compat/usf_document_native.cpp",
+      "line": 150,
+      "sha256": "fcf89ef5f84361df1899dd7cab6ca195c970f47cc85117e8935b9be969ac2870"
+    },
+    "cases": 1340,
+    "scalar_cases": 20735,
+    "scalar_values": 1885,
+    "load_cases": 348,
+    "load_inputs": 28,
+    "trace_lines": 40517,
+    "coverage": "Existing1340document/reload cases,640state snapshots and20735scalar calls retained. Added28byte XML fixtures x2file/memory modes x3no-COM/STA/MTA modes x2preload states=336, plus null/missing file paths x3apartments x2preloads=12. All348 cases capture3complete source-state snapshots and converted document. Includes UTF8/16/32 BOM variants, encoding declarations, malformed/truncated XML, wrong/case-varied roots, namespaces, duplicate attributes and internal entity. Five raw BSTR records and SAFEARRAY copy/lock facts independently expose ATL behavior.",
+    "method": "Actual selected cleanup source vs candidate, two executions each on both architectures; all full traces also compared byte-for-byte to pre-port baseline."
+  },
+  "limits": [
+    "Experimental document-owner path only; no production switch, whole-format/host closure or complete-library claim.",
+    "Windows MSXML/OleAut32/Ole32/User32/CRT remain system dependencies reached through Rust unsafe FFI. Rust now owns USF DOM construction/load/getters and their local COM resources. Native document serialization, shared critical-section gate, AddStyle/Add conversion dispatch and other host adapters remain transitional.",
+    "Finite Unicode Windows MSVC14.44 x86/x64 evidence. No claim for allocator/new-handler reentry, injected system failures, locale or registration mutation, arbitrary concurrent source edits, non-Unicode builds or non-Windows whole-renderer behavior.",
+    "Caller buffer validity and callback validity/nonunwinding remain unsafe FFI preconditions. System COM implementations must satisfy their SDK contracts. COM owners remain on the calling thread; the host must initialize COM. The library does not initialize COM for the host.",
+    "Unexpected null COM interfaces and representation overflows are unresolved or refused without reproducing unsafe reference behavior. Lexical unsafe counts include function-pointer types and are an inventory, not a soundness proof or migration percentage.",
+    "Crashes, hangs and nondeterminism remain unresolved. Earlier USF visibility-control failures and SubViewer missing-style outcomes retain original provenance."
+  ],
+  "next_work": [
+    "Port shared STS/RTS color consumers and their distinct numeric fallback/formatting rules, then retire native color map on the experimental path.",
+    "Continue document conversion/host adapter migration, renderer, all remaining formats/options/interfaces and vendored implementation.",
+    "Preserve unresolved SubViewer outcomes and original evidence provenance."
+  ]
+}
