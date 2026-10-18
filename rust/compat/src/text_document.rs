@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-//! Owned SubRip and MPL2 parser loops from cleanup STS.cpp. Native ReadString,
+//! Owned SubRip, MPL2, Old SubRip and VPlayer loops from cleanup STS.cpp. ReadString,
 //! CString predicates, exact scanf conversions, formatting and Add are services.
 //! No caller buffer, native object or callback is retained by the session.
 use crate::ass_document::Error;
@@ -16,11 +16,14 @@ pub enum Op {
     Emit = 4,
     Done = 5,
     Failed = 6,
+    FindPipe = 7,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Format {
     SubRip,
     Mpl2,
+    OldSubRip,
+    VPlayer,
 }
 pub struct Run {
     format: Format,
@@ -31,6 +34,7 @@ pub struct Run {
     accepted: bool,
     start: i64,
     end: i64,
+    pipe_position: usize,
 }
 impl Run {
     pub fn new(format: Format) -> Self {
@@ -43,6 +47,7 @@ impl Run {
             accepted: false,
             start: 0,
             end: 0,
+            pipe_position: 0,
         }
     }
     pub fn read(
@@ -56,6 +61,9 @@ impl Run {
             return Err(Error::Protocol);
         }
         let line = crate::ass_input::trim(raw, spaces).ok_or(Error::Protocol)?;
+        if line.len() > i32::MAX as usize {
+            return Err(Error::CountOverflow);
+        }
         if self.op == Op::ReadHeader {
             // Both outer while(ReadString) loops discard false-read fragments.
             if eof {
@@ -67,7 +75,12 @@ impl Run {
                 return Ok(());
             }
             self.line = line.to_vec();
-            self.op = Op::ScanHeader;
+            self.pipe_position = 0;
+            self.op = if matches!(self.format, Format::OldSubRip | Format::VPlayer) {
+                Op::FindPipe
+            } else {
+                Op::ScanHeader
+            };
         } else {
             // SubRip's inner loop checks raw empty EOF before trimming.
             if eof && raw.is_empty() {
@@ -85,9 +98,16 @@ impl Run {
     }
     /// Only initialized native scan values may be supplied: SubRip c>=11 gives
     /// [h1,m1,s1,ms1,h2,m2,s2,ms2], with each secondary ms parse defaulting to 0;
-    /// MPL2 c==2 gives [start,end,0,0,0,0,0,0]. Other counts ignore the array.
+    /// MPL2 c==2 gives [start,end,0,0,0,0,0,0]; OldSubRip c==6 gives
+    /// [h1,m1,s1,h2,m2,s2,0,0]; VPlayer c==3 gives [h,m,s,0,0,0,0,0].
+    /// Other counts ignore the array.
     pub fn header(&mut self, count: i32, values: [i32; 8]) -> Result<(), Error> {
-        let max = if self.format == Format::SubRip { 12 } else { 2 };
+        let max = match self.format {
+            Format::SubRip => 12,
+            Format::Mpl2 => 2,
+            Format::OldSubRip => 6,
+            Format::VPlayer => 3,
+        };
         if self.op != Op::ScanHeader || !(-1..=max).contains(&count) {
             return Err(Error::Protocol);
         }
@@ -143,6 +163,77 @@ impl Run {
                     };
                 }
             }
+            Format::OldSubRip | Format::VPlayer => {
+                if count == max {
+                    fn milliseconds(t: &[i32]) -> i64 {
+                        i64::from(t[0])
+                            .wrapping_mul(60)
+                            .wrapping_add(i64::from(t[1]))
+                            .wrapping_mul(60)
+                            .wrapping_add(i64::from(t[2]))
+                            .wrapping_mul(1000)
+                    }
+                    let (delimiter, searches) = if self.format == Format::OldSubRip {
+                        (125, 2)
+                    } else {
+                        (58, 3)
+                    };
+                    // Each CString Find returns -1 on failure; +1 resets the
+                    // NEXT search (or Mid) to zero. Do not split on delimiters.
+                    let c_end = self
+                        .line
+                        .iter()
+                        .position(|&u| u == 0)
+                        .unwrap_or(self.line.len());
+                    let mut start = 0;
+                    for _ in 0..searches {
+                        start = self.line[start..c_end]
+                            .iter()
+                            .position(|&u| u == delimiter)
+                            .map_or(0, |p| start + p + 1);
+                    }
+                    self.line = self.line[start..].to_vec();
+                    let ms = milliseconds(&values[..3]);
+                    self.start = ms.wrapping_mul(10000);
+                    self.end = if self.format == Format::OldSubRip {
+                        milliseconds(&values[3..6]).wrapping_mul(10000)
+                    } else {
+                        // Duration uses counted caption length before Add trims
+                        // it, including raw units after an embedded NUL.
+                        ms.wrapping_add(1000)
+                            .wrapping_add(50 * self.line.len() as i64)
+                            .wrapping_mul(10000)
+                    };
+                    self.op = Op::Emit;
+                } else {
+                    self.op = if count == -1 {
+                        Op::ReadHeader
+                    } else {
+                        Op::Failed
+                    };
+                }
+            }
+        }
+        Ok(())
+    }
+    /// Charset-aware FindChar remains a native service. Its reply may skip a
+    /// pipe used as a DBCS trail byte; replacement and iteration are Rust-owned.
+    pub fn found_pipe(&mut self, found: i32) -> Result<(), Error> {
+        if self.op != Op::FindPipe {
+            return Err(Error::Protocol);
+        }
+        if found == -1 {
+            self.op = Op::ScanHeader;
+            return Ok(());
+        }
+        let index = usize::try_from(found).map_err(|_| Error::Protocol)?;
+        if index < self.pipe_position || self.line.get(index) != Some(&124) {
+            return Err(Error::Protocol);
+        }
+        self.line[index] = 10;
+        self.pipe_position = index + 1;
+        if self.pipe_position == self.line.len() {
+            self.op = Op::ScanHeader;
         }
         Ok(())
     }
@@ -190,9 +281,10 @@ impl Run {
     }
     /// op:u32,accepted:u32,start:i64,end:i64, followed by raw UTF16LE. Scan
     /// requests expose the trimmed line; Emit exposes owned unformatted text.
+    /// FindPipe alone inserts a u32 search position before its raw UTF16LE line.
     pub fn snapshot(&self) -> Vec<u8> {
         let text = match self.op {
-            Op::ScanHeader | Op::ScanCaption => &self.line[..],
+            Op::ScanHeader | Op::ScanCaption | Op::FindPipe => &self.line[..],
             Op::Emit => {
                 if self.format == Format::SubRip {
                     self.cue.text()
@@ -207,6 +299,9 @@ impl Run {
         bytes.extend_from_slice(&u32::from(self.accepted).to_le_bytes());
         bytes.extend_from_slice(&self.start.to_le_bytes());
         bytes.extend_from_slice(&self.end.to_le_bytes());
+        if self.op == Op::FindPipe {
+            bytes.extend_from_slice(&(self.pipe_position as u32).to_le_bytes());
+        }
         for u in text {
             bytes.extend_from_slice(&u.to_le_bytes());
         }
@@ -227,6 +322,91 @@ mod tests {
     fn start(run: &mut Run, doc: &Document) {
         read(run, doc, "time", false);
         run.header(12, [0, 0, 1, 234, 0, 0, 4, 567]).unwrap();
+    }
+    #[test]
+    fn pipe_replies_are_checked_and_can_skip_dbcs_trail_bytes() {
+        let doc = Document::default();
+        let mut run = Run::new(Format::VPlayer);
+        read(&mut run, &doc, "0:0:1:A\u{81}|B|C|", false);
+        let initial = run.snapshot();
+        assert_eq!(initial[0], 7);
+        assert_eq!(&initial[24..28], &[0; 4]);
+        for invalid in [-2, 0, 99] {
+            assert_eq!(run.found_pipe(invalid), Err(Error::Protocol));
+            assert_eq!(run.snapshot(), initial);
+        }
+        // Native FindChar skipped index8, the DBCS trail byte.
+        run.found_pipe(10).unwrap();
+        assert_eq!(run.pipe_position, 11);
+        assert_eq!(run.line[8], 124);
+        let before = run.snapshot();
+        assert_eq!(run.found_pipe(8), Err(Error::Protocol));
+        assert_eq!(run.snapshot(), before);
+        run.found_pipe(12).unwrap();
+        assert_eq!(run.op, Op::ScanHeader);
+        assert_eq!(run.found_pipe(-1), Err(Error::Protocol));
+        assert_eq!(initial[28 + 10 * 2], 124); // earlier snapshot owns its bytes
+        run.header(3, [0, 0, 1, 0, 0, 0, 0, 0]).unwrap();
+        assert_eq!(
+            run.line,
+            "A\u{81}|B\nC\n".encode_utf16().collect::<Vec<_>>()
+        );
+        assert_eq!((run.start, run.end), (10_000_000, 23_500_000));
+    }
+    #[test]
+    fn permissive_scan_delimiters_and_counted_duration_match_native_expressions() {
+        let doc = Document::default();
+        for (format, input, count, expected, end) in [
+            (
+                Format::OldSubRip,
+                "{0:0:1}{0:0:4tail",
+                6,
+                "{0:0:1}{0:0:4tail",
+                40_000_000,
+            ),
+            (
+                Format::OldSubRip,
+                "{0:0:1}{0:0:4}raw\0tail",
+                6,
+                "raw\0tail",
+                40_000_000,
+            ),
+            (Format::VPlayer, "0:0:1tail", 3, "0:0:1tail", 24_500_000),
+            (
+                Format::VPlayer,
+                "0:0:1:raw\0tail",
+                3,
+                "raw\0tail",
+                24_000_000,
+            ),
+        ] {
+            let mut run = Run::new(format);
+            read(&mut run, &doc, input, false);
+            run.found_pipe(-1).unwrap();
+            run.header(count, [0, 0, 1, 0, 0, 4, 0, 0]).unwrap();
+            assert_eq!(run.line, expected.encode_utf16().collect::<Vec<_>>());
+            assert_eq!((run.start, run.end), (10_000_000, end));
+        }
+    }
+    #[test]
+    fn legacy_outer_eof_and_rejected_scan_are_terminal() {
+        let doc = Document::default();
+        for format in [Format::OldSubRip, Format::VPlayer] {
+            let mut run = Run::new(format);
+            read(&mut run, &doc, "ignored final fragment", true);
+            assert_eq!(run.op, Op::Done);
+            assert!(!run.accepted);
+            let mut run = Run::new(format);
+            read(&mut run, &doc, "junk", false);
+            assert_eq!(run.header(0, [0; 8]), Err(Error::Protocol));
+            run.found_pipe(-1).unwrap();
+            run.header(-1, [0; 8]).unwrap();
+            assert_eq!(run.op, Op::ReadHeader);
+            read(&mut run, &doc, "junk", false);
+            run.found_pipe(-1).unwrap();
+            run.header(0, [0; 8]).unwrap();
+            assert_eq!(run.op, Op::Failed);
+        }
     }
     #[test]
     fn blank_state_survives_intervening_text_and_consumes_numeric_boundary() {

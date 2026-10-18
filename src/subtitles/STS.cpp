@@ -1100,8 +1100,8 @@ static bool OpenTextDocument(CTextFile* file, CSimpleTextSubtitle& ret, int Char
     XyRust::TextDocument parser(*ret.m_document,format);
     for(;;)
     {
-        CStringW text;int64_t start,end;bool accepted;
-        const unsigned op=parser.Next(text,start,end,accepted);
+        CStringW text;int64_t start,end;bool accepted;int position;
+        const unsigned op=parser.Next(text,start,end,accepted,position);
         if(op==5) return accepted;
         if(op==6) return false;
         if(op==0 || op==2) {CStringW line;const bool eof=!file->ReadString(line);parser.Read(line,eof);}
@@ -1124,10 +1124,21 @@ static bool OpenTextDocument(CTextFile* file, CSimpleTextSubtitle& ret, int Char
                     values={{h1,m1,s1,ms1,h2,m2,s2,ms2}};
                 }
             }
-            else
+            else if(format==1)
             {
                 int first,last;count=swscanf_s(text,L"[%d][%d]",&first,&last);
                 if(count==2){values[0]=first;values[1]=last;}
+            }
+            else if(format==2)
+            {
+                int h1,m1,s1,h2,m2,s2;
+                count=swscanf_s(text,L"{%d:%d:%d}{%d:%d:%d}",&h1,&m1,&s1,&h2,&m2,&s2);
+                if(count==6)values={{h1,m1,s1,h2,m2,s2,0,0}};
+            }
+            else
+            {
+                int h,m,s;count=swscanf_s(text,L"%d:%d:%d:",&h,&m,&s);
+                if(count==3)values={{h,m,s,0,0,0,0,0}};
             }
             // Partial scan locals are never read or serialized.
             parser.Header(count,values);
@@ -1135,10 +1146,11 @@ static bool OpenTextDocument(CTextFile* file, CSimpleTextSubtitle& ret, int Char
         else if(op==3) {int number;WCHAR unit;parser.Step(1,swscanf_s(text,L"%d%c",&number,&unit,1)==1?1:0);}
         else if(op==4)
         {
-            const CStringW converted=format==0?SubRipper2SSA(text,CharSet):MPL22SSA(text,file->IsUnicode(),CharSet);
+            const CStringW converted=format==0?SubRipper2SSA(text,CharSet):format==1?MPL22SSA(text,file->IsUnicode(),CharSet):text;
             ret.Add(converted,file->IsUnicode(),start,end);
             parser.Step(2,0);
         }
+        else if(op==7) parser.Step(3,FindChar(text,'|',position,file->IsUnicode(),CharSet));
     }
 }
 #endif
@@ -1238,6 +1250,9 @@ static bool OpenSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 
 static bool OpenOldSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return OpenTextDocument(file,ret,CharSet,2);
+#else
     CStringW buff;
     while(file->ReadString(buff))
     {
@@ -1278,6 +1293,7 @@ static bool OpenOldSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int Char
     }
 
     return(!ret.IsEmpty());
+#endif
 }
 
 static bool OpenSubViewer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
@@ -2043,6 +2059,9 @@ static bool OpenSami(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 
 static bool OpenVPlayer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return OpenTextDocument(file,ret,CharSet,3);
+#else
     CStringW buff;
     while(file->ReadString(buff))
     {
@@ -2083,6 +2102,7 @@ static bool OpenVPlayer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
     }
 
     return(!ret.IsEmpty());
+#endif
 }
 
 static inline CStringW GetStr(CStringW& buff, WCHAR sep = L',') //throw(...)

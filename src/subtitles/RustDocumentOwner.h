@@ -898,13 +898,15 @@ public:
     void Header(int count,const std::array<int32_t,8>& numbers) {
         DocumentDetail::Bytes bytes;for(auto n:numbers)DocumentDetail::Append(bytes,static_cast<uint32_t>(n),4);Step(0,count,bytes);
     }
-    unsigned Next(CStringW& text,int64_t& start,int64_t& end,bool& accepted) const {
+    unsigned Next(CStringW& text,int64_t& start,int64_t& end,bool& accepted,int& position) const {
         std::array<uint8_t,8> out{};
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_text_parser_part_v1(id_,out.data(),out.size());}));
         DocumentReply snapshot(DocumentDetail::Load(out,0,8));const auto bytes=snapshot.Read();
-        DocumentDetail::Shape(bytes.size()>=24 && (bytes.size()-24)%2==0 && DocumentDetail::Load(bytes,0,4)<=6 && DocumentDetail::Load(bytes,4,4)<=1);
+        DocumentDetail::Shape(bytes.size()>=24 && (bytes.size()-24)%2==0 && DocumentDetail::Load(bytes,0,4)<=7 && DocumentDetail::Load(bytes,4,4)<=1);
         start=DocumentDetail::I64(DocumentDetail::Load(bytes,8,8));end=DocumentDetail::I64(DocumentDetail::Load(bytes,16,8));accepted=DocumentDetail::Load(bytes,4,4)!=0;
-        size_t offset=24;text=DocumentDetail::String(bytes,offset,DocumentDetail::Count((bytes.size()-24)/2));return static_cast<unsigned>(DocumentDetail::Load(bytes,0,4));
+        const unsigned op=static_cast<unsigned>(DocumentDetail::Load(bytes,0,4));size_t offset=24;position=0;
+        if(op==7){DocumentDetail::Shape(bytes.size()>=28);position=DocumentDetail::Count(DocumentDetail::Load(bytes,24,4));offset=28;}
+        text=DocumentDetail::String(bytes,offset,DocumentDetail::Count((bytes.size()-offset)/2));return op;
     }
 };
 class OpenLifecycle {
