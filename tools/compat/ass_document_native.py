@@ -11,7 +11,7 @@ from document_native_lifecycle import ROOT, PIN, LIBRARIES, SYSTEM_LIBRARIES, fi
 
 SOURCE = ROOT / "tools/compat/ass_document_native.cpp"
 OBSERVER = ROOT / "tools/compat/document_native_lifecycle.cpp"
-CASES = 2856
+CASES = 3266
 
 
 def validate(data, bits):
@@ -26,6 +26,13 @@ def validate(data, bits):
             raise ValueError("incorrect ASS case order/outcome/position")
     if lines[-1] != f"ass-complete cases={CASES}".encode():
         raise ValueError("missing ASS completion marker")
+    fonts = [line for line in lines if line.startswith(b"ass-font ")]
+    if not fonts or lines[-2] != f"ass-font-complete calls={len(fonts)}".encode():
+        raise ValueError("missing font boundary observations")
+    for index, row in enumerate(fonts):
+        match = re.fullmatch(f"ass-font index={index} bytes=".encode() + rb"([1-9]\d*) data=([0-9a-f]+)", row)
+        if not match or len(match[2]) != int(match[1]) * 2:
+            raise ValueError("invalid font bytes or call order")
     if not any(b"outcome=0 " in row for row in rows) or not any(b"outcome=-101 " in row for row in rows):
         raise ValueError("missing normal failure or thrown field-extraction control")
 

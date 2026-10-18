@@ -4,7 +4,21 @@
 #define main unused_document_lifecycle_main
 #include "document_native_lifecycle.cpp"
 #undef main
+// Observe the exact process-private font installation requests at the system
+// boundary. Rendering comparisons separately exercise the real Windows call.
+static unsigned font_calls=0;
+static HANDLE WINAPI TraceAddFontMemResourceEx(PVOID data,DWORD size,PVOID reserved,DWORD* count) {
+    if(reserved || !count || !data || !size) throw std::runtime_error("bad font installation request");
+    printf("ass-font index=%u bytes=%lu data=",font_calls++,static_cast<unsigned long>(size));
+    const BYTE* bytes=static_cast<const BYTE*>(data);
+    for(DWORD i=0;i<size;++i)printf("%02x",bytes[i]);
+    printf("\n");
+    *count=(font_calls&1)?0:1;
+    return (font_calls&1)?NULL:reinterpret_cast<HANDLE>(static_cast<UINT_PTR>(1));
+}
+#define AddFontMemResourceEx TraceAddFontMemResourceEx
 #include <STS.cpp>
+#undef AddFontMemResourceEx
 
 static void ass_case(unsigned index, const CStringW& input, CSize screen) {
     TraceDocument document(0);
@@ -110,6 +124,21 @@ int main() {
         }
         for(auto tail:{L"",L" ",L"\t",L"; tail",L"\r\n",L"\r\n;tail",L"[Events]\r\n;tail",L"[Events]\r\n "})
             ass_case(index++,CStringW(tail),CSize(0,0));
+        const wchar_t* fontStops[]={L"",L" ",L"[Script Info]tail",L"[V4+ Styles]",L"[V4 Styles]",L"[Events]",L"[Fonts]",L"[Graphics]",L"[V4++ Styles]",L"[events]",L"fontname: next",L"Fontname: next"};
+        for(int length=0;length<=9;++length) for(auto stop:fontStops) for(int newline=0;newline<2;++newline) {
+            CStringW text(L"[Script Info]\r\nfontname: first\r\n");
+            for(int i=0;i<length;++i)text.AppendChar(static_cast<WCHAR>(33+i));
+            text+=L"\r\n";text+=stop;
+            if(newline)text+=L"\r\nPlayResX: 1280\r\n";
+            ass_case(index++,text,CSize(0,0));
+        }
+        for(auto unit:boundaries) for(int position=0;position<5;++position) for(int newline=0;newline<2;++newline) {
+            CStringW text(L"[Script Info]\r\nfontname: raw\r\n");
+            for(int i=0;i<5;++i)text.AppendChar(i==position?unit:L'!');
+            if(newline)text+=L"\r\nfontname: after\r\n!!\r\n[Events]\r\n";
+            ass_case(index++,text,CSize(0,0));
+        }
+        printf("ass-font-complete calls=%u\n",font_calls);
         printf("ass-complete cases=%u\n",index);
         return 0;
     } catch(const std::exception& error) {fprintf(stderr,"unresolved: %s\n",error.what());return 1;}

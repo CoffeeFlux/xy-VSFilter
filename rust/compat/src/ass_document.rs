@@ -26,6 +26,7 @@ pub struct Run {
     input: crate::ass_input::Input,
     style: Option<crate::ass_style::Style>,
     style_field: u32,
+    fonts: Option<crate::ass_fonts::Fonts>,
 }
 
 impl Run {
@@ -50,7 +51,7 @@ impl Run {
             return Err(Error::Protocol);
         }
         self.kind = self.headers.classify(lowered_key);
-        self.pending = matches!(self.kind, 1 | 2 | 4..=11 | 17);
+        self.pending = matches!(self.kind, 1 | 2 | 4..=11 | 16 | 17);
         self.input.classified();
         Ok(())
     }
@@ -82,6 +83,37 @@ impl Run {
         let mut style = crate::ass_style::Style::new(input, self.headers.style_version);
         self.style_field = style.next_field();
         self.style = Some(style);
+        Ok(())
+    }
+    pub fn begin_fonts(&mut self) -> Result<(), Error> {
+        if self.kind != 16 || !self.pending || self.fonts.is_some() {
+            return Err(Error::Protocol);
+        }
+        self.fonts = Some(crate::ass_fonts::Fonts::default());
+        Ok(())
+    }
+    pub fn read_font(&mut self, input: &[u16], spaces: &[u8], eof: bool) -> Result<(), Error> {
+        let fonts = self.fonts.as_mut().ok_or(Error::Protocol)?;
+        if !fonts.read(input, spaces, eof) {
+            return Err(Error::Protocol);
+        }
+        Ok(())
+    }
+    pub fn font_part(&self) -> Result<alloc::vec::Vec<u8>, Error> {
+        Ok(self.fonts.as_ref().ok_or(Error::Protocol)?.snapshot())
+    }
+    pub fn font_installed(&mut self) -> Result<(), Error> {
+        if !self.fonts.as_mut().ok_or(Error::Protocol)?.installed() {
+            return Err(Error::Protocol);
+        }
+        Ok(())
+    }
+    pub fn end_fonts(&mut self) -> Result<(), Error> {
+        if self.fonts.as_ref().ok_or(Error::Protocol)?.action() != crate::ass_fonts::Action::Done {
+            return Err(Error::Protocol);
+        }
+        self.fonts = None;
+        self.pending = false;
         Ok(())
     }
     /// Values and the remaining native GetStr/GetInt/GetFloat buffer are copied
@@ -421,6 +453,33 @@ mod tests {
             );
             assert_eq!(decoded.char_set, 1);
         }
+    }
+    #[test]
+    fn font_session_blocks_outer_parser_until_consumed_and_installed() {
+        let mut doc = Document::default();
+        let mut run = Run::begin(&mut doc);
+        assert_eq!(run.begin_fonts(), Err(Error::Protocol));
+        let line = units("fontname: first");
+        run.read_line(&line, &alloc::vec![0;line.len()], false)
+            .unwrap();
+        classify(&mut run, "fontname");
+        assert_eq!(run.end_record(true), Err(Error::Protocol));
+        run.begin_fonts().unwrap();
+        assert_eq!(run.begin_fonts(), Err(Error::Protocol));
+        assert_eq!(run.end_fonts(), Err(Error::Protocol));
+        assert_eq!(run.font_installed(), Err(Error::Protocol));
+        assert_eq!(run.classify(&units("[events]")), Err(Error::Protocol));
+        run.read_font(&[33, 33], &[0, 0], false).unwrap();
+        run.read_font(&[33], &[0], true).unwrap();
+        let snapshot = run.font_part().unwrap();
+        assert_eq!(&snapshot[8..], &[0]);
+        assert_eq!(run.end_fonts(), Err(Error::Protocol));
+        run.font_installed().unwrap();
+        run.end_fonts().unwrap();
+        assert_eq!(run.font_part(), Err(Error::Protocol));
+        run.end_record(true).unwrap();
+        run.read_line(&[], &[], true).unwrap();
+        assert_eq!(&snapshot[8..], &[0]);
     }
     fn units(text: &str) -> alloc::vec::Vec<u16> {
         text.encode_utf16().collect()

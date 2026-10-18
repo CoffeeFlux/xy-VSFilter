@@ -777,6 +777,25 @@ public:
     }
     unsigned EntryKind() const {return static_cast<unsigned>(DocumentDetail::Load(state_,0,4));}
     void EndRecord(bool success=true) {Step(8,success?1:0);}
+    void BeginFonts() {Step(9,0);}
+    void FontInstalled() {Step(10,0);}
+    void EndFonts() {Step(11,0);}
+    void ReadFont(const CStringW& text,bool eof) {
+        const auto bytes=DocumentDetail::Units(text);
+        std::vector<uint8_t> spaces(static_cast<size_t>(text.GetLength()));
+        for(int i=0;i<text.GetLength();++i)spaces[i]=CStringW::StrTraits::IsSpace(text[i])?1:0;
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_ass_font_read_v1(
+            id_,eof?1:0,bytes.data(),bytes.size(),spaces.data(),spaces.size(),state_.data(),state_.size());}));
+    }
+    unsigned FontPart(DocumentDetail::Bytes& bytes) const {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_ass_font_part_v1(id_,out.data(),out.size());}));
+        DocumentReply snapshot(DocumentDetail::Load(out,0,8));bytes=snapshot.Read();
+        DocumentDetail::Shape(bytes.size()>=8 && DocumentDetail::Load(bytes,0,4)<=2 && DocumentDetail::Load(bytes,4,4)==0);
+        const auto action=static_cast<unsigned>(DocumentDetail::Load(bytes,0,4));
+        DocumentDetail::Shape(action==1 ? bytes.size()>8 && bytes.size()-8<=MAXDWORD : bytes.size()==8);
+        return action;
+    }
     void StyleStep(unsigned command,uint64_t bits,const CStringW& text,const CStringW& remainder) {
         const auto input=DocumentDetail::Units(text),rest=DocumentDetail::Units(remainder);
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_ass_style_v1(

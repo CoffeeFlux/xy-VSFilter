@@ -2540,7 +2540,27 @@ if(sver <= 4)   style->scrAlignment = (style->scrAlignment&4) ? ((style->scrAlig
         }
         else if(entryKind == 16)
         {
-            LoadUUEFont(file);
+            headers.BeginFonts();
+            for(;;)
+            {
+                XyRust::DocumentDetail::Bytes font;
+                const unsigned action=headers.FontPart(font);
+                if(action==2) {headers.EndFonts();break;}
+                if(action==0)
+                {
+                    CStringW line;
+                    const bool eof=!file->ReadString(line);
+                    headers.ReadFont(line,eof);
+                }
+                else
+                {
+                    // No Rust loan is held across Windows. The reference keeps
+                    // this process-private resource until exit and ignores failure.
+                    DWORD count;
+                    AddFontMemResourceEx(font.data()+8,static_cast<DWORD>(font.size()-8),NULL,&count);
+                    headers.FontInstalled();
+                }
+            }
         }
 #else
         else if(entry == L"[script info]")

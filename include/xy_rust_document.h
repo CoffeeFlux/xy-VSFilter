@@ -293,6 +293,14 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_input_part_v1(uint64_t run,u
 // output is the standard16-byte ASS state. Part groups:0 field:u32,reserved:u32,
 // remainder;1 same header plus name;2 complete existing style wire. Groups1/2
 // require all fields. Snapshots are independent; no native style pointer crosses.
+// ASS step commands9/10/11: begin font records, acknowledge installation,
+// finish records. Value and text must be zero/empty. Font read receives raw
+// UTF16LE and strict CString whitespace flags, EOF=!ReadString result.
+// Font part returns snapshot: action:u32(Read0/Install1/Done2),reserved:u32=0,
+// followed by decoded bytes for Install. Install outside registry admission;
+// ignore Windows return/count and retain process-private font until exit.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_font_read_v1(uint64_t,uint32_t,const uint8_t*,size_t,const uint8_t*,size_t,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_font_part_v1(uint64_t,uint8_t*,size_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_style_v1(uint64_t,uint32_t,uint64_t,const uint8_t*,size_t,const uint8_t*,size_t,uint8_t*,size_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_style_part_v1(uint64_t,uint32_t,uint8_t*,size_t);
 // CopyStyles typed run binds destination and source. Open performs no mutation;

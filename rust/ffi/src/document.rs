@@ -302,6 +302,7 @@ pub unsafe extern "C" fn xy_vsfilter_document_ass_begin_v1(
 /// 6 dialogue numeric reply, 7 commit dialogue with trimmed text and flags
 /// (bit0 Unicode, bit1 native Default match). Other text commands use value 0.
 /// Command8 acknowledges the current input record (0 failure,1 success).
+/// Commands9/10/11 begin fonts, acknowledge installation, end fonts (no value/text).
 #[no_mangle]
 pub unsafe extern "C" fn xy_vsfilter_document_ass_step_v1(
     id: u64,
@@ -313,12 +314,13 @@ pub unsafe extern "C" fn xy_vsfilter_document_ass_step_v1(
     capacity: usize,
 ) -> u32 {
     required!(output_capacity(output, capacity, 16));
-    if command > 8
+    if command > 11
         || (matches!(command, 0 | 4 | 5) && value != 0)
         || (matches!(command, 1..=3 | 6 | 8) && length != 0)
         || (command == 2 && value != 0)
         || (command == 7 && !(0..=3).contains(&value))
         || (command == 8 && !(0..=1).contains(&value))
+        || (command >= 9 && (value != 0 || length != 0))
         || length % 2 != 0
     {
         return INVALID_INPUT;
@@ -341,6 +343,9 @@ pub unsafe extern "C" fn xy_vsfilter_document_ass_step_v1(
             6 => run.dialogue_number(value),
             7 => run.append_dialogue(document, &text, value & 1 != 0, value & 2 != 0),
             8 => run.end_record(value != 0),
+            9 => run.begin_fonts(),
+            10 => run.font_installed(),
+            11 => run.end_fonts(),
             _ => unreachable!(),
         }
         .map_err(ass_error)?;
@@ -372,6 +377,46 @@ fn ass_error(error: xy_vsfilter_compat::ass_document::Error) -> u32 {
             _ => COUNT_OVERFLOW,
         },
     }
+}
+
+/// # Safety
+/// Input is raw UTF-16LE; spaces supplies one initialized strict-bool byte per
+/// unit from CString traits. Both spans are copied before admission and may
+/// overlap output. Output is 16 writable bytes with the existing ASS state.
+/// EOF is the negation of ReadString's result; a false read discards its text.
+/// Requires an active font session awaiting a read.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_ass_font_read_v1(
+    id: u64,
+    eof: u32,
+    input: *const u8,
+    length: usize,
+    spaces: *const u8,
+    space_length: usize,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 16));
+    if eof > 1 || length % 2 != 0 || space_length != length / 2 {
+        return INVALID_INPUT;
+    }
+    // SAFETY: initialized bounded spans; ownership precedes registry admission.
+    let bytes = required!(unsafe { copy_input(input, length) });
+    // SAFETY: same caller-buffer contract; neither loan is retained.
+    let spaces = required!(unsafe { copy_input(spaces, space_length) });
+    let text = units(&bytes);
+    let state = required!(admitted(|registry| {
+        let (_, run) = registry.ass_pair(id).map_err(registry_error)?;
+        run.read_font(&text, &spaces, eof != 0).map_err(ass_error)?;
+        Ok(run.state())
+    }));
+    let mut bytes = [0; 16];
+    for (chunk, value) in bytes.chunks_exact_mut(4).zip(state) {
+        chunk.copy_from_slice(&value.to_le_bytes());
+    }
+    // SAFETY: output preflighted before any mutation; all registry loans ended.
+    unsafe { write_output(output, &bytes) };
+    OK
 }
 
 /// # Safety
@@ -410,6 +455,29 @@ pub unsafe extern "C" fn xy_vsfilter_document_ass_read_v1(
     }
     // SAFETY: output preflighted before any mutation; all registry loans ended.
     unsafe { write_output(output, &bytes) };
+    OK
+}
+
+/// # Safety
+/// Output receives an immutable snapshot ID in eight writable bytes. Snapshot
+/// header is action:u32(Read=0,Install=1,Done=2),reserved:u32=0, followed by
+/// decoded font bytes during Install. No borrowed native or registry state.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_ass_font_part_v1(
+    id: u64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let bytes = required!(admitted(|registry| registry
+        .ass_pair(id)
+        .map_err(registry_error)?
+        .1
+        .font_part()
+        .map_err(ass_error)));
+    let snapshot = required!(insert(Resource::Snapshot(bytes)));
+    // SAFETY: validated output and independently owned snapshot ID.
+    unsafe { write_output(output, &snapshot.to_le_bytes()) };
     OK
 }
 
@@ -3023,6 +3091,189 @@ mod tests {
             assert_eq!(xy_vsfilter_document_destroy_v1(owner), OK);
             assert_eq!(read_snapshot(token), retained);
             assert_eq!(xy_vsfilter_document_snapshot_drop_v1(token), OK);
+            // Checked font protocol: copied buffers, preflight atomicity, Busy,
+            // stale owners, and independent decoded snapshots.
+            let font_owner = create();
+            assert_eq!(
+                xy_vsfilter_document_ass_begin_v1(font_owner, out.as_mut_ptr(), 8),
+                OK
+            );
+            let font_run = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let key: Vec<u8> = "fontname"
+                .encode_utf16()
+                .flat_map(u16::to_le_bytes)
+                .collect();
+            assert_eq!(
+                xy_vsfilter_document_ass_step_v1(
+                    font_run,
+                    0,
+                    0,
+                    key.as_ptr(),
+                    key.len(),
+                    out.as_mut_ptr(),
+                    16
+                ),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_ass_step_v1(
+                    font_run,
+                    9,
+                    0,
+                    ptr::null(),
+                    0,
+                    out.as_mut_ptr(),
+                    16
+                ),
+                OK
+            );
+            let mut encoded = [33u8, 0, 33, 0];
+            for (id, eof, length, spaces, capacity, expected) in [
+                (font_run, 2, 4, 2, 16, INVALID_INPUT),
+                (font_run, 0, 3, 2, 16, INVALID_INPUT),
+                (font_run, 0, 4, 1, 16, INVALID_INPUT),
+                (font_run, 0, 4, 2, 15, INVALID_INPUT),
+                (font_owner, 0, 4, 2, 16, BAD_HANDLE),
+            ] {
+                out.fill(0xa5);
+                assert_eq!(
+                    xy_vsfilter_document_ass_font_read_v1(
+                        id,
+                        eof,
+                        encoded.as_ptr(),
+                        length,
+                        [0, 0].as_ptr(),
+                        spaces,
+                        out.as_mut_ptr(),
+                        capacity
+                    ),
+                    expected
+                );
+                assert_eq!(out, [0xa5; 16]);
+            }
+            assert_eq!(
+                xy_vsfilter_document_ass_font_read_v1(
+                    font_run,
+                    0,
+                    encoded.as_ptr(),
+                    4,
+                    [0, 2].as_ptr(),
+                    2,
+                    out.as_mut_ptr(),
+                    16
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_ass_font_read_v1(
+                        font_run,
+                        0,
+                        encoded.as_ptr(),
+                        4,
+                        [0, 0].as_ptr(),
+                        2,
+                        out.as_mut_ptr(),
+                        16
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                xy_vsfilter_document_ass_font_read_v1(
+                    font_run,
+                    0,
+                    encoded.as_ptr(),
+                    4,
+                    [0, 0].as_ptr(),
+                    2,
+                    out.as_mut_ptr(),
+                    16
+                ),
+                OK
+            );
+            encoded.fill(0);
+            assert_eq!(
+                xy_vsfilter_document_ass_font_read_v1(
+                    font_run,
+                    1,
+                    ptr::null(),
+                    0,
+                    ptr::null(),
+                    0,
+                    out.as_mut_ptr(),
+                    16
+                ),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_ass_font_part_v1(font_run, out.as_mut_ptr(), 7),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_ass_font_part_v1(font_owner, out.as_mut_ptr(), 8),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_ass_font_part_v1(
+                        font_run,
+                        out.as_mut_ptr(),
+                        8
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                xy_vsfilter_document_ass_font_part_v1(font_run, out.as_mut_ptr(), 8),
+                OK
+            );
+            let font_snapshot = u64::from_le_bytes(out[..8].try_into().unwrap());
+            assert_eq!(read_snapshot(font_snapshot), [1, 0, 0, 0, 0, 0, 0, 0, 0]);
+            assert_eq!(
+                xy_vsfilter_document_ass_step_v1(
+                    font_run,
+                    11,
+                    0,
+                    ptr::null(),
+                    0,
+                    out.as_mut_ptr(),
+                    16
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_ass_step_v1(
+                    font_run,
+                    10,
+                    0,
+                    ptr::null(),
+                    0,
+                    out.as_mut_ptr(),
+                    16
+                ),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_ass_step_v1(
+                    font_run,
+                    11,
+                    0,
+                    ptr::null(),
+                    0,
+                    out.as_mut_ptr(),
+                    16
+                ),
+                OK
+            );
+            assert_eq!(xy_vsfilter_document_destroy_v1(font_owner), OK);
+            assert_eq!(
+                xy_vsfilter_document_ass_font_part_v1(font_run, out.as_mut_ptr(), 8),
+                BAD_HANDLE
+            );
+            assert_eq!(read_snapshot(font_snapshot), [1, 0, 0, 0, 0, 0, 0, 0, 0]);
+            assert_eq!(xy_vsfilter_document_ass_drop_v1(font_run), OK);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(font_snapshot), OK);
             let simple_owner = create();
             let mut simple_out = [0xa5; 4];
             assert_eq!(

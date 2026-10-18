@@ -27,7 +27,17 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: owned ASS input and checked style sessions (2026-10-18)
+## Active port: embedded ASS font lifecycle (2026-10-18)
+
+The experimental ASS session now owns embedded-font record accumulation,
+whitespace trimming, marker/section/EOF sequencing, and decoded font bytes.
+CString's per-fragment NUL truncation is modeled explicitly. Installation remains
+a Windows service called after Rust registry loans end; its ignored return value
+and process-exit resource lifetime are preserved. Other parser paths still use
+the transitional FontRecords adapter. Fresh x86/x64 direct and rendering
+comparisons are in progress; the prior validated increment is recorded below.
+
+## Previous port: owned ASS input and checked style sessions (2026-10-18)
 
 The experimental ASS session now owns line storage, FastTrim ordering, key and
 payload splitting, read/dispatch sequencing, and final-record/final-comment EOF
