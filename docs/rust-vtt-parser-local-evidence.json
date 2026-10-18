@@ -1,0 +1,543 @@
+{
+  "schema": 1,
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "candidate_commit": "716e486dc78fc255a80cd27cd7cb504ee67a16eb",
+  "implementation_commit": "be633a3ad10d68c96a64567fe1abe5600f35de3e",
+  "prior_increment": "e4c9adac",
+  "configuration": {
+    "native": "Release, RustTextDecoder=true, RustDocumentOwnerExperimental=true",
+    "rust": "1.85.0; native-runtime with +crt-static",
+    "msvc": "14.44.35207",
+    "sdk": "10.0.26100.0"
+  },
+  "scope": "WebVTT owned parser and persistent colors; no format, frontend, host or repository closure.",
+  "architectures": {
+    "x64": {
+      "corpus": {
+        "report": "artifacts/vtt-csri-x64/summary.json",
+        "sha256": "98f9d52c4a0a9275792de31771bd18b9e6041c25b5bd3890372f7b0f2de5b695",
+        "complete": true,
+        "frames": 10106,
+        "distinct_controls": 96,
+        "partition_exact": true,
+        "cases": 934,
+        "shards": [
+          {
+            "report": "artifacts/vtt-csri-x64/shard-0/report.json",
+            "sha256": "e58fa3f708053f9ee74e599298ff44ae40c1d568449ee0cd63b0b2f83f9b541a",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1242,
+            "cases": 117
+          },
+          {
+            "report": "artifacts/vtt-csri-x64/shard-1/report.json",
+            "sha256": "6f0cbf7aa4e70c0680e6a47a3fcfab96acac8fe91452a33f25fb25adc584fac3",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1242,
+            "cases": 117
+          },
+          {
+            "report": "artifacts/vtt-csri-x64/shard-2/report.json",
+            "sha256": "82b23663e28394c8c60c881ebf42f8d043089c2496c9c9c5d23be7c1d35d5a23",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1258,
+            "cases": 117
+          },
+          {
+            "report": "artifacts/vtt-csri-x64/shard-3/report.json",
+            "sha256": "55b4916787f08112f046fd5eb5c60bce3560487fbd837625ef6d4363ab4edc74",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1258,
+            "cases": 117
+          },
+          {
+            "report": "artifacts/vtt-csri-x64/shard-4/report.json",
+            "sha256": "a2f3ca3d2b62a91a1913f4f5b08170204d2a95e3e1128c1f5f5ada3c2dafff94",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1304,
+            "cases": 117
+          },
+          {
+            "report": "artifacts/vtt-csri-x64/shard-5/report.json",
+            "sha256": "ca2f96f9804bde0832896d396e9dadbb1a97e0890860b62c3c7121b16eb51456",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1304,
+            "cases": 117
+          },
+          {
+            "report": "artifacts/vtt-csri-x64/shard-6/report.json",
+            "sha256": "1d722809810e9674f8dda04b2a4cc61ae581ddae71778d5d6205326febac5ece",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1249,
+            "cases": 116
+          },
+          {
+            "report": "artifacts/vtt-csri-x64/shard-7/report.json",
+            "sha256": "9823ef307a93ce67b490546458baff3c3de2b7b7ad44f0980beb99281fede44a",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1249,
+            "cases": 116
+          }
+        ],
+        "rendered_frames": 10106,
+        "source_manifest_sha256": "f60ad48a0e462e61b716a59e72332245274909313b9a9689e10ee01a9bc8e1fb",
+        "partition_driver_sha256": "4392815b470d533594db027909d828b6caedb09f0336356e721d56cf37f02419"
+      },
+      "new_rendering": {
+        "included_in_full_corpus": true,
+        "cases": 20,
+        "frames": 240,
+        "distinct_controls": 4,
+        "ids": [
+          "vtt-parser-alignment-file",
+          "vtt-parser-alignment-memory",
+          "vtt-parser-color-replace-file",
+          "vtt-parser-color-replace-memory",
+          "vtt-parser-comment-file",
+          "vtt-parser-comment-memory",
+          "vtt-parser-control-file",
+          "vtt-parser-control-memory",
+          "vtt-parser-duplicate-file",
+          "vtt-parser-duplicate-memory",
+          "vtt-parser-final-fragment-file",
+          "vtt-parser-final-fragment-memory",
+          "vtt-parser-raw-units-file",
+          "vtt-parser-raw-units-memory",
+          "vtt-parser-style-after-cue-file",
+          "vtt-parser-style-after-cue-memory",
+          "vtt-parser-style-arrow-file",
+          "vtt-parser-style-arrow-memory",
+          "vtt-parser-style-replace-file",
+          "vtt-parser-style-replace-memory"
+        ]
+      },
+      "parser": {
+        "report": "artifacts/vtt-final-probe-x64/report.json",
+        "sha256": "50159af756b97543a36e95fbd7495684f45e3b4264d54caa7859d6cc0594f4ab",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "716e486dc78fc255a80cd27cd7cb504ee67a16eb",
+        "trace_lines": 21939,
+        "inputs_unchanged": true,
+        "cases": 2292
+      },
+      "baseline_parser": {
+        "report": "artifacts/vtt-baseline-x64/report.json",
+        "sha256": "22160ae8926459855dde818cf389fe175e0d1be0781ff6f027c876cedcb31e72",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "b1026d123a39c709d460fdb3dc701c3c6c8ab4ec",
+        "trace_lines": 21939,
+        "inputs_unchanged": true,
+        "cases": 2292
+      },
+      "baseline_traces_preserved": true,
+      "sami_regression": {
+        "report": "artifacts/vtt-sami-regression-x64/report.json",
+        "sha256": "ea30d842575d0e89f32c8fc0800dab843cf82f1a823acb119bba75466a41a33e",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "716e486dc78fc255a80cd27cd7cb504ee67a16eb",
+        "trace_lines": 26992,
+        "inputs_unchanged": true,
+        "cases": 2836
+      },
+      "text_regression": {
+        "report": "artifacts/vtt-text-regression-x64/report.json",
+        "sha256": "81d76951590d2efcd00d7f1158c7113e625b94878866ed355644ec553e0a1a54",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "716e486dc78fc255a80cd27cd7cb504ee67a16eb",
+        "trace_lines": 44404,
+        "inputs_unchanged": true,
+        "cases": 5692
+      },
+      "microdvd_regression": {
+        "report": "artifacts/vtt-microdvd-regression-x64/report.json",
+        "sha256": "155959fc2f66c59a0df4079b850e963209cbe37dbe23bf5343825cd14905417b",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "716e486dc78fc255a80cd27cd7cb504ee67a16eb",
+        "trace_lines": 41491,
+        "inputs_unchanged": true,
+        "cases": 4588
+      },
+      "ass_regression": {
+        "report": "artifacts/vtt-ass-probe-x64/report.json",
+        "sha256": "2d3d727998b229d927437466f437418165cf410555c14fe15117328256d611db",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "716e486dc78fc255a80cd27cd7cb504ee67a16eb",
+        "trace_lines": 22286,
+        "inputs_unchanged": true,
+        "cases": 3266
+      },
+      "xombie_regression": {
+        "report": "artifacts/vtt-xombie-probe-x64/report.json",
+        "sha256": "6546d7dfaecc01736c590b0567cd97435c0039c94df161f689e0f124960dbe38",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "716e486dc78fc255a80cd27cd7cb504ee67a16eb",
+        "trace_lines": 10441,
+        "inputs_unchanged": true,
+        "cases": 1242
+      },
+      "lifecycle": {
+        "report": "artifacts/vtt-lifecycle-x64/report.json",
+        "sha256": "2848d5edc4385d3d7f3e03874d8c18f032e8ba62429bf6eb107f5f7180af3506",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "716e486dc78fc255a80cd27cd7cb504ee67a16eb",
+        "trace_lines": 3693,
+        "inputs_unchanged": true
+      },
+      "compile": {
+        "report": "artifacts/vtt-compile-x64/report.json",
+        "sha256": "42be6eb338032390815dc37ef0e5fa1f85f81558dc164da930f514b6a7908542",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "716e486dc78fc255a80cd27cd7cb504ee67a16eb",
+        "inputs_unchanged": true,
+        "scope": "Compile-only actual style helper/lifecycle sources and headers; no link, execution or parity claim"
+      },
+      "com": {
+        "report": "artifacts/vtt-contracts-x64/com/report.json",
+        "sha256": "fee7bb7174c2ae37f3c3007351648faf6f20e01b42369c2090378f988ea1068b",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "716e486dc78fc255a80cd27cd7cb504ee67a16eb",
+        "inputs_unchanged": true,
+        "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "2d254068a40e5f59cf191c3c6bbfc984b548193b668c4decac21dc1e94e02169",
+          "candidate_sha256": "c2e94e562e10f68a013c1bc97e9c917b76a2791fa922ffeed079ff931fd7005e",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "858b557df4643353cc2b7f7a4faf24fb20fc571f39dc8929949a8b9d80276024"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "32b7c2cd6eb817120414db53b3c3005e719ae4b993c4a69d0d66c7f6ac363d5a",
+          "candidate_sha256": "fb5ef1e436cb54c1937dd8ccf6991fca8b1865f9c30f6d1197508a43cdf47ef8",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "09623cbd08a08a70ca726d32f1ac7a80358fe93589dfe22d814f7c9544f6d751"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "f1165742064181b7fb73bacb16017d8e202c8bb0be90ed8c2eb812ac282c2df8",
+          "candidate_sha256": "6cc687c89df8cf1749cd657d15bf51ac46d6e6a4449b073df3ceb1caefd85c8b",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "b0b48a3cf2bf2ecbbac4ecca863a815ab4a0c1137277a9b7d5830d9d1beca5c9"
+        }
+      }
+    },
+    "x86": {
+      "corpus": {
+        "report": "artifacts/vtt-csri-x86/summary.json",
+        "sha256": "ea8927e1c0cbb81090779c6ee2e64555cdd3191f56874dfc2cd8b727779a5d33",
+        "complete": true,
+        "frames": 10106,
+        "distinct_controls": 96,
+        "partition_exact": true,
+        "cases": 934,
+        "shards": [
+          {
+            "report": "artifacts/vtt-csri-x86/shard-0/report.json",
+            "sha256": "4225dd7cc726b411782355b664556aa94a2c9a9300a8acb6c8b1ced2e8acaa3c",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1242,
+            "cases": 117
+          },
+          {
+            "report": "artifacts/vtt-csri-x86/shard-1/report.json",
+            "sha256": "7d20b9c68949bc587ad856bfe0fe9dc964034e910d2bf304b31858112102ba43",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1242,
+            "cases": 117
+          },
+          {
+            "report": "artifacts/vtt-csri-x86/shard-2/report.json",
+            "sha256": "a26ffea68e130281a65c75b25e5103717624dfce6e4dd93edcc8de3264f3837d",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1258,
+            "cases": 117
+          },
+          {
+            "report": "artifacts/vtt-csri-x86/shard-3/report.json",
+            "sha256": "3f88360a3e5cd6da732517a82ff87bb653a702f548f1ab51dd8ed1846bc65d94",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1258,
+            "cases": 117
+          },
+          {
+            "report": "artifacts/vtt-csri-x86/shard-4/report.json",
+            "sha256": "c23148e7a53ac0e8446a5ccf42f53d6eef91ac34f87553ce39cbf6510424dcd7",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1304,
+            "cases": 117
+          },
+          {
+            "report": "artifacts/vtt-csri-x86/shard-5/report.json",
+            "sha256": "6c2157d8949bac168facb7685d466ccb7037d85bbf26388801634f158938dbe6",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1304,
+            "cases": 117
+          },
+          {
+            "report": "artifacts/vtt-csri-x86/shard-6/report.json",
+            "sha256": "9f1372810c7c93eb078ca11e67fe25d1cab6b9052379f3fbd7c3f5fed33d6f0b",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1249,
+            "cases": 116
+          },
+          {
+            "report": "artifacts/vtt-csri-x86/shard-7/report.json",
+            "sha256": "5f2b70bcb412f95b6f4d669ced3ca0b3b5d089c15b0f921f6e38d1368e576e4d",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1249,
+            "cases": 116
+          }
+        ],
+        "rendered_frames": 10106,
+        "source_manifest_sha256": "f60ad48a0e462e61b716a59e72332245274909313b9a9689e10ee01a9bc8e1fb",
+        "partition_driver_sha256": "4392815b470d533594db027909d828b6caedb09f0336356e721d56cf37f02419"
+      },
+      "new_rendering": {
+        "included_in_full_corpus": true,
+        "cases": 20,
+        "frames": 240,
+        "distinct_controls": 4,
+        "ids": [
+          "vtt-parser-alignment-file",
+          "vtt-parser-alignment-memory",
+          "vtt-parser-color-replace-file",
+          "vtt-parser-color-replace-memory",
+          "vtt-parser-comment-file",
+          "vtt-parser-comment-memory",
+          "vtt-parser-control-file",
+          "vtt-parser-control-memory",
+          "vtt-parser-duplicate-file",
+          "vtt-parser-duplicate-memory",
+          "vtt-parser-final-fragment-file",
+          "vtt-parser-final-fragment-memory",
+          "vtt-parser-raw-units-file",
+          "vtt-parser-raw-units-memory",
+          "vtt-parser-style-after-cue-file",
+          "vtt-parser-style-after-cue-memory",
+          "vtt-parser-style-arrow-file",
+          "vtt-parser-style-arrow-memory",
+          "vtt-parser-style-replace-file",
+          "vtt-parser-style-replace-memory"
+        ]
+      },
+      "parser": {
+        "report": "artifacts/vtt-final-probe-x86/report.json",
+        "sha256": "e3ce60ee69133d54ba90a5158ad1fd591678d02ced5e25053ab425a14c84764a",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "716e486dc78fc255a80cd27cd7cb504ee67a16eb",
+        "trace_lines": 21939,
+        "inputs_unchanged": true,
+        "cases": 2292
+      },
+      "baseline_parser": {
+        "report": "artifacts/vtt-baseline-x86/report.json",
+        "sha256": "021b240f5ff018f1179216aee7513091f18b8c0f91add862bf6f46d2b918296e",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "b1026d123a39c709d460fdb3dc701c3c6c8ab4ec",
+        "trace_lines": 21939,
+        "inputs_unchanged": true,
+        "cases": 2292
+      },
+      "baseline_traces_preserved": true,
+      "sami_regression": {
+        "report": "artifacts/vtt-sami-regression-x86/report.json",
+        "sha256": "26cc5a5adbaab589134523fcb601941d5e46346bac2695c50dd64959a7f66120",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "716e486dc78fc255a80cd27cd7cb504ee67a16eb",
+        "trace_lines": 26992,
+        "inputs_unchanged": true,
+        "cases": 2836
+      },
+      "text_regression": {
+        "report": "artifacts/vtt-text-regression-x86/report.json",
+        "sha256": "609229b6b9c32ef9d20fc9e501a60c57e2661c3a3e7ef6afe0625db898389fe5",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "716e486dc78fc255a80cd27cd7cb504ee67a16eb",
+        "trace_lines": 44404,
+        "inputs_unchanged": true,
+        "cases": 5692
+      },
+      "microdvd_regression": {
+        "report": "artifacts/vtt-microdvd-regression-x86/report.json",
+        "sha256": "bd18d11ea7281d7c6a520ca8a21e211d768c0cf8c572d9be0fd5242bf648da81",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "716e486dc78fc255a80cd27cd7cb504ee67a16eb",
+        "trace_lines": 41491,
+        "inputs_unchanged": true,
+        "cases": 4588
+      },
+      "ass_regression": {
+        "report": "artifacts/vtt-ass-probe-x86/report.json",
+        "sha256": "50476c7f527d031da2d62b4c8f2650fe9309516406575944b8059aa51c76d14a",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "716e486dc78fc255a80cd27cd7cb504ee67a16eb",
+        "trace_lines": 22286,
+        "inputs_unchanged": true,
+        "cases": 3266
+      },
+      "xombie_regression": {
+        "report": "artifacts/vtt-xombie-probe-x86/report.json",
+        "sha256": "409dec4b7080269049681968fd6708c0059a4e62c197245ea8638762ada19ef6",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "716e486dc78fc255a80cd27cd7cb504ee67a16eb",
+        "trace_lines": 10441,
+        "inputs_unchanged": true,
+        "cases": 1242
+      },
+      "lifecycle": {
+        "report": "artifacts/vtt-lifecycle-x86/report.json",
+        "sha256": "dcb176907aa3ccfe69ed64bc006477ab623364491ca94908d61a5bbf5ca8b7f7",
+        "complete": true,
+        "equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "716e486dc78fc255a80cd27cd7cb504ee67a16eb",
+        "trace_lines": 3693,
+        "inputs_unchanged": true
+      },
+      "compile": {
+        "report": "artifacts/vtt-compile-x86/report.json",
+        "sha256": "2d969dd64cdfe2597867726283a0bf04d7b0c35ac126685cea1cfeabb2cdaeb0",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "716e486dc78fc255a80cd27cd7cb504ee67a16eb",
+        "inputs_unchanged": true,
+        "scope": "Compile-only actual style helper/lifecycle sources and headers; no link, execution or parity claim"
+      },
+      "com": {
+        "report": "artifacts/vtt-contracts-x86/com/report.json",
+        "sha256": "594a7d47d863e531d2cc0664bf7ba01c582424a56901b237710b5f8340fae0d2",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "716e486dc78fc255a80cd27cd7cb504ee67a16eb",
+        "inputs_unchanged": true,
+        "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "69faa2d5f90f35fe4184e9e9bd892adb76fee60295701988f61ab7af0664d9eb",
+          "candidate_sha256": "f2113b938092f179e0f713a90f39286310694d66b156798e7d4f5f24933475e2",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "dbd365316d54d5a3d590b63604fbbc5ea6849a912eb7660e52d8df4bdd6b2120"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "2c3b904d7f91902ef456e07b648c5d6351878318c235397eeb9b39eb3fffa34f",
+          "candidate_sha256": "aaddce20f81e23c909655d66e5e40d7b5c676c6897b31be6beeb005c9a33c6bd",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "8821591e5f42e83c8361380a00b4869b748312f9374da70041ad829e381b6bbc"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "3e7c20a4d6c42457d92eb56c42e4fd9f3bddb93276f2c1cd28bfb73edd06484c",
+          "candidate_sha256": "df95d455d7c98fd7a1b31a3e2ef7c335f74b7631ca039386881bc4eecfb3454a",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "bee8a1d975859e0ab8a9b6843e14f813df818b8538e6501927e792bb180eb7c1"
+        }
+      }
+    }
+  },
+  "limits": [
+    "No production default switch, format closure, real player/Aegisub graph integration or repository completion.",
+    "Native file, CString locale predicates, CRT scans, CSS regex/stoi, WebVTT2SSA, Add and host adapters remain transitional.",
+    "Finite local MSVC14.44 Windows evidence. File I/O failure injection, native regex/stoi exceptions, pre-Open simplicity and allocation failure/reentry remain unresolved.",
+    "No new non-Windows/Miri/default native-document runtime parity; fallback paths have compile evidence only.",
+    "No crash, hang or nondeterministic reference outcome is treated as equality. Existing raw fallback adapters, renderer, all public hosts and vendored code remain in the full migration scope."
+  ],
+  "source_inventory": {
+    "path": "docs/rust-vtt-parser-inventory.json",
+    "sha256": "e2512df82e685ed4254b4502310e5aaa059bbac81126a2c2e74d2804be71d6e6"
+  },
+  "unsafe_lexical_inventory": {
+    "report": "artifacts/vtt-unsafe-inventory.json",
+    "sha256": "b898e099c4ebfd902c675581179aad56da50f04af09a88f6470184ad81e205e7",
+    "safe_core_unsafe_sites": 0,
+    "limits": "Lexical inventory only, not a soundness proof."
+  },
+  "rust_tests": {
+    "core_per_architecture": 283,
+    "ffi_per_architecture": 123,
+    "fmt": true,
+    "clippy_all_targets": true,
+    "clippy_native_runtime": true,
+    "log": "artifacts/vtt-checks.log",
+    "log_sha256": "f85131b7fda7d7c434f942f50397cd92b3ee66fadad3d3dd86d82a005f641743"
+  },
+  "python_harness_tests": {
+    "count": 155,
+    "skipped": 1,
+    "failures": 0,
+    "log": "artifacts/vtt-checks.log",
+    "log_sha256": "f85131b7fda7d7c434f942f50397cd92b3ee66fadad3d3dd86d82a005f641743",
+    "corpus_check_included": true
+  },
+  "build_logs": {
+    "artifacts/vtt-build-x64.log": "aef6fc4ef9829c49d6ab0d515cde4afbfed86d1695d4143344f64879fe2b4243",
+    "artifacts/vtt-build-x86.log": "d802b488cd5e3cf1c0554b4c94f2d612ce234344ed83e6578c5fe9daa2d5b388",
+    "artifacts/vtt-build-rust-x64.log": "ab1aadb606792e7431195cb39986c210c61ee16e146fac86ab038597dc7f0326",
+    "artifacts/vtt-build-rust-x86.log": "509d3af5ddd5f5ed364f6f564ee20aed86157b2a94517b0dffe511febde79df1"
+  }
+}

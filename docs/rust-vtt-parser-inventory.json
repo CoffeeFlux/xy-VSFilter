@@ -1,0 +1,122 @@
+{
+  "schema": 1,
+  "candidate_commit": "716e486dc78fc255a80cd27cd7cb504ee67a16eb",
+  "implementation_commit": "be633a3ad10d68c96a64567fe1abe5600f35de3e",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "Owned WebVTT read/parse/caption lifecycle and persistent color map in the experimental document path. Full repository Rust migration remains active.",
+  "production_sources": {
+    "rust/compat/src/vtt_document.rs": "d080403c2bb51e0151d86d54e3362abd1642b67fcf2d3273ee51f58d67049748",
+    "rust/compat/src/lib.rs": "09b267bb845ac7ff3a677cbce4fbd9092addad73b589447c900fcabed7f41811",
+    "rust/ffi/src/document.rs": "1d7d283a34af10490caa610c01311144dcc502a48989b88f68d693e0ed66c6c4",
+    "rust/ffi/src/document_registry.rs": "fba152d3c8bbf799dc40b28a18af4b2ae856c6354c57a44657ddf45331001038",
+    "include/xy_rust_document.h": "80089ea6ad5df64587d31f878aa9cd55238e606f68e385e1c1ab372687745e0a",
+    "src/subtitles/RustDocumentOwner.h": "b0aada92bb461603f068c1ef5c34cb4c7dc1c7f734d01fe27433c7623a2b7a1f",
+    "src/subtitles/STS.cpp": "19ec23afc95f2a96ccb2710b43c1a11221f61abe3ce928f954bff837cdc3fdb4",
+    "src/subtitles/STS.h": "1bbd8862ac1359a88eb5d1b3e319cbae1fb36da92cac9451ef86a7be52d7b0a8"
+  },
+  "reference_sources": {
+    "src/subtitles/STS.cpp": "2616b67db84f7329ac6e2363a3f03d61977fa07c37ed9c04d32ec2b1197f31e0",
+    "src/subtitles/TextFile.cpp": "71c00071f9ceb466c539fda26103a4a94b802a4a01f4b807852e159563772f2f",
+    "src/dsutil/text.h": "92efdac94644006b4559d868631c27c841811327af9eedc408b817631e09d249"
+  },
+  "operations": [
+    {
+      "operation": "Magic, header, style, time, caption and emission lifecycle",
+      "source": {
+        "path": "rust/compat/src/vtt_document.rs",
+        "line": 31,
+        "sha256": "d080403c2bb51e0151d86d54e3362abd1642b67fcf2d3273ee51f58d67049748"
+      },
+      "behavior": "Rust owns raw lines, header/start/end tokens, cue tags, style buffer, captions, previous caption/header, found-first-cue flag, time arithmetic and read/parse decisions. Magic ignores the first read result. Ordinary outer and caption loops discard false-read fragments; a style-loop EOF fragment is reused as a header without trimming. Style blank means counted empty, so whitespace-only style lines continue. Closed comment deletion retains the final slash. A valid first cue permanently disables style-block detection. Time scans short-circuit; count5 shifts three numbers, count7 uses four, and arithmetic wraps i64. Consecutive duplicates require CString-prefix equality of both caption and full header. Caption concatenation suppresses the added newline after a source NUL."
+    },
+    {
+      "operation": "Persistent color ownership",
+      "source": {
+        "path": "rust/compat/src/vtt_document.rs",
+        "line": 120,
+        "sha256": "d080403c2bb51e0151d86d54e3362abd1642b67fcf2d3273ee51f58d67049748"
+      },
+      "behavior": "A Rust BTreeMap of raw UTF16 keys owns all 16 default classes and subsequent CSS results. Each update replaces both foreground and background, with no merge; an empty pair is ignored. Immutable map snapshots are copied into a temporary native map only for one WebVTT2SSA call; applied flags and markup stacks are conversion-local. No canonical native map survives a parser request."
+    },
+    {
+      "operation": "Transitional native services",
+      "source": {
+        "path": "src/subtitles/STS.cpp",
+        "line": 927,
+        "sha256": "19ec23afc95f2a96ccb2710b43c1a11221f61abe3ce928f954bff837cdc3fdb4"
+      },
+      "behavior": "ReadString, CString whitespace, exact swscanf_s buffers/conversions, original CSS regular expressions and stoi, WebVTT2SSA formatting and Add run outside registry loans. Only initialized time locals cross the boundary. The CSS extractor preserves last-default selection, named-class traversal and color parsing, and sends each update to Rust. The fallback parser remains unchanged and in migration scope."
+    }
+  ],
+  "boundary_review": {
+    "source": {
+      "path": "rust/ffi/src/document.rs",
+      "line": 275,
+      "sha256": "1d7d283a34af10490caa610c01311144dcc502a48989b88f68d693e0ed66c6c4"
+    },
+    "registry": {
+      "path": "rust/ffi/src/document_registry.rs",
+      "line": 465,
+      "sha256": "fba152d3c8bbf799dc40b28a18af4b2ae856c6354c57a44657ddf45331001038"
+    },
+    "exports": [
+      "xy_vsfilter_document_vtt_begin_v1",
+      "xy_vsfilter_document_vtt_read_v1",
+      "xy_vsfilter_document_vtt_packet_v1",
+      "xy_vsfilter_document_vtt_time_v1",
+      "xy_vsfilter_document_vtt_step_v1",
+      "xy_vsfilter_document_vtt_part_v1",
+      "xy_vsfilter_document_vtt_drop_v1"
+    ],
+    "contract": "Typed never-reused document-bound IDs under nonblocking registry admission. Read/packet spans are copied before borrowing state. Strict booleans, counted raw-unit packet sizes, scanf ranges, initialized scalar values, command values and phases are checked before mutation. Output capacity is checked before publication. Snapshots are immutable and survive parent/session destruction. No native file, buffer, map or callback pointer is retained.",
+    "unsafe_delta": {
+      "extern_unsafe_functions": 4,
+      "unsafe_blocks": 5,
+      "raw_slice_constructors": 0,
+      "rust_native_pointer_owners": 0
+    },
+    "tests": "Malformed packets, raw surrogate/NUL preservation, phase errors, BUSY, typed/stale IDs, output preflight, caller mutation, snapshot lifetime, style EOF reuse, whitespace-only style input, comment deletion, whole-entry color replacement, time short-circuit and duplicate cues."
+  },
+  "direct_probe": {
+    "source": {
+      "path": "tools/compat/vtt_document_native.cpp",
+      "line": 7,
+      "sha256": "f2503cc1a18a8894d6554fa60e8036b427dcc760d22a96986717a09ed2e4d3b7"
+    },
+    "cases": 2292,
+    "trace_lines": 21939,
+    "baseline": {
+      "commit": "b1026d123a39c709d460fdb3dc701c3c6c8ab4ec",
+      "cases": 2292,
+      "trace_lines": 21939
+    },
+    "method": "Actual selected STS.cpp implementations with initialized document observer. Two reference and two candidate executions compare outcomes, document state and byte position. Empty/preloaded documents, magic casing/placement, malformed and overflowing time scans, CSS ordering, comments, class replacement, duplicate cues, ANSI/DBCS, raw units and EOF fragments are included. No crashing, hanging, exceptional or nondeterministic run is treated as a successful comparison."
+  },
+  "rendering": {
+    "generator": {
+      "path": "tools/compat/make_corpus.py",
+      "line": 831,
+      "sha256": "fb3371662834248b0980de279a24b0fced976692060b8c5ee9289e3ee186895e"
+    },
+    "new_files": 10,
+    "new_cases": 20,
+    "new_frames": 240,
+    "new_distinct_controls": 4,
+    "behavior": "File/memory opens, timestamp boundaries, repeated/backward seeks, class replacement, alignment, RGB colors, style-arrow recovery, comments, duplicates, post-cue styles, dropped final fragments and NUL/surrogate input. Class replacement/control and alignment/control images must differ."
+  },
+  "limits": [
+    "No production default switch, format closure, real player/Aegisub graph integration or repository completion.",
+    "Native file, CString locale predicates, CRT scans, CSS regex/stoi, WebVTT2SSA, Add and host adapters remain transitional.",
+    "Finite local MSVC14.44 Windows evidence. File I/O failure injection, native regex/stoi exceptions, pre-Open simplicity and allocation failure/reentry remain unresolved.",
+    "No new non-Windows/Miri/default native-document runtime parity; fallback paths have compile evidence only.",
+    "No crash, hang or nondeterministic reference outcome is treated as equality. Existing raw fallback adapters, renderer, all public hosts and vendored code remain in the full migration scope."
+  ],
+  "next_work": [
+    "Continue remaining format ownership: SubViewer, USF and RealText. SubViewer source has uninitialized style booleans before a style declaration and a param+2 color read; triage reference outcomes before choosing safe emulation, without treating crashes or nondeterminism as passes.",
+    "Replace native numeric, encoding, formatting and file adapters with audited system boundaries and safe policy.",
+    "Continue complete rendering, public host/ABI and vendored native replacement; retire fallback/raw adapters as callers move."
+  ]
+}

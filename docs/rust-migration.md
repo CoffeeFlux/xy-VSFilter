@@ -27,7 +27,42 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: SAMI parser ownership (2026-10-18)
+## Current port: WebVTT parser and color ownership (2026-10-18)
+
+The experimental document path now owns WebVTT's input/cue/style lifecycle,
+raw tokens, cue tags, current and previous captions, duplicate decisions, time
+arithmetic and persistent color map in safe Rust. Native ReadString, CString
+predicates, CRT scans, CSS regex/stoi, WebVTT2SSA and Add remain transitional
+services outside registry loans. The complete repository remains the target,
+including the renderer, every host adapter and vendored native code.
+
+The port preserves style-loop EOF fragments being reused as headers, whitespace
+lines inside styles, the trailing slash left by comment removal, whole-entry
+color replacement, last-default selection, short-circuited time scans and
+duplicate suppression based on both caption and header. Style recognition stops
+after the first valid cue; ordinary final caption fragments are discarded.
+
+Candidate `716e486d` (implementation `be633a3a`, followed by a test-only Clippy
+correction) passes cleanup `67da07cd` comparisons on **each** Windows architecture:
+
+* 2,292 direct WebVTT cases and 21,939 identical trace lines, repeated twice for
+  reference and candidate. Checkpoint `b1026d12` captured the pre-port baseline.
+* All 934 rendering cases and 10,106 frames, with 96 distinct-frame controls.
+  The 20 added file/memory cases contribute 240 frames and four controls.
+* Regression probes for 2,836 SAMI, 5,692 text-parser, 4,588 MicroDVD, 3,266 ASS
+  and 1,242 XombieSub cases; 3,693 lifecycle trace lines; nine compile probes;
+  all three DLLs' exports/dependencies; and 10 scoped COM cases plus two controls.
+* 283 safe-core and 123 FFI tests, formatting and Clippy per architecture;
+  155 Python harness tests with one skip. Seven checked WebVTT entry points add
+  four unsafe marshalling functions and five unsafe blocks, with no new raw-slice
+  constructors or Rust owners of native pointers. The core forbids unsafe code.
+
+See the [source/boundary inventory](rust-vtt-parser-inventory.json) and
+[local evidence manifest](rust-vtt-parser-local-evidence.json). File I/O failures,
+native regex/stoi exception behavior and real host integration remain unresolved.
+No production switch, format closure or whole-library completion is claimed.
+
+## Previous port: SAMI parser ownership (2026-10-18)
 
 The experimental document path now owns SAMI's discovery/rewind sequence, saved
 file position, raw input and uppercase copies, comment/caption state, timestamp
