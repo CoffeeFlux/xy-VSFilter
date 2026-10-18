@@ -844,7 +844,8 @@ def make_cases(files):
             if path.stem.startswith("legacy-parser-"):
                 cases[-1]["times"] = ["0", "0.9999999", "1", "2", "2.3499999", "2.35", "2.37", "2.3999999", "2.4", "3.9999999", "4", "2.37", "1"]
             if path.stem.startswith("microdvd-parser-"):
-                cases[-1]["times"] = ["0", "0.9999999", "1", "1.9999999", "2", "2.4", "3", "3.9999999", "4", "5.9999999", "6", "3", "1"]
+                # Reference MS2RT(frame) then FRAME conversion inflates time by 10000.
+                cases[-1]["times"] = ["0", "9999.9999999", "10000", "19999.9999999", "20000", "24000", "30000", "39999.9999999", "40000", "59999.9999999", "60000", "30000", "10000"]
             warning_styles = {"field-tab-prefixes": "\tDefault", "field-unicode-style-space": "\u2003Default"}
             if path.stem in warning_styles:
                 cases[-1]["dialog_actions"] = [{"title": "Warning",
