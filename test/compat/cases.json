@@ -11,6 +11,54 @@
       "font-valid-control-memory"
     ],
     [
+      "shared-color-html-black-file",
+      "shared-color-html-zero-file"
+    ],
+    [
+      "shared-color-html-black-memory",
+      "shared-color-html-zero-memory"
+    ],
+    [
+      "shared-color-html-aqua-file",
+      "shared-color-html-control-file"
+    ],
+    [
+      "shared-color-html-aqua-memory",
+      "shared-color-html-control-memory"
+    ],
+    [
+      "shared-color-html-outline-file",
+      "shared-color-html-control-file"
+    ],
+    [
+      "shared-color-html-outline-memory",
+      "shared-color-html-control-memory"
+    ],
+    [
+      "shared-color-html-shadow-file",
+      "shared-color-html-control-file"
+    ],
+    [
+      "shared-color-html-shadow-memory",
+      "shared-color-html-control-memory"
+    ],
+    [
+      "shared-color-sami-black-file",
+      "shared-color-sami-zero-file"
+    ],
+    [
+      "shared-color-sami-black-memory",
+      "shared-color-sami-zero-memory"
+    ],
+    [
+      "shared-color-vtt-black-file",
+      "shared-color-vtt-zero-file"
+    ],
+    [
+      "shared-color-vtt-black-memory",
+      "shared-color-vtt-zero-memory"
+    ],
+    [
       "text-parser-srt-nul-file",
       "text-parser-srt-control-file"
     ],
@@ -24263,6 +24311,662 @@
       "stride_padding": 16,
       "fill_seed": 31,
       "com_apartment": "mta"
+    },
+    {
+      "id": "shared-color-html-control-file",
+      "script": "test/compat/generated/shared-color-html-control.ass",
+      "sha256": "2162a69737c83f0a40b5389b49c530a8ae12a14216b588b964ce099d523d3694",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-html-control-memory",
+      "script": "test/compat/generated/shared-color-html-control.ass",
+      "sha256": "2162a69737c83f0a40b5389b49c530a8ae12a14216b588b964ce099d523d3694",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-html-black-file",
+      "script": "test/compat/generated/shared-color-html-black.ass",
+      "sha256": "edd37ad272edb57d47de66d3149f0c8d1011877b8b41e3479fd1d8033661b1cf",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-html-black-memory",
+      "script": "test/compat/generated/shared-color-html-black.ass",
+      "sha256": "edd37ad272edb57d47de66d3149f0c8d1011877b8b41e3479fd1d8033661b1cf",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-html-zero-file",
+      "script": "test/compat/generated/shared-color-html-zero.ass",
+      "sha256": "9fcbd83523743005ed7588bc957ed7a1304744b9a7b83c4941be5651e8c0fae2",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-html-zero-memory",
+      "script": "test/compat/generated/shared-color-html-zero.ass",
+      "sha256": "9fcbd83523743005ed7588bc957ed7a1304744b9a7b83c4941be5651e8c0fae2",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-html-aqua-file",
+      "script": "test/compat/generated/shared-color-html-aqua.ass",
+      "sha256": "6db499f25076e869d16b1d0dcc7ec8e9f80ef143e7a3b685ab3b2e477a0cb20e",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-html-aqua-memory",
+      "script": "test/compat/generated/shared-color-html-aqua.ass",
+      "sha256": "6db499f25076e869d16b1d0dcc7ec8e9f80ef143e7a3b685ab3b2e477a0cb20e",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-html-hex-file",
+      "script": "test/compat/generated/shared-color-html-hex.ass",
+      "sha256": "33b8629362c727392cafe07079081e55754b952c83721c6ca29564676912d6db",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-html-hex-memory",
+      "script": "test/compat/generated/shared-color-html-hex.ass",
+      "sha256": "33b8629362c727392cafe07079081e55754b952c83721c6ca29564676912d6db",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-html-overflow-file",
+      "script": "test/compat/generated/shared-color-html-overflow.ass",
+      "sha256": "4f498d1b001ae0ee81b5ee053ca2def037de1ddfb30ebd9d9c3f9692873206ca",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-html-overflow-memory",
+      "script": "test/compat/generated/shared-color-html-overflow.ass",
+      "sha256": "4f498d1b001ae0ee81b5ee053ca2def037de1ddfb30ebd9d9c3f9692873206ca",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-html-negative-file",
+      "script": "test/compat/generated/shared-color-html-negative.ass",
+      "sha256": "f46f5d3a43cf0e69f8da5ea23900beb5820708a781d907b4d2200ef1eaaed0c0",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-html-negative-memory",
+      "script": "test/compat/generated/shared-color-html-negative.ass",
+      "sha256": "f46f5d3a43cf0e69f8da5ea23900beb5820708a781d907b4d2200ef1eaaed0c0",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-html-outline-file",
+      "script": "test/compat/generated/shared-color-html-outline.ass",
+      "sha256": "2e4a9581233e57c21e0bfd6bc15090787ba1f513e83d61737dc6537e3907ec55",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-html-outline-memory",
+      "script": "test/compat/generated/shared-color-html-outline.ass",
+      "sha256": "2e4a9581233e57c21e0bfd6bc15090787ba1f513e83d61737dc6537e3907ec55",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-html-shadow-file",
+      "script": "test/compat/generated/shared-color-html-shadow.ass",
+      "sha256": "ee01326e2a723b7e46a1ac069f1a695d4e654646dcb5201cfc99a80373b83e1f",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-html-shadow-memory",
+      "script": "test/compat/generated/shared-color-html-shadow.ass",
+      "sha256": "ee01326e2a723b7e46a1ac069f1a695d4e654646dcb5201cfc99a80373b83e1f",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-html-nul-file",
+      "script": "test/compat/generated/shared-color-html-nul.ass",
+      "sha256": "9ff8b8f8374b668bf71d3256aedc8dbe72b25581e6072292a6cf7bcad779e560",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-html-nul-memory",
+      "script": "test/compat/generated/shared-color-html-nul.ass",
+      "sha256": "9ff8b8f8374b668bf71d3256aedc8dbe72b25581e6072292a6cf7bcad779e560",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1.00",
+        "1.0000001",
+        "2.50",
+        "3.9999999",
+        "4.00",
+        "4.0000001",
+        "2.50",
+        "1.00"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-sami-black-file",
+      "script": "test/compat/generated/shared-color-sami-black.smi",
+      "sha256": "ec67dc97fdf4e065f590d6358a053c3f0dde421cefbff7628c615a3b366fef5d",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-sami-black-memory",
+      "script": "test/compat/generated/shared-color-sami-black.smi",
+      "sha256": "ec67dc97fdf4e065f590d6358a053c3f0dde421cefbff7628c615a3b366fef5d",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-vtt-black-file",
+      "script": "test/compat/generated/shared-color-vtt-black.vtt",
+      "sha256": "babd6ea023302fdc4abc811dd973197d687f94b3f62b9c3f3260f0a24a30a65a",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-vtt-black-memory",
+      "script": "test/compat/generated/shared-color-vtt-black.vtt",
+      "sha256": "babd6ea023302fdc4abc811dd973197d687f94b3f62b9c3f3260f0a24a30a65a",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-sami-zero-file",
+      "script": "test/compat/generated/shared-color-sami-zero.smi",
+      "sha256": "dfdf1506122b432a2e7cc9bb4c524f855614409e8b8847b2b85fdad9e287738d",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-sami-zero-memory",
+      "script": "test/compat/generated/shared-color-sami-zero.smi",
+      "sha256": "dfdf1506122b432a2e7cc9bb4c524f855614409e8b8847b2b85fdad9e287738d",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-vtt-zero-file",
+      "script": "test/compat/generated/shared-color-vtt-zero.vtt",
+      "sha256": "37074af20f53e2db8711ab9ea685b9bb1aa242569a4c40a944fe4dc8957b00f8",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-vtt-zero-memory",
+      "script": "test/compat/generated/shared-color-vtt-zero.vtt",
+      "sha256": "37074af20f53e2db8711ab9ea685b9bb1aa242569a4c40a944fe4dc8957b00f8",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-sami-aqua-file",
+      "script": "test/compat/generated/shared-color-sami-aqua.smi",
+      "sha256": "fd311b9f58c14f8e87e5c4a5d699b74ee92cca7a80c3d7a27324a015a0f5e101",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-sami-aqua-memory",
+      "script": "test/compat/generated/shared-color-sami-aqua.smi",
+      "sha256": "fd311b9f58c14f8e87e5c4a5d699b74ee92cca7a80c3d7a27324a015a0f5e101",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-vtt-aqua-file",
+      "script": "test/compat/generated/shared-color-vtt-aqua.vtt",
+      "sha256": "2fcc7acfb1e96356f70b31f98af1e7dccc063c3cad6f390689dd72a774d65d97",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "shared-color-vtt-aqua-memory",
+      "script": "test/compat/generated/shared-color-vtt-aqua.vtt",
+      "sha256": "2fcc7acfb1e96356f70b31f98af1e7dccc063c3cad6f390689dd72a774d65d97",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "1",
+        "2",
+        "3.9999999",
+        "4",
+        "2"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
     },
     {
       "id": "geometry-641-359",

@@ -883,6 +883,23 @@ def realtext_parser_variants():
         yield "realtext-parser-"+name+".rt",data
 
 
+def shared_color_variants():
+    for name,attributes in {
+        "control":'color="white"', "black":'color="black"',
+        "zero":'color="000000"', "aqua":'color="aqua"',
+        "hex":'color="##123456"', "overflow":'color="80000000"',
+        "negative":'color="-1"', "outline":'outline-color="red"',
+        "shadow":'shadow-color="lime"', "nul":'color="red\x00blue"',
+    }.items():
+        caption='<font outline-level="4" shadow-level="4" '+attributes+'>Color sample</font>'
+        yield 'shared-color-html-'+name+'.ass',SEED.replace(b'COMPAT_TEXT',caption.encode('ascii'))
+    for name,value in (("black","black"),("zero","000000"),("aqua","aqua")):
+        text='<SAMI>\r\n<SYNC Start=1000><font color="'+value+'">Color sample</font>\r\n<SYNC Start=4000>&nbsp;\r\n'
+        yield 'shared-color-sami-'+name+'.smi',text.encode('ascii')
+        text='WEBVTT\r\nSTYLE\r\n::cue(.tone) {color:'+value+';}\r\n\r\n00:01.000 --> 00:04.000\r\n<c.tone>Color sample</c>\r\n\r\n'
+        yield 'shared-color-vtt-'+name+'.vtt',text.encode('ascii')
+
+
 def usf_conversion_variants():
     font='<fontstyle face="Arial" size="36" color="#ffffff" weight="normal" outline-level="2" shadow-level="1"/>'
     default='<style name="Default">'+font+'</style>'
@@ -977,6 +994,12 @@ def make_cases(files):
     return {"schema": 1, "description": "Starter differential corpus; not exhaustive compatibility evidence.",
             "expect_distinct_frames": [[a + "-" + mode, b + "-" + mode]
                                        for a, b in (("font-valid-attached", "font-valid-control"),
+                                                    ("shared-color-html-black", "shared-color-html-zero"),
+                                                    ("shared-color-html-aqua", "shared-color-html-control"),
+                                                    ("shared-color-html-outline", "shared-color-html-control"),
+                                                    ("shared-color-html-shadow", "shared-color-html-control"),
+                                                    ("shared-color-sami-black", "shared-color-sami-zero"),
+                                                    ("shared-color-vtt-black", "shared-color-vtt-zero"),
                                                     ("text-parser-srt-nul", "text-parser-srt-control"),
                                                     ("text-parser-mpl-missing-bracket", "text-parser-mpl-control"),
                                                     ("legacy-parser-old-missing-brace", "legacy-parser-old-control"),
@@ -1082,6 +1105,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in vtt_parser_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in realtext_parser_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in usf_conversion_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in shared_color_variants()]
     manifest = json.dumps(make_cases(files + generated), indent=2) + "\n"
     expected = generated + [(DEST / "cases.json", manifest.encode("utf-8"))]
     for path, data in expected:

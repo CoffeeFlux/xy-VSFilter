@@ -52,6 +52,7 @@
 #include "STS.h"
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 #include "RustDocumentOwner.h"
+#include "xy_rust_colors.h"
 #endif
 #include <atlbase.h>
 
@@ -187,6 +188,7 @@ size_t RegexUtil::wstringMatch(const std::wregex& pattern, const std::wstring& t
 
 // gathered from http://www.netwave.or.jp/~shikai/shikai/shcolor.htm
 
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 static struct htmlcolor {TCHAR* name; DWORD color;} htmlcolors[] =
 {
     {_T("white"), 0xffffff},
@@ -342,8 +344,12 @@ CHtmlColorMap::CHtmlColorMap()
 }
 
 CHtmlColorMap g_colors;
+#endif
 
 static CStringW SSAColorTag(CStringW arg, CStringW ctag = L"c") {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return XyRust::HtmlColorTag(arg,ctag);
+#else
     DWORD val, color;
     if (g_colors.Lookup(CString(arg), val)) {
         color = (DWORD)val;
@@ -354,6 +360,7 @@ static CStringW SSAColorTag(CStringW arg, CStringW ctag = L"c") {
     CStringW tmp;
     tmp.Format(L"%02x%02x%02x", color & 0xff, (color >> 8) & 0xff, (color >> 16) & 0xff);
     return CStringW(L"{\\" + ctag + L"&H") + tmp + L"&}";
+#endif
 }
 
 static std::wstring SSAColorTagCS(std::wstring arg, CStringW ctag = L"c") {
@@ -1929,6 +1936,10 @@ static CStringW SMI2SSA(CStringW str, int CharSet)
                 if(action == 2)
                 {
                     arg = arguments.Text<CStringW>(1);
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                    arg=XyRust::HtmlColorTag(arg,L"c");
+                    convert.Insert(arg,arg.GetLength());
+#else
                     DWORD color;
 
                     DWORD val;
@@ -1939,6 +1950,7 @@ static CStringW SMI2SSA(CStringW str, int CharSet)
 
                     arg.Format(L"%02x%02x%02x", color&0xff, (color>>8)&0xff, (color>>16)&0xff);
                     convert.Insert(CStringW(L"{\\c&H") + arg + L"&}", 5 + arg.GetLength() + 2);
+#endif
                 }
             }
         }
@@ -1984,6 +1996,11 @@ static CStringW SMI2SSA(CStringW str, int CharSet)
                     if ( arg.IsEmpty())
                         continue;
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                    const CStringW colorTag=XyRust::HtmlColorTag(arg,L"c");
+                    lstr.Insert(k+l+chars_inserted,colorTag);str.Insert(k+l+chars_inserted,colorTag);
+                    chars_inserted+=colorTag.GetLength();
+#else
                     DWORD val;
                     if(g_colors.Lookup(CString(arg), val))
                         color = (DWORD)val;
@@ -1994,6 +2011,7 @@ static CStringW SMI2SSA(CStringW str, int CharSet)
                     lstr.Insert(k + l + chars_inserted, CStringW(L"{\\c&H") + arg + L"&}");
                     str.Insert(k + l + chars_inserted, CStringW(L"{\\c&H") + arg + L"&}");
                     chars_inserted += 5 + arg.GetLength() + 2;
+#endif
                 }
 /*
                 else if (arg.Find(_T("size=" )) == 0 )

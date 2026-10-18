@@ -9,6 +9,8 @@ mod ass_tags;
 mod be_blur;
 mod be_filter;
 mod bilinear;
+#[cfg(windows)]
+mod colors;
 mod document;
 mod document_registry;
 mod drawing;
@@ -28,6 +30,8 @@ mod subrip;
 mod text_reader;
 mod timeline_search;
 mod webvtt;
+#[cfg(windows)]
+mod windows_crt;
 #[cfg(windows)]
 mod windows_usf;
 #[cfg(all(feature = "native-runtime", not(windows)))]

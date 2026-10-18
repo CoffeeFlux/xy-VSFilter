@@ -1,0 +1,7 @@
+WEBVTT
+STYLE
+::cue(.tone) {color:000000;}
+
+00:01.000 --> 00:04.000
+<c.tone>Color sample</c>
+

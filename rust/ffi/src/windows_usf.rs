@@ -2,6 +2,7 @@
 //! Windows MSXML boundary for USF. System objects are owned on the calling
 //! thread, outside document-registry admission; no COM pointer enters the core.
 //! Layouts are checked against tools/compat/msxml_abi_native.cpp on x86/x64.
+use crate::windows_crt::{compare, number};
 use alloc::{vec, vec::Vec};
 use core::{
     ffi::c_void,
@@ -166,10 +167,6 @@ extern "system" {
 #[link(name = "user32")]
 extern "system" {
     fn CharLowerBuffW(text: *mut u16, length: u32) -> u32;
-}
-extern "C" {
-    fn wcstol(text: *const u16, end: *mut *mut u16, base: i32) -> i32;
-    fn _wcsicmp(a: *const u16, b: *const u16) -> i32;
 }
 
 /// Owns exactly one COM reference. NonNull keeps this owner !Send/!Sync.
@@ -557,21 +554,7 @@ fn terminated(input: &[u16]) -> Units {
     out.push(0);
     out
 }
-fn number(input: &[u16], base: i32) -> (i32, u32) {
-    let input = terminated(input);
-    let mut end = ptr::null_mut();
-    // SAFETY: terminated owned UTF-16 input, valid end-pointer slot; callers use
-    // base10 or16. Windows long is32bits on both SDK-probed MSVC architectures.
-    let value = unsafe { wcstol(input.as_ptr(), &mut end, base) };
-    (value, u32::from(end.cast_const() > input.as_ptr()))
-}
-fn compare(a: &[u16], b: &[u16]) -> i32 {
-    let a = terminated(a);
-    let b = terminated(b);
-    // SAFETY: two live terminated UTF-16 buffers; the exact CRT function used by
-    // CStringW::CompareNoCase, retaining native locale and first-NUL semantics.
-    unsafe { _wcsicmp(a.as_ptr(), b.as_ptr()) }
-}
+
 fn scalar(kind: u32, input: &[u16], argument: i32) -> Result<i32, Error> {
     let mut run = xy_vsfilter_compat::usf_scalar::Run::new(kind, input, argument)
         .map_err(|_| Error::Protocol)?;

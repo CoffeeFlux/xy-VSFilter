@@ -47,13 +47,7 @@ fn tokens(input: &[u16]) -> Vec<Units> {
 fn color_value(raw: u32) -> i32 {
     (((raw & 255) << 16) | (raw & 0xff00ff00) | ((raw >> 16) & 255)) as i32
 }
-fn named_color(text: &[u16]) -> u32 {
-    let text = prefix(text);
-    COLORS
-        .iter()
-        .find(|(name, _)| text.iter().copied().eq(name.bytes().map(u16::from)))
-        .map_or(0, |(_, value)| *value)
-}
+
 enum Pending {
     Time {
         tokens: Vec<Units>,
@@ -106,7 +100,7 @@ impl Run {
                         hex: input[first..].to_vec(),
                     }
                 } else {
-                    Pending::Done(color_value(named_color(input)))
+                    Pending::Done(color_value(crate::colors::named(input).unwrap_or(0)))
                 }
             }
             3 => {
@@ -205,149 +199,6 @@ impl Run {
         Ok(b)
     }
 }
-
-// Generated exactly from cleanup STS.cpp htmlcolors[]. Names and unusual values
-// are intentional; this is not a CSS/ASS specification color table.
-const COLORS: [(&str, u32); 138] = [
-    ("white", 0xffffff),
-    ("whitesmoke", 0xf5f5f5),
-    ("ghostwhite", 0xf8f8ff),
-    ("snow", 0xfffafa),
-    ("gainsboro", 0xdcdcdc),
-    ("lightgrey", 0xd3d3d3),
-    ("silver", 0xc0c0c0),
-    ("darkgray", 0xa9a9a9),
-    ("gray", 0x808080),
-    ("dimgray", 0x696969),
-    ("lightslategray", 0x778899),
-    ("slategray", 0x708090),
-    ("darkslategray", 0x2f4f4f),
-    ("black", 0x000000),
-    ("azure", 0xf0ffff),
-    ("aliceblue", 0xf0f8ff),
-    ("mintcream", 0xf5fffa),
-    ("honeydew", 0xf0fff0),
-    ("lightcyan", 0xe0ffff),
-    ("paleturqoise", 0xafeeee),
-    ("powderblue", 0xb0e0e6),
-    ("lightblue", 0xadd8ed),
-    ("lightsteelblue", 0xb0c4de),
-    ("skyblue", 0x87ceeb),
-    ("lightskyblue", 0x87cefa),
-    ("cyan", 0x00ffff),
-    ("aqua", 0x00ff80),
-    ("deepskyblue", 0x00bfff),
-    ("aquamarine", 0x7fffd4),
-    ("turquoise", 0x40e0d0),
-    ("darkturquoise", 0x00ced1),
-    ("lightseagreen", 0x20b2aa),
-    ("mediumturquoise", 0x40e0dd),
-    ("mediumaquamarine", 0x66cdaa),
-    ("cadetblue", 0x5f9ea0),
-    ("teal", 0x008080),
-    ("darkcyan", 0x008b8b),
-    ("comflowerblue", 0x6495ed),
-    ("dodgerblue", 0x1e90ff),
-    ("steelblue", 0x4682b4),
-    ("royalblue", 0x4169e1),
-    ("blue", 0x0000ff),
-    ("mediumblue", 0x0000cd),
-    ("mediumslateblue", 0x7b68ee),
-    ("slateblue", 0x6a5acd),
-    ("darkslateblue", 0x483d8b),
-    ("darkblue", 0x00008b),
-    ("midnightblue", 0x191970),
-    ("navy", 0x000080),
-    ("palegreen", 0x98fb98),
-    ("lightgreen", 0x90ee90),
-    ("mediumspringgreen", 0x00fa9a),
-    ("springgreen", 0x00ff7f),
-    ("chartreuse", 0x7fff00),
-    ("lawngreen", 0x7cfc00),
-    ("lime", 0x00ff00),
-    ("limegreen", 0x32cd32),
-    ("greenyellow", 0xadff2f),
-    ("yellowgreen", 0x9acd32),
-    ("darkseagreen", 0x8fbc8f),
-    ("mediumseagreen", 0x3cb371),
-    ("seagreen", 0x2e8b57),
-    ("olivedrab", 0x6b8e23),
-    ("forestgreen", 0x228b22),
-    ("green", 0x008000),
-    ("darkkhaki", 0xbdb76b),
-    ("olive", 0x808000),
-    ("darkolivegreen", 0x556b2f),
-    ("darkgreen", 0x006400),
-    ("floralwhite", 0xfffaf0),
-    ("seashell", 0xfff5ee),
-    ("ivory", 0xfffff0),
-    ("beige", 0xf5f5dc),
-    ("cornsilk", 0xfff8dc),
-    ("lemonchiffon", 0xfffacd),
-    ("lightyellow", 0xffffe0),
-    ("lightgoldenrodyellow", 0xfafad2),
-    ("papayawhip", 0xffefd5),
-    ("blanchedalmond", 0xffedcd),
-    ("palegoldenrod", 0xeee8aa),
-    ("khaki", 0xf0eb8c),
-    ("bisque", 0xffe4c4),
-    ("moccasin", 0xffe4b5),
-    ("navajowhite", 0xffdead),
-    ("peachpuff", 0xffdab9),
-    ("yellow", 0xffff00),
-    ("gold", 0xffd700),
-    ("wheat", 0xf5deb3),
-    ("orange", 0xffa500),
-    ("darkorange", 0xff8c00),
-    ("oldlace", 0xfdf5e6),
-    ("linen", 0xfaf0e6),
-    ("antiquewhite", 0xfaebd7),
-    ("lightsalmon", 0xffa07a),
-    ("darksalmon", 0xe9967a),
-    ("salmon", 0xfa8072),
-    ("lightcoral", 0xf08080),
-    ("indianred", 0xcd5c5c),
-    ("coral", 0xff7f50),
-    ("tomato", 0xff6347),
-    ("orangered", 0xff4500),
-    ("red", 0xff0000),
-    ("crimson", 0xdc143c),
-    ("firebrick", 0xb22222),
-    ("maroon", 0x800000),
-    ("darkred", 0x8b0000),
-    ("lavender", 0xe6e6fe),
-    ("lavenderblush", 0xfff0f5),
-    ("mistyrose", 0xffe4e1),
-    ("thistle", 0xd8bfd8),
-    ("pink", 0xffc0cb),
-    ("lightpink", 0xffb6c1),
-    ("palevioletred", 0xdb7093),
-    ("hotpink", 0xff69b4),
-    ("fuchsia", 0xff00ee),
-    ("magenta", 0xff00ff),
-    ("mediumvioletred", 0xc71585),
-    ("deeppink", 0xff1493),
-    ("plum", 0xdda0dd),
-    ("violet", 0xee82ee),
-    ("orchid", 0xda70d6),
-    ("mediumorchid", 0xba55d3),
-    ("mediumpurple", 0x9370db),
-    ("purple", 0x9370db),
-    ("blueviolet", 0x8a2be2),
-    ("darkviolet", 0x9400d3),
-    ("darkorchid", 0x9932cc),
-    ("tan", 0xd2b48c),
-    ("burlywood", 0xdeb887),
-    ("sandybrown", 0xf4a460),
-    ("peru", 0xcd853f),
-    ("goldenrod", 0xdaa520),
-    ("darkgoldenrod", 0xb8860b),
-    ("chocolate", 0xd2691e),
-    ("rosybrown", 0xbc8f8f),
-    ("sienna", 0xa0522d),
-    ("saddlebrown", 0x8b4513),
-    ("brown", 0xa52a2a),
-];
 
 #[cfg(test)]
 mod tests {

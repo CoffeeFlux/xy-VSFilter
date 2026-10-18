@@ -419,5 +419,7 @@ extern BYTE   CharSetList[];
 extern TCHAR* CharSetNames[];
 extern int    CharSetLen;
 
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 class CHtmlColorMap : public CAtlMap<CString, DWORD, CStringElementTraits<CString> > {public: CHtmlColorMap();};
 extern CHtmlColorMap g_colors;
+#endif

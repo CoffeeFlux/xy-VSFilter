@@ -23,6 +23,9 @@
 #include <math.h>
 #include <time.h>
 #include "RTS.h"
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+#include "xy_rust_colors.h"
+#endif
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_ass.h"
 #include "xy_rust_drawing.h"
@@ -3028,6 +3031,9 @@ bool CRenderedTextSubtitle::ParseHtmlTag(CSubtitle* sub, CStringW str, STSStyle&
                 }
                 if(nColor >= 0 && nColor < 4)
                 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                    style.colors[nColor]=XyRust::HtmlColor(params[i]);
+#else
                     CString key = params[i].TrimLeft(L'#');
                     DWORD val;
                     if(g_colors.Lookup(key, val))
@@ -3035,6 +3041,7 @@ bool CRenderedTextSubtitle::ParseHtmlTag(CSubtitle* sub, CStringW str, STSStyle&
                     else if((style.colors[nColor] = _tcstol(key, NULL, 16)) == 0)
                         style.colors[nColor] = 0x00ffffff;  // default is white
                     style.colors[nColor] = ((style.colors[nColor]>>16)&0xff)|((style.colors[nColor]&0xff)<<16)|(style.colors[nColor]&0x00ff00);
+#endif
                 }
             }
         }
