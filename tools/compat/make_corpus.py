@@ -958,7 +958,7 @@ def make_cases(files):
                                                     ("realtext-parser-map-replace", "realtext-parser-control"),
                                                     ("realtext-parser-italic", "realtext-parser-control"),
                                                     ("realtext-parser-helper-red", "realtext-parser-helper-control"),
-                                                    ("realtext-parser-helper-bold", "realtext-parser-helper-control"),
+                                                    ("realtext-parser-helper-fractions", "realtext-parser-helper-control"),
                                                     ("vtt-parser-color-replace", "vtt-parser-control"),
                                                     ("vtt-parser-alignment", "vtt-parser-control"),
                                                     ("sami-parser-title-skip", "sami-parser-control"),
