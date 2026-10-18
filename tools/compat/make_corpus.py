@@ -753,6 +753,25 @@ def xombie_variants():
     yield "xombie-font-attached.xss",attached+control
 
 
+def text_parser_variants():
+    timing="1\r\n0:0:1,234 --> 0:0:4,567\r\n"
+    for name,text in {
+        "srt-control":timing+"Visible\r\nsecond\r\n",
+        "srt-nul":timing+"Visible\x00discarded\r\nsecond\r\n",
+        "srt-separators":timing.replace("0:0:1,234 --> 0:0:4,567","0x0x1.234 --> 0x0x4.567")+"Visible\r\nsecond\r\n",
+        "srt-numeric-eof":timing+"Visible\r\n\r\n2",
+        "srt-final-blank":timing+"Visible\r\n \t",
+        "mpl-control":"[12][45]Visible\r\n",
+        "mpl-missing-bracket":"[12][45Visible\r\n",
+        "mpl-final-fragment":"[12][45]Visible\r\n[20][30]ignored",
+        "mpl-raw-units":"[12][45]Visible\x00\ud800tail\r\n",
+        "mpl-spaces":" \t[12][45]  Visible \t\r\n",
+    }.items():
+        raw="\x00" in text
+        data=b"\xff\xfe"+text.encode("utf-16le","surrogatepass") if raw else text.encode("ascii")
+        yield "text-parser-"+name+(".srt" if name.startswith("srt-") else ".mpl"),data
+
+
 def timestamps(data):
     matches = re.findall(rb"Dialogue:[^,]*,(\d+):(\d+):(\d+(?:\.\d+)?),(\d+):(\d+):(\d+(?:\.\d+)?)", data)
     if not matches:
@@ -784,6 +803,8 @@ def make_cases(files):
                 cases[-1]["times"] = ["0", "0.9999999", "1", "1.5", "1.9999999", "2", "2.5", "3", "3.5", "4", "4.5", "5", "4", "3", "2", "1", "0", "2", "1", "3"]
             if path.stem.startswith("xombie-"):
                 cases[-1]["times"] = ["0", "1.2339999", "1.234", "1.2340001", "2", "3", "4.3449999", "4.345", "4.3450001", "2", "1.234", "0"]
+            if path.stem.startswith("text-parser-"):
+                cases[-1]["times"] = ["0", "1.1999999", "1.2", "1.2339999", "1.234", "2", "4.4999999", "4.5", "4.5669999", "4.567", "2", "1.234"]
             warning_styles = {"field-tab-prefixes": "\tDefault", "field-unicode-style-space": "\u2003Default"}
             if path.stem in warning_styles:
                 cases[-1]["dialog_actions"] = [{"title": "Warning",
@@ -806,6 +827,8 @@ def make_cases(files):
     return {"schema": 1, "description": "Starter differential corpus; not exhaustive compatibility evidence.",
             "expect_distinct_frames": [[a + "-" + mode, b + "-" + mode]
                                        for a, b in (("font-valid-attached", "font-valid-control"),
+                                                    ("text-parser-srt-nul", "text-parser-srt-control"),
+                                                    ("text-parser-mpl-missing-bracket", "text-parser-mpl-control"),
                                                     ("xombie-italic", "xombie-control"),
                                                     ("xombie-font-attached", "xombie-font-control"),
                                                     ("drawing-state-spline-close-twice", "drawing-state-control"),
@@ -887,6 +910,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in sami_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in sami_file_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in xombie_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in text_parser_variants()]
     manifest = json.dumps(make_cases(files + generated), indent=2) + "\n"
     expected = generated + [(DEST / "cases.json", manifest.encode("utf-8"))]
     for path, data in expected:
