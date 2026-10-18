@@ -77,62 +77,8 @@ pub unsafe extern "C" fn xy_vsfilter_ass_style_field(
         0 => state.input().len() as u32,
         1 => u32::from(state.input().get(index as usize).copied().unwrap_or(0)),
         2 => state.number(index as usize),
-        3 => state.result().len() as u32,
-        4 => u32::from(state.result().get(index as usize).copied().unwrap_or(0)),
-        5 => state.name().len() as u32,
-        6 => u32::from(state.name().get(index as usize).copied().unwrap_or(0)),
         _ => 0,
     }
-}
-/// # Safety
-/// Owner is live and exclusively held by the noncopyable parser adapter.
-/// Returns 1 for the current unsupplied integer field, otherwise 0.
-#[no_mangle]
-pub unsafe extern "C" fn xy_vsfilter_ass_style_integer(
-    owner: *mut Style,
-    field: u32,
-    value: i32,
-) -> u32 {
-    // SAFETY: the native RAII owner lends exclusive access for this call only.
-    u32::from(unsafe { &mut *owner }.integer(field, value))
-}
-/// # Safety
-/// Owner is live/exclusive. Bits are the exact native GetFloat f64 result.
-#[no_mangle]
-pub unsafe extern "C" fn xy_vsfilter_ass_style_float_bits(
-    owner: *mut Style,
-    field: u32,
-    bits: u64,
-) -> u32 {
-    // SAFETY: the native RAII owner lends exclusive access for this call only.
-    u32::from(unsafe { &mut *owner }.float(field, f64::from_bits(bits)))
-}
-/// # Safety
-/// Owner is live/exclusive; nonempty input spans length initialized aligned u16
-/// units, disjoint from owner, with length*2 fitting isize. Input is copied.
-#[no_mangle]
-pub unsafe extern "C" fn xy_vsfilter_ass_style_text(
-    owner: *mut Style,
-    field: u32,
-    input: *const u16,
-    length: u32,
-) -> u32 {
-    let input = if length == 0 {
-        &[]
-    } else {
-        // SAFETY: bounded immutable span provided by the native adapter.
-        unsafe { core::slice::from_raw_parts(input, length as usize) }
-    };
-    // SAFETY: owner is exclusive and disjoint from input; text copies the units.
-    u32::from(unsafe { &mut *owner }.text(field, input))
-}
-/// # Safety
-/// Owner is live/exclusive. Finalizes only once, after every enabled field was
-/// supplied and next returned zero. Results are owned bytes, never native layout.
-#[no_mangle]
-pub unsafe extern "C" fn xy_vsfilter_ass_style_finish(owner: *mut Style) -> u32 {
-    // SAFETY: the native RAII owner lends exclusive access for this call only.
-    u32::from(unsafe { &mut *owner }.finish())
 }
 /// # Safety
 /// Release the unique create result once, after all calls have completed.
@@ -146,53 +92,6 @@ pub unsafe extern "C" fn xy_vsfilter_ass_style_release(owner: *mut Style) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    #[test]
-    fn value_inputs_are_copied_and_results_are_independent_of_native_buffers() {
-        // SAFETY: live exclusive owner, valid disjoint loans and exactly one release.
-        unsafe {
-            let owner = xy_vsfilter_ass_style_create(core::ptr::null(), 0, 6);
-            assert_eq!(xy_vsfilter_ass_style_finish(owner), 0);
-            loop {
-                let field = xy_vsfilter_ass_style_next(owner);
-                if field == 0 {
-                    break;
-                }
-                if field == 27 {
-                    continue;
-                }
-                if field == 1 || field == 2 {
-                    let mut name = [42, 65, 0, 0xd800];
-                    assert_eq!(
-                        xy_vsfilter_ass_style_text(owner, field, name.as_ptr(), 4),
-                        1
-                    );
-                    name.fill(9);
-                } else if field == 3 || (12..=15).contains(&field) || field == 17 || field == 18 {
-                    assert_eq!(
-                        xy_vsfilter_ass_style_float_bits(owner, field, (-0.0f64).to_bits()),
-                        1
-                    );
-                } else {
-                    assert_eq!(xy_vsfilter_ass_style_integer(owner, field, 1), 1);
-                }
-            }
-            assert_eq!(xy_vsfilter_ass_style_finish(owner), 1);
-            assert_eq!(xy_vsfilter_ass_style_finish(owner), 0);
-            assert_eq!(xy_vsfilter_ass_style_field(owner, 5, 0), 3);
-            assert_eq!(xy_vsfilter_ass_style_field(owner, 6, 0), 65);
-            assert_eq!(xy_vsfilter_ass_style_field(owner, 6, 2), 0xd800);
-            let length = xy_vsfilter_ass_style_field(owner, 3, 0);
-            let bytes: alloc::vec::Vec<u8> = (0..length)
-                .map(|i| xy_vsfilter_ass_style_field(owner, 4, i) as u8)
-                .collect();
-            assert_eq!(xy_vsfilter_ass_style_field(owner, 4, u32::MAX), 0);
-            xy_vsfilter_ass_style_release(owner);
-            let value = xy_vsfilter_compat::document_style::decode(&bytes).unwrap();
-            assert_eq!(value.font_name, [42, 65, 0, 0xd800]);
-            assert_eq!(value.font_size.to_bits(), (-0.0f64).to_bits());
-            assert_eq!(value.font_scale_x.to_bits(), 0);
-        }
-    }
     #[test]
     fn owned_remainder_and_colors_do_not_retain_native_loans() {
         let mut input = [65u16, 0, 66];

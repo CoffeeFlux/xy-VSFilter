@@ -36,7 +36,9 @@
 #include "xy_rust_pipe_line.h"
 #include "xy_rust_encoding.h"
 #include "xy_rust_ass_dialogue.h"
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 #include "xy_rust_ass_style.h"
+#endif
 #include "xy_rust_ass_headers.h"
 #include "xy_rust_font_records.h"
 #include "xy_rust_webvtt.h"
@@ -2385,17 +2387,18 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
             try
             {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-                XyRust::AssStyle fields(buff,sver);
-                for(unsigned field;(field=fields.Next())!=0;) {
-                    if(field==27)continue;
-                    buff=fields.Text<CStringW>();
-                    if(field==1 || field==2)fields.StringValue(field,GetStr(buff));
-                    else if(field==3 || (field>=12 && field<=15) || field==17 || field==18)fields.Real(field,GetFloat(buff));
-                    else fields.Integer(field,GetInt(buff));
-                    fields.Accept(buff);
+                headers.BeginStyle(buff);
+                for(unsigned field;(field=headers.StyleNext(buff))!=0;) {
+                    if(field==1 || field==2) {
+                        const CStringW value=GetStr(buff);headers.StyleString(value,buff);
+                    } else if(field==3 || (field>=12 && field<=15) || field==17 || field==18) {
+                        const double value=GetFloat(buff);headers.StyleReal(value,buff);
+                    } else {
+                        const int value=GetInt(buff);headers.StyleInteger(value,buff);
+                    }
                 }
-                *style=XyRust::DocumentDetail::StyleValue(fields.Finish());
-                const CString StyleName=fields.Name<CString>();
+                CString StyleName;
+                headers.FinishStyle(*style,StyleName);
 #else
                 CString StyleName;
                 int alpha;

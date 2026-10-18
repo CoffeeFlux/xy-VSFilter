@@ -34,8 +34,12 @@ payload splitting, read/dispatch sequencing, and final-record/final-comment EOF
 decisions. It receives raw UTF-16 and native CString-trait whitespace flags;
 lowercase and file reads remain explicit platform adapters. This removes the
 native mutable line preparation and EOF policy from this parser path.
-Validation against the cleanup is in progress, including expanded raw-unit,
-whitespace, empty-key and EOF cases. The complete-library goal remains active;
+The line checkpoint `7714d991` passes 2,856 direct parser cases on each Windows
+architecture, including expanded raw-unit, whitespace, empty-key and EOF cases.
+Style assembly is now being consolidated into the same checked document-bound
+session, replacing the four raw-pointer value-building exports from the prior
+increment with typed commands and independently owned snapshots. Validation of
+the combined candidate is in progress. The complete-library goal remains active;
 no package closure or production enablement is claimed.
 
 ## Previous port: ASS/SSA parser control (2026-10-17)

@@ -777,6 +777,32 @@ public:
     }
     unsigned EntryKind() const {return static_cast<unsigned>(DocumentDetail::Load(state_,0,4));}
     void EndRecord(bool success=true) {Step(8,success?1:0);}
+    void StyleStep(unsigned command,uint64_t bits,const CStringW& text,const CStringW& remainder) {
+        const auto input=DocumentDetail::Units(text),rest=DocumentDetail::Units(remainder);
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_ass_style_v1(
+            id_,command,bits,input.data(),input.size(),rest.data(),rest.size(),state_.data(),state_.size());}));
+    }
+    void BeginStyle(const CStringW& input) {StyleStep(0,0,input,CStringW());}
+    void StyleInteger(int value,const CStringW& rest) {StyleStep(1,static_cast<uint32_t>(value),CStringW(),rest);}
+    void StyleReal(double value,const CStringW& rest) {uint64_t bits;std::memcpy(&bits,&value,sizeof bits);StyleStep(2,bits,CStringW(),rest);}
+    void StyleString(const CStringW& value,const CStringW& rest) {StyleStep(3,0,value,rest);}
+    DocumentDetail::Bytes StylePart(unsigned group) const {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_ass_style_part_v1(id_,group,out.data(),out.size());}));
+        DocumentReply snapshot(DocumentDetail::Load(out,0,8));return snapshot.Read();
+    }
+    unsigned StyleNext(CStringW& remainder) const {
+        const auto bytes=StylePart(0);
+        DocumentDetail::Shape(bytes.size()>=8 && (bytes.size()-8)%2==0 && DocumentDetail::Load(bytes,0,4)<=26 && DocumentDetail::Load(bytes,4,4)==0);
+        size_t offset=8;remainder=DocumentDetail::String(bytes,offset,DocumentDetail::Count((bytes.size()-8)/2));
+        return static_cast<unsigned>(DocumentDetail::Load(bytes,0,4));
+    }
+    void FinishStyle(STSStyle& value,CString& name) {
+        value=DocumentDetail::StyleValue(StylePart(2));const auto bytes=StylePart(1);
+        DocumentDetail::Shape(bytes.size()>=8 && (bytes.size()-8)%2==0 && DocumentDetail::Load(bytes,0,8)==0);
+        size_t offset=8;name=DocumentDetail::String(bytes,offset,DocumentDetail::Count((bytes.size()-8)/2));
+        StyleStep(4,0,CStringW(),CStringW());
+    }
     bool DialoguePart(unsigned group, CStringW& text, WCHAR& separator) const {
         std::array<uint8_t,8> out{};
         DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_ass_dialogue_part_v1(id_,group,out.data(),out.size());}));

@@ -13,6 +13,7 @@ pub enum Error {
     UnsuppliedScreen,
     Preparation(crate::document_prepare::Error),
     Storage(crate::document::Refusal),
+    CountOverflow,
 }
 
 #[derive(Default)]
@@ -23,6 +24,8 @@ pub struct Run {
     failed: bool,
     dialogue: Option<crate::ass_dialogue::Dialogue>,
     input: crate::ass_input::Input,
+    style: Option<crate::ass_style::Style>,
+    style_field: u32,
 }
 
 impl Run {
@@ -47,7 +50,7 @@ impl Run {
             return Err(Error::Protocol);
         }
         self.kind = self.headers.classify(lowered_key);
-        self.pending = matches!(self.kind, 1 | 4..=11 | 17);
+        self.pending = matches!(self.kind, 1 | 2 | 4..=11 | 17);
         self.input.classified();
         Ok(())
     }
@@ -69,6 +72,101 @@ impl Run {
             self.failed = true;
         }
         self.input.finish(success);
+        Ok(())
+    }
+
+    pub fn begin_style(&mut self, input: &[u16]) -> Result<(), Error> {
+        if self.kind != 2 || !self.pending || self.style.is_some() {
+            return Err(Error::Protocol);
+        }
+        let mut style = crate::ass_style::Style::new(input, self.headers.style_version);
+        self.style_field = style.next_field();
+        self.style = Some(style);
+        Ok(())
+    }
+    /// Values and the remaining native GetStr/GetInt/GetFloat buffer are copied
+    /// into the session. kind1=i32 bits, kind2=f64 bits, kind3=raw text.
+    pub fn style_value(
+        &mut self,
+        kind: u32,
+        bits: u64,
+        text: &[u16],
+        remainder: &[u16],
+    ) -> Result<(), Error> {
+        let style = self.style.as_mut().ok_or(Error::Protocol)?;
+        let field = self.style_field;
+        let expected = match field {
+            1 | 2 => 3,
+            3 | 12..=15 | 17 | 18 => 2,
+            4..=11 | 16 | 19..=26 => 1,
+            _ => return Err(Error::Protocol),
+        };
+        if kind != expected
+            || (kind != 3 && !text.is_empty())
+            || (kind == 3 && bits != 0)
+            || (kind == 1 && bits > u32::MAX as u64)
+        {
+            return Err(Error::Protocol);
+        }
+        if text.len() > i32::MAX as usize
+            || remainder.len() > i32::MAX as usize
+            || (field == 2
+                && text.len() as u64 * 2 + crate::document_style::HEADER_BYTES as u64
+                    > u32::MAX as u64)
+        {
+            return Err(Error::CountOverflow);
+        }
+        let supplied = match kind {
+            1 => style.integer(field, bits as u32 as i32),
+            2 => style.float(field, f64::from_bits(bits)),
+            3 => style.text(field, text),
+            _ => unreachable!(),
+        };
+        if !supplied {
+            return Err(Error::Protocol);
+        }
+        style.accept(remainder);
+        self.style_field = style.next_field();
+        if self.style_field == 27 {
+            self.style_field = style.next_field();
+        }
+        if self.style_field == 0 && !style.finish() {
+            return Err(Error::Protocol);
+        }
+        Ok(())
+    }
+    pub fn style_part(&self, group: u32) -> Result<alloc::vec::Vec<u8>, Error> {
+        let style = self.style.as_ref().ok_or(Error::Protocol)?;
+        if group == 2 && self.style_field == 0 {
+            return Ok(style.result().to_vec());
+        }
+        let text = match group {
+            0 => {
+                if self.style_field == 0 {
+                    &[][..]
+                } else {
+                    style.input()
+                }
+            }
+            1 if self.style_field == 0 => style.name(),
+            _ => return Err(Error::Protocol),
+        };
+        let mut bytes = alloc::vec::Vec::new();
+        bytes.extend_from_slice(&self.style_field.to_le_bytes());
+        bytes.extend_from_slice(&0u32.to_le_bytes());
+        for unit in text {
+            bytes.extend_from_slice(&unit.to_le_bytes());
+        }
+        Ok(bytes)
+    }
+    /// Native copied the final value and name; no native pointer is transferred.
+    /// Release the parsing session before the existing AddStyle ownership handoff.
+    pub fn end_style(&mut self) -> Result<(), Error> {
+        if self.style_field != 0 || self.style.as_ref().is_none_or(|s| s.result().is_empty()) {
+            return Err(Error::Protocol);
+        }
+        self.style = None;
+        self.pending = false;
         Ok(())
     }
 
@@ -270,6 +368,59 @@ mod tests {
         assert_eq!(run.state()[3], 0);
         assert_eq!(doc.script_size(), Some([0, 0]));
         assert_eq!(run.read_line(&[], &[], true), Err(Error::Protocol));
+    }
+
+    #[test]
+    fn typed_style_values_require_order_and_owned_results_survive_session_release() {
+        for version in 3..=6 {
+            let mut doc = Document::default();
+            let mut run = Run::begin(&mut doc);
+            if version >= 4 {
+                classify(&mut run, "scripttype");
+                run.script_version(version).unwrap();
+            }
+            classify(&mut run, "style");
+            run.begin_style(&units("native remainder")).unwrap();
+            assert_eq!(run.end_style(), Err(Error::Protocol));
+            assert_eq!(run.style_part(2), Err(Error::Protocol));
+            assert_eq!(run.classify(&units("[events]")), Err(Error::Protocol));
+            let before = run.style_part(0).unwrap();
+            assert_eq!(run.style_value(1, 99, &[], &[]), Err(Error::Protocol));
+            assert_eq!(run.style_part(0).unwrap(), before);
+            loop {
+                let part = run.style_part(0).unwrap();
+                let field = u32::from_le_bytes(part[..4].try_into().unwrap());
+                if field == 0 {
+                    break;
+                }
+                assert_ne!(field, 27);
+                let mut raw = alloc::vec![42, 65, 0, 0xd800];
+                match field {
+                    1 | 2 => run.style_value(3, 0, &raw, &units("rest")).unwrap(),
+                    3 | 12..=15 | 17 | 18 => run
+                        .style_value(2, (-0.0f64).to_bits(), &[], &units("rest"))
+                        .unwrap(),
+                    _ => run
+                        .style_value(1, u32::MAX.into(), &[], &units("rest"))
+                        .unwrap(),
+                }
+                raw.fill(9);
+            }
+            let value = run.style_part(2).unwrap();
+            let name = run.style_part(1).unwrap();
+            run.end_style().unwrap();
+            assert_eq!(run.style_part(2), Err(Error::Protocol));
+            classify(&mut run, "[events]");
+            let decoded = crate::document_style::decode(&value).unwrap();
+            assert_eq!(decoded.font_name, [42, 65, 0, 0xd800]);
+            assert_eq!(&name[8..], &[65, 0, 0, 0, 0, 0xd8]);
+            assert_eq!(decoded.font_size.to_bits(), (-0.0f64).to_bits());
+            assert_eq!(
+                decoded.font_scale_x.to_bits(),
+                if version >= 5 { 0 } else { 100f64.to_bits() }
+            );
+            assert_eq!(decoded.char_set, 1);
+        }
     }
     fn units(text: &str) -> alloc::vec::Vec<u16> {
         text.encode_utf16().collect()

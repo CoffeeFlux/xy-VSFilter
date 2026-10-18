@@ -287,6 +287,14 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_dialogue_part_v1(uint64_t ru
 // read; a final completed record stops. Invalid protocol leaves output unchanged.
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_read_v1(uint64_t run,uint32_t eof,const uint8_t*,size_t,const uint8_t*,size_t,uint8_t*,size_t);
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_input_part_v1(uint64_t run,uint32_t group,uint8_t*,size_t);
+// Style session uses the checked ASS run ID. Commands0 begin(input),1 i32 bits,
+// 2 f64 bits,3 raw string value,4 release finished value. Commands1..3 also supply
+// the native remaining GetStr/GetInt/GetFloat buffer. Inputs are raw UTF-16LE;
+// output is the standard16-byte ASS state. Part groups:0 field:u32,reserved:u32,
+// remainder;1 same header plus name;2 complete existing style wire. Groups1/2
+// require all fields. Snapshots are independent; no native style pointer crosses.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_style_v1(uint64_t,uint32_t,uint64_t,const uint8_t*,size_t,const uint8_t*,size_t,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_ass_style_part_v1(uint64_t,uint32_t,uint8_t*,size_t);
 // CopyStyles typed run binds destination and source. Open performs no mutation;
 // first step initializes/clears and returns Advanced before reading source rows.
 // Step output8 is snapshot ID; packet16: action:u32(0Done/1Advanced/2NeedSuffix),

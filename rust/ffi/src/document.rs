@@ -301,6 +301,7 @@ pub unsafe extern "C" fn xy_vsfilter_document_ass_begin_v1(
 /// 3 detected script version, 4 extracted/lowered text value, 5 begin dialogue,
 /// 6 dialogue numeric reply, 7 commit dialogue with trimmed text and flags
 /// (bit0 Unicode, bit1 native Default match). Other text commands use value 0.
+/// Command8 acknowledges the current input record (0 failure,1 success).
 #[no_mangle]
 pub unsafe extern "C" fn xy_vsfilter_document_ass_step_v1(
     id: u64,
@@ -365,6 +366,7 @@ fn ass_error(error: xy_vsfilter_compat::ass_document::Error) -> u32 {
         Error::Protocol => INVALID_INPUT,
         Error::UnsuppliedScreen => UNRESOLVED_REFERENCE,
         Error::Storage(error) => refusal(error),
+        Error::CountOverflow => COUNT_OVERFLOW,
         Error::Preparation(crate_error) => match crate_error {
             xy_vsfilter_compat::document_prepare::Error::UnresolvedTail => UNRESOLVED_REFERENCE,
             _ => COUNT_OVERFLOW,
@@ -459,6 +461,83 @@ pub unsafe extern "C" fn xy_vsfilter_document_ass_dialogue_part_v1(
     }));
     let snapshot = required!(insert(Resource::Snapshot(bytes)));
     // SAFETY: validated output, and all native/session loans have ended.
+    unsafe { write_output(output, &snapshot.to_le_bytes()) };
+    OK
+}
+
+/// # Safety
+/// Raw text/remainder are bounded UTF-16LE byte spans copied before admission;
+/// output receives 16 state bytes and may overlap either input. Commands:
+/// 0 begin(text=input),1 integer bits,2 double bits,3 string field(text=value),
+/// 4 release completed style. Commands1..3 supply the native remaining buffer.
+/// No native object address is accepted as the run ID or retained in Rust.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_ass_style_v1(
+    id: u64,
+    command: u32,
+    bits: u64,
+    text: *const u8,
+    length: usize,
+    remainder: *const u8,
+    remainder_length: usize,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 16));
+    if command > 4
+        || length % 2 != 0
+        || remainder_length % 2 != 0
+        || (matches!(command, 0 | 3 | 4) && bits != 0)
+        || (matches!(command, 1 | 2 | 4) && length != 0)
+        || (matches!(command, 0 | 4) && remainder_length != 0)
+    {
+        return INVALID_INPUT;
+    }
+    // SAFETY: initialized bounded spans copied before taking any registry loan.
+    let text = required!(unsafe { copy_input(text, length) });
+    // SAFETY: same caller-buffer contract; no native reference escapes.
+    let remainder = required!(unsafe { copy_input(remainder, remainder_length) });
+    let text = units(&text);
+    let remainder = units(&remainder);
+    let state = required!(admitted(|registry| {
+        let (_, run) = registry.ass_pair(id).map_err(registry_error)?;
+        match command {
+            0 => run.begin_style(&text),
+            1..=3 => run.style_value(command, bits, &text, &remainder),
+            4 => run.end_style(),
+            _ => unreachable!(),
+        }
+        .map_err(ass_error)?;
+        Ok(run.state())
+    }));
+    let mut bytes = [0; 16];
+    for (chunk, value) in bytes.chunks_exact_mut(4).zip(state) {
+        chunk.copy_from_slice(&value.to_le_bytes());
+    }
+    // SAFETY: output preflighted before mutation; registry loans ended.
+    unsafe { write_output(output, &bytes) };
+    OK
+}
+/// # Safety
+/// Output receives an immutable snapshot ID in eight writable bytes. Groups:
+/// 0 next field:u32,reserved:u32=0,raw remainder;1 same header and raw name;
+/// 2 the existing complete style wire. Groups1/2 require finished conversion.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_ass_style_part_v1(
+    id: u64,
+    group: u32,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let bytes = required!(admitted(|registry| registry
+        .ass_pair(id)
+        .map_err(registry_error)?
+        .1
+        .style_part(group)
+        .map_err(ass_error)));
+    let snapshot = required!(insert(Resource::Snapshot(bytes)));
+    // SAFETY: independent snapshot ID; no registry reference escapes.
     unsafe { write_output(output, &snapshot.to_le_bytes()) };
     OK
 }
@@ -2349,6 +2428,165 @@ mod tests {
         // explicit null/oversized checks are rejected before raw accesses.
         unsafe {
             // Supplied-only simplicity uses the existing checked metadata boundary.
+            let style_owner = create();
+            let mut out = [0xa5; 16];
+            assert_eq!(
+                xy_vsfilter_document_ass_begin_v1(style_owner, out.as_mut_ptr(), 8),
+                OK
+            );
+            let run = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let key: Vec<u8> = "style".encode_utf16().flat_map(u16::to_le_bytes).collect();
+            assert_eq!(
+                xy_vsfilter_document_ass_step_v1(
+                    run,
+                    0,
+                    0,
+                    key.as_ptr(),
+                    key.len(),
+                    out.as_mut_ptr(),
+                    16
+                ),
+                OK
+            );
+            out.fill(0xa5);
+            for (id, command, bits, length, capacity, expected) in [
+                (run, 0, 0, 1, 16, INVALID_INPUT),
+                (run, 0, 1, 0, 16, INVALID_INPUT),
+                (run, 0, 0, 0, 15, INVALID_INPUT),
+                (run, 4, 0, 0, 16, INVALID_INPUT),
+                (style_owner, 0, 0, 0, 16, BAD_HANDLE),
+            ] {
+                assert_eq!(
+                    xy_vsfilter_document_ass_style_v1(
+                        id,
+                        command,
+                        bits,
+                        key.as_ptr(),
+                        length,
+                        ptr::null(),
+                        0,
+                        out.as_mut_ptr(),
+                        capacity
+                    ),
+                    expected
+                );
+                assert_eq!(out, [0xa5; 16]);
+            }
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_ass_style_v1(
+                        run,
+                        0,
+                        0,
+                        ptr::null(),
+                        0,
+                        ptr::null(),
+                        0,
+                        out.as_mut_ptr(),
+                        16
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                xy_vsfilter_document_ass_style_v1(
+                    run,
+                    0,
+                    0,
+                    key.as_ptr(),
+                    key.len(),
+                    ptr::null(),
+                    0,
+                    out.as_mut_ptr(),
+                    16
+                ),
+                OK
+            );
+            let raw = [42, 0, 65, 0, 0, 0, 0, 0xd8];
+            loop {
+                assert_eq!(
+                    xy_vsfilter_document_ass_style_part_v1(run, 0, out.as_mut_ptr(), 8),
+                    OK
+                );
+                let part = u64::from_le_bytes(out[..8].try_into().unwrap());
+                let bytes = read_snapshot(part);
+                assert_eq!(xy_vsfilter_document_snapshot_drop_v1(part), OK);
+                let field = u32::from_le_bytes(bytes[..4].try_into().unwrap());
+                if field == 0 {
+                    break;
+                }
+                let (command, bits, text, len) = match field {
+                    1 | 2 => (3, 0, raw.as_ptr(), raw.len()),
+                    3 | 12..=15 | 17 | 18 => (2, (-0.0f64).to_bits(), ptr::null(), 0),
+                    _ => (1, u32::MAX.into(), ptr::null(), 0),
+                };
+                out.fill(0xa5);
+                assert_eq!(
+                    xy_vsfilter_document_ass_style_v1(
+                        run,
+                        command,
+                        bits,
+                        text,
+                        len,
+                        ptr::null(),
+                        0,
+                        out.as_mut_ptr(),
+                        15
+                    ),
+                    INVALID_INPUT
+                );
+                assert_eq!(out, [0xa5; 16]);
+                assert_eq!(
+                    xy_vsfilter_document_ass_style_v1(
+                        run,
+                        command,
+                        bits,
+                        text,
+                        len,
+                        ptr::null(),
+                        0,
+                        out.as_mut_ptr(),
+                        16
+                    ),
+                    OK
+                );
+            }
+            assert_eq!(
+                xy_vsfilter_document_ass_style_part_v1(run, 2, out.as_mut_ptr(), 8),
+                OK
+            );
+            let result = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let bytes = read_snapshot(result);
+            assert_eq!(
+                xy_vsfilter_document_ass_style_v1(
+                    run,
+                    4,
+                    0,
+                    ptr::null(),
+                    0,
+                    ptr::null(),
+                    0,
+                    out.as_mut_ptr(),
+                    16
+                ),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_ass_style_part_v1(run, 2, out.as_mut_ptr(), 8),
+                INVALID_INPUT
+            );
+            assert_eq!(xy_vsfilter_document_destroy_v1(style_owner), OK);
+            assert_eq!(
+                xy_vsfilter_document_ass_style_part_v1(run, 0, out.as_mut_ptr(), 8),
+                BAD_HANDLE
+            );
+            assert_eq!(xy_vsfilter_document_ass_drop_v1(run), OK);
+            assert_eq!(read_snapshot(result), bytes);
+            assert_eq!(
+                style_wire::decode(&bytes).unwrap().font_name,
+                [42, 65, 0, 0xd800]
+            );
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(result), OK);
             let owner = create();
             let mut output = [0xa5; 16];
             assert_eq!(
