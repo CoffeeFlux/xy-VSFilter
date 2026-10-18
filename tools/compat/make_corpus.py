@@ -790,6 +790,24 @@ def legacy_parser_variants():
         yield "legacy-parser-"+name+(".sub" if name.startswith("old-") else ".txt"), data
 
 
+def microdvd_parser_variants():
+    for name, text in {
+        "control": "{0}{100}First caption\r\n{50}{150}Second caption\r\n",
+        "style-sticky": "{Default}\r\n{0}{100}First caption\r\n{50}{150}Second caption\r\n",
+        "brace-control": "{0}{100}Visible\r\n",
+        "missing-brace": "{0}{100Visible\r\n",
+        "provisional": "{0}{}First caption\r\n{25}{}Second caption\r\n{50}{100}Third caption\r\n",
+        "empty-provisional": "{0}{}\r\n{25}{100}Second caption\r\n{50}{150}Third caption\r\n",
+        "style-switch": "{First}{y:b}\r\n{0}{}First caption\r\n{sEcOnD}{y:i}{c:$102030}\r\n{25}{100}Second caption\r\n{50}{150}Third caption\r\n",
+        "final-fragment": "{0}{}First caption\r\n{25}{100}ignored",
+        "raw-units": "{0}{100}Visible\x00\ud800tail\r\n",
+        "dbcs": "{Style}{h:128}\r\n{0}{}A\x81|B|C\r\n{50}{100}Tail\r\n",
+    }.items():
+        data = (b"\xff\xfe"+text.encode("utf-16le", "surrogatepass")
+                if "\x00" in text else text.encode("latin1"))
+        yield "microdvd-parser-"+name+".sub", data
+
+
 def timestamps(data):
     matches = re.findall(rb"Dialogue:[^,]*,(\d+):(\d+):(\d+(?:\.\d+)?),(\d+):(\d+):(\d+(?:\.\d+)?)", data)
     if not matches:
@@ -825,6 +843,8 @@ def make_cases(files):
                 cases[-1]["times"] = ["0", "1.1999999", "1.2", "1.2339999", "1.234", "2", "4.4999999", "4.5", "4.5669999", "4.567", "2", "1.234"]
             if path.stem.startswith("legacy-parser-"):
                 cases[-1]["times"] = ["0", "0.9999999", "1", "2", "2.3499999", "2.35", "2.37", "2.3999999", "2.4", "3.9999999", "4", "2.37", "1"]
+            if path.stem.startswith("microdvd-parser-"):
+                cases[-1]["times"] = ["0", "0.9999999", "1", "1.9999999", "2", "2.4", "3", "3.9999999", "4", "5.9999999", "6", "3", "1"]
             warning_styles = {"field-tab-prefixes": "\tDefault", "field-unicode-style-space": "\u2003Default"}
             if path.stem in warning_styles:
                 cases[-1]["dialog_actions"] = [{"title": "Warning",
@@ -851,6 +871,8 @@ def make_cases(files):
                                                     ("text-parser-mpl-missing-bracket", "text-parser-mpl-control"),
                                                     ("legacy-parser-old-missing-brace", "legacy-parser-old-control"),
                                                     ("legacy-parser-vp-caption-space", "legacy-parser-vp-control"),
+                                                    ("microdvd-parser-style-sticky", "microdvd-parser-control"),
+                                                    ("microdvd-parser-missing-brace", "microdvd-parser-brace-control"),
                                                     ("xombie-italic", "xombie-control"),
                                                     ("xombie-font-attached", "xombie-font-control"),
                                                     ("drawing-state-spline-close-twice", "drawing-state-control"),
@@ -934,6 +956,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in xombie_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in text_parser_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in legacy_parser_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in microdvd_parser_variants()]
     manifest = json.dumps(make_cases(files + generated), indent=2) + "\n"
     expected = generated + [(DEST / "cases.json", manifest.encode("utf-8"))]
     for path, data in expected:
