@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "candidate_commit": "3ba8fcba02785b3683f14343f015515e80255b4f",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "Safe Rust canonical USF metadata/styles/effects/texts, ordered DOM traversal, inline text assembly, inheritance and repeated conversion state.",
+  "production_sources": {
+    "rust/compat/src/usf_model.rs": "a7dacde8eef36f476ade24cccdb8f7699999dc1fb8d6a411c1e02558cf9d428a",
+    "rust/compat/src/usf_conversion.rs": "a72d81d25225998d171e70a56c059b0b237730dbf751e096a92bb4293d2a446b",
+    "rust/compat/src/lib.rs": "12296eb8fad27d136d02d646148c5c43d756c4341042885efddccdb38677d7a5",
+    "rust/ffi/src/document.rs": "079fa7991eac1b465d2f811ea63277f31dd1369304fad0dc2de44feae18e42b1",
+    "rust/ffi/src/document_registry.rs": "013a3d86cc3babc3df139a050c8bfef3b228a7b5b690a58c084d5cb7a21eca63",
+    "include/xy_rust_document.h": "f253cd1f139519a72aeedc0aa8411ebe5c47e834ea1a4e04dcbe1c55a8e69f48",
+    "src/subtitles/RustDocumentOwner.h": "2d25095bdeb8f2a69d841096f7555462e3cf4fa753a914f35b9f2ae7bac94e13",
+    "src/subtitles/USFSubtitles.cpp": "04fef1a4d2cc0e2890f3b7dc249dfb56015fdfd0d2798d91f0a191c480ab75ae",
+    "src/subtitles/USFSubtitles.h": "47adc3ba86c761ba218644fa27358e0fe8a4d5b4a2968b4894fee6a823d8fff5"
+  },
+  "reference_sources": {
+    "src/subtitles/USFSubtitles.cpp": "85df63bd57900a62a4900058f02affdefe388834b5b4ac4cc95b5fd7f95873c6",
+    "src/subtitles/USFSubtitles.h": "4c120ac34c52c6dbf7c111492c32e4597080616a7f515d6341d4cf545f868036",
+    "src/subtitles/STS.cpp": "2616b67db84f7329ac6e2363a3f03d61977fa07c37ed9c04d32ec2b1197f31e0"
+  },
+  "operations": [
+    {
+      "operation": "Persistent source ownership and reloads",
+      "source": {
+        "path": "rust/compat/src/usf_model.rs",
+        "line": 375,
+        "sha256": "a7dacde8eef36f476ade24cccdb8f7699999dc1fb8d6a411c1e02558cf9d428a"
+      },
+      "behavior": "The model exists independently of a destination subtitle document. Metadata persists across loads. Successful DOM loading begins traversal by clearing styles/effects/texts only. Failed native XML loading makes no Rust state call. A valid DOM with no recognized root returns false after clearing lists, retaining metadata."
+    },
+    {
+      "operation": "Ordered DOM traversal",
+      "source": {
+        "path": "rust/compat/src/usf_model.rs",
+        "line": 646,
+        "sha256": "a7dacde8eef36f476ade24cccdb8f7699999dc1fb8d6a411c1e02558cf9d428a"
+      },
+      "behavior": "An explicit safe task stack searches for the first recursive USF root and then makes metadata/styles/effects/subtitles passes over direct children. Native service requests retain name plus nodeValue access, firstChild/nextSibling order, repeated attribute lookup and the original font getter order. No COM pointer enters Rust."
+    },
+    {
+      "operation": "Metadata, style and effect quirks",
+      "source": {
+        "path": "rust/compat/src/usf_model.rs",
+        "line": 693,
+        "sha256": "a7dacde8eef36f476ade24cccdb8f7699999dc1fb8d6a411c1e02558cf9d428a"
+      },
+      "behavior": "Metadata recognizes nested fields and direct author children. Font/position nodes replace whole blocks. Nested style/effect names overwrite names. Keyframe children are deliberately not traversed; only position is retained. First case-insensitive Default supplies missing fields to non-Default styles; later Default styles stay independent. Empty text styles become Default."
+    },
+    {
+      "operation": "Inline text and timing",
+      "source": {
+        "path": "rust/compat/src/usf_model.rs",
+        "line": 766,
+        "sha256": "a7dacde8eef36f476ade24cccdb8f7699999dc1fb8d6a411c1e02558cf9d428a"
+      },
+      "behavior": "Rust composes b/i/u/font prefixes and same-order postfixes, minimum-six-digit full u32 color hex, k duration divided by10, br and raw get_xml text. CR is removed, LF becomes space, adjacent spaces collapse, tabs/entities/raw code units remain. k/br skip child content; CDATA is not #text. Native time scalars combine with wrapping i32 addition; converter still widens directly to ticks without MS2RT."
+    },
+    {
+      "operation": "Conversion state retention",
+      "source": {
+        "path": "rust/ffi/src/document.rs",
+        "line": 443,
+        "sha256": "079fa7991eac1b465d2f811ea63277f31dd1369304fad0dc2de44feae18e42b1"
+      },
+      "behavior": "Conversion begins from the Rust model with no native list import. Pending caption emission updates canonical Rust text before native Add. Repeated conversions and failed reloads accumulate the same prefixes, including conversion to another destination. Both source and destination IDs are checked before each step or snapshot."
+    }
+  ],
+  "boundary_review": {
+    "source": {
+      "path": "rust/ffi/src/document.rs",
+      "line": 311,
+      "sha256": "079fa7991eac1b465d2f811ea63277f31dd1369304fad0dc2de44feae18e42b1"
+    },
+    "registry": {
+      "path": "rust/ffi/src/document_registry.rs",
+      "line": 481,
+      "sha256": "013a3d86cc3babc3df139a050c8bfef3b228a7b5b690a58c084d5cb7a21eca63"
+    },
+    "native_adapter": {
+      "path": "src/subtitles/USFSubtitles.cpp",
+      "line": 214,
+      "sha256": "04fef1a4d2cc0e2890f3b7dc249dfb56015fdfd0d2798d91f0a191c480ab75ae"
+    },
+    "new_private_entries": [
+      "xy_vsfilter_document_usf_source_create_v1",
+      "xy_vsfilter_document_usf_source_drop_v1",
+      "xy_vsfilter_document_usf_source_begin_v1",
+      "xy_vsfilter_document_usf_source_step_v1",
+      "xy_vsfilter_document_usf_source_part_v1",
+      "xy_vsfilter_document_usf_begin_v2"
+    ],
+    "contract": "Nonblocking typed registry admission; bounded copied raw-u16 replies; scalar/string shape and phase checks; output preflight; monotonically allocated integer IDs; immutable snapshots outlive either parent. COM/CRT callbacks run between admitted calls. Native node table holds CComPtr values, copies before vector growth and checks each node ID. No new raw pointer owner or slice constructor.",
+    "unsafe_delta": {
+      "extern_unsafe_functions": 4,
+      "unsafe_blocks": 4,
+      "new_raw_slice_constructors": 0
+    },
+    "legacy_private_entry": "The v1 packet-import begin remains for private boundary regression coverage; the native USF path now uses source-bound begin_v2.",
+    "tests": "Malformed scalar/string replies, odd byte lengths, wrong op, active parse/reload refusal, wrong-kind/stale IDs, BUSY, output capacity/atomicity, source-drop and parent-drop snapshots; core raw NUL/surrogates, retained metadata, ignored keyframe children, inline entities/spacing/colors/reset order, default inheritance and whole-font replacement."
+  },
+  "direct_probe": {
+    "baseline_commit": "b3885359c7d6b7b320ae83a690f0890878db50cb",
+    "source": {
+      "path": "tools/compat/usf_document_native.cpp",
+      "line": 25,
+      "sha256": "0b796eb719a8f6c34f81536b3b2dbb04ef63e44fbf58753dab953a36a215bc0c"
+    },
+    "cases": 1340,
+    "trace_lines": 15655,
+    "coverage": "Original1212 cases retained byte-for-byte up to the completion marker. Added8 initial XML variants x8 reload variants x2 preload states:128 sequences,640 complete state snapshots. Each sequence converts after both reads and into another document. Snapshots include all10 metadata fields, styles, effect/keyframe records and captions, including conversion mutations.",
+    "method": "Actual selected STS.cpp/OpenUSF/CUSFSubtitles with initialized document observer and STA COM. Two executions of pinned reference and two of candidate must agree, then baseline/post-port full traces must agree."
+  },
+  "limits": [
+    "Experimental document-owner path only; no production switch, whole-format/host closure or complete-library claim.",
+    "System MSXML DOM construction, load, getters, lowercasing and attribute lookup still use a native adapter. Final implementation must reach Windows MSXML through audited Rust COM FFI, retaining host COM initialization requirements.",
+    "TimeToInt, ColorToDWORD, wcstol, CompareNoCase, TranslateMargin, TranslateAlignment and AddStyle/Add still use transitional native services. Fallback implementations, every host, renderer and vendored native code remain in scope.",
+    "Finite Windows MSVC14.44 x86/x64 evidence. Allocation/new-handler reentry, injected COM getter failures, file-I/O faults, concurrent source edits, locale changes, uninitialized document fields and non-Windows whole-renderer behavior are not closed.",
+    "Parsed records enter the Rust model before their fields finish filling; partial state is not exposed by the source snapshot API during traversal. Exceptional/reentrant observation and compatible recovery require separate evidence. Reload while a conversion ID is retained is a private protocol refusal, not a claimed public host behavior.",
+    "Snapshots are detached and typed IDs never repeat; lexical unsafe counts are an inventory, not a soundness proof or migration percentage.",
+    "Crashes, hangs and nondeterministic reference outcomes remain unresolved. Prior SubViewer missing-style results and earlier USF failed visibility controls keep their original provenance."
+  ],
+  "next_work": [
+    "Port remaining USF scalar conversion helpers with direct CRT/cleanup evidence.",
+    "Replace native MSXML and host ABI adapters with audited Rust FFI; keep Windows system XML behavior and explicit host COM initialization.",
+    "Continue full renderer, all formats/options/hosts and vendored code migration; SubViewer unresolved outcomes remain open."
+  ]
+}
