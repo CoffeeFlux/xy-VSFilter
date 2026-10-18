@@ -3393,8 +3393,34 @@ static bool OpenMPL2(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 #endif
 }
 
-static bool OpenRealText(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+static
+#endif
+bool OpenRealText(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    CRealTextParser services;
+    XyRust::RealTextSession parser(*ret.m_document,services.m_iDefaultSubtitleDurationInMillisecs);
+    for(;;) {
+        CStringW text;int64_t start,end;bool accepted;
+        const unsigned op=parser.Next(text,start,end,accepted);
+        if(op==8)return accepted;
+        if(op==9)return false;
+        if(op==0){CStringW line;const bool eof=!file->ReadString(line);parser.Read(line,eof);}
+        else if(op==1)parser.Step(0,text.CompareNoCase(L"<window"));
+        else if(op==2 || op==3){
+            std::wstring remaining(text,text.GetLength());CRealTextParser::Tag tag;
+            const bool response=op==2?services.ExtractTag(remaining,tag):services.ExtractTextTag(remaining,tag);
+            parser.Extracted(response,remaining,tag);
+        }
+        else if(op==4 || op==5)parser.Step(1,services.GetTimecode(std::wstring(text,text.GetLength())));
+        else if(op==6)parser.Rendered(services.RenderTags(parser.Tags<CRealTextParser::Tag>()));
+        else if(op==7){
+            // Original map export passes c_str(): truncate only at this boundary.
+            ret.Add(SubRipper2SSA(static_cast<LPCWSTR>(text),CharSet),file->IsUnicode(),start,end);parser.Step(2);
+        }
+    }
+#else
     std::wstring szFile;
     CStringW buff;
 
@@ -3428,6 +3454,7 @@ static bool OpenRealText(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
     }
 
     return !ret.IsEmpty();
+#endif
 }
 
 typedef bool (*STSOpenFunct)(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet);

@@ -271,6 +271,20 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_open_lifecycle_drop_v1(uint64_t 
 // Invalid protocol/capacity leaves the run, document and output untouched;
 // absent opposite screen axis reports UNRESOLVED_REFERENCE. No native loans
 // or callbacks survive a call. Drop remains valid after document destruction.
+// Checked RealText session. Begin supplies default duration in milliseconds.
+// Read copies UTF16LE and strict-bool spaces. Packet0: strict-bool extraction
+// result plus remaining length:u32/units/tag. Packet1: raw rendered text/value0.
+// Tag: flags/name length/attribute count:u32, name units; then sorted attribute
+// key/value lengths:u32 and raw units. Step0 initial CompareNoCase,1 time,2 Add ack.
+// Part0 op/accepted:u32,start/end:i64,payload; Part1 tag count:u32 and tags;
+// Part2 count:u32 then start/end:i32,length:u32,units; Part3 center:u32/window tag.
+// Ops Read0/CheckStart1/Tag2/Text3/Start4/End5/Render6/Emit7/Done8/Failed9.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_realtext_begin_v1(uint64_t,int32_t,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_realtext_drop_v1(uint64_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_realtext_read_v1(uint64_t,uint32_t,const uint8_t*,size_t,const uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_realtext_packet_v1(uint64_t,uint32_t,uint32_t,const uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_realtext_step_v1(uint64_t,uint32_t,int32_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_realtext_part_v1(uint64_t,uint32_t,uint8_t*,size_t);
 // Checked WebVTT session. Read copies raw UTF16LE and strict-bool whitespace.
 // Packet0 header count and three strings only for count2/3; Packet1 converted
 // UTF16LE; Packet2 key/foreground/background (value0 for commands1/2).

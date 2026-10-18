@@ -33,6 +33,7 @@ pub(crate) enum Kind {
     XombieRun,
     TextRun,
     MicroDvdRun,
+    RealTextRun,
     VttRun,
     SamiRun,
     SearchRun,
@@ -78,6 +79,10 @@ pub(crate) enum Resource {
         owner: Handle,
         run: xy_vsfilter_compat::microdvd_document::Run,
     },
+    RealTextRun {
+        owner: Handle,
+        run: xy_vsfilter_compat::realtext_session::Run,
+    },
     VttRun {
         owner: Handle,
         run: xy_vsfilter_compat::vtt_document::Run,
@@ -104,6 +109,7 @@ impl Resource {
             Self::XombieRun { .. } => Kind::XombieRun,
             Self::TextRun { .. } => Kind::TextRun,
             Self::MicroDvdRun { .. } => Kind::MicroDvdRun,
+            Self::RealTextRun { .. } => Kind::RealTextRun,
             Self::VttRun { .. } => Kind::VttRun,
             Self::SamiRun { .. } => Kind::SamiRun,
             Self::SearchRun { .. } => Kind::SearchRun,
@@ -456,6 +462,40 @@ impl Registry {
         };
         match (document_resource, run_resource) {
             (Resource::Document(document), Resource::MicroDvdRun { run, .. }) => {
+                Ok((document, run))
+            }
+            _ => Err(Error::TypeMismatch),
+        }
+    }
+
+    pub(crate) fn realtext_pair(
+        &mut self,
+        id: Handle,
+    ) -> Result<
+        (
+            &mut Document,
+            &mut xy_vsfilter_compat::realtext_session::Run,
+        ),
+        Error,
+    > {
+        let run_index = self.position(id)?;
+        let owner = match &self.slots[run_index].1 {
+            Resource::RealTextRun { owner, .. } => *owner,
+            _ => return Err(Error::TypeMismatch),
+        };
+        let owner_index = self.position(owner)?;
+        if owner_index == run_index {
+            return Err(Error::TypeMismatch);
+        }
+        let (document_resource, run_resource) = if owner_index < run_index {
+            let (before, after) = self.slots.split_at_mut(run_index);
+            (&mut before[owner_index].1, &mut after[0].1)
+        } else {
+            let (before, after) = self.slots.split_at_mut(owner_index);
+            (&mut after[0].1, &mut before[run_index].1)
+        };
+        match (document_resource, run_resource) {
+            (Resource::Document(document), Resource::RealTextRun { run, .. }) => {
                 Ok((document, run))
             }
             _ => Err(Error::TypeMismatch),

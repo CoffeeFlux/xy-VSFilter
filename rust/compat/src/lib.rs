@@ -151,3 +151,5 @@ pub mod microdvd_document;
 pub mod sami_document;
 
 pub mod vtt_document;
+
+pub mod realtext_session;

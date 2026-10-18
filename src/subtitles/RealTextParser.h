@@ -27,6 +27,11 @@
 #include <list>
 #include <cwctype>
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+class CTextFile;
+class CSimpleTextSubtitle;
+#endif
+
 class CRealTextParser
 {
 public:
@@ -64,6 +69,9 @@ public:
 
 
 private:
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    friend bool OpenRealText(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet);
+#endif
     bool ExtractTag(std::wstring& p_rszLine, Tag& p_rTag);
     bool ExtractTextTag(std::wstring& p_rszLine, Tag& p_rTag);
     bool ExtractString(std::wstring& p_rszLine, std::wstring& p_rszString);
