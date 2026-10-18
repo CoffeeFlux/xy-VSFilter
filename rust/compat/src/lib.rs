@@ -147,3 +147,5 @@ pub mod xombie;
 pub mod text_document;
 
 pub mod microdvd_document;
+
+pub mod sami_document;

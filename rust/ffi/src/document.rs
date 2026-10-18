@@ -270,6 +270,128 @@ pub extern "C" fn xy_vsfilter_document_search_drop_v1(id: u64) -> u32 {
 }
 
 /// # Safety
+/// Output receives a document-bound SAMI session ID in eight writable bytes.
+/// Position is the native file position captured before format discovery.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_sami_begin_v1(
+    owner: u64,
+    position: u64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let id = required!(admitted(|registry| {
+        registry.document(owner).map_err(registry_error)?;
+        let id = registry.reserve_insert().map_err(registry_error)?;
+        registry.insert_reserved(
+            id,
+            Resource::SamiRun {
+                owner,
+                run: xy_vsfilter_compat::sami_document::Run::new(position),
+            },
+        );
+        Ok(id)
+    }));
+    // SAFETY: preflighted output; registry borrowing has ended.
+    unsafe { write_output(output, &id.to_le_bytes()) };
+    OK
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_sami_drop_v1(id: u64) -> u32 {
+    status(DOCUMENTS.destroy(id, Kind::SamiRun).map_err(registry_error))
+}
+/// # Safety
+/// Initialized raw UTF16LE and one strict-bool whitespace flag per unit. Flags
+/// are used only for successful post-rewind reads; other phases supply zeros.
+/// EOF is !ReadString. Both spans are copied before registry admission.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_sami_read_v1(
+    id: u64,
+    eof: u32,
+    input: *const u8,
+    length: usize,
+    spaces: *const u8,
+    space_length: usize,
+) -> u32 {
+    if eof > 1 || length % 2 != 0 || space_length != length / 2 {
+        return INVALID_INPUT;
+    }
+    // SAFETY: initialized bounded caller buffer, copied before borrowing state.
+    let text = units(&required!(unsafe { copy_input(input, length) }));
+    // SAFETY: same caller-buffer contract for predicate flags.
+    let spaces = required!(unsafe { copy_input(spaces, space_length) });
+    status(admitted(|registry| {
+        registry
+            .sami_pair(id)
+            .map_err(registry_error)?
+            .1
+            .read(&text, &spaces, eof != 0)
+            .map_err(ass_error)
+    }))
+}
+/// # Safety
+/// Initialized uppercase UTF16LE copy of the requested line, with unchanged
+/// counted length. Input is copied before admission; no native loan survives.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_sami_upper_v1(
+    id: u64,
+    input: *const u8,
+    length: usize,
+) -> u32 {
+    if length % 2 != 0 {
+        return INVALID_INPUT;
+    }
+    // SAFETY: initialized bounded caller buffer, copied before admission.
+    let text = units(&required!(unsafe { copy_input(input, length) }));
+    status(admitted(|registry| {
+        registry
+            .sami_pair(id)
+            .map_err(registry_error)?
+            .1
+            .uppercase(&text)
+            .map_err(ass_error)
+    }))
+}
+/// Commands:0 rewind ack(value0),1 strict-bool iswdigit reply,2 Add ack(value0).
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_sami_step_v1(id: u64, command: u32, value: u32) -> u32 {
+    if command > 2 || (command == 1 && value > 1) || (command != 1 && value != 0) {
+        return INVALID_INPUT;
+    }
+    status(admitted(|registry| {
+        let (_, run) = registry.sami_pair(id).map_err(registry_error)?;
+        match command {
+            0 => run.rewind(),
+            1 => run.digit(value != 0),
+            2 => run.acknowledge(),
+            _ => unreachable!(),
+        }
+        .map_err(ass_error)
+    }))
+}
+/// # Safety
+/// Output receives independent snapshot ID in eight writable bytes. Snapshot:
+/// op/accepted/digit-unit/reserved:u32[4], rewind-position:u64,start/end:i64,
+/// raw UTF16LE. No native or run loan escapes this call.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_sami_part_v1(
+    id: u64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let bytes = required!(admitted(|registry| Ok(registry
+        .sami_pair(id)
+        .map_err(registry_error)?
+        .1
+        .snapshot())));
+    let snapshot = required!(insert(Resource::Snapshot(bytes)));
+    // SAFETY: preflighted writable output; immutable snapshot owns its bytes.
+    unsafe { write_output(output, &snapshot.to_le_bytes()) };
+    OK
+}
+
+/// # Safety
 /// Output receives a document-bound MicroDVD run ID in eight writable bytes.
 #[no_mangle]
 pub unsafe extern "C" fn xy_vsfilter_document_microdvd_begin_v1(
@@ -4209,6 +4331,203 @@ mod tests {
             assert_eq!(xy_vsfilter_document_microdvd_drop_v1(micro_run), OK);
             assert_eq!(xy_vsfilter_document_microdvd_drop_v1(micro_run), BAD_HANDLE);
             for snapshot in [micro_snapshot, name_snapshot, current_name] {
+                assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
+            }
+            let sami_owner = create();
+            out.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_document_sami_begin_v1(sami_owner, 42, out.as_mut_ptr(), 7),
+                INVALID_INPUT
+            );
+            assert_eq!(out, [0xa5; 16]);
+            assert_eq!(
+                xy_vsfilter_document_sami_begin_v1(sami_owner, 42, out.as_mut_ptr(), 8),
+                OK
+            );
+            let sami_run = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let mut raw: Vec<u8> = "<sami>".encode_utf16().flat_map(u16::to_le_bytes).collect();
+            let spaces = alloc::vec![0;raw.len()/2];
+            assert_eq!(
+                xy_vsfilter_document_sami_read_v1(
+                    sami_run,
+                    2,
+                    raw.as_ptr(),
+                    raw.len(),
+                    spaces.as_ptr(),
+                    spaces.len()
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_sami_read_v1(
+                    sami_owner,
+                    0,
+                    raw.as_ptr(),
+                    raw.len(),
+                    spaces.as_ptr(),
+                    spaces.len()
+                ),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                xy_vsfilter_document_sami_read_v1(
+                    sami_run,
+                    0,
+                    raw.as_ptr(),
+                    raw.len(),
+                    spaces.as_ptr(),
+                    spaces.len() - 1
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_sami_read_v1(
+                        sami_run,
+                        0,
+                        raw.as_ptr(),
+                        raw.len(),
+                        spaces.as_ptr(),
+                        spaces.len()
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                xy_vsfilter_document_sami_read_v1(
+                    sami_run,
+                    0,
+                    raw.as_ptr(),
+                    raw.len(),
+                    spaces.as_ptr(),
+                    spaces.len()
+                ),
+                OK
+            );
+            raw.fill(0);
+            let upper: Vec<u8> = "<SAMI>".encode_utf16().flat_map(u16::to_le_bytes).collect();
+            assert_eq!(
+                xy_vsfilter_document_sami_upper_v1(sami_run, upper.as_ptr(), upper.len() - 1),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_sami_upper_v1(sami_run, upper.as_ptr(), upper.len() - 2),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_sami_upper_v1(
+                        sami_run,
+                        upper.as_ptr(),
+                        upper.len()
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                xy_vsfilter_document_sami_upper_v1(sami_run, upper.as_ptr(), upper.len()),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_sami_step_v1(sami_run, 0, 0),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_sami_read_v1(sami_run, 1, ptr::null(), 0, ptr::null(), 0),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_sami_part_v1(sami_run, out.as_mut_ptr(), 8),
+                OK
+            );
+            let rewind_snapshot = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let rewind = read_snapshot(rewind_snapshot);
+            assert_eq!(rewind[0], 3);
+            assert_eq!(u64::from_le_bytes(rewind[16..24].try_into().unwrap()), 42);
+            assert_eq!(
+                xy_vsfilter_document_sami_step_v1(sami_run, 0, 1),
+                INVALID_INPUT
+            );
+            assert_eq!(xy_vsfilter_document_sami_step_v1(sami_run, 0, 0), OK);
+            for text in ["caption\0tail", "<SYNC START=12M3>second"] {
+                let raw: Vec<u8> = text.encode_utf16().flat_map(u16::to_le_bytes).collect();
+                let spaces = alloc::vec![0;raw.len()/2];
+                assert_eq!(
+                    xy_vsfilter_document_sami_read_v1(
+                        sami_run,
+                        0,
+                        raw.as_ptr(),
+                        raw.len(),
+                        spaces.as_ptr(),
+                        spaces.len()
+                    ),
+                    OK
+                );
+                let upper: Vec<u8> = text
+                    .to_ascii_uppercase()
+                    .encode_utf16()
+                    .flat_map(u16::to_le_bytes)
+                    .collect();
+                assert_eq!(
+                    xy_vsfilter_document_sami_upper_v1(sami_run, upper.as_ptr(), upper.len()),
+                    OK
+                );
+            }
+            assert_eq!(
+                xy_vsfilter_document_sami_step_v1(sami_run, 1, 2),
+                INVALID_INPUT
+            );
+            assert_eq!(xy_vsfilter_document_sami_step_v1(sami_run, 1, 1), OK);
+            assert_eq!(xy_vsfilter_document_sami_step_v1(sami_run, 1, 1), OK);
+            assert_eq!(
+                xy_vsfilter_document_sami_step_v1(sami_run, 1, 1),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_sami_part_v1(sami_run, out.as_mut_ptr(), 7),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_sami_part_v1(sami_run, out.as_mut_ptr(), 8),
+                OK
+            );
+            let sami_snapshot = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let retained = read_snapshot(sami_snapshot);
+            assert_eq!(retained[0], 7);
+            assert_eq!(
+                i64::from_le_bytes(retained[32..40].try_into().unwrap()),
+                120000
+            );
+            assert_eq!(
+                &retained[40..],
+                &"caption"
+                    .encode_utf16()
+                    .flat_map(u16::to_le_bytes)
+                    .collect::<Vec<_>>()
+            );
+            assert_eq!(xy_vsfilter_document_sami_step_v1(sami_run, 2, 0), OK);
+            assert_eq!(
+                xy_vsfilter_document_sami_read_v1(sami_run, 1, ptr::null(), 0, ptr::null(), 0),
+                OK
+            );
+            assert_eq!(xy_vsfilter_document_sami_step_v1(sami_run, 2, 0), OK);
+            assert_eq!(
+                xy_vsfilter_document_sami_part_v1(sami_run, out.as_mut_ptr(), 8),
+                OK
+            );
+            let done_snapshot = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let done = read_snapshot(done_snapshot);
+            assert_eq!(done[0], 8);
+            assert_eq!(done[4], 1);
+            assert_eq!(xy_vsfilter_document_destroy_v1(sami_owner), OK);
+            assert_eq!(
+                xy_vsfilter_document_sami_part_v1(sami_run, out.as_mut_ptr(), 8),
+                BAD_HANDLE
+            );
+            assert_eq!(read_snapshot(sami_snapshot), retained);
+            assert_eq!(xy_vsfilter_document_sami_drop_v1(sami_run), OK);
+            assert_eq!(xy_vsfilter_document_sami_drop_v1(sami_run), BAD_HANDLE);
+            for snapshot in [rewind_snapshot, sami_snapshot, done_snapshot] {
                 assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
             }
             let simple_owner = create();

@@ -271,6 +271,17 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_open_lifecycle_drop_v1(uint64_t 
 // Invalid protocol/capacity leaves the run, document and output untouched;
 // absent opposite screen axis reports UNRESOLVED_REFERENCE. No native loans
 // or callbacks survive a call. Drop remains valid after document destruction.
+// Checked SAMI discovery/rewind/caption session. Read/Upper copy raw UTF16LE.
+// Step0 rewind ack,1 strict-bool iswdigit,2 Add ack; acknowledgements use value0.
+// Part: op/accepted/digit-unit/reserved:u32[4],rewind-position:u64,start/end:i64,
+// raw UTF16LE. Ops ProbeRead0/ProbeUpper1/ProbeDiscard2/Rewind3/Read4/Upper5/
+// Digit6/Emit7/Done8/Failed9. Discovery deliberately reads one extra line.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_sami_begin_v1(uint64_t,uint64_t,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_sami_drop_v1(uint64_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_sami_read_v1(uint64_t,uint32_t,const uint8_t*,size_t,const uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_sami_upper_v1(uint64_t,const uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_sami_step_v1(uint64_t,uint32_t,uint32_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_sami_part_v1(uint64_t,uint8_t*,size_t);
 // Checked MicroDVD session. Read supplies raw UTF16LE and strict-bool whitespace.
 // Step0 primary scan,1 fallback scan BEFORE +1,2 Add ack (zero scalars).
 // Style acknowledges native AddStyle with copied normalized name and charset.

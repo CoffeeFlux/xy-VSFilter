@@ -9,7 +9,7 @@ pub struct File {
     close_comment: bool,
     pub start: i32,
 }
-fn contains(input: &[u16], needle: &[u8]) -> bool {
+pub(crate) fn contains(input: &[u16], needle: &[u8]) -> bool {
     input
         .windows(needle.len())
         .any(|part| part.iter().zip(needle).all(|(&a, &b)| a == u16::from(b)))
@@ -17,22 +17,31 @@ fn contains(input: &[u16], needle: &[u8]) -> bool {
 impl File {
     /// The native caller has uppercased a fresh line. Actions: 0 ignore,
     /// 1 append, 2 emit the previous caption and then append this sync line.
-    pub fn begin(&mut self, upper: &[u16]) -> u32 {
+    fn classified(&self, upper: &[u16]) -> (bool, bool, u32) {
         let upper = &upper[..upper
             .iter()
             .position(|&unit| unit == 0)
             .unwrap_or(upper.len())];
-        if contains(upper, b"<!--") || contains(upper, b"<TITLE>") {
-            self.comment = true;
-        }
-        self.close_comment = contains(upper, b"-->") || contains(upper, b"</TITLE>");
-        if self.comment {
+        let comment = self.comment || contains(upper, b"<!--") || contains(upper, b"<TITLE>");
+        let close_comment = contains(upper, b"-->") || contains(upper, b"</TITLE>");
+        let action = if comment {
             0
         } else if contains(upper, b"<SYNC START=") {
             2
         } else {
             1
-        }
+        };
+        (comment, close_comment, action)
+    }
+    /// Inspect the action before reserving bounded caption growth.
+    pub fn action(&self, upper: &[u16]) -> u32 {
+        self.classified(upper).2
+    }
+    pub fn begin(&mut self, upper: &[u16]) -> u32 {
+        let (comment, close_comment, action) = self.classified(upper);
+        self.comment = comment;
+        self.close_comment = close_comment;
+        action
     }
     pub fn flushed(&mut self, time: i32) {
         self.start = time;

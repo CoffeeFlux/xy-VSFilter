@@ -240,6 +240,7 @@ class AssDocument;
 class XombieDocument;
 class TextDocument;
 class MicroDvdDocument;
+class SamiDocument;
 class UnknownStylesPass;
 class StyleAddition;
 class NamedStyleCopy;
@@ -250,6 +251,7 @@ class DocumentReply {
     friend class XombieDocument;
     friend class TextDocument;
     friend class MicroDvdDocument;
+    friend class SamiDocument;
     friend class DocumentOwner;
     friend class UnknownStylesPass;
     friend class StyleAddition;
@@ -291,6 +293,7 @@ class DocumentOwner {
     friend class XombieDocument;
     friend class TextDocument;
     friend class MicroDvdDocument;
+    friend class SamiDocument;
     friend class UnknownStylesPass;
     friend class StyleAddition;
     friend class NamedStyleCopy;
@@ -879,6 +882,37 @@ public:
         style=DocumentDetail::StyleValue(Part(1));const auto bytes=Part(2);DocumentDetail::Shape(bytes.size()%2==0);
         size_t offset=0;name=DocumentDetail::String(bytes,offset,DocumentDetail::Count(bytes.size()/2));
         Step(4); // release before AddStyle consumes its native temporary
+    }
+};
+class SamiDocument {
+    uint64_t id_=0;
+public:
+    SamiDocument(const DocumentOwner& owner,uint64_t position) {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_sami_begin_v1(owner.id_,position,out.data(),out.size());}));id_=DocumentDetail::Load(out,0,8);
+    }
+    SamiDocument(const SamiDocument&)=delete;SamiDocument& operator=(const SamiDocument&)=delete;
+    ~SamiDocument() noexcept {if(id_){const auto id=id_;id_=0;DocumentDetail::Release(DocumentDetail::Invoke([&]{return xy_vsfilter_document_sami_drop_v1(id);}));}}
+    void Read(const CStringW& text,bool eof,bool trim) {
+        const auto bytes=DocumentDetail::Units(text);std::vector<uint8_t> spaces(text.GetLength(),0);
+        if(trim && !eof)for(int i=0;i<text.GetLength();++i)spaces[i]=CStringW::StrTraits::IsSpace(text[i])?1:0;
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_sami_read_v1(id_,eof?1:0,bytes.data(),bytes.size(),spaces.data(),spaces.size());}));
+    }
+    void Upper(const CStringW& text) {
+        const auto bytes=DocumentDetail::Units(text);
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_sami_upper_v1(id_,bytes.data(),bytes.size());}));
+    }
+    void Step(unsigned command,unsigned value=0) {
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_sami_step_v1(id_,command,value);}));
+    }
+    unsigned Next(CStringW& text,int64_t& start,int64_t& end,bool& accepted,uint64_t& position,unsigned& unit) const {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_sami_part_v1(id_,out.data(),out.size());}));
+        DocumentReply snapshot(DocumentDetail::Load(out,0,8));const auto bytes=snapshot.Read();
+        DocumentDetail::Shape(bytes.size()>=40 && (bytes.size()-40)%2==0 && DocumentDetail::Load(bytes,0,4)<=9 && DocumentDetail::Load(bytes,4,4)<=1 && DocumentDetail::Load(bytes,8,4)<=65535 && DocumentDetail::Load(bytes,12,4)==0);
+        accepted=DocumentDetail::Load(bytes,4,4)!=0;unit=static_cast<unsigned>(DocumentDetail::Load(bytes,8,4));position=DocumentDetail::Load(bytes,16,8);
+        start=DocumentDetail::I64(DocumentDetail::Load(bytes,24,8));end=DocumentDetail::I64(DocumentDetail::Load(bytes,32,8));
+        size_t offset=40;text=DocumentDetail::String(bytes,offset,DocumentDetail::Count((bytes.size()-40)/2));return static_cast<unsigned>(DocumentDetail::Load(bytes,0,4));
     }
 };
 class MicroDvdDocument {

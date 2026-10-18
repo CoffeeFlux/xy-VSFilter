@@ -1977,6 +1977,25 @@ static CStringW SMI2SSA(CStringW str, int CharSet)
 
 static bool OpenSami(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    XyRust::SamiDocument parser(*ret.m_document,file->GetPosition());
+    for(;;)
+    {
+        CStringW text;int64_t start,end;bool accepted;uint64_t position;unsigned unit;
+        const unsigned op=parser.Next(text,start,end,accepted,position,unit);
+        if(op==8)return accepted;
+        if(op==9)return false;
+        if(op==0 || op==2 || op==4){CStringW line;const bool eof=!file->ReadString(line);parser.Read(line,eof,op==4);}
+        else if(op==1 || op==5){text.MakeUpper();parser.Upper(text);}
+        else if(op==3){file->Seek(position,CFile::begin);parser.Step(0);}
+        else if(op==6){parser.Step(1,iswdigit(static_cast<WCHAR>(unit))?1:0);}
+        else if(op==7)
+        {
+            ret.Add(SMI2SSA(text,CharSet),file->IsUnicode(),start,end);
+            parser.Step(2);
+        }
+    }
+#else
     CStringW buff, caption;
 
     ULONGLONG pos = file->GetPosition();
@@ -2093,6 +2112,7 @@ static bool OpenSami(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 
 #endif
     return(true);
+#endif
 }
 
 static bool OpenVPlayer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
