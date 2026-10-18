@@ -11,7 +11,9 @@ from document_native_lifecycle import ROOT, PIN, LIBRARIES, SYSTEM_LIBRARIES, fi
 
 SOURCE = ROOT / "tools/compat/usf_document_native.cpp"
 OBSERVER = ROOT / "tools/compat/document_native_lifecycle.cpp"
-CASES = 1212
+LEGACY_CASES = 1212
+RELOAD_CASES = 128
+CASES = LEGACY_CASES + RELOAD_CASES
 
 
 def validate(data, bits):
@@ -24,6 +26,18 @@ def validate(data, bits):
     for index, row in enumerate(rows):
         if not re.fullmatch(f"usf-case index={index} outcome=".encode() + rb"(?:0|1) position=\d+", row):
             raise ValueError("incorrect USF case order/outcome/position")
+    states = [line for line in lines if line.startswith(b"usf-state ")]
+    reloads = [line for line in lines if line.startswith(b"usf-reload ")]
+    if len(states) != RELOAD_CASES * 5 or len(reloads) != RELOAD_CASES:
+        raise ValueError("missing reload state observations")
+    for offset, row in enumerate(states):
+        index, phase = LEGACY_CASES + offset // 5, offset % 5
+        match = re.fullmatch(f"usf-state index={index} phase={phase} bytes=".encode() + rb"(\d+) data=([0-9a-f]+)", row)
+        if not match or int(match[1]) * 2 != len(match[2]) or int(match[1]) < 52:
+            raise ValueError("invalid reload state packet")
+    for offset, row in enumerate(reloads):
+        if not re.fullmatch(f"usf-reload index={LEGACY_CASES + offset} before=".encode() + rb"[01] after=[01]", row):
+            raise ValueError("invalid reload outcomes")
     if lines[-1] != f"usf-complete cases={CASES}".encode():
         raise ValueError("missing USF completion marker")
     if not any(b"outcome=0 " in row for row in rows) or not any(b"outcome=1 " in row for row in rows):
