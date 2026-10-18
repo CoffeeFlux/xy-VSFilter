@@ -270,6 +270,79 @@ pub extern "C" fn xy_vsfilter_document_search_drop_v1(id: u64) -> u32 {
 }
 
 /// # Safety
+/// Bounded initialized raw UTF-16 bytes are copied before admission. Eight
+/// writable output bytes receive an independent typed USF scalar session ID.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_usf_scalar_begin_v1(
+    kind: u32,
+    input: *const u8,
+    length: usize,
+    argument: i32,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    if length % 2 != 0 {
+        return INVALID_INPUT;
+    }
+    if length / 2 > i32::MAX as usize {
+        return COUNT_OVERFLOW;
+    }
+    // SAFETY: initialized bounded bytes copied before any registry loan.
+    let input = units(&required!(unsafe { copy_input(input, length) }));
+    let run = required!(
+        xy_vsfilter_compat::usf_scalar::Run::new(kind, &input, argument).map_err(ass_error)
+    );
+    let id = required!(insert(Resource::UsfScalar(run)));
+    // SAFETY: preflighted output after registry admission has ended.
+    unsafe { write_output(output, &id.to_le_bytes()) };
+    OK
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_usf_scalar_step_v1(
+    id: u64,
+    op: u32,
+    value: i32,
+    consumed: u32,
+) -> u32 {
+    status(admitted(|registry| {
+        registry
+            .usf_scalar_mut(id)
+            .map_err(registry_error)?
+            .step(op, value, consumed)
+            .map_err(ass_error)
+    }))
+}
+/// # Safety
+/// Eight writable bytes receive a detached immutable request/result snapshot.
+/// Layout: op/base/result/a-count/b-count:u32 followed by raw UTF-16 strings.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_usf_scalar_part_v1(
+    id: u64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let bytes = required!(admitted(|registry| registry
+        .usf_scalar_mut(id)
+        .map_err(registry_error)?
+        .snapshot()
+        .map_err(ass_error)));
+    let snapshot = required!(insert(Resource::Snapshot(bytes)));
+    // SAFETY: preflighted output; detached snapshot retains no registry reference.
+    unsafe { write_output(output, &snapshot.to_le_bytes()) };
+    OK
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_usf_scalar_drop_v1(id: u64) -> u32 {
+    status(
+        DOCUMENTS
+            .destroy(id, Kind::UsfScalar)
+            .map_err(registry_error),
+    )
+}
+
+/// # Safety
 /// Bounded initialized USF packet is copied and decoded before registry admission.
 /// Eight writable output bytes receive a document-bound conversion ID. Begin
 /// applies original metadata defaults only after packet and output preflight.
@@ -5267,6 +5340,147 @@ mod tests {
             assert_eq!(xy_vsfilter_document_usf_drop_v1(conversion), OK);
             assert_eq!(xy_vsfilter_document_destroy_v1(destination), OK);
             assert_eq!(xy_vsfilter_document_snapshot_drop_v1(state_snapshot), OK);
+            // USF scalar input is copied; requests survive caller mutation and
+            // detached result snapshots outlive the independent typed session.
+            out.fill(0xa5);
+            let mut scalar_input: Vec<u8> = [49u16, 0, 50, 58, 51]
+                .into_iter()
+                .flat_map(u16::to_le_bytes)
+                .collect();
+            assert_eq!(
+                xy_vsfilter_document_usf_scalar_begin_v1(
+                    1,
+                    scalar_input.as_ptr(),
+                    scalar_input.len(),
+                    0,
+                    out.as_mut_ptr(),
+                    7
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_scalar_begin_v1(
+                    1,
+                    scalar_input.as_ptr(),
+                    scalar_input.len() - 1,
+                    0,
+                    out.as_mut_ptr(),
+                    8
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_scalar_begin_v1(
+                    9,
+                    scalar_input.as_ptr(),
+                    scalar_input.len(),
+                    0,
+                    out.as_mut_ptr(),
+                    8
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_scalar_begin_v1(
+                    1,
+                    scalar_input.as_ptr(),
+                    scalar_input.len(),
+                    1,
+                    out.as_mut_ptr(),
+                    8
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_usf_scalar_begin_v1(
+                        1,
+                        scalar_input.as_ptr(),
+                        scalar_input.len(),
+                        0,
+                        out.as_mut_ptr(),
+                        8
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert!(out.iter().all(|&b| b == 0xa5));
+            assert_eq!(
+                xy_vsfilter_document_usf_scalar_begin_v1(
+                    1,
+                    scalar_input.as_ptr(),
+                    scalar_input.len(),
+                    0,
+                    out.as_mut_ptr(),
+                    8
+                ),
+                OK
+            );
+            let scalar = u64::from_le_bytes(out[..8].try_into().unwrap());
+            scalar_input.fill(0xa5);
+            let unrelated = create();
+            assert_eq!(
+                xy_vsfilter_document_usf_scalar_step_v1(unrelated, 1, 3, 1),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_scalar_drop_v1(unrelated),
+                BAD_HANDLE
+            );
+            assert_eq!(xy_vsfilter_document_destroy_v1(unrelated), OK);
+            assert_eq!(
+                xy_vsfilter_document_usf_scalar_step_v1(scalar, 2, 3, 0),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_scalar_step_v1(scalar, 1, 3, 2),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_usf_scalar_step_v1(scalar, 1, 3, 1))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_scalar_part_v1(scalar, out.as_mut_ptr(), 7),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_scalar_part_v1(scalar, out.as_mut_ptr(), 8),
+                OK
+            );
+            let scalar_request = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let request = read_snapshot(scalar_request);
+            assert_eq!(&request[20..], &[51, 0]);
+            for value in [3, 2, 1] {
+                assert_eq!(
+                    xy_vsfilter_document_usf_scalar_step_v1(scalar, 1, value, 1),
+                    OK
+                );
+            }
+            assert_eq!(
+                xy_vsfilter_document_usf_scalar_step_v1(scalar, 1, 1, 1),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_usf_scalar_part_v1(scalar, out.as_mut_ptr(), 8),
+                OK
+            );
+            let scalar_result = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let result = read_snapshot(scalar_result);
+            assert_eq!(u32::from_le_bytes(result[..4].try_into().unwrap()), 3);
+            assert_eq!(i32::from_le_bytes(result[8..12].try_into().unwrap()), 62003);
+            assert_eq!(xy_vsfilter_document_usf_scalar_drop_v1(scalar), OK);
+            assert_eq!(xy_vsfilter_document_usf_scalar_drop_v1(scalar), BAD_HANDLE);
+            assert_eq!(
+                xy_vsfilter_document_usf_scalar_part_v1(scalar, out.as_mut_ptr(), 8),
+                BAD_HANDLE
+            );
+            assert_eq!(read_snapshot(scalar_result), result);
+            assert_eq!(read_snapshot(scalar_request), request);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(scalar_result), OK);
+            assert_eq!(xy_vsfilter_document_snapshot_drop_v1(scalar_request), OK);
             // WebVTT: copies, phase errors, typed IDs, BUSY, and detached snapshots.
             let vtt_owner = create();
             out.fill(0xa5);

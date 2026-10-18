@@ -246,6 +246,7 @@ class VttDocument;
 class RealTextSession;
 class UsfConversion;
 class UsfSource;
+class UsfScalar;
 class UnknownStylesPass;
 class StyleAddition;
 class NamedStyleCopy;
@@ -261,6 +262,7 @@ class DocumentReply {
     friend class RealTextSession;
     friend class UsfConversion;
     friend class UsfSource;
+    friend class UsfScalar;
     friend class DocumentOwner;
     friend class UnknownStylesPass;
     friend class StyleAddition;
@@ -307,6 +309,7 @@ class DocumentOwner {
     friend class RealTextSession;
     friend class UsfConversion;
     friend class UsfSource;
+    friend class UsfScalar;
     friend class UnknownStylesPass;
     friend class StyleAddition;
     friend class NamedStyleCopy;
@@ -895,6 +898,37 @@ public:
         style=DocumentDetail::StyleValue(Part(1));const auto bytes=Part(2);DocumentDetail::Shape(bytes.size()%2==0);
         size_t offset=0;name=DocumentDetail::String(bytes,offset,DocumentDetail::Count(bytes.size()/2));
         Step(4); // release before AddStyle consumes its native temporary
+    }
+};
+class UsfScalar {
+    uint64_t id_=0;
+    DocumentDetail::Bytes Part() const {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_usf_scalar_part_v1(id_,out.data(),out.size());}));
+        DocumentReply snapshot(DocumentDetail::Load(out,0,8));return snapshot.Read();
+    }
+public:
+    UsfScalar(unsigned kind,const CStringW& input,int argument=0) {
+        const auto bytes=DocumentDetail::Units(input);std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_usf_scalar_begin_v1(kind,bytes.data(),bytes.size(),argument,out.data(),out.size());}));id_=DocumentDetail::Load(out,0,8);
+    }
+    UsfScalar(const UsfScalar&)=delete;UsfScalar& operator=(const UsfScalar&)=delete;
+    ~UsfScalar() noexcept {if(id_){const auto id=id_;id_=0;DocumentDetail::Release(DocumentDetail::Invoke([&]{return xy_vsfilter_document_usf_scalar_drop_v1(id);}));}}
+    int Value() {
+        for(;;){
+            const auto bytes=Part();DocumentDetail::Shape(bytes.size()>=20);
+            const auto op=DocumentDetail::Load(bytes,0,4),base=DocumentDetail::Load(bytes,4,4);
+            size_t offset=20;const CStringW a=DocumentDetail::String(bytes,offset,DocumentDetail::Count(DocumentDetail::Load(bytes,12,4)));
+            const CStringW b=DocumentDetail::String(bytes,offset,DocumentDetail::Count(DocumentDetail::Load(bytes,16,4)));
+            DocumentDetail::Shape(offset==bytes.size() && op>=1 && op<=3);
+            if(op==3)return DocumentDetail::I32(DocumentDetail::Load(bytes,8,4));
+            int value;unsigned consumed=0;
+            if(op==1){
+                DocumentDetail::Shape(base==10 || base==16);WCHAR* end=NULL;
+                value=wcstol(a,&end,static_cast<int>(base));consumed=end>static_cast<LPCWSTR>(a)?1:0;
+            }else value=a.CompareNoCase(b);
+            DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_usf_scalar_step_v1(id_,static_cast<unsigned>(op),value,consumed);}));
+        }
     }
 };
 class UsfSource {

@@ -95,6 +95,9 @@ static CStringW GetAttrib(CStringW attrib, CComPtr<IXMLDOMNode> pNode)
 
 static int TimeToInt(CStringW str)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return XyRust::UsfScalar(1,str,0).Value();
+#else
 	CAtlList<CStringW> sl;
 	int i = 0;
 	for(CStringW token = str.Tokenize(L":.,", i); !token.IsEmpty(); token = str.Tokenize(L":.,", i))
@@ -117,10 +120,14 @@ static int TimeToInt(CStringW str)
 	}
 
 	return(time);
+#endif
 }
 
 static DWORD ColorToDWORD(CStringW str)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return XyRust::UsfScalar(2,str,0).Value();
+#else
 	if(str.IsEmpty()) return(0);
 
 	DWORD ret = 0;
@@ -137,10 +144,14 @@ static DWORD ColorToDWORD(CStringW str)
 	ret = ((ret&0xff)<<16)|(ret&0xff00ff00)|((ret>>16)&0xff);
 
 	return(ret);
+#endif
 }
 
 static int TranslateAlignment(CStringW alignment)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return XyRust::UsfScalar(4,alignment,0).Value();
+#else
 	return
 		!alignment.CompareNoCase(L"BottomLeft") ? 1 :
 		!alignment.CompareNoCase(L"BottomCenter") ? 2 :
@@ -152,10 +163,14 @@ static int TranslateAlignment(CStringW alignment)
 		!alignment.CompareNoCase(L"TopCenter") ? 8 :
 		!alignment.CompareNoCase(L"TopRight") ? 9 :
 		2;
+#endif
 }
 
 static int TranslateMargin(CStringW margin, int wndsize)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return XyRust::UsfScalar(3,margin,wndsize).Value();
+#else
 	int ret = 0;
 
 	if(!margin.IsEmpty())
@@ -165,6 +180,7 @@ static int TranslateMargin(CStringW margin, int wndsize)
 	}
 
 	return(ret);
+#endif
 }
 
 ////////////////

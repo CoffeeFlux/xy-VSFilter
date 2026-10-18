@@ -158,3 +158,4 @@ pub mod realtext_engine;
 
 pub mod usf_conversion;
 pub mod usf_model;
+pub mod usf_scalar;

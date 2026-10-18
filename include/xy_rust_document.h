@@ -279,6 +279,16 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_open_lifecycle_drop_v1(uint64_t 
 // Step command equals op:1 CompareNoCase,2 wcstol10,3 ColorToDWORD,4 Margin,
 // 5 Alignment,6 AddStyle ack0,7 Add ack0. Done8. Group0 op/arg/index/aLen/bLen:u32
 // and raw strings; group1 existing style wire; group2 existing entry wire.
+// USF scalar helpers: kind1 TimeToInt,2 ColorToDWORD,3 TranslateMargin,
+// 4 TranslateAlignment. Only margin accepts a nonzero argument (window size).
+// Snapshot op/base/result/a-count/b-count:u32 followed by raw u16 strings.
+// op1 requests wcstol(base10/16) and a bool consumed-prefix reply; op2 requests
+// CompareNoCase(a,b) with consumed0; op3 is done with result's original bits.
+// CRT services run outside registry admission; the session stores no pointers.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_usf_scalar_begin_v1(uint32_t,const uint8_t*,size_t,int32_t,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_usf_scalar_step_v1(uint64_t,uint32_t,int32_t,uint32_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_usf_scalar_part_v1(uint64_t,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_usf_scalar_drop_v1(uint64_t);
 // Persistent USF source. Only successful XML loads begin a new traversal.
 // Request: op,node,result,text-length:u32 + raw u16. Services: 1 lower name
 // plus nodeValue access; 2 firstChild; 3 nextSibling; 4 attribute; 5 text;

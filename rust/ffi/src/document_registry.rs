@@ -36,6 +36,7 @@ pub(crate) enum Kind {
     RealTextRun,
     UsfRun,
     UsfSource,
+    UsfScalar,
     VttRun,
     SamiRun,
     SearchRun,
@@ -82,6 +83,7 @@ pub(crate) enum Resource {
         run: xy_vsfilter_compat::microdvd_document::Run,
     },
     UsfSource(xy_vsfilter_compat::usf_model::State),
+    UsfScalar(xy_vsfilter_compat::usf_scalar::Run),
     UsfRun {
         owner: Handle,
         source: Option<Handle>,
@@ -120,6 +122,7 @@ impl Resource {
             Self::RealTextRun { .. } => Kind::RealTextRun,
             Self::UsfRun { .. } => Kind::UsfRun,
             Self::UsfSource(_) => Kind::UsfSource,
+            Self::UsfScalar(_) => Kind::UsfScalar,
             Self::VttRun { .. } => Kind::VttRun,
             Self::SamiRun { .. } => Kind::SamiRun,
             Self::SearchRun { .. } => Kind::SearchRun,
@@ -478,6 +481,16 @@ impl Registry {
         }
     }
 
+    pub(crate) fn usf_scalar_mut(
+        &mut self,
+        id: Handle,
+    ) -> Result<&mut xy_vsfilter_compat::usf_scalar::Run, Error> {
+        let index = self.position(id)?;
+        match &mut self.slots[index].1 {
+            Resource::UsfScalar(run) => Ok(run),
+            _ => Err(Error::TypeMismatch),
+        }
+    }
     pub(crate) fn usf_source(
         &self,
         id: Handle,
