@@ -239,6 +239,7 @@ class OpenLifecycle;
 class AssDocument;
 class XombieDocument;
 class TextDocument;
+class MicroDvdDocument;
 class UnknownStylesPass;
 class StyleAddition;
 class NamedStyleCopy;
@@ -248,6 +249,7 @@ class DocumentReply {
     friend class AssDocument;
     friend class XombieDocument;
     friend class TextDocument;
+    friend class MicroDvdDocument;
     friend class DocumentOwner;
     friend class UnknownStylesPass;
     friend class StyleAddition;
@@ -288,6 +290,7 @@ class DocumentOwner {
     friend class AssDocument;
     friend class XombieDocument;
     friend class TextDocument;
+    friend class MicroDvdDocument;
     friend class UnknownStylesPass;
     friend class StyleAddition;
     friend class NamedStyleCopy;
@@ -876,6 +879,44 @@ public:
         style=DocumentDetail::StyleValue(Part(1));const auto bytes=Part(2);DocumentDetail::Shape(bytes.size()%2==0);
         size_t offset=0;name=DocumentDetail::String(bytes,offset,DocumentDetail::Count(bytes.size()/2));
         Step(4); // release before AddStyle consumes its native temporary
+    }
+};
+class MicroDvdDocument {
+    uint64_t id_=0;
+    DocumentDetail::Bytes Part(unsigned group) const {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_microdvd_part_v1(id_,group,out.data(),out.size());}));
+        DocumentReply snapshot(DocumentDetail::Load(out,0,8));return snapshot.Read();
+    }
+public:
+    MicroDvdDocument(const DocumentOwner& owner,int charset) {
+        std::array<uint8_t,8> out{};
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_microdvd_begin_v1(owner.id_,charset,out.data(),out.size());}));id_=DocumentDetail::Load(out,0,8);
+    }
+    MicroDvdDocument(const MicroDvdDocument&)=delete;MicroDvdDocument& operator=(const MicroDvdDocument&)=delete;
+    ~MicroDvdDocument() noexcept {if(id_){const auto id=id_;id_=0;DocumentDetail::Release(DocumentDetail::Invoke([&]{return xy_vsfilter_document_microdvd_drop_v1(id);}));}}
+    void Read(const CStringW& text,bool eof) {
+        const auto bytes=DocumentDetail::Units(text);std::vector<uint8_t> spaces(text.GetLength());
+        for(int i=0;i<text.GetLength();++i)spaces[i]=CStringW::StrTraits::IsSpace(text[i])?1:0;
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_microdvd_read_v1(id_,eof?1:0,bytes.data(),bytes.size(),spaces.data(),spaces.size());}));
+    }
+    void Step(unsigned command,int value,int first=0,int last=0) {
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_microdvd_step_v1(id_,command,value,first,last);}));
+    }
+    void Style(bool success,const CStringW& name,int charset) {
+        const auto bytes=DocumentDetail::Units(name);
+        DocumentDetail::Check(DocumentDetail::Invoke([&]{return xy_vsfilter_document_microdvd_style_v1(id_,success?1:0,charset,bytes.data(),bytes.size());}));
+    }
+    CStringW StyleName() const {
+        const auto bytes=Part(1);DocumentDetail::Shape(bytes.size()%2==0);size_t offset=0;
+        return DocumentDetail::String(bytes,offset,DocumentDetail::Count(bytes.size()/2));
+    }
+    unsigned Next(CStringW& text,int64_t& start,int64_t& end,bool& accepted,int& charset) const {
+        const auto bytes=Part(0);
+        DocumentDetail::Shape(bytes.size()>=32 && (bytes.size()-32)%2==0 && DocumentDetail::Load(bytes,0,4)<=6 && DocumentDetail::Load(bytes,4,4)<=1 && DocumentDetail::Load(bytes,12,4)==0);
+        accepted=DocumentDetail::Load(bytes,4,4)!=0;charset=DocumentDetail::I32(DocumentDetail::Load(bytes,8,4));
+        start=DocumentDetail::I64(DocumentDetail::Load(bytes,16,8));end=DocumentDetail::I64(DocumentDetail::Load(bytes,24,8));
+        size_t offset=32;text=DocumentDetail::String(bytes,offset,DocumentDetail::Count((bytes.size()-32)/2));return static_cast<unsigned>(DocumentDetail::Load(bytes,0,4));
     }
 };
 class TextDocument {

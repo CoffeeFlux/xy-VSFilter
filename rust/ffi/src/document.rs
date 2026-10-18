@@ -270,6 +270,139 @@ pub extern "C" fn xy_vsfilter_document_search_drop_v1(id: u64) -> u32 {
 }
 
 /// # Safety
+/// Output receives a document-bound MicroDVD run ID in eight writable bytes.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_microdvd_begin_v1(
+    owner: u64,
+    charset: i32,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let id = required!(admitted(|registry| {
+        registry.document(owner).map_err(registry_error)?;
+        let id = registry.reserve_insert().map_err(registry_error)?;
+        registry.insert_reserved(
+            id,
+            Resource::MicroDvdRun {
+                owner,
+                run: xy_vsfilter_compat::microdvd_document::Run::new(charset),
+            },
+        );
+        Ok(id)
+    }));
+    // SAFETY: preflighted writable output; no registry loan remains.
+    unsafe { write_output(output, &id.to_le_bytes()) };
+    OK
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_microdvd_drop_v1(id: u64) -> u32 {
+    status(
+        DOCUMENTS
+            .destroy(id, Kind::MicroDvdRun)
+            .map_err(registry_error),
+    )
+}
+/// # Safety
+/// Raw initialized UTF16LE plus one strict-bool whitespace flag per code unit.
+/// Both spans are copied before admission. EOF is !ReadString.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_microdvd_read_v1(
+    id: u64,
+    eof: u32,
+    input: *const u8,
+    length: usize,
+    spaces: *const u8,
+    space_length: usize,
+) -> u32 {
+    if eof > 1 || length % 2 != 0 || space_length != length / 2 {
+        return INVALID_INPUT;
+    }
+    // SAFETY: initialized bounded caller spans, copied before any registry loan.
+    let text = units(&required!(unsafe { copy_input(input, length) }));
+    // SAFETY: same caller-span contract for the whitespace predicates.
+    let spaces = required!(unsafe { copy_input(spaces, space_length) });
+    status(admitted(|registry| {
+        let (doc, run) = registry.microdvd_pair(id).map_err(registry_error)?;
+        run.read(doc, &text, &spaces, eof != 0).map_err(ass_error)
+    }))
+}
+/// Commands0/1 supply primary/fallback scanf count and initialized values.
+/// Fallback count is BEFORE legacy +1; only count1 supplies first. Command2
+/// acknowledges Add and requires zero scalars. No partial native locals cross.
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_document_microdvd_step_v1(
+    id: u64,
+    command: u32,
+    value: i32,
+    first: i32,
+    last: i32,
+) -> u32 {
+    if command > 2
+        || (command == 1 && last != 0)
+        || (command == 2 && (value != 0 || first != 0 || last != 0))
+    {
+        return INVALID_INPUT;
+    }
+    status(admitted(|registry| {
+        let (doc, run) = registry.microdvd_pair(id).map_err(registry_error)?;
+        match command {
+            0 => run.primary(doc, value, first, last),
+            1 => run.fallback(doc, value, first),
+            2 => run.acknowledge(),
+            _ => unreachable!(),
+        }
+        .map_err(ass_error)
+    }))
+}
+/// # Safety
+/// Initialized raw UTF16LE normalized style name, copied before admission.
+/// Success acknowledges completed native AddStyle; charset is captured before
+/// AddStyle can destroy the native style adapter. Failure requires empty name
+/// and zero charset. No native style pointer crosses or is retained.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_microdvd_style_v1(
+    id: u64,
+    success: u32,
+    charset: i32,
+    input: *const u8,
+    length: usize,
+) -> u32 {
+    if success > 1 || length % 2 != 0 || (success == 0 && (length != 0 || charset != 0)) {
+        return INVALID_INPUT;
+    }
+    // SAFETY: initialized bounded caller span; copied before mutation/admission.
+    let name = units(&required!(unsafe { copy_input(input, length) }));
+    status(admitted(|registry| {
+        let (_, run) = registry.microdvd_pair(id).map_err(registry_error)?;
+        run.style(success != 0, &name, charset).map_err(ass_error)
+    }))
+}
+/// # Safety
+/// Output receives immutable snapshot ID in eight writable bytes. Group0 is
+/// op/accepted/charset/reserved:u32[4],start/end:i64,raw UTF16LE. Group1 is raw
+/// UTF16LE candidate style name during Style, current name otherwise.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_document_microdvd_part_v1(
+    id: u64,
+    group: u32,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    required!(output_capacity(output, capacity, 8));
+    let bytes = required!(admitted(|registry| registry
+        .microdvd_pair(id)
+        .map_err(registry_error)?
+        .1
+        .snapshot(group)
+        .map_err(ass_error)));
+    let snapshot = required!(insert(Resource::Snapshot(bytes)));
+    // SAFETY: preflighted output; independent snapshot owns all result bytes.
+    unsafe { write_output(output, &snapshot.to_le_bytes()) };
+    OK
+}
+
+/// # Safety
 /// Output receives a document-bound text parser run ID in eight writable bytes.
 /// Formats:0 SubRip,1 MPL2,2 OldSubRip,3 VPlayer. No constructor mutation.
 #[no_mangle]
@@ -3900,6 +4033,184 @@ mod tests {
                 assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
             }
             assert_eq!(xy_vsfilter_document_destroy_v1(pipe_owner), OK);
+            let micro_owner = create();
+            out.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_document_microdvd_begin_v1(micro_owner, 128, out.as_mut_ptr(), 7),
+                INVALID_INPUT
+            );
+            assert_eq!(out, [0xa5; 16]);
+            assert_eq!(
+                xy_vsfilter_document_microdvd_begin_v1(micro_owner, 128, out.as_mut_ptr(), 8),
+                OK
+            );
+            let micro_run = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let mut raw: Vec<u8> = "{STYLE}{h:0}"
+                .encode_utf16()
+                .flat_map(u16::to_le_bytes)
+                .collect();
+            let spaces = alloc::vec![0;raw.len()/2];
+            assert_eq!(
+                xy_vsfilter_document_microdvd_read_v1(
+                    micro_run,
+                    2,
+                    raw.as_ptr(),
+                    raw.len(),
+                    spaces.as_ptr(),
+                    spaces.len()
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_microdvd_read_v1(
+                    micro_owner,
+                    0,
+                    raw.as_ptr(),
+                    raw.len(),
+                    spaces.as_ptr(),
+                    spaces.len()
+                ),
+                BAD_HANDLE
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_microdvd_read_v1(
+                        micro_run,
+                        0,
+                        raw.as_ptr(),
+                        raw.len(),
+                        spaces.as_ptr(),
+                        spaces.len()
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                xy_vsfilter_document_microdvd_read_v1(
+                    micro_run,
+                    0,
+                    raw.as_ptr(),
+                    raw.len(),
+                    spaces.as_ptr(),
+                    spaces.len()
+                ),
+                OK
+            );
+            raw.fill(0);
+            assert_eq!(
+                xy_vsfilter_document_microdvd_step_v1(micro_run, 1, 0, 0, 0),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_microdvd_step_v1(micro_run, 0, 3, 0, 0),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_microdvd_step_v1(micro_run, 0, 0, 0, 0),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_microdvd_step_v1(micro_run, 1, 0, 0, 1),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_microdvd_step_v1(micro_run, 1, 0, 0, 0),
+                OK
+            );
+            assert_eq!(
+                xy_vsfilter_document_microdvd_part_v1(micro_run, 2, out.as_mut_ptr(), 8),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_microdvd_part_v1(micro_run, 1, out.as_mut_ptr(), 8),
+                OK
+            );
+            let name_snapshot = u64::from_le_bytes(out[..8].try_into().unwrap());
+            assert_eq!(
+                read_snapshot(name_snapshot),
+                "STYLE"
+                    .encode_utf16()
+                    .flat_map(u16::to_le_bytes)
+                    .collect::<Vec<_>>()
+            );
+            assert_eq!(
+                xy_vsfilter_document_microdvd_part_v1(micro_run, 0, out.as_mut_ptr(), 8),
+                OK
+            );
+            let micro_snapshot = u64::from_le_bytes(out[..8].try_into().unwrap());
+            let retained = read_snapshot(micro_snapshot);
+            assert_eq!(retained[0], 3);
+            assert_eq!(retained[8], 128);
+            assert_eq!(
+                &retained[32..],
+                &"{h:0}"
+                    .encode_utf16()
+                    .flat_map(u16::to_le_bytes)
+                    .collect::<Vec<_>>()
+            );
+            let mut name: Vec<u8> = "Style".encode_utf16().flat_map(u16::to_le_bytes).collect();
+            assert_eq!(
+                xy_vsfilter_document_microdvd_style_v1(micro_run, 2, 0, name.as_ptr(), name.len()),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_microdvd_style_v1(micro_run, 0, 0, name.as_ptr(), name.len()),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                xy_vsfilter_document_microdvd_style_v1(
+                    micro_run,
+                    1,
+                    0,
+                    name.as_ptr(),
+                    name.len() - 1
+                ),
+                INVALID_INPUT
+            );
+            assert_eq!(
+                DOCUMENTS
+                    .try_with(|_| xy_vsfilter_document_microdvd_style_v1(
+                        micro_run,
+                        1,
+                        0,
+                        name.as_ptr(),
+                        name.len()
+                    ))
+                    .unwrap(),
+                BUSY
+            );
+            assert_eq!(
+                xy_vsfilter_document_microdvd_style_v1(micro_run, 1, 0, name.as_ptr(), name.len()),
+                OK
+            );
+            name.fill(0);
+            assert_eq!(
+                xy_vsfilter_document_microdvd_part_v1(micro_run, 1, out.as_mut_ptr(), 8),
+                OK
+            );
+            let current_name = u64::from_le_bytes(out[..8].try_into().unwrap());
+            assert_eq!(
+                read_snapshot(current_name),
+                "Style"
+                    .encode_utf16()
+                    .flat_map(u16::to_le_bytes)
+                    .collect::<Vec<_>>()
+            );
+            assert_eq!(
+                xy_vsfilter_document_microdvd_step_v1(micro_run, 2, 0, 0, 0),
+                INVALID_INPUT
+            );
+            assert_eq!(xy_vsfilter_document_destroy_v1(micro_owner), OK);
+            assert_eq!(
+                xy_vsfilter_document_microdvd_part_v1(micro_run, 0, out.as_mut_ptr(), 8),
+                BAD_HANDLE
+            );
+            assert_eq!(read_snapshot(micro_snapshot), retained);
+            assert_eq!(xy_vsfilter_document_microdvd_drop_v1(micro_run), OK);
+            assert_eq!(xy_vsfilter_document_microdvd_drop_v1(micro_run), BAD_HANDLE);
+            for snapshot in [micro_snapshot, name_snapshot, current_name] {
+                assert_eq!(xy_vsfilter_document_snapshot_drop_v1(snapshot), OK);
+            }
             let simple_owner = create();
             let mut simple_out = [0xa5; 4];
             assert_eq!(

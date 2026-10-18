@@ -1683,6 +1683,43 @@ static CStringW MicroDVD2SSA(CStringW str, bool fUnicode, int CharSet)
 
 static bool OpenMicroDVD(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    XyRust::MicroDvdDocument parser(*ret.m_document,CharSet);
+    for(;;)
+    {
+        CStringW text;int64_t start,end;bool accepted;int charset;
+        const unsigned op=parser.Next(text,start,end,accepted,charset);
+        if(op==5)return accepted;
+        if(op==6)return false;
+        if(op==0){CStringW line;const bool eof=!file->ReadString(line);parser.Read(line,eof);}
+        else if(op==1)
+        {
+            int first,last;const int count=swscanf_s(text,L"{%d}{%d}",&first,&last);
+            parser.Step(0,count,count==2?first:0,count==2?last:0);
+        }
+        else if(op==2)
+        {
+            int first;const int count=swscanf_s(text,L"{%d}{}",&first);
+            parser.Step(1,count,count==1?first:0);
+        }
+        else if(op==3)
+        {
+            std::unique_ptr<STSStyle> value(GetMicroDVDStyle(text,charset));
+            if(!value){parser.Style(false,CStringW(),0);continue;}
+            CString name=parser.StyleName();name.MakeUpper();
+            if(name.GetLength()){CString tail=name.Mid(1);tail.MakeLower();name=name.Left(1)+tail;}
+            const int nextCharSet=value->charSet;
+            ret.AddStyle(name,value.release());
+            parser.Style(true,name,nextCharSet);
+        }
+        else if(op==4)
+        {
+            const CString style=parser.StyleName();
+            ret.Add(MicroDVD2SSA(text,file->IsUnicode(),charset),file->IsUnicode(),start,end,style);
+            parser.Step(2,0);
+        }
+    }
+#else
     bool fCheck = false, fCheck2 = false;
 
     CString style(_T("Default"));
@@ -1753,6 +1790,7 @@ static bool OpenMicroDVD(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
     }
 
     return(!ret.IsEmpty());
+#endif
 }
 
 static void ReplaceNoCase(CStringW& str, CStringW from, CStringW to)

@@ -271,6 +271,18 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_open_lifecycle_drop_v1(uint64_t 
 // Invalid protocol/capacity leaves the run, document and output untouched;
 // absent opposite screen axis reports UNRESOLVED_REFERENCE. No native loans
 // or callbacks survive a call. Drop remains valid after document destruction.
+// Checked MicroDVD session. Read supplies raw UTF16LE and strict-bool whitespace.
+// Step0 primary scan,1 fallback scan BEFORE +1,2 Add ack (zero scalars).
+// Style acknowledges native AddStyle with copied normalized name and charset.
+// Part0: op/accepted/charset/reserved:u32[4],start/end:i64,raw UTF16LE.
+// Ops: Read0/Primary1/Fallback2/Style3/Emit4/Done5/Failed6.
+// Part1: raw UTF16LE candidate name during Style, current style otherwise.
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_microdvd_begin_v1(uint64_t,int32_t,uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_microdvd_drop_v1(uint64_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_microdvd_read_v1(uint64_t,uint32_t,const uint8_t*,size_t,const uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_microdvd_step_v1(uint64_t,uint32_t,int32_t,int32_t,int32_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_microdvd_style_v1(uint64_t,uint32_t,int32_t,const uint8_t*,size_t);
+uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_microdvd_part_v1(uint64_t,uint32_t,uint8_t*,size_t);
 // Checked text-parser session:0 SubRip/1 MPL2/2 OldSubRip/3 VPlayer. Read supplies EOF,
 // raw UTF16LE and strict-bool CString predicates. Step0 supplies scanf count
 // and eight initialized i32 LE values; step1 numeric-only bool; step2 Add ack.
