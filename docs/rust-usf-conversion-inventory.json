@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+  "validation_manifest_commit": "c11992cc6cab274b5efd3a515d8d0f92c7d345fc",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "Safe Rust USF style/subtitle conversion orchestration, imported value ownership and prepared output assembly; XML parsing and canonical parsed-result ownership remain native.",
+  "production_sources": {
+    "rust/compat/src/usf_conversion.rs": "e70fc853bdb2a890612c9b29124f6b57f866f3d5963940dc783f51898556e941",
+    "rust/compat/src/ass_style_value.rs": "22000e28d7dfa3635ff9fb3ee19724a84147e69e5faba42599f0e95a0f2ec928",
+    "rust/compat/src/document_style.rs": "bdfffedb13b7a46798cba530243f68f3b2e46247fac1cd5831fbd126389e5378",
+    "rust/compat/src/document_wire.rs": "68b38639e50514ae7b95f181d9f330e34d63629555ae2b046a10a447dbe8be27",
+    "rust/compat/src/lib.rs": "62bac83e39fc28b1a35073bf4de35abb131860c7d30742385bc3d5ad6d5d2af8",
+    "rust/ffi/src/document.rs": "ccc3e9dd893ef0cc8059d14ccc97acfdb0ed494054cf13cdb770ba9a4de5c3b8",
+    "rust/ffi/src/document_registry.rs": "89f335093bced1e9f7fd61ff51abdfe5add3cc03a79d1f7ee1c0735714cd2c6a",
+    "include/xy_rust_document.h": "b5fdcc1333fd658e9e591da21398e20d80f7e62d85a6b22e92dcf32494b4edcf",
+    "src/subtitles/RustDocumentOwner.h": "bcfa1bcbcf11d88417ce211043b1ff7b748d85ebe2bcf9ff520e5275411a339f",
+    "src/subtitles/STS.h": "ff87bd166ff435130cf3d0140bcc24c3aafccac3a6da8fa5de78b078678b8b38",
+    "src/subtitles/USFSubtitles.cpp": "76d1115bf003ea327d1a973952cf57f54fd28841c83c3e601accbcb5afb691f3",
+    "src/subtitles/USFSubtitles.h": "4c120ac34c52c6dbf7c111492c32e4597080616a7f515d6341d4cf545f868036"
+  },
+  "reference_sources": {
+    "src/subtitles/USFSubtitles.cpp": "85df63bd57900a62a4900058f02affdefe388834b5b4ac4cc95b5fd7f95873c6",
+    "src/subtitles/USFSubtitles.h": "4c120ac34c52c6dbf7c111492c32e4597080616a7f515d6341d4cf545f868036",
+    "src/subtitles/STS.cpp": "2616b67db84f7329ac6e2363a3f03d61977fa07c37ed9c04d32ec2b1197f31e0",
+    "src/subtitles/STS.h": "57dc87a3de9470ca04adc007c175956bd4acfddcb720324886bb4a2c7699080b"
+  },
+  "operations": [
+    {
+      "operation": "Checked imported values",
+      "source": {
+        "path": "rust/compat/src/usf_conversion.rs",
+        "line": 308,
+        "sha256": "e70fc853bdb2a890612c9b29124f6b57f866f3d5963940dc783f51898556e941"
+      },
+      "behavior": "Raw counted UTF16 language, ordered style records and text records are copied into Rust before conversion. Counts and minimum record sizes are checked before vector growth, every string is bounded and trailing bytes are rejected. Native DOM values, CStrings, lists and pointers are never borrowed across the registry boundary."
+    },
+    {
+      "operation": "Metadata and style construction",
+      "source": {
+        "path": "rust/compat/src/usf_conversion.rs",
+        "line": 368,
+        "sha256": "e70fc853bdb2a890612c9b29124f6b57f866f3d5963940dc783f51898556e941"
+      },
+      "behavior": "Rust applies language name, UTF8, screen640x480, scaledBAS and wrap1 in original order. It owns default style values, margins, alignment/relative choice, font fields, rotation, colors and alpha composition. Alpha first truncates wcstol to BYTE then clamps its nonnegative percentage to100; integer to f64 conversion is exact for i32. Later case-insensitive Default styles may overwrite global wrap."
+    },
+    {
+      "operation": "Conversion control and service order",
+      "source": {
+        "path": "rust/compat/src/usf_conversion.rs",
+        "line": 408,
+        "sha256": "e70fc853bdb2a890612c9b29124f6b57f866f3d5963940dc783f51898556e941"
+      },
+      "behavior": "Styles are converted and handed to AddStyle before captions. Native comparisons and numeric/color/margin/alignment services are requested at the original conditions, including per-color alpha conversion and unconditional text rotation conversion. Document screen dimensions/wrap are read live after host callbacks."
+    },
+    {
+      "operation": "Prepared subtitle assembly",
+      "source": {
+        "path": "rust/compat/src/usf_conversion.rs",
+        "line": 554,
+        "sha256": "e70fc853bdb2a890612c9b29124f6b57f866f3d5963940dc783f51898556e941"
+      },
+      "behavior": "Rust owns alignment/rotation/wrap prefix composition, zero-based text margins, first exact-name/nonempty-wrap style lookup and prepared raw text. Caption rotations prepend z then x then y, so visible prefix order reverses. Case-insensitive Default bypasses named-wrap lookup, while named lookup uses CString-style first-NUL exact comparison. Native USF start/stop i32 values widen directly to i64 ticks without MS2RT. Effect parsing does not make effects active; the original Add receives empty actor/effect."
+    },
+    {
+      "operation": "Repeated conversion state",
+      "source": {
+        "path": "src/subtitles/USFSubtitles.cpp",
+        "line": 265,
+        "sha256": "76d1115bf003ea327d1a973952cf57f54fd28841c83c3e601accbcb5afb691f3"
+      },
+      "behavior": "The native adapter updates the source text before Add, preserving accumulating prefixes on repeated conversion and after failed XML reloads. It materializes one copied style/entry and calls AddStyle/Add outside registry admission. Existing native XML loading/traversal/storage and fallback converter remain in scope."
+    }
+  ],
+  "boundary_review": {
+    "source": {
+      "path": "rust/ffi/src/document.rs",
+      "line": 277,
+      "sha256": "ccc3e9dd893ef0cc8059d14ccc97acfdb0ed494054cf13cdb770ba9a4de5c3b8"
+    },
+    "registry": {
+      "path": "rust/ffi/src/document_registry.rs",
+      "line": 477,
+      "sha256": "89f335093bced1e9f7fd61ff51abdfe5add3cc03a79d1f7ee1c0735714cd2c6a"
+    },
+    "exports": [
+      "xy_vsfilter_document_usf_begin_v1",
+      "xy_vsfilter_document_usf_step_v1",
+      "xy_vsfilter_document_usf_part_v1",
+      "xy_vsfilter_document_usf_drop_v1"
+    ],
+    "contract": "Typed never-reused document-bound IDs, nonblocking admission, input copied/decoded before admission, output capacity preflight before mutation/publication. Scalar command must match pending op; AddStyle/Add acknowledgements require0. Immutable snapshots use checked existing style/entry codecs and outlive run/parent. No native pointer retained in Rust.",
+    "unsafe_delta": {
+      "extern_unsafe_functions": 2,
+      "unsafe_blocks": 3,
+      "new_raw_slice_constructors": 0,
+      "native_pointer_owners_in_rust_session": 0
+    },
+    "tests": "Malformed/truncated/overflow/trailing input, caller-buffer mutation, raw NUL/surrogate text, phase refusal, BUSY, wrong-kind/stale IDs, output capacity/atomicity, parent-drop snapshots, alpha truncation, zero-weight fallback, live dimensions, prefix ordering, unchanged raw times, later-default wrap and first matching named wrap."
+  },
+  "direct_probe": {
+    "source": {
+      "path": "tools/compat/usf_document_native.cpp",
+      "line": 9,
+      "sha256": "74af3e803a86df3223bebf65ba668992c244428a7ae673fa4f83c5553ee6d930"
+    },
+    "cases": 1212,
+    "trace_lines": 11461,
+    "baseline_commit": "27c8af223f55d62a972b7e4f3509332227db5b27",
+    "method": "Actual selected STS.cpp OpenUSF and USFSubtitles.cpp, linked initialized document observer and native libraries, COM apartment initialized. Two reference and two candidate runs compare complete outcomes, byte positions, metadata, styles, entries and segments. Baseline/post-port traces must be byte-identical.",
+    "coverage": "Root marker casing/rejection, empty accepted documents, missing timing fields,20x20 time combinations,18 font variants x8 position variants, style inheritance/duplicate defaults/exact names, named wrapping, repeated ConvertToSTS, invalid reload followed by conversion, inline XML text/entities/fonts, karaoke/br and raw Unicode units. Empty/preloaded document cases."
+  },
+  "limits": [
+    "Experimental ConvertToSTS path only. No production switch, USF format closure or full-library completion.",
+    "CUSFSubtitles still owns native XML metadata/styles/effects/texts. The checked conversion session imports independent copies; native text values are updated before Add for repeated conversion. MSXML loading/traversal, style inheritance, inline text parsing and parsed-result ownership remain required port work.",
+    "CompareNoCase, wcstol, ColorToDWORD, TranslateMargin, TranslateAlignment, AddStyle and Add remain native callback services. Raw Rust values and integer IDs replace no public host ABI; all host adapters and fallback implementations remain transitional.",
+    "Finite Windows MSVC14.44 x86/x64 evidence. No allocation/reentry failure, COM or file-I/O fault injection, locale mutation, uninitialized document fields, non-Windows whole-renderer or Miri parity claim.",
+    "The imported source list is stable during conversion in these probes. Arbitrary concurrent native edits to source parser lists or exceptional partial mutation require separate evidence before closure.",
+    "Crashes, hangs and nondeterministic results remain unresolved, never equality. The SubViewer missing-style investigation remains unresolved; renderer, every format/host and vendored code remain in the full Rust objective."
+  ],
+  "next_work": [
+    "Move USF XML traversal, metadata/styles/effects/texts and inheritance into safe Rust-owned storage; keep system MSXML behavior through an audited Rust COM boundary at the final endpoint.",
+    "Replace remaining USF scalar helpers and native text mutation/host callbacks; preserve tiny tick intervals and repeat-conversion effects rather than correcting them.",
+    "Continue unresolved SubViewer reference investigation and complete renderer/host/vendored migration."
+  ]
+}

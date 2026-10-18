@@ -1,0 +1,1099 @@
+{
+  "schema": 1,
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+  "prior_increment": "a26ec925",
+  "scope": "Safe Rust USF style/subtitle conversion orchestration, imported value ownership and prepared output assembly; XML parsing and canonical parsed-result ownership remain native.",
+  "validation_manifest_commit": "c11992cc6cab274b5efd3a515d8d0f92c7d345fc",
+  "configuration": {
+    "native": "Release, RustTextDecoder=true, RustDocumentOwnerExperimental=true",
+    "rust": "1.85.0; native-runtime with +crt-static",
+    "msvc": "14.44.35207",
+    "sdk": "10.0.26100.0"
+  },
+  "architectures": {
+    "x64": {
+      "corpus": {
+        "report": "artifacts/usf-host-csri-x64/summary.json",
+        "sha256": "fa86586cb7645bd2031490b6d6e1e885440604dbea59c1e9d1ce826856410157",
+        "complete": true,
+        "frames": 11066,
+        "distinct_controls": 116,
+        "partition_exact": true,
+        "cases": 1034,
+        "shards": [
+          {
+            "report": "artifacts/usf-host-csri-x64/shard-0/report.json",
+            "sha256": "9cbd2fcbf809373c5f995c761d6fb5eb1248f7be30f500e5e0bfd13bfe0074e1",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1410,
+            "cases": 130
+          },
+          {
+            "report": "artifacts/usf-host-csri-x64/shard-1/report.json",
+            "sha256": "383aa18c94cdfaae2dc00bead6548e1efaa728490702f2df2d0dd36f0c7fed29",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1410,
+            "cases": 130
+          },
+          {
+            "report": "artifacts/usf-host-csri-x64/shard-2/report.json",
+            "sha256": "cfc8283b8d316dd11b5e4e15bf12da3050f4ebaf4095ce4f93126deb54e07ba8",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1381,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-host-csri-x64/shard-3/report.json",
+            "sha256": "9216376cb23c00b575ca26293cab8faf43b17676b04827ce599986ac307cd917",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1369,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-host-csri-x64/shard-4/report.json",
+            "sha256": "77ae6b525bfc86ec6f0b450efa3a273def6b07824bd0a042f71ac701461c8c53",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1370,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-host-csri-x64/shard-5/report.json",
+            "sha256": "e8b383aea8170605c42826951687aa815c366ab9c052caa031be73be24727e7f",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1370,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-host-csri-x64/shard-6/report.json",
+            "sha256": "b2053a3d66ea6810a27026d0a982bfd6ee37397abae6d126dc4c00a71c7c31c8",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1372,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-host-csri-x64/shard-7/report.json",
+            "sha256": "885b6556392ad663dd4e3af6553ccaf1dd0411af084c6af6ecc25c65a1e11f0f",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1384,
+            "cases": 129
+          }
+        ],
+        "source_manifest_sha256": "978c916d653a72dc94b8ee558c26da645a68475fe211c9b00c90c7a597ebb84a",
+        "partition_driver_sha256": "483799255b82c6152d5ed05288000c8c3a6db5e03075359d9eab54ac7dc2bce5"
+      },
+      "new_usf_rendering": {
+        "cases": 60,
+        "uninitialized_com_rejections": 20,
+        "initialized_sta_mta_cases": 40,
+        "frames": 480,
+        "distinct_controls": 12,
+        "ids": [
+          "usf-conversion-alpha-file",
+          "usf-conversion-alpha-file-mta",
+          "usf-conversion-alpha-file-sta",
+          "usf-conversion-alpha-memory",
+          "usf-conversion-alpha-memory-mta",
+          "usf-conversion-alpha-memory-sta",
+          "usf-conversion-control-file",
+          "usf-conversion-control-file-mta",
+          "usf-conversion-control-file-sta",
+          "usf-conversion-control-memory",
+          "usf-conversion-control-memory-mta",
+          "usf-conversion-control-memory-sta",
+          "usf-conversion-duplicate-default-file",
+          "usf-conversion-duplicate-default-file-mta",
+          "usf-conversion-duplicate-default-file-sta",
+          "usf-conversion-duplicate-default-memory",
+          "usf-conversion-duplicate-default-memory-mta",
+          "usf-conversion-duplicate-default-memory-sta",
+          "usf-conversion-inheritance-file",
+          "usf-conversion-inheritance-file-mta",
+          "usf-conversion-inheritance-file-sta",
+          "usf-conversion-inheritance-memory",
+          "usf-conversion-inheritance-memory-mta",
+          "usf-conversion-inheritance-memory-sta",
+          "usf-conversion-inline-font-file",
+          "usf-conversion-inline-font-file-mta",
+          "usf-conversion-inline-font-file-sta",
+          "usf-conversion-inline-font-memory",
+          "usf-conversion-inline-font-memory-mta",
+          "usf-conversion-inline-font-memory-sta",
+          "usf-conversion-italic-file",
+          "usf-conversion-italic-file-mta",
+          "usf-conversion-italic-file-sta",
+          "usf-conversion-italic-memory",
+          "usf-conversion-italic-memory-mta",
+          "usf-conversion-italic-memory-sta",
+          "usf-conversion-margin-file",
+          "usf-conversion-margin-file-mta",
+          "usf-conversion-margin-file-sta",
+          "usf-conversion-margin-memory",
+          "usf-conversion-margin-memory-mta",
+          "usf-conversion-margin-memory-sta",
+          "usf-conversion-named-wrap-file",
+          "usf-conversion-named-wrap-file-mta",
+          "usf-conversion-named-wrap-file-sta",
+          "usf-conversion-named-wrap-memory",
+          "usf-conversion-named-wrap-memory-mta",
+          "usf-conversion-named-wrap-memory-sta",
+          "usf-conversion-rotation-file",
+          "usf-conversion-rotation-file-mta",
+          "usf-conversion-rotation-file-sta",
+          "usf-conversion-rotation-memory",
+          "usf-conversion-rotation-memory-mta",
+          "usf-conversion-rotation-memory-sta",
+          "usf-conversion-xml-text-file",
+          "usf-conversion-xml-text-file-mta",
+          "usf-conversion-xml-text-file-sta",
+          "usf-conversion-xml-text-memory",
+          "usf-conversion-xml-text-memory-mta",
+          "usf-conversion-xml-text-memory-sta"
+        ],
+        "included_in_full_corpus": true
+      },
+      "usf_parser": {
+        "report": "artifacts/usf-final-x64/report.json",
+        "sha256": "b21d228a7c15948265f54afb00149be4f8adfd8c4e66007a4b88397ea8713a42",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+        "trace_lines": 11461,
+        "inputs_unchanged": true,
+        "cases": 1212
+      },
+      "baseline_usf_parser": {
+        "report": "artifacts/usf-baseline-x64/report.json",
+        "sha256": "4766d333890dba69a829ef6806dc11b1bc4028bbb9844d859900891bcf3f2a6c",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "27c8af223f55d62a972b7e4f3509332227db5b27",
+        "trace_lines": 11461,
+        "inputs_unchanged": true,
+        "cases": 1212
+      },
+      "baseline_traces_preserved": true,
+      "initial_full_run": {
+        "report": "artifacts/usf-final-csri-x64/summary.json",
+        "sha256": "0e761b72ef62b3538700ed952348daeff9bda7bcf765a9ea26d09cf05e1cb708",
+        "complete": false,
+        "frames": 10586,
+        "distinct_controls": 110,
+        "partition_exact": true,
+        "cases": 994,
+        "all_individual_cases_equal": true,
+        "controls_passed": false,
+        "failed_controls": [
+          {
+            "candidate": false,
+            "cases": [
+              "usf-conversion-italic-file",
+              "usf-conversion-control-file"
+            ],
+            "reference-0": false
+          },
+          {
+            "candidate": false,
+            "cases": [
+              "usf-conversion-margin-file",
+              "usf-conversion-control-file"
+            ],
+            "reference-0": false
+          },
+          {
+            "candidate": false,
+            "cases": [
+              "usf-conversion-rotation-file",
+              "usf-conversion-control-file"
+            ],
+            "reference-0": false
+          },
+          {
+            "candidate": false,
+            "cases": [
+              "usf-conversion-italic-memory",
+              "usf-conversion-control-memory"
+            ],
+            "reference-0": false
+          },
+          {
+            "candidate": false,
+            "cases": [
+              "usf-conversion-margin-memory",
+              "usf-conversion-control-memory"
+            ],
+            "reference-0": false
+          },
+          {
+            "candidate": false,
+            "cases": [
+              "usf-conversion-rotation-memory",
+              "usf-conversion-control-memory"
+            ],
+            "reference-0": false
+          }
+        ],
+        "usf_open_rejected_cases": [
+          "usf-conversion-alpha-file",
+          "usf-conversion-alpha-memory",
+          "usf-conversion-control-file",
+          "usf-conversion-control-memory",
+          "usf-conversion-duplicate-default-file",
+          "usf-conversion-duplicate-default-memory",
+          "usf-conversion-inheritance-file",
+          "usf-conversion-inheritance-memory",
+          "usf-conversion-inline-font-file",
+          "usf-conversion-inline-font-memory",
+          "usf-conversion-italic-file",
+          "usf-conversion-italic-memory",
+          "usf-conversion-margin-file",
+          "usf-conversion-margin-memory",
+          "usf-conversion-named-wrap-file",
+          "usf-conversion-named-wrap-memory",
+          "usf-conversion-rotation-file",
+          "usf-conversion-rotation-memory",
+          "usf-conversion-xml-text-file",
+          "usf-conversion-xml-text-memory"
+        ],
+        "shards": [
+          {
+            "report": "artifacts/usf-final-csri-x64/shard-0/report.json",
+            "sha256": "922401de633885dce5167c4f2e305445bc6eeec066c0dbcfc41ee2b035899920",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1352,
+            "cases": 125
+          },
+          {
+            "report": "artifacts/usf-final-csri-x64/shard-1/report.json",
+            "sha256": "55aa91897cb3023d2c2218f9c6681153a8c9bc4e577f6a6f5e1deb0eb7b829cc",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1352,
+            "cases": 125
+          },
+          {
+            "report": "artifacts/usf-final-csri-x64/shard-2/report.json",
+            "sha256": "d9d6f4e5a566fcd5f1b30d10aa2f5f8452db75e342a70bbd6e0acd03ba1918c8",
+            "complete": true,
+            "passed": false,
+            "rendered_frames": 1301,
+            "cases": 124
+          },
+          {
+            "report": "artifacts/usf-final-csri-x64/shard-3/report.json",
+            "sha256": "84c10d9d49220be54963d376ecfbf034468d1e6e8aacf8abe732eb51cbf6a9f6",
+            "complete": true,
+            "passed": false,
+            "rendered_frames": 1301,
+            "cases": 124
+          },
+          {
+            "report": "artifacts/usf-final-csri-x64/shard-4/report.json",
+            "sha256": "62fd9863aa427de8604e4541febdc9a01ece5968d5491ae8ceec1f84ac25bc4e",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1296,
+            "cases": 124
+          },
+          {
+            "report": "artifacts/usf-final-csri-x64/shard-5/report.json",
+            "sha256": "efd836f8afce4a4aaaa3a1efc92beb3214e15c08171101ebb17a2013d5d69198",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1296,
+            "cases": 124
+          },
+          {
+            "report": "artifacts/usf-final-csri-x64/shard-6/report.json",
+            "sha256": "92ab826f0a52ff5b93355f29047e73db42d8168cbbc43ec0b4bc57c9accd57aa",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1344,
+            "cases": 124
+          },
+          {
+            "report": "artifacts/usf-final-csri-x64/shard-7/report.json",
+            "sha256": "b6acfa482d0d03dff4fa50ddacc10b792a59585253feb4f3f317f8405ac64a6b",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1344,
+            "cases": 124
+          }
+        ],
+        "not_a_passing_gate": true
+      },
+      "exploratory_sta_run": {
+        "report": "artifacts/usf-com-x64/report.json",
+        "sha256": "a540d8a56279247dda41ee1886078599f2567b722775de27914565c17fd8029d",
+        "complete": true,
+        "passed": false,
+        "rendered_frames": 240,
+        "cases": 20,
+        "not_a_passing_gate": true,
+        "failed_rotation_controls": [
+          {
+            "candidate": false,
+            "cases": [
+              "usf-conversion-rotation-file",
+              "usf-conversion-control-file"
+            ],
+            "reference-0": false
+          },
+          {
+            "candidate": false,
+            "cases": [
+              "usf-conversion-rotation-memory",
+              "usf-conversion-control-memory"
+            ],
+            "reference-0": false
+          }
+        ],
+        "driver_sha256": "17d552eb5aeed568195cd66a30fe5360fe79971af206bc0af040a7225c698039",
+        "note": "Exploratory wrapper did not propagate main return code; report passed=false governs. Final tracked harness preserves proper exit status."
+      },
+      "realtext_regression": {
+        "report": "artifacts/usf-final-probe-x64/report.json",
+        "sha256": "bafd183c2941ce8fc1e2786d48c7254b39fcaa1caebfc39b98532244db106e83",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+        "trace_lines": 37887,
+        "inputs_unchanged": true,
+        "cases": 4532
+      },
+      "vtt_regression": {
+        "report": "artifacts/usf-vtt-regression-x64/report.json",
+        "sha256": "b802187352251289d9c58a8ec69a2a52549f4500b74b327e7ca0a25357df476b",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+        "trace_lines": 21939,
+        "inputs_unchanged": true,
+        "cases": 2292
+      },
+      "sami_regression": {
+        "report": "artifacts/usf-sami-regression-x64/report.json",
+        "sha256": "cd4127cfcb3c16efbc46ac67da78c7a8041260e3ccb54c332346157e4ed29dc4",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+        "trace_lines": 26992,
+        "inputs_unchanged": true,
+        "cases": 2836
+      },
+      "text_regression": {
+        "report": "artifacts/usf-text-regression-x64/report.json",
+        "sha256": "963df6157a5b01b23135216ac5ee26186b1f886e0214f653475e94ff76bf0acd",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+        "trace_lines": 44404,
+        "inputs_unchanged": true,
+        "cases": 5692
+      },
+      "microdvd_regression": {
+        "report": "artifacts/usf-microdvd-regression-x64/report.json",
+        "sha256": "bc9c6457bb7f8b1848093c0c4699605385a7b20b8b0fe9d1f5684a39f52e7943",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+        "trace_lines": 41491,
+        "inputs_unchanged": true,
+        "cases": 4588
+      },
+      "ass_regression": {
+        "report": "artifacts/usf-ass-probe-x64/report.json",
+        "sha256": "bf33c431ee073d4ad074f12612a6d1e809f0890aa83c8623ad16bf4ea0e4575f",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+        "trace_lines": 22286,
+        "inputs_unchanged": true,
+        "cases": 3266
+      },
+      "xombie_regression": {
+        "report": "artifacts/usf-xombie-probe-x64/report.json",
+        "sha256": "8adbed1c27bf78f20845c799ae05507319a3ff557919eb7ef9536ccf6cbfd8ab",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+        "trace_lines": 10441,
+        "inputs_unchanged": true,
+        "cases": 1242
+      },
+      "lifecycle": {
+        "report": "artifacts/usf-lifecycle-x64/report.json",
+        "sha256": "487373d23e925a84c06ccc75902c0bbf21b3a43f2da39d64592fda977b9d7e68",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+        "trace_lines": 3693,
+        "inputs_unchanged": true
+      },
+      "compile": {
+        "report": "artifacts/usf-compile-x64/report.json",
+        "sha256": "b35ec751a78decf209f123a0b93b763cedd940ebe3d3156596de5df8faa48490",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+        "inputs_unchanged": true,
+        "scope": "Compile-only actual style helper/lifecycle sources and headers; no link, execution or parity claim"
+      },
+      "com": {
+        "report": "artifacts/usf-contracts-x64/com/report.json",
+        "sha256": "20963dd8c8151787bb7e2aec925bea8cbf88ab0e3f5acb41d9e5263529d92672",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+        "inputs_unchanged": true,
+        "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "2d254068a40e5f59cf191c3c6bbfc984b548193b668c4decac21dc1e94e02169",
+          "candidate_sha256": "af1d179193004fb9d257c8c43e93817e79c07c1092347fbda2eb6b5fc097642e",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "858b557df4643353cc2b7f7a4faf24fb20fc571f39dc8929949a8b9d80276024"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "32b7c2cd6eb817120414db53b3c3005e719ae4b993c4a69d0d66c7f6ac363d5a",
+          "candidate_sha256": "d2c084a07a549ea1b4a1e496be38cb204da980a5141bf7ae1ba190c648d5dea7",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "09623cbd08a08a70ca726d32f1ac7a80358fe93589dfe22d814f7c9544f6d751"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "f1165742064181b7fb73bacb16017d8e202c8bb0be90ed8c2eb812ac282c2df8",
+          "candidate_sha256": "189406e7d38ff985d4875fe40edaea2614a2a8921a2e000bc8b8116999056095",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "b0b48a3cf2bf2ecbbac4ecca863a815ab4a0c1137277a9b7d5830d9d1beca5c9"
+        }
+      }
+    },
+    "x86": {
+      "corpus": {
+        "report": "artifacts/usf-host-csri-x86/summary.json",
+        "sha256": "d2a27c67d59fa23542106d10323d9ac87db4ad4b3fc509e0b8eb049914ef39fd",
+        "complete": true,
+        "frames": 11066,
+        "distinct_controls": 116,
+        "partition_exact": true,
+        "cases": 1034,
+        "shards": [
+          {
+            "report": "artifacts/usf-host-csri-x86/shard-0/report.json",
+            "sha256": "497ee36ad4a55874197183aee61795d2f430c30589205611272cd935c2b6cc4f",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1410,
+            "cases": 130
+          },
+          {
+            "report": "artifacts/usf-host-csri-x86/shard-1/report.json",
+            "sha256": "b567190e4cc5a4b9fb6d5a34f9042613e4d872cb4982e85cb6ac09a5070e4d55",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1410,
+            "cases": 130
+          },
+          {
+            "report": "artifacts/usf-host-csri-x86/shard-2/report.json",
+            "sha256": "ad8484f5c5e334c686680422d83aed82580d5f249d0210631b2ebf1ca6265a72",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1381,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-host-csri-x86/shard-3/report.json",
+            "sha256": "f8f867ce79f9b4f6fa2a978de0dcf1fd6e51021753fb8377e1783736b8c4cd96",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1369,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-host-csri-x86/shard-4/report.json",
+            "sha256": "65bf13c41ef2c64e0819ce0b3129d50e7b6271464d17359a52353fa92a52b42c",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1370,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-host-csri-x86/shard-5/report.json",
+            "sha256": "d6a3818463fec07e73322ae14985333a95e301d489700910016f85d3ed164c37",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1370,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-host-csri-x86/shard-6/report.json",
+            "sha256": "be73cb1e01625b358db921196a1f6459b5a2254c4bb48da11bc2a32baf5b8452",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1372,
+            "cases": 129
+          },
+          {
+            "report": "artifacts/usf-host-csri-x86/shard-7/report.json",
+            "sha256": "15d1d06219846dce63c4f78507089ba37a12131a999827194e0578fd20ac35a7",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1384,
+            "cases": 129
+          }
+        ],
+        "source_manifest_sha256": "978c916d653a72dc94b8ee558c26da645a68475fe211c9b00c90c7a597ebb84a",
+        "partition_driver_sha256": "483799255b82c6152d5ed05288000c8c3a6db5e03075359d9eab54ac7dc2bce5"
+      },
+      "new_usf_rendering": {
+        "cases": 60,
+        "uninitialized_com_rejections": 20,
+        "initialized_sta_mta_cases": 40,
+        "frames": 480,
+        "distinct_controls": 12,
+        "ids": [
+          "usf-conversion-alpha-file",
+          "usf-conversion-alpha-file-mta",
+          "usf-conversion-alpha-file-sta",
+          "usf-conversion-alpha-memory",
+          "usf-conversion-alpha-memory-mta",
+          "usf-conversion-alpha-memory-sta",
+          "usf-conversion-control-file",
+          "usf-conversion-control-file-mta",
+          "usf-conversion-control-file-sta",
+          "usf-conversion-control-memory",
+          "usf-conversion-control-memory-mta",
+          "usf-conversion-control-memory-sta",
+          "usf-conversion-duplicate-default-file",
+          "usf-conversion-duplicate-default-file-mta",
+          "usf-conversion-duplicate-default-file-sta",
+          "usf-conversion-duplicate-default-memory",
+          "usf-conversion-duplicate-default-memory-mta",
+          "usf-conversion-duplicate-default-memory-sta",
+          "usf-conversion-inheritance-file",
+          "usf-conversion-inheritance-file-mta",
+          "usf-conversion-inheritance-file-sta",
+          "usf-conversion-inheritance-memory",
+          "usf-conversion-inheritance-memory-mta",
+          "usf-conversion-inheritance-memory-sta",
+          "usf-conversion-inline-font-file",
+          "usf-conversion-inline-font-file-mta",
+          "usf-conversion-inline-font-file-sta",
+          "usf-conversion-inline-font-memory",
+          "usf-conversion-inline-font-memory-mta",
+          "usf-conversion-inline-font-memory-sta",
+          "usf-conversion-italic-file",
+          "usf-conversion-italic-file-mta",
+          "usf-conversion-italic-file-sta",
+          "usf-conversion-italic-memory",
+          "usf-conversion-italic-memory-mta",
+          "usf-conversion-italic-memory-sta",
+          "usf-conversion-margin-file",
+          "usf-conversion-margin-file-mta",
+          "usf-conversion-margin-file-sta",
+          "usf-conversion-margin-memory",
+          "usf-conversion-margin-memory-mta",
+          "usf-conversion-margin-memory-sta",
+          "usf-conversion-named-wrap-file",
+          "usf-conversion-named-wrap-file-mta",
+          "usf-conversion-named-wrap-file-sta",
+          "usf-conversion-named-wrap-memory",
+          "usf-conversion-named-wrap-memory-mta",
+          "usf-conversion-named-wrap-memory-sta",
+          "usf-conversion-rotation-file",
+          "usf-conversion-rotation-file-mta",
+          "usf-conversion-rotation-file-sta",
+          "usf-conversion-rotation-memory",
+          "usf-conversion-rotation-memory-mta",
+          "usf-conversion-rotation-memory-sta",
+          "usf-conversion-xml-text-file",
+          "usf-conversion-xml-text-file-mta",
+          "usf-conversion-xml-text-file-sta",
+          "usf-conversion-xml-text-memory",
+          "usf-conversion-xml-text-memory-mta",
+          "usf-conversion-xml-text-memory-sta"
+        ],
+        "included_in_full_corpus": true
+      },
+      "usf_parser": {
+        "report": "artifacts/usf-final-x86/report.json",
+        "sha256": "985dabc549a99a6c1621e09d95f79a9d2ca8acff2438fe7dd41ce0c6c88b9248",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+        "trace_lines": 11461,
+        "inputs_unchanged": true,
+        "cases": 1212
+      },
+      "baseline_usf_parser": {
+        "report": "artifacts/usf-baseline-x86/report.json",
+        "sha256": "b41239d4c6ccf9084bcd263c7170363d6a13d883be61b4df9e5f46353e9a27c1",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "27c8af223f55d62a972b7e4f3509332227db5b27",
+        "trace_lines": 11461,
+        "inputs_unchanged": true,
+        "cases": 1212
+      },
+      "baseline_traces_preserved": true,
+      "initial_full_run": {
+        "report": "artifacts/usf-final-csri-x86/summary.json",
+        "sha256": "7fed6ac8c13664915b7e53b46b15e906adacbf553fdfffef845558d694fdb2e5",
+        "complete": false,
+        "frames": 10586,
+        "distinct_controls": 110,
+        "partition_exact": true,
+        "cases": 994,
+        "all_individual_cases_equal": true,
+        "controls_passed": false,
+        "failed_controls": [
+          {
+            "candidate": false,
+            "cases": [
+              "usf-conversion-italic-file",
+              "usf-conversion-control-file"
+            ],
+            "reference-0": false
+          },
+          {
+            "candidate": false,
+            "cases": [
+              "usf-conversion-margin-file",
+              "usf-conversion-control-file"
+            ],
+            "reference-0": false
+          },
+          {
+            "candidate": false,
+            "cases": [
+              "usf-conversion-rotation-file",
+              "usf-conversion-control-file"
+            ],
+            "reference-0": false
+          },
+          {
+            "candidate": false,
+            "cases": [
+              "usf-conversion-italic-memory",
+              "usf-conversion-control-memory"
+            ],
+            "reference-0": false
+          },
+          {
+            "candidate": false,
+            "cases": [
+              "usf-conversion-margin-memory",
+              "usf-conversion-control-memory"
+            ],
+            "reference-0": false
+          },
+          {
+            "candidate": false,
+            "cases": [
+              "usf-conversion-rotation-memory",
+              "usf-conversion-control-memory"
+            ],
+            "reference-0": false
+          }
+        ],
+        "usf_open_rejected_cases": [
+          "usf-conversion-alpha-file",
+          "usf-conversion-alpha-memory",
+          "usf-conversion-control-file",
+          "usf-conversion-control-memory",
+          "usf-conversion-duplicate-default-file",
+          "usf-conversion-duplicate-default-memory",
+          "usf-conversion-inheritance-file",
+          "usf-conversion-inheritance-memory",
+          "usf-conversion-inline-font-file",
+          "usf-conversion-inline-font-memory",
+          "usf-conversion-italic-file",
+          "usf-conversion-italic-memory",
+          "usf-conversion-margin-file",
+          "usf-conversion-margin-memory",
+          "usf-conversion-named-wrap-file",
+          "usf-conversion-named-wrap-memory",
+          "usf-conversion-rotation-file",
+          "usf-conversion-rotation-memory",
+          "usf-conversion-xml-text-file",
+          "usf-conversion-xml-text-memory"
+        ],
+        "shards": [
+          {
+            "report": "artifacts/usf-final-csri-x86/shard-0/report.json",
+            "sha256": "1b3b7763166a70e21597c8b36a1cb9503a47cdb7feadf28d83fdb0a71d93c56d",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1352,
+            "cases": 125
+          },
+          {
+            "report": "artifacts/usf-final-csri-x86/shard-1/report.json",
+            "sha256": "f465219f0d0dac1d8a04f46b1715674106bbdd7212f90cfec92abf7dbc6d18fa",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1352,
+            "cases": 125
+          },
+          {
+            "report": "artifacts/usf-final-csri-x86/shard-2/report.json",
+            "sha256": "b17c7f1c96c25b778cc877a46218c21f6b754652906e59059bb56e9a709040ca",
+            "complete": true,
+            "passed": false,
+            "rendered_frames": 1301,
+            "cases": 124
+          },
+          {
+            "report": "artifacts/usf-final-csri-x86/shard-3/report.json",
+            "sha256": "a2e3568b865157b3273814af9e52946480f4d1cf22ff368211704aab0c4381ce",
+            "complete": true,
+            "passed": false,
+            "rendered_frames": 1301,
+            "cases": 124
+          },
+          {
+            "report": "artifacts/usf-final-csri-x86/shard-4/report.json",
+            "sha256": "3568cbc67cd04a152ceacfc358b3bcaf03fbb767d2692cfe6d9e4df4a38bb28c",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1296,
+            "cases": 124
+          },
+          {
+            "report": "artifacts/usf-final-csri-x86/shard-5/report.json",
+            "sha256": "41a512444e5f8739c7fb009cbb840c9940d35c7537bfa6cb71c9c0eb406bd69c",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1296,
+            "cases": 124
+          },
+          {
+            "report": "artifacts/usf-final-csri-x86/shard-6/report.json",
+            "sha256": "04cfa9cfdd58732b799558035932646f84adfddf13cc20eb711eddf13272629e",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1344,
+            "cases": 124
+          },
+          {
+            "report": "artifacts/usf-final-csri-x86/shard-7/report.json",
+            "sha256": "253a0ad496223e1a7bee0b4f4495ddad93742d4ee9e4a51b1f268e4eb49d7793",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1344,
+            "cases": 124
+          }
+        ],
+        "not_a_passing_gate": true
+      },
+      "exploratory_sta_run": {
+        "report": "artifacts/usf-com-x86/report.json",
+        "sha256": "6a99fcbdaa10a1b8742d3f640fc166f0d017d11a8deaab097abfa00f0c272376",
+        "complete": true,
+        "passed": false,
+        "rendered_frames": 240,
+        "cases": 20,
+        "not_a_passing_gate": true,
+        "failed_rotation_controls": [
+          {
+            "candidate": false,
+            "cases": [
+              "usf-conversion-rotation-file",
+              "usf-conversion-control-file"
+            ],
+            "reference-0": false
+          },
+          {
+            "candidate": false,
+            "cases": [
+              "usf-conversion-rotation-memory",
+              "usf-conversion-control-memory"
+            ],
+            "reference-0": false
+          }
+        ],
+        "driver_sha256": "17d552eb5aeed568195cd66a30fe5360fe79971af206bc0af040a7225c698039",
+        "note": "Exploratory wrapper did not propagate main return code; report passed=false governs. Final tracked harness preserves proper exit status."
+      },
+      "realtext_regression": {
+        "report": "artifacts/usf-final-probe-x86/report.json",
+        "sha256": "6294577a41c4df9ff92cea8a7ac03c8e783afe2c99470d2343d4c9faceebee78",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+        "trace_lines": 37887,
+        "inputs_unchanged": true,
+        "cases": 4532
+      },
+      "vtt_regression": {
+        "report": "artifacts/usf-vtt-regression-x86/report.json",
+        "sha256": "1e294ee96cea4cd2dc9592effde438c7eac26710b295acf5f32adeaff431b31f",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+        "trace_lines": 21939,
+        "inputs_unchanged": true,
+        "cases": 2292
+      },
+      "sami_regression": {
+        "report": "artifacts/usf-sami-regression-x86/report.json",
+        "sha256": "7a685bf91765b27aaca159f1ba1edcfaa8715f09bb4304ea89f492632c835059",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+        "trace_lines": 26992,
+        "inputs_unchanged": true,
+        "cases": 2836
+      },
+      "text_regression": {
+        "report": "artifacts/usf-text-regression-x86/report.json",
+        "sha256": "577859c1256c44962cd4353ff37fbf53dfae910ad9730e07039aff74eef11108",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+        "trace_lines": 44404,
+        "inputs_unchanged": true,
+        "cases": 5692
+      },
+      "microdvd_regression": {
+        "report": "artifacts/usf-microdvd-regression-x86/report.json",
+        "sha256": "5daa671db901bbf995a2d5d97800276bba009566a0eaf85dce06550e9dd7808f",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+        "trace_lines": 41491,
+        "inputs_unchanged": true,
+        "cases": 4588
+      },
+      "ass_regression": {
+        "report": "artifacts/usf-ass-probe-x86/report.json",
+        "sha256": "b74d4e7afb3e012c1a6b91f4eb4ec0649d11ea30e199ddc28ea9038c3fde9568",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+        "trace_lines": 22286,
+        "inputs_unchanged": true,
+        "cases": 3266
+      },
+      "xombie_regression": {
+        "report": "artifacts/usf-xombie-probe-x86/report.json",
+        "sha256": "2192a8b3679eb39b44c36fb1492c0546be413a9ee4947bfd6f1ef2415f60b565",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+        "trace_lines": 10441,
+        "inputs_unchanged": true,
+        "cases": 1242
+      },
+      "lifecycle": {
+        "report": "artifacts/usf-lifecycle-x86/report.json",
+        "sha256": "3d15cbb9779252bd68a507d5a0a3aeffcebd09d0ccc04d181264ea443d25b373",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+        "trace_lines": 3693,
+        "inputs_unchanged": true
+      },
+      "compile": {
+        "report": "artifacts/usf-compile-x86/report.json",
+        "sha256": "a429adfd53e50292321b43c08c7379aa5b530a47f6937c5e51315665e12a54db",
+        "complete": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+        "inputs_unchanged": true,
+        "scope": "Compile-only actual style helper/lifecycle sources and headers; no link, execution or parity claim"
+      },
+      "com": {
+        "report": "artifacts/usf-contracts-x86/com/report.json",
+        "sha256": "b9a2af4fc1725befbe76e9485957662bf13128946b0068fad13166d0beda46c0",
+        "complete": true,
+        "passed": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "candidate_commit": "e432472d9296baca32f353849f03d5e8b1698601",
+        "inputs_unchanged": true,
+        "scope": "Fresh disconnected filters, STA and MTA, class factory and IUnknown identity, standard interface availability, selected custom IIDs through IUnknown only, initial state/name/class/clock, property-page UUIDs, stream count, pin names/directions/IDs/parent identity, FindPin and enumerator reset/clone/skip. No registration, custom interface methods, media negotiation, graph playback or UI. Constructor settings writes are confined to each private volatile HKCU key. Autoloader pin-ID operations are excluded from reference parity and checked separately on the candidate. Two reference and two candidate processes per case; unstable, crashed, timed-out or incomplete runs are failures.",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "69faa2d5f90f35fe4184e9e9bd892adb76fee60295701988f61ab7af0664d9eb",
+          "candidate_sha256": "e83b90d18a54813fa10f3ff801ff6012889e30f841ac797daf0bdf8ba7111c6f",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "dbd365316d54d5a3d590b63604fbbc5ea6849a912eb7660e52d8df4bdd6b2120"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "2c3b904d7f91902ef456e07b648c5d6351878318c235397eeb9b39eb3fffa34f",
+          "candidate_sha256": "c8f4db3efb3257cdb393b2a0db3554b5e1d8ced6c3f1ee8f87f035db6cf5dc44",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "8821591e5f42e83c8361380a00b4869b748312f9374da70041ad829e381b6bbc"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "3e7c20a4d6c42457d92eb56c42e4fd9f3bddb93276f2c1cd28bfb73edd06484c",
+          "candidate_sha256": "030d4e0b466488d29b5d1e58c94df960499adff92ed970d73984f5ea61107ec7",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "bee8a1d975859e0ab8a9b6843e14f813df818b8538e6501927e792bb180eb7c1"
+        }
+      }
+    }
+  },
+  "limits": [
+    "Experimental ConvertToSTS path only. No production switch, USF format closure or full-library completion.",
+    "CUSFSubtitles still owns native XML metadata/styles/effects/texts. The checked conversion session imports independent copies; native text values are updated before Add for repeated conversion. MSXML loading/traversal, style inheritance, inline text parsing and parsed-result ownership remain required port work.",
+    "CompareNoCase, wcstol, ColorToDWORD, TranslateMargin, TranslateAlignment, AddStyle and Add remain native callback services. Raw Rust values and integer IDs replace no public host ABI; all host adapters and fallback implementations remain transitional.",
+    "Finite Windows MSVC14.44 x86/x64 evidence. No allocation/reentry failure, COM or file-I/O fault injection, locale mutation, uninitialized document fields, non-Windows whole-renderer or Miri parity claim.",
+    "The imported source list is stable during conversion in these probes. Arbitrary concurrent native edits to source parser lists or exceptional partial mutation require separate evidence before closure.",
+    "Crashes, hangs and nondeterministic results remain unresolved, never equality. The SubViewer missing-style investigation remains unresolved; renderer, every format/host and vendored code remain in the full Rust objective."
+  ],
+  "source_inventory": {
+    "path": "docs/rust-usf-conversion-inventory.json",
+    "sha256": "666299608ead8e826901655223d8bd9fe18ef2444d335c1798584084ed20fcca"
+  },
+  "unsafe_lexical_inventory": {
+    "report": "artifacts/usf-unsafe-inventory.json",
+    "sha256": "9fc7ffed03cabc1a28fd2441945933573f2c56c706ee60bcaf01eb4d5ec54060",
+    "safe_core_files": 102,
+    "safe_core_unsafe_sites": 0,
+    "ffi_unsafe_functions": 352,
+    "ffi_unsafe_blocks": 431,
+    "ffi_raw_shared_slice_constructors": 62,
+    "delta": {
+      "ffi_unsafe_functions": 2,
+      "ffi_unsafe_blocks": 3,
+      "ffi_raw_shared_slice_constructors": 0
+    },
+    "limits": "Lexical inventory, not a soundness proof or completion percentage."
+  },
+  "rust_tests": {
+    "core_per_architecture": 295,
+    "ffi_per_architecture": 123,
+    "fmt": true,
+    "clippy_all_targets": true,
+    "clippy_native_runtime": true,
+    "log": "artifacts/usf-checks.log",
+    "log_sha256": "f1019b07f21d3ec47c687df1e70da8f38eb061c617e5216da6b8851a40873c6e"
+  },
+  "python_harness_tests": {
+    "count": 162,
+    "skipped": 1,
+    "failures": 0,
+    "corpus_check_included": true,
+    "log": "artifacts/usf-host-harness.log",
+    "log_sha256": "f10febc440823b5c3d370a91121426347583691f97aa4a53a4e6d8a385493a97"
+  },
+  "harness_sources": {
+    "tools/compat/csri_compare.py": "9f71f1bc0426ca96b47ae35d798ef7b86f17e52d213c67730e122384d85a3b7a",
+    "tools/compat/test_csri_compare.py": "b6ac646a898a51cf70a59b619621c8951d87c37252ac992e0c9c3d7b4001ed3a",
+    "tools/compat/make_corpus.py": "021aacca63a911e2edc518e9291330ad7a0fbb5138b16d4d6564735fef8bcf02",
+    "tools/compat/usf_document_native.cpp": "74af3e803a86df3223bebf65ba668992c244428a7ae673fa4f83c5553ee6d930",
+    "tools/compat/usf_document_native.py": "cf1202784194d228dec8d257d9bd9631d8714c27ec20c56fb7cec4f217a6df59",
+    "tools/compat/test_usf_document_native.py": "b6f47bee8939609cbc53a2cfd2ed41fed4a66096b745d15e5e830df6c8d7d487"
+  },
+  "com_host_contract": "Default worker does not initialize COM. Optional sta/mta initializes the calling thread before loading/opening the renderer, balances S_OK and S_FALSE with CoUninitialize after close, rejects failed HRESULTs as harness errors, and records apartment/HRESULT in each result. Distinct-frame controls require matching apartment configuration.",
+  "build_logs": {
+    "artifacts/usf-build-x64.log": "a843c12ce5815da52f8aa7e6ef160ea5ade8a8288679691b8b29659cdad8b999",
+    "artifacts/usf-build-x86.log": "b788b85459a6cd179eaf61dadbcb8631801ca522423b38a0176d220e8ed06ca1",
+    "artifacts/usf-build-rust-x64.log": "508e1ad06501a186b61e237fb1258de49ac841d66b980d2777ceeb2c0841c1b6",
+    "artifacts/usf-build-rust-x86.log": "b3c810a45882699e14a90bb439cd1104ef472597dbefe569e9cc7cc62fb54011"
+  },
+  "subviewer_reference_investigation": {
+    "path": "docs/rust-subviewer-reference-outcomes.json",
+    "sha256": "9cd5e22c6e894051966451dad661bf7cc1cd5e4b99f76fd118d61220b08be882",
+    "new_parity_claimed": false
+  },
+  "system_xml_registration": {
+    "clsid": "{2933BF90-7B36-11d2-B20E-00C04F983E60}",
+    "method": "Read-only COM registration and system-file snapshot after direct comparisons; this is not an observed loaded-module trace.",
+    "registrations": [
+      {
+        "architecture": "x64",
+        "server": "%SystemRoot%\\System32\\msxml3.dll",
+        "threading_model": "Both"
+      },
+      {
+        "architecture": "x86",
+        "server": "%SystemRoot%\\System32\\msxml3.dll",
+        "threading_model": "Both"
+      }
+    ],
+    "system_files": [
+      {
+        "architecture": "x64",
+        "path": "C:\\Windows\\System32\\msxml3.dll",
+        "sha256": "dbebbda0c3f26ef348d239c5180d2559129944092095cd1764db0f197b1fbc9d"
+      },
+      {
+        "architecture": "x86",
+        "path": "C:\\Windows\\SysWOW64\\msxml3.dll",
+        "sha256": "67c6147fe647f8a9800bf7fd8d5da98aaeb6d5898bc9f97d7f772fa546f0d675"
+      }
+    ]
+  }
+}

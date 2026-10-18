@@ -27,7 +27,60 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: RealText helper engine (2026-10-18)
+## Current port: USF style and subtitle conversion (2026-10-18)
+
+The experimental USF converter now imports ordered raw style/text values into a
+checked safe-Rust session. Rust owns style construction, color/alpha composition,
+font/position decisions, wrap selection, formatting-prefix assembly and output
+records. Native callbacks provide CString/CRT and color/margin/alignment services,
+then AddStyle/Add consume detached copies. The native parser's text is updated
+before Add so repeated conversions retain their accumulating prefixes.
+
+This is a conversion port, not USF closure: XML loading/traversal, inheritance,
+inline-text parsing and the canonical parsed metadata/style/effect/text lists
+still belong to CUSFSubtitles. Moving those into Rust is the next USF work.
+The full renderer, every host adapter, all formats and vendored code remain in
+the complete-library goal.
+
+Implementation `e432472d` with harness/fixtures `c11992cc` passes cleanup
+`67da07cd` checks on **each** Windows
+architecture (x86 and x64):
+
+* 1,212 direct USF cases / 11,461 identical trace lines, with two runs of each
+  implementation; these also equal the pre-port baseline `27c8af22`.
+* 1,034 rendering cases / 11,066 frames / 116 distinct-frame controls. USF adds
+  20 no-COM rejection cases and 40 STA/MTA file/memory cases with 480 rendered
+  frames and 12 controls. All original 974 case definitions are retained.
+* RealText, WebVTT, SAMI, text-parser, MicroDVD, ASS and XombieSub regressions;
+  3,693 lifecycle trace lines; nine compile probes; all three DLLs' exports and
+  dependencies; 10 scoped COM cases plus two candidate-only controls.
+* 295 safe-core and 123 FFI tests, formatting and Clippy on both architectures;
+  162 Python harness tests with one skip. Four private entries add two unsafe
+  marshalling functions and three blocks, with no new raw-slice constructors.
+
+The reference passes USF millisecond counts directly as 100ns ticks. A nominal
+one-second cue therefore starts at 0.0001 seconds here; the fixtures sample these
+tiny intervals and backward seeks. The port deliberately retains that behavior,
+BYTE alpha truncation before percentage clamping, later-default wrap replacement,
+case-sensitive named-wrap lookup and repeated-conversion prefix accumulation.
+
+The first full rendering run correctly matched USF open rejections, but failed
+six visibility controls because its worker had not initialized COM. An explicit
+STA probe then rendered all 20 cases; its rotation contrast still matched the
+control in the reference. The final harness exposes optional STA/MTA setup,
+balances successful CoInitializeEx/CoUninitialize, and leaves the default
+uninitialized. The corpus retains no-COM rejection coverage and uses italic,
+margin and alpha contrasts in both apartment modes. The original failed full
+and exploratory STA reports remain recorded; final full runs use the corrected
+host configurations. No library change was made to auto-initialize COM or to
+change reference rotation behavior.
+
+See the [USF source/boundary inventory](rust-usf-conversion-inventory.json) and
+[local evidence manifest](rust-usf-conversion-local-evidence.json). No production
+switch or whole-format/host/library completion is claimed. Prior RealText evidence
+and unresolved SubViewer observations remain attributed to their own commits.
+
+## Previous port: RealText helper engine (2026-10-18)
 
 The experimental RealText path now keeps tag/text extraction, attribute parsing,
 case-folded key assembly, time folding and tag rendering inside the checked
