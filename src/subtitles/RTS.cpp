@@ -69,6 +69,7 @@ const double MAX_SUB_PIXEL_F = 8.0;
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 #include "RustRendererDc.h"
 #include "RustFontIntern.inl"
+#include "RustTextMeasure.h"
 #else
 // WARNING: this isn't very thread safe, use only one RTS a time.
 static HDC g_hDC;
@@ -731,11 +732,10 @@ void CText::GetTextInfo(TextInfo *output, const FwSTSStyle& style, const CString
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     XyRust::RendererDcOperation operation;
-    const HDC g_hDC=operation.get();
     FwCMyFont font(style,operation);
+    XyRust::MeasureText(*output,style.get(),str,operation,font.get());
 #else
     FwCMyFont font(style);
-#endif
     output->m_ascent = (int)(style.get().fontScaleY/100*font.get().m_ascent);
     output->m_descent = (int)(style.get().fontScaleY/100*font.get().m_descent);
 
@@ -759,6 +759,7 @@ void CText::GetTextInfo(TextInfo *output, const FwSTSStyle& style, const CString
     }
     output->m_width = (int)(style.get().fontScaleX/100*output->m_width + 4) >> 3;
     SelectFont(g_hDC, hOldFont);
+#endif
 }
 
 // CPolygon

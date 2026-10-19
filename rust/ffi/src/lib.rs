@@ -44,6 +44,8 @@ mod style_assignment;
 mod style_compare;
 mod style_intern;
 mod subrip;
+#[cfg(windows)]
+mod text_measure;
 mod text_reader;
 mod timeline_search;
 mod webvtt;
@@ -55,6 +57,8 @@ mod windows_float;
 mod windows_font;
 #[cfg(windows)]
 mod windows_style_map;
+#[cfg(windows)]
+mod windows_text_measure;
 #[cfg(windows)]
 mod windows_usf;
 #[cfg(all(feature = "native-runtime", not(windows)))]
