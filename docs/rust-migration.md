@@ -27,7 +27,65 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: renderer effect ownership and parsing (2026-10-18)
+## Current port: owned ASS command trees (2026-10-18)
+
+The experimental renderer now constructs and stores ASS command trees in safe
+Rust: all 54 command names, longest-prefix lookup, position levels, parameter
+rewriting and nested transforms. Flat owned nodes contain raw UTF-16 parameters
+and checked child indices. Parsing and destruction are iterative. The native
+command map, position-level array and initializer are excluded; symbol inspection
+confirms their absence from both experimental subtitle libraries.
+
+The renderer/cache retains checked tree IDs through shared lifetime wrappers.
+Reading a tag returns copied parameters and a child-list view retaining the same
+owner. The canonical tree no longer uses nested ATL lists or CString arrays.
+Native cache keys/eviction, temporary parameter materialization and remaining
+style/animation/clip evaluation are still transitional.
+
+Lookup remains case-sensitive and selects prefixes of length five down to one.
+Uppercase K is distinct. Scalar commands append their suffix after any existing
+parenthesized parameters; color/alpha suffixes trim the set of `&` and `H`.
+For example, `unknown(1,2)` resolves to underline command `u` and appends
+`nknown`. Transform children are parsed only for one to four parameters, using
+the final parameter. No ASS-spec normalization or Unicode conversion is added.
+
+Implementation `7a178b0d` passes cleanup `67da07cd` checks on **each** Windows
+architecture (x86 and x64):
+
+* 5,142 actual parser calls across 1,714 inputs, covering every command,
+  malformed suffixes, raw code-unit mutations, nested transforms, fresh trees
+  and repeated appends. All 10,286 trace lines match across two runs per
+  implementation and equal pre-port baseline `223aac17`, including complete
+  command/position/parameter/child snapshots, errno and null-tree refusal.
+* Expanded rendering corpus: 1,178 cases / 12,702 frames / 172 distinct-frame
+  controls. The previous 1,146 cases are unchanged. Sixteen scripts add 32
+  file/memory cases, 352 frames and 12 controls for prefix recognition,
+  parameter precedence, transforms and backward seeks.
+* Effect, HTML, shared-color and USF traces remain unchanged. RealText, WebVTT,
+  SAMI, text-parser, MicroDVD, ASS and XombieSub regressions pass, together with
+  3,693 lifecycle trace lines, nine compile probes, all three DLLs' exports and
+  dependencies, and scoped COM checks.
+* 318 safe-core and 132 FFI tests, formatting and Clippy on both architectures;
+  171 Python tests with one skip. The 108-file portable core has zero unsafe
+  sites. Three unsafe exports, one callback type and five unsafe blocks form the
+  new boundary; it adds no raw resource pointer or mutable foreign slice.
+
+See the [ASS tree inventory](rust-ass-tree-inventory.json) and
+[local evidence manifest](rust-ass-tree-local-evidence.json). Input is copied
+before CRT whitespace classification; parsing runs outside registry admission.
+Append checks its owner/list and preserves existing child IDs. Queries return
+detached packets, check output capacity and leave output untouched on refusal.
+Stale and wrong-type IDs are rejected. Allocation/reentry, injected failures and
+reference depth-limit outcomes remain unclosed. No production switch or
+whole-library completion is claimed.
+
+Next: migrate the remaining ASS override evaluation, including style changes,
+animation/transforms, clips, karaoke and polygon state, and continue renderer
+subtitle/word/layout ownership. Native caches, all host adapters, all formats,
+options/interfaces and vendored implementation remain in scope.
+
+
+## Previous port: renderer effect ownership and parsing (2026-10-18)
 
 The experimental renderer now keeps all five CSubtitle effect slots in safe
 Rust. Banner/Scroll column parsing and fade/fad/move/org/pos construction also

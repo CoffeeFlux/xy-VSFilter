@@ -1,0 +1,133 @@
+{
+  "schema": 1,
+  "candidate_commit": "7a178b0dec2a971384636c75da9a343c1e192380",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "Full renderer ASS command-tree construction, longest-prefix dispatch, parameter rewriting, nested transforms, position-level table and canonical tree ownership in safe Rust.",
+  "production_sources": {
+    "rust/compat/src/ass_tree.rs": "cb22a0ba8784710da280b4532b73e47e741c193d7cc283c6265ae58aea65ce03",
+    "rust/compat/src/ass_tags.rs": "6792ac12ebbf50f9356d0aa7abad85b20d505e64f7ea539a66eb42990d05a637",
+    "rust/compat/src/lib.rs": "a54f6ca58b7aa0996ab91ec9063ab11e5c3bcf35b1fce615ac7b181233ed2611",
+    "rust/ffi/src/ass_tree.rs": "6067a0a6a4c20d335bb120678a07f378673a3565f4bacc1652e1b4859359b98a",
+    "rust/ffi/src/document.rs": "492a7b6095d5a0beb30f9a7a3f1185de7e2f6e95818680a2fd81b8e8f660639e",
+    "rust/ffi/src/document_registry.rs": "16233fafeafd0cc7a7178d16a3cab6ba95894cd05b2e30468c3120e3444bccd5",
+    "rust/ffi/src/lib.rs": "fb8fc2e42af7456dea541d9b95c1a16b0ee6f0514f62fe0eb4bd20a39743a67d",
+    "include/xy_rust_ass_tree.h": "32d369b0f6a978b24fc37c5e55b190c82f3aaaaa5a3536a10fd1eee0eabf4c99",
+    "src/subtitles/RTS.cpp": "1fab41a94a2275241d78693b6b0c21de68adc5bb2a5ada94a48d1b24753fc34f",
+    "src/subtitles/RTS.h": "5f23e67bea8613131f36f7175677838989d3a032a25e91ecb4f7f61abb99a967",
+    "src/subtitles/cache_manager.h": "42abecb035e5a7cf645c98d4f95c5eb68b7480ec08eb5c6cc3c61bafb8d5b05f",
+    "src/subtitles/RustDocumentOwner.h": "203a44c583a3d217a94508d4e69be8b35bf214e79db2786f3c44809503caf674"
+  },
+  "reference_sources": {
+    "src/subtitles/RTS.cpp": "ef6aae1b68accd3da5cc9093377a118cf11f5754c597cec68173b06c80f71454",
+    "src/subtitles/RTS.h": "7fa99ac55e37e9cbc66bb3b219dba1e860ed8bd02e34a44acb2ad8ad93957c26",
+    "src/subtitles/cache_manager.h": "42abecb035e5a7cf645c98d4f95c5eb68b7480ec08eb5c6cc3c61bafb8d5b05f"
+  },
+  "operations": [
+    {
+      "operation": "Command recognition and position levels",
+      "source": {
+        "path": "rust/compat/src/ass_tree.rs",
+        "line": 9,
+        "sha256": "cb22a0ba8784710da280b4532b73e47e741c193d7cc283c6265ae58aea65ce03"
+      },
+      "behavior": "54 case-sensitive cleanup command names with numeric IDs matching AssCmdType. Search prefix length5 down1; uppercaseK remains distinct. Unknown/empty command ID54. Static hard/soft/none table replaces native maps and their initializer; symbols absent from both candidate libraries."
+    },
+    {
+      "operation": "Parameter preparation",
+      "source": {
+        "path": "rust/compat/src/ass_tree.rs",
+        "line": 126,
+        "sha256": "cb22a0ba8784710da280b4532b73e47e741c193d7cc283c6265ae58aea65ce03"
+      },
+      "behavior": "Existing raw-unit tokenizer supplies spans and Windows whitespace classifications. Parenthesized parameters remain in order. Scalar commands append command suffix even when parenthesized parameters exist. Color/alpha append suffix trimmed at both ends by the set{&,H}. Unknown commands retain parenthesized parameters. Empty commands append an empty unknown node. Prefix recognition means unknown(1,2) actually resolves to underline u with appended nknown suffix."
+    },
+    {
+      "operation": "Nested transforms",
+      "source": {
+        "path": "rust/compat/src/ass_tree.rs",
+        "line": 170,
+        "sha256": "cb22a0ba8784710da280b4532b73e47e741c193d7cc283c6265ae58aea65ce03"
+      },
+      "behavior": "Only t with1..4 parameters parses its final parameter as a child tree. The first closing parenthesis and backslash-before-comma lexical rules are preserved. Explicit work stack uses original raw input spans and whitespace masks; flat nodes and child indices avoid recursive parser/destructor stacks. Native evaluation recursion remains transitional."
+    },
+    {
+      "operation": "Owned tree and append semantics",
+      "source": {
+        "path": "rust/compat/src/ass_tree.rs",
+        "line": 76,
+        "sha256": "cb22a0ba8784710da280b4532b73e47e741c193d7cc283c6265ae58aea65ce03"
+      },
+      "behavior": "Flat Vec<Node> stores command,Vec<Vec<u16>> parameters,and child IDs; roots are a separate index list. Append prechecks target and index overflow, remaps prepared nodes, and retains all existing node/list IDs. Children can be appended through checked list IDs. No borrowed input survives parse; detached node packets can outlive canonical owner."
+    },
+    {
+      "operation": "Renderer/cache boundary",
+      "source": {
+        "path": "include/xy_rust_ass_tree.h",
+        "line": 13,
+        "sha256": "32d369b0f6a978b24fc37c5e55b190c82f3aaaaa5a3536a10fd1eee0eabf4c99"
+      },
+      "behavior": "AssTagList becomes a Rust-owner/list view. Native cache payload retains a shared ID lifetime wrapper, not a native tree. Reading a tag copies raw parameter values and gives children a shared owner with checked list index. Releasing a parent view does not destroy an owner retained by child views. Application materializes one temporary AssTag and reads position level through a value-only Rust entry."
+    }
+  ],
+  "boundary_review": {
+    "source": {
+      "path": "rust/ffi/src/ass_tree.rs",
+      "line": 113,
+      "sha256": "6067a0a6a4c20d335bb120678a07f378673a3565f4bacc1652e1b4859359b98a"
+    },
+    "native_adapter": {
+      "path": "include/xy_rust_ass_tree.h",
+      "line": 13,
+      "sha256": "32d369b0f6a978b24fc37c5e55b190c82f3aaaaa5a3536a10fd1eee0eabf4c99"
+    },
+    "new_private_entries": [
+      "xy_vsfilter_ass_tree_create_v1",
+      "xy_vsfilter_ass_tree_destroy_v1",
+      "xy_vsfilter_ass_tree_append_v1",
+      "xy_vsfilter_ass_tree_query_v1",
+      "xy_vsfilter_ass_tree_position_v1"
+    ],
+    "contract": "Typed IDs identify owned trees; list0 isroot and nonzero list IDs identify a node child-list. Create returns8byteID. Append copies UTF16LE input, computes CRT whitespace and builds detached tree outside gate/admission, then transfers it into checked owner/list. Query0 returnsu64count,query1 returnsu64packetsize,query2 returns command/childlist/paramcount then length-prefixedrawUTF16LE. Queries stage output after registry access, neverreadoutput, and rejectshortcapacity without writes. Drop removes owner before destruction. Native input pointers and paired gate callbacks are synchronous only.",
+    "unsafe_delta": {
+      "unsafe_functions": 4,
+      "unsafe_blocks": 5,
+      "new_raw_shared_slice_constructors": 1,
+      "new_raw_nonoverlapping_copies": 2,
+      "note": "Function count includes one unsafe gate-callback type plus3unsafe exports. Blocks are2callbacks,1inputcopy and2outputwrites. No raw canonical pointers, mutable foreign slices, unsafe impls or mutable statics added."
+    },
+    "tests": "Everycommandprefix,case,suffixappend; nestedtransform/parametercount; unknownparameters; append preservingexistingchildIDs; detachedpacketandrawsurrogates; suppliedwhitespace; firstNUL; invalidshape/list/index; stale/wrongtypeIDs; reentryBusy; queryshortcapacityatomicity; copiedpacketafterdestroy; treeappendtochild; explicitnull/oversizemetadata."
+  },
+  "direct_probe": {
+    "baseline_commit": "223aac17f84704d01c5c2aba7e3a7ffb41a45702",
+    "source": {
+      "path": "tools/compat/ass_tree_native.cpp",
+      "line": 29,
+      "sha256": "410d17818968da54b027316c08ad91fa5aaba44f865ff768fc08faf331c129e8"
+    },
+    "runner": {
+      "path": "tools/compat/ass_tree_native.py",
+      "line": 36,
+      "sha256": "240507c1dfde25e9363cd8f7f40a6df2414dee03609ca05f59139678302c2867"
+    },
+    "inputs": 1714,
+    "cases": 5142,
+    "trace_lines": 10286,
+    "coverage": "17baseinputs +54commands x16suffixforms +264rawcodeunits x3positions +32nesteddepthinputs +9transformparametercountinputs =1714. Each input parsesfresh,appendsafterseedtree,andappendsagain=5142observations. Full recursive command/hardlevel/rawparameter/child-list snapshots, errno,returnstatus,inputlength,andnulltreerefusal. Two reference and two candidate runs perarchitecture; all equalpreportbaseline.",
+    "method": "Actual linked private static ParseSSATag viaexplicitlyinstantiatedfunctionaddress; no copiedparser/access/layoutrewrite. Observer traverses native reference CAtlList and candidate detached Rust tree views into the same counted byte serialization. Validator checks all tree/parameter bounds and exact completion."
+  },
+  "limits": [
+    "Experimental renderer/document-owner path only. No production switch or whole-renderer/host/library completion claim.",
+    "All canonical ASS command nodes, raw parameter strings and child lists are Rust-owned. Native CString cache keys, cache eviction and shared_ptr owner wrappers, temporary parameter materialization, and remaining override evaluation remain transitional.",
+    "Windows CRT iswspace remains a system service on copied code units outside admission. Native caller buffer validity, synchronous paired gate validity and native wrapper lifetimes remain audited FFI contracts; no pointer into canonical Rust storage escapes.",
+    "Finite initialized Unicode Windows MSVC14.44 x86/x64 evidence. Allocation failure, new-handler reentry, fault injection, arbitrary concurrent native wrapper destruction, locale changes and reference stack-overflow/depth limits are not closed. Busy/internal failures are experimental statuses, not established public host compatibility.",
+    "The portable parser and tree destruction are iterative with flat nodes. Remaining native override evaluation recursively walks transforms and is still migration work. Native temporary parameter arrays do not own the cached canonical tree.",
+    "Lexical unsafe counts are an inventory, not a soundness proof or migration percentage. Crashes/hangs/nondeterminism remain unresolved; earlier evidence retains original provenance."
+  ],
+  "next_work": [
+    "Migrate remaining ASS override evaluation: style changes, animation/transforms, clips, karaoke and polygon state; continue subtitle/word/layout ownership.",
+    "Continue renderer, document/host adapters, cache policy, all formats/options/interfaces and vendored implementation; preserve unresolved reference outcomes."
+  ]
+}
