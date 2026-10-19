@@ -4,6 +4,21 @@ from style_intern_native import CASES, compare, validate, validate_lifecycle
 
 
 class StyleTraceControls(unittest.TestCase):
+    def test_map_operations_enumeration_sticky_domains_and_repeats(self):
+        operations=([('construct',0)]+[('insert',i+1) for i in range(128)]+[('equal',128)]*128+
+                    [('conflict',129+i) for i in range(32)]+[('empty',0)]+[('reuse',i+1) for i in range(64)]+[('empty',0),('destroy',0)])
+        rows=[b'style-map-provenance pointer_bits=64']
+        for index,(op,count) in enumerate(operations*2):
+            sticky=index//356;status=8 if sticky else 0
+            rows.append(f'style-map index={index} sticky={sticky} op={op} count={count} fp={status:08x} domains={status:016x},{status:016x}'.encode())
+            rows.append(b'style-map-names'+b''.join(f' {i:04x}'.encode() for i in range(count)))
+        rows.append(b'style-map-complete cases=712');good=b'\n'.join(rows)+b'\n'
+        compare([good]*4,64,'map-lifecycle')
+        for bad in [good.replace(b'op=equal',b'op=insert',1),good.replace(b'count=128',b'count=127',1),good.replace(b' 0000\n',b'\n',1),good.replace(b'0000000000000008,0000000000000008',b'0000000000000008,0000000000000000',1),good.replace(b'cases=712',b'cases=711')]:
+            with self.assertRaises(ValueError):validate(bad,64,'map-lifecycle')
+        bad=good.replace(b'domains=0000000000000000,0000000000000000',b'domains=0000000000000000,0000000100000000',1)
+        with self.assertRaises(ValueError):compare([good,good,bad,bad],64,'map-lifecycle')
+
     def test_lifecycle_requires_sticky_status_move_aliases_and_late_release(self):
         good=b'style-move copy=1 empty=1 distinct=1 count=1\nstyle-move restored=1 source_empty=1 count=1\nstyle-sticky before=00000008 after=00000008 domains=0000000800000000,0000000800000000 count=0 rects=0\nstyle-lifecycle-complete count=1\nstyle-late count=0 rects=0 valid=1\n'
         validate_lifecycle(good)

@@ -72,6 +72,17 @@ static void pair(STSStyle& first,STSStyle& second) {
 }
 class StyleDocument : public CSimpleTextSubtitle {
 public:
+    void names() const {
+        printf("style-map-names");
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        for(size_t i=0;i<GetStyleCount();++i){CString name;if(!GetStyleNameAt(i,name))abort();
+#else
+        POSITION pos=m_styles.GetStartPosition();while(pos){const CString& name=m_styles.GetNextKey(pos);
+#endif
+            printf(" ");for(int j=0;j<name.GetLength();++j)printf("%04x",unsigned(uint16_t(name[j])));
+        }
+        printf("\n");
+    }
     size_t count() const {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
         return GetStyleCount();
@@ -90,6 +101,33 @@ public:
         printf("style-add-name present=%u\n",present?1:0);if(present)describe(copy);
     }
 };
+static int map_lifecycle() {
+    if(!AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0))return 2;
+    printf("style-map-provenance pointer_bits=%u\n",unsigned(sizeof(void*)*8));
+    unsigned index=0;
+    for(unsigned sticky=0;sticky<2;++sticky){
+        auto reset=[&](){_clearfp();if(sticky && std::feraiseexcept(FE_DIVBYZERO))abort();return domains();};
+        auto report=[&](const char* op,uint64_t before,StyleDocument* doc){
+            const unsigned fp=_statusfp();const uint64_t after=domains();
+            printf("style-map index=%u sticky=%u op=%s count=%llu fp=%08x domains=%016llx,%016llx\n",index++,sticky,op,
+                static_cast<unsigned long long>(doc?doc->count():0),fp,static_cast<unsigned long long>(before),static_cast<unsigned long long>(after));
+            if(doc)doc->names();else printf("style-map-names\n");
+        };
+        uint64_t before=reset();auto doc=new StyleDocument;report("construct",before,doc);
+        for(unsigned phase=0;phase<3;++phase)for(unsigned i=0;i<(phase==2?32:128);++i){
+            CString name;name.Format(L"Map%04u",i);auto value=new STSStyle;value->fontWeight=400+i+(phase==2?1000:0);
+            before=reset();doc->AddStyle(name,value);report(phase==0?"insert":phase==1?"equal":"conflict",before,doc);
+        }
+        before=reset();doc->Empty();report("empty",before,doc);
+        for(unsigned i=0;i<64;++i){
+            CString name;name.Format(L"Reuse%04u",i);auto value=new STSStyle;value->fontWeight=400+i;
+            before=reset();doc->AddStyle(name,value);report("reuse",before,doc);
+        }
+        before=reset();doc->Empty();report("empty",before,doc);
+        before=reset();delete doc;report("destroy",before,nullptr);
+    }
+    printf("style-map-complete cases=%u\n",index);return 0;
+}
 static int add_styles() {
     if(!AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0))return 2;
     printf("style-add-provenance pointer_bits=%u\n",unsigned(sizeof(void*)*8));
@@ -108,6 +146,7 @@ static int add_styles() {
     printf("style-add-complete cases=%u\n",index);return 0;
 }
 int main(int argc,char** argv) {
+    if(argc>1&&!strcmp(argv[1],"map-lifecycle"))return map_lifecycle();
     same_values=argc>1&&!strcmp(argv[1],"same-values");
     raw_twins=argc>1&&!strcmp(argv[1],"raw-twins");
     if(argc>1&&!strcmp(argv[1],"add-style"))return add_styles();
