@@ -13,10 +13,16 @@
 
 static void check(bool b){if(!b)throw std::runtime_error("font observer failed");}
 static void bytes(const void* p,size_t n){const auto* b=static_cast<const unsigned char*>(p);for(size_t i=0;i<n;++i)printf("%02x",b[i]);}
-struct Status {unsigned fp;int error;DWORD last;};
+struct Status {unsigned fp;int error;DWORD last;unsigned x87,sse;};
 static void reset(){errno=1234;SetLastError(0x12345678);_clearfp();}
-static Status status(){Status s={_statusfp(),errno,GetLastError()};return s;}
-static void emit(const char* phase,Status s){printf(" %s=%x,%d,%lu",phase,s.fp,s.error,s.last);}
+static Status status(){Status s={_statusfp(),errno,GetLastError(),0,0};
+#ifdef _M_IX86
+    _statusfp2(&s.x87,&s.sse);
+#else
+    s.sse=s.fp;
+#endif
+    return s;}
+static void emit(const char* phase,Status s){printf(" %s=%x,%x,%x,%d,%lu",phase,s.fp,s.x87,s.sse,s.error,s.last);}
 static unsigned sequence=0;
 static bool expired_handle_diagnostic=false;
 static void run(const STSStyleBase& style,HDC dc){

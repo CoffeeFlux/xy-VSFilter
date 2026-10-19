@@ -7,9 +7,9 @@ class GdiTraceControls(unittest.TestCase):
         for i in range(CASES):
             mode=i%3
             events=['getdc','caps','muldiv','releasedc']+['create']*(1 if mode==0 else 2)+['select','metrics','select']+([] if mode==2 else ['delete'])
-            rows += [f'font-gdi-case index={i} mode={mode} events={len(events)} count=0 font={int(mode!=2)} ascent=2 descent=1 final=1,1234,0'.encode()]
+            rows += [f'font-gdi-case index={i} mode={mode} events={len(events)} count=0 font={int(mode!=2)} ascent=2 descent=1 final=1,0,1,1234,0'.encode()]
             for name in events:
-                rows += [f'gdi name={name} a=0 b=0 c=0 result=0 before=0,1234,0 after=1,1234,0 data='.encode()+b'0'*(184 if name=='create' else 114 if name=='metrics' else 0)]
+                rows += [f'gdi name={name} a=0 b=0 c=0 result=0 before=0,0,0,1234,0 after=1,0,1,1234,0 data='.encode()+b'0'*(184 if name=='create' else 114 if name=='metrics' else 0)]
         rows += [f'font-gdi-complete cases={CASES}'.encode()]
         return b'\n'.join(rows)+b'\n'
     def test_call_order_fallback_metrics_and_repeat_evidence(self):

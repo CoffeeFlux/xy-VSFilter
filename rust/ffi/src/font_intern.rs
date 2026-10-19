@@ -88,7 +88,8 @@ fn read(boundary: &Boundary, id: u64) -> Result<[u8; 16], u32> {
 /// # Safety
 /// Output spans 16 writable bytes: HFONT u64 LE, ascent/descent i32 LE. This
 /// borrowed Windows handle must not be deleted or retained past owner release;
-/// restore any prior selected object before releasing the final checked owner.
+/// Existing DC selection can survive final release in the cleanup release
+/// build. No new operation may use this borrowed handle after owner release.
 #[no_mangle]
 pub unsafe extern "C" fn xy_vsfilter_font_read_v1(id: u64, output: *mut u8) -> u32 {
     if output.is_null() {

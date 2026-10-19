@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 //! Owned HFONT and CMyFont's Windows calls. Handles never designate Rust memory.
-//! Font selection by transitional callers must finish before the final owner
-//! release. Registry admission serializes creation; complete calls serialize Drop.
+//! Registry admission serializes creation; complete calls serialize Drop.
+//! Release builds can leave this font selected in the native DC at final release;
+//! preserve Windows DeleteObject failure/deferred deletion, as CFont does.
 use xy_vsfilter_compat::font_intern::{Error, Key};
 
 #[repr(C)]
@@ -177,7 +178,7 @@ impl Drop for Font {
     fn drop(&mut self) {
         if self.handle != 0 {
             // SAFETY: this non-Clone owner received the handle from Windows;
-            // it is deleted once, after all external selections have ended.
+            // one deletion is attempted, preserving any native DC selection.
             // Ignore failure exactly as CFont/CGdiObject destruction does.
             unsafe {
                 // CFont::Detach traverses the same MFC TLS map before deletion.

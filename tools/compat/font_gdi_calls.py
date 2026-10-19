@@ -21,12 +21,12 @@ def validate(data,bits):
     for row in rows[1:-1]:
         if row.startswith(b'font-gdi-case '):
             if remaining:raise ValueError('missing API events')
-            m=re.fullmatch(f'font-gdi-case index={index} '.encode()+rb'mode=([012]) events=(\d+) count=0 font=([01]) ascent=-?\d+ descent=-?\d+ final=[0-9a-f]+,-?\d+,\d+',row)
+            m=re.fullmatch(f'font-gdi-case index={index} '.encode()+rb'mode=([012]) events=(\d+) count=0 font=([01]) ascent=-?\d+ descent=-?\d+ final=[0-9a-f]+,[0-9a-f]+,[0-9a-f]+,-?\d+,\d+',row)
             if not m or int(m[1])!=index%3 or int(m[3])!=(index%3!=2):raise ValueError('invalid font case')
             remaining=int(m[2]);events=[];index+=1
         elif row.startswith(b'gdi '):
             if remaining<=0:raise ValueError('extra API event')
-            m=re.fullmatch(rb'gdi name=(getdc|releasedc|caps|muldiv|create|select|metrics|delete) a=\d+ b=\d+ c=\d+ result=\d+ before=[0-9a-f]+,-?\d+,\d+ after=[0-9a-f]+,-?\d+,\d+ data=([0-9a-f]*)',row)
+            m=re.fullmatch(rb'gdi name=(getdc|releasedc|caps|muldiv|create|select|metrics|delete) a=\d+ b=\d+ c=\d+ result=\d+ before=[0-9a-f]+,[0-9a-f]+,[0-9a-f]+,-?\d+,\d+ after=[0-9a-f]+,[0-9a-f]+,[0-9a-f]+,-?\d+,\d+ data=([0-9a-f]*)',row)
             if not m:raise ValueError('invalid API event')
             name=m[1];expected=184 if name==b'create' else 114 if name==b'metrics' else 0
             if len(m[2])!=expected:raise ValueError('invalid API packet')

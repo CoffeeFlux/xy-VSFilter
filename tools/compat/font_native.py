@@ -20,8 +20,8 @@ def validate(data,bits,edge=False):
     if len(rows)!=cases*2+2:raise ValueError('missing font observations')
     if not re.fullmatch(rb'font-provenance pointer_bits='+str(bits).encode()+rb' ansi=\d+ oem=\d+ logfont=92 metric=60',rows[0]):raise ValueError('wrong font ABI')
     for i in range(cases):
-        if not re.fullmatch(f'font-case index={i} '.encode()+(rb'count=[12] aliases=[01]1' if edge else rb'count=1 aliases=11')+rb' ascent=-?\d+ descent=-?\d+ extent=-?\d+,-?\d+(?: (?:first|second|copy|read)=[0-9a-f]+,-?\d+,\d+){4} logfont=[0-9a-f]{184} metric=[0-9a-f]{120}',rows[1+2*i]):raise ValueError(f'invalid font case {i}')
-        if not re.fullmatch(f'font-release index={i} '.encode()+(rb'count=[02]' if edge else rb'count=0')+rb'(?: (?:a|b|c)=[0-9a-f]+,-?\d+,\d+){3}',rows[2+2*i]):raise ValueError(f'invalid release {i}')
+        if not re.fullmatch(f'font-case index={i} '.encode()+(rb'count=[12] aliases=[01]1' if edge else rb'count=1 aliases=11')+rb' ascent=-?\d+ descent=-?\d+ extent=-?\d+,-?\d+(?: (?:first|second|copy|read)=[0-9a-f]+,[0-9a-f]+,[0-9a-f]+,-?\d+,\d+){4} logfont=[0-9a-f]{184} metric=[0-9a-f]{120}',rows[1+2*i]):raise ValueError(f'invalid font case {i}')
+        if not re.fullmatch(f'font-release index={i} '.encode()+(rb'count=[02]' if edge else rb'count=0')+rb'(?: (?:a|b|c)=[0-9a-f]+,[0-9a-f]+,[0-9a-f]+,-?\d+,\d+){3}',rows[2+2*i]):raise ValueError(f'invalid release {i}')
     if not re.fullmatch(f'font-complete cases={cases} '.encode()+(rb'count=[02]' if edge else rb'count=0'),rows[-1]):raise ValueError('incomplete font release')
 
 def compare(traces,bits,edge=False):
