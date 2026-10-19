@@ -885,6 +885,32 @@ def realtext_parser_variants():
 
 
 
+
+def ass_override_variants():
+    for name,caption in {
+        'control':r'{\shad0}Override sample',
+        'relative-size':r'{\shad0\fs+3}Override sample',
+        'border':r'{\shad0\xbord8\ybord4}Override sample',
+        'alpha':r'{\shad0\alpha&H80&\3a&H00&}Override sample',
+        'rotation':r'{\shad0\frz25\fax0.2}Override sample',
+        'rectangle':r'{\shad0\clip(300,150,355,210)}Override sample',
+        'inverse-rectangle':r'{\shad0\iclip(300,150,355,210)}Override sample',
+        'karaoke':r'{\shad0\1c&H00FF00&\2c&H0000FF&\kt10\kf80}Override{\ko40} sample',
+        'transform':r'{\shad0\t(200,1600,0.5,\fs54\bord8\frz20)}Override sample',
+        'nested-transform':r'{\shad0\t(0,1800,\bord8\t(300,900,2,\fs54)\frz20)}Override sample',
+        'vector':r'{\shad0\clip(m 280 140 l 370 140 370 220 280 220)}Override sample',
+        'inverse-vector':r'{\shad0\iclip(2,m 560 280 l 740 280 740 440 560 440)}Override sample',
+        'vector-first':r'{\shad0\clip(m 280 140 l 370 140 370 220 280 220)\iclip(m 0 0 l 640 0 640 360)}Override sample',
+        'named-reset':r'{\fs64\b1}Override{\rDefault\shad0} sample',
+        'missing-reset':r'{\fs64\b1}Override{\rMissing\shad0} sample',
+        'font-reset':r'{\fnArial\fs+2\fscx120\fsp2}Override{\fn0\fsc\fsp} sample',
+        'booleans':r'{\b700\i1\u1\s1}Override{\b2\i2\u2\s2} sample',
+        'signed-shadow':r'{\xshad-4\yshad6\xbord-1\ybord3}Override sample',
+        'polygon':r'{\p1\pbo-2\shad0}m 0 0 l 40 0 40 30 0 30{\p0} sample',
+        'wrap-align':r'{\an7\a11\q2\shad0}Override\Nsample',
+    }.items():
+        yield 'ass-override-'+name+'.ass',SEED.replace(b'COMPAT_TEXT',caption.encode('ascii'))
+
 def ass_tree_variants():
     for name,tags in {
         'control':r'\b0\i0\u0\1c&HFFFFFF&',
@@ -1050,7 +1076,7 @@ def make_cases(files):
                 for apartment in ("sta", "mta"):
                     cases.append({**uninitialized, "id": uninitialized["id"] + "-" + apartment,
                                   "com_apartment": apartment})
-            if path.stem.startswith("ass-tree-"):
+            if path.stem.startswith(("ass-tree-","ass-override-")):
                 cases[-1]["times"] = ["0", "0.9999999", "1", "1.1", "1.5", "2", "2.6", "3.9999999", "4", "2", "1.1"]
             if path.stem.startswith("effects-"):
                 cases[-1]["times"] = ["0", "0.9999999", "1", "1.125", "1.5", "1.9", "2", "2.5", "3.1", "3.5", "3.9999999", "4", "2", "1.125"]
@@ -1152,6 +1178,9 @@ def make_cases(files):
                        for a,b in (("bold","prefix-bold"),("prefix-underline","control"),
                                    ("parenthesized-color","control"),("trim-color","control"),
                                    ("transform-multiple","control"),("duplicate-scalar-param","control"))
+                       for mode in ("file","memory")]
+                    + [[f"ass-override-{a}-{mode}",f"ass-override-control-{mode}"]
+                       for a in ("relative-size","border","alpha","rotation","rectangle","inverse-rectangle","karaoke","transform")
                        for mode in ("file","memory")], "cases": cases}
 
 
@@ -1207,6 +1236,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in html_tag_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in effects_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in ass_tree_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in ass_override_variants()]
     manifest = json.dumps(make_cases(files + generated), indent=2) + "\n"
     expected = generated + [(DEST / "cases.json", manifest.encode("utf-8"))]
     for path, data in expected:

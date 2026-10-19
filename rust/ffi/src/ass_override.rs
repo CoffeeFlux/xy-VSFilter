@@ -217,3 +217,180 @@ pub extern "C" fn xy_vsfilter_ass_animation_v1(
     };
     ass_override::animation(&state, dst, src, animate != 0, &mut svc)
 }
+
+#[cfg(test)]
+pub(crate) fn test_exports(document_id: u64) {
+    use alloc::vec::Vec;
+    use core::ptr;
+    struct Observation {
+        packets: Vec<Vec<u8>>,
+        reenter: u64,
+    }
+    unsafe extern "C" fn observe(context: *mut c_void, bytes: *const u8, length: usize) -> u32 {
+        // SAFETY: this test supplies a live exclusive Observation and the export
+        // supplies a detached packet readable through this synchronous callback.
+        let observation = unsafe { &mut *context.cast::<Observation>() };
+        observation
+            .packets
+            .push(unsafe { core::slice::from_raw_parts(bytes, length) }.to_vec());
+        if observation.reenter != 0 {
+            assert_eq!(
+                crate::effects::xy_vsfilter_effects_clear_v1(observation.reenter),
+                0
+            );
+        }
+        0
+    }
+    let mut input = State::default().encode();
+    for value in [192u32, 192, 0] {
+        input.extend_from_slice(&value.to_le_bytes());
+    }
+    input.extend_from_slice(&[0; 384]);
+    let mut observation = Observation {
+        packets: Vec::new(),
+        reenter: 0,
+    };
+    let context = (&mut observation as *mut Observation).cast::<c_void>();
+    let mut id = [0; 8];
+    // SAFETY: buffers and context stay live, callback observes only during the
+    // call. This runs in the existing serialized global registry export test.
+    unsafe {
+        assert_eq!(
+            crate::effects::xy_vsfilter_effects_create_v1(id.as_mut_ptr()),
+            0
+        );
+        let id = u64::from_le_bytes(id);
+        assert_eq!(
+            xy_vsfilter_ass_override_v1(
+                0,
+                0,
+                document_id,
+                id,
+                input.as_ptr(),
+                input.len(),
+                context,
+                Some(observe),
+                None,
+                None
+            ),
+            0
+        );
+        assert_eq!(observation.packets.len(), 1);
+        assert_eq!(&observation.packets[0][..132], &input[..132]);
+        assert_eq!(
+            xy_vsfilter_ass_override_v1(
+                0,
+                1,
+                document_id,
+                id,
+                input.as_ptr(),
+                input.len(),
+                context,
+                Some(observe),
+                None,
+                None
+            ),
+            4
+        );
+        assert_eq!(
+            xy_vsfilter_ass_override_v1(
+                document_id,
+                0,
+                document_id,
+                id,
+                input.as_ptr(),
+                input.len(),
+                context,
+                Some(observe),
+                None,
+                None
+            ),
+            1
+        );
+        assert_eq!(
+            xy_vsfilter_ass_override_v1(
+                0,
+                0,
+                document_id,
+                id,
+                ptr::null(),
+                0,
+                context,
+                Some(observe),
+                None,
+                None
+            ),
+            3
+        );
+        assert_eq!(
+            xy_vsfilter_ass_override_v1(
+                0,
+                0,
+                document_id,
+                id,
+                input.as_ptr(),
+                usize::MAX,
+                context,
+                Some(observe),
+                None,
+                None
+            ),
+            5
+        );
+        assert_eq!(observation.packets.len(), 1);
+        observation.reenter = id;
+        assert_eq!(
+            xy_vsfilter_ass_override_v1(
+                0,
+                0,
+                document_id,
+                id,
+                input.as_ptr(),
+                input.len(),
+                context,
+                Some(observe),
+                None,
+                None
+            ),
+            2
+        );
+        assert_eq!(observation.packets.len(), 2);
+        assert_eq!(crate::effects::xy_vsfilter_effects_destroy_v1(id), 0);
+        assert_eq!(
+            xy_vsfilter_ass_override_v1(
+                0,
+                0,
+                document_id,
+                id,
+                input.as_ptr(),
+                input.len(),
+                context,
+                Some(observe),
+                None,
+                None
+            ),
+            1
+        );
+        assert_eq!(observation.packets.len(), 2);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn malformed_style_lengths_and_flags_refuse_before_services() {
+        let mut input = State::default().encode();
+        for value in [192u32, 192, 0] {
+            input.extend_from_slice(&value.to_le_bytes());
+        }
+        input.extend_from_slice(&[0; 384]);
+        assert!(decode(&input).is_ok());
+        assert_eq!(decode(&input[..143]).err(), Some(3));
+        input[140] = 2;
+        assert_eq!(decode(&input).err(), Some(3));
+        input[140] = 0;
+        input[132..136].copy_from_slice(&u32::MAX.to_le_bytes());
+        assert!(decode(&input).is_err());
+    }
+}

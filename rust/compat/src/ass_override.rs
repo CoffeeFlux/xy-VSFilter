@@ -405,7 +405,7 @@ impl Evaluation {
                     // CString comparison stops at NUL; Trim stops scanning at
                     // NUL but retains the remaining stored code units.
                     let nul = p.iter().position(|u| *u == 0).unwrap_or(p.len());
-                    if p.is_empty() || &p[..nul] == [b'0' as u16] {
+                    if p.is_empty() || p[..nul] == [b'0' as u16] {
                         current.font_name = original.font_name.clone();
                     } else {
                         current.font_name = p.to_vec();
@@ -428,7 +428,14 @@ impl Evaluation {
                     } else {
                         let number = svc.float(p);
                         let dst = if matches!(p[0], 45 | 43) {
-                            current.font_size + current.font_size * number / 10.0
+                            #[cfg(target_arch = "x86")]
+                            {
+                                crate::ass_override_float::relative(current.font_size, number)
+                            }
+                            #[cfg(not(target_arch = "x86"))]
+                            {
+                                current.font_size + current.font_size * number / 10.0
+                            }
                         } else {
                             number
                         };

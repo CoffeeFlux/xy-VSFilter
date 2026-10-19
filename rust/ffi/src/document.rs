@@ -9656,6 +9656,8 @@ mod tests {
             crate::effects::test_exports(fresh);
             #[cfg(windows)]
             crate::ass_tree::test_exports(fresh);
+            #[cfg(windows)]
+            crate::ass_override::test_exports(fresh);
             assert_eq!(xy_vsfilter_document_destroy_v1(fresh), OK);
         }
     }
