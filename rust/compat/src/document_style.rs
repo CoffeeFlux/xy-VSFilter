@@ -101,8 +101,9 @@ impl StyleValue {
         assert_eq!(self.margins, owner.coordinates());
         self.rectangle_owner = Some(owner);
     }
-    /// Apply native floating assignment effects in field order. Raw transport,
-    /// storage cloning and copy construction deliberately do not call this.
+    /// Apply target floating copy effects in declaration order. Explicit native
+    /// assignment and IA32 canonical construction use this; raw transport and
+    /// ordinary storage cloning preserve bits without invoking the callback.
     pub fn assign_floats_with(&mut self, mut assign: impl FnMut(u64) -> u64) {
         for value in [
             &mut self.font_size,

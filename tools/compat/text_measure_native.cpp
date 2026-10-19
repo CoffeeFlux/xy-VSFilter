@@ -5,6 +5,9 @@
 #undef XY_TEXT_MEASURE_INCLUDED
 #include <cfenv>
 #include <process.h>
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+#include <RustTextMeasure.h>
+#endif
 static unsigned history,extent_count;static bool observing;
 struct MeasureEvent {const char* name;int count,result,width;Status before,after;};
 static MeasureEvent measure_events[16];static unsigned measure_used;
@@ -40,13 +43,22 @@ int main(int argc,char** argv){try{
         memcpy(&original,&(canonical.*fields[field]),8);
         if(raw_canonical)memcpy(&(canonical.*fields[field]),&raw[value],8);
 #else
-        const STSStyle canonical=owner->get();memcpy(&original,&(canonical.*fields[field]),8);
+        STSStyle canonical=owner->get();memcpy(&original,&(canonical.*fields[field]),8);
+        // Raw-input mode calls the production measurement adapter with a
+        // detached style, bypassing canonical construction on both sides.
+        if(raw_canonical)memcpy(&(canonical.*fields[field]),&raw[value],8);
 #endif
         uint64_t measured;memcpy(&measured,&(canonical.*fields[field]),8);
         printf("text-measure-input index=%u bits=%016llx\n",index,static_cast<unsigned long long>(measured));
         for(history=0;history<4;++history){
             CText::TextInfo output={history==3?INT_MAX:5,0x12345678,0x23456789};measure_used=extent_count=0;reset();if(sticky)check(std::feraiseexcept(FE_DIVBYZERO)==0);const Status before=status();
-            observing=true;TextProbe::measure(output,*owner,text);const Status after=status();observing=false;
+            observing=true;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            if(raw_canonical){XyRust::RendererDcOperation operation;FwCMyFont measured_font(canonical,operation);XyRust::MeasureText(output,canonical,text,operation,measured_font.get());}
+            else
+#endif
+            TextProbe::measure(output,*owner,text);
+            const Status after=status();observing=false;
             printf("text-measure-case index=%u sticky=%u field=%u bits=%016llx history=%u events=%u output=%d,%d,%d",index++,sticky,field,static_cast<unsigned long long>(raw[value]),history,measure_used,output.m_width,output.m_ascent,output.m_descent);emit("before",before);emit("after",after);printf("\n");
             for(unsigned j=0;j<measure_used;++j){const auto& e=measure_events[j];printf("text-measure-call name=%s count=%d result=%d width=%d",e.name,e.count,e.result,e.width);emit("before",e.before);emit("after",e.after);printf("\n");}
         }

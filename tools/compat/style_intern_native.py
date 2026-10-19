@@ -175,6 +175,9 @@ def main():
                       "src/thirdparty","include","include/unrar")]
             exe=work/"style-interner.exe"
             command=["cl","/nologo","/Bv","/O2","/Oi","/Ob2","/fp:precise","/EHsc","/std:c++14","/MT","/Gy","/showIncludes"]
+            # Match common.props NoExtensions: the x86 default SSE2 changes
+            # implicit style-copy NaN quieting and floating exception domains.
+            if bits==32:command.append("/arch:IA32")
             command += ["/D"+define for define in defines]+["/I"+str(path) for path in includes]
             command += [str(SOURCE),"/Fo:"+str(work/"probe.obj"),"/Fe:"+str(exe),"/link","/SUBSYSTEM:CONSOLE","/OPT:REF","/OPT:ICF","/VERBOSE:LIB","/LIBPATH:"+str(root/"lib")]
             command += list(map(str,libraries))+list(SYSTEM_LIBRARIES)

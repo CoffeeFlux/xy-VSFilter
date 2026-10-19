@@ -171,14 +171,29 @@ impl Table {
         rectangles: &mut rect_intern::Table,
         equal: &mut impl FnMut(&StyleValue, &StyleValue) -> bool,
     ) -> Result<Arc<Value>, Error> {
+        self.intern_with_copy(identity, style, rectangles, equal, &mut |_| {})
+    }
+    /// Apply target copy effects only after the initial lookup misses. Native
+    /// new T(v) precedes emplace, whose hash and comparisons use the copied key.
+    /// The callback must preserve the style's shape and nested rectangle value.
+    pub fn intern_with_copy(
+        &mut self,
+        identity: u64,
+        mut style: StyleValue,
+        rectangles: &mut rect_intern::Table,
+        equal: &mut impl FnMut(&StyleValue, &StyleValue) -> bool,
+        copy: &mut impl FnMut(&mut StyleValue),
+    ) -> Result<Arc<Value>, Error> {
         if identity == 0 || self.entries.contains_key(&identity) {
             return Err(Error::Identity);
         }
-        let hash = hash(&style);
+        let lookup_hash = hash(&style);
         // XyInterned::Intern's lookup, then unordered_map::emplace's lookup.
-        if let Some(value) = self.find(&style, hash, equal)? {
+        if let Some(value) = self.find(&style, lookup_hash, equal)? {
             return Ok(value);
         }
+        copy(&mut style);
+        let hash = hash(&style);
         if let Some(value) = self.find(&style, hash, equal)? {
             return Ok(value);
         }
@@ -299,6 +314,39 @@ mod tests {
     use super::*;
     fn style() -> StyleValue {
         crate::ass_style_value::Builder::default().value
+    }
+    #[test]
+    fn canonical_copy_follows_lookup_and_rehashes_the_copied_value() {
+        let mut table = Table::new();
+        let mut rectangles = rect_intern::Table::new();
+        let mut copies = 0;
+        let mut copy = |value: &mut StyleValue| {
+            copies += 1;
+            value.char_set = 129;
+        };
+        let original = style();
+        let first = table
+            .intern_with_copy(
+                1,
+                original,
+                &mut rectangles,
+                &mut StyleValue::native_compatible_eq,
+                &mut copy,
+            )
+            .unwrap();
+        assert_eq!(first.style.char_set, 129);
+        // Finding the copied key proves its new hash was used for insertion.
+        let alias = table
+            .intern_with_copy(
+                2,
+                first.style.clone(),
+                &mut rectangles,
+                &mut StyleValue::native_compatible_eq,
+                &mut copy,
+            )
+            .unwrap();
+        assert!(Arc::ptr_eq(&first, &alias));
+        assert_eq!(copies, 1);
     }
     #[test]
     fn zero_alias_keeps_first_raw_value_and_rectangle_outlives_other_owners() {

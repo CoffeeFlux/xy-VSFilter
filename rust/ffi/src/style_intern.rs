@@ -26,11 +26,15 @@ fn create(boundary: &Boundary, value: wire::StyleValue) -> Result<[u8; 24], u32>
             let id = r.reserve_insert().map_err(error)?;
             let value = r
                 .styles
-                .intern_with(
+                .intern_with_copy(
                     id,
                     value,
                     &mut r.rectangles,
                     &mut crate::style_compare::equal,
+                    // Cleanup Win32 /arch:IA32 copies all floating members
+                    // through x87; x64 copies raw bits. Do this only on a miss,
+                    // before the copied key is hashed for emplace.
+                    &mut |style| style.assign_floats_with(crate::style_assignment::copy_bits),
                 )
                 .map_err(style_error)?;
             // Every stored style came through the checked wire decoder, including
