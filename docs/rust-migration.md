@@ -27,7 +27,87 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: owned ASS command trees (2026-10-18)
+## Current port: ASS override evaluation (2026-10-18)
+
+The experimental renderer now evaluates all 54 ASS commands in safe Rust,
+including style changes, nested transforms, animation, alignment, wrap, karaoke,
+polygon state, rectangular clipping and vector-clip requests. An explicit task
+stack replaces recursive transform evaluation. The native per-tag application
+switch and CalcAnimation implementation are excluded on this path.
+
+The evaluator works on owned tree/style/effect snapshots and raw UTF-16 units.
+Vector-clip construction remains a synchronous native service. Before calling
+it, Rust checkpoints effects and sends detached style/scalar values to the native
+mirrors; later tags run after construction succeeds. No registry loan or native
+admission gate spans CRT or clip callbacks. Effect revisions reject reentrant
+mutation, and C++ catches exceptions before returning across the Rust boundary.
+Native subtitle/style mirrors, clipper/polygon construction and renderer caches
+remain transitional.
+
+The port preserves conversion calls even for empty parameters where the native
+branch makes them, masked-channel color animation, individual clamp rules,
+first-wins alignment/effects/clippers, and complete named-style resets. Karaoke
+adds fractional durations before integer conversion. Nested transforms retain
+the inner timing state rather than restoring outer values on return.
+
+Direct comparison found and fixed a one-bit Win32 relative-font-size mismatch.
+The native /arch:IA32 build retains the x87 extended exponent range between
+operations at its default 53-bit precision. Safe normalized significands and
+separate exponents now emulate that calculation; x64 retains direct double
+arithmetic. The failed candidate trace is preserved with its provenance.
+
+A further direct probe found 38 Win32 alpha mismatches during extrapolation
+with negative transform acceleration. MSVC converts double to BYTE through a
+signed 64-bit result on x86, versus a signed 32-bit result on x64. Rust now
+emulates those conversions before retaining the low byte. All 180 expanded
+alpha cases match, and two new rendering scripts exercise negative acceleration.
+The font reset also follows CString's stored-length character comparison;
+end-to-end raw-font cases retain the tokenizer's first-NUL behavior.
+
+Final implementation `215816d5` is checked against cleanup `67da07cd` on both
+Windows architectures (x86 and x64):
+
+* 9,312 full override applications, 2,304 direct animation calculations and
+  400 relative-font-size boundary cases, four raw-font cases and 180 alpha
+  extrapolation cases. All 96,014 trace lines
+  match across two runs per implementation. The original 95,425 observation
+  lines also equal pre-port baseline `4c44c31c`. Traces include complete style
+  bits, renderer/subtitle state, effects, vector-clip inputs, errno and returns.
+* Expanded rendering corpus: 1,222 cases / 13,186 frames / 192 distinct-frame
+  controls. The previous 1,178 cases are unchanged. Twenty-two scripts add 44
+  file/memory cases, 484 frames and 20 controls, including backward seeks.
+* Final effect observations remain identical across 13,608 applications. The
+  older effect probe now initializes every scalar read by the full evaluator.
+  All three final DLLs pass export/dependency and scoped COM checks.
+* The broader tree, HTML, color, USF, RealText, WebVTT, SAMI, text, MicroDVD,
+  ASS and XombieSub suites passed at `9c27c179`, together with 3,693 lifecycle
+  trace lines and nine compile probes. Those results retain their original
+  provenance. Since that revision, the only changed production source is the
+  override evaluator; final override/effect/rendering/ABI checks cover the
+  subsequent raw-font and alpha corrections.
+* 326 safe-core and 133 FFI tests, formatting and Clippy on both architectures;
+  172 Python tests with one skip. The 110-file portable core has zero unsafe
+  sites. One unsafe input export, two callback type declarations and three
+  unsafe blocks form the new boundary; it introduces no raw canonical owner
+  pointer or mutable foreign slice.
+
+See the [override inventory](rust-ass-override-inventory.json) and
+[local evidence manifest](rust-ass-override-local-evidence.json). Finite default
+floating-point-mode evidence does not close other rounding/precision modes,
+FTZ/DAZ, signaling NaNs, arbitrary locale changes or all exponent-range cases in
+other expressions. Allocation failures, native reentry changes to document/style
+state, reference depth-limit outcomes and externally visible internal error
+statuses remain unclosed. No production switch or whole-library completion is
+claimed.
+
+Next: move subtitle, word, line and clipper ownership and renderer cache policy
+into Rust, using direct traces of copy/append, compaction, wrapping, metrics,
+cursor movement, lifetime and GDI interactions. Native adapters, all formats,
+options/interfaces and vendored implementation remain in scope; the endpoint
+continues to be the entire repository in Rust.
+
+
+## Previous port: owned ASS command trees (2026-10-18)
 
 The experimental renderer now constructs and stores ASS command trees in safe
 Rust: all 54 command names, longest-prefix lookup, position levels, parameter

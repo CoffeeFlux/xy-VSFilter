@@ -1,0 +1,819 @@
+{
+  "schema": 1,
+  "candidate_commit": "215816d5f9e55bf5af4bd3c40b024c83095b53a2",
+  "baseline_commit": "4c44c31c065de2f57f3a4503508fd6308de6c23c",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "Full ASS override application dispatch and CalcAnimation in the experimental Rust renderer.",
+  "limits": [
+    "Experimental renderer/document-owner path only; no production switch or whole-renderer, host or library completion claim.",
+    "All 54 ASS override dispatch branches, nested transform evaluation, animation interpolation, style/alignment/wrap/karaoke/polygon decisions and clip requests run in safe Rust. Native subtitle/style mirrors, clipper/polygon construction, renderer/word/layout ownership and cache policy remain transitional.",
+    "CRT numeric conversion, whitespace and pow are Windows system services outside registry admission. Callback packets contain detached state/style/raw code units. C++ catches exceptions and rethrows only after Rust returns; native callback and buffer lifetimes remain audited contracts.",
+    "Finite initialized Unicode MSVC14.44 x86/x64 evidence under observed default floating-point modes. Other x87 precision/rounding modes, FTZ/DAZ, signaling NaNs, arbitrary locale changes and reference depth-limit outcomes are not closed.",
+    "No allocation-failure or native new-handler fault injection closure. Effects revision checks refuse reentry mutation; document named styles are snapshotted at entry. Arbitrary document/style reentry changes, concurrent native wrapper destruction and externally observed exception/Busy behavior remain unclosed.",
+    "Native clip side effects occur in tag order after checkpointing effects and native mirrors. Failures do not roll back earlier checkpoints. Portable tasks and tree storage are iterative; reference crashes/hangs/nondeterminism remain unresolved, never parity.",
+    "Lexical unsafe counts are an inventory rather than a soundness proof or migration percentage. All formats/options/interfaces, hosts and vendored implementation remain in scope."
+  ],
+  "configuration": {
+    "native": "Release; RustTextDecoder=true; RustDocumentOwnerExperimental=true",
+    "rust": "1.85.0; native-runtime; +crt-static",
+    "msvc": "14.44.35207",
+    "sdk": "10.0.26100.0"
+  },
+  "architectures": {
+    "x64": {
+      "baseline_override": {
+        "report": "artifacts/override-baseline-fixed-x64/report.json",
+        "sha256": "aab7e62e51e2ffd0dc2482d46890ffc833d901f02ab797a02421fa6f1e111430",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 95426,
+        "candidate_commit": "4c44c31c065de2f57f3a4503508fd6308de6c23c",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "inputs": 1144,
+        "cases": 9312
+      },
+      "final_override": {
+        "report": "artifacts/override-final-pass-native-x64/report.json",
+        "sha256": "c8a221b02df5b4e18ef919a9a1717b1cdc537564e926aac61520a7ec6c42fc97",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 96014,
+        "candidate_commit": "215816d5f9e55bf5af4bd3c40b024c83095b53a2",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "inputs": 1144,
+        "cases": 9312
+      },
+      "preport_observations_preserved": true,
+      "tree_regression": {
+        "report": "artifacts/override-tree-final-x64/report.json",
+        "sha256": "9c2d712b231306a55ceec9fb360be6aa689187d5806c1f32a2fad575357102e5",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 10286,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "inputs": 1714,
+        "cases": 5142,
+        "previous_traces_preserved": true
+      },
+      "html_regression": {
+        "report": "artifacts/override-parser-final-x64/report.json",
+        "sha256": "3afe619e65871db80422645b4b1ccbfd43c6137f47b5006ddcd4e7be15b608d1",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 17186,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "inputs": 1408,
+        "cases": 5728,
+        "previous_traces_preserved": true
+      },
+      "colors_regression": {
+        "report": "artifacts/override-shared-final-x64/report.json",
+        "sha256": "621ebb53acabf2c518b461af02a200bfdca5aff9d090fc75449dc0adae423e34",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 12234,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "values": 1112,
+        "cases": 8896,
+        "previous_traces_preserved": true
+      },
+      "usf_regression": {
+        "report": "artifacts/override-final-x64/report.json",
+        "sha256": "677d4b501ef8a25f6a980b2deb76a95b61279fe99d01f1caf45ece7440ef97d5",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 40517,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "scalar_cases": 20735,
+        "scalar_values": 1885,
+        "load_cases": 348,
+        "load_inputs": 28,
+        "cases": 1340,
+        "previous_traces_preserved": true
+      },
+      "realtext_regression": {
+        "report": "artifacts/override-final-probe-x64/report.json",
+        "sha256": "5355813aa24256b899e91f7f58feced3574c226ddcb9e56fa9407dfa70494b6c",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 37887,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 4532,
+        "previous_traces_preserved": true
+      },
+      "vtt_regression": {
+        "report": "artifacts/override-vtt-regression-x64/report.json",
+        "sha256": "5a44dee7275978027e51075c269ee0410d8f3dc5eb8ad1dd5a011d4710d5a3b5",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 21939,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 2292,
+        "previous_traces_preserved": true
+      },
+      "sami_regression": {
+        "report": "artifacts/override-sami-regression-x64/report.json",
+        "sha256": "fb76aca8bd7fe873c1f185a022439972eefb6b384d75d0bcdaf29e79228f0bd1",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 26992,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 2836,
+        "previous_traces_preserved": true
+      },
+      "text_regression": {
+        "report": "artifacts/override-text-regression-x64/report.json",
+        "sha256": "de0d00bb7c57743d84455373cc466491f102d4210095947ff57493f666143b81",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 44404,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 5692,
+        "previous_traces_preserved": true
+      },
+      "microdvd_regression": {
+        "report": "artifacts/override-microdvd-regression-x64/report.json",
+        "sha256": "92c2c84269e7b66e0ea4b9c3ddb11227ebd7bf5c42c16319113abc553288ba1f",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 41491,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 4588,
+        "previous_traces_preserved": true
+      },
+      "ass_regression": {
+        "report": "artifacts/override-ass-probe-x64/report.json",
+        "sha256": "902c8f23d7cde50befc2481c5b8da3e0e627d3f1da5cfc3b65122b2fef8e6620",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 22286,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 3266,
+        "previous_traces_preserved": true
+      },
+      "xombie_regression": {
+        "report": "artifacts/override-xombie-probe-x64/report.json",
+        "sha256": "0426075b520cee2f75010cb38fc4793273626c713c550a4455a71b5c1b4d5d7b",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 10441,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 1242,
+        "previous_traces_preserved": true
+      },
+      "final_effects": {
+        "report": "artifacts/override-final-pass-effects-x64/report.json",
+        "sha256": "a90953cfa0cd11e0b589ca773baf4a62ee04eb069c3f747830cd976ea565174e",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 81722,
+        "candidate_commit": "215816d5f9e55bf5af4bd3c40b024c83095b53a2",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "inputs": 1116,
+        "cases": 13608
+      },
+      "prior_regression_scope": {
+        "commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "final_production_delta": [
+          "rust/compat/src/ass_override.rs"
+        ],
+        "note": "Prior parser/tree/HTML/color/USF suites retain their measured revision. Final override, effect, rendering and ABI checks cover the last raw-font/alpha corrections; unrelated parser modules are unchanged."
+      },
+      "corpus": {
+        "report": "artifacts/override-final-pass-csri-x64/summary.json",
+        "sha256": "7b87c991f34458ef94e40b3d6e1ce7fe294ee7ea2a592e540ac6ef76da72337e",
+        "complete": true,
+        "frames": 13186,
+        "distinct_controls": 192,
+        "cases": 1222,
+        "shards": [
+          {
+            "report": "artifacts/override-final-pass-csri-x64/shard-0/report.json",
+            "sha256": "c115b516dce21d5a0749aca5ae772c6077ca00d04f1120fd4a093ee2f6f36885",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1671,
+            "cases": 153
+          },
+          {
+            "report": "artifacts/override-final-pass-csri-x64/shard-1/report.json",
+            "sha256": "ebe464385845bce154900514006f560b61674356507badc6447920bcbc72e120",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1659,
+            "cases": 153
+          },
+          {
+            "report": "artifacts/override-final-pass-csri-x64/shard-2/report.json",
+            "sha256": "42e4d84c753af226c6be54ea5fe2d20524721b6b2b9ee04b7d141b79973a234e",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1658,
+            "cases": 153
+          },
+          {
+            "report": "artifacts/override-final-pass-csri-x64/shard-3/report.json",
+            "sha256": "8966e83a79477b8d78871399a77e7c401805c9cdebc0241d979a117d067503be",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1658,
+            "cases": 153
+          },
+          {
+            "report": "artifacts/override-final-pass-csri-x64/shard-4/report.json",
+            "sha256": "5963092613694d5b59ec7b58ffa09b641cc6d9824895774aab37f1822b81583a",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1619,
+            "cases": 153
+          },
+          {
+            "report": "artifacts/override-final-pass-csri-x64/shard-5/report.json",
+            "sha256": "ed087219930d5403a4d344f47819e349e8652b057e5ce0ec1088a9077d24e549",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1631,
+            "cases": 153
+          },
+          {
+            "report": "artifacts/override-final-pass-csri-x64/shard-6/report.json",
+            "sha256": "b38f1e77536e97f224d9b981f1ee7100853b582b39b2fd6f4e1eea45024e325d",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1645,
+            "cases": 152
+          },
+          {
+            "report": "artifacts/override-final-pass-csri-x64/shard-7/report.json",
+            "sha256": "8de8faff9467c891f20738f8a14c4619a7e48388699aa9a4e8eca0b775825e43",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1645,
+            "cases": 152
+          }
+        ]
+      },
+      "new_override_rendering": {
+        "cases": 44,
+        "frames": 484,
+        "distinct_controls": 20,
+        "included_in_full_corpus": true
+      },
+      "prior_lifecycle": {
+        "report": "artifacts/override-lifecycle-x64/report.json",
+        "sha256": "4e23a0d4038778dd16f0869c21535278b2f3f519b11fbf6066ba19eea0126ca0",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 3693,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+      },
+      "prior_compile": {
+        "report": "artifacts/override-compile-x64/report.json",
+        "sha256": "963f1773858381ceccaab80c1f1987588a12ef3a2acb4c985898735c8d3996e1",
+        "complete": true,
+        "inputs_unchanged": true,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+      },
+      "com": {
+        "report": "artifacts/override-final-pass-contracts-x64/com/report.json",
+        "sha256": "a54fd1c08e6f492833d4c6a36110cb712610bbc04c7642b56c68c67e6bfbbd45",
+        "complete": true,
+        "passed": true,
+        "inputs_unchanged": true,
+        "candidate_commit": "215816d5f9e55bf5af4bd3c40b024c83095b53a2",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "2d254068a40e5f59cf191c3c6bbfc984b548193b668c4decac21dc1e94e02169",
+          "candidate_sha256": "bb4149af487491d55cb1c88dbd4f1e07f1a5c18b30963a422952bd5d1c7445d7",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "805d7d7481b2774c2612b7cd7dd7fdaa4dd04a35111f3726a6704acf88c4a0d2"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "32b7c2cd6eb817120414db53b3c3005e719ae4b993c4a69d0d66c7f6ac363d5a",
+          "candidate_sha256": "7bb10299f62e1253e5b1361907e172f5be726b103a5c0143f86978aa2e9c69ed",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "2ce278d6be4d85c557490e59cb33e78ca53faf3e38061e9ca3eb225897be359a"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "f1165742064181b7fb73bacb16017d8e202c8bb0be90ed8c2eb812ac282c2df8",
+          "candidate_sha256": "244e3f92f5f1060f9f50ad58577b9d48aebf5357ffc9f8eb4185bf9d7792e551",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "b0b48a3cf2bf2ecbbac4ecca863a815ab4a0c1137277a9b7d5830d9d1beca5c9"
+        }
+      }
+    },
+    "x86": {
+      "baseline_override": {
+        "report": "artifacts/override-baseline-fixed-x86/report.json",
+        "sha256": "44a4a5acce4dd879f2b1c62fda141a5490b5a7888c3e64043343be2d657ef558",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 95426,
+        "candidate_commit": "4c44c31c065de2f57f3a4503508fd6308de6c23c",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "inputs": 1144,
+        "cases": 9312
+      },
+      "final_override": {
+        "report": "artifacts/override-final-pass-native-x86/report.json",
+        "sha256": "a3bcc11fd55aca4edbcb4df8f98d0c0da83aee1af4de179a4ab59b5a88001ba0",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 96014,
+        "candidate_commit": "215816d5f9e55bf5af4bd3c40b024c83095b53a2",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "inputs": 1144,
+        "cases": 9312
+      },
+      "preport_observations_preserved": true,
+      "tree_regression": {
+        "report": "artifacts/override-tree-final-x86/report.json",
+        "sha256": "4fc82280ae53cc3b491a5c029b13c98b86f1ab0ee73696212d7e677b195379d9",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 10286,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "inputs": 1714,
+        "cases": 5142,
+        "previous_traces_preserved": true
+      },
+      "html_regression": {
+        "report": "artifacts/override-parser-final-x86/report.json",
+        "sha256": "d6c571f90cc1e3f3fb0dd7a93fb32d7dfd163facf672ee6d60e34ce3fcf64606",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 17186,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "inputs": 1408,
+        "cases": 5728,
+        "previous_traces_preserved": true
+      },
+      "colors_regression": {
+        "report": "artifacts/override-shared-final-x86/report.json",
+        "sha256": "8603091533c066753bea2944111608f180dfcc9fdc76d55ddddd75279b492f8b",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 12234,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "values": 1112,
+        "cases": 8896,
+        "previous_traces_preserved": true
+      },
+      "usf_regression": {
+        "report": "artifacts/override-final-x86/report.json",
+        "sha256": "a12f1dff52a2e6d5ea4373ccef078d003cd3082c006e3203c3e7b36a228365e9",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 40517,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "scalar_cases": 20735,
+        "scalar_values": 1885,
+        "load_cases": 348,
+        "load_inputs": 28,
+        "cases": 1340,
+        "previous_traces_preserved": true
+      },
+      "realtext_regression": {
+        "report": "artifacts/override-final-probe-x86/report.json",
+        "sha256": "acd6ebf0e61002b5fb2001ebb760170971f336502a22d4aea7dd4298c309c633",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 37887,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 4532,
+        "previous_traces_preserved": true
+      },
+      "vtt_regression": {
+        "report": "artifacts/override-vtt-regression-x86/report.json",
+        "sha256": "5a8d31b41e1a72766abfac772004678b9f562f69145ba92cfaf715905f393bea",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 21939,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 2292,
+        "previous_traces_preserved": true
+      },
+      "sami_regression": {
+        "report": "artifacts/override-sami-regression-x86/report.json",
+        "sha256": "a320c0acfda35c5a1ddd08937eac597c9f3c47dd05859d3c4a892a7961af473e",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 26992,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 2836,
+        "previous_traces_preserved": true
+      },
+      "text_regression": {
+        "report": "artifacts/override-text-regression-x86/report.json",
+        "sha256": "0cfaf356e18518016aed6dff5eead6b2699837432500a91f54cfd57b5b25b1ba",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 44404,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 5692,
+        "previous_traces_preserved": true
+      },
+      "microdvd_regression": {
+        "report": "artifacts/override-microdvd-regression-x86/report.json",
+        "sha256": "1f15d5e569d645ad45e7f50c62a53c0d062dc2d18fd6f615b93cee325dbd7bc2",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 41491,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 4588,
+        "previous_traces_preserved": true
+      },
+      "ass_regression": {
+        "report": "artifacts/override-ass-probe-x86/report.json",
+        "sha256": "6e4fffa0deffc67baab1d8195d7d603ff25b1b5067ed79407517f84fb0f037ca",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 22286,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 3266,
+        "previous_traces_preserved": true
+      },
+      "xombie_regression": {
+        "report": "artifacts/override-xombie-probe-x86/report.json",
+        "sha256": "d15f7c3d6e686334c8a1618709406630724fefc7095c991af1910f21d0d038c1",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 10441,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 1242,
+        "previous_traces_preserved": true
+      },
+      "final_effects": {
+        "report": "artifacts/override-final-pass-effects-x86/report.json",
+        "sha256": "6fd8a310b14a12c1ce4e73a9bcc1851067fa92391c81c39da1f568e6d9c9ff37",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 81722,
+        "candidate_commit": "215816d5f9e55bf5af4bd3c40b024c83095b53a2",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "inputs": 1116,
+        "cases": 13608
+      },
+      "prior_regression_scope": {
+        "commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "final_production_delta": [
+          "rust/compat/src/ass_override.rs"
+        ],
+        "note": "Prior parser/tree/HTML/color/USF suites retain their measured revision. Final override, effect, rendering and ABI checks cover the last raw-font/alpha corrections; unrelated parser modules are unchanged."
+      },
+      "corpus": {
+        "report": "artifacts/override-final-pass-csri-x86/summary.json",
+        "sha256": "739e7005db078c0f606a569c39592e1baaa64c9fcd557dffb153b81859854ada",
+        "complete": true,
+        "frames": 13186,
+        "distinct_controls": 192,
+        "cases": 1222,
+        "shards": [
+          {
+            "report": "artifacts/override-final-pass-csri-x86/shard-0/report.json",
+            "sha256": "7b0ca0cf328eb4de2fc5090cd058e383fd2038a37e4c58b041229bcc0e611ca0",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1671,
+            "cases": 153
+          },
+          {
+            "report": "artifacts/override-final-pass-csri-x86/shard-1/report.json",
+            "sha256": "43ee146044ec69b9bd262d2847217a9e11c5c3bd392de76a771d4201ae100263",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1659,
+            "cases": 153
+          },
+          {
+            "report": "artifacts/override-final-pass-csri-x86/shard-2/report.json",
+            "sha256": "a0d4be8384275105883c14da97a227bc5731c61505105ba390ae1a3fea6af4b4",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1658,
+            "cases": 153
+          },
+          {
+            "report": "artifacts/override-final-pass-csri-x86/shard-3/report.json",
+            "sha256": "bcf99ff4873e3c5040a82d627f36b81ef35b7fd2fbcd7e233cedec1206321868",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1658,
+            "cases": 153
+          },
+          {
+            "report": "artifacts/override-final-pass-csri-x86/shard-4/report.json",
+            "sha256": "52b2099a8c406464a25d4118385aafb68ca053c59c6fc59692a86b1a3cfbd45a",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1619,
+            "cases": 153
+          },
+          {
+            "report": "artifacts/override-final-pass-csri-x86/shard-5/report.json",
+            "sha256": "cbecbc091dd30be78cd73436fe565bb22d548c93786a12fe1ffbd982c490d8e8",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1631,
+            "cases": 153
+          },
+          {
+            "report": "artifacts/override-final-pass-csri-x86/shard-6/report.json",
+            "sha256": "ac28450e91e278267b8353237492b8f122dcc81e9a8994233f14c2a30faee2bb",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1645,
+            "cases": 152
+          },
+          {
+            "report": "artifacts/override-final-pass-csri-x86/shard-7/report.json",
+            "sha256": "2e02168f5f5629dabf28de631b6f1e594420b456a4b4d55c180e352092d4407d",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1645,
+            "cases": 152
+          }
+        ]
+      },
+      "new_override_rendering": {
+        "cases": 44,
+        "frames": 484,
+        "distinct_controls": 20,
+        "included_in_full_corpus": true
+      },
+      "prior_lifecycle": {
+        "report": "artifacts/override-lifecycle-x86/report.json",
+        "sha256": "216be5cc6f8e6698f269d8a9a979be65ad89b726314ca5dcdff222c8eb4f03b4",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 3693,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+      },
+      "prior_compile": {
+        "report": "artifacts/override-compile-x86/report.json",
+        "sha256": "4b2bca58443a0414370e3318604adcbd12f3ace2459fec457fa340312df83d2e",
+        "complete": true,
+        "inputs_unchanged": true,
+        "candidate_commit": "9c27c179fe4f84d9d5d13201d7c496d1cf9ecf74",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+      },
+      "com": {
+        "report": "artifacts/override-final-pass-contracts-x86/com/report.json",
+        "sha256": "7f6acb4ef0862e770d46eac60631ba70837330cbd8c068be2b5c435d71977fc9",
+        "complete": true,
+        "passed": true,
+        "inputs_unchanged": true,
+        "candidate_commit": "215816d5f9e55bf5af4bd3c40b024c83095b53a2",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "69faa2d5f90f35fe4184e9e9bd892adb76fee60295701988f61ab7af0664d9eb",
+          "candidate_sha256": "d1c01dead89e30b58b2897426553283237b61ba010371a60bcb6e02c5dd89418",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "8b0365bd8b1fa8ea13b65d8681836b85d870a46781d0a3cbfb851b1000a21ae7"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "2c3b904d7f91902ef456e07b648c5d6351878318c235397eeb9b39eb3fffa34f",
+          "candidate_sha256": "fddb8983893fd2e80bfa9e3999b4c972f72e753052e88382a6c5372256b05d36",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "2a22ef471924cc53ea843b14cb2fb5e1dc765f9e308e8ed316172476b0696dd5"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "3e7c20a4d6c42457d92eb56c42e4fd9f3bddb93276f2c1cd28bfb73edd06484c",
+          "candidate_sha256": "10eeee6ebf0b8727ea6697f9868b49ac41891d6405f9718b09e2e3ce86ed80ae",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "bee8a1d975859e0ab8a9b6843e14f813df818b8538e6501927e792bb180eb7c1"
+        }
+      }
+    }
+  },
+  "corpus_growth": {
+    "old_cases": 1178,
+    "added_cases": 44,
+    "total_cases": 1222,
+    "added_scripts": 22,
+    "prior_cases_unchanged": true,
+    "old_controls_retained": true,
+    "added_controls": 20,
+    "manifest_sha256": "2949bb98bfbc49bd3496af90ef9a8b3b386395637ff34bc54b0fc4e86fe61363"
+  },
+  "unsafe_lexical_inventory": {
+    "report": "artifacts/override-final-pass-unsafe-inventory.json",
+    "sha256": "924a76f4ab5097adac6a3ef3e4a6e36df14fe6a1b89c9ec9ebe5ae46ed1026e9",
+    "safe_core_files": 110,
+    "safe_core_unsafe_sites": 0,
+    "ffi_unsafe_functions": 383,
+    "ffi_unsafe_blocks": 499,
+    "ffi_raw_shared_slice_constructors": 68,
+    "delta": {
+      "production_function_sites": 3,
+      "production_blocks": 3,
+      "raw_shared_slice_constructors": 1,
+      "raw_nonoverlapping_copies": 0
+    }
+  },
+  "checks": {
+    "core_per_architecture": 326,
+    "ffi_per_architecture": 133,
+    "fmt": true,
+    "clippy_all_targets": true,
+    "clippy_native_runtime": true,
+    "python_tests": 172,
+    "python_skipped": 1,
+    "corpus_check": true,
+    "log": "artifacts/override-final-pass-checks.log",
+    "log_sha256": "077b2ccfa2c23dc6af7a6df8eeb9e0e983fd95342ca18c7ad1e4fa148b9c105e"
+  },
+  "resolved_candidate_mismatch": {
+    "report": "artifacts/override-try-x86/report.json",
+    "report_sha256": "b34b43cb6f912254a7bd8311d777881a48cfb004d147c2df8532169835ee229b",
+    "candidate_commit": "779f56b040f9c20392b3a14c91a15324068975da",
+    "deterministic_reference": true,
+    "different_lines": [
+      75492
+    ],
+    "resolution": "Win32 x87 extended exponent emulation in9c27c179; all original observations and400 additional relative-size cases now equal cleanup. This was a candidate rounding bug, not an unresolved reference outcome."
+  },
+  "effect_probe_initialization": {
+    "harness_commit": "05c0299649e3b88f2c3e26d912c940e9050d6536",
+    "final_harness_included_in": "215816d5f9e55bf5af4bd3c40b024c83095b53a2",
+    "reason": "The full evaluator snapshots renderer scalars and clip geometry which the earlier effect-only branch did not read. Initialize these values on both sides before calling private methods. The corrected observations still equal the earlier effect-port traces.",
+    "superseded_reports": [
+      "artifacts/override-owner-final-x64/report.json",
+      "artifacts/override-owner-final-x86/report.json"
+    ]
+  },
+  "resolved_x86_alpha_mismatch": {
+    "previous_candidate_commit": "12ce8dae931c208fcffeff72779df840a23bf669",
+    "cases": 150,
+    "x86_mismatches": 38,
+    "x64_mismatches": 0,
+    "resolution": "MSVC Win32 double-to-BYTE narrowing through signed64; final primary probe includes these150 cases plus30 signed-negative cases.",
+    "x64": {
+      "artifacts\\override-alpha-review-x64\\alpha.cpp": "bda3269d726b835a77c414f72c2601db146e7deafd9a9ae1fa3350469965f84a",
+      "artifacts\\override-alpha-review-x64\\candidate-build.stderr": "8f64bd6a8216289bccaaa0d53279de97ff760af7fece933e233270f4c7d49247",
+      "artifacts\\override-alpha-review-x64\\candidate-build.stdout": "f3925586c087bdf9432acb080e356209d22382ec15c7be28aab3af71d890fdf6",
+      "artifacts\\override-alpha-review-x64\\candidate.exe": "83fe606c7ab846bb6175348cfd13c0d6b0a35e86fea79db6ce8ff6a4fed89ca0",
+      "artifacts\\override-alpha-review-x64\\candidate.obj": "a1efa11db96694c238004605250b35b7b3d386f784a5f8350ece772c12aef5c9",
+      "artifacts\\override-alpha-review-x64\\candidate.stdout": "23b603f48fc7b68d5a4cae33e1f7f3c70e53bff4bb04f3006b08370461bdde31",
+      "artifacts\\override-alpha-review-x64\\reference-build.stderr": "8f64bd6a8216289bccaaa0d53279de97ff760af7fece933e233270f4c7d49247",
+      "artifacts\\override-alpha-review-x64\\reference-build.stdout": "e33c1613b2e464bd662ed92029feaef24f1c5e1fe3d423834df21662c8f36b3a",
+      "artifacts\\override-alpha-review-x64\\reference.exe": "099200937656b60944fe1031a6e0c9d54c4921fadc22d5bcdd3dae1c8eac0ea9",
+      "artifacts\\override-alpha-review-x64\\reference.obj": "767dd84d930d6496b68c4ad14451c2825522949f91b8cec84cce988126d4fbe7",
+      "artifacts\\override-alpha-review-x64\\reference.stdout": "23b603f48fc7b68d5a4cae33e1f7f3c70e53bff4bb04f3006b08370461bdde31"
+    },
+    "x86": {
+      "artifacts\\override-alpha-review-x86\\alpha.cpp": "bda3269d726b835a77c414f72c2601db146e7deafd9a9ae1fa3350469965f84a",
+      "artifacts\\override-alpha-review-x86\\candidate-build.stderr": "f70eef4faab8a41d1efb7a6ef61bff964341b713a92fb87bd49d2159fc83eb38",
+      "artifacts\\override-alpha-review-x86\\candidate-build.stdout": "5344c297ffc047e0213f161d54ea279041d721e7a30bb1c932d1b6269be94d6c",
+      "artifacts\\override-alpha-review-x86\\candidate.exe": "4587ccc6672b6ad8a64c1950d024af8a00e336d7162c0b85bcbe3f3a9aba79d8",
+      "artifacts\\override-alpha-review-x86\\candidate.obj": "7970198fee27aef8865d2d93795f917f8771a8342fdefc0bed340c913d16f09f",
+      "artifacts\\override-alpha-review-x86\\candidate.stdout": "23b603f48fc7b68d5a4cae33e1f7f3c70e53bff4bb04f3006b08370461bdde31",
+      "artifacts\\override-alpha-review-x86\\reference-build.stderr": "f70eef4faab8a41d1efb7a6ef61bff964341b713a92fb87bd49d2159fc83eb38",
+      "artifacts\\override-alpha-review-x86\\reference-build.stdout": "fdb004baa6dbb355b89aa6f1f080bc17fa33313b9c01be560d88bc418b748c1f",
+      "artifacts\\override-alpha-review-x86\\reference.exe": "8e30def5fca6b5e69394df082011592bc33ce3aa73f2a8f2b314edcb572c7350",
+      "artifacts\\override-alpha-review-x86\\reference.obj": "48f6757cc124a174696c05fe61404d93b6d1657e0ae18f88726b7cfb74b20805",
+      "artifacts\\override-alpha-review-x86\\reference.stdout": "ad46415b00951f68fa57902e1980f58e56e6ebd8d3b7c0ac01cf20abb56c5a4e"
+    }
+  },
+  "superseded_build_collision": {
+    "report": "artifacts/override-verified-owner-final-x64/report.json",
+    "sha256": "b0b8ee660fb7d9f9630e8aa749b598672a1aefbdb606b31ca36588670063871a",
+    "reason": "Concurrent LTCG links attempted the same generated Rasterizer.asm path. No reference execution occurred in that attempt; final same-architecture native links are serialized and the final effect comparison passes."
+  },
+  "harness_sources": {
+    "tools/compat/effects_native.cpp": "c27f9b47b98c28be737da51376c0da5d5e6ae084add4affe8b8bc0937071503a",
+    "tools/compat/effects_native.py": "0c8485abbd0a4f28e4be1c1497624710fce266b295ca1c31ca8975ead4d9cedb",
+    "tools/compat/override_native.cpp": "081a4f8ca0282e74687b7408681259e439f7319b3a8362f348f08356f0ec89fd",
+    "tools/compat/override_native.py": "31e22065294a0d0de55b7169a769670a2758f69c889da99de17a2b76401406d5",
+    "tools/compat/test_override_native.py": "68c933f343560f57e419560d7202c8f29a9067faedbe709d025cbb23429961b5",
+    "tools/compat/document_native_lifecycle.cpp": "31cff4ee0c64f7fef7dc3b2b01779928d32ab2a81f769301dcb5000cc8f2d937",
+    "tools/compat/csri_compare.py": "9f71f1bc0426ca96b47ae35d798ef7b86f17e52d213c67730e122384d85a3b7a",
+    "tools/compat/make_corpus.py": "5af4ae2764ad4d4ead92d7a9eeeef297975b53c887ec8f0deeed2defd8add271",
+    "test/compat/cases.json": "2949bb98bfbc49bd3496af90ef9a8b3b386395637ff34bc54b0fc4e86fe61363",
+    "artifacts/run-override-final-pass-host-corpus.py": "431065ccaec20b847ad4d1c7e5c82d8ca782f8b8ade9976290356c7b5bc2c82d"
+  },
+  "build_logs": {
+    "artifacts/override-final-pass-build-x64.log": "1e4ff3233394efa262eb9b65d151a0f5d4d0ff8845520bdbaabb313a662ae17a",
+    "artifacts/override-final-pass-build-x86.log": "5a88ee2943447b32eba78b0e5ebb3df814313b1b99ab0c39cd0735eebd2ecedd",
+    "artifacts/override-final-pass-build-rust-x64.log": "86be23718e7cbcc30ad680f9cb65d308b3cd785a8e2259c6c45dfc6a04c4a0d3",
+    "artifacts/override-final-pass-build-rust-x86.log": "2392f4ff35f36a0c2eeed3c0226e9c4b02a634189aba3f08e39068471501c087"
+  },
+  "source_inventory": {
+    "path": "docs/rust-ass-override-inventory.json",
+    "sha256": "6f7bfc8a41905e580f1ca48aef6b66375ed6865ed661203f0458c9ee58c82882"
+  },
+  "prior_evidence": {
+    "docs/rust-ass-tree-local-evidence.json": "4e80bff48694a285c8bcee8621adb404a7e49ba4337b9fc6405ca04f8e55815c",
+    "docs/rust-effects-local-evidence.json": "ee19b1c240cfda455128be4ff9f6faf374bb5679087b84fe4ea4bbbc45601ff5",
+    "docs/rust-html-tag-local-evidence.json": "5bd4a6c65c497037e394f6b7fe267699f251babe939b82239a02b0d49ee4d4d8",
+    "docs/rust-shared-colors-local-evidence.json": "4eaf232684389457509de1d5c72fc2dd35fe4b90167725dc1813e9493aac8117",
+    "docs/rust-usf-msxml-local-evidence.json": "14850168fa5a9c8595fe40560d86884147065dffecbabb1e3951591f43ceb568",
+    "docs/rust-subviewer-reference-outcomes.json": "9cd5e22c6e894051966451dad661bf7cc1cd5e4b99f76fd118d61220b08be882"
+  }
+}

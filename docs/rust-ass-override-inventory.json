@@ -1,0 +1,140 @@
+{
+  "schema": 1,
+  "candidate_commit": "215816d5f9e55bf5af4bd3c40b024c83095b53a2",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "Full ASS override application dispatch and CalcAnimation in the experimental Rust renderer.",
+  "production_sources": {
+    "rust/compat/src/ass_override.rs": "ad821498ace03f6d4df6088cc65fe903f4a3e5e2ca4ced5392cd7e75f175bea4",
+    "rust/compat/src/ass_override_float.rs": "7de9c8d74c690da1038fdf9da2d30b8266f8afb68f9db1f32458f92b68b53c40",
+    "rust/compat/src/ass_tree.rs": "9a865fde49ff9741da4313083822c572e5258ac5a8e58157052d9e1dabf1283d",
+    "rust/compat/src/html_tag.rs": "25a6eed649e33d31da3e95033b337a6252b9e38527d8f963544198f3034d731d",
+    "rust/compat/src/lib.rs": "5c22e9023aad5b9d737b079bce28e5f3299125254e41057e49fd1ac853ffbc3b",
+    "rust/ffi/src/ass_override.rs": "86f73fe7fbdcc4ba538a7dafcd8a1261d5d6bf4ae38edbf6cabb5f0ddd0298ec",
+    "rust/ffi/src/effects.rs": "56cd1ac56e0ea783cfc042e1365bb103e84bf7aacf125deff2b1585bf370e745",
+    "rust/ffi/src/windows_crt.rs": "f129214377d78400574ea1cfd61278d8fbb44b3fa16d810a488254ac619f0a79",
+    "rust/ffi/src/document.rs": "fbcc7d0eeef0776ecb6d23e0e472267b83a25dc3ea6ee429faaab8d650ace3e0",
+    "rust/ffi/src/lib.rs": "50d418f6142f2dc32d503b8ad7925df1f455e992a441b2fbdda3a3174ca31540",
+    "include/xy_rust_ass_override.h": "d64101d951d823240294270b38c22d683f84bb82abfde0767f4ebf5f25eeb234",
+    "include/xy_rust_ass_tree.h": "47b0674c46b8e5afcad1e9a04714f68a1523b3dadc07aab0764196fd48a340be",
+    "include/xy_rust_effects.h": "ae99eb6387c5614f0c99413a6f4c295b0eea0e52e71e40abf17560f0e857a34f",
+    "src/subtitles/RTS.cpp": "66f11296b4be2324e49715bce02454e2f91e6249a084bd232071d009684a4d36",
+    "src/subtitles/RustDocumentOwner.h": "78776a57f8f6ce5767fc8d0d5a60a1ae5dff9b5b48dfc5b2d68837a5bf2694d7"
+  },
+  "reference_sources": {
+    "src/subtitles/RTS.cpp": "ef6aae1b68accd3da5cc9093377a118cf11f5754c597cec68173b06c80f71454",
+    "src/subtitles/RTS.h": "7fa99ac55e37e9cbc66bb3b219dba1e860ed8bd02e34a44acb2ad8ad93957c26",
+    "src/common.props": "86b73bba9e35afa45b283aa86173570a1a9d02881aaa6fb74741cfdeece52500"
+  },
+  "operations": [
+    {
+      "operation": "Complete command evaluation",
+      "source": {
+        "path": "rust/compat/src/ass_override.rs",
+        "line": 206,
+        "sha256": "ad821498ace03f6d4df6088cc65fe903f4a3e5e2ca4ced5392cd7e75f175bea4"
+      },
+      "behavior": "All 54 command IDs retain hard-position update before dispatch, stored UTF-16 parameter emptiness, exact CRT conversion calls, original-style fallback and named-style lookup. Colors animate masked channels separately; alpha conversion uses a signed64 intermediate on Win32 and signed32 on Win64 before keeping the low byte; font/angle/scale/blur/shadow branches preserve individual clamping and empty-parameter service ordering."
+    },
+    {
+      "operation": "Transforms and animation",
+      "source": {
+        "path": "rust/compat/src/ass_override.rs",
+        "line": 75,
+        "sha256": "ad821498ace03f6d4df6088cc65fe903f4a3e5e2ca4ced5392cd7e75f175bea4"
+      },
+      "behavior": "Explicit tasks mark transform return; flags change after child evaluation and inner timing is not restored. Distinct two/three/four-parameter parsing paths retain wcstod versus wcstol differences. Interpolation preserves threshold, signed wrapping time differences, CRT pow and ordered arithmetic."
+    },
+    {
+      "operation": "Win32 relative font size",
+      "source": {
+        "path": "rust/compat/src/ass_override_float.rs",
+        "line": 98,
+        "sha256": "7de9c8d74c690da1038fdf9da2d30b8266f8afb68f9db1f32458f92b68b53c40"
+      },
+      "behavior": "Native /arch:IA32 uses x87 53-bit significands with extended exponent range before storing the CalcAnimation argument. Safe normalized significands and separate exponents retain underflow/overflow intermediates. x64 keeps direct double operations. Evidence includes 400 actual-renderer boundary cases, not only an isolated arithmetic probe."
+    },
+    {
+      "operation": "Karaoke, alignment, wrap and polygon state",
+      "source": {
+        "path": "rust/compat/src/ass_override.rs",
+        "line": 487,
+        "sha256": "ad821498ace03f6d4df6088cc65fe903f4a3e5e2ca4ced5392cd7e75f175bea4"
+      },
+      "behavior": "Fractional karaoke durations add to the old integer end in double before conversion. kt, K/kf, ko and k retain distinct kinds and animation flags. Alignment first-wins, document wrap fallback, drawing mode and baseline remain exact initialized scalar values."
+    },
+    {
+      "operation": "Clip/effect ordering",
+      "source": {
+        "path": "rust/compat/src/ass_override.rs",
+        "line": 354,
+        "sha256": "ad821498ace03f6d4df6088cc65fe903f4a3e5e2ca4ced5392cd7e75f175bea4"
+      },
+      "behavior": "Vector clip requests preserve first-wins and observed wrapping scale shifts. Rectangular clips retain conversion/animation order and inversion state. Existing safe effects owner handles fade/fad/move/org/pos. Each vector request checkpoints prior effects/style/scalars before synchronous native construction; later tags run only after success."
+    },
+    {
+      "operation": "Detached checked boundary",
+      "source": {
+        "path": "rust/ffi/src/ass_override.rs",
+        "line": 130,
+        "sha256": "86f73fe7fbdcc4ba538a7dafcd8a1261d5d6bf4ae38edbf6cabb5f0ddd0298ec"
+      },
+      "behavior": "Input, tree and named styles are copied; effects carry a revision. No registry loan or native admission gate spans CRT or callback services. Callback packets own all bytes. Revision mismatch before or after callbacks refuses overwrite. Null/malformed/wrong-type/stale IDs are rejected; no raw canonical resource pointer is exposed."
+    },
+    {
+      "operation": "Transitional native mirror",
+      "source": {
+        "path": "include/xy_rust_ass_override.h",
+        "line": 11,
+        "sha256": "d64101d951d823240294270b38c22d683f84bb82abfde0767f4ebf5f25eeb234"
+      },
+      "behavior": "Private friend bridge passes checked IDs; renderer serializes initialized state/style and materializes detached checkpoints. Native per-tag dispatch and recursive evaluation are excluded on the experimental path. C++ clipper construction and native scalar/style mirrors remain migration work."
+    }
+  ],
+  "boundary_review": {
+    "unsafe_delta": {
+      "production_function_sites": 3,
+      "production_blocks": 3,
+      "raw_shared_slice_constructors": 1,
+      "raw_nonoverlapping_copies": 0
+    },
+    "details": "One unsafe input export and two callback type declarations; blocks copy input, invoke a synchronous callback, and call CRT pow. Reuses short Effects admission and revision commit. No new unsafe impl, mutable static, mutable foreign slice, assembly, transmute or raw owner pointer."
+  },
+  "direct_probe": {
+    "baseline_commit": "4c44c31c065de2f57f3a4503508fd6308de6c23c",
+    "source": {
+      "path": "tools/compat/override_native.cpp",
+      "line": 75,
+      "sha256": "081a4f8ca0282e74687b7408681259e439f7319b3a8362f348f08356f0ec89fd"
+    },
+    "runner": {
+      "path": "tools/compat/override_native.py",
+      "line": 21,
+      "sha256": "31e22065294a0d0de55b7169a769670a2758f69c889da99de17a2b76401406d5"
+    },
+    "inputs": 1144,
+    "override_cases": 9312,
+    "animation_cases": 2304,
+    "relative_size_cases": 400,
+    "raw_font_cases": 4,
+    "alpha_cases": 180,
+    "trace_lines": 96014,
+    "method": "Actual linked private string ParseSSATag and CalcAnimation through explicitly instantiated member addresses. Complete initialized style bits, renderer/subtitle scalars, effect slots, raw polygon text/scales/inversion/size, errno and return values. Two independent runs per implementation and architecture. Original 95425 observation lines equal the pre-port baseline; 400 appended relative-size cases,4 raw-font cases and180 alpha-extrapolation cases compare directly to cleanup. Raw-font string parsing stops at NUL; an owned-parameter unit test separately checks CString character-comparison stored-length semantics.",
+    "coverage": "46 scalar commands x20 raw/malformed numeric values, 10 multi-parameter forms x20 values, 24 additional sequences, eight state seeds, and two repeated ten-tag sequences. 12x12x8x2 direct animation calls. Relative sizes cross 20 bit patterns and20 modifiers including min subnormals, min normal, max finite, negative values, NaNs and infinities. Six alpha inputs cross six accelerations and five times, including negative exponents and signed hexadecimal limits."
+  },
+  "limits": [
+    "Experimental renderer/document-owner path only; no production switch or whole-renderer, host or library completion claim.",
+    "All 54 ASS override dispatch branches, nested transform evaluation, animation interpolation, style/alignment/wrap/karaoke/polygon decisions and clip requests run in safe Rust. Native subtitle/style mirrors, clipper/polygon construction, renderer/word/layout ownership and cache policy remain transitional.",
+    "CRT numeric conversion, whitespace and pow are Windows system services outside registry admission. Callback packets contain detached state/style/raw code units. C++ catches exceptions and rethrows only after Rust returns; native callback and buffer lifetimes remain audited contracts.",
+    "Finite initialized Unicode MSVC14.44 x86/x64 evidence under observed default floating-point modes. Other x87 precision/rounding modes, FTZ/DAZ, signaling NaNs, arbitrary locale changes and reference depth-limit outcomes are not closed.",
+    "No allocation-failure or native new-handler fault injection closure. Effects revision checks refuse reentry mutation; document named styles are snapshotted at entry. Arbitrary document/style reentry changes, concurrent native wrapper destruction and externally observed exception/Busy behavior remain unclosed.",
+    "Native clip side effects occur in tag order after checkpointing effects and native mirrors. Failures do not roll back earlier checkpoints. Portable tasks and tree storage are iterative; reference crashes/hangs/nondeterminism remain unresolved, never parity.",
+    "Lexical unsafe counts are an inventory rather than a soundness proof or migration percentage. All formats/options/interfaces, hosts and vendored implementation remain in scope."
+  ],
+  "next_work": [
+    "Move CSubtitle/word/layout/clipper ownership and renderer caches into Rust; retain exact render ordering and native GDI boundary audit.",
+    "Continue all host adapters, formats/options/interfaces and vendored code. The whole-repository endpoint remains Rust."
+  ]
+}
