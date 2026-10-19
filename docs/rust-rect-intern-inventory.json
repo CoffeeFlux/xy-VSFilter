@@ -1,0 +1,109 @@
+{
+  "schema": 1,
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "candidate_commit": "c4254ab77214e29766bc27fd52ca011467efee34",
+  "scope": "Experimental canonical style-margin rectangle ownership and moved string IDs; style ownership itself remains native",
+  "operations": [
+    {
+      "operation": "Canonical rectangle ownership",
+      "source": {
+        "path": "rust/compat/src/rect_intern.rs",
+        "line": 8,
+        "sha256": "84f712674d6fa60410f0b6d84c05659262722a1c8852adab1bd918f3f9882b28"
+      },
+      "behavior": "Safe Arc values contain canonical identity and four raw signed 32-bit coordinates. BTreeMap keys compare complete coordinates. No ordering normalization, native pointer key or expired weak reference."
+    },
+    {
+      "operation": "Lifetime accounting",
+      "source": {
+        "path": "rust/compat/src/rect_intern.rs",
+        "line": 51,
+        "sha256": "84f712674d6fa60410f0b6d84c05659262722a1c8852adab1bd918f3f9882b28"
+      },
+      "behavior": "Under serialized complete admission, table plus checked resources are the only Arc holders. Release removes the canonical table reference when the final checked owner is removed. Resource destruction follows outside the registry guard. Future non-resource Arc holders must join this accounting protocol."
+    },
+    {
+      "operation": "Checked native boundary",
+      "source": {
+        "path": "rust/ffi/src/rect_intern.rs",
+        "line": 13,
+        "sha256": "5efab8f09f7ef4148a7cee1dfe6686952131cd7122c7c09682cbdece37df387c"
+      },
+      "behavior": "Reserve a unique checked ID before table mutation. Return separate checked-owner and canonical-identity u64 values. Reads copy four coordinates into detached output. Stale, wrong-kind and null calls refuse without writes. Fixed input is copied first, allowing unaligned and aliased input/output."
+    },
+    {
+      "operation": "Registry release",
+      "source": {
+        "path": "rust/ffi/src/document_registry.rs",
+        "line": 764,
+        "sha256": "98b406c827dbd39b7c193c91ca4e2a57a12280869241fa25be892054b494193d"
+      },
+      "behavior": "Validate the expected resource kind before removal. Rectangle table accounting runs under admission; the removed Arc is destroyed afterwards. Existing document and other resource ownership behavior remains in place."
+    },
+    {
+      "operation": "Transitional wrapper",
+      "source": {
+        "path": "src/subtitles/RustRectIntern.inl",
+        "line": 10,
+        "sha256": "cea2a05c9d2bf5da2dde781fae66db2b385af5c146065d1b95c7a9472713440c"
+      },
+      "behavior": "Native shared wrapper holds checked handle and immutable identity. Copy shares the wrapper; assignment interns before releasing the old owner. get returns a detached CRect; all repository rectangle get callsites were reviewed as immediate member/value use. No canonical rectangle pointer crosses FFI."
+    },
+    {
+      "operation": "Move semantics",
+      "source": {
+        "path": "include/xy_rust_string_flyweight.h",
+        "line": 14,
+        "sha256": "a70b116c886b4adc72b9141d6b4e066e86f2446433507ab27d3d8019ce37efec"
+      },
+      "behavior": "Legacy string ID remains a scalar in the wrapper so implicit move preserves the source ID while transferring ownership. Empty rectangle wrappers compare through identity zero. Moved-from value reads are safely refused; native null dereferences are unresolved, not matching results."
+    },
+    {
+      "operation": "Independent cleanup oracle",
+      "source": {
+        "path": "tools/compat/rect_intern_native.cpp",
+        "line": 37,
+        "sha256": "420aa21210802502499398c1f41810f029057e9826949e41900ff68d0ea17923"
+      },
+      "behavior": "Actual cleanup and candidate classes, linked to their respective libraries. Two complete runs per side and architecture observe alias matrices, raw values, live counts, moves and late global release. Original pre-port trace remains identical after removing the added move rows."
+    },
+    {
+      "operation": "Style observations for next ownership port",
+      "source": {
+        "path": "tools/compat/style_intern_native.cpp",
+        "line": 46,
+        "sha256": "95d271f4722b025b73b08a8703e4ddd461466e9cfb498c4854f391e44a97e079"
+      },
+      "behavior": "Actual native style interning remains in use. All 15 floating fields, raw fonts, margins, alias identity, raw canonical values and floating flags are observed. Live NaN keys are retained until process reclamation. Separate children read only Count after one NaN owner release; subsequent expired-key lookup remains unresolved."
+    }
+  ],
+  "boundary_review": {
+    "new_production_unsafe_function_sites": 3,
+    "new_production_unsafe_blocks": 4,
+    "new_shared_foreign_slices": 0,
+    "new_nonoverlapping_copies": 4,
+    "details": "One exact 16-byte input copy and three detached output copies. No new raw owner pointer, unsafe impl, mutable foreign slice, mutable static, assembly, unchecked indexing or transmute. Native wrappers and gate remain transitional."
+  },
+  "evidence": {
+    "rectangle_steps": 294,
+    "rectangle_trace_lines": 5003,
+    "string_steps": 410,
+    "string_trace_lines": 5334,
+    "style_cases": 196,
+    "style_trace_lines": 591,
+    "runs_per_architecture": {
+      "reference": 2,
+      "candidate": 2
+    },
+    "rectangle_controls": "Default/raw LONG extremes, 16 retained slots, symmetric alias matrix, copy/move/assignment, 2048 simultaneous values, release/reinsertion, late global read/release and zero final count.",
+    "style_limits": "Native style interner observations establish a baseline; they are not a Rust style interner implementation claim."
+  },
+  "limits": [
+    "Finite default-environment evidence, not a production switch or full migration completion.",
+    "Allocation failure, allocator reentry, nondefault floating environments and whole-renderer concurrency remain unclosed.",
+    "Moved-from value reads dereference null natively; safe refusal is not counted as reference parity.",
+    "NaN owner release leaves a native table entry counted. Later lookup could dereference a freed key and remains unresolved; no memory corruption is emulated.",
+    "Rust rectangle strong-count accounting relies on serialized complete calls and the table/resource-only Arc ownership invariant. Extend it when styles own rectangle references.",
+    "Styles, fonts, word/line/subtitle graphs, caches, rasterization, all host adapters and vendored code remain in scope."
+  ]
+}

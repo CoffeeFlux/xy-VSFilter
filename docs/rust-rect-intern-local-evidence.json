@@ -1,0 +1,675 @@
+{
+  "schema": 1,
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "candidate_commit": "c4254ab77214e29766bc27fd52ca011467efee34",
+  "baseline_probe_commit": "cfc8e8dbbe55fae1085e955b297811ac8cda1f38",
+  "architectures": {
+    "x64": {
+      "rect_intern_native": {
+        "path": "artifacts/rect-rect_intern_native-x64/report.json",
+        "sha256": "faa41a00d1a141e24acc91a465811d9ee9c143911723956f3e18fce44937f049",
+        "cases": 294,
+        "trace_lines": 5003
+      },
+      "string_flyweight_native": {
+        "path": "artifacts/rect-string_flyweight_native-x64/report.json",
+        "sha256": "271ff74d8da1566e3079be26d75e6e96713f54875dca5cbbc5172c8d2bc667bd",
+        "cases": 410,
+        "trace_lines": 5334
+      },
+      "style_intern_native": {
+        "path": "artifacts/rect-style_intern_native-x64/report.json",
+        "sha256": "1a116978352679ebcaf6c4c28c5fefd8865cdde101f01f76edc9842aeeb29318",
+        "cases": 196,
+        "trace_lines": 591,
+        "isolated_nan_release": {
+          "count_before": 1,
+          "count_after": 1,
+          "post_release_lookup_executed": false,
+          "trace_sha256": [
+            "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+            "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+            "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+            "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062"
+          ]
+        }
+      },
+      "preport_rectangle_baseline": {
+        "path": "artifacts/rect-baseline-x64/report.json",
+        "sha256": "a6f7e76a793f70d78736aff535ac832881554986c46f53047229bbc3a44e5250",
+        "original_observations_unchanged": true
+      },
+      "prior_string_observations_unchanged": true,
+      "regressions": {
+        "override_native": {
+          "path": "artifacts/rect-override_native-x64/report.json",
+          "sha256": "d8a4a0641ee41c9a6e2458a1fe353ecdaf930e97245355390eff3931594a0707",
+          "cases": 9312,
+          "trace_lines": 96014
+        },
+        "ass_tree_native": {
+          "path": "artifacts/rect-ass_tree_native-x64/report.json",
+          "sha256": "c927570baaf52c80beca9ede4165d7cebed57e54abeb06ec813605786ce470c2",
+          "cases": 5142,
+          "trace_lines": 10286
+        },
+        "effects_native": {
+          "path": "artifacts/rect-effects_native-x64/report.json",
+          "sha256": "51763896e5485fb3a71bbe55e22bbf579ad7d8e249c0a3787a9ce6ce0ef408bc",
+          "cases": 13608,
+          "trace_lines": 81722
+        },
+        "html_tag_native": {
+          "path": "artifacts/rect-html_tag_native-x64/report.json",
+          "sha256": "f164d185394b3798daa8b05eac80b52bfc893a574ea7ca28746bcbfa4f45c66f",
+          "cases": 5728,
+          "trace_lines": 17186
+        },
+        "shared_color_native": {
+          "path": "artifacts/rect-shared_color_native-x64/report.json",
+          "sha256": "430e231b366c227477857d5fdc03388a79d7eb9bcc037b3fdcc34e5c35b52591",
+          "cases": 8896,
+          "trace_lines": 12234
+        },
+        "usf_document_native": {
+          "path": "artifacts/rect-usf_document_native-x64/report.json",
+          "sha256": "a6887cad955542bfecd0d89b6a79c913317f7dc85906667382a9c9c6583822f5",
+          "cases": 1340,
+          "trace_lines": 40517
+        },
+        "realtext_document_native": {
+          "path": "artifacts/rect-realtext_document_native-x64/report.json",
+          "sha256": "21760a9e29f1557e30ded0498fe9e29b3332942358b3818867668dbcb67ccb79",
+          "cases": 4532,
+          "trace_lines": 37887
+        },
+        "vtt_document_native": {
+          "path": "artifacts/rect-vtt_document_native-x64/report.json",
+          "sha256": "b38b52e036e43e15e7f1d7c36bd8812b625a90603a47556c71d1e05bc92cb468",
+          "cases": 2292,
+          "trace_lines": 21939
+        },
+        "sami_document_native": {
+          "path": "artifacts/rect-sami_document_native-x64/report.json",
+          "sha256": "43bd2c17e3a1e461ebe92c1a68883d053f715b8c0397c7e9f4da0b179db0c310",
+          "cases": 2836,
+          "trace_lines": 26992
+        },
+        "text_document_native": {
+          "path": "artifacts/rect-text_document_native-x64/report.json",
+          "sha256": "efa29f96335f7d922a6b38bb86036fab04508ba6738725c396f2ccc4ee367c7a",
+          "cases": 5692,
+          "trace_lines": 44404
+        },
+        "microdvd_document_native": {
+          "path": "artifacts/rect-microdvd_document_native-x64/report.json",
+          "sha256": "e9f7d711c4a9f8e73a0ee79e61668451f8ba023c2b481bdbc5d6f82168aece22",
+          "cases": 4588,
+          "trace_lines": 41491
+        },
+        "ass_document_native": {
+          "path": "artifacts/rect-ass_document_native-x64/report.json",
+          "sha256": "7d5f96ccbe3eeb0e0de6fb6e6f678922f75a3922d1f74394e57c177bca59e7c3",
+          "cases": 3266,
+          "trace_lines": 22286
+        },
+        "xombie_document_native": {
+          "path": "artifacts/rect-xombie_document_native-x64/report.json",
+          "sha256": "2a5f5faa99c6e8681e8f69700b1606d9632ecde676703956ae19bd991a951bc6",
+          "cases": 1242,
+          "trace_lines": 10441
+        },
+        "document_style_api_compile": {
+          "path": "artifacts/rect-document_style_api_compile-x64/report.json",
+          "sha256": "e0101d38c3f3ddd79f6fd1ddf0afe4a6d06ccb6aa5768e2986cce7cf22381795",
+          "cases": null,
+          "trace_lines": null
+        },
+        "document_native_lifecycle": {
+          "path": "artifacts/rect-document_native_lifecycle-x64/report.json",
+          "sha256": "3f7433ea552d9435b0b0849e7596ce443073c8dcd517637d26e7b76fe90565e6",
+          "cases": null,
+          "trace_lines": 3693
+        }
+      },
+      "historical_storage_harness": {
+        "primitives": {
+          "path": "artifacts/rect-document-windows-x64/report.json",
+          "sha256": "6fbd6d60a1dd20c5085c778f98ed658e418ade992bf6dc9bff33129eaee7c2da",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 53711,
+          "rust_parity_within_harness_scope": false
+        },
+        "/facade": {
+          "path": "artifacts/rect-document-windows-x64/facade/report.json",
+          "sha256": "3df39d3b0890ca361acc2591e4c99c5c46d3912bf5e12d26b2b48bc7cb7a99f7",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 166,
+          "rust_parity_within_harness_scope": false
+        },
+        "/owner": {
+          "path": "artifacts/rect-document-windows-x64/owner/report.json",
+          "sha256": "f98ade58c7fb59602fe9cc273cb47f2f142d0227eac20c048ae472b11259194d",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 2361,
+          "rust_parity_within_harness_scope": true
+        }
+      },
+      "historical_storage_scope": "Historical upstream algorithms only; current Rust rectangle adapter on both storage sides. Actual cleanup rectangle parity comes from rect_intern_native.",
+      "rendering": {
+        "path": "artifacts/rect-csri-x64/summary.json",
+        "sha256": "0aebddf4e61499db31f8142b976e68913400f63d57a5ed23924e0ee56dc75c36",
+        "cases": 1222,
+        "frames": 13186,
+        "distinct_controls": 192,
+        "shards": [
+          {
+            "path": "artifacts/rect-csri-x64/shard-0/report.json",
+            "sha256": "8a91c3f85f564f61cbab1c9c165e5b60a4e2eefaa1537bda47ccca87100dd046"
+          },
+          {
+            "path": "artifacts/rect-csri-x64/shard-1/report.json",
+            "sha256": "73e18b1b2e2b8d9649183ab12b706a992717d69c17cac9bd1cc1f6260761831c"
+          },
+          {
+            "path": "artifacts/rect-csri-x64/shard-2/report.json",
+            "sha256": "191b23cea779cafee9f66da07b9d0209dd1b6889220e61e4be2523eaa73302b9"
+          },
+          {
+            "path": "artifacts/rect-csri-x64/shard-3/report.json",
+            "sha256": "d30ae340eb79b7962cf00af4fea5fc83e1941ee0737a34edc26ec6f148f249e8"
+          },
+          {
+            "path": "artifacts/rect-csri-x64/shard-4/report.json",
+            "sha256": "76edeaaf8d1d11a2cea474830308b9b29dc7450257d6310d68b379603efb2021"
+          },
+          {
+            "path": "artifacts/rect-csri-x64/shard-5/report.json",
+            "sha256": "d4912fc60da84fc78d9aa407736de70730ddb0824831512fd3567d68c61f2acf"
+          },
+          {
+            "path": "artifacts/rect-csri-x64/shard-6/report.json",
+            "sha256": "0278627436e69e46ba580d03d736fdc383f36b62bb00f5d2c6ee4668155031b2"
+          },
+          {
+            "path": "artifacts/rect-csri-x64/shard-7/report.json",
+            "sha256": "2d89cbc4cdeeacde7861c28171bf9238f6ce9ff60dfa0619c2d80b772c1382a2"
+          }
+        ]
+      },
+      "contracts": {
+        "path": "artifacts/rect-contracts-x64/summary.json",
+        "sha256": "6deb4b23cef7dce374bfde358d6b81124423ae0f0920ff2fbd68b1b082a7d9c9",
+        "com": {
+          "path": "artifacts/rect-contracts-x64/com/report.json",
+          "sha256": "85b934c0b35bd12c8fff58b68cabe6ce38214269c7ece71222b06b83466fff73"
+        },
+        "dlls": {
+          "VSFilter.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/x64/Release/VSFilter.dll",
+              "sha256": "2d254068a40e5f59cf191c3c6bbfc984b548193b668c4decac21dc1e94e02169"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/x64/Release/VSFilter.dll",
+              "sha256": "10567f453b0e29d35c0dd312566a161395c2cc1eeda1feed4d28e71a30542542"
+            },
+            "exports": {
+              "path": "artifacts/rect-contracts-x64/VSFilter.dll.pe_exports.json",
+              "sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1"
+            },
+            "dependencies": {
+              "path": "artifacts/rect-contracts-x64/VSFilter.dll.pe_dependencies.json",
+              "sha256": "805d7d7481b2774c2612b7cd7dd7fdaa4dd04a35111f3726a6704acf88c4a0d2"
+            }
+          },
+          "XySubFilter.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/x64/Release/XySubFilter.dll",
+              "sha256": "32b7c2cd6eb817120414db53b3c3005e719ae4b993c4a69d0d66c7f6ac363d5a"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/x64/Release/XySubFilter.dll",
+              "sha256": "c9de5e554d2ce81cbcaefce3ce96983587a0711b75b3b4d883a67eef2e932c5a"
+            },
+            "exports": {
+              "path": "artifacts/rect-contracts-x64/XySubFilter.dll.pe_exports.json",
+              "sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42"
+            },
+            "dependencies": {
+              "path": "artifacts/rect-contracts-x64/XySubFilter.dll.pe_dependencies.json",
+              "sha256": "2ce278d6be4d85c557490e59cb33e78ca53faf3e38061e9ca3eb225897be359a"
+            }
+          },
+          "xy_sub_filter_consumer.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/x64/Release/xy_sub_filter_consumer.dll",
+              "sha256": "f1165742064181b7fb73bacb16017d8e202c8bb0be90ed8c2eb812ac282c2df8"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/x64/Release/xy_sub_filter_consumer.dll",
+              "sha256": "48fa0cc563fbcd633083bdf38ceb1c799a562723088cfc9b042f051ae8d8f81e"
+            },
+            "exports": {
+              "path": "artifacts/rect-contracts-x64/xy_sub_filter_consumer.dll.pe_exports.json",
+              "sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b"
+            },
+            "dependencies": {
+              "path": "artifacts/rect-contracts-x64/xy_sub_filter_consumer.dll.pe_dependencies.json",
+              "sha256": "b0b48a3cf2bf2ecbbac4ecca863a815ab4a0c1137277a9b7d5830d9d1beca5c9"
+            }
+          }
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/rect-build-x64.log",
+          "sha256": "6632938e45425fc346277f5b620088d6602afbc68b0570853b14be89e930b1fc"
+        },
+        {
+          "path": "artifacts/rect-build-rust-x64.log",
+          "sha256": "362164d792d3e519b4d97a658300245014c58fd9adb812802be7d0b124cc8de0"
+        }
+      ]
+    },
+    "x86": {
+      "rect_intern_native": {
+        "path": "artifacts/rect-rect_intern_native-x86/report.json",
+        "sha256": "39741251b2671071309e503997485c3ca27f5b1795d0ffeceb6c8cf18356d956",
+        "cases": 294,
+        "trace_lines": 5003
+      },
+      "string_flyweight_native": {
+        "path": "artifacts/rect-string_flyweight_native-x86/report.json",
+        "sha256": "4b89efc7a75bb4209c809d1d06a58943b14ede1f41532b5a195031e057382a98",
+        "cases": 410,
+        "trace_lines": 5334
+      },
+      "style_intern_native": {
+        "path": "artifacts/rect-style_intern_native-x86/report.json",
+        "sha256": "64d464017c25e6c1b340b7be93cebfc3ba184b150e1dd5f1ed6bb2608b8eec3e",
+        "cases": 196,
+        "trace_lines": 591,
+        "isolated_nan_release": {
+          "count_before": 1,
+          "count_after": 1,
+          "post_release_lookup_executed": false,
+          "trace_sha256": [
+            "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+            "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+            "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+            "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16"
+          ]
+        }
+      },
+      "preport_rectangle_baseline": {
+        "path": "artifacts/rect-baseline-x86/report.json",
+        "sha256": "90f19abf0e54208decda47a2fb728d2bcdc669cd7b461b4cb7d8d57177d76500",
+        "original_observations_unchanged": true
+      },
+      "prior_string_observations_unchanged": true,
+      "regressions": {
+        "override_native": {
+          "path": "artifacts/rect-override_native-x86/report.json",
+          "sha256": "78358918f53e999429214bc860dbd453a7486941d1d3a222e8eacbfb5cb1e367",
+          "cases": 9312,
+          "trace_lines": 96014
+        },
+        "ass_tree_native": {
+          "path": "artifacts/rect-ass_tree_native-x86/report.json",
+          "sha256": "bffb81fa7b105b12c99db3b328b10382e38373baaa66f95480c896cb4cebb1c9",
+          "cases": 5142,
+          "trace_lines": 10286
+        },
+        "effects_native": {
+          "path": "artifacts/rect-effects_native-x86/report.json",
+          "sha256": "8aa1069bbbb8233451d03d5e62618049c25b81f3458de2299deb039a35fd174d",
+          "cases": 13608,
+          "trace_lines": 81722
+        },
+        "html_tag_native": {
+          "path": "artifacts/rect-html_tag_native-x86/report.json",
+          "sha256": "fd5750d02e9eecea60d53517d833687d94f085daa9f9f17bca161c4ee3d6ef39",
+          "cases": 5728,
+          "trace_lines": 17186
+        },
+        "shared_color_native": {
+          "path": "artifacts/rect-shared_color_native-x86/report.json",
+          "sha256": "a4e57458bb04431c5c410ab9d5f1626946df08955dd0382eed9d50c3ebaf2654",
+          "cases": 8896,
+          "trace_lines": 12234
+        },
+        "usf_document_native": {
+          "path": "artifacts/rect-usf_document_native-x86/report.json",
+          "sha256": "171541e6851b65acde3f9991ccc8658bc2e8ff055e768542d79177431fd997c3",
+          "cases": 1340,
+          "trace_lines": 40517
+        },
+        "realtext_document_native": {
+          "path": "artifacts/rect-realtext_document_native-x86/report.json",
+          "sha256": "bb424c8bbfd7e30581caa845ba511c96f2d80f1a08d1433f44b9a959bc8531be",
+          "cases": 4532,
+          "trace_lines": 37887
+        },
+        "vtt_document_native": {
+          "path": "artifacts/rect-vtt_document_native-x86/report.json",
+          "sha256": "7ab36def3d15d586cef0efb8075da7b72dd844458497afac69ed80f67dd6c639",
+          "cases": 2292,
+          "trace_lines": 21939
+        },
+        "sami_document_native": {
+          "path": "artifacts/rect-sami_document_native-x86/report.json",
+          "sha256": "5d06356471eebae1016ce324d4d6643dca71e343d092eea2549a22fa50a23a0e",
+          "cases": 2836,
+          "trace_lines": 26992
+        },
+        "text_document_native": {
+          "path": "artifacts/rect-text_document_native-x86/report.json",
+          "sha256": "9516dd1ebf63ac2a90643ac9d6a1609cfc2078050e10ceb899f5e1c6dbf6704d",
+          "cases": 5692,
+          "trace_lines": 44404
+        },
+        "microdvd_document_native": {
+          "path": "artifacts/rect-microdvd_document_native-x86/report.json",
+          "sha256": "df3e2c595cb839853f6533ef33de98ba209ab7695d9d50cc5903988ea319bfdf",
+          "cases": 4588,
+          "trace_lines": 41491
+        },
+        "ass_document_native": {
+          "path": "artifacts/rect-ass_document_native-x86/report.json",
+          "sha256": "2d0734e11c0f2d1b7d0b796ac3e274205c1761a5635c25ba05f37c67836662ea",
+          "cases": 3266,
+          "trace_lines": 22286
+        },
+        "xombie_document_native": {
+          "path": "artifacts/rect-xombie_document_native-x86/report.json",
+          "sha256": "5b8631e6094dbb4677c990a22d786b29df26aa28120d5367a4a3ff91843b3a0f",
+          "cases": 1242,
+          "trace_lines": 10441
+        },
+        "document_style_api_compile": {
+          "path": "artifacts/rect-document_style_api_compile-x86/report.json",
+          "sha256": "dd605c440ec737a378cec55239e7b6c9d353f6c2e007f781e9641fce6112feab",
+          "cases": null,
+          "trace_lines": null
+        },
+        "document_native_lifecycle": {
+          "path": "artifacts/rect-document_native_lifecycle-x86/report.json",
+          "sha256": "bbb3902e6ef03c91de28e17f5c52bd31ca1fd735be814612f3f80717103d3192",
+          "cases": null,
+          "trace_lines": 3693
+        }
+      },
+      "historical_storage_harness": {
+        "primitives": {
+          "path": "artifacts/rect-document-windows-x86/report.json",
+          "sha256": "a5a159b4549f746b5d355307fe06d1b1c70de006fcc3828085bfd4514cd84866",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 53711,
+          "rust_parity_within_harness_scope": false
+        },
+        "/facade": {
+          "path": "artifacts/rect-document-windows-x86/facade/report.json",
+          "sha256": "506a4a4c349a87d5173b8dd171012913606bc817072093cb1c1c3c4978e3fe8c",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 166,
+          "rust_parity_within_harness_scope": false
+        },
+        "/owner": {
+          "path": "artifacts/rect-document-windows-x86/owner/report.json",
+          "sha256": "f96e9bde290f82b94ebdea862f9bbf4f18416312d1c5f3cb48474a501ef15439",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 2361,
+          "rust_parity_within_harness_scope": true
+        }
+      },
+      "historical_storage_scope": "Historical upstream algorithms only; current Rust rectangle adapter on both storage sides. Actual cleanup rectangle parity comes from rect_intern_native.",
+      "rendering": {
+        "path": "artifacts/rect-csri-x86/summary.json",
+        "sha256": "f69e430d674828d9d4d04d1528b7d40c9fce5c8174f93b4e9877374249cbd7bb",
+        "cases": 1222,
+        "frames": 13186,
+        "distinct_controls": 192,
+        "shards": [
+          {
+            "path": "artifacts/rect-csri-x86/shard-0/report.json",
+            "sha256": "c924b0e9eb05cac4a89c27eae9bc60bc8016193f1e2553609d4f6c3b12ef945e"
+          },
+          {
+            "path": "artifacts/rect-csri-x86/shard-1/report.json",
+            "sha256": "b6c2670a86d5b68d6d00cf2c516cb36e835cca3e3b081e07952db22f418dd188"
+          },
+          {
+            "path": "artifacts/rect-csri-x86/shard-2/report.json",
+            "sha256": "1a1a30c19f0603bde9ef99e11bedb8b0bad7c892e22b088051b38fab4a2a553c"
+          },
+          {
+            "path": "artifacts/rect-csri-x86/shard-3/report.json",
+            "sha256": "786d6528b4aa4f0f1f8314c460812eb34c56e12b302aa473d89c7d19e3805765"
+          },
+          {
+            "path": "artifacts/rect-csri-x86/shard-4/report.json",
+            "sha256": "d1cf2c7879f989c65d7364dd72ecce6522bd77c3d679718ea91cee4274aaa3b0"
+          },
+          {
+            "path": "artifacts/rect-csri-x86/shard-5/report.json",
+            "sha256": "78de4c3974477a547914c0a8e11d985aa90f5ebacd978a4802ee6494ab3c3c39"
+          },
+          {
+            "path": "artifacts/rect-csri-x86/shard-6/report.json",
+            "sha256": "3342506a907dc1e0470a0ac16db6d754c9ad9f77f45325d04f40bd4eba7b126c"
+          },
+          {
+            "path": "artifacts/rect-csri-x86/shard-7/report.json",
+            "sha256": "a33acf52db7b9b31be00f1a596d69f726aa0a90b23753c71b92427f168e76b09"
+          }
+        ]
+      },
+      "contracts": {
+        "path": "artifacts/rect-contracts-x86/summary.json",
+        "sha256": "6deb4b23cef7dce374bfde358d6b81124423ae0f0920ff2fbd68b1b082a7d9c9",
+        "com": {
+          "path": "artifacts/rect-contracts-x86/com/report.json",
+          "sha256": "d4faa150e3d3036e93f2407cbc800b50c053bebd7b59f98653f42253b56187f6"
+        },
+        "dlls": {
+          "VSFilter.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/Win32/Release/VSFilter.dll",
+              "sha256": "69faa2d5f90f35fe4184e9e9bd892adb76fee60295701988f61ab7af0664d9eb"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/Win32/Release/VSFilter.dll",
+              "sha256": "ee4ca5a6b7db284966f0720ae08d0e1f439c437fa8c0ed5ce79eabb24879a7ee"
+            },
+            "exports": {
+              "path": "artifacts/rect-contracts-x86/VSFilter.dll.pe_exports.json",
+              "sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c"
+            },
+            "dependencies": {
+              "path": "artifacts/rect-contracts-x86/VSFilter.dll.pe_dependencies.json",
+              "sha256": "8b0365bd8b1fa8ea13b65d8681836b85d870a46781d0a3cbfb851b1000a21ae7"
+            }
+          },
+          "XySubFilter.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/Win32/Release/XySubFilter.dll",
+              "sha256": "2c3b904d7f91902ef456e07b648c5d6351878318c235397eeb9b39eb3fffa34f"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/Win32/Release/XySubFilter.dll",
+              "sha256": "5a53db8d0f94d05e226c8dbe7836bcad5582f0eabbd7b1b67297be93449870a4"
+            },
+            "exports": {
+              "path": "artifacts/rect-contracts-x86/XySubFilter.dll.pe_exports.json",
+              "sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11"
+            },
+            "dependencies": {
+              "path": "artifacts/rect-contracts-x86/XySubFilter.dll.pe_dependencies.json",
+              "sha256": "2a22ef471924cc53ea843b14cb2fb5e1dc765f9e308e8ed316172476b0696dd5"
+            }
+          },
+          "xy_sub_filter_consumer.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/Win32/Release/xy_sub_filter_consumer.dll",
+              "sha256": "3e7c20a4d6c42457d92eb56c42e4fd9f3bddb93276f2c1cd28bfb73edd06484c"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/Win32/Release/xy_sub_filter_consumer.dll",
+              "sha256": "dd78cfe33bf3f1710bbe54464651204621d3a5806d3358bab040c7169d885617"
+            },
+            "exports": {
+              "path": "artifacts/rect-contracts-x86/xy_sub_filter_consumer.dll.pe_exports.json",
+              "sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94"
+            },
+            "dependencies": {
+              "path": "artifacts/rect-contracts-x86/xy_sub_filter_consumer.dll.pe_dependencies.json",
+              "sha256": "bee8a1d975859e0ab8a9b6843e14f813df818b8538e6501927e792bb180eb7c1"
+            }
+          }
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/rect-build-x86.log",
+          "sha256": "eea2cd821a8cc8c126f9489196ba51e9c1f68e5189e9e8fbfdfbc720184a270b"
+        },
+        {
+          "path": "artifacts/rect-build-rust-x86.log",
+          "sha256": "07de5b707051d3d8fcbac2aa70a378de80542a18f3f11591c38f97e8282554fe"
+        }
+      ]
+    }
+  },
+  "checks": {
+    "path": "artifacts/rect-checks.log",
+    "sha256": "db95bb4cb2d4f98235aaba8e57038658da22b736811b42a40df89985012859e9",
+    "safe_core_per_architecture": 333,
+    "ffi_per_architecture": 135,
+    "python_existing": 175,
+    "python_skipped": 1,
+    "fmt": true,
+    "clippy_all_targets_and_native_runtime_both_architectures": true,
+    "additional_style_control": {
+      "path": "artifacts/rect-style-control.log",
+      "sha256": "d583b2f424efe77f848b8079f78e0d458c464fcf3b93cef2af34b215f16e3dc1",
+      "tests": 1
+    }
+  },
+  "unsafe_inventory": {
+    "path": "artifacts/rect-unsafe-inventory.json",
+    "sha256": "6ad0258f62f7cf7bc432d3d880a5b27c6a5b6c64fc54614018b01fde85a7454f"
+  },
+  "initial_x64_compiler_failure": {
+    "path": "artifacts/rect-initial-build-x64.log",
+    "sha256": "57e5898ddf65ecb1d8b1840e8ece524799fb8bb9669ac5bd4ef4b5318cbd3225",
+    "outcome": "MSVC C1001 in existing xy_filter.cpp during XySubFilter LTCG. Process terminated; same build retried successfully without source or compiler-option changes. No reference compatibility result inferred from this build failure."
+  },
+  "sources": [
+    {
+      "path": "rust/compat/src/rect_intern.rs",
+      "sha256": "84f712674d6fa60410f0b6d84c05659262722a1c8852adab1bd918f3f9882b28"
+    },
+    {
+      "path": "rust/ffi/src/rect_intern.rs",
+      "sha256": "5efab8f09f7ef4148a7cee1dfe6686952131cd7122c7c09682cbdece37df387c"
+    },
+    {
+      "path": "rust/ffi/src/document_registry.rs",
+      "sha256": "98b406c827dbd39b7c193c91ca4e2a57a12280869241fa25be892054b494193d"
+    },
+    {
+      "path": "include/xy_rust_rect_intern.h",
+      "sha256": "0d502fa6290f7b10023279ed286b31ec5f5398fa0b471d05265b87e720a51a1b"
+    },
+    {
+      "path": "src/subtitles/RustRectIntern.inl",
+      "sha256": "cea2a05c9d2bf5da2dde781fae66db2b385af5c146065d1b95c7a9472713440c"
+    },
+    {
+      "path": "src/subtitles/STS.cpp",
+      "sha256": "6fdd7b9de714ffdad31fb41d0369c8ce3b4e7a9a8b343a6e7ac41052b13b9001"
+    },
+    {
+      "path": "src/subtitles/flyweight_base_types.h",
+      "sha256": "0d82e8157d7a2af07bb5ede0e7b82b063c7a891ade5e3f4bb2137c30c4b402bb"
+    },
+    {
+      "path": "include/xy_rust_string_flyweight.h",
+      "sha256": "a70b116c886b4adc72b9141d6b4e066e86f2446433507ab27d3d8019ce37efec"
+    },
+    {
+      "path": "src/subtitles/RustStringFlyweight.inl",
+      "sha256": "cde67a50429367c4d16299fd13d9fd14155983ccff1837c3e4ebb12143711c9e"
+    },
+    {
+      "path": "tools/compat/document_windows_probe.py",
+      "sha256": "6ba508bbd697568be933fb99a27244524873d906631388d101613695d3dab342"
+    },
+    {
+      "path": "tools/compat/test_document_windows_probe.py",
+      "sha256": "d96b5338ebed1318872baf6ff2f1dd36244e62cd98b740131d07606fb148c315"
+    },
+    {
+      "path": "tools/compat/rect_intern_native.cpp",
+      "sha256": "420aa21210802502499398c1f41810f029057e9826949e41900ff68d0ea17923"
+    },
+    {
+      "path": "tools/compat/rect_intern_native.py",
+      "sha256": "da413550ad2f7910f50913651c2f0fc3de6d782b7481cb2e3fe845c574e54c48"
+    },
+    {
+      "path": "tools/compat/string_flyweight_native.cpp",
+      "sha256": "0f102ac4b56f0d2cf91b76790bcee2819dca2ca43a1aad52e0b9f9c1fa0ffe6c"
+    },
+    {
+      "path": "tools/compat/string_flyweight_native.py",
+      "sha256": "3b6c289fa06c8f11dd85ee10d4a1f04b106fd52c424b8fc1fe4b59208b0655b0"
+    },
+    {
+      "path": "tools/compat/style_intern_native.cpp",
+      "sha256": "95d271f4722b025b73b08a8703e4ddd461466e9cfb498c4854f391e44a97e079"
+    },
+    {
+      "path": "tools/compat/style_intern_native.py",
+      "sha256": "2131e79b6924dbcebae2e7bc6efcbc4915168e181a4a7bffc206dc6e80562fcc"
+    },
+    {
+      "path": "tools/compat/test_rect_intern_native.py",
+      "sha256": "3948c1b09daa55602996038e007f897282d4fc44b24368d610a5cfe06743271b"
+    },
+    {
+      "path": "tools/compat/test_string_flyweight_native.py",
+      "sha256": "d12c9ddc53c681002f824c3cb893c6be535c680f35ae76e897e440f4f026be4a"
+    },
+    {
+      "path": "tools/compat/test_style_intern_native.py",
+      "sha256": "b87a7659ab9cd6dd1f0190b348e892b3330f0ca2defc90d6f5667a686669fdde"
+    }
+  ],
+  "harnesses": [
+    {
+      "path": "artifacts/run-rect-host-corpus.py",
+      "sha256": "191a847edf669349316a79900368ccd8f2e5396d824db3bafd896fc8742b1803"
+    },
+    {
+      "path": "artifacts/run-rect-contracts.py",
+      "sha256": "f288f118a93b0390b27a30df8154c2e0e7a2a5bca1fc245c4571f67b239ce133"
+    },
+    {
+      "path": "artifacts/write-rect-evidence.py",
+      "sha256": "51769bf95392a5824167148ac65b0c903c99435e97b483cc1773fe401587e6fd"
+    },
+    {
+      "path": "tools/compat/audit_rust_boundary.py",
+      "sha256": "959ddcd63c7f0301ba1f1b56615333d3f2d31cbc0ee024d2a9b8b80eccd7a475"
+    }
+  ],
+  "limits": [
+    "Finite default-environment evidence; no production switch or whole-library completion.",
+    "Style interning remains native. NaN post-release count is observed, but later dangling-key lookup is unresolved and never counted as passing.",
+    "Moved-from value reads dereference null in the reference; excluded and safely refused. Moved-from IDs and empty rectangle equality are checked.",
+    "Allocation failures, reentry, nondefault floating environments and whole-renderer concurrency remain unclosed.",
+    "Rectangle Arc release assumes serialized complete calls and no holders beyond table and checked rectangle resources. Future style ownership must integrate rectangle lifetime accounting."
+  ]
+}

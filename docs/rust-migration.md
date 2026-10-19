@@ -27,7 +27,86 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: renderer text ownership (2026-10-18)
+## Current port: shared rectangle ownership (2026-10-19)
+
+The experimental renderer now keeps canonical style-margin rectangles in safe
+Rust. The native `XyInterned<CRect>` instantiation is excluded on this path. A
+Rust table owns four raw signed 32-bit coordinates and shares immutable values
+with checked rectangle resources. Equal live rectangles share an identity;
+releasing the last owner removes the canonical entry. Detached native reads
+preserve reversed and extreme coordinates without normalization. The remaining
+native wrapper carries a checked handle and immutable identity, and remains
+transitional.
+
+The string wrapper also preserves a previously missed move detail: the cleanup
+implementation moves its text pointer but copies its scalar ID, leaving that ID
+readable in the source object. The adapter now does the same. Moved-from rectangle
+wrappers compare as empty shared owners. Reading a moved-from value dereferences
+null in the reference and is excluded from passing evidence; the adapters refuse
+that invalid read safely.
+
+Implementation `c4254ab7` is validated against cleanup `67da07cd` on Windows x86
+and x64:
+
+* Rectangle comparisons cover 294 observed transitions / 5,003 trace lines per
+  run, with two reference and two candidate runs. They exercise defaults, raw
+  coordinates, alias matrices, copying, moves, assignments, bulk retention,
+  release/reinsertion and a late global owner's read/release at shutdown. All
+  pre-port observations from `cfc8e8db` remain identical.
+* String comparisons cover 410 observed transitions / 5,334 trace lines, with
+  the new moved-from ID control and all prior text/cache observations unchanged.
+* A new direct style probe covers 196 cases / 591 trace lines per run, including
+  all 15 floating fields, raw font-name tails, rectangle identities and floating
+  status flags. This validates the rectangle change within native styles and
+  establishes observations for the upcoming style ownership port; canonical
+  style storage itself is still native.
+* Rendering remains exact across 1,222 cases / 13,186 frames / 192 distinct-frame
+  controls per architecture. The corpus is unchanged. All three DLLs pass
+  export/dependency checks and the scoped COM comparison (10 reference cases
+  and two candidate controls per architecture).
+* Override, tree, effects, HTML, color, USF, RealText, WebVTT, SAMI, text,
+  MicroDVD, ASS, Xombie, style API compilation and native document lifecycle
+  regressions pass again at this implementation. The historical Windows
+  storage harness also runs; its current rectangle adapter is shared by both
+  sides and is explicitly **not** independent rectangle parity evidence.
+* Each architecture passes 333 safe-core and 135 FFI tests, plus formatting and
+  Clippy for all targets and the native runtime. The existing 175 Python tests
+  pass (one skipped), together with the added style-observer negative control.
+
+The style observations constrain the next port. Signed zeros can share a native
+style despite different full hash values; the existing Rust `StyleValue` bitwise
+equality must not replace native style equality. A separate, repeated child test
+shows that releasing one NaN-valued style leaves its native table entry counted
+(`1 -> 1`). No subsequent lookup through that expired raw key is executed or
+claimed compatible. The primary style trace keeps all NaN keys alive and skips
+their destruction at process exit. Further unsafe histories remain unresolved.
+
+The rectangle boundary adds three unsafe input/output functions and four bounded
+copies, with no borrowed foreign slice or new unsafe implementation. The lexical
+inventory finds no unsafe code in 112 core files; 78 FFI files contain 389 unsafe
+function sites and 507 unsafe blocks. These counts overlap and are not a proof
+of soundness or a migration percentage. Rectangle lifetime accounting currently
+assumes complete calls are serialized by the native gate and that only the table
+and checked rectangle resources hold its Arcs. Moving styles into Rust must
+extend that ownership protocol before styles retain canonical rectangles.
+
+The initial x64 link hit MSVC C1001 in existing SIMD code. After that process
+terminated, the same build succeeded without source or compiler-option changes.
+The failed log is retained separately; it provides no compatibility result.
+No production default was switched. Styles, fonts, word/line/subtitle graphs,
+rendering, host adapters and vendored code remain in scope.
+
+Evidence and boundary review:
+[`rust-rect-intern-inventory.json`](rust-rect-intern-inventory.json) and
+[`rust-rect-intern-local-evidence.json`](rust-rect-intern-local-evidence.json).
+Local build, probe, rendering, contract and regression artifacts use the
+`artifacts/rect-*` prefix. Re-run `rect_intern_native.py`,
+`string_flyweight_native.py` and `style_intern_native.py` from each architecture's
+VS developer environment against `artifacts/cleanup-reference`; the candidate
+must be committed and its native libraries rebuilt first. Existing text-port
+evidence below retains its original implementation and reference attribution.
+
+## Previous port: renderer text ownership (2026-10-18)
 
 The experimental renderer now keeps the shared text used by words and polygons
 in safe Rust. Rust owns the complete raw UTF-16 values, cache identity, MRU order,
