@@ -24,15 +24,15 @@ typedef XyInterned<LoggedStyle> Logged;
 static std::shared_ptr<Logged> slots[704];
 static std::shared_ptr<FwSTSStyle> actual[704];
 static unsigned step=0, serial=0;
-static void byte(unsigned n) {printf("%02x",n&255);}
-static void integer(uint64_t n,unsigned width) {for(unsigned i=0;i<width;++i)byte(unsigned(n>>(i*8)));}
+static void write_byte(unsigned n) {printf("%02x",n&255);}
+static void integer(uint64_t n,unsigned width) {for(unsigned i=0;i<width;++i)write_byte(unsigned(n>>(i*8)));}
 static void wire(const STSStyle& s) {
     integer(s.charSet,4);integer(s.fontWeight,4);integer(s.scrAlignment,4);integer(s.borderStyle,4);integer(s.relativeTo,4);
     CRect r=s.marginRect.get();integer(r.left,4);integer(r.top,4);integer(r.right,4);integer(r.bottom,4);
     for(unsigned i=0;i<4;++i)integer(s.colors[i],4);
-    for(unsigned i=0;i<4;++i)byte(s.alpha[i]);
-    byte(s.fItalic);byte(s.fUnderline);byte(s.fStrikeOut);
-    for(unsigned i=0;i<5;++i)byte(0);
+    for(unsigned i=0;i<4;++i)write_byte(s.alpha[i]);
+    write_byte(s.fItalic);write_byte(s.fUnderline);write_byte(s.fStrikeOut);
+    for(unsigned i=0;i<5;++i)write_byte(0);
     integer(s.fontName.GetLength(),4);integer(0,4);
     const double* fields[]={&s.fontSize,&s.outlineWidthX,&s.outlineWidthY,&s.shadowDepthX,&s.shadowDepthY,
         &s.fontScaleX,&s.fontScaleY,&s.fontSpacing,&s.fBlur,&s.fGaussianBlur,&s.fontAngleZ,&s.fontAngleX,&s.fontAngleY,&s.fontShiftX,&s.fontShiftY};

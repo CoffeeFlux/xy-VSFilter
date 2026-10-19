@@ -101,8 +101,10 @@ def main():
         run(['cargo','build','--locked','--offline','--release','--manifest-path',str(ROOT/'Cargo.toml'),'-p','xy-vsfilter-compat','--example','style_table_replay','--target',target,'--target-dir',str(ROOT/'artifacts/style-table-cargo')], 'rust-build')
         candidate = ROOT/'artifacts/style-table-cargo'/target/'release/examples/style_table_replay.exe'
         report['binary_sha256'] = {str(p):sha(p.read_bytes()) for p in [native,candidate]}; save()
-        traces = [run([str(native)],f'reference-{i}').stdout for i in [1,2]]
-        traces += [run([str(candidate),str(out/'reference-1.stdout')],f'candidate-{i}').stdout for i in [1,2]]
+        results = [run([str(native)],f'reference-{i}') for i in [1,2]]
+        results += [run([str(candidate),str(out/'reference-1.stdout')],f'candidate-{i}') for i in [1,2]]
+        if any(r.stderr for r in results): raise ValueError('unexpected runtime stderr')
+        traces = [r.stdout for r in results]
         comparisons = compare(traces,bits)
         for p, digest in {**report['source_sha256'],**report['library_sha256'],**headers,**report['binary_sha256']}.items():
             if sha(Path(p).read_bytes()) != digest: raise ValueError('input or executable changed')

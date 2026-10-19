@@ -2,6 +2,8 @@
 //! Owned style interning with the cleanup's MSVC unique-table traversal.
 //! This is the ownership engine, not yet the renderer's native adapter.
 //! Comparison callbacks make traversal observable without exposing pointers.
+//! They must return the same deterministic value equality as the native key;
+//! observers may record calls but must not change comparison policy mid-operation.
 //! Native floating flags/traps and allocation failures need separate validation.
 use crate::{document_style::StyleValue, rect_intern};
 use alloc::collections::BTreeMap;
