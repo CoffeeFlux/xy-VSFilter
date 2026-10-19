@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cstddef>
 namespace XyRust {
+class RendererDcOperation;
 struct FontSnapshot {
     HFONT handle;
     int m_ascent,m_descent;
@@ -14,6 +15,7 @@ class FontIntern {
     std::shared_ptr<Owner> owner_;
 public:
     FontIntern(const STSStyleBase& style);
+    FontIntern(const STSStyleBase& style,const RendererDcOperation& operation);
     FontSnapshot get()const;
     static size_t Count();
 };

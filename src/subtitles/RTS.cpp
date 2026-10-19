@@ -64,11 +64,15 @@
 const int MAX_SUB_PIXEL = 8;
 const double MAX_SUB_PIXEL_F = 8.0;
 
+// Native fallback only. Experimental lifetime and complete DC operations are
+// owned/checked by Rust, with the shared adapter gate serializing GDI callers.
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+#include "RustRendererDc.h"
+#include "RustFontIntern.inl"
+#else
 // WARNING: this isn't very thread safe, use only one RTS a time.
 static HDC g_hDC;
 static int g_hDC_refcnt = 0;
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-#include "RustFontIntern.inl"
 #endif
 
 static long revcolor(long c)
@@ -669,7 +673,13 @@ bool CText::Append(const SharedPtrCWord& w)
 bool CText::CreatePath(PathData* path_data)
 {
     bool succeeded = false;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    XyRust::RendererDcOperation operation;
+    const HDC g_hDC=operation.get();
+    FwCMyFont font(m_style,operation);
+#else
     FwCMyFont font(m_style);
+#endif
     HFONT hOldFont = SelectFont(g_hDC, font.get());
     ASSERT(hOldFont);
 
@@ -719,7 +729,13 @@ bool CText::CreatePath(PathData* path_data)
 
 void CText::GetTextInfo(TextInfo *output, const FwSTSStyle& style, const CStringW& str )
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    XyRust::RendererDcOperation operation;
+    const HDC g_hDC=operation.get();
+    FwCMyFont font(style,operation);
+#else
     FwCMyFont font(style);
+#endif
     output->m_ascent = (int)(style.get().fontScaleY/100*font.get().m_ascent);
     output->m_descent = (int)(style.get().fontScaleY/100*font.get().m_descent);
 
@@ -1857,6 +1873,9 @@ CRenderedTextSubtitle::CRenderedTextSubtitle(CCritSec* pLock)
     }
 #endif
     m_size = CSize(0, 0);
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    m_renderer_dc_owner = XyRust::AcquireRendererDc();
+#else
     if(g_hDC_refcnt == 0)
     {
         g_hDC = CreateCompatibleDC(NULL);
@@ -1865,14 +1884,19 @@ CRenderedTextSubtitle::CRenderedTextSubtitle(CCritSec* pLock)
         SetMapMode(g_hDC, MM_TEXT);
     }
     g_hDC_refcnt++;
+#endif
     m_movable = true;
 }
 
 CRenderedTextSubtitle::~CRenderedTextSubtitle()
 {
     Deinit();
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    XyRust::ReleaseRendererDc(m_renderer_dc_owner);
+#else
     g_hDC_refcnt--;
     if(g_hDC_refcnt == 0) DeleteDC(g_hDC);
+#endif
 }
 
 #ifndef XY_VSFILTER_RUST_ASS_TREE

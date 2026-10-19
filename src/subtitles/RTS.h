@@ -479,6 +479,9 @@ private:
     void ShrinkCache();
 private:
     static std::size_t s_max_cache_size;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    uint64_t m_renderer_dc_owner = 0;
+#endif
 protected:
     virtual void OnChanged();
     
