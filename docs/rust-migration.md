@@ -27,7 +27,50 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest port: word transforms over Rust-owned paths (2026-10-19)
+## Latest port: ordered scan-line sampling and edge growth (2026-10-19)
+
+Implementation `b8a8566b` moves the ordered integer line sampler into safe Rust.
+The experimental native adapter supplies endpoints/direction to the existing
+Rust-owned edge storage and receives updated next-edge/capacity counters.
+Rust computes the half-sample prestep, preserves 32-bit X-difference wrapping
+before widening, advances the 64-bit accumulator, packs edge positions, grows
+the edge allocation with the reference's doubling policy, and inserts edges
+through checked indices. No row or edge pointer crosses this new boundary.
+
+Invalid rows and wrapped/non-progressing index or capacity ranges return an
+unresolved-shape error before mutation; they are not clipped or counted as
+compatible. Allocation failure remains separately unclosed. Experimental scan
+initialization no longer falls back to raw C++ buffers when Rust allocation
+fails. The older edge API's exclusive opaque owner-pointer contract is retained
+temporarily; moving it to checked IDs remains in scope.
+
+The maintained probe calls the actual cleanup/candidate ScanConvert methods.
+On both x86 and x64, all 384 reused-object histories / 70,692 trace lines match
+twice per role, including every packed span, first/last point, edge counter,
+capacity, size, result and floating/error status. The 192 paths cover line and
+native curve callers, multiple figures, ignored/close types, horizontal/empty
+paths, integer X extremes and edge-buffer growth. The 4,560-case transform and
+39-state path ownership regressions also pass. See the
+[boundary audit](rust-scan-lines-boundary.md) and
+[local evidence](rust-scan-lines-local-evidence.json).
+
+Both architectures build all three DLLs, preserve exports/dependencies, and pass
+ten COM cases plus two controls. Each new rendering run matches all 1,222 cases /
+13,186 frames and passes 192 distinct-frame controls. This later passing run
+does not resolve or erase the earlier x64 cleanup exit crash recorded in the word
+transform evidence. Rust passes 359 core and 141 FFI tests per architecture,
+formatting and Clippy. The existing 200 Python tests pass with one skip, and the
+two new scan observer control tests pass separately. The safe core has no unsafe
+code; the FFI inventory records 573 production unsafe blocks, 408 unsafe
+functions, four unsafe Sync implementations and 18 assembly sites.
+
+Curve coefficient/step arithmetic, path dispatch and figure closure, persistent
+scan result ownership, and all remaining host/vendor implementation stay in
+scope. The next step is a Rust-owned scan-conversion operation using the new
+line sampler and target-exact curve arithmetic. The experimental flag remains
+opt-in; this is not full-library completion.
+
+## Earlier port: word transforms over Rust-owned paths (2026-10-19)
 
 Implementation `d03d00bc` moves CWord::Transform into Rust under the existing
 experimental renderer flag. C++ sends only nine raw floating bit patterns, two

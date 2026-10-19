@@ -1,0 +1,333 @@
+{
+  "schema": 1,
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "candidate_implementation_commit": "b8a8566b5deff3ce5774bc517ff57fd2c1d6db67",
+  "status": "Experimental ordered scan-line migration checkpoint; full-library migration remains active",
+  "architectures": {
+    "x86": {
+      "native": {
+        "scan_lines_native": {
+          "path": "artifacts/scan-lines-scan_lines_native-x86/report.json",
+          "sha256": "85262e7302f0611cd74c300237fe66b089e4e4888f7826939599b8d5b831cf59",
+          "candidate_commit": "b8a8566b5deff3ce5774bc517ff57fd2c1d6db67",
+          "cases": 384,
+          "trace_lines": 70692,
+          "trace_sha256": [
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f"
+          ],
+          "binary_sha256": {
+            "reference": "a8540b8f8eebc001eb4502ce1b7dd75d5036ca9822fe2bb1b3fe0171cadaa7c1",
+            "candidate": "cf1789d4cbe4728414f17ad67c241e649ee5e3714703373d579c68b4b9f3c7ce"
+          }
+        },
+        "word_transform_native": {
+          "path": "artifacts/scan-lines-word_transform_native-x86/report.json",
+          "sha256": "9504debefaa7a24d21c580789b33a1660736db47e2ab5a64273cdf7cec17733a",
+          "candidate_commit": "b8a8566b5deff3ce5774bc517ff57fd2c1d6db67",
+          "cases": 4560,
+          "trace_lines": 9122,
+          "trace_sha256": [
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd"
+          ],
+          "binary_sha256": {
+            "reference": "d6e1d88a652771f38268d6817c0aca43525c744b7e7e130752ede064c8a76d61",
+            "candidate": "665be8e4f97bc9ba5758be8feedb7f82cc2b998d52993d4aaa7dc41cb76cd23b"
+          }
+        },
+        "path_data_native": {
+          "path": "artifacts/scan-lines-path_data_native-x86/report.json",
+          "sha256": "d2ca093885961aecc5c29defe63ab028747baac5e57bcad0f9f4e933f812289b",
+          "candidate_commit": "b8a8566b5deff3ce5774bc517ff57fd2c1d6db67",
+          "cases": 39,
+          "trace_lines": 171,
+          "trace_sha256": [
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2"
+          ],
+          "binary_sha256": {
+            "reference": "58e9af7a31b562d69f17ff61d3497cf71a1180256b8b671ca9115c0e56d1cc1b",
+            "candidate": "fd86c89197cd7f2ff0186a3a980e3a15282a0052fda091768cb8c2d8899781b8"
+          }
+        }
+      },
+      "rendering": {
+        "path": "artifacts/scan-lines-csri-x86/summary.json",
+        "sha256": "256a1bd3828de020eec59254cde135b85a9b495d30fb7452c76811147ee2bd36",
+        "original_manifest_sha256": "2949bb98bfbc49bd3496af90ef9a8b3b386395637ff34bc54b0fc4e86fe61363",
+        "partition_exact": true,
+        "cases": 1222,
+        "frames": 13186,
+        "shard_results": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            7,
+            0
+          ]
+        ],
+        "complete": true,
+        "candidate_dll": {
+          "path": "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\bin\\lib_17.0\\Win32\\Release\\VSFilter.dll",
+          "sha256": "bb11d5ca1baae5166dc0f9473e895aad7b7da5a2a2e819da6ce13e42cc84ac17"
+        },
+        "reference_source": {
+          "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+          "repository": "https://github.com/CoffeeFlux/xy-VSFilter"
+        },
+        "distinct_controls": 192,
+        "stable_equal_cases": 1222,
+        "stable_equal_frames": 13186,
+        "unresolved_cases": []
+      },
+      "contracts": {
+        "path": "artifacts/scan-lines-contracts-x86.log",
+        "sha256": "445a1347a43a8f59ccc7dfd18b9c878b4d225eeaaf4cc2cee89c7ff109d43161"
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "path": "bin/lib_17.0/Win32/Release/VSFilter.dll",
+          "sha256": "bb11d5ca1baae5166dc0f9473e895aad7b7da5a2a2e819da6ce13e42cc84ac17"
+        },
+        "XySubFilter.dll": {
+          "path": "bin/lib_17.0/Win32/Release/XySubFilter.dll",
+          "sha256": "05ca82e7a99c59a85df54171c00399b19bde0b1cb14c608168151c60ed5ee822"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "path": "bin/lib_17.0/Win32/Release/xy_sub_filter_consumer.dll",
+          "sha256": "0d70bdc945965e116eed032f5ea901c9d69e86b2c3f0bcf1878fe13a2f002a2c"
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/scan-lines-build-x86.log",
+          "sha256": "a3bc9543cb6fb60935f4dc23ba241d1e33cdddaac14a2c317d2201bc5cee4d51"
+        },
+        {
+          "path": "artifacts/scan-lines-build-rust-x86.log",
+          "sha256": "3c5b0d731c8ab8574a0d10010fb0a573591fdce443b7262db405dc0aa0d40354"
+        }
+      ],
+      "prior_direct_baseline": {
+        "path": "artifacts/scan-lines-baseline-x86/report.json",
+        "sha256": "381ea89a06c831db3e2895ba1643a0c83535eadd2af730820245260899813eb8"
+      }
+    },
+    "x64": {
+      "native": {
+        "scan_lines_native": {
+          "path": "artifacts/scan-lines-scan_lines_native-x64/report.json",
+          "sha256": "fefb512dbec4b4c227219bc9f664cd4c0a74f8f79cf9cfe7dbbc0dc0c58a9c6a",
+          "candidate_commit": "b8a8566b5deff3ce5774bc517ff57fd2c1d6db67",
+          "cases": 384,
+          "trace_lines": 70692,
+          "trace_sha256": [
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2"
+          ],
+          "binary_sha256": {
+            "reference": "558f43a79f2ea31dbc021d2d42523b5eb801746104498c2ca2e9646e8806722c",
+            "candidate": "64a8ccdd6e1f599f44d2711fa8d93a35d2a2f8bb3cdfaa97b5371237559634fc"
+          }
+        },
+        "word_transform_native": {
+          "path": "artifacts/scan-lines-word_transform_native-x64/report.json",
+          "sha256": "bd412974fda3bd8d7e3bcd0f821de38c32822b206aa03a03f9b63d6e1cee21b1",
+          "candidate_commit": "b8a8566b5deff3ce5774bc517ff57fd2c1d6db67",
+          "cases": 4560,
+          "trace_lines": 9122,
+          "trace_sha256": [
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b"
+          ],
+          "binary_sha256": {
+            "reference": "5b8fc8ecebd531b1a2c82c931dbb95660dce8890b5f85cb499fdfa297186ca15",
+            "candidate": "b853cad01a0ce28d8aced0ac7dbd33ab118eef794ff719a663e904024d1a9d06"
+          }
+        },
+        "path_data_native": {
+          "path": "artifacts/scan-lines-path_data_native-x64/report.json",
+          "sha256": "fc50960de88a94b76684423ec629b8ab989eedb35a865be60a0e75fab4209076",
+          "candidate_commit": "b8a8566b5deff3ce5774bc517ff57fd2c1d6db67",
+          "cases": 39,
+          "trace_lines": 171,
+          "trace_sha256": [
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031"
+          ],
+          "binary_sha256": {
+            "reference": "4a52860bb875f92d8d324f34792737cd48aad3f45da502aadb3ff692ff69281d",
+            "candidate": "e1a93a072b38e33a319d1b2f4aa9f52f529b235e29d5f9f34b083aaccffb3492"
+          }
+        }
+      },
+      "rendering": {
+        "path": "artifacts/scan-lines-csri-x64/summary.json",
+        "sha256": "c48f874a2add059e8ea6bdfdb3dba0dea9285af3a12e2968caae2bf1a71e7665",
+        "original_manifest_sha256": "2949bb98bfbc49bd3496af90ef9a8b3b386395637ff34bc54b0fc4e86fe61363",
+        "partition_exact": true,
+        "cases": 1222,
+        "frames": 13186,
+        "shard_results": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            7,
+            0
+          ]
+        ],
+        "complete": true,
+        "candidate_dll": {
+          "path": "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\bin\\lib_17.0\\x64\\Release\\VSFilter.dll",
+          "sha256": "0049a608be752b3283acf849d42742ee209a938479dfa30371baa34e45917fc0"
+        },
+        "reference_source": {
+          "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+          "repository": "https://github.com/CoffeeFlux/xy-VSFilter"
+        },
+        "distinct_controls": 192,
+        "stable_equal_cases": 1222,
+        "stable_equal_frames": 13186,
+        "unresolved_cases": []
+      },
+      "contracts": {
+        "path": "artifacts/scan-lines-contracts-x64.log",
+        "sha256": "445a1347a43a8f59ccc7dfd18b9c878b4d225eeaaf4cc2cee89c7ff109d43161"
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "path": "bin/lib_17.0/x64/Release/VSFilter.dll",
+          "sha256": "0049a608be752b3283acf849d42742ee209a938479dfa30371baa34e45917fc0"
+        },
+        "XySubFilter.dll": {
+          "path": "bin/lib_17.0/x64/Release/XySubFilter.dll",
+          "sha256": "0f35433dceeebcbfec26fdc59cb840d7700a9f887f76f54616b9ec07a33bd067"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "path": "bin/lib_17.0/x64/Release/xy_sub_filter_consumer.dll",
+          "sha256": "f5d5402cbefb40ad2729c675628a74bdb5c8cba09ef4a80e2b0632ac915accde"
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/scan-lines-build-x64.log",
+          "sha256": "b4b6aaca91c4aa9857c3dc18d5378687ec0ff8c19ac888e21fd14617f5cbf7a6"
+        },
+        {
+          "path": "artifacts/scan-lines-build-rust-x64.log",
+          "sha256": "0dcca5ec0d5da764c5922b81f54de0114e3d87d4ce56dd9be0e734d53df28285"
+        }
+      ],
+      "prior_direct_baseline": {
+        "path": "artifacts/scan-lines-baseline-x64/report.json",
+        "sha256": "32fba074a8a319552af0b8541706bbfe7e700bd3830f67ea93157eda8c93ebc1"
+      }
+    }
+  },
+  "checks": {
+    "path": "artifacts/scan-lines-checks.log",
+    "sha256": "57518c1fc6c3efe331b63f9a791020d55f8cbf62660860ff2052b051c18c215e",
+    "core_per_architecture": 359,
+    "ffi_per_architecture": 141,
+    "python_existing": 200,
+    "python_existing_skipped": 1,
+    "python_new_observer": 2,
+    "observer_log": {
+      "path": "artifacts/scan-lines-observer-checks.log",
+      "sha256": "c9dcb25f54660f9f98536d914977d5361db70b7e215d55497af5e32e6cdd8b11"
+    },
+    "fmt": true,
+    "clippy_both_architectures_and_native_runtime": true
+  },
+  "unsafe_inventory": {
+    "path": "artifacts/scan-lines-unsafe-inventory.json",
+    "sha256": "c00467cefca4f3e0fa739531d8dc43993a0d57793e78e4ee1cc6956453c97bcd"
+  },
+  "previous_unresolved_reference": {
+    "evidence": "rust-word-transform-local-evidence.json",
+    "case": "field-unicode-style-space-file",
+    "result": "Earlier x64 cleanup exit access violation remains unresolved; a later passing run does not erase it."
+  },
+  "limitations": [
+    "Finite Release/default Windows floating-control observations; Debug, allocator failure and arbitrary host concurrency remain unclosed.",
+    "Invalid rows, index/capacity overflow and non-progressing growth are rejected as unresolved native outcomes rather than clipped. The direct success fixture only accesses allocated rows.",
+    "The FFI still uses the older exclusive opaque edge-owner pointer contract; migration to checked IDs remains in scope.",
+    "Bezier/B-spline arithmetic, path dispatch, figure connection/closure, scan result object ownership, remaining host adapters and vendors remain native/in scope. No production default switched."
+  ],
+  "sources": {
+    "rust/compat/src/scan_line.rs": "e419169588a62f0c4d02086f2c5190061b0903c5e4080161fb3a03b813d2bf00",
+    "rust/compat/src/edge_storage.rs": "6ec4e8b1f32b8a36d0379798f0566b28546a815dae5cbb85b214a919d9589be8",
+    "rust/ffi/src/edge_storage.rs": "1b5bc7c77f2bcfb4052381dd18ce479aa08be914586af654691e57befd979768",
+    "include/xy_rust_edges.h": "fc75bda2990f032b81fca461e3443ae1caa41a96068ec39179b34c56eec47759",
+    "src/subtitles/Rasterizer.cpp": "803a42426e24954432c77665d776423f8e499f087d460b1dab78e9b4307bbbbd",
+    "tools/compat/scan_lines_native.cpp": "65b68194d790dc7eed69c96be2cdee3da271b53e46fae7cdb5d99a42e1e9b916",
+    "tools/compat/scan_lines_native.py": "309544142d8a0663c309564fd7fda5d4202573df239e480cb63a1f2606df4f57",
+    "tools/compat/test_scan_lines_native.py": "0fad6a8615e74bfe2ef9cebfad0deac2fb43e6a18d7cb29afc655a908e775467",
+    "docs/rust-scan-lines-boundary.md": "f663ec234144e0cc9a39d09de0dd801e2957a09c908b245766b399d6a1663229"
+  }
+}
