@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "implementation_commit": "815dc6016ac063ef03e542d625ee94cdb0802cc9",
+  "evidence": "rust-path-data-local-evidence.json",
+  "ownership": [
+    "Path owns initialized parallel Vec<Point>/Vec<u8> in the safe core; fields are private and all public mutations preserve matching lengths.",
+    "Store validates monotonic non-reused integer IDs. C++ PathData owns only a checked ID through PathOwner; it no longer owns persistent malloc/realloc buffers in experimental builds.",
+    "Deep copy, self assignment, empty-source assignment no-op, clear, hashing, wrapping append and alignment execute in Rust.",
+    "Native reads receive detached snapshots; transforms and polygons explicitly replace from detached packets. No Rust path address, point slice, or mutable loan crosses the native adapter ABI."
+  ],
+  "boundary": [
+    "A dedicated atomic admission serializes all path registry access. HRTB closures cannot return state references; the unsafe Sync implementation is justified by exclusive admission and the Store owning only Send values.",
+    "GDI obtains synchronous output pointers only to initialized exact-count local vectors. Only complete successful GetPath output becomes path data. Renderer operation guards bound borrowed HDC lifetime and selection state.",
+    "Text path control uses the safe core with narrow Windows calls: spacing/legacy branch, UTF16 consumption, ignored partial failures, wrapping offsets, checked failure restoration and Release successful-call non-restoration.",
+    "Native adapter serialization covers FFI calls; full host concurrency, reentry and arbitrary external callbacks are not established by this boundary."
+  ],
+  "preserved_quirks": [
+    "Assigning an empty source leaves a nonempty destination intact.",
+    "Spaced text stops at first NUL; unspaced text uses full CString length including its NUL tail. Empty spaced input leaves the existing path untouched.",
+    "Partial begin/text/end Boolean failures are ignored by CText; unspaced checked failures restore the prior font. Successful Release calls leave the font selected.",
+    "Begin clears before invoking GDI, even when BeginPath fails. CloseFigure failure is ignored in Release. EndPath failure aborts the GDI path.",
+    "Append and alignment retain directly observed machine-integer wraparound at i32 bounds."
+  ],
+  "remaining_native_work": [
+    "CWord::Transform floating transforms and CPolygon::PrepareDraw scalar geometry.",
+    "ScanLineData curve/line evaluation and scan-conversion control; its readers now share one detached path snapshot per ScanConvert.",
+    "Word/line/subtitle and cache object graphs; all player/CSRI/AviSynth/VirtualDub/DirectShow/XySubFilter consumer adapters and vendors.",
+    "Resolve negative/short GetPath and allocator outcomes without reading or reproducing native uninitialized memory; broaden FP, Debug and host concurrency evidence."
+  ]
+}

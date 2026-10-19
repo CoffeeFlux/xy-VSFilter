@@ -217,8 +217,8 @@
     "C++ word/line/subtitle graphs, raw path buffers, host adapters and vendors remain in scope. No production default switched."
   ],
   "next_work": [
-    "CText measurement is ported and validated at c7916fe3; see rust-text-measure-local-evidence.json. Port the remaining CText path control flow, retaining raw UTF16 and exact Windows numeric conversions/status effects.",
-    "Move persistent PathData points/types and partial-path growth into safe Rust ownership, using the new actual-CText probe as a direct regression baseline.",
-    "Then continue word/line/subtitle graphs, all host adapters and vendors; retain x86/x64 exact rendering and host evidence."
+    "CText measurement is validated at c7916fe3; persistent PathData and text path control are validated at 815dc601. See rust-text-measure-local-evidence.json and rust-path-data-local-evidence.json.",
+    "Port CWord transforms, polygon preparation and scan-conversion control from detached native snapshots into safe Rust operations on owned paths.",
+    "Continue remaining word/line/subtitle/cache graphs, all host adapters and vendors; preserve x86/x64 exact rendering and host evidence. Negative/short GetPath, allocation failures and arbitrary host concurrency remain unresolved."
   ]
 }

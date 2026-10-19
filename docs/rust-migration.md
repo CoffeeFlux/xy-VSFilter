@@ -27,7 +27,77 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest port: Rust CText measurement and IA32 canonical copies (2026-10-19)
+## Latest port: persistent path ownership and text-path control (2026-10-19)
+
+Implementation `815dc601` moves persistent PathData points/types into the safe
+Rust core. Experimental C++ PathData now owns a checked integer ID rather than
+malloc/realloc buffers. Rust performs deep copies, comparison, hashing, clear,
+append and AlignLeftTop. Empty-source assignment retains the existing destination,
+and directly observed integer overflow in translation and alignment is emulated
+with wrapping arithmetic. There is no persistent native mirror or exported Rust
+path pointer. Native readers receive detached packets; transforms and polygon
+preparation explicitly replace the value after editing their temporary snapshots.
+Scan conversion takes one snapshot and shares it with its curve/line evaluators.
+
+Path capture and CText::CreatePath sequencing also run in Rust. The Windows
+boundary gives synchronous GDI calls initialized, exact-sized local buffers and
+accepts captured path data only after a complete read. A separate atomic path
+admission validates IDs and excludes overlapping mutation/release. It does not
+hold DOCUMENTS admission across GDI calls. Renderer operation guards continue to
+bound borrowed HDC and font lifetimes. All native inputs are copied UTF16 units,
+raw floating bits, or fixed-width scalars; no foreign pointer is retained.
+
+The safe text loop preserves the Release reference's unusual control flow:
+spaced text stops at first NUL, while unspaced text uses the complete CString
+length; partial begin/text/end Boolean failures are ignored; checked unspaced
+failures restore the font, while successful calls leave it selected because the
+native restoration was ASSERT-only. Begin clears before the GDI call even on
+failure, CloseFigure failure is ignored, and EndPath failure calls AbortPath.
+The existing native text-path fixture now reads detached candidate snapshots.
+
+Direct cleanup comparisons pass on x86 and x64. The new maintained PathData
+probe observes 39 states / 171 trace lines per architecture, twice per role:
+copy independence, self/empty assignment, replacement, append/empty append, clear,
+six integer-edge geometries, raw points/types and hashes, and begin/end/close
+failures. Both 432-case measurement modes, the 40-case real-GDI text/path probe,
+DC lifecycle and font probes also pass. All three DLLs build and preserve exports
+and dependencies; ten COM cases plus two controls pass per architecture. Each
+architecture matches 1,222 rendering cases / 13,186 frames exactly, with 192
+distinct-frame controls. Rust passes 356 core and 140 FFI tests per architecture,
+formatting and Clippy; Python passes 198 tests with one skip. The core still
+forbids unsafe code. The boundary inventory is now 565 production unsafe blocks
+across 89 FFI files, four audited Sync implementations, and 13 assembly sites.
+
+An intermediate x86 link reported MSVC C1001 in existing SIMD code and remained
+live after the fatal diagnostic. The identified failed linker was stopped; its
+log is retained as a build failure, not parity. Final clean committed builds and
+comparisons pass. See [path evidence](rust-path-data-local-evidence.json) and the
+[ownership inventory](rust-path-data-inventory.json).
+
+Negative GetPath counts and short reads remain unresolved reference outcomes.
+The boundary returns private status 6 instead of exposing uninitialized native
+data or reproducing partial-path DebugBreak. This does not establish equivalent
+error handling for those histories. Allocation failure, arbitrary host reentry/
+concurrency, Debug assertion side effects and other floating control modes also
+remain unaudited. The production default remains unchanged.
+
+Full-library migration remains active. Next are CWord::Transform floating
+geometry, polygon preparation, scan-conversion control and remaining word/line/
+subtitle/cache graphs, then the remaining host adapters and vendors. Temporary
+C++ snapshots are transitional native code, not the final memory-safety boundary.
+The old path-buffer leaf remains for the native fallback; historical leaf
+comparisons retain their original reference and adapter pins.
+
+Windows handoff: after the documented build, run `tools/compat/path_data_native.py`
+from the matching VS developer shell with `--reference-root
+artifacts/cleanup-reference --platform Win32` (or `x64`) and a fresh `--output`
+directory. Repeat the text/path, both measurement modes, DC/font, exact rendering
+and DLL/COM checks. Native probes require clean committed source, validate full
+traces, repeat both roles, and pin library/header/executable hashes. Current
+evidence uses `path-text-*` artifacts; earlier `path-owned-*` artifacts describe
+intermediate builds and are not this final checkpoint.
+
+## Earlier port: Rust CText measurement and IA32 canonical copies (2026-10-19)
 
 Implementation `db474fa3`, completed by `c7916fe3`, moves GetTextInfo sequencing
 into the safe Rust core. The Windows boundary owns a detached raw-UTF16 packet
