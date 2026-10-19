@@ -1,0 +1,80 @@
+{
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "scope": "Next named-style-map arithmetic boundary: source review and reproduced AddStyle mismatch, not a completed correction.",
+  "sources": [
+    {
+      "path": "rust/compat/src/document_style_map.rs",
+      "sha256": "a8c113e7ed5e0111507763b977eebf08f37ade03ae482076925239c0573508c7"
+    },
+    {
+      "path": "rust/compat/src/document_style_add.rs",
+      "sha256": "82c019855f1fd1ea377991f1116862d2544ccb5ac3cbba77238f38c0828f2179"
+    },
+    {
+      "path": "rust/compat/src/document.rs",
+      "sha256": "110ff9535f7a741f12d80ec408a31c6cfcb0f2a80ee98f296f0dd927a6560921"
+    },
+    {
+      "path": "rust/ffi/src/document.rs",
+      "sha256": "bafafc089faee87a8cebf6e66614be88ea4fbfe741d9a770c8b24948c9fc924d"
+    },
+    {
+      "path": "rust/ffi/src/document_registry.rs",
+      "sha256": "ec5b89bd753711da1b3af347c9656be810c4e8827af05a01d97f583f883ad731"
+    },
+    {
+      "path": "src/subtitles/STS.cpp",
+      "sha256": "a354d1a1939d576f19ffdcc8c0496d5d390fba0f7409edf324dc018a78df9c89"
+    },
+    {
+      "path": "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/atlmfc/include/atlcoll.h",
+      "sha256": "7fc0634c45fb4788cf2c78572040a082fb763e51c7cb517e1c3cb701265cb38f"
+    },
+    {
+      "path": "artifacts/font-native-map-x86/probe.map",
+      "sha256": "9aca7c289a5eee3a46b3ae0f3984314e1d0c60f7632b2187d143bba3fae4cae7"
+    },
+    {
+      "path": "artifacts/font-native-map-x86/disassembly.txt",
+      "sha256": "55295baa514c2c5652c5d9a596e1a94c448b2fb0dc863c46ae7f8b0f87b522d6"
+    }
+  ],
+  "confirmed_source_differences": [
+    "Rust computes the high threshold in every insert and the low threshold in every successful removal; ATL caches both.",
+    "ATL updates thresholds in SetOptimalLoad, InitHashTable and successful Rehash. Its constructor calls SetOptimalLoad; compiler folding of default constants still needs direct constructor observations.",
+    "The native bins pointer is initially null and becomes null again on RemoveAll. First insertion allocates bins and updates thresholds; removing the final node does not release bins. Count==0 alone cannot model this distinction.",
+    "RemoveAll holds the automatic-rehash lock, so it retains bin count and does not recalculate thresholds while freeing nodes.",
+    "Native x86 InitHashTable converts unsigned bin count through x87 into a stored f32, then multiplies in x87 and calls __ftol2 (64-bit return; EAX retained for size_t), high before low. This is NOT the __ftol2_sse signed-i32 helper used for font heights.",
+    "Native x86 PickSize converts count to a stored f32, divides by 0.75 in x87, and calls __ftol2 without rounding the division result to f32 first. Rust currently rounds through f32 and uses saturating casts. Large-count reachability and allocation failure must stay qualified."
+  ],
+  "x86_addresses": {
+    "InitHashTable": "0041cfc0",
+    "PickSize": "0041d200",
+    "ftol2": "004acf70"
+  },
+  "next_work": [
+    "Observe actual constructor, first insertion, existing-key update, conflict removal/reinsertion, growth, Empty and reuse, plus sticky x87/SSE status. Keep two repeats per role and both architectures.",
+    "Add cached thresholds and a logical bins-initialized state to the safe map. Keep raw key order, primes, growth/shrink and retired value order unchanged.",
+    "Supply target arithmetic at the Windows boundary without unsafe code in the portable core. Avoid function callbacks or temporary Document constructions accidentally raising new floating exceptions.",
+    "Revalidate all 360 AddStyle cases, map growth/lifecycle, all format/document probes and actual rendering/hosts. Never count the current mismatch as passing.",
+    "Audit native style assignment versus Rust-owned default-style setters and selected-state copying separately. Transitional C++ assignment correction does not establish those Rust storage copy semantics for signaling NaNs."
+  ],
+  "deferred_ownership": "After these compatibility gaps, shared renderer HDC and text/path operations, then word/line/subtitle ownership; all hosts and vendored code remain in scope.",
+  "candidate_implementation_commit": "a518992aae3315977003a07cdfc7d9f65f9b37fd",
+  "current_failed_comparisons": {
+    "x86": {
+      "path": "artifacts/style-copy-add-style-x86/report.json",
+      "cases": 360,
+      "different_status_rows": 360,
+      "raw_values_and_names_equal": true,
+      "passing": false
+    },
+    "x64": {
+      "path": "artifacts/style-copy-add-style-x64/report.json",
+      "cases": 360,
+      "different_status_rows": 195,
+      "raw_values_and_names_equal": true,
+      "passing": false
+    }
+  }
+}

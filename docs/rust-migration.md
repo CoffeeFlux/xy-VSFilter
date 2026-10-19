@@ -27,7 +27,71 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest integrated port: font ownership and Windows GDI boundary (2026-10-19)
+## Latest correction: style floating comparisons and assignment (2026-10-19)
+
+Implementation `a518992a` preserves the cleanup's floating-point domains during
+canonical style lookup/release and the equality decision in AddStyle. The safe
+core retains all 15 fields' short-circuit order through a comparison callback.
+The Windows boundary shares the audited x87 comparator with font ownership;
+x64 retains its native SSE comparison. The original 15 x86 discrepancies are
+corrected without clearing caller flags.
+
+The expanded probe also exposed a different x86 copy behavior: cleanup MSVC's
+implicit STSStyle assignment uses FLD/FSTP and quiets signaling NaNs, while its
+copy constructor can retain their raw bits. The transitional native assignment
+now delegates each floating copy to an audited Rust scalar helper, preserving
+field order and the distinction between assignment and raw transport. This does
+not complete the audit of Rust-owned default-style setters or selected-state
+copying; those operations still need corresponding reference observations.
+
+On both Windows architectures, two reference and two candidate runs match for
+three scenarios, each with 196 cases / 788 trace lines: the original interning
+inputs, assignment followed by interning, and deliberately identical raw-value
+pairs. Observations include full values, canonical aliases/counts, separate
+x87/SSE flags during assignment and each interning phase, final release,
+ambient sticky flags, moved owners and late release. The failed initial copy
+observations are retained separately; no NaN expired-key lookup is executed.
+
+All three DLLs build on both architectures. Each architecture passes 1,222
+rendering cases / 13,186 exact frames, 192 distinct-frame controls, font/GDI,
+rectangle/string/table probes, 15 format/document regressions, export/dependency
+checks, and 10 COM cases plus two controls. All 340 core and 136 FFI tests pass
+per architecture, with formatting and Clippy checks. The final Python rerun
+passes 184 tests with one skip.
+
+The historical storage harness initially rejected the new assignment declaration.
+Its narrowly updated declaration check retains the pinned implicit assignment
+on both storage-algorithm sides and still rejects other changes. Its original
+upstream reference remains unchanged; its passing results are not current style
+assignment parity. Actual assignment evidence comes from the cleanup probes
+above. The harness update has separate commit provenance from the implementation.
+
+The new 360-case AddStyle probe is **not passing**. After the assignment fix, all
+raw style values and conflict names agree, but floating status differs in 360
+x86 rows and 195 x64 rows. Source/disassembly review identifies the remaining
+named-map issue: ATL caches load thresholds and updates them at initialization
+or rehash; Rust currently recomputes them during insertion/removal, also using
+the wrong floating domain on x86. Do not hide this difference by clearing status
+or count these cases as parity. Correct the map lifecycle and arithmetic next,
+then audit the remaining native assignment versus Rust storage-copy boundaries.
+
+See [style floating evidence](rust-style-floating-local-evidence.json),
+[boundary inventory](rust-style-floating-inventory.json), and the
+[next named-map review](rust-style-map-floating-inventory.json). All 115 portable
+core files remain free of unsafe code. The 83-file FFI inventory includes one
+additional unsafe block for the bounded scalar assignment helper; its lexical
+counts are not a soundness proof. Reproduce the focused checks with
+`tools/compat/style_intern_native.py --reference-root artifacts/cleanup-reference
+--platform x64 --scenario interning --output <new-directory>`, repeating for
+Win32 and scenarios `same-values`, `raw-twins`, and `add-style`. Local final
+artifacts use `style-copy-*`.
+
+No production default was switched. Nondefault floating modes/traps, allocation
+failure/reentry and host concurrency remain unclosed. Shared device-context and
+text/path ownership, word/line/subtitle graphs, all host interfaces and vendored
+code remain part of the complete Rust migration.
+
+## Earlier font ownership and Windows GDI boundary (2026-10-19)
 
 The experimental renderer now owns canonical font keys and HFONT lifetimes in
 Rust. The portable table owns raw UTF16 keys and weak payload references; typed
@@ -53,8 +117,8 @@ assembly or unsafe code. Earlier combined floating-status checks concealed the
 x87/SSE difference; those earlier passes are not evidence of separate-domain
 parity. A subsequent style diagnostic confirms 15 x86 floating-domain mismatches
 while all original aggregate observations remain identical. The extended x64 style
-probe passes. This is an open compatibility defect, not a passing comparison;
-correct style equality before expanding the device-context port. The exact
+probe passes. Those observations were an open compatibility defect at that
+checkpoint; the style-floating correction above addresses them. The exact
 diagnostic source is preserved in `tools/compat/style_float_domains_diagnostic.cpp`;
 the evidence file retains differing rows and the original build provenance.
 
@@ -82,8 +146,8 @@ Reproduce the focused comparisons with `tools/compat/font_native.py` and
 `--edge 0` through `--edge 11` isolate raw floating inputs. Local final artifacts
 use `font-domain-*`; earlier failing observations remain separately attributed.
 
-After correcting the x86 style-status defect, the next ownership boundary is
-the shared renderer device context, followed by text/path operations and
+After the intervening style/map compatibility work, the next ownership boundary
+is the shared renderer device context, followed by text/path operations and
 word/line/subtitle ownership. In cleanup Release builds,
 CText::CreatePath's successful restoration occurs only inside an omitted ASSERT;
 font deletion can therefore happen while the font is still selected. Preserve
