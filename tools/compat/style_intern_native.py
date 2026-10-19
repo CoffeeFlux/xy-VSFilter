@@ -33,6 +33,13 @@ def compare(traces,bits):
     for trace in traces:validate(trace,bits)
     if any(trace!=traces[0] for trace in traces[1:]):raise ValueError("style traces differ or are nondeterministic")
 
+def validate_lifecycle(data):
+    rows=data.splitlines()
+    if len(rows)!=5 or rows[:2]!=[b'style-move copy=1 empty=1 distinct=1 count=1',b'style-move restored=1 source_empty=1 count=1']:raise ValueError('invalid style move lifetime')
+    m=re.fullmatch(rb'style-sticky before=([0-9a-f]{8}) after=\1 count=0 rects=0',rows[2])
+    if not m or int(m[1],16)==0:raise ValueError('ambient status lost or invalid final release')
+    if rows[3:]!=[b'style-lifecycle-complete count=1',b'style-late count=0 rects=0 valid=1']:raise ValueError('late owner read/release failed')
+
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -117,6 +124,14 @@ def main():
                 if result.stderr or result.stdout.strip()!=expected:raise ValueError("unstable or changed isolated post-release count; unresolved")
                 released.append(result.stdout)
         report['isolated_nan_release']={'count_before':1,'count_after':1,'post_release_lookup_executed':False,'trace_sha256':[sha(v) for v in released]}
+        lifecycle=[]
+        for label in ('reference','candidate'):
+            for repeat in (1,2):
+                result=run([str(out/label/'style-interner.exe'),'lifecycle'],out/label,f'{label}-lifecycle-{repeat}',30)
+                if result.stderr:raise ValueError('unexpected lifecycle stderr')
+                validate_lifecycle(result.stdout);lifecycle.append(result.stdout)
+        if any(v!=lifecycle[0] for v in lifecycle[1:]):raise ValueError('style lifecycle differs or is nondeterministic')
+        report['lifecycle']={'trace_sha256':[sha(v) for v in lifecycle],'trace_lines':5,'late_owner':True,'sticky_status':True}
         compare(traces,bits)
         if [git(root,"rev-parse","HEAD") for root in roots]!=commits or any(git(root,"status","--porcelain","--untracked-files=no") for root in roots):
             raise ValueError("source changed during comparison")

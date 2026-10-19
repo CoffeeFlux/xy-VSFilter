@@ -11,6 +11,8 @@
 #include <vector>
 #include <float.h>
 #include <process.h>
+#include <cfenv>
+#include <utility>
 
 static double STSStyle::* fields[]={&STSStyle::fontSize,&STSStyle::outlineWidthX,&STSStyle::outlineWidthY,
     &STSStyle::shadowDepthX,&STSStyle::shadowDepthY,&STSStyle::fontScaleX,&STSStyle::fontScaleY,
@@ -22,6 +24,15 @@ static bool nan(const STSStyle& value) {
     return false;
 }
 static std::vector<std::shared_ptr<FwSTSStyle>> finite_owners,nan_owners;
+static struct LateStyle {
+    std::shared_ptr<FwSTSStyle> value;
+    ~LateStyle() {
+        if(!value)return;
+        bool valid;{const STSStyle& s=value->get();valid=s.fontName==L"late-style" && s.fontSize==18;}
+        value.reset();
+        printf("style-late count=%llu rects=%llu valid=%u\n",static_cast<unsigned long long>(FwSTSStyle::Count()),static_cast<unsigned long long>(FwRect::Count()),valid?1:0);
+    }
+} late_style;
 static unsigned cases=0;
 static void retain(const std::shared_ptr<FwSTSStyle>& value) {(nan(value->get())?nan_owners:finite_owners).push_back(value);}
 static void describe(const STSStyle& value) {
@@ -47,7 +58,22 @@ static void pair(STSStyle& first,STSStyle& second) {
     printf("style-fp index=%u first=%08x second=%08x copy=%08x read=%08x equality=%08x\n",cases-1,fa,fb,fc,fr,fe);
     describe(av);describe(bv);retain(a);retain(b);retain(c);
 }
-int main(int argc,char**) {
+int main(int argc,char** argv) {
+    if(argc>1 && !strcmp(argv[1],"lifecycle")) {
+        {
+            FwSTSStyle a,b(a),c(std::move(a)),empty(std::move(a));
+            printf("style-move copy=%u empty=%u distinct=%u count=%llu\n",b==c?1:0,a==empty?1:0,a!=c?1:0,static_cast<unsigned long long>(FwSTSStyle::Count()));
+            a=b;empty=std::move(c);
+            printf("style-move restored=%u source_empty=%u count=%llu\n",a==empty?1:0,c!=empty?1:0,static_cast<unsigned long long>(FwSTSStyle::Count()));
+        }
+        _clearfp();if(std::feraiseexcept(FE_DIVBYZERO))return 2;const unsigned before=_statusfp();
+        {STSStyle s;FwSTSStyle a(s),b(a);const STSStyle& snapshot=b.get();if(snapshot.fontSize!=18)return 3;}
+        const unsigned after=_statusfp();
+        printf("style-sticky before=%08x after=%08x count=%llu rects=%llu\n",before,after,static_cast<unsigned long long>(FwSTSStyle::Count()),static_cast<unsigned long long>(FwRect::Count()));
+        {STSStyle s;s.fontName=L"late-style";late_style.value=std::make_shared<FwSTSStyle>(s);}
+        printf("style-lifecycle-complete count=%llu\n",static_cast<unsigned long long>(FwSTSStyle::Count()));
+        return 0;
+    }
     if(argc>1) {
         // No lookup occurs after release. Count() itself never dereferences keys.
         STSStyle value;const uint64_t n=0x7ff8000000000001ull;memcpy(&value.fontSize,&n,8);

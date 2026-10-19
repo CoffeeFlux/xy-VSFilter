@@ -83,7 +83,16 @@ impl Table {
         if (size as f32) / (self.bucket_count as f32) <= 1.0 {
             return Ok(None);
         }
-        let required = (size as f32) as usize;
+        let rounded = size as f32;
+        // LLVM's direct f32 -> usize lowering evaluates an unused subtraction
+        // of 2^(usize::BITS-1), setting inexact even for small exact counts such
+        // as 9 and 65. Valid node counts fit our order Vec's signed allocation
+        // bound. Convert through the signed type to avoid that extra operation;
+        // never clear ambient floating status to hide the discrepancy.
+        if rounded >= isize::MAX as f32 {
+            return Err(Error::Capacity);
+        }
+        let required = rounded as isize as usize;
         let target = if self.bucket_count < 512 && self.bucket_count * 8 >= required {
             self.bucket_count * 8
         } else {

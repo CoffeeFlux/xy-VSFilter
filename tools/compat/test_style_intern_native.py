@@ -1,9 +1,14 @@
 import unittest
 
-from style_intern_native import CASES, compare, validate
+from style_intern_native import CASES, compare, validate, validate_lifecycle
 
 
 class StyleTraceControls(unittest.TestCase):
+    def test_lifecycle_requires_sticky_status_move_aliases_and_late_release(self):
+        good=b'style-move copy=1 empty=1 distinct=1 count=1\nstyle-move restored=1 source_empty=1 count=1\nstyle-sticky before=00000008 after=00000008 count=0 rects=0\nstyle-lifecycle-complete count=1\nstyle-late count=0 rects=0 valid=1\n'
+        validate_lifecycle(good)
+        for bad in [good.replace(b'empty=1',b'empty=0'),good.replace(b'after=00000008',b'after=00000000'),good.replace(b'valid=1',b'valid=0'),good.replace(b'00000008',b'00000000')]:
+            with self.assertRaises(ValueError):validate_lifecycle(bad)
     def trace(self):
         rows = [b"style-provenance pointer_bits=64 ansi=932 oem=932"]
         value = (b"style-value rect=0,0,0,0 ints=0,0,0,0,0,0,0,0 font=1:d800 colors="
