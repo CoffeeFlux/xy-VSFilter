@@ -88,6 +88,14 @@ impl Cache {
             self.values.remove(key(value.units()));
         }
     }
+    /// Module teardown releases cached allocations while retained owners remain
+    /// valid. New construction after native cache destruction is unresolved,
+    /// refused safely by maximum zero.
+    pub fn shutdown(&mut self) {
+        self.values.clear();
+        self.order = VecDeque::new();
+        self.maximum = 0;
+    }
     pub fn clear(&mut self, reset: bool) {
         self.values.clear();
         self.order.clear();
@@ -145,6 +153,17 @@ mod tests {
         cache.set_maximum(0, true);
         assert_eq!(cache.stats(), [0, 0, 0, 0]);
         assert_eq!(cache.intern(vec![]).unwrap_err(), Disabled);
+    }
+    #[test]
+    fn shutdown_releases_cache_ownership_but_retained_text_is_live() {
+        let mut cache = Cache::new();
+        let value = cache.intern(vec![65, 0, 0xd800]).unwrap();
+        assert_eq!(Arc::strong_count(&value), 3);
+        cache.shutdown();
+        assert_eq!(Arc::strong_count(&value), 1);
+        assert_eq!(value.units(), &[65, 0, 0xd800]);
+        assert_eq!(cache.stats()[..2], [0, 0]);
+        assert_eq!(cache.intern(vec![65]).unwrap_err(), Disabled);
     }
     #[test]
     fn counters_and_legacy_ids_wrap_but_never_allocate_zero() {

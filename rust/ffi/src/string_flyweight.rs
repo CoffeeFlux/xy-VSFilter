@@ -47,6 +47,7 @@ fn cache(boundary: &Boundary, action: u32, maximum: usize, reset: bool) -> Resul
                 1 => r.strings.set_maximum(maximum, reset),
                 2 => r.strings.clear(reset),
                 3 => r.strings.remove_tail(),
+                4 => r.strings.shutdown(),
                 _ => return Err(3),
             }
             let mut out = [0; 32];
@@ -137,7 +138,8 @@ pub unsafe extern "C" fn xy_vsfilter_string_read_v1(
 }
 /// # Safety
 /// Output spans 32 writable bytes. Caller serializes admission. Action 0 reads,
-/// 1 resizes, 2 clears, 3 removes the least-recently-used entry. The optional
+/// 1 resizes, 2 clears, 3 removes the least-recently-used entry, 4 shuts down
+/// module cache storage. The optional
 /// reset flag clears statistics on actions 1/2. No callback or pointer retained.
 #[no_mangle]
 pub unsafe extern "C" fn xy_vsfilter_string_cache_v1(
@@ -146,7 +148,7 @@ pub unsafe extern "C" fn xy_vsfilter_string_cache_v1(
     reset: u32,
     output: *mut u8,
 ) -> u32 {
-    if output.is_null() || reset > 1 || action > 3 {
+    if output.is_null() || reset > 1 || action > 4 {
         return 3;
     }
     let bytes = match cache(&DOCUMENTS, action, maximum, reset != 0) {
@@ -188,7 +190,7 @@ pub(crate) fn test_exports(document: u64) {
             xy_vsfilter_string_create_v1(buffer.as_ptr(), 1, buffer.as_mut_ptr()),
             3
         );
-        assert_eq!(xy_vsfilter_string_cache_v1(4, 0, 0, buffer.as_mut_ptr()), 3);
+        assert_eq!(xy_vsfilter_string_cache_v1(5, 0, 0, buffer.as_mut_ptr()), 3);
         assert_eq!(buffer, [0xa5; 32]);
         assert_eq!(xy_vsfilter_string_cache_v1(2, 0, 0, buffer.as_mut_ptr()), 0);
         assert_eq!(xy_vsfilter_string_read_v1(id, buffer.as_mut_ptr(), 32), 0);

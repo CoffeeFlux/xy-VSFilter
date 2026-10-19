@@ -31,6 +31,7 @@ struct LateOwner {
     std::shared_ptr<XyFwStringW> value;
     ~LateOwner() {
         if(!value)return;
+        if(value->Get()!=L"late-owner")std::terminate();
         value.reset();
         printf("string-shutdown released=1\n");
     }

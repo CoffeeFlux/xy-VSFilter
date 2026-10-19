@@ -18,6 +18,7 @@ public:
     class Cacher {
         static size_t Call(uint32_t action,size_t maximum,bool reset,unsigned field);
     public:
+        ~Cacher();
         size_t GetMaxItemNum()const;
         size_t GetCurItemNum()const;
         size_t GetCacheHitCount()const;

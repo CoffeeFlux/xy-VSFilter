@@ -25,6 +25,7 @@ struct StringFlyweight::Owner {
 };
 StringFlyweight::StringFlyweight(const CStringW* value) {
     std::unique_ptr<const CStringW> input(value);
+    GetCacher(); // Register cache teardown before the first canonical insertion.
     DocumentDetail::Shape(value!=nullptr);owner_=std::make_shared<Owner>(*input);
 }
 CStringW StringFlyweight::Get()const {
@@ -37,6 +38,10 @@ size_t StringFlyweight::Cacher::Call(uint32_t action,size_t maximum,bool reset,u
     std::array<uint8_t,32> out;
     DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_string_cache_v1(action,maximum,reset?1:0,out.data());}));
     return static_cast<size_t>(DocumentDetail::Load(out,field*8,8));
+}
+StringFlyweight::Cacher::~Cacher() {
+    std::array<uint8_t,32> out;
+    DocumentDetail::Release(DocumentDetail::Invoke([&](){return xy_vsfilter_string_cache_v1(4,0,0,out.data());}));
 }
 size_t StringFlyweight::Cacher::GetMaxItemNum()const {return Call(0,0,false,0);}
 size_t StringFlyweight::Cacher::GetCurItemNum()const {return Call(0,0,false,1);}
