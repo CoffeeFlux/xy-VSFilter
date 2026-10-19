@@ -35,7 +35,8 @@ static void run(const STSStyleBase& style,HDC dc){
     reset();a.reset();Status dropa=status();reset();b.reset();Status dropb=status();reset();c.reset();Status dropc=status();
     printf("font-release index=%u count=%llu",sequence-1,static_cast<unsigned long long>(FwCMyFont::Count()));
     emit("a",dropa);emit("b",dropb);emit("c",dropc);
-    printf(" deleted=%u%u\n",GetObjectType(ha)==0,GetObjectType(hb)==0);
+    DWORD ta=GetObjectType(ha),tb=GetObjectType(hb);check(GdiFlush()!=FALSE);
+    printf(" types=%lu,%lu flushed=%lu,%lu\n",ta,tb,GetObjectType(ha),GetObjectType(hb));
 }
 int main(){try{
     check(AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0)!=FALSE);
