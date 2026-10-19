@@ -812,7 +812,11 @@ impl Registry {
             }
             Resource::StyleValue(value) => self
                 .styles
-                .release(value, &mut self.rectangles)
+                .release_with(
+                    value,
+                    &mut self.rectangles,
+                    &mut crate::style_compare::equal,
+                )
                 .map_err(|_| Error::Unresolved),
             _ => Ok(()),
         };

@@ -2116,10 +2116,11 @@ pub unsafe extern "C" fn xy_vsfilter_document_add_style_begin_v1(
         registry.document(owner).map_err(registry_error)?;
         let (reply, run_id) = registry.reserve_two().map_err(registry_error)?;
         let mut bytes = Vec::with_capacity(packet_length);
-        let result = xy_vsfilter_compat::document_style_add::begin(
+        let result = xy_vsfilter_compat::document_style_add::begin_with(
             registry.document_mut(owner).map_err(registry_error)?,
             &name,
             &mut incoming,
+            crate::style_compare::equal,
         )
         .map_err(style_add_error)?;
         use xy_vsfilter_compat::document_style_add::Action;

@@ -6,37 +6,8 @@
 use xy_vsfilter_compat::font_intern::{Error, Key};
 
 pub(crate) fn key_equal(a: &Key, b: &Key) -> bool {
-    a.native_eq_with(b, float_equal)
+    a.native_eq_with(b, crate::windows_float::equal_f64)
 }
-#[cfg(target_arch = "x86_64")]
-fn float_equal(a: f64, b: f64) -> bool {
-    a == b
-}
-#[cfg(target_arch = "x86")]
-fn float_equal(a: f64, b: f64) -> bool {
-    let equal: u8;
-    // SAFETY: both initialized f64 inputs remain live; two x87 loads and
-    // FUCOMPP balance the x87 stack. AX and condition flags are declared
-    // clobbered. This is the pinned STSStyleBase::operator== instruction order,
-    // including denormal/signaling-NaN load effects in x87, not SSE.
-    unsafe {
-        core::arch::asm!(
-            "fld qword ptr [{a}]",
-            "fld qword ptr [{b}]",
-            "fucompp",
-            "fnstsw ax",
-            "test ah, 0x44",
-            "setnp {equal}",
-            a=in(reg) &a,
-            b=in(reg) &b,
-            equal=lateout(reg_byte) equal,
-            lateout("ax") _,
-            options(readonly,nostack),
-        );
-    }
-    equal != 0
-}
-
 #[repr(C)]
 struct LogFont {
     height: i32,

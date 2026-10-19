@@ -38,6 +38,7 @@ mod runtime;
 mod segment_insert;
 mod segments;
 mod string_flyweight;
+mod style_compare;
 mod style_intern;
 mod subrip;
 mod text_reader;
@@ -45,6 +46,8 @@ mod timeline_search;
 mod webvtt;
 #[cfg(windows)]
 mod windows_crt;
+#[cfg(windows)]
+mod windows_float;
 #[cfg(windows)]
 mod windows_font;
 #[cfg(windows)]

@@ -56,6 +56,15 @@ pub fn begin(
     name: &[u16],
     incoming: &mut Option<Option<StyleValue>>,
 ) -> Result<Begin, Error> {
+    begin_with(document, name, incoming, StyleValue::native_compatible_eq)
+}
+/// Uses a target comparator during classification; no borrowed value escapes.
+pub fn begin_with(
+    document: &mut Document,
+    name: &[u16],
+    incoming: &mut Option<Option<StyleValue>>,
+    mut equal: impl FnMut(&StyleValue, &StyleValue) -> bool,
+) -> Result<Begin, Error> {
     if incoming.is_none() {
         return Err(Error::InvalidPreparedValue);
     }
@@ -87,7 +96,7 @@ pub fn begin(
                 .as_ref()
                 .and_then(Option::as_ref)
                 .ok_or(Error::UnresolvedNull)?;
-            if previous.native_compatible_eq(value) {
+            if equal(previous, value) {
                 retired.discarded_incoming = incoming.take().ok_or(Error::InvalidPreparedValue)?;
                 Action::Done
             } else {

@@ -13,30 +13,53 @@ SOURCE = ROOT / "tools/compat/style_intern_native.cpp"
 CASES = 196
 INPUTS = CASES
 
-def validate(data,bits):
+def validate(data,bits,scenario="interning"):
+    if scenario=="add-style":return validate_add(data,bits)
     rows=data.splitlines()
     if len(rows)!=CASES*4+4:raise ValueError("missing style observations")
     if not re.fullmatch(rb"style-provenance pointer_bits="+str(bits).encode()+rb" ansi=\d+ oem=\d+",rows[0]):raise ValueError("wrong architecture")
     for i in range(CASES):
         if not re.fullmatch(f"style-intern index={i} ".encode()+rb"alias=[01] copy_alias=1 value_equal=[01] self_equal=[01] count=\d+ rects=\d+ fp=[0-9a-f]{8} hash=[0-9a-f]{16},[0-9a-f]{16}",rows[1+i*4]):raise ValueError("wrong style state/order")
-        if not re.fullmatch(f"style-fp index={i} ".encode()+rb"first=[0-9a-f]{8} second=[0-9a-f]{8} copy=[0-9a-f]{8} read=[0-9a-f]{8} equality=[0-9a-f]{8}",rows[2+i*4]):raise ValueError("missing separated floating status")
+        if not re.fullmatch(f"style-fp index={i} ".encode()+rb"first=[0-9a-f]{8} second=[0-9a-f]{8} copy=[0-9a-f]{8} read=[0-9a-f]{8} equality=[0-9a-f]{8} domains=[0-9a-f]{16}(?:,[0-9a-f]{16}){4}",rows[2+i*4]):raise ValueError("missing separated floating status")
         for row in rows[3+i*4:5+i*4]:
             m=re.fullmatch(rb"style-value rect=(-?\d+,){3}-?\d+ ints=(-?\d+,){7}-?\d+ font=(\d+):([0-9a-f]*) colors=[0-9a-f]{40} doubles=[0-9a-f]{240}",row)
             if not m or int(m[3])*4!=len(m[4]):raise ValueError("invalid full style value")
-    if not re.fullmatch(rb'style-release-fp fp=[0-9a-f]{8}',rows[-3]):raise ValueError("missing release status")
-    if rows[-2]!=b'style-final finite_released=1 retained_nan=90 styles=45 rects=1':raise ValueError("missing retained NaN accounting")
+    if not re.fullmatch(rb'style-release-fp fp=[0-9a-f]{8} domains=[0-9a-f]{16}',rows[-3]):raise ValueError("missing release status")
+    expected_final=b'style-final finite_released=1 retained_nan=135 styles=90 rects=1' if scenario=='same-values' else b'style-final finite_released=1 retained_nan=90 styles=45 rects=1'
+    if rows[-2]!=expected_final:raise ValueError("missing retained NaN accounting")
     if rows[-1]!=f'style-intern-complete cases={CASES}'.encode():raise ValueError("missing completion")
 
 
-def compare(traces,bits):
+def validate_add(data,bits):
+    rows=data.splitlines()
+    if not rows or rows[0]!=f'style-add-provenance pointer_bits={bits}'.encode():raise ValueError('wrong AddStyle architecture')
+    at=1
+    for index in range(360):
+        if at>=len(rows):raise ValueError('missing AddStyle case')
+        m=re.fullmatch(f'style-add index={index} '.encode()+rb'count=([12]) first=[0-9a-f]{8} second=[0-9a-f]{8} domains=[0-9a-f]{16},[0-9a-f]{16}',rows[at])
+        if not m:raise ValueError('invalid AddStyle status/count/order')
+        count=int(m[1]);at+=1
+        for name in range(2):
+            present=name==0 or count==2
+            if at>=len(rows) or rows[at]!=f'style-add-name present={int(present)}'.encode():raise ValueError('invalid AddStyle conflict names')
+            at+=1
+            if present:
+                if at>=len(rows):raise ValueError('missing AddStyle value')
+                value=re.fullmatch(rb'style-value rect=(-?\d+,){3}-?\d+ ints=(-?\d+,){7}-?\d+ font=(\d+):([0-9a-f]*) colors=[0-9a-f]{40} doubles=[0-9a-f]{240}',rows[at])
+                if not value or int(value[3])*4!=len(value[4]):raise ValueError('invalid AddStyle raw value')
+                at+=1
+    if rows[at:]!=[b'style-add-complete cases=360']:raise ValueError('invalid AddStyle completion')
+
+
+def compare(traces,bits,scenario="interning"):
     if len(traces)!=4:raise ValueError("two runs per implementation required")
-    for trace in traces:validate(trace,bits)
+    for trace in traces:validate(trace,bits,scenario)
     if any(trace!=traces[0] for trace in traces[1:]):raise ValueError("style traces differ or are nondeterministic")
 
 def validate_lifecycle(data):
     rows=data.splitlines()
     if len(rows)!=5 or rows[:2]!=[b'style-move copy=1 empty=1 distinct=1 count=1',b'style-move restored=1 source_empty=1 count=1']:raise ValueError('invalid style move lifetime')
-    m=re.fullmatch(rb'style-sticky before=([0-9a-f]{8}) after=\1 count=0 rects=0',rows[2])
+    m=re.fullmatch(rb'style-sticky before=([0-9a-f]{8}) after=\1 domains=([0-9a-f]{16}),\2 count=0 rects=0',rows[2])
     if not m or int(m[1],16)==0:raise ValueError('ambient status lost or invalid final release')
     if rows[3:]!=[b'style-lifecycle-complete count=1',b'style-late count=0 rects=0 valid=1']:raise ValueError('late owner read/release failed')
 
@@ -46,6 +69,7 @@ def main():
     parser.add_argument("--reference-root", type=Path, required=True)
     parser.add_argument("--platform", choices=("Win32", "x64"), required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--scenario",choices=("interning","same-values","add-style"),default="interning")
     args = parser.parse_args()
     if os.name != "nt":
         parser.error("Windows ATL/MFC and built native libraries required")
@@ -53,7 +77,7 @@ def main():
     out.mkdir(parents=True, exist_ok=False)
     roots = (args.reference_root.resolve(), ROOT)
     report = dict(complete=False, equal=False, reference_commit=PIN, platform=args.platform,
-                  kind="actual-renderer-style-interner", cases=CASES, inputs=INPUTS, builds={},
+                  kind="actual-renderer-style-interner", cases=360 if args.scenario=="add-style" else CASES, inputs=360 if args.scenario=="add-style" else INPUTS, scenario=args.scenario, builds={},
                   probe_sha256=sha(SOURCE.read_bytes()), 
                   runner_sha256=sha(Path(__file__).read_bytes()),
                   environment={key:os.environ.get(key) for key in ("VCToolsVersion","WindowsSDKVersion","VSCMD_ARG_TGT_ARCH")},
@@ -109,10 +133,10 @@ def main():
             build["included_source_sha256"]=headers
             build["binary_sha256"]=sha(exe.read_bytes())
             for repeat in (1,2):
-                result=run([str(exe)],work,f"{label}-trace-{repeat}",120)
+                result=run([str(exe)]+([] if args.scenario=="interning" else [args.scenario]),work,f"{label}-trace-{repeat}",120)
                 if result.stderr:
                     raise ValueError("unexpected style interner probe stderr")
-                validate(result.stdout,bits);traces.append(result.stdout)
+                validate(result.stdout,bits,args.scenario);traces.append(result.stdout)
             for path,digest in {**headers,**build["library_sha256"],str(exe):build["binary_sha256"]}.items():
                 if sha(Path(path).read_bytes())!=digest:
                     raise ValueError("native probe input or binary changed")
@@ -132,7 +156,7 @@ def main():
                 validate_lifecycle(result.stdout);lifecycle.append(result.stdout)
         if any(v!=lifecycle[0] for v in lifecycle[1:]):raise ValueError('style lifecycle differs or is nondeterministic')
         report['lifecycle']={'trace_sha256':[sha(v) for v in lifecycle],'trace_lines':5,'late_owner':True,'sticky_status':True}
-        compare(traces,bits)
+        compare(traces,bits,args.scenario)
         if [git(root,"rev-parse","HEAD") for root in roots]!=commits or any(git(root,"status","--porcelain","--untracked-files=no") for root in roots):
             raise ValueError("source changed during comparison")
         for path,key in ((SOURCE,"probe_sha256"),(Path(__file__),"runner_sha256")):
@@ -143,7 +167,7 @@ def main():
     except Exception as error:
         report["unresolved"]=str(error);save();raise
     save()
-    print(json.dumps({"output":str(out),"complete":True,"equal":True,"cases":CASES}))
+    print(json.dumps({"output":str(out),"complete":True,"equal":True,"cases":report["cases"]}))
 
 
 if __name__=="__main__":

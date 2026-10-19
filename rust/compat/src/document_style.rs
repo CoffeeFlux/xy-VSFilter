@@ -110,6 +110,14 @@ impl StyleValue {
     /// double equality (NaN unequal; positive and negative zero equal).
     /// Floating-point status flags and enabled-trap behavior are not claimed.
     pub fn native_compatible_eq(&self, other: &Self) -> bool {
+        self.native_compatible_eq_with(other, |a, b| a == b)
+    }
+    /// Inject the target floating comparison without changing field or short-circuit order.
+    pub fn native_compatible_eq_with(
+        &self,
+        other: &Self,
+        mut equal: impl FnMut(f64, f64) -> bool,
+    ) -> bool {
         fn prefix(v: &[u16]) -> &[u16] {
             &v[..v.iter().position(|&x| x == 0).unwrap_or(v.len())]
         }
@@ -120,10 +128,10 @@ impl StyleValue {
             && self.margins[3] == other.margins[3]
             && self.screen_alignment == other.screen_alignment
             && self.border_style == other.border_style
-            && self.outline_width_x == other.outline_width_x
-            && self.outline_width_y == other.outline_width_y
-            && self.shadow_depth_x == other.shadow_depth_x
-            && self.shadow_depth_y == other.shadow_depth_y
+            && equal(self.outline_width_x, other.outline_width_x)
+            && equal(self.outline_width_y, other.outline_width_y)
+            && equal(self.shadow_depth_x, other.shadow_depth_x)
+            && equal(self.shadow_depth_y, other.shadow_depth_y)
             && self.colors[0] == other.colors[0]
             && self.colors[1] == other.colors[1]
             && self.colors[2] == other.colors[2]
@@ -132,24 +140,24 @@ impl StyleValue {
             && self.alpha[1] == other.alpha[1]
             && self.alpha[2] == other.alpha[2]
             && self.alpha[3] == other.alpha[3]
-            && self.blur == other.blur
-            && self.gaussian_blur == other.gaussian_blur
+            && equal(self.blur, other.blur)
+            && equal(self.gaussian_blur, other.gaussian_blur)
             && self.relative_to == other.relative_to
             && self.char_set == other.char_set
             && prefix(&self.font_name) == prefix(&other.font_name)
-            && self.font_size == other.font_size
-            && self.font_scale_x == other.font_scale_x
-            && self.font_scale_y == other.font_scale_y
-            && self.font_spacing == other.font_spacing
+            && equal(self.font_size, other.font_size)
+            && equal(self.font_scale_x, other.font_scale_x)
+            && equal(self.font_scale_y, other.font_scale_y)
+            && equal(self.font_spacing, other.font_spacing)
             && self.font_weight == other.font_weight
             && self.italic == other.italic
             && self.underline == other.underline
             && self.strikeout == other.strikeout
-            && self.font_angle_z == other.font_angle_z
-            && self.font_angle_x == other.font_angle_x
-            && self.font_angle_y == other.font_angle_y
-            && self.font_shift_x == other.font_shift_x
-            && self.font_shift_y == other.font_shift_y
+            && equal(self.font_angle_z, other.font_angle_z)
+            && equal(self.font_angle_x, other.font_angle_x)
+            && equal(self.font_angle_y, other.font_angle_y)
+            && equal(self.font_shift_x, other.font_shift_x)
+            && equal(self.font_shift_y, other.font_shift_y)
     }
 }
 fn total(count: usize) -> Result<usize, Error> {
@@ -295,6 +303,57 @@ mod tests {
             font_shift_y: f64::from_bits(0x7ff8000000000042),
             relative_to: -10,
         }
+    }
+    #[test]
+    fn target_comparison_preserves_field_order_and_short_circuit() {
+        let mut value = fixture();
+        value.font_shift_y = 14.5;
+        let expected = [
+            value.outline_width_x,
+            value.outline_width_y,
+            value.shadow_depth_x,
+            value.shadow_depth_y,
+            value.blur,
+            value.gaussian_blur,
+            value.font_size,
+            value.font_scale_x,
+            value.font_scale_y,
+            value.font_spacing,
+            value.font_angle_z,
+            value.font_angle_x,
+            value.font_angle_y,
+            value.font_shift_x,
+            value.font_shift_y,
+        ];
+        for stop in 0..=expected.len() {
+            let mut seen = alloc::vec::Vec::new();
+            let equal = value.native_compatible_eq_with(&value, |a, b| {
+                assert_eq!(a.to_bits(), b.to_bits());
+                seen.push(a.to_bits());
+                seen.len() <= stop
+            });
+            assert_eq!(equal, stop == expected.len());
+            assert_eq!(
+                seen,
+                expected[..(stop + 1).min(expected.len())]
+                    .iter()
+                    .map(|v| v.to_bits())
+                    .collect::<alloc::vec::Vec<_>>()
+            );
+        }
+        let mut different = value.clone();
+        different.margins[0] ^= 1;
+        assert!(!value.native_compatible_eq_with(&different, |_, _| panic!(
+            "comparison after unequal margins"
+        )));
+        different = value.clone();
+        different.font_weight ^= 1;
+        let mut calls = 0;
+        assert!(!value.native_compatible_eq_with(&different, |_, _| {
+            calls += 1;
+            true
+        }));
+        assert_eq!(calls, 10);
     }
     #[test]
     fn complete_roundtrip_and_offsets() {

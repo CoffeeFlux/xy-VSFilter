@@ -14,6 +14,15 @@
 #include <cfenv>
 #include <utility>
 
+static uint64_t domains() {
+    unsigned x87=0,sse=0;
+#ifdef _M_IX86
+    _statusfp2(&x87,&sse);
+#else
+    sse=_statusfp();
+#endif
+    return (uint64_t(x87)<<32)|sse;
+}
 static double STSStyle::* fields[]={&STSStyle::fontSize,&STSStyle::outlineWidthX,&STSStyle::outlineWidthY,
     &STSStyle::shadowDepthX,&STSStyle::shadowDepthY,&STSStyle::fontScaleX,&STSStyle::fontScaleY,
     &STSStyle::fontSpacing,&STSStyle::fBlur,&STSStyle::fGaussianBlur,&STSStyle::fontAngleZ,
@@ -33,7 +42,7 @@ static struct LateStyle {
         printf("style-late count=%llu rects=%llu valid=%u\n",static_cast<unsigned long long>(FwSTSStyle::Count()),static_cast<unsigned long long>(FwRect::Count()),valid?1:0);
     }
 } late_style;
-static unsigned cases=0;
+static unsigned cases=0;static bool same_values=false;
 static void retain(const std::shared_ptr<FwSTSStyle>& value) {(nan(value->get())?nan_owners:finite_owners).push_back(value);}
 static void describe(const STSStyle& value) {
     const CRect r=value.marginRect.get();
@@ -45,20 +54,60 @@ static void describe(const STSStyle& value) {
     printf("\n");
 }
 static void pair(STSStyle& first,STSStyle& second) {
+    if(same_values)first=second;
     _clearfp();
-    auto a=std::make_shared<FwSTSStyle>(first);const unsigned fa=_statusfp();_clearfp();
-    auto b=std::make_shared<FwSTSStyle>(second);const unsigned fb=_statusfp();_clearfp();
-    auto c=std::make_shared<FwSTSStyle>(*b);const unsigned fc=_statusfp();_clearfp();
-    const STSStyle& av=a->get();const STSStyle& bv=b->get();const unsigned fr=_statusfp();_clearfp();
+    auto a=std::make_shared<FwSTSStyle>(first);const unsigned fa=_statusfp();const uint64_t dfa=domains();_clearfp();
+    auto b=std::make_shared<FwSTSStyle>(second);const unsigned fb=_statusfp();const uint64_t dfb=domains();_clearfp();
+    auto c=std::make_shared<FwSTSStyle>(*b);const unsigned fc=_statusfp();const uint64_t dfc=domains();_clearfp();
+    const STSStyle& av=a->get();const STSStyle& bv=b->get();const unsigned fr=_statusfp();const uint64_t dfr=domains();_clearfp();
     const bool equal=(first==second),self=(second==second);
-    const unsigned fe=_statusfp(),flags=fa|fb|fc|fr|fe;
+    const unsigned fe=_statusfp(),flags=fa|fb|fc|fr|fe;const uint64_t dfe=domains();
     printf("style-intern index=%u alias=%u copy_alias=%u value_equal=%u self_equal=%u count=%llu rects=%llu fp=%08x hash=%016llx,%016llx\n",
         cases++,*a==*b?1:0,*b==*c?1:0,equal?1:0,self?1:0,static_cast<unsigned long long>(FwSTSStyle::Count()),
         static_cast<unsigned long long>(FwRect::Count()),flags,static_cast<unsigned long long>(hash_value(first)),static_cast<unsigned long long>(hash_value(second)));
-    printf("style-fp index=%u first=%08x second=%08x copy=%08x read=%08x equality=%08x\n",cases-1,fa,fb,fc,fr,fe);
+    printf("style-fp index=%u first=%08x second=%08x copy=%08x read=%08x equality=%08x domains=%016llx,%016llx,%016llx,%016llx,%016llx\n",cases-1,fa,fb,fc,fr,fe,static_cast<unsigned long long>(dfa),static_cast<unsigned long long>(dfb),static_cast<unsigned long long>(dfc),static_cast<unsigned long long>(dfr),static_cast<unsigned long long>(dfe));
     describe(av);describe(bv);retain(a);retain(b);retain(c);
 }
+class StyleDocument : public CSimpleTextSubtitle {
+public:
+    size_t count() const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        return GetStyleCount();
+#else
+        return m_styles.GetCount();
+#endif
+    }
+    void show(const wchar_t* name) const {
+        STSStyle copy;bool present;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        present=GetNamedStyleCopy(CString(name),copy);
+#else
+        STSStyle* value=nullptr;present=m_styles.Lookup(CString(name),value)!=FALSE;
+        if(present)copy=*value;
+#endif
+        printf("style-add-name present=%u\n",present?1:0);if(present)describe(copy);
+    }
+};
+static int add_styles() {
+    if(!AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0))return 2;
+    printf("style-add-provenance pointer_bits=%u\n",unsigned(sizeof(void*)*8));
+    const uint64_t values[]={0,0x8000000000000000ull,0x3ff0000000000000ull,0xbff0000000000000ull,1,
+        0x0010000000000000ull,0x7fefffffffffffffull,0x7ff0000000000000ull,0xfff0000000000000ull,
+        0x7ff8000000000001ull,0xfff8000000000001ull,0x7ff0000000000001ull};
+    unsigned index=0;
+    for(unsigned same=0;same<2;++same)for(auto field:fields)for(auto n:values){
+        StyleDocument doc;auto first=new STSStyle;auto second=new STSStyle;
+        first->*field=0.0;memcpy(&(second->*field),&n,8);if(same)*first=*second;
+        _clearfp();doc.AddStyle(CString(L"Probe"),first);unsigned fa=_statusfp();uint64_t da=domains();
+        _clearfp();doc.AddStyle(CString(L"Probe"),second);unsigned fb=_statusfp();uint64_t db=domains();
+        printf("style-add index=%u count=%llu first=%08x second=%08x domains=%016llx,%016llx\n",index++,static_cast<unsigned long long>(doc.count()),fa,fb,static_cast<unsigned long long>(da),static_cast<unsigned long long>(db));
+        doc.show(L"Probe");doc.show(L"Probe2");
+    }
+    printf("style-add-complete cases=%u\n",index);return 0;
+}
 int main(int argc,char** argv) {
+    same_values=argc>1&&!strcmp(argv[1],"same-values");
+    if(argc>1&&!strcmp(argv[1],"add-style"))return add_styles();
     if(argc>1 && !strcmp(argv[1],"lifecycle")) {
         {
             FwSTSStyle a,b(a),c(std::move(a)),empty(std::move(a));
@@ -66,15 +115,15 @@ int main(int argc,char** argv) {
             a=b;empty=std::move(c);
             printf("style-move restored=%u source_empty=%u count=%llu\n",a==empty?1:0,c!=empty?1:0,static_cast<unsigned long long>(FwSTSStyle::Count()));
         }
-        _clearfp();if(std::feraiseexcept(FE_DIVBYZERO))return 2;const unsigned before=_statusfp();
+        _clearfp();if(std::feraiseexcept(FE_DIVBYZERO))return 2;const unsigned before=_statusfp();const uint64_t before_domains=domains();
         {STSStyle s;FwSTSStyle a(s),b(a);const STSStyle& snapshot=b.get();if(snapshot.fontSize!=18)return 3;}
-        const unsigned after=_statusfp();
-        printf("style-sticky before=%08x after=%08x count=%llu rects=%llu\n",before,after,static_cast<unsigned long long>(FwSTSStyle::Count()),static_cast<unsigned long long>(FwRect::Count()));
+        const unsigned after=_statusfp();const uint64_t after_domains=domains();
+        printf("style-sticky before=%08x after=%08x domains=%016llx,%016llx count=%llu rects=%llu\n",before,after,static_cast<unsigned long long>(before_domains),static_cast<unsigned long long>(after_domains),static_cast<unsigned long long>(FwSTSStyle::Count()),static_cast<unsigned long long>(FwRect::Count()));
         {STSStyle s;s.fontName=L"late-style";late_style.value=std::make_shared<FwSTSStyle>(s);}
         printf("style-lifecycle-complete count=%llu\n",static_cast<unsigned long long>(FwSTSStyle::Count()));
         return 0;
     }
-    if(argc>1) {
+    if(argc>1 && !same_values) {
         // No lookup occurs after release. Count() itself never dereferences keys.
         STSStyle value;const uint64_t n=0x7ff8000000000001ull;memcpy(&value.fontSize,&n,8);
         auto owner=std::make_shared<FwSTSStyle>(value);
@@ -101,7 +150,7 @@ int main(int argc,char** argv) {
         b.marginRect=CRect(i%2?INT32_MIN:20,i%3?INT32_MAX:20,int(i)-4,-int(i));pair(a,b);
     }
     _clearfp();finite_owners.clear();const unsigned released_flags=_statusfp();
-    printf("style-release-fp fp=%08x\n",released_flags);
+    printf("style-release-fp fp=%08x domains=%016llx\n",released_flags,static_cast<unsigned long long>(domains()));
     printf("style-final finite_released=1 retained_nan=%llu styles=%llu rects=%llu\n",static_cast<unsigned long long>(nan_owners.size()),
         static_cast<unsigned long long>(FwSTSStyle::Count()),static_cast<unsigned long long>(FwRect::Count()));
     printf("style-intern-complete cases=%u\n",cases);
