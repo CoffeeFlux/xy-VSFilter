@@ -27,6 +27,63 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
+## In progress: canonical style ownership (2026-10-19)
+
+The safe Rust style owner table is implemented in `style_intern.rs`. It owns
+complete raw style values and their canonical rectangle references, preserves
+target-width hashing and the cleanup's MSVC bucket traversal, and keeps the
+first matching style's complete data. The renderer still uses native
+`XyInterned<STSStyle>`: the checked FFI resources and native lifetime wrapper are
+the next integration work. This is not a completed style-adapter switch.
+
+Direct comparisons at `b6a419f1` pass on Windows x86 and x64, with two native and
+two Rust runs for each trace. The native probe uses the actual cleanup interner
+template with a logging value comparator that calls actual `STSStyle` equality.
+A parallel actual `FwSTSStyle` table asserts matching aliases and canonical
+tags. Rust replays only native input packets and computes its own output:
+
+* Ownership trace: 1,760 operations, 21,667 key comparisons and 25,189 lines.
+  Covers 704 retained slots, growth through 1,024 buckets, collisions, copying,
+  replacement, release/reinsertion, signed-zero aliases and one final NaN drop.
+* Float trace: 720 operations, 619 key comparisons and 2,061 lines. Covers all
+  15 floating fields with 12 raw patterns each, including signed zero, extrema,
+  subnormals, infinities and quiet/signaling NaNs. Finite owners are released
+  while all 45 NaN keys remain alive in 90 handles; native destruction is skipped
+  at exit to avoid later expired-key lookup.
+* Both traces compare full hashes, every key comparison in order, canonical-ID
+  alias masks, complete retained style packets and style/rectangle counts.
+  Observer line endings alone are normalized between native and Rust output.
+
+The table holds safe weak references. Releasing a final non-reflexive style
+preserves the observed counted entry while freeing its owned data. A later
+lookup that would touch that expired key returns an explicit unresolved outcome;
+it never dereferences freed storage. This refusal is unit-tested, not claimed as
+matching a native memory-corruption history. Rectangle release accounting now
+documents canonical style owners as participants alongside checked rectangle
+resources; complete release/drop calls must remain serialized.
+
+All 336 core and 135 FFI tests pass per architecture, as do formatting, Clippy
+for all targets/native-runtime configurations and 177 Python tests (one skip).
+Final observer/example changes have focused checks. No unsafe code or FFI export
+was added; all 113 portable-core files remain free of unsafe code.
+
+Before wiring this engine into the renderer, capture floating status immediately
+after intern/copy/release and canonical reads. Later native equality checks can
+mask a missing earlier flag. Floating flags/traps, nondefault control modes,
+allocation failure/reentry and concurrency remain unclosed by these core traces.
+Review detached native style lifetimes, including the address-of-`fBlur` cache
+hash, then rebuild and run exact rendering and host comparisons on both Windows
+architectures. Previous renderer results below retain their original commit;
+they are not evidence of this engine's integration.
+
+See [style owner core evidence](rust-style-owner-core-evidence.json).
+Reproduce with `style_table_native.py --reference-root artifacts/cleanup-reference
+--platform x64 --output <new-directory>` and again with `--edges`; repeat using
+`--platform Win32` from the x86 developer environment. Local artifacts use
+`artifacts/style-verified-*`; integration notes are in
+`artifacts/style-owner-next-integration.txt`. The full renderer, every host
+adapter and vendored implementation remain in scope.
+
 ## Current port: shared rectangle ownership (2026-10-19)
 
 The experimental renderer now keeps canonical style-margin rectangles in safe

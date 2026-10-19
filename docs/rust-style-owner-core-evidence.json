@@ -1,0 +1,137 @@
+{
+  "schema": 1,
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "candidate_commit": "b6a419f1a2f6ada7606978ce6cdb89b5c873d030",
+  "scope": "Safe canonical style owner table and direct native-template comparison. Renderer style adapter remains native; no new rendering/host claim.",
+  "architectures": {
+    "x64": {
+      "final": {
+        "path": "artifacts/style-verified-final-x64/report.json",
+        "sha256": "433ed30420b205b300c9384e061f690280afd98e980db5c4793c98fd52fad445",
+        "operations": 1760,
+        "key_comparisons": 21667,
+        "trace_lines": 25189,
+        "normalized_trace_sha256": "031e57b6bea0c814f62b9db48d040426262787833ee6b042f4e2267cc505ad17",
+        "reference_runs": 2,
+        "candidate_runs": 2
+      },
+      "edges": {
+        "path": "artifacts/style-verified-edges-x64/report.json",
+        "sha256": "d13091c61fd37480a52501545ecc13cc457f4c089479f48f8fe0f9bdfdd72014",
+        "operations": 720,
+        "key_comparisons": 619,
+        "trace_lines": 2061,
+        "normalized_trace_sha256": "167e7f3becc3989bf173ecffc89659111810253109270bc08629ffa565f69cff",
+        "reference_runs": 2,
+        "candidate_runs": 2
+      }
+    },
+    "x86": {
+      "final": {
+        "path": "artifacts/style-verified-final-x86/report.json",
+        "sha256": "285ace2239aa2ee3800688f4811646cea86069e234f4fa7d3b6d4be0801bf6e5",
+        "operations": 1760,
+        "key_comparisons": 21667,
+        "trace_lines": 25189,
+        "normalized_trace_sha256": "d6530e6d248d45dd30bbe896256a8ac84c57899c4f03285e302258b5b5bda69c",
+        "reference_runs": 2,
+        "candidate_runs": 2
+      },
+      "edges": {
+        "path": "artifacts/style-verified-edges-x86/report.json",
+        "sha256": "aa046831e482fff7f03c732fa92e7a2cbcbfce5706c98655029e2f54015f5db5",
+        "operations": 720,
+        "key_comparisons": 619,
+        "trace_lines": 2061,
+        "normalized_trace_sha256": "228eecec86e3ecaf8b6e4b9d45a6def5e926f59063e6dc8c0d012c6db07a6dc9",
+        "reference_runs": 2,
+        "candidate_runs": 2
+      }
+    }
+  },
+  "checks": {
+    "workspace": {
+      "path": "artifacts/style-owner-checks.log",
+      "sha256": "ae88e5bf309de39a6b0d8d3b55fba8719f10bc8cefd2575ccca417cf7405ff36"
+    },
+    "workspace_commit": "e52e77bc5af4a00ee3e9e78e4391e33da5a3b770",
+    "crate_sources_and_manifests_unchanged_since_workspace_check": true,
+    "core_per_architecture": 336,
+    "ffi_per_architecture": 135,
+    "python": 177,
+    "python_skipped": 1,
+    "fmt": true,
+    "clippy_all_targets_and_native_runtime_both_architectures": true,
+    "final_example_and_observer_controls": {
+      "path": "artifacts/style-owner-focused.log",
+      "sha256": "0a8ff14de1c32a04721a0c3046338680c3010a7ce2b56993b542500358aa9652"
+    }
+  },
+  "unsafe_inventory": {
+    "path": "artifacts/style-owner-unsafe-inventory.json",
+    "sha256": "bb8949899d7af0c1f6d70c7cc409f971fa0268b79a6f3e2aba8c69bd7df1bead"
+  },
+  "boundary": {
+    "new_production_unsafe_sites": 0,
+    "new_ffi_exports": 0,
+    "replay_example_forbids_unsafe": true,
+    "ownership": "Canonical StyleValue plus rectangle Arc, owned by checked callers in the upcoming adapter. The table retains Weak values and safely refuses expired-key lookups. Complete release/drop operations require serialization.",
+    "comparison_policy": "Target-width wrapping hash and MSVC bucket traversal; native_compatible_eq for value decisions. Comparator observers must not change equality policy during an operation."
+  },
+  "sources": [
+    {
+      "path": "rust/compat/src/style_intern.rs",
+      "sha256": "1dc061900be627c62573bdebf3ccea8f7f427e796c21ad2fc1e149397ca909b3"
+    },
+    {
+      "path": "rust/compat/src/rect_intern.rs",
+      "sha256": "1c4742e8f89b8e74c46acdfd69eea64e669fa6fd47ce30626ded63f8e6f6e0d2"
+    },
+    {
+      "path": "rust/compat/examples/style_table_replay.rs",
+      "sha256": "2f4530346ed6f6494d272f547e029161630e101509bb025d5f2189eeddbec599"
+    },
+    {
+      "path": "tools/compat/style_table_native.cpp",
+      "sha256": "eaba7e0882b64d65b74b2fa8ba8adb05b75fdbc563946d4b0c8d0c4e3ca7c6b4"
+    },
+    {
+      "path": "tools/compat/style_table_native.py",
+      "sha256": "e2284a99a64648be18d8b514375deb7c1cec38821d240669c3245528bb996e5b"
+    },
+    {
+      "path": "tools/compat/test_style_table_native.py",
+      "sha256": "2040b76d3363e3d547aa4f87b3b3d8e79762c4e9368e5420c4572eb0051b2574"
+    }
+  ],
+  "limits": [
+    "The renderer still instantiates native XyInterned<STSStyle>; checked FFI resources and its transitional native wrapper remain to implement.",
+    "Trace equality covers hashes, comparator call order/results, alias masks, retained raw packets and live counts. It does not establish floating status flags/traps, nondefault floating controls, allocator failure/reentry or concurrency.",
+    "Normal trace ends after one NaN owner release and Count. Edge trace retains all 45 NaN keys and 90 owners until process reclamation. Neither executes a native expired-key lookup.",
+    "Renderer/ABI evidence remains attributed to rectangle implementation c4254ab7. No renderer binaries were rebuilt or production default changed for this core increment.",
+    "All remaining renderer, host-adapter and vendored code stays in scope."
+  ],
+  "observer_corrections": [
+    {
+      "artifact": {
+        "path": "artifacts/style-table-x64/report.json",
+        "sha256": "029272efa62b40b79ad59246c58c0358ea9026f9d677aa68e9f741407b79c6d0"
+      },
+      "reason": "Native helper named byte conflicted with a Windows typedef; renamed write_byte."
+    },
+    {
+      "artifact": {
+        "path": "artifacts/style-owner-initial-checks.log",
+        "sha256": "ab16fafed005b17bf930be455f6e85b7a85a9a3ee33ab379a0148a7570526b33"
+      },
+      "reason": "Clippy format_collect in the replay example; replaced with write! accumulation."
+    },
+    {
+      "artifact": {
+        "path": "artifacts/style-table-edges-x64/report.json",
+        "sha256": "8ee2f2b389943d1aa963aa59b55660f12d48f292d0fad5877363c0148622a6b6"
+      },
+      "reason": "Observer assumed at least 1000 comparisons; actual repeated trace has exactly 619, and all native/Rust rows agreed. Final validator requires exact counts and alias controls."
+    }
+  ]
+}
