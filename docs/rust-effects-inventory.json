@@ -1,0 +1,145 @@
+{
+  "schema": 1,
+  "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "CSubtitle effect slots and lifetime, Banner/Scroll column parser, and fade/fad/move/org/pos effect construction in safe Rust; native rendering consumes detached values.",
+  "production_sources": {
+    "rust/compat/src/effects.rs": "ce5b5013057661d7feab599f028ee58d2b66b40d47b8ca536530a25df04968b6",
+    "rust/compat/src/lib.rs": "828315afdf6892febff97e20dcdf53eca3b22630c9e6fd8c3e90730e4b074939",
+    "rust/ffi/src/effects.rs": "fd7a20e28dc6cb3adaa07a1e554d123c0271b9dd47522a51d8f4f2c7ba77592f",
+    "rust/ffi/src/document.rs": "94714ac9408e8400ce24c44353cb0bb26728fa1cbbf54de89e39a214af25f71b",
+    "rust/ffi/src/document_registry.rs": "bc03a0be4c9aa1da4ccdbf0a4af37dc7f393e71a8b661920196ab63a4e60dc02",
+    "rust/ffi/src/windows_crt.rs": "6b4babac6142161c3e757498cc7913e842fde35f8c84ef3df525331ccf2df233",
+    "rust/ffi/src/lib.rs": "f7aaf6b409f20ae471a7769dc0d2513e2fd2276518030ab87f9d8d910bbd299b",
+    "include/xy_rust_effects.h": "050be51a05da206649343a2c2bb6a7f6ba57da02b850d534cc2fbd296c441516",
+    "src/subtitles/RTS.cpp": "8bf433f42938e14255c4c0b8ab003c6356d29dfe2da70fef334965bd9d3fd3d7",
+    "src/subtitles/RTS.h": "8309f9d70b9b1c105a8d0d26d71da516794aa1cd5de6a7d031915152d1e2a876",
+    "src/subtitles/RustDocumentOwner.h": "203a44c583a3d217a94508d4e69be8b35bf214e79db2786f3c44809503caf674"
+  },
+  "reference_sources": {
+    "src/subtitles/RTS.cpp": "ef6aae1b68accd3da5cc9093377a118cf11f5754c597cec68173b06c80f71454",
+    "src/subtitles/RTS.h": "7fa99ac55e37e9cbc66bb3b219dba1e860ed8bd02e34a44acb2ad8ad93957c26"
+  },
+  "operations": [
+    {
+      "operation": "Effect ownership",
+      "source": {
+        "path": "rust/compat/src/effects.rs",
+        "line": 34,
+        "sha256": "ce5b5013057661d7feab599f028ee58d2b66b40d47b8ca536530a25df04968b6"
+      },
+      "behavior": "Five typed optional owned values contain8params and4times. Queries copy values. Clear discards all slots. No raw Effect allocation/deletion or persistent native effect array remains on the experimental path. CClipper retains a transitional value copy."
+    },
+    {
+      "operation": "Column tokenization and classification",
+      "source": {
+        "path": "rust/compat/src/effects.rs",
+        "line": 155,
+        "sha256": "ce5b5013057661d7feab599f028ee58d2b66b40d47b8ca536530a25df04968b6"
+      },
+      "behavior": "Leading/trailing whitespace traverses stored rawcodeunits with iswspace. Empty/firstNUL inputs return. FindChar searches stored length including embeddedNUL; delimiter is included in effect name. CompareNoCase uses firstNUL CRT semantics. Scanf sees the original terminated suffix, not the right-trimmed span. Banner requires1assigned value; Scroll requires3; optional values startzero."
+    },
+    {
+      "operation": "Banner/Scroll values and flags",
+      "source": {
+        "path": "rust/compat/src/effects.rs",
+        "line": 80,
+        "sha256": "ce5b5013057661d7feab599f028ee58d2b66b40d47b8ca536530a25df04968b6"
+      },
+      "behavior": "Delay applies exact ordered division and C++ max comparison; NaN selects1. Scroll swaps integer top/bottom before scaling. Scale multiplication/order and MSVC float-to-i32 indefinite values are preserved. Direction derives from stored name length12. Banner setswrap2 andmaxhard0; Scroll setshard2. Columns replace existing same-type slots."
+    },
+    {
+      "operation": "ASS effect decisions",
+      "source": {
+        "path": "rust/compat/src/effects.rs",
+        "line": 88,
+        "sha256": "ce5b5013057661d7feab599f028ee58d2b66b40d47b8ca536530a25df04968b6"
+      },
+      "behavior": "Fade/fad share behavior selected byparametercount2or7; animated is set even on refusal. Move accepts4or6; Org/Pos accept2. Existing slot prevents CRT calls; first wins, including Move/Pos sharing one slot. Native generic hard-position dispatch remains upstream of this call. Params usewcstol/wcstod and exactscaleaxis/order. Fad times0/3=-1, Move defaulttimes=-1, Pos times0. All unused fields initializedzero."
+    },
+    {
+      "operation": "Typed IDs and reentry",
+      "source": {
+        "path": "rust/ffi/src/effects.rs",
+        "line": 44,
+        "sha256": "fd7a20e28dc6cb3adaa07a1e554d123c0271b9dd47522a51d8f4f2c7ba77592f"
+      },
+      "behavior": "Existing checked registry stores effect state and a nonwrapping revision. Each parser call clones state under short admission, runs CRT with no registry loan/native gate, then commits only if revision is unchanged. Reentrant clear/mutation refuses stale commit. Wrong/stale IDs cannot dereference native pointers; destruction removes resource under guard then drops it after guard release."
+    },
+    {
+      "operation": "Windows CRT scan",
+      "source": {
+        "path": "rust/ffi/src/windows_crt.rs",
+        "line": 61,
+        "sha256": "6b4babac6142161c3e757498cc7913e842fde35f8c84ef3df525331ccf2df233"
+      },
+      "behavior": "Bounded owned terminated UTF16. Fixed3/4%d formats with four valid distincti32 output slots use system swscanf via static legacy_stdio_definitions library; no custom numeric lexer. wcstod and wcstol preserve Windows locale/errno behavior. All numeric results copied byvalue."
+    }
+  ],
+  "boundary_review": {
+    "source": {
+      "path": "rust/ffi/src/effects.rs",
+      "line": 181,
+      "sha256": "fd7a20e28dc6cb3adaa07a1e554d123c0271b9dd47522a51d8f4f2c7ba77592f"
+    },
+    "native_adapter": {
+      "path": "include/xy_rust_effects.h",
+      "line": 13,
+      "sha256": "050be51a05da206649343a2c2bb6a7f6ba57da02b850d534cc2fbd296c441516"
+    },
+    "new_private_entries": [
+      "xy_vsfilter_effects_create_v1",
+      "xy_vsfilter_effects_destroy_v1",
+      "xy_vsfilter_effects_clear_v1",
+      "xy_vsfilter_effects_get_v1",
+      "xy_vsfilter_effects_apply_v1"
+    ],
+    "contract": "Create returnsu64ID in8bytes. Query returns56bytes (present,slot,8params,4times). Apply request contains command,2f64bits,wrap/hard/animated,count,andlength-prefixedrawparameters. Input is fullycopied and decoded and outputcapacity12checked before callbacks/services/mutation. Output is stagedaftercommit, neverread, andmayoverlapinput. Create/get/clear/destroy are serialized by existingnativeLoan; apply invokes paired enter/leave only aroundregistry access. No pointerretention or ownerallocation borrowing acrosssystem services.",
+    "unsafe_delta": {
+      "unsafe_functions": 4,
+      "unsafe_blocks": 8,
+      "new_raw_shared_slice_constructors": 1,
+      "new_raw_nonoverlapping_copies": 3,
+      "note": "Lexical function count includes the unsafe gate callback type; three new unsafe exports. Blocks:2gatecallbacks,2CRTcalls,1inputcopy,3outputwrites. No new unsafe impl, mutable static, raw resource handle, or mutable foreign slice."
+    },
+    "tests": "First-wins suppresses numeric calls; invalidfade stillanimates; detachedvalue survivesclear; repeatedBanner replacement andcoexistingScroll; castindefinite/NaNdelay; packetcounts/trailingbytes/bool; wrong/staleIDs/reentryrevisionconflict; invalidcapacitybeforemutation; overlap; initializedgetandclear; copiedvalue survivesdestruction; two realWindowsbuilds andactualreference probes."
+  },
+  "direct_probe": {
+    "baseline_commit": "41fdec3fa1a2896ebb7ff6b93c215b88953902ac",
+    "source": {
+      "path": "tools/compat/effects_native.cpp",
+      "line": 17,
+      "sha256": "425cac3bae7a7e5579baec1adb48c60768b8aeaaad6d9aa6111da6792108df9f"
+    },
+    "runner": {
+      "path": "tools/compat/effects_native.py",
+      "line": 19,
+      "sha256": "0c8485abbd0a4f28e4be1c1497624710fce266b295ca1c31ca8975ead4d9cedb"
+    },
+    "inputs": 1116,
+    "column_inputs": 953,
+    "ass_inputs": 163,
+    "cases": 13608,
+    "effect_snapshots": 68040,
+    "clear_snapshots": 60,
+    "trace_lines": 81722,
+    "coverage": "953column and163ASS inputs x12scale/flag seeds plus18sequentialcalls perseed. Scales include1,.5,2.5,-1,+/-zero,+/-infinity,NaNpayload,smallnormal,2^31,1.1 with differingx/y. 264rawcodeunits injected in3columnpositions,21numericstrings in7column and7ASS positions. Fresh and repeatedfirstwins/overwrite cases, eachownerexplicitlycleared anddestructed. Captureerrno,acceptance,wrap,hardposition,animated,allinitializedparams/times,andcolumn type only.12clearsverifyallslotsabsent.",
+    "method": "Actual private linked ParseEffect and ParseSSATag methods accessed with explicitlyinstantiatedmemberaddresses; no copiedparser or access/layoutrewrites. Eacharchitecture requires2reference+2candidate identicaltraces and equalitytopreportbaseline. UninitializedASS type is deliberatelyexcluded; no parityclaimforundefinedfields."
+  },
+  "limits": [
+    "Experimental renderer/document-owner path only. No production switch or whole-renderer, host or library completion claim.",
+    "Windows CRT iswspace, _wcsicmp, swscanf, wcstol and wcstod remain audited system services. The final implementation still requires migration of other native parser/renderer/host/vendor code.",
+    "Native CSubtitle lifetime, style/parameter/value marshaling, caller buffer validity and shared-gate callback validity remain transitional FFI contracts. No Rust resource pointer or buffer borrow escapes.",
+    "Finite initialized Unicode Windows MSVC14.44 x86/x64 evidence. Allocation failure, new-handler reentry, signal/exception injection, arbitrary concurrent destruction and locale changes are not closed. Busy and internal failures remain experimental statuses, not established public host compatibility.",
+    "ASS-created native Effect::type is uninitialized and not read by the renderer for slots0/1/2. The probe deliberately omits that field; the Rust representation uses typed slot identity. No undefined native bytes are compared or reproduced.",
+    "Repeated Banner/Scroll assignment overwrites and leaks the old C++ allocation in the reference. Rust replaces the owned value safely; visible slot state is preserved, the leak is not reproduced.",
+    "Unsafe lexical counts are inventory, not a soundness proof or migration percentage. Crashes/hangs/nondeterminism remain unresolved; prior evidence retains its original provenance."
+  ],
+  "next_work": [
+    "Migrate remaining ASS override evaluation and renderer subtitle/word/layout ownership.",
+    "Continue renderer, document/host adapters, all formats/options/interfaces and vendored implementation; keep unresolved reference outcomes open."
+  ]
+}

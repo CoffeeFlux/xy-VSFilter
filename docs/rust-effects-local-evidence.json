@@ -1,0 +1,693 @@
+{
+  "schema": 1,
+  "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+  "baseline_commit": "41fdec3fa1a2896ebb7ff6b93c215b88953902ac",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "CSubtitle effect slots and lifetime, Banner/Scroll column parser, and fade/fad/move/org/pos effect construction in safe Rust; native rendering consumes detached values.",
+  "limits": [
+    "Experimental renderer/document-owner path only. No production switch or whole-renderer, host or library completion claim.",
+    "Windows CRT iswspace, _wcsicmp, swscanf, wcstol and wcstod remain audited system services. The final implementation still requires migration of other native parser/renderer/host/vendor code.",
+    "Native CSubtitle lifetime, style/parameter/value marshaling, caller buffer validity and shared-gate callback validity remain transitional FFI contracts. No Rust resource pointer or buffer borrow escapes.",
+    "Finite initialized Unicode Windows MSVC14.44 x86/x64 evidence. Allocation failure, new-handler reentry, signal/exception injection, arbitrary concurrent destruction and locale changes are not closed. Busy and internal failures remain experimental statuses, not established public host compatibility.",
+    "ASS-created native Effect::type is uninitialized and not read by the renderer for slots0/1/2. The probe deliberately omits that field; the Rust representation uses typed slot identity. No undefined native bytes are compared or reproduced.",
+    "Repeated Banner/Scroll assignment overwrites and leaks the old C++ allocation in the reference. Rust replaces the owned value safely; visible slot state is preserved, the leak is not reproduced.",
+    "Unsafe lexical counts are inventory, not a soundness proof or migration percentage. Crashes/hangs/nondeterminism remain unresolved; prior evidence retains its original provenance."
+  ],
+  "configuration": {
+    "native": "Release; RustTextDecoder=true; RustDocumentOwnerExperimental=true",
+    "rust": "1.85.0; native-runtime; +crt-static",
+    "msvc": "14.44.35207",
+    "sdk": "10.0.26100.0"
+  },
+  "architectures": {
+    "x64": {
+      "baseline_effects": {
+        "report": "artifacts/effects-baseline-x64/report.json",
+        "sha256": "9f451fa73fe62b356ecef34b681128245c48069a8248215a724149e6c7fb446e",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 81722,
+        "candidate_commit": "41fdec3fa1a2896ebb7ff6b93c215b88953902ac",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "inputs": 1116,
+        "cases": 13608
+      },
+      "final_effects": {
+        "report": "artifacts/effects-owner-final-x64/report.json",
+        "sha256": "fbad377404aa407f823cc3f6b8e977a844243e97079b835bd8c1512098f56a4b",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 81722,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "inputs": 1116,
+        "cases": 13608
+      },
+      "preport_effects_traces_preserved": true,
+      "html_regression": {
+        "report": "artifacts/effects-parser-final-x64/report.json",
+        "sha256": "17b8e8be1cf5a24190ac42042d70261950f12ef8df4769fa47363179e88f9f16",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 17186,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "inputs": 1408,
+        "cases": 5728
+      },
+      "shared_color_regression": {
+        "report": "artifacts/effects-shared-final-x64/report.json",
+        "sha256": "db16a369d69382d649d9c84d0776cbe280a0faf43d8bed94452c3a74868621aa",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 12234,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "values": 1112,
+        "cases": 8896
+      },
+      "usf_regression": {
+        "report": "artifacts/effects-final-x64/report.json",
+        "sha256": "b567bdf2e060d31ba5dbf32cc8b316abeb84e72f9566d9dd0f9ccd8943ef8347",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 40517,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "scalar_cases": 20735,
+        "scalar_values": 1885,
+        "load_cases": 348,
+        "load_inputs": 28,
+        "cases": 1340
+      },
+      "previous_usf_traces_preserved": true,
+      "corpus": {
+        "report": "artifacts/effects-csri-x64/summary.json",
+        "sha256": "3e1580c0b215e81685349582358e00c9630f2b539668bcc616684c4c137958f2",
+        "complete": true,
+        "frames": 12350,
+        "distinct_controls": 160,
+        "cases": 1146,
+        "shards": [
+          {
+            "report": "artifacts/effects-csri-x64/shard-0/report.json",
+            "sha256": "aa393ff2b20aa680ef2932a416ecc19518b90d940a82f7f840de89924038c184",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1546,
+            "cases": 144
+          },
+          {
+            "report": "artifacts/effects-csri-x64/shard-1/report.json",
+            "sha256": "34bee8208500fd2ded4ff372685d914917ff50eeca510c1c1db04d60b8c6d7c1",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1546,
+            "cases": 144
+          },
+          {
+            "report": "artifacts/effects-csri-x64/shard-2/report.json",
+            "sha256": "bc14f7bed05f7c9f1b07d7835ff8d4ccc17028632e6c9466a49728760b102e86",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1543,
+            "cases": 143
+          },
+          {
+            "report": "artifacts/effects-csri-x64/shard-3/report.json",
+            "sha256": "7847dcb2c6d90982dceeacada68e129478d15b155877d4128fe8c145ff2307d2",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1531,
+            "cases": 143
+          },
+          {
+            "report": "artifacts/effects-csri-x64/shard-4/report.json",
+            "sha256": "59b970efdb1edcf38e0721e94e0e601c14713fc42a7473228f5c5003c20c8176",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1544,
+            "cases": 143
+          },
+          {
+            "report": "artifacts/effects-csri-x64/shard-5/report.json",
+            "sha256": "71591d38fd786c18a3fef40405f1a8f7e4681a2747fe663fab876319af837f10",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1544,
+            "cases": 143
+          },
+          {
+            "report": "artifacts/effects-csri-x64/shard-6/report.json",
+            "sha256": "4604c51b7277af08fce39afdc1c0571248bb49f87b768712593e401ac0ac1afc",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1542,
+            "cases": 143
+          },
+          {
+            "report": "artifacts/effects-csri-x64/shard-7/report.json",
+            "sha256": "c0b15c334b95abdf802ec737c30baec54bfb878d9af8adec82b13402760487e5",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1554,
+            "cases": 143
+          }
+        ]
+      },
+      "new_effects_rendering": {
+        "cases": 44,
+        "frames": 616,
+        "distinct_controls": 16,
+        "included_in_full_corpus": true
+      },
+      "realtext_regression": {
+        "report": "artifacts/effects-final-probe-x64/report.json",
+        "sha256": "c9584b2a7417a1e1fd461c936557642c30f44d95e16a76a9ce1b86e5f569c956",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 37887,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 4532
+      },
+      "vtt_regression": {
+        "report": "artifacts/effects-vtt-regression-x64/report.json",
+        "sha256": "844475c67a67cf7861836e5e1e52fc490597092174b7899c1a5e8e3de0f45e3a",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 21939,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 2292
+      },
+      "sami_regression": {
+        "report": "artifacts/effects-sami-regression-x64/report.json",
+        "sha256": "1c84e318d457f4d33e7829335b2d0d3d9beff71592f051f6f758c2bf8e657b69",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 26992,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 2836
+      },
+      "text_regression": {
+        "report": "artifacts/effects-text-regression-x64/report.json",
+        "sha256": "e9b02b85877321b93d1d915599f32a524d2059ccd6412f444cdc4ea1f38df5b3",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 44404,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 5692
+      },
+      "microdvd_regression": {
+        "report": "artifacts/effects-microdvd-regression-x64/report.json",
+        "sha256": "5df2fe5c479990dd9d2dc98f61d6f5574c07c27a9a9cb983d7b846fc93cfd3f0",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 41491,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 4588
+      },
+      "ass_regression": {
+        "report": "artifacts/effects-ass-probe-x64/report.json",
+        "sha256": "a41d0973c217e26434be33a9b28da647fe162f3e939417965e46a4ae2c85d793",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 22286,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 3266
+      },
+      "xombie_regression": {
+        "report": "artifacts/effects-xombie-probe-x64/report.json",
+        "sha256": "de89c9d8ca2b122c6b915295adc9bb3b6bf6a180fdcc4f87ffc2afa5bda4a4d9",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 10441,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 1242
+      },
+      "lifecycle": {
+        "report": "artifacts/effects-lifecycle-x64/report.json",
+        "sha256": "18f9b234d87edf2f9528a6732db8b0b82c028bc1879dd24dd94cdf4d02e9a88b",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 3693,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+      },
+      "compile": {
+        "report": "artifacts/effects-compile-x64/report.json",
+        "sha256": "9c76763b09ecc6e5e01d7e342778d82f5a539ef3ed08f69da6844143d1868e7a",
+        "complete": true,
+        "inputs_unchanged": true,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+      },
+      "com": {
+        "report": "artifacts/effects-contracts-x64/com-permitted/report.json",
+        "sha256": "8acfe3fd7f94b089afae29acff6aa0568f70d50034de8779a56b384d30dc1e36",
+        "complete": true,
+        "passed": true,
+        "inputs_unchanged": true,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "2d254068a40e5f59cf191c3c6bbfc984b548193b668c4decac21dc1e94e02169",
+          "candidate_sha256": "3d8c11cb0c885d0555539a3dfc035970d6a65f1fea573efef60f28dfb7fd0992",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1",
+          "dependencies_report_sha256": "805d7d7481b2774c2612b7cd7dd7fdaa4dd04a35111f3726a6704acf88c4a0d2"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "32b7c2cd6eb817120414db53b3c3005e719ae4b993c4a69d0d66c7f6ac363d5a",
+          "candidate_sha256": "d81b5abd030fd24ae0399a53fc973d962cb6b31258b9a668809a4f76377cd5df",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42",
+          "dependencies_report_sha256": "2ce278d6be4d85c557490e59cb33e78ca53faf3e38061e9ca3eb225897be359a"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "f1165742064181b7fb73bacb16017d8e202c8bb0be90ed8c2eb812ac282c2df8",
+          "candidate_sha256": "861bf3f301cad7ea414037233369e17448a9e62cc73fddf52fdce15fc3cd4722",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b",
+          "dependencies_report_sha256": "b0b48a3cf2bf2ecbbac4ecca863a815ab4a0c1137277a9b7d5830d9d1beca5c9"
+        }
+      }
+    },
+    "x86": {
+      "baseline_effects": {
+        "report": "artifacts/effects-baseline-x86/report.json",
+        "sha256": "c606989331c24428258872e949acc10f6d204e35fd14a137f8cb05b8c0a5b4fc",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 81722,
+        "candidate_commit": "41fdec3fa1a2896ebb7ff6b93c215b88953902ac",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "inputs": 1116,
+        "cases": 13608
+      },
+      "final_effects": {
+        "report": "artifacts/effects-owner-final-x86/report.json",
+        "sha256": "6a32beb08e57a4f8d2691c53083097857766a0f57447ee8feaea9095f09670aa",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 81722,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "inputs": 1116,
+        "cases": 13608
+      },
+      "preport_effects_traces_preserved": true,
+      "html_regression": {
+        "report": "artifacts/effects-parser-final-x86/report.json",
+        "sha256": "0508ed63af14a63a56dd6774dc5b7a6927613426599001ecffe42ed7b1a3b235",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 17186,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "inputs": 1408,
+        "cases": 5728
+      },
+      "shared_color_regression": {
+        "report": "artifacts/effects-shared-final-x86/report.json",
+        "sha256": "bc29e2c2c972ac2a94e8f301cba04493d4626228cddac12aeeaa6cd263c46113",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 12234,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "values": 1112,
+        "cases": 8896
+      },
+      "usf_regression": {
+        "report": "artifacts/effects-final-x86/report.json",
+        "sha256": "52b1a2527c103a4cef7119a2fe681a491a36926574d3b84e26a6b658a81a15cc",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 40517,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "scalar_cases": 20735,
+        "scalar_values": 1885,
+        "load_cases": 348,
+        "load_inputs": 28,
+        "cases": 1340
+      },
+      "previous_usf_traces_preserved": true,
+      "corpus": {
+        "report": "artifacts/effects-csri-x86/summary.json",
+        "sha256": "8332b7dac1aa9a2e6a6ba610d238529a05fef5493ead4a0dbba28922d751bb15",
+        "complete": true,
+        "frames": 12350,
+        "distinct_controls": 160,
+        "cases": 1146,
+        "shards": [
+          {
+            "report": "artifacts/effects-csri-x86/shard-0/report.json",
+            "sha256": "a30eef2c61b9f1eff33db45f5d803c21a6186823c586a8c31d4ef8ed203dc2ce",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1546,
+            "cases": 144
+          },
+          {
+            "report": "artifacts/effects-csri-x86/shard-1/report.json",
+            "sha256": "2ea982986a6039802283fc088702430b98a0dd9052fd8c56e697b46395b1f1ae",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1546,
+            "cases": 144
+          },
+          {
+            "report": "artifacts/effects-csri-x86/shard-2/report.json",
+            "sha256": "6209effc69f37021ec0d8ccfb178cd9b4136923d1733b4e49be525892998e848",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1543,
+            "cases": 143
+          },
+          {
+            "report": "artifacts/effects-csri-x86/shard-3/report.json",
+            "sha256": "4933ebcc58b917a8a6bc94c8c3a01dd0b414673f5a5e1d9e5ce0abce6e1bb372",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1531,
+            "cases": 143
+          },
+          {
+            "report": "artifacts/effects-csri-x86/shard-4/report.json",
+            "sha256": "1ec6f0c8f096ef0c8ba4ec8015b8dc5577a0a4d1b9b306b7f6fb468272cb4053",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1544,
+            "cases": 143
+          },
+          {
+            "report": "artifacts/effects-csri-x86/shard-5/report.json",
+            "sha256": "a804ca5aeacb0d2b6cd3a974fbcc564e73eac57073de2b40e17b6e16f8db7c40",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1544,
+            "cases": 143
+          },
+          {
+            "report": "artifacts/effects-csri-x86/shard-6/report.json",
+            "sha256": "73f7cfc24eeb919c0b862515f78c4abb73244f5efe90248ee9128643813602d7",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1542,
+            "cases": 143
+          },
+          {
+            "report": "artifacts/effects-csri-x86/shard-7/report.json",
+            "sha256": "cfcae6d4608b1fe7deef914e4c35b825bf3aefd81409cb7d6ee61165b28c7eae",
+            "complete": true,
+            "passed": true,
+            "rendered_frames": 1554,
+            "cases": 143
+          }
+        ]
+      },
+      "new_effects_rendering": {
+        "cases": 44,
+        "frames": 616,
+        "distinct_controls": 16,
+        "included_in_full_corpus": true
+      },
+      "realtext_regression": {
+        "report": "artifacts/effects-final-probe-x86/report.json",
+        "sha256": "f06827b82513b63cf65656f90fa612dd1c3aad341ea69809ca64079b0cc566ec",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 37887,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 4532
+      },
+      "vtt_regression": {
+        "report": "artifacts/effects-vtt-regression-x86/report.json",
+        "sha256": "bb1a7c1414ddebb1eeb59a3b34de1f4f99136392db6cfef6b47259b5df0f8eb6",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 21939,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 2292
+      },
+      "sami_regression": {
+        "report": "artifacts/effects-sami-regression-x86/report.json",
+        "sha256": "bc8d2993e73afff958aded316647ec35f998220557706070b783cccc9a1ec645",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 26992,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 2836
+      },
+      "text_regression": {
+        "report": "artifacts/effects-text-regression-x86/report.json",
+        "sha256": "cf358331f223379f801caf1a7d1b9136ead181a4f6c8fbd753dd03afd25e4823",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 44404,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 5692
+      },
+      "microdvd_regression": {
+        "report": "artifacts/effects-microdvd-regression-x86/report.json",
+        "sha256": "daa2a671975acbedf1f88f10377551fe19ed45648d4b3cdb823f90b7079ce0bd",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 41491,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 4588
+      },
+      "ass_regression": {
+        "report": "artifacts/effects-ass-probe-x86/report.json",
+        "sha256": "2f24421ebf61cff3cdfb17ddb94e3e95d165e28dab988fce8dba18c7c560252b",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 22286,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 3266
+      },
+      "xombie_regression": {
+        "report": "artifacts/effects-xombie-probe-x86/report.json",
+        "sha256": "c33f80100a98e7e6cfe7969b77ddca7ece1b3bf6b4447a4bf6dce4f351f15cfc",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 10441,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 1242
+      },
+      "lifecycle": {
+        "report": "artifacts/effects-lifecycle-x86/report.json",
+        "sha256": "60871091b42bce1e59fbbdcac18711110151e071174d355356d4e3294367d066",
+        "complete": true,
+        "equal": true,
+        "repeat_equal": true,
+        "inputs_unchanged": true,
+        "trace_lines": 3693,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+      },
+      "compile": {
+        "report": "artifacts/effects-compile-x86/report.json",
+        "sha256": "ca8db21a5d1cd29374791d831522ce736931e405e28ed9c0bc69909d6c8bdb9b",
+        "complete": true,
+        "inputs_unchanged": true,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+      },
+      "com": {
+        "report": "artifacts/effects-contracts-x86/com-permitted/report.json",
+        "sha256": "cb498c2b385bda8d209b04f92c20b8b702c2356ea8849e1a55644351bb54c884",
+        "complete": true,
+        "passed": true,
+        "inputs_unchanged": true,
+        "candidate_commit": "d6ba4b7e18772b6caf19c1095632e4f2f9f84c29",
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "cases": 10
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "reference_sha256": "69faa2d5f90f35fe4184e9e9bd892adb76fee60295701988f61ab7af0664d9eb",
+          "candidate_sha256": "5f630469b9f71b4e3b0666f8b38bc1e4e2e0e62ccb440c7f7ac82ec0de57b614",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c",
+          "dependencies_report_sha256": "8b0365bd8b1fa8ea13b65d8681836b85d870a46781d0a3cbfb851b1000a21ae7"
+        },
+        "XySubFilter.dll": {
+          "reference_sha256": "2c3b904d7f91902ef456e07b648c5d6351878318c235397eeb9b39eb3fffa34f",
+          "candidate_sha256": "fd3029e459ee4177ae5342e34edf1da67d1bcec58066c4fde58508564703f924",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11",
+          "dependencies_report_sha256": "2a22ef471924cc53ea843b14cb2fb5e1dc765f9e308e8ed316172476b0696dd5"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "reference_sha256": "3e7c20a4d6c42457d92eb56c42e4fd9f3bddb93276f2c1cd28bfb73edd06484c",
+          "candidate_sha256": "8f8cb5c6aaddf94cd49019d7f295efe37b83aecf8c347d4172a5abae0df72d8e",
+          "exports_equal": true,
+          "declared_requirements_compatible": true,
+          "exports_report_sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94",
+          "dependencies_report_sha256": "bee8a1d975859e0ab8a9b6843e14f813df818b8538e6501927e792bb180eb7c1"
+        }
+      }
+    }
+  },
+  "corpus_growth": {
+    "old_cases": 1102,
+    "added_cases": 44,
+    "total_cases": 1146,
+    "added_scripts": 22,
+    "prior_cases_unchanged": true,
+    "old_controls_retained": true,
+    "added_controls": 16,
+    "manifest_sha256": "d408732fdbfdebba5e6e7803f8154ce5cceb829699398fd4684131939b4242d8"
+  },
+  "unsafe_lexical_inventory": {
+    "report": "artifacts/effects-unsafe-inventory.json",
+    "sha256": "c98bb6ee77fea87a66059453cc35b5e80b930b5b04cc9ad7bb8bd6330dff1887",
+    "safe_core_files": 107,
+    "safe_core_unsafe_sites": 0,
+    "ffi_unsafe_functions": 376,
+    "ffi_unsafe_blocks": 491,
+    "ffi_raw_shared_slice_constructors": 66,
+    "delta": {
+      "unsafe_functions": 4,
+      "unsafe_blocks": 8,
+      "new_raw_shared_slice_constructors": 1,
+      "new_raw_nonoverlapping_copies": 3,
+      "note": "Lexical function count includes the unsafe gate callback type; three new unsafe exports. Blocks:2gatecallbacks,2CRTcalls,1inputcopy,3outputwrites. No new unsafe impl, mutable static, raw resource handle, or mutable foreign slice."
+    }
+  },
+  "checks": {
+    "core_per_architecture": 314,
+    "ffi_per_architecture": 130,
+    "fmt": true,
+    "clippy_all_targets": true,
+    "clippy_native_runtime": true,
+    "python_tests": 169,
+    "python_skipped": 1,
+    "corpus_check": true,
+    "log": "artifacts/effects-checks.log",
+    "log_sha256": "c75998247b24e1349008358b3f90d3ac508fadfa90c2768fd8c0303dc90c090e",
+    "corpus_check_log_sha256": "6d5495dfa668689369207ffed9619010799c41a8dddeb6608e02980e218e1402"
+  },
+  "harness_sources": {
+    "tools/compat/effects_native.cpp": "425cac3bae7a7e5579baec1adb48c60768b8aeaaad6d9aa6111da6792108df9f",
+    "tools/compat/effects_native.py": "0c8485abbd0a4f28e4be1c1497624710fce266b295ca1c31ca8975ead4d9cedb",
+    "tools/compat/test_effects_native.py": "0956f7b5c84d1378638316a7557361fb1a1dc3f2ed7868f7824677dd9936bf62",
+    "tools/compat/html_tag_native.cpp": "e1f3f1dc72ccd4f535d9ed24d006ed2063f9db6a183e6c32259405a046a10bde",
+    "tools/compat/html_tag_native.py": "a438446b385601eb4e577ce33073bd883176d247b2c56f253d16deb26e762a9f",
+    "tools/compat/shared_color_native.cpp": "32bf9b652626b802bc0c170317f5ee65857406f3168c24c5e986152c418c0dd1",
+    "tools/compat/shared_color_native.py": "4b21f92eef7f476680612dbb394f384169ca08d34c6dc13395df6cbbe5995399",
+    "tools/compat/test_shared_color_native.py": "88458cfae2bfd5852496b7c08bebfc975ba15ecce96419f6f1518e24c1ad4dbf",
+    "tools/compat/legacy_color_names.h": "cb645ae555f1e4d5c9c9a034f190e2f15155e098d7d77c1545813c607e80a3cc",
+    "tools/compat/usf_document_native.cpp": "54b67d73b57bf8f53f5239230ec3612d5ec671790a8507ba9e09160bf094ea27",
+    "tools/compat/csri_compare.py": "9f71f1bc0426ca96b47ae35d798ef7b86f17e52d213c67730e122384d85a3b7a",
+    "tools/compat/make_corpus.py": "891bbc8d257b35e35491177027c10a4481c000ab5da9870d38df0bcfd8e842f4",
+    "test/compat/cases.json": "d408732fdbfdebba5e6e7803f8154ce5cceb829699398fd4684131939b4242d8",
+    "artifacts/run-effects-host-corpus.py": "71ef809fefdf2b0cc8e85f5cfed208e9ee17d92e476a9f0582ca9431c8eb9c41"
+  },
+  "sandbox_com_attempts": {
+    "x86": {
+      "report": "artifacts/effects-contracts-x86/com/report.json",
+      "sha256": "9040a235ff9129c6b37d714d3c71692978a1ca7959ef057f732c56167f5cbff7",
+      "outcome": "All workers exit5 creating isolated volatile HKCU keys in sandbox; no DLL exercised. Preserved as failed environmental attempt. Separate permitted run passes."
+    },
+    "x64": {
+      "report": "artifacts/effects-contracts-x64/com/report.json",
+      "sha256": "a26ecaf8126073525b24002946f1b12143a7e245e7a98ee292d48447f653fad9",
+      "outcome": "All workers exit5 creating isolated volatile HKCU keys in sandbox; no DLL exercised. Preserved as failed environmental attempt. Separate permitted run passes."
+    }
+  },
+  "build_logs": {
+    "artifacts/effects-build-x64.log": "3e443356937475d167ac88e49951705f93361506c357d92f181e9bf7218d8c66",
+    "artifacts/effects-build-x86.log": "5a19eecf8ce24c8d8cc1a095cf4a0903b08f5bd96dfe583fe082a6a4537816da",
+    "artifacts/effects-build-rust-x64.log": "bd6139a12db2ae50e6f08ac605b0f5ee610da66f602003d75f2fe9fce5824f14",
+    "artifacts/effects-build-rust-x86.log": "cecced5c155147176f1737fb26106380b34fae0324126c164d74094127c87662"
+  },
+  "source_inventory": {
+    "path": "docs/rust-effects-inventory.json",
+    "sha256": "5fd24c680a78b2b7a524714edcbf599e0a0c2e64f19a6ae52b52ddace3971d15"
+  },
+  "prior_evidence": {
+    "docs/rust-html-tag-local-evidence.json": "5bd4a6c65c497037e394f6b7fe267699f251babe939b82239a02b0d49ee4d4d8",
+    "docs/rust-shared-colors-local-evidence.json": "4eaf232684389457509de1d5c72fc2dd35fe4b90167725dc1813e9493aac8117",
+    "docs/rust-usf-msxml-local-evidence.json": "14850168fa5a9c8595fe40560d86884147065dffecbabb1e3951591f43ceb568",
+    "docs/rust-usf-scalar-local-evidence.json": "cebf60fb4bcec453e613d87738cef83e7b58e8faf83fc984bb1c753a653b7965",
+    "docs/rust-subviewer-reference-outcomes.json": "9cd5e22c6e894051966451dad661bf7cc1cd5e4b99f76fd118d61220b08be882"
+  }
+}

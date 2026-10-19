@@ -27,7 +27,63 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: renderer HTML tag parser (2026-10-18)
+## Current port: renderer effect ownership and parsing (2026-10-18)
+
+The experimental renderer now keeps all five CSubtitle effect slots in safe
+Rust. Banner/Scroll column parsing and fade/fad/move/org/pos construction also
+run there. The native renderer reads detached values through checked IDs; its
+effect pointer array, per-effect allocations and deletion loop are excluded on
+this path. CSubtitle itself and CClipper's effect value copy remain transitional.
+
+The port preserves first-wins ASS effects, including Move/Pos sharing a slot,
+and replacement for repeated Banner/Scroll columns. Fade/fad select behavior by
+parameter count and set animation even when no effect is inserted. Scanning,
+case comparison, whitespace and numeric conversions use Windows CRT services.
+Scale arithmetic preserves order and the observed MSVC conversion results for
+overflow, infinities and NaNs. Raw UTF-16 and embedded-NUL behavior are retained.
+
+The native ASS allocations leave Effect::type uninitialized. Neither the old
+renderer's ASS-slot reads nor this probe use that field; Rust uses typed slot
+identity. Replacing a Banner/Scroll value safely discards the previous value
+instead of reproducing the reference's leaked allocation.
+
+Implementation `d6ba4b7e` passes cleanup `67da07cd` checks on **each** Windows
+architecture (x86 and x64):
+
+* 13,608 actual renderer calls, covering 953 column and 163 ASS inputs, 12 scale
+  and flag seeds, repeated effects, and explicit clears. All 81,722 trace lines
+  match across two runs per implementation and equal pre-port baseline
+  `41fdec3f`, including errno, flags and initialized effect fields.
+* Expanded rendering corpus: 1,146 cases / 12,350 frames / 160 distinct-frame
+  controls. The previous 1,102 cases are unchanged. Twenty-two new scripts add
+  44 file/memory cases, 616 frames and 16 controls covering first-wins behavior,
+  malformed parameters, animation, Banner/Scroll and backward seeks.
+* Previous HTML, shared-color and USF traces remain unchanged. RealText, WebVTT,
+  SAMI, text-parser, MicroDVD, ASS and XombieSub regressions pass, along with
+  3,693 lifecycle trace lines, nine compile probes, all three DLLs' exports and
+  dependencies, and scoped COM checks. Sandboxed COM workers initially failed
+  to create their isolated registry keys; that failed environmental attempt is
+  retained separately from the successful permitted run.
+* 314 safe-core and 130 FFI tests, formatting and Clippy on both architectures;
+  169 Python tests with one skip. The 107-file portable core has zero unsafe
+  sites. The boundary adds three unsafe exports, an unsafe callback type and
+  eight unsafe blocks for scoped gates, CRT services and bounded buffer copies.
+
+See the [effect inventory](rust-effects-inventory.json) and
+[local evidence manifest](rust-effects-local-evidence.json). Parsing copies input
+before callbacks, checks output capacity before mutation, and performs CRT work
+outside registry admission. Commits check a nonwrapping revision so reentrant
+mutation cannot silently overwrite newer state. Queries return detached values;
+stale or wrong-type IDs are refused. Allocation/reentry and injected failures
+remain unclosed. No production switch or whole-library completion is claimed.
+
+Next: migrate the remaining ASS override evaluation and renderer subtitle,
+word and layout ownership, then continue all renderer/document/host adapters,
+formats/options/interfaces and vendored implementation. Earlier evidence retains
+its original provenance.
+
+
+## Previous port: renderer HTML tag parser (2026-10-18)
 
 The experimental renderer now runs complete ParseHtmlTag decisions in safe Rust:
 raw code-unit tokenization, attribute order, style changes, closing-tag restores
