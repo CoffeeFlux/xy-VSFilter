@@ -60,6 +60,11 @@ fn native_int(value: f64) -> i32 {
         _mm_cvttsd_si32(_mm_set_sd(value))
     }
 }
+fn height(size: f64) -> i32 {
+    // Keep both source conversions and their position relative to Windows
+    // calls. API-boundary observations can see floating status before return.
+    core::hint::black_box(native_int(core::hint::black_box(size) + 0.5))
+}
 pub(crate) struct Font {
     handle: usize,
     ascent: i32,
@@ -97,15 +102,21 @@ impl Font {
         // These calls are retained even though CMyFont overwrites lfHeight.
         unsafe {
             let screen = GetDC(0);
+            // Cleanup MSVC evaluates the conversion before GetDeviceCaps on
+            // x86, and after it on x64; the GDI call observer sees this status.
+            #[cfg(target_arch = "x86")]
+            let converted = height(key.font_size);
             let dpi = GetDeviceCaps(screen, 90);
-            lf.height = MulDiv(native_int(key.font_size + 0.5), dpi, 72).wrapping_neg();
+            #[cfg(not(target_arch = "x86"))]
+            let converted = height(key.font_size);
+            lf.height = MulDiv(converted, dpi, 72).wrapping_neg();
             ReleaseDC(0, screen);
         }
         lf.weight = key.font_weight;
         lf.italic = if key.italic { 255 } else { 0 };
         lf.underline = if key.underline { 255 } else { 0 };
         lf.strikeout = if key.strikeout { 255 } else { 0 };
-        lf.height = native_int(key.font_size + 0.5);
+        lf.height = height(key.font_size);
         lf.out_precision = 4;
         lf.clip_precision = 0;
         lf.quality = 4;
