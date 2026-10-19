@@ -27,7 +27,42 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest correction: Rust-owned default-style assignment (2026-10-19)
+## Latest correction: document styles retain rectangle owners (2026-10-19)
+
+Implementation `03d78ffa`, validated with fixture checkpoint `ebd25901`, gives
+persistent Rust default and named document styles real canonical rectangle
+owners. Explicit native-style copies retain these owners. Raw packet decoding
+and ordinary value snapshots remain detached, so diagnostics do not extend
+canonical lifetimes. The rectangle table holds weak entries; the final owner
+ends the payload lifetime, and subsequent insertion reclaims expired metadata.
+Style-interner expired NaN keys retain their separate unresolved qualification.
+
+The original 14-phase actual-document probe now matches on x86 and x64. A second
+24-phase history covers aliases, conflicting and equal AddStyle inputs, named
+snapshots, canonical style sharing, Copy, self-Copy, Empty, surviving owners after
+document destruction, recreation and final release. Each compares two reference
+and two candidate runs. The earlier twelve-row mismatch at `9105c8f5` remains
+preserved as historical failure evidence, with its original source hashes.
+
+All nine style scenarios, the five font/GDI/rectangle/string/style-table probes,
+and all 15 format/document regressions pass on both architectures. Each of the
+three DLLs builds and passes export/dependency checks; COM covers ten cases plus
+two controls per architecture. Rendering remains exact for all 1,222 cases and
+13,186 frames per architecture, including 192 distinct-frame controls. Both Rust
+architectures pass 345 core and 136 FFI tests, formatting and Clippy checks;
+Python passes 189 tests with one skip. Historical storage evidence remains
+attributed to its original upstream pin. No unsafe code was added: the core
+still has none, and the FFI inventory remains 530 blocks and seven assembly sites.
+
+See [ownership evidence](rust-document-rectangle-local-evidence.json) and the
+[nested rectangle inventory](rust-document-rectangle-inventory.json). The
+experimental switch remains in place. These finite histories do not establish
+allocation-failure, reentry or concurrent-host compatibility, or completion of
+the migration. Next is shared renderer HDC ownership with separate operation and
+lifetime serialization, followed by text/path and word/line/subtitle graphs,
+all remaining host adapters and vendored implementations.
+
+## Previous correction: Rust-owned default-style assignment (2026-10-19)
 
 Implementation `9105c8f5` corrects the x86 default-style setter, selected-state
 Copy and self-Copy mismatch. The safe core applies assignment effects to all
@@ -57,15 +92,14 @@ The portable core remains free of unsafe code; the new assignment routing module
 is safe Rust. The 85-file FFI inventory still has 530 unsafe blocks and seven
 assembly sites, unchanged from the named-map correction.
 
-A further actual-document ownership diagnostic is **not passing** on either
+At that checkpoint, a further actual-document ownership diagnostic was **not passing** on either
 architecture: 12 of 14 phase rows differ in canonical rectangle counts across
 construction, default-style assignment, named-style insertion, Copy, Empty and
 final release. Native stored STSStyle values retain their FwRect owners. Rust
-Document currently retains raw margin values. The canonical style interner
+Document then retained raw margin values. The canonical style interner
 retains a rectangle Arc, but document styles do not. This releases canonical
-entries too early. The next implementation must retain the actual nested owners, including
-replacement and retirement behavior; counter adjustment would not restore the
-ownership graph. See [nested rectangle handoff](rust-document-rectangle-inventory.json).
+entries too early. The correction above now retains actual nested owners, including
+replacement and retirement behavior; the old result remains historical evidence. See [nested rectangle handoff](rust-document-rectangle-inventory.json).
 The exact fixture is `tools/compat/document_rectangle_lifetime_diagnostic.cpp`.
 
 The shared renderer HDC boundary also now has a direct lifecycle baseline. On

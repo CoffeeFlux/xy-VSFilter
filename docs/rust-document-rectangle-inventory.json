@@ -1,86 +1,207 @@
 {
   "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
-  "candidate_implementation_commit": "9105c8f5e21ea63a5aa6046898310e49fbbefa9f",
-  "scope": "Unresolved actual-document nested canonical rectangle ownership. Finite successful allocations; not passing on either architecture.",
+  "candidate_implementation_commit": "03d78ffaafe81f4cfb647b78cff354dd79188d5b",
+  "candidate_validation_commit": "ebd2590139cf3c8817146c623e88010e5e10ac84",
+  "scope": "Rust-owned nested canonical rectangles for document default and named styles. Finite successful ownership histories match the cleanup on x86 and x64.",
+  "historical_failure": {
+    "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+    "candidate_implementation_commit": "9105c8f5e21ea63a5aa6046898310e49fbbefa9f",
+    "scope": "Unresolved actual-document nested canonical rectangle ownership. Finite successful allocations; not passing on either architecture.",
+    "sources": [
+      {
+        "path": "rust/compat/src/document.rs",
+        "sha256": "a4ff267819e9dd61d6f2431f9eaca5dfebc38d03936da9c79dba0ae29ed07ea4"
+      },
+      {
+        "path": "rust/compat/src/document_style.rs",
+        "sha256": "f8363c29b4626aa526df69d7d90c0ebb12ce7cdbede664fd169560cdfae38fab"
+      },
+      {
+        "path": "rust/compat/src/style_intern.rs",
+        "sha256": "600e21aa9e8a976d8ca60a786f0fad7610a979dc945e70bc649c33006c90a7a5"
+      },
+      {
+        "path": "rust/compat/src/rect_intern.rs",
+        "sha256": "1c4742e8f89b8e74c46acdfd69eea64e669fa6fd47ce30626ded63f8e6f6e0d2"
+      },
+      {
+        "path": "rust/ffi/src/document.rs",
+        "sha256": "41348cc1186d1c33c0b4ec328362a1b20a8d876e737974ae7e13a3654be8619a"
+      },
+      {
+        "path": "rust/ffi/src/document_registry.rs",
+        "sha256": "49e52f12d5ce50b6d4a0ec9fd30bba41b92ad9e94b269f215e6fb7008b3eecf1"
+      },
+      {
+        "path": "rust/ffi/src/style_intern.rs",
+        "sha256": "95d7c631f624420f6ecb426fdee6ca010b422e309b9bd0b954f1fc9e3fbac1a0"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "sha256": "a354d1a1939d576f19ffdcc8c0496d5d390fba0f7409edf324dc018a78df9c89"
+      },
+      {
+        "path": "src/subtitles/RustDocumentOwner.h",
+        "sha256": "dbef5aa61b3cf682e105b1ebc15efe5d485b877dbbe42e1d2788ed9c5d51a19e"
+      },
+      {
+        "path": "tools/compat/document_rectangle_lifetime_diagnostic.cpp",
+        "sha256": "e5bad97e9d32c38a11d782563d1e31551d2c91b80cfac44d5e85af270c8d7e2b"
+      },
+      {
+        "path": "artifacts/run-default-copy-document-rect.py",
+        "sha256": "0862931caafea3576b2cf8a015fa5d471d10613815b9718c3a4a64e87b671fd5"
+      }
+    ],
+    "diagnostics": {
+      "x86": {
+        "path": "artifacts/default-copy-document-rect-x86/report.json",
+        "sha256": "a91aa7a18365b8165d134f55242bdbd09c7bec46dedc8088304654472b5d0b1f",
+        "cases": 14,
+        "trace_lines": 16,
+        "different_rows": 12,
+        "repeat_equal": true,
+        "passing": false
+      },
+      "x64": {
+        "path": "artifacts/default-copy-document-rect-x64/report.json",
+        "sha256": "c87e3aeb547d0ccc757688cfc2a6bdd6e68ca2b3ce3c4b9dedd1e704d7f9a195",
+        "cases": 14,
+        "trace_lines": 16,
+        "different_rows": 12,
+        "repeat_equal": true,
+        "passing": false
+      }
+    },
+    "findings": [
+      "Native stored STSStyle objects own FwRect canonical references. Document StyleValue currently stores only raw margin coordinates. The style interner Value already retains a rectangle Arc, but Document default/named styles do not.",
+      "Constructing one or two empty native documents leaves one canonical default rectangle. Candidate leaves none.",
+      "After replacing the source default style and releasing the temporary input, native retains two rectangle values (source and destination defaults); candidate retains none.",
+      "Copy reuses the source rectangle and releases the old destination default. Empty retains default ownership while clearing named styles. Native named styles add a distinct retained rectangle and Copy preserves it until the corresponding named owners are cleared.",
+      "The 14-phase native rectangle counts are 0,1,1,2,2,2,1,1,2,2,2,1,1,0. Candidate counts are 0,0,0,1,1,0,0,0,0,0,0,0,0,0. All style-interner counts remain zero in this fixture.",
+      "Rendering and floating-copy fixtures remain passing, but do not prove this nested lifetime invariant. Do not replace actual nested ownership with a synthetic counter."
+    ],
+    "next_work": [
+      "Promote the exact diagnostic into the maintained native runner/validator with wrong-count/order/lifetime negative controls.",
+      "Retain real canonical rectangle owners for persistent default and named document styles. Separate raw style packets/snapshots from owned style payloads; avoid attaching ownership indiscriminately to every temporary Clone.",
+      "Preserve canonical sharing and retirement during replacement, AddStyle conflict renaming, Copy/CopyStyles, Empty, self-Copy and final document release. Inspect all mutation paths; coordinate canonical-table release with registry admission and retired payload destruction.",
+      "Validate nested lifetimes, aliases/identity, counts and release/recreate histories against actual cleanup on both architectures, retaining the current floating-copy and map ordering/status behavior.",
+      "After this ownership graph is correct, migrate shared renderer HDC/text/path ownership using the retained lifecycle baseline; then word/line/subtitle graphs, all hosts and vendors."
+    ]
+  },
   "sources": [
     {
       "path": "rust/compat/src/document.rs",
-      "sha256": "a4ff267819e9dd61d6f2431f9eaca5dfebc38d03936da9c79dba0ae29ed07ea4"
+      "sha256": "ff17c0b2b5998f46b52a111cf796c053b76256af03054a20bac1ff7bf6a8b4f6"
     },
     {
       "path": "rust/compat/src/document_style.rs",
-      "sha256": "f8363c29b4626aa526df69d7d90c0ebb12ce7cdbede664fd169560cdfae38fab"
+      "sha256": "fc944154de9ada105c4b688a8c1a83862ba3d5e371f75b2be52976599975f0dd"
     },
     {
-      "path": "rust/compat/src/style_intern.rs",
-      "sha256": "600e21aa9e8a976d8ca60a786f0fad7610a979dc945e70bc649c33006c90a7a5"
+      "path": "rust/compat/src/document_style_add.rs",
+      "sha256": "c829382d947c31490bce6808704f15a7d2f4f7b0dadd4481172202a0239b8b95"
+    },
+    {
+      "path": "rust/compat/src/document_style_copy.rs",
+      "sha256": "ecc0fc87d04ebfc355a97089d4d60b283db97671fb489981a8cb05493f2292c4"
     },
     {
       "path": "rust/compat/src/rect_intern.rs",
-      "sha256": "1c4742e8f89b8e74c46acdfd69eea64e669fa6fd47ce30626ded63f8e6f6e0d2"
+      "sha256": "98a184bbce671842f5ba266d45626e7cf73e77600bc47a4108080694621427bb"
     },
     {
       "path": "rust/ffi/src/document.rs",
-      "sha256": "41348cc1186d1c33c0b4ec328362a1b20a8d876e737974ae7e13a3654be8619a"
+      "sha256": "4d746e630c95c2b252b75b99c4a3f0244373452df523d4bcb5884977154e2c4f"
     },
     {
       "path": "rust/ffi/src/document_registry.rs",
-      "sha256": "49e52f12d5ce50b6d4a0ec9fd30bba41b92ad9e94b269f215e6fb7008b3eecf1"
+      "sha256": "a427ea58918ea729593843e2256605463937ef1bc71a0cb204dbd04a14b4b3f0"
     },
     {
-      "path": "rust/ffi/src/style_intern.rs",
-      "sha256": "95d7c631f624420f6ecb426fdee6ca010b422e309b9bd0b954f1fc9e3fbac1a0"
+      "path": "tools/compat/style_intern_native.cpp",
+      "sha256": "bc499c7e2f63b53142a6dc237cd90b7ef71d6d0fdbe1c2df05c868e158a96284"
     },
     {
-      "path": "src/subtitles/STS.cpp",
-      "sha256": "a354d1a1939d576f19ffdcc8c0496d5d390fba0f7409edf324dc018a78df9c89"
+      "path": "tools/compat/style_intern_native.py",
+      "sha256": "9107b97da3ca5c83c7479c3d6919e35e5b53a823546f617633a5fb6c859adf2f"
     },
     {
-      "path": "src/subtitles/RustDocumentOwner.h",
-      "sha256": "dbef5aa61b3cf682e105b1ebc15efe5d485b877dbbe42e1d2788ed9c5d51a19e"
-    },
-    {
-      "path": "tools/compat/document_rectangle_lifetime_diagnostic.cpp",
-      "sha256": "e5bad97e9d32c38a11d782563d1e31551d2c91b80cfac44d5e85af270c8d7e2b"
-    },
-    {
-      "path": "artifacts/run-default-copy-document-rect.py",
-      "sha256": "0862931caafea3576b2cf8a015fa5d471d10613815b9718c3a4a64e87b671fd5"
+      "path": "tools/compat/test_style_intern_native.py",
+      "sha256": "7536576d01c7dab4a9be4ba4744f1fef6b7ac8ac241aa72b316f2897f3552bf4"
     }
   ],
-  "diagnostics": {
+  "validated": {
     "x86": {
-      "path": "artifacts/default-copy-document-rect-x86/report.json",
-      "sha256": "a91aa7a18365b8165d134f55242bdbd09c7bec46dedc8088304654472b5d0b1f",
-      "cases": 14,
-      "trace_lines": 16,
-      "different_rows": 12,
-      "repeat_equal": true,
-      "passing": false
+      "document-rectangles": {
+        "path": "artifacts/nested-owned-document-rectangles-x86/report.json",
+        "sha256": "55efb87445150c45190a9f056336401ab228b146dcfe29d787fd1da0f7f71c8e",
+        "cases": 14,
+        "trace_lines": 16,
+        "passing": true,
+        "trace_sha256": [
+          "7104107a8cd8fc8843dee87a763daf59e249f5de1c66125ef8f037d936d67327",
+          "7104107a8cd8fc8843dee87a763daf59e249f5de1c66125ef8f037d936d67327",
+          "7104107a8cd8fc8843dee87a763daf59e249f5de1c66125ef8f037d936d67327",
+          "7104107a8cd8fc8843dee87a763daf59e249f5de1c66125ef8f037d936d67327"
+        ]
+      },
+      "document-rectangle-history": {
+        "path": "artifacts/nested-owned-document-rectangle-history-x86/report.json",
+        "sha256": "a29999859f2c886b26db3c20463c322a1ee5a1c3271782e40e90eecae3f0eb4e",
+        "cases": 24,
+        "trace_lines": 26,
+        "passing": true,
+        "trace_sha256": [
+          "0a65b92df94754f01525c7c91648c26f314851521666fc0caf9dd5849ec8f56f",
+          "0a65b92df94754f01525c7c91648c26f314851521666fc0caf9dd5849ec8f56f",
+          "0a65b92df94754f01525c7c91648c26f314851521666fc0caf9dd5849ec8f56f",
+          "0a65b92df94754f01525c7c91648c26f314851521666fc0caf9dd5849ec8f56f"
+        ]
+      }
     },
     "x64": {
-      "path": "artifacts/default-copy-document-rect-x64/report.json",
-      "sha256": "c87e3aeb547d0ccc757688cfc2a6bdd6e68ca2b3ce3c4b9dedd1e704d7f9a195",
-      "cases": 14,
-      "trace_lines": 16,
-      "different_rows": 12,
-      "repeat_equal": true,
-      "passing": false
+      "document-rectangles": {
+        "path": "artifacts/nested-owned-document-rectangles-x64/report.json",
+        "sha256": "fc14fc73045e1730806e4bf81bda32b25ac38b7673891b3a878fcc9dbaccfb6c",
+        "cases": 14,
+        "trace_lines": 16,
+        "passing": true,
+        "trace_sha256": [
+          "32bbad0a4802ce49e6e866956649201167f03d59bdde739632b2b0621063755b",
+          "32bbad0a4802ce49e6e866956649201167f03d59bdde739632b2b0621063755b",
+          "32bbad0a4802ce49e6e866956649201167f03d59bdde739632b2b0621063755b",
+          "32bbad0a4802ce49e6e866956649201167f03d59bdde739632b2b0621063755b"
+        ]
+      },
+      "document-rectangle-history": {
+        "path": "artifacts/nested-owned-document-rectangle-history-x64/report.json",
+        "sha256": "6d932366cc34cdc6b156222b0c1d7f44cbbd0521efd0ca0c9f19ccd5ce8c3941",
+        "cases": 24,
+        "trace_lines": 26,
+        "passing": true,
+        "trace_sha256": [
+          "1ebb058a7dd8e011714ef678ee4ed69c6b054ae9d4670b05872f2e8bc9d1250e",
+          "1ebb058a7dd8e011714ef678ee4ed69c6b054ae9d4670b05872f2e8bc9d1250e",
+          "1ebb058a7dd8e011714ef678ee4ed69c6b054ae9d4670b05872f2e8bc9d1250e",
+          "1ebb058a7dd8e011714ef678ee4ed69c6b054ae9d4670b05872f2e8bc9d1250e"
+        ]
+      }
     }
   },
   "findings": [
-    "Native stored STSStyle objects own FwRect canonical references. Document StyleValue currently stores only raw margin coordinates. The style interner Value already retains a rectangle Arc, but Document default/named styles do not.",
-    "Constructing one or two empty native documents leaves one canonical default rectangle. Candidate leaves none.",
-    "After replacing the source default style and releasing the temporary input, native retains two rectangle values (source and destination defaults); candidate retains none.",
-    "Copy reuses the source rectangle and releases the old destination default. Empty retains default ownership while clearing named styles. Native named styles add a distinct retained rectangle and Copy preserves it until the corresponding named owners are cleared.",
-    "The 14-phase native rectangle counts are 0,1,1,2,2,2,1,1,2,2,2,1,1,0. Candidate counts are 0,0,0,1,1,0,0,0,0,0,0,0,0,0. All style-interner counts remain zero in this fixture.",
-    "Rendering and floating-copy fixtures remain passing, but do not prove this nested lifetime invariant. Do not replace actual nested ownership with a synthetic counter."
+    "Persistent default and named StyleValue objects retain real Arc rectangle owners admitted through the common canonical table. Raw decoding, wire snapshots and ordinary Clone remain detached. Explicit copy_owned retains ownership for native style copies and selected-state copies.",
+    "Rectangle canonical storage uses Weak entries so retired nested owners can die outside registry admission without a callback. The final Arc drop ends canonical lifetime; the next insertion removes expired metadata. Explicit resources retain their existing release boundary.",
+    "The original 14-phase lifecycle now matches counts 0,1,1,2,2,2,1,1,2,2,2,1,1,0, including Empty retaining default ownership. The historical twelve-row mismatch remains separately attributed to 9105c8f5.",
+    "The extended 24-phase history covers aliases, AddStyle conflict renaming, equal incoming styles, named snapshots, canonical style sharing, Copy, self-Copy, document destruction with surviving styles, recreation and final zero owners.",
+    "Weak rectangle bookkeeping does not change the separate unresolved expired-NaN-key behavior of the style interner."
+  ],
+  "limits": [
+    "Finite allocation-success histories; full host concurrency, reentry and allocation failure remain outside this evidence.",
+    "Local rendering and host contract regressions do not establish complete migration of all host interfaces or native object graphs."
   ],
   "next_work": [
-    "Promote the exact diagnostic into the maintained native runner/validator with wrong-count/order/lifetime negative controls.",
-    "Retain real canonical rectangle owners for persistent default and named document styles. Separate raw style packets/snapshots from owned style payloads; avoid attaching ownership indiscriminately to every temporary Clone.",
-    "Preserve canonical sharing and retirement during replacement, AddStyle conflict renaming, Copy/CopyStyles, Empty, self-Copy and final document release. Inspect all mutation paths; coordinate canonical-table release with registry admission and retired payload destruction.",
-    "Validate nested lifetimes, aliases/identity, counts and release/recreate histories against actual cleanup on both architectures, retaining the current floating-copy and map ordering/status behavior.",
-    "After this ownership graph is correct, migrate shared renderer HDC/text/path ownership using the retained lifecycle baseline; then word/line/subtitle graphs, all hosts and vendors."
+    "Migrate shared renderer HDC ownership with a separate operation/lifetime guard and explicit lock/reentry/thread contract, using the retained GDI lifecycle baseline.",
+    "Continue text/path, word/line/subtitle ownership, all host adapters and vendored implementations in Rust."
   ]
 }

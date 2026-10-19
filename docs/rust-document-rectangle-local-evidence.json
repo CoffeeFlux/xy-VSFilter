@@ -1,0 +1,1154 @@
+{
+  "schema": 1,
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "candidate_implementation_commit": "ebd2590139cf3c8817146c623e88010e5e10ac84",
+  "architectures": {
+    "x64": {
+      "style_scenarios": {
+        "interning": {
+          "path": "artifacts/nested-owned-interning-x64/report.json",
+          "sha256": "bc25ab329fadda5cbd618efb4dc80203a9064a77f776a9feaa2e95ad5f0694f0",
+          "cases": 196,
+          "trace_lines": 788,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062"
+            ]
+          }
+        },
+        "same-values": {
+          "path": "artifacts/nested-owned-same-values-x64/report.json",
+          "sha256": "e65ab5d3799ca0e89fbb1c308ad3d760a17c09eb9f7dfc369221500811a15ded",
+          "cases": 196,
+          "trace_lines": 788,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062"
+            ]
+          }
+        },
+        "raw-twins": {
+          "path": "artifacts/nested-owned-raw-twins-x64/report.json",
+          "sha256": "7f001171cfd4bf1e36904e43a2b8591bb9116df3d3cd58c535cb9a54900bc813",
+          "cases": 196,
+          "trace_lines": 788,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062"
+            ]
+          }
+        },
+        "add-style": {
+          "path": "artifacts/nested-owned-add-style-x64/report.json",
+          "sha256": "cbd2edfd6f8bdc64fd1e8e4b05cf9857a2c64f7fab23a4ee109917f0ba56888a",
+          "cases": 360,
+          "trace_lines": 1637,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062"
+            ]
+          }
+        },
+        "map-lifecycle": {
+          "path": "artifacts/nested-owned-map-lifecycle-x64/report.json",
+          "sha256": "70eac5a7f1c71d00dc53e07f187930c2c3d4427a0638958d70f114aa9b7c148f",
+          "cases": 712,
+          "trace_lines": 1426,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062"
+            ]
+          }
+        },
+        "map-growth": {
+          "path": "artifacts/nested-owned-map-growth-x64/report.json",
+          "sha256": "cc7ecd4bff34ee2e6f5fc764c7f0dfefa0ec59b2e8bc8293574168259db649b9",
+          "cases": 1544,
+          "trace_lines": 3090,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062"
+            ]
+          }
+        },
+        "default-style": {
+          "path": "artifacts/nested-owned-default-style-x64/report.json",
+          "sha256": "e88e84c7e87267d65a8d9652c027e7d7048f552ed0fca3b9326139026bc1c2c0",
+          "cases": 360,
+          "trace_lines": 2882,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062"
+            ]
+          }
+        },
+        "document-rectangles": {
+          "path": "artifacts/nested-owned-document-rectangles-x64/report.json",
+          "sha256": "fc14fc73045e1730806e4bf81bda32b25ac38b7673891b3a878fcc9dbaccfb6c",
+          "cases": 14,
+          "trace_lines": 16,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062"
+            ]
+          }
+        },
+        "document-rectangle-history": {
+          "path": "artifacts/nested-owned-document-rectangle-history-x64/report.json",
+          "sha256": "6d932366cc34cdc6b156222b0c1d7f44cbbd0521efd0ca0c9f19ccd5ce8c3941",
+          "cases": 24,
+          "trace_lines": 26,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062"
+            ]
+          }
+        }
+      },
+      "other_ownership": {
+        "font_native": {
+          "path": "artifacts/nested-owned-font_native-x64/report.json",
+          "sha256": "17c3bf77e4b8b0db34c8bf83916c3cac5b6c6db2386dfa16b22155bccbc7cf73",
+          "cases": 195,
+          "trace_lines": 392
+        },
+        "font_gdi_calls": {
+          "path": "artifacts/nested-owned-font_gdi_calls-x64/report.json",
+          "sha256": "329c003e35eae3a35f962505127059143ccf5fee935dc17b3ce88862876d964b",
+          "cases": 12,
+          "trace_lines": 126
+        },
+        "rect_intern_native": {
+          "path": "artifacts/nested-owned-rect_intern_native-x64/report.json",
+          "sha256": "3f733a1ea61f2902750c6b6f5a068cada9bf0c8b85ff5c26dbb8ba15cf8d1feb",
+          "cases": 294,
+          "trace_lines": 5003
+        },
+        "string_flyweight_native": {
+          "path": "artifacts/nested-owned-string_flyweight_native-x64/report.json",
+          "sha256": "94085c8e903c436914bcafbb801134ae0ca56b251adbfcd6de6d393690582194",
+          "cases": 410,
+          "trace_lines": 5334
+        },
+        "style_table_adapter_native": {
+          "path": "artifacts/nested-owned-style_table_adapter_native-x64/report.json",
+          "sha256": "74408409cdce64ce9f3029a545805d9a152a0465af546dd3210dbaaae676652c",
+          "cases": 1760,
+          "trace_lines": 25189
+        }
+      },
+      "regressions": {
+        "override_native": {
+          "path": "artifacts/nested-owned-override_native-x64/report.json",
+          "sha256": "d3dd2ac14d93896d1d9d93e6d554cbabcefcb4b5763bd03098e59aa59ed5f530",
+          "cases": 9312,
+          "trace_lines": 96014
+        },
+        "ass_tree_native": {
+          "path": "artifacts/nested-owned-ass_tree_native-x64/report.json",
+          "sha256": "e504d4744166386f7be792eb4baee9a489797e1f6d9b28dad13b6a41f75537f8",
+          "cases": 5142,
+          "trace_lines": 10286
+        },
+        "effects_native": {
+          "path": "artifacts/nested-owned-effects_native-x64/report.json",
+          "sha256": "b37c6baf04d1a71244cf19f67a4b2962ad1b0eeefe7c5458aa7a47cffda1b6db",
+          "cases": 13608,
+          "trace_lines": 81722
+        },
+        "html_tag_native": {
+          "path": "artifacts/nested-owned-html_tag_native-x64/report.json",
+          "sha256": "9450ff58dbfbdef9867d50eb8aae4ff8e47a075bc84bf3194867ff1c708345c4",
+          "cases": 5728,
+          "trace_lines": 17186
+        },
+        "shared_color_native": {
+          "path": "artifacts/nested-owned-shared_color_native-x64/report.json",
+          "sha256": "e3512652e20f14259d67104db2a5d082c748b96990b00a102e5fbee234bf26f5",
+          "cases": 8896,
+          "trace_lines": 12234
+        },
+        "usf_document_native": {
+          "path": "artifacts/nested-owned-usf_document_native-x64/report.json",
+          "sha256": "2ab48e3baa632694383f897cdcbcd4afafbb4f358b162389f0597e2aa5f0acd8",
+          "cases": 1340,
+          "trace_lines": 40517
+        },
+        "realtext_document_native": {
+          "path": "artifacts/nested-owned-realtext_document_native-x64/report.json",
+          "sha256": "ddfeacd873a8693be829aa05bac6f5e02e16a7414e0bd62baaa620258998cca2",
+          "cases": 4532,
+          "trace_lines": 37887
+        },
+        "vtt_document_native": {
+          "path": "artifacts/nested-owned-vtt_document_native-x64/report.json",
+          "sha256": "b354ee96a6a4c966d0e5365f5dc53a8f845ea601e0057ef9aff96a53dc1f938c",
+          "cases": 2292,
+          "trace_lines": 21939
+        },
+        "sami_document_native": {
+          "path": "artifacts/nested-owned-sami_document_native-x64/report.json",
+          "sha256": "918e69ccfcf616c44df57f9147170cc2195c8649eeeeb408a71a58ba65e7596b",
+          "cases": 2836,
+          "trace_lines": 26992
+        },
+        "text_document_native": {
+          "path": "artifacts/nested-owned-text_document_native-x64/report.json",
+          "sha256": "e62852101e03169789645e9c2e3859197795c83a3bb7ac9ce559474ff0b683d8",
+          "cases": 5692,
+          "trace_lines": 44404
+        },
+        "microdvd_document_native": {
+          "path": "artifacts/nested-owned-microdvd_document_native-x64/report.json",
+          "sha256": "930df8bf3ccc58f849428cc4651b33a5c7eba7f5d556e21a32bfc53d3d7813f1",
+          "cases": 4588,
+          "trace_lines": 41491
+        },
+        "ass_document_native": {
+          "path": "artifacts/nested-owned-ass_document_native-x64/report.json",
+          "sha256": "62b742938c5cc02b384a00a0acc0cffe6acab1c110ec5e4b10609d363e8fb422",
+          "cases": 3266,
+          "trace_lines": 22286
+        },
+        "xombie_document_native": {
+          "path": "artifacts/nested-owned-xombie_document_native-x64/report.json",
+          "sha256": "cd42cefbda7de92844cfcec0fde944660763400fb7c2775cc77b6e6b3e648306",
+          "cases": 1242,
+          "trace_lines": 10441
+        },
+        "document_style_api_compile": {
+          "path": "artifacts/nested-owned-document_style_api_compile-x64/report.json",
+          "sha256": "b9e2628503ce7e47c62882791e0283fb49c4f4ef0c3734b982b06d43b8b53cee",
+          "cases": null,
+          "trace_lines": null
+        },
+        "document_native_lifecycle": {
+          "path": "artifacts/nested-owned-document_native_lifecycle-x64/report.json",
+          "sha256": "f765b9448081dc886fc9cf6df6f5511f1951286f2bde89874a73d8b3dab02ffd",
+          "cases": null,
+          "trace_lines": 3693
+        }
+      },
+      "historical_storage": {
+        "primitives": {
+          "path": "artifacts/nested-owned-document-windows-x64/report.json",
+          "sha256": "bfee237b4bbe5d5043671feb743a600aff5758d5c5bef8616705b5c5445ae4cc",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 53711,
+          "rust_parity": false
+        },
+        "/facade": {
+          "path": "artifacts/nested-owned-document-windows-x64/facade/report.json",
+          "sha256": "f7fcc277ea745d0f3d2bf0fc589180fcc68250b4612783a79682283f81280cb2",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 166,
+          "rust_parity": false
+        },
+        "/owner": {
+          "path": "artifacts/nested-owned-document-windows-x64/owner/report.json",
+          "sha256": "114c9d4e40725918a84938b1e52bdc905fed14b15217360f820d24e6c6e78c78",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 2361,
+          "rust_parity": true
+        },
+        "assignment_scope": "Pinned compiler-generated STSStyle assignment on both storage-algorithm sides; exact current x86 assignment declaration excluded. Independent actual cleanup comparison: style_intern_native.py --scenario same-values"
+      },
+      "rendering": {
+        "path": "artifacts/nested-owned-csri-x64/summary.json",
+        "sha256": "d4e5275141f71b92797a7f68a1dde5341613fe5ee44411e7665c615dcf7d3384",
+        "cases": 1222,
+        "frames": 13186,
+        "controls": 192,
+        "shards": [
+          {
+            "path": "artifacts/nested-owned-csri-x64/shard-0/report.json",
+            "sha256": "2108ef102015fc696e50409d7411fb19118b47f92a73f79659f600c3c29cbbbb"
+          },
+          {
+            "path": "artifacts/nested-owned-csri-x64/shard-1/report.json",
+            "sha256": "237a7797ecd4e4442531deb48dfaf2636e2d103b805ac52930e33d5fa4adfb0b"
+          },
+          {
+            "path": "artifacts/nested-owned-csri-x64/shard-2/report.json",
+            "sha256": "ffb9cf092238c5cbc88cb1d999a8d5628bf227e20014118fd7cc9e9ea4d64d2f"
+          },
+          {
+            "path": "artifacts/nested-owned-csri-x64/shard-3/report.json",
+            "sha256": "1caf2972bb5456a0a3007db4dfd61488f8ab244468f5c4da916a2933d3744c90"
+          },
+          {
+            "path": "artifacts/nested-owned-csri-x64/shard-4/report.json",
+            "sha256": "bfbf70d79334a86f130a54a95e79e4aeceabd6eb1f9f77b56e55979039d76140"
+          },
+          {
+            "path": "artifacts/nested-owned-csri-x64/shard-5/report.json",
+            "sha256": "ae398b17ec613611e3259c1631b671176af6ce3de5f1326bd1c2198f1ad6e320"
+          },
+          {
+            "path": "artifacts/nested-owned-csri-x64/shard-6/report.json",
+            "sha256": "5d65ca66fb17f07c94e95cf05d4091e73e865260899b739e444a69430ba718bb"
+          },
+          {
+            "path": "artifacts/nested-owned-csri-x64/shard-7/report.json",
+            "sha256": "da7bef4555af0be859a4b68d5ec69bd5a2f7bed57a0b95c3fd1f68fd9686dab2"
+          }
+        ]
+      },
+      "contracts": {
+        "path": "artifacts/nested-owned-contracts-x64/summary.json",
+        "sha256": "6deb4b23cef7dce374bfde358d6b81124423ae0f0920ff2fbd68b1b082a7d9c9",
+        "com": {
+          "path": "artifacts/nested-owned-contracts-x64/com/report.json",
+          "sha256": "2040e9e71a01ca01ffa6ab6b8687cb22578bb9a37408e8d442dc9fdf7267553d"
+        },
+        "dlls": {
+          "VSFilter.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/x64/Release/VSFilter.dll",
+              "sha256": "2d254068a40e5f59cf191c3c6bbfc984b548193b668c4decac21dc1e94e02169"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/x64/Release/VSFilter.dll",
+              "sha256": "42a1b0ad038efb68051ebbb10b3d8f8b03cd025f585170e8c32d25280a8d16a4"
+            },
+            "exports": {
+              "path": "artifacts/nested-owned-contracts-x64/VSFilter.dll.pe_exports.json",
+              "sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1"
+            },
+            "dependencies": {
+              "path": "artifacts/nested-owned-contracts-x64/VSFilter.dll.pe_dependencies.json",
+              "sha256": "805d7d7481b2774c2612b7cd7dd7fdaa4dd04a35111f3726a6704acf88c4a0d2"
+            }
+          },
+          "XySubFilter.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/x64/Release/XySubFilter.dll",
+              "sha256": "32b7c2cd6eb817120414db53b3c3005e719ae4b993c4a69d0d66c7f6ac363d5a"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/x64/Release/XySubFilter.dll",
+              "sha256": "b767f5b0fcf2ebb1325e02c5fb2178582a17661e1cff9111f9b0499fbb8206c6"
+            },
+            "exports": {
+              "path": "artifacts/nested-owned-contracts-x64/XySubFilter.dll.pe_exports.json",
+              "sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42"
+            },
+            "dependencies": {
+              "path": "artifacts/nested-owned-contracts-x64/XySubFilter.dll.pe_dependencies.json",
+              "sha256": "2ce278d6be4d85c557490e59cb33e78ca53faf3e38061e9ca3eb225897be359a"
+            }
+          },
+          "xy_sub_filter_consumer.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/x64/Release/xy_sub_filter_consumer.dll",
+              "sha256": "f1165742064181b7fb73bacb16017d8e202c8bb0be90ed8c2eb812ac282c2df8"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/x64/Release/xy_sub_filter_consumer.dll",
+              "sha256": "87778fb6b9e7c69c619499ce41209c951d815298e2891b85b45209b82d811fd5"
+            },
+            "exports": {
+              "path": "artifacts/nested-owned-contracts-x64/xy_sub_filter_consumer.dll.pe_exports.json",
+              "sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b"
+            },
+            "dependencies": {
+              "path": "artifacts/nested-owned-contracts-x64/xy_sub_filter_consumer.dll.pe_dependencies.json",
+              "sha256": "b0b48a3cf2bf2ecbbac4ecca863a815ab4a0c1137277a9b7d5830d9d1beca5c9"
+            }
+          }
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/nested-rect-build-x64.log",
+          "sha256": "848c24d49937ca4bece40bd0176f3cb1d31e041ffc7d25669cf457b0835297af"
+        },
+        {
+          "path": "artifacts/nested-rect-build-rust-x64.log",
+          "sha256": "62a5f170c76b2a62a18d9b2829d7a9edf0a0924d9b184985b78f7838182d13ad"
+        }
+      ],
+      "historical_failing_nested_rectangles": {
+        "path": "artifacts/default-copy-document-rect-x64/report.json",
+        "sha256": "c87e3aeb547d0ccc757688cfc2a6bdd6e68ca2b3ce3c4b9dedd1e704d7f9a195",
+        "candidate_commit": "9105c8f5e21ea63a5aa6046898310e49fbbefa9f",
+        "passing": false,
+        "different_rows": 12,
+        "cases": 14,
+        "trace_lines": 16
+      }
+    },
+    "x86": {
+      "style_scenarios": {
+        "interning": {
+          "path": "artifacts/nested-owned-interning-x86/report.json",
+          "sha256": "aaea574ade3e1a92fd576f01cff619e06f60301e1f65d0435e7d5b5018894fb5",
+          "cases": 196,
+          "trace_lines": 788,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16"
+            ]
+          }
+        },
+        "same-values": {
+          "path": "artifacts/nested-owned-same-values-x86/report.json",
+          "sha256": "797f78ce97f1b76a62fe184ccee8f9b37d40f48e07faa1f5094902911ef7f132",
+          "cases": 196,
+          "trace_lines": 788,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16"
+            ]
+          }
+        },
+        "raw-twins": {
+          "path": "artifacts/nested-owned-raw-twins-x86/report.json",
+          "sha256": "b2538fffe1a4342005052e4f480bab7680a6a8fa91ac034a2e7d6b406509e85a",
+          "cases": 196,
+          "trace_lines": 788,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16"
+            ]
+          }
+        },
+        "add-style": {
+          "path": "artifacts/nested-owned-add-style-x86/report.json",
+          "sha256": "4db65fb6a607e9e51c03ecd26205ba69ec3abf4ddf7aa2a9fbf980d3769b4f60",
+          "cases": 360,
+          "trace_lines": 1637,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16"
+            ]
+          }
+        },
+        "map-lifecycle": {
+          "path": "artifacts/nested-owned-map-lifecycle-x86/report.json",
+          "sha256": "c0e1b888dfa5b7a163eb2478f5f5a76549c52ff9ecb784ee485cf7e2055fa585",
+          "cases": 712,
+          "trace_lines": 1426,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16"
+            ]
+          }
+        },
+        "map-growth": {
+          "path": "artifacts/nested-owned-map-growth-x86/report.json",
+          "sha256": "aa6bb3db659cd680b728f820d5f9a955a1fff5d417354f96c62b612e42fb0eee",
+          "cases": 1544,
+          "trace_lines": 3090,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16"
+            ]
+          }
+        },
+        "default-style": {
+          "path": "artifacts/nested-owned-default-style-x86/report.json",
+          "sha256": "922ecafe3255577a2d9cfe64a42cbe332c63fc29dbc021c9d824e95c22ad905e",
+          "cases": 360,
+          "trace_lines": 2882,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16"
+            ]
+          }
+        },
+        "document-rectangles": {
+          "path": "artifacts/nested-owned-document-rectangles-x86/report.json",
+          "sha256": "55efb87445150c45190a9f056336401ab228b146dcfe29d787fd1da0f7f71c8e",
+          "cases": 14,
+          "trace_lines": 16,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16"
+            ]
+          }
+        },
+        "document-rectangle-history": {
+          "path": "artifacts/nested-owned-document-rectangle-history-x86/report.json",
+          "sha256": "a29999859f2c886b26db3c20463c322a1ee5a1c3271782e40e90eecae3f0eb4e",
+          "cases": 24,
+          "trace_lines": 26,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16"
+            ]
+          }
+        }
+      },
+      "other_ownership": {
+        "font_native": {
+          "path": "artifacts/nested-owned-font_native-x86/report.json",
+          "sha256": "71174fdd261c5f1fab6ecf8681b8956c382506d4d374be44764c14b5315ce5e9",
+          "cases": 195,
+          "trace_lines": 392
+        },
+        "font_gdi_calls": {
+          "path": "artifacts/nested-owned-font_gdi_calls-x86/report.json",
+          "sha256": "33de11268f082306d5926a243780bc5c553b9453bf01861dd16c13da7dd8176b",
+          "cases": 12,
+          "trace_lines": 126
+        },
+        "rect_intern_native": {
+          "path": "artifacts/nested-owned-rect_intern_native-x86/report.json",
+          "sha256": "96afcc9778f35e7e5fcf5eac86ec59f2a7ba30b98702f555aaf59632185b9ca9",
+          "cases": 294,
+          "trace_lines": 5003
+        },
+        "string_flyweight_native": {
+          "path": "artifacts/nested-owned-string_flyweight_native-x86/report.json",
+          "sha256": "82d53da6d1141ef2f1807e2bb97125a60248ca62300a3b4a1e47244194e323bd",
+          "cases": 410,
+          "trace_lines": 5334
+        },
+        "style_table_adapter_native": {
+          "path": "artifacts/nested-owned-style_table_adapter_native-x86/report.json",
+          "sha256": "ba502f575abc5051b9a4bdcd946d4adbee4e64b4187de8fe47e41158bba5e096",
+          "cases": 1760,
+          "trace_lines": 25189
+        }
+      },
+      "regressions": {
+        "override_native": {
+          "path": "artifacts/nested-owned-override_native-x86/report.json",
+          "sha256": "3110baf8aa60b181911c2b88058ec70d312845f9be307c882b43a080311d0fab",
+          "cases": 9312,
+          "trace_lines": 96014
+        },
+        "ass_tree_native": {
+          "path": "artifacts/nested-owned-ass_tree_native-x86/report.json",
+          "sha256": "86243b15dfc132664d03031cd4e145a88fcc6268db61290957762febbb74d367",
+          "cases": 5142,
+          "trace_lines": 10286
+        },
+        "effects_native": {
+          "path": "artifacts/nested-owned-effects_native-x86/report.json",
+          "sha256": "cf92900cce363b345e1e7f2b0eabe9ff4262a994f6cf032411b355623804398a",
+          "cases": 13608,
+          "trace_lines": 81722
+        },
+        "html_tag_native": {
+          "path": "artifacts/nested-owned-html_tag_native-x86/report.json",
+          "sha256": "d6d22be39dffd23e48c3584725db24a8d740954841697189ef6c3cc9f3d69676",
+          "cases": 5728,
+          "trace_lines": 17186
+        },
+        "shared_color_native": {
+          "path": "artifacts/nested-owned-shared_color_native-x86/report.json",
+          "sha256": "e293140377bcc82b791bb9697000ea23e19b9ed586586b35d92986202e0f8a18",
+          "cases": 8896,
+          "trace_lines": 12234
+        },
+        "usf_document_native": {
+          "path": "artifacts/nested-owned-usf_document_native-x86/report.json",
+          "sha256": "7321db0c82a82f0829c79991061729173c1ee10b15548ff7553d833a986e1dfb",
+          "cases": 1340,
+          "trace_lines": 40517
+        },
+        "realtext_document_native": {
+          "path": "artifacts/nested-owned-realtext_document_native-x86/report.json",
+          "sha256": "1f883b1384a1b35bad695c04e39e497f2f1ab4cc64e7aff5d6eb71a7d945071e",
+          "cases": 4532,
+          "trace_lines": 37887
+        },
+        "vtt_document_native": {
+          "path": "artifacts/nested-owned-vtt_document_native-x86/report.json",
+          "sha256": "8dd14f45ce186a58748fee09a056800831268cead811c2cab8c36482ab4a6517",
+          "cases": 2292,
+          "trace_lines": 21939
+        },
+        "sami_document_native": {
+          "path": "artifacts/nested-owned-sami_document_native-x86/report.json",
+          "sha256": "24cbb466d3bd4311ccf1afac066717db2bafccafe9c703e36238112ace7b906c",
+          "cases": 2836,
+          "trace_lines": 26992
+        },
+        "text_document_native": {
+          "path": "artifacts/nested-owned-text_document_native-x86/report.json",
+          "sha256": "91a6399a851bc76f883f5e907b33102112fc2409e10823893e1209c428bfa380",
+          "cases": 5692,
+          "trace_lines": 44404
+        },
+        "microdvd_document_native": {
+          "path": "artifacts/nested-owned-microdvd_document_native-x86/report.json",
+          "sha256": "d9145a71c057e3030ce7237ae7d0008810630884db9a0c29730b92385e05bc6b",
+          "cases": 4588,
+          "trace_lines": 41491
+        },
+        "ass_document_native": {
+          "path": "artifacts/nested-owned-ass_document_native-x86/report.json",
+          "sha256": "87c7dd31dcd9f649f3ab61e78ee6b9042e38c9f3eada79350fcfc31cf000d5d7",
+          "cases": 3266,
+          "trace_lines": 22286
+        },
+        "xombie_document_native": {
+          "path": "artifacts/nested-owned-xombie_document_native-x86/report.json",
+          "sha256": "e704af559329cb5a1634b639d0414578a39be122118c732466874f3f98a71ac1",
+          "cases": 1242,
+          "trace_lines": 10441
+        },
+        "document_style_api_compile": {
+          "path": "artifacts/nested-owned-document_style_api_compile-x86/report.json",
+          "sha256": "cf40449bec0ac434a4c4410e4d23fe5405b779ded6f24906c5c7cf8765ec342e",
+          "cases": null,
+          "trace_lines": null
+        },
+        "document_native_lifecycle": {
+          "path": "artifacts/nested-owned-document_native_lifecycle-x86/report.json",
+          "sha256": "438a726c330e710e8597ec67def84c745dab16a7007c7d50ac5dee732cb34b76",
+          "cases": null,
+          "trace_lines": 3693
+        }
+      },
+      "historical_storage": {
+        "primitives": {
+          "path": "artifacts/nested-owned-document-windows-x86/report.json",
+          "sha256": "44996a9af43ae4b75b34a15b5b6bfa03e4c762fa93a6426e1c5e0ede8e7922ee",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 53711,
+          "rust_parity": false
+        },
+        "/facade": {
+          "path": "artifacts/nested-owned-document-windows-x86/facade/report.json",
+          "sha256": "6bd03b1fa9253b2d20d3b44a6722205c152cc1656e3c74618869f1cd7667a83e",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 166,
+          "rust_parity": false
+        },
+        "/owner": {
+          "path": "artifacts/nested-owned-document-windows-x86/owner/report.json",
+          "sha256": "b1f6779cf863617653679f3b5f957d6ec104420e1e8e01159344287ddb422e8f",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 2361,
+          "rust_parity": true
+        },
+        "assignment_scope": "Pinned compiler-generated STSStyle assignment on both storage-algorithm sides; exact current x86 assignment declaration excluded. Independent actual cleanup comparison: style_intern_native.py --scenario same-values"
+      },
+      "rendering": {
+        "path": "artifacts/nested-owned-csri-x86/summary.json",
+        "sha256": "9ce185c4691d7f19781c4da87b002dce5f5a17f85da4e833dd0ea25c49d97123",
+        "cases": 1222,
+        "frames": 13186,
+        "controls": 192,
+        "shards": [
+          {
+            "path": "artifacts/nested-owned-csri-x86/shard-0/report.json",
+            "sha256": "a91754f9c56bcd6192f3d6007b25cfdd2d7a20bb820e75d277928271db3d9e0c"
+          },
+          {
+            "path": "artifacts/nested-owned-csri-x86/shard-1/report.json",
+            "sha256": "9deddfe1f609d6b28cb01e80f58e5900f0fd16d5aecf6c845673a9a75728a342"
+          },
+          {
+            "path": "artifacts/nested-owned-csri-x86/shard-2/report.json",
+            "sha256": "3d839c53b371ea2593c9d08f8fba9a8b7c97e599c34ca0a0853ca35caf987df7"
+          },
+          {
+            "path": "artifacts/nested-owned-csri-x86/shard-3/report.json",
+            "sha256": "5dfb8e79ebf1fde1f9ac12a534299755b83e1e7f9067d1dfcb101585c211f2f0"
+          },
+          {
+            "path": "artifacts/nested-owned-csri-x86/shard-4/report.json",
+            "sha256": "7682919f1e69a0771789b0c500ef652e9f363d8247456482ee58ff7bca9c876b"
+          },
+          {
+            "path": "artifacts/nested-owned-csri-x86/shard-5/report.json",
+            "sha256": "057610249ca9abf4978375a0ef9fc10b351e994a8b7b6c235f7e21a2d0abdb93"
+          },
+          {
+            "path": "artifacts/nested-owned-csri-x86/shard-6/report.json",
+            "sha256": "dfc4b1e92fd4725ee2ed293416afee97e83ee7f6dba909d9e23301bc92264e66"
+          },
+          {
+            "path": "artifacts/nested-owned-csri-x86/shard-7/report.json",
+            "sha256": "a717025eb1737980b489010944b16d2463c268f78ebc7e590337245ed9e5ee83"
+          }
+        ]
+      },
+      "contracts": {
+        "path": "artifacts/nested-owned-contracts-x86/summary.json",
+        "sha256": "6deb4b23cef7dce374bfde358d6b81124423ae0f0920ff2fbd68b1b082a7d9c9",
+        "com": {
+          "path": "artifacts/nested-owned-contracts-x86/com/report.json",
+          "sha256": "f393f3ff2606dd7fe72f4621b652a4fa6734a4fad80a91d6527e0e65e0db5ff9"
+        },
+        "dlls": {
+          "VSFilter.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/Win32/Release/VSFilter.dll",
+              "sha256": "69faa2d5f90f35fe4184e9e9bd892adb76fee60295701988f61ab7af0664d9eb"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/Win32/Release/VSFilter.dll",
+              "sha256": "8d4e05034278d6383f37d1bfe16dcafe9b461d0182d9da11c9d516df19c3214a"
+            },
+            "exports": {
+              "path": "artifacts/nested-owned-contracts-x86/VSFilter.dll.pe_exports.json",
+              "sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c"
+            },
+            "dependencies": {
+              "path": "artifacts/nested-owned-contracts-x86/VSFilter.dll.pe_dependencies.json",
+              "sha256": "8b0365bd8b1fa8ea13b65d8681836b85d870a46781d0a3cbfb851b1000a21ae7"
+            }
+          },
+          "XySubFilter.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/Win32/Release/XySubFilter.dll",
+              "sha256": "2c3b904d7f91902ef456e07b648c5d6351878318c235397eeb9b39eb3fffa34f"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/Win32/Release/XySubFilter.dll",
+              "sha256": "503c22adf4284e6bcce2920ec84a56ea51e0a99372839e3bccc81843ad739dbc"
+            },
+            "exports": {
+              "path": "artifacts/nested-owned-contracts-x86/XySubFilter.dll.pe_exports.json",
+              "sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11"
+            },
+            "dependencies": {
+              "path": "artifacts/nested-owned-contracts-x86/XySubFilter.dll.pe_dependencies.json",
+              "sha256": "2a22ef471924cc53ea843b14cb2fb5e1dc765f9e308e8ed316172476b0696dd5"
+            }
+          },
+          "xy_sub_filter_consumer.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/Win32/Release/xy_sub_filter_consumer.dll",
+              "sha256": "3e7c20a4d6c42457d92eb56c42e4fd9f3bddb93276f2c1cd28bfb73edd06484c"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/Win32/Release/xy_sub_filter_consumer.dll",
+              "sha256": "b3dfeb555d51c86b6fa2d2c79ea928ec7c4a90edaeb282b3b090fb054108f6e8"
+            },
+            "exports": {
+              "path": "artifacts/nested-owned-contracts-x86/xy_sub_filter_consumer.dll.pe_exports.json",
+              "sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94"
+            },
+            "dependencies": {
+              "path": "artifacts/nested-owned-contracts-x86/xy_sub_filter_consumer.dll.pe_dependencies.json",
+              "sha256": "bee8a1d975859e0ab8a9b6843e14f813df818b8538e6501927e792bb180eb7c1"
+            }
+          }
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/nested-rect-build-x86.log",
+          "sha256": "9d07d45d092852fecb1658f8e1f22f25ef3d109b96d1a0956b1f65f34d8c4c18"
+        },
+        {
+          "path": "artifacts/nested-rect-build-rust-x86.log",
+          "sha256": "c8fb9122bb54d443de80612eab76d6bc1be63087f728deeb0f5685b5cbc84380"
+        }
+      ],
+      "historical_failing_nested_rectangles": {
+        "path": "artifacts/default-copy-document-rect-x86/report.json",
+        "sha256": "a91aa7a18365b8165d134f55242bdbd09c7bec46dedc8088304654472b5d0b1f",
+        "candidate_commit": "9105c8f5e21ea63a5aa6046898310e49fbbefa9f",
+        "passing": false,
+        "different_rows": 12,
+        "cases": 14,
+        "trace_lines": 16
+      }
+    }
+  },
+  "checks": {
+    "path": "artifacts/nested-rect-checks.log",
+    "sha256": "851c335ffe4279fc4fd24bfb573045ce7212eff2acea4d5c9de7a49f35c367f7",
+    "safe_core_per_architecture": 345,
+    "ffi_per_architecture": 136,
+    "fmt": true,
+    "clippy_all_targets_and_native_runtime_both_architectures": true,
+    "python_tests": 189,
+    "python_log": {
+      "path": "artifacts/nested-owned-python.log",
+      "sha256": "7e0e71bdd170ac45b564c121425ebdfa6fdc40b17ef18de1565d01f235cce11b"
+    },
+    "skipped": 1
+  },
+  "unsafe_inventory": {
+    "path": "artifacts/nested-owned-unsafe-inventory.json",
+    "sha256": "77395a3f4896ebea3324d68c7bf2401d2654c07b68609df4eb49aad3bde8a13c"
+  },
+  "sources": [
+    {
+      "path": "rust/compat/src/document.rs",
+      "sha256": "ff17c0b2b5998f46b52a111cf796c053b76256af03054a20bac1ff7bf6a8b4f6"
+    },
+    {
+      "path": "rust/compat/src/document_style.rs",
+      "sha256": "fc944154de9ada105c4b688a8c1a83862ba3d5e371f75b2be52976599975f0dd"
+    },
+    {
+      "path": "rust/compat/src/document_style_add.rs",
+      "sha256": "c829382d947c31490bce6808704f15a7d2f4f7b0dadd4481172202a0239b8b95"
+    },
+    {
+      "path": "rust/compat/src/document_style_copy.rs",
+      "sha256": "ecc0fc87d04ebfc355a97089d4d60b283db97671fb489981a8cb05493f2292c4"
+    },
+    {
+      "path": "rust/compat/src/rect_intern.rs",
+      "sha256": "98a184bbce671842f5ba266d45626e7cf73e77600bc47a4108080694621427bb"
+    },
+    {
+      "path": "rust/compat/src/ass_style_value.rs",
+      "sha256": "70189337ce15f06d151a8aec81fffdc2f4e1e4609d51539c2bbfcf4e15cdeabe"
+    },
+    {
+      "path": "rust/ffi/src/document.rs",
+      "sha256": "4d746e630c95c2b252b75b99c4a3f0244373452df523d4bcb5884977154e2c4f"
+    },
+    {
+      "path": "rust/ffi/src/document_registry.rs",
+      "sha256": "a427ea58918ea729593843e2256605463937ef1bc71a0cb204dbd04a14b4b3f0"
+    },
+    {
+      "path": "tools/compat/style_intern_native.cpp",
+      "sha256": "bc499c7e2f63b53142a6dc237cd90b7ef71d6d0fdbe1c2df05c868e158a96284"
+    },
+    {
+      "path": "tools/compat/style_intern_native.py",
+      "sha256": "9107b97da3ca5c83c7479c3d6919e35e5b53a823546f617633a5fb6c859adf2f"
+    },
+    {
+      "path": "tools/compat/test_style_intern_native.py",
+      "sha256": "7536576d01c7dab4a9be4ba4744f1fef6b7ac8ac241aa72b316f2897f3552bf4"
+    }
+  ],
+  "implementation_commit": "03d78ffaafe81f4cfb647b78cff354dd79188d5b",
+  "scope": "Real canonical rectangle owners retained by Rust default/named document styles; raw clones and wire packets remain detached. Reference and candidate observations each repeated twice.",
+  "limits": [
+    "Finite successful allocations; allocation failure, reentry, concurrent host operations and complete native graph destruction are not established by these histories.",
+    "Weak rectangle entries permit safe destruction outside registry admission; expired bookkeeping is reclaimed at the next insertion. Style interner expired NaN keys retain their separate unresolved qualification.",
+    "Shared renderer HDC ownership is still native; next implementation uses retained lifecycle baseline.",
+    "Historical storage retains its original upstream reference and implicit-assignment seam; not cleanup floating-assignment parity.",
+    "No production default switched; remaining renderer graphs, all host interfaces and vendored code remain in the full Rust objective."
+  ],
+  "verification_harnesses": [
+    {
+      "path": "artifacts/write-nested-owned-evidence.py",
+      "sha256": "65f1bc6bdbd340f169f5360cfcdd142494130c098774157247e9cd3da8f23c18"
+    },
+    {
+      "path": "artifacts/run-nested-owned-host-corpus.py",
+      "sha256": "b03f2c735f38f7640d90bc11387e7c395ca64cd3f96a2a4ae36e4d315480b49e"
+    },
+    {
+      "path": "artifacts/run-nested-owned-contracts.py",
+      "sha256": "3f2cfe11a4aeb4fa6f43975c3661e10b79e7e4a27b92b39f8cd28e80acae41f2"
+    },
+    {
+      "path": "tools/compat/audit_rust_boundary.py",
+      "sha256": "959ddcd63c7f0301ba1f1b56615333d3f2d31cbc0ee024d2a9b8b80eccd7a475"
+    }
+  ]
+}

@@ -44,7 +44,7 @@
     "The current font-create boundary rejects a null DC; failed-DC constructor lifecycle parity does not imply later text/font failure-path parity.",
     "Keep explicit release at its original destructor point after Deinit and before remaining native member/base destruction. Preserve one unconditional DeleteDC attempt, including null."
   ],
-  "next_probe": "First correct nested document rectangle ownership (rust-document-rectangle-inventory.json). Then Promote the retained lifecycle fixture into the maintained probe/validator; extend DeleteDC failure and selected-font/text/path histories. Move shared canonical DC lifetime into Rust with typed owner IDs and an explicit whole-operation/thread-lifetime contract, then rerun lifecycle, font/GDI, exact rendering and hosts.",
+  "next_probe": "Nested document rectangle ownership is corrected at 03d78ffa and validated at ebd25901 (rust-document-rectangle-local-evidence.json). Promote the retained DC lifecycle fixture into the maintained runner/validator; extend DeleteDC failure and selected-font/text/path histories. Move shared canonical DC lifetime into Rust with typed owner IDs and an explicit whole-operation/thread-lifetime contract, then rerun lifecycle, font/GDI, exact rendering and hosts.",
   "lifecycle_baseline": {
     "candidate_commit": "9105c8f5e21ea63a5aa6046898310e49fbbefa9f",
     "source": {
@@ -76,7 +76,7 @@
       "path": "tools/compat/renderer_dc_lifecycle_diagnostic.cpp",
       "sha256": "476d9520db4691f09b2fb123ca6c6a762b14faa6a7506dce86e074d10ef5c0cb"
     },
-    "limits": "This scoped GDI/status baseline does not compare nested document rectangle counts; that separate probe is failing on both architectures."
+    "limits": "This historical scoped GDI/status baseline does not compare nested document rectangle counts. That separate probe failed at 9105c8f5; the correction and current passing evidence are separately recorded in rust-document-rectangle-local-evidence.json."
   },
   "observed_lifecycle_details": [
     "Nested owners share one DC; eight measured constructor/destructor phases have cumulative call counts 4,4,4,4,4,5,9,10. Last release deletes once; the next first owner recreates.",
