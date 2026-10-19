@@ -43,6 +43,9 @@ typedef struct {
     unsigned char *buffer;      // w x h buffer
 } Bitmap;
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+#include "xy_rust_path_data.h"
+#endif
 struct PathData
 {
 public:
@@ -61,10 +64,26 @@ public:
     
     void AlignLeftTop(CPoint *left_top, CSize *size);
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    XyRust::PathSnapshot Snapshot()const{return m_path.Read();}
+    void Replace(const XyRust::PathSnapshot& value){m_path.Replace(value);}
+    int Count()const{return m_path.Count();}
+    ULONG Hash()const{return m_path.Hash();}
+    bool Text(HDC dc,uintptr_t font,uint64_t spacing,const uint16_t* units,size_t count){return m_path.Text(dc,font,spacing,units,count);}
+private:
+    XyRust::PathOwner m_path;
+#else
     BYTE* mpPathTypes;
     POINT* mpPathPoints;
     int mPathPoints;
+#endif
 };
+
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+typedef XyRust::PathSnapshot PathDataRead;
+#else
+typedef PathData PathDataRead;
+#endif
 
 typedef std::shared_ptr<const PathData> SharedPtrConstPathData;
 typedef std::shared_ptr<PathData> SharedPtrPathData;
@@ -105,8 +124,8 @@ private:
 private:
     void _ReallocEdgeBuffer(unsigned edges);
     void _AddEdge(int row, int position);
-    void _EvaluateBezier(const PathData& path_data, int ptbase, bool fBSpline);
-    void _EvaluateLine(const PathData& path_data, int pt1idx, int pt2idx);
+    void _EvaluateBezier(const PathDataRead& path_data, int ptbase, bool fBSpline);
+    void _EvaluateLine(const PathDataRead& path_data, int pt1idx, int pt2idx);
     void _EvaluateLine(int x0, int y0, int x1, int y1);	
     // The following function is templated and forcingly inlined for performance sake
     template<int flag> __forceinline void _EvaluateLine(int x0, int y0, int x1, int y1);

@@ -207,4 +207,6 @@ mod ssf_arabic;
 
 mod ssf_split;
 
+#[cfg(windows)]
+mod path_data;
 mod ssf_literal;

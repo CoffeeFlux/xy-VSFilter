@@ -52,9 +52,15 @@ int main(){try{
         TextProbe word(interned,strings[text]);PathData path;TextProbe::TextInfo info={0,0,0};
         text_used=0;reset();text_recording=true;TextProbe::measure(info,interned,strings[text]);Status measured=status();unsigned measurement_events=text_used;
         reset();bool result=word.path(path);Status pathed=status();text_recording=false;
-        check(path.mPathPoints>=0&&path.mPathPoints<100000);const auto selected=GetCurrentObject(text_dc,OBJ_FONT);
-        printf("dc-text-case index=%u spacing=%u text=%u mode=%u events=%u measurement_events=%u result=%u measured=%d,%d,%d selected_stock=%u selected_null=%u points=%d",index++,spacing,text,mode,text_used,measurement_events,result?1:0,info.m_width,info.m_ascent,info.m_descent,selected==stock_font,selected==NULL,path.mPathPoints);emit("measure_status",measured);emit("path_status",pathed);printf("\n");
-        printf("dc-text-path");for(int j=0;j<path.mPathPoints;++j)printf(" %02x:%ld,%ld",unsigned(path.mpPathTypes[j]),path.mpPathPoints[j].x,path.mpPathPoints[j].y);printf("\n");
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        const auto path_snapshot=path.Snapshot();const int path_count=static_cast<int>(path_snapshot.points.size());
+        const POINT* path_points=path_snapshot.points.data();const BYTE* path_types=path_snapshot.types.data();
+#else
+        const int path_count=path.mPathPoints;const POINT* path_points=path.mpPathPoints;const BYTE* path_types=path.mpPathTypes;
+#endif
+        check(path_count>=0&&path_count<100000);const auto selected=GetCurrentObject(text_dc,OBJ_FONT);
+        printf("dc-text-case index=%u spacing=%u text=%u mode=%u events=%u measurement_events=%u result=%u measured=%d,%d,%d selected_stock=%u selected_null=%u points=%d",index++,spacing,text,mode,text_used,measurement_events,result?1:0,info.m_width,info.m_ascent,info.m_descent,selected==stock_font,selected==NULL,path_count);emit("measure_status",measured);emit("path_status",pathed);printf("\n");
+        printf("dc-text-path");for(int j=0;j<path_count;++j)printf(" %02x:%ld,%ld",unsigned(path_types[j]),path_points[j].x,path_points[j].y);printf("\n");
         for(unsigned j=0;j<text_used;++j){const auto& v=text_events[j];printf("dc-text-call name=%s a=%d b=%d result=%d extent=%d,%d",v.name,v.a,v.b,v.result,v.x,v.y);emit("before",v.before);emit("after",v.after);printf("\n");}
         // End an ignored partial-path failure only after observation, then let
         // the real renderer destructor release its DC at the original point.

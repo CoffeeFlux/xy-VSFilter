@@ -436,6 +436,7 @@ bool CWord::NeedTransform()
 
 //void CWord::Transform(PathData* path_data, const CPointCoor2& org)
 //{
+
 //    //// CPUID from VDub
 //    //bool fSSE2 = !!(g_cpuid.m_flags & CCpuID::sse2);
 //
@@ -448,6 +449,12 @@ bool CWord::NeedTransform()
 void CWord::Transform(PathData* path_data, const CPointCoor2 &org )
 {
     ASSERT(path_data);
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    auto path_snapshot=path_data->Snapshot();POINT* path_points=path_snapshot.points.data();const int path_count=static_cast<int>(path_snapshot.points.size());
+#else
+    POINT* path_points=path_data->mpPathPoints;const int path_count=path_data->mPathPoints;
+#endif
+
     const STSStyle& style = m_style.get();
 
     const double scalex = style.fontScaleX/100.0;
@@ -556,11 +563,11 @@ void CWord::Transform(PathData* path_data, const CPointCoor2 &org )
     double scaled_org_x = org.x+0.5;
     double scaled_org_y = org.y+0.5;
 
-    for (ptrdiff_t i = 0; i < path_data->mPathPoints; i++) {
+    for (ptrdiff_t i = 0; i < path_count; i++) {
         double x, y, z, xx;
 
-        xx = path_data->mpPathPoints[i].x;
-        y = path_data->mpPathPoints[i].y;
+        xx = path_points[i].x;
+        y = path_points[i].y;
 
         z = xxx[2][0] * xx + xxx[2][1] * y + xxx[2][2];
         x = xxx[0][0] * xx + xxx[0][1] * y + xxx[0][2];
@@ -571,14 +578,17 @@ void CWord::Transform(PathData* path_data, const CPointCoor2 &org )
         x = x / z;
         y = y / z;
 
-        path_data->mpPathPoints[i].x = (long)(x + scaled_org_x);
-        path_data->mpPathPoints[i].y = (long)(y + scaled_org_y);
+        path_points[i].x = (long)(x + scaled_org_x);
+        path_points[i].y = (long)(y + scaled_org_y);
         if (m_round_to_whole_pixel_after_scale_to_target && (m_target_scale_x!=1.0 || m_target_scale_y!=1.0))
         {
-            path_data->mpPathPoints[i].x = (path_data->mpPathPoints[i].x + 32)&~63;
-            path_data->mpPathPoints[i].y = (path_data->mpPathPoints[i].y + 32)&~63;//fix me: readability
+            path_points[i].x = (path_points[i].x + 32)&~63;
+            path_points[i].y = (path_points[i].y + 32)&~63;//fix me: readability
         }
     }
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    path_data->Replace(path_snapshot);
+#endif
 }
 
 bool CWord::CreateOpaqueBox()
@@ -673,14 +683,14 @@ bool CText::Append(const SharedPtrCWord& w)
 
 bool CText::CreatePath(PathData* path_data)
 {
-    bool succeeded = false;
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    XyRust::RendererDcOperation operation;
-    const HDC g_hDC=operation.get();
-    FwCMyFont font(m_style,operation);
+    XyRust::RendererDcOperation operation;FwCMyFont font(m_style,operation);
+    const auto style=m_style.get();uint64_t spacing;memcpy(&spacing,&style.fontSpacing,8);
+    const CStringW& text=m_str.Get();return path_data->Text(operation.get(),reinterpret_cast<uintptr_t>(font.get().handle),spacing,reinterpret_cast<const uint16_t*>(static_cast<LPCWSTR>(text)),text.GetLength());
 #else
+
+    bool succeeded = false;
     FwCMyFont font(m_style);
-#endif
     HFONT hOldFont = SelectFont(g_hDC, font.get());
     ASSERT(hOldFont);
 
@@ -726,6 +736,7 @@ bool CText::CreatePath(PathData* path_data)
     }
     ASSERT(SelectFont(g_hDC, hOldFont));
     return(true);
+#endif
 }
 
 void CText::GetTextInfo(TextInfo *output, const FwSTSStyle& style, const CStringW& str )
@@ -1021,6 +1032,11 @@ bool CPolygon::CreatePath(PathData* path_data)
     int len = m_pathTypesOrg.GetCount();
 #endif
     if(len == 0) return(false);
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    XyRust::PathSnapshot path_snapshot;path_snapshot.points.resize(len);path_snapshot.types.resize(len);
+    for(int i=0;i<len;++i){path_snapshot.types[i]=m_pathOrg.Type(i);path_snapshot.points[i]=m_pathOrg.GetPoint<CPoint>(i);}
+    path_data->Replace(path_snapshot);
+#else
     if(path_data->mPathPoints != len)
     {
         BYTE* pNewPathTypes = (BYTE*)realloc(path_data->mpPathTypes, len * sizeof(BYTE));
@@ -1046,6 +1062,7 @@ bool CPolygon::CreatePath(PathData* path_data)
 #else
     memcpy(path_data->mpPathTypes, m_pathTypesOrg.GetData(), len*sizeof(BYTE));
     memcpy(path_data->mpPathPoints, m_pathPointsOrg.GetData(), len*sizeof(POINT));
+#endif
 #endif
     return(true);
 }

@@ -33,6 +33,9 @@
 #include <vector>
 #include <algorithm>
 #include "Rasterizer.h"
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+#include "RustPathData.inl"
+#endif
 #include <math.h>
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_fill.h"
@@ -2176,6 +2179,19 @@ Overlay* Overlay::GetSubpixelVariance(unsigned int xshift, unsigned int yshift)
 
 // PathData
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+PathData::PathData(){}
+PathData::PathData(const PathData& src):m_path(src.m_path){}
+const PathData& PathData::operator=(const PathData& src){m_path=src.m_path;return *this;}
+PathData::~PathData(){}
+bool PathData::operator==(const PathData& rhs)const{return this==&rhs||m_path.Equal(rhs.m_path);}
+void PathData::_TrashPath(){m_path.Clear();}
+bool PathData::BeginPath(HDC dc){return m_path.Begin(dc,true);}
+bool PathData::EndPath(HDC dc){return m_path.End(dc,false,0,0);}
+bool PathData::PartialBeginPath(HDC dc,bool clear){return m_path.Begin(dc,clear);}
+bool PathData::PartialEndPath(HDC dc,long dx,long dy){return m_path.End(dc,true,dx,dy);}
+void PathData::AlignLeftTop(CPoint* point,CSize* size){m_path.Align(point,size);}
+#else
 PathData::PathData():mpPathTypes(NULL), mpPathPoints(NULL), mPathPoints(0)
 {
 }
@@ -2398,6 +2414,8 @@ void PathData::AlignLeftTop(CPoint *left_top, CSize *size)
     return;
 }
 
+#endif
+
 //////////////////////////////////////////////////////////////////////////
 
 // ScanLineData
@@ -2437,12 +2455,18 @@ void ScanLineData::_AddEdge(int row, int position)
     ++mEdgeNext;
 }
 
-void ScanLineData::_EvaluateBezier(const PathData& path_data, int ptbase, bool fBSpline)
+void ScanLineData::_EvaluateBezier(const PathDataRead& path_data, int ptbase, bool fBSpline)
 {
-    const POINT* pt0 = path_data.mpPathPoints + ptbase;
-    const POINT* pt1 = path_data.mpPathPoints + ptbase + 1;
-    const POINT* pt2 = path_data.mpPathPoints + ptbase + 2;
-    const POINT* pt3 = path_data.mpPathPoints + ptbase + 3;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    const POINT* path_points=path_data.points.data();
+#else
+    const POINT* path_points=path_data.mpPathPoints;
+#endif
+
+    const POINT* pt0 = path_points + ptbase;
+    const POINT* pt1 = path_points + ptbase + 1;
+    const POINT* pt2 = path_points + ptbase + 2;
+    const POINT* pt3 = path_points + ptbase + 3;
     double x0 = pt0->x;
     double x1 = pt1->x;
     double x2 = pt2->x;
@@ -2515,10 +2539,16 @@ void ScanLineData::_EvaluateBezier(const PathData& path_data, int ptbase, bool f
     _EvaluateLine(lastp.x, lastp.y, (int)x, (int)y);
 }
 
-void ScanLineData::_EvaluateLine(const PathData& path_data, int pt1idx, int pt2idx)
+void ScanLineData::_EvaluateLine(const PathDataRead& path_data, int pt1idx, int pt2idx)
 {
-    const POINT* pt1 = path_data.mpPathPoints + pt1idx;
-    const POINT* pt2 = path_data.mpPathPoints + pt2idx;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    const POINT* path_points=path_data.points.data();
+#else
+    const POINT* path_points=path_data.mpPathPoints;
+#endif
+
+    const POINT* pt1 = path_points + pt1idx;
+    const POINT* pt2 = path_points + pt2idx;
     _EvaluateLine(pt1->x, pt1->y, pt2->x, pt2->y);
 }
 
@@ -2578,12 +2608,21 @@ void ScanLineData::_EvaluateLine(int x0, int y0, int x1, int y1)
 
 bool ScanLineData::ScanConvert(const PathData& path_data, const CSize& size)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    const auto snapshot=path_data.Snapshot();const PathDataRead& view=snapshot;
+    const int path_count=static_cast<int>(snapshot.points.size());
+    const POINT* path_points=snapshot.points.data();const BYTE* path_types=snapshot.types.data();
+#else
+    const PathDataRead& view=path_data;const int path_count=path_data.mPathPoints;
+    const POINT* path_points=path_data.mpPathPoints;const BYTE* path_types=path_data.mpPathTypes;
+#endif
+
     int lastmoveto = -1;
     int i;
     // Drop any outlines we may have.
     mOutline.clear();
     // Determine bounding box
-    if(!path_data.mPathPoints)
+    if(!path_count)
     {
         mWidth = mHeight = 0;
         return false;
@@ -2614,9 +2653,9 @@ bool ScanLineData::ScanConvert(const PathData& path_data, const CSize& size)
     fFirstSet = false;
     firstp.x = firstp.y = 0;
     lastp.x = lastp.y = 0;
-    for(i=0; i<path_data.mPathPoints; ++i)
+    for(i=0; i<path_count; ++i)
     {
-        BYTE t = path_data.mpPathTypes[i] & ~PT_CLOSEFIGURE;
+        BYTE t = path_types[i] & ~PT_CLOSEFIGURE;
         switch(t)
         {
         case PT_MOVETO:
@@ -2624,23 +2663,23 @@ bool ScanLineData::ScanConvert(const PathData& path_data, const CSize& size)
                 _EvaluateLine(lastp.x, lastp.y, firstp.x, firstp.y);
             lastmoveto = i;
             fFirstSet = false;
-            lastp = path_data.mpPathPoints[i];
+            lastp = path_points[i];
             break;
         case PT_MOVETONC:
             break;
         case PT_LINETO:
-            if(path_data.mPathPoints - (i-1) >= 2) _EvaluateLine(path_data, i-1, i);
+            if(path_count - (i-1) >= 2) _EvaluateLine(view, i-1, i);
             break;
         case PT_BEZIERTO:
-            if(path_data.mPathPoints - (i-1) >= 4) _EvaluateBezier(path_data, i-1, false);
+            if(path_count - (i-1) >= 4) _EvaluateBezier(view, i-1, false);
             i += 2;
             break;
         case PT_BSPLINETO:
-            if(path_data.mPathPoints - (i-1) >= 4) _EvaluateBezier(path_data, i-1, true);
+            if(path_count - (i-1) >= 4) _EvaluateBezier(view, i-1, true);
             i += 2;
             break;
         case PT_BSPLINEPATCHTO:
-            if(path_data.mPathPoints - (i-3) >= 4) _EvaluateBezier(path_data, i-3, true);
+            if(path_count - (i-3) >= 4) _EvaluateBezier(view, i-3, true);
             break;
         }
     }

@@ -172,6 +172,8 @@ pub mod html_tag;
 
 pub mod font_intern;
 pub mod font_key_wire;
+pub mod path_data;
 pub mod rect_intern;
 pub mod string_flyweight;
 pub mod style_intern;
+pub mod text_path;

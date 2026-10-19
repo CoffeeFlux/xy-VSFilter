@@ -17,9 +17,9 @@ extern "system" {
 extern "system" {
     fn GetVersion() -> u32;
 }
-struct Windows {
-    dc: usize,
-    font: usize,
+pub(crate) struct Windows {
+    pub(crate) dc: usize,
+    pub(crate) font: usize,
 }
 impl Backend for Windows {
     type Selection = usize;

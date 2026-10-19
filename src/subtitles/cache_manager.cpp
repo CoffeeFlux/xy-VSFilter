@@ -32,6 +32,9 @@ inline void AddFuncCalls(int func)
 
 ULONG PathDataTraits::Hash( const PathData& key )
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return key.Hash();
+#else
     ULONG hash = 515;
     hash += (hash<<5);
     hash += key.mPathPoints;
@@ -48,6 +51,7 @@ ULONG PathDataTraits::Hash( const PathData& key )
         hash += key.mpPathPoints[i].y;
     }
     return hash;
+#endif
 }
 
 ULONG ClipperTraits::Hash( const CClipper& key )
