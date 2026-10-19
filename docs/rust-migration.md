@@ -27,7 +27,52 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: renderer style ownership (2026-10-19)
+## In progress: font key ownership (2026-10-19)
+
+The safe Rust font interner core is implemented in `font_intern.rs`. It owns raw
+`STSStyleBase` keys independently from weak payload references and preserves the
+cleanup's target-width hashing, bucket traversal, construction timing and final
+release lookup. Payload construction follows the first lookup and precedes the
+map's insertion comparisons. Complete calls must remain serialized. The renderer
+still uses native `FwCMyFont` and `CMyFont`; GDI font handles and metrics have not
+switched to this engine yet.
+
+Direct comparisons at `fe964cf8` pass on Windows x86 and x64, with two native and
+two Rust runs per architecture. Each trace has 3,290 operations, 35,079 ordered
+key comparisons and 44,375 lines, with 1,357 payload constructions and matching
+destructions. The native probe instantiates the actual cleanup `XyInternedByKey`
+template, calling actual `STSStyleBase` equality/hash functions; a parallel
+uninstrumented specialization checks every held alias and canonical tag. Rust
+replays only the input operations and computes its own comparisons, aliases,
+raw canonical key values, counts and payload lifecycle events.
+
+Coverage includes 704 slots, collision-heavy growth, copying, replacement,
+release/reinsertion, cross-sign zero aliases, 12 raw floating patterns, flag
+combinations and raw font-name units. Unlike the style table, this native table
+owns its keys: NaN keys remain safe to compare after payload release. The trace
+continues through lookup and rehash after such releases, ends with seven counted
+expired keys, and destroys every payload. Rust preserves that result without
+raw key pointers or the style table's expired-key refusal.
+
+All 338 core and 136 FFI tests pass per architecture, plus formatting, Clippy
+for all targets/native-runtime configurations and 179 Python tests (one skip).
+The final expanded probe has focused controls and direct comparisons. This adds
+no unsafe code or FFI exports; all 114 portable-core files remain free of unsafe
+sites. See [font owner core evidence](rust-font-owner-core-evidence.json).
+Reproduce with `tools/compat/font_table_native.py --reference-root
+artifacts/cleanup-reference --platform x64 --output <new-directory>` and repeat
+with `--platform Win32` from the x86 developer environment. Local artifacts use
+`font-owner-*`.
+
+Next, replace `CMyFont` ownership with audited Rust calls to Windows GDI while
+preserving LOGFONT conversion, fallback to Arial, metric rounding, selected-font
+restoration and resource release. These mock-payload traces do not establish
+GDI behavior, floating status/traps, allocation failure, reentry or concurrency.
+The renderer results below remain pinned to their earlier implementation and
+are not font-integration evidence. Word/line/subtitle graphs, the complete
+renderer, every host adapter and vendored code remain in scope.
+
+## Latest integrated port: renderer style ownership (2026-10-19)
 
 The experimental renderer now uses the safe Rust canonical style table through
 typed checked resources. The native wrapper holds an owner ID, canonical identity

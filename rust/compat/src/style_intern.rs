@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 //! Owned style interning with the cleanup's MSVC unique-table traversal.
-//! This is the ownership engine, not yet the renderer's native adapter.
+//! The experimental renderer uses this through the checked style FFI adapter.
 //! Comparison callbacks make traversal observable without exposing pointers.
 //! They must return the same deterministic value equality as the native key;
 //! observers may record calls but must not change comparison policy mid-operation.

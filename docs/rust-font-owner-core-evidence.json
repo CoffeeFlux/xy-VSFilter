@@ -1,0 +1,140 @@
+{
+  "schema": 1,
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "candidate_commit": "fe964cf86ab284a125c73c1a629ab7d0d4b15ac3",
+  "scope": "Safe font key ownership engine, payload lifecycle and MSVC traversal. Mock payloads, no GDI or renderer switch.",
+  "architectures": {
+    "x64": {
+      "path": "artifacts/font-owner-final-x64/report.json",
+      "sha256": "648d31b4070fb4e59b43a55229d3517433ef8fc19ef479fc7a25a77cac5a936a",
+      "steps": 3290,
+      "comparisons": 35079,
+      "trace_lines": 44375,
+      "created_and_destroyed_payloads": 1357,
+      "retained_expired_nan_keys": 7,
+      "normalized_trace_sha256": [
+        "95ffccba27619094d10b1ee1feed7e2fe955530dcbf98492944b568853a4b7d7",
+        "95ffccba27619094d10b1ee1feed7e2fe955530dcbf98492944b568853a4b7d7",
+        "95ffccba27619094d10b1ee1feed7e2fe955530dcbf98492944b568853a4b7d7",
+        "95ffccba27619094d10b1ee1feed7e2fe955530dcbf98492944b568853a4b7d7"
+      ],
+      "binary_sha256": {
+        "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\font-owner-final-x64\\native.exe": "e09d844d57fc77a8a4ea70b3e2091753778af5878ea447132bc90e2dfe41a332",
+        "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\font-table-cargo\\x86_64-pc-windows-msvc\\release\\examples\\font_table_replay.exe": "bfd892af7c2a6fafa0161251fd71b0c00ea68d508c002806a5017b7388b5b510"
+      },
+      "library_sha256": {
+        "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\strmbaseR.lib": "e4a3eed835fc6dcfdd7b81e684678cce0aaf032187e1ff2611b7f4146d6a9067",
+        "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\dsutilR.lib": "3dfc9f2eb59caef227f3ab723a1f10b672ab44f3efb61a75030d5b0a8730892b",
+        "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\subtitlesR.lib": "d6d48a179e28d70404ff870f6c6b640b9c768940065a95039695f7684689e50d",
+        "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\subpicR.lib": "23aed7e98c3c33cf31a956900fc720faf5d603edbb27c1f821964e9ccf87c5de",
+        "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\basevideofilterR.lib": "738d7f288e53690373e814f00ab7edcc8419e40de46a96f7a888a549ce8ca39e",
+        "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\libssfR.lib": "58a84c5e08a8c4c75e60e0f53b2590e6696e7f5938d52cc46b895ad326b4f1d8",
+        "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\unrarR.lib": "3dcfd1c32bc6261c168c841ebeb86c8dd4177f5698730424cbf39628f3e8a56c"
+      },
+      "environment": {
+        "VCToolsVersion": "14.44.35207",
+        "WindowsSDKVersion": "10.0.26100.0\\",
+        "VSCMD_ARG_TGT_ARCH": "x64"
+      }
+    },
+    "x86": {
+      "path": "artifacts/font-owner-final-x86/report.json",
+      "sha256": "1298ec1d036c94396e228af4bb93f9b020b14ab0e220e2b00b9c2fb8863fbac7",
+      "steps": 3290,
+      "comparisons": 35079,
+      "trace_lines": 44375,
+      "created_and_destroyed_payloads": 1357,
+      "retained_expired_nan_keys": 7,
+      "normalized_trace_sha256": [
+        "e0edc7d16e175b8952ade757313487071d79ee6cc33441507b8abb663d427c44",
+        "e0edc7d16e175b8952ade757313487071d79ee6cc33441507b8abb663d427c44",
+        "e0edc7d16e175b8952ade757313487071d79ee6cc33441507b8abb663d427c44",
+        "e0edc7d16e175b8952ade757313487071d79ee6cc33441507b8abb663d427c44"
+      ],
+      "binary_sha256": {
+        "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\font-owner-final-x86\\native.exe": "0cded7b90b8735f5690db1b9bdf184dd4e7ca5f0beb6569fcab1a5eec8e7700e",
+        "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\font-table-cargo\\i686-pc-windows-msvc\\release\\examples\\font_table_replay.exe": "6ff354aba090b8932793cafa4cd9ce07f23ceb20805d4cb12e29fdaa44048195"
+      },
+      "library_sha256": {
+        "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\strmbaseR.lib": "5926e97d337eebffe4ea20b996f2f0e62a33f67d6562e18a829c4f45888a954e",
+        "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\dsutilR.lib": "3333bc109c61750684684cafa818c90d68af49906e6c08994013e8e0bb711b0b",
+        "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\subtitlesR.lib": "46495e9e54830b1ee76e90021b0cd688be766a46fc9d354b52958651f3888f59",
+        "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\subpicR.lib": "2e3315a04138a6822958356c79dafdf47bdd51e6ddd32cf7ce6da8eae54a3e1f",
+        "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\basevideofilterR.lib": "3598e7cf095d9fefc68de1393902310c4c621a0b792b16098df40554cd6d2ada",
+        "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\libssfR.lib": "3eaa482d6d3b16a0b48816cf21cb96f3bb932963eb7b114c76372c785e4bbc09",
+        "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\unrarR.lib": "2a77b674333a0ac1e05fc155374268e7395d3e8163f1dc212788d446f3eb75cf"
+      },
+      "environment": {
+        "VCToolsVersion": "14.44.35207",
+        "WindowsSDKVersion": "10.0.26100.0\\",
+        "VSCMD_ARG_TGT_ARCH": "x86"
+      }
+    }
+  },
+  "checks": {
+    "path": "artifacts/font-owner-checks.log",
+    "sha256": "7b46d0cda511bc1d4291fe29c68571cd190d41d2c20939bf2d02356227681367",
+    "implementation_commit": "8eab1fbfae6adfe49ec6d163c9658ccabe79f6f2",
+    "safe_core_per_architecture": 338,
+    "ffi_per_architecture": 136,
+    "python": 179,
+    "python_skipped": 1,
+    "fmt": true,
+    "clippy_all_targets_and_native_runtime_both_architectures": true,
+    "final_probe_controls": {
+      "path": "artifacts/font-owner-final-controls.log",
+      "sha256": "cd93e48567c909dabfa028a6c2d0c17250e049735f3bc036512fd5ab14b65f50"
+    }
+  },
+  "unsafe_inventory": {
+    "path": "artifacts/font-owner-unsafe-inventory.json",
+    "sha256": "357734bb32ff6b74feee9070972a0db71445bd284c28e53c8da04dc0302e3512"
+  },
+  "sources": [
+    {
+      "path": "rust/compat/src/font_intern.rs",
+      "sha256": "cb0fabfde6be7a24185cfc0535d9d516cd1bb0b76feb94feee2d3eed0207c8f8"
+    },
+    {
+      "path": "rust/compat/examples/font_table_replay.rs",
+      "sha256": "b820488793a5f6f0112f3aa678e14bdc6a3d3aed0019eeab96d76e0bddd7f773"
+    },
+    {
+      "path": "tools/compat/font_table_native.cpp",
+      "sha256": "b50ae45033712be61904c638fc25f4db7a2a56f04b8445c49ef9cbc775a76946"
+    },
+    {
+      "path": "tools/compat/font_table_native.py",
+      "sha256": "02dd1870f496fd70553dee3885b798d7bc829a22a89707375812f09117eed4ef"
+    },
+    {
+      "path": "tools/compat/test_font_table_native.py",
+      "sha256": "2b6a6852b7b95a32e00da7b41292ef2ae9296f2c790b7cf9dee74e7c0c8e1a50"
+    }
+  ],
+  "reference_sources": [
+    {
+      "path": "artifacts/cleanup-reference/src/subtitles/flyweight_base_types.h",
+      "sha256": "1fff0d7e1bb0b1195e20fe6d1b65234450d3c19c6acf900c3a3cee79a4c242a1"
+    },
+    {
+      "path": "artifacts/cleanup-reference/src/subtitles/STS.h",
+      "sha256": "57dc87a3de9470ca04adc007c175956bd4acfddcb720324886bb4a2c7699080b"
+    },
+    {
+      "path": "artifacts/cleanup-reference/src/subtitles/STS.cpp",
+      "sha256": "2616b67db84f7329ac6e2363a3f03d61977fa07c37ed9c04d32ec2b1197f31e0"
+    },
+    {
+      "path": "artifacts/cleanup-reference/src/subtitles/RTS.cpp",
+      "sha256": "ef6aae1b68accd3da5cc9093377a118cf11f5754c597cec68173b06c80f71454"
+    }
+  ],
+  "limits": [
+    "Not a renderer font switch. Windows font construction, GDI metrics, HFONT ownership and selection remain native.",
+    "Default-value comparisons only; floating status/traps and nondefault modes require separate observations.",
+    "Allocator failure, reentry and concurrency are unclosed. Safe construction refusal is a unit test, not native exception parity.",
+    "Existing style renderer and full-frame evidence stays pinned to dd2e2585; it is not font-integration evidence.",
+    "All renderer objects, hosts and vendored implementations remain in the full migration scope."
+  ]
+}
