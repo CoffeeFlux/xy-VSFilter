@@ -59,15 +59,27 @@ inline size_t AddSize(size_t left, size_t right) {
 // One shared recursive gate per linked module. The inline function's local
 // static is shared across translation units. It serializes EACH C ABI call,
 // never a whole native parser/render operation or output value construction.
+// Global renderer caches may release owners after function-local destructors.
+// SRW storage has no teardown; keep recursive admission using the owning Windows
+// thread ID. Only the owner accesses depth_, and all owner_ accesses interlock.
+// This transitional Windows service uses no heap allocation or retained handle.
 class Gate {
-    CRITICAL_SECTION section_;
+    SRWLOCK section_;
+    volatile LONG owner_;
+    size_t depth_;
     Gate(const Gate&) = delete;
     Gate& operator=(const Gate&) = delete;
 public:
-    Gate() { InitializeCriticalSection(&section_); }
-    ~Gate() { DeleteCriticalSection(&section_); }
-    void Enter() { EnterCriticalSection(&section_); }
-    void Leave() { LeaveCriticalSection(&section_); }
+    constexpr Gate() : section_{}, owner_(0), depth_(0) {}
+    void Enter() {
+        const LONG thread = static_cast<LONG>(GetCurrentThreadId());
+        if(InterlockedCompareExchange(&owner_,0,0) == thread) { ++depth_; return; }
+        AcquireSRWLockExclusive(&section_);
+        depth_ = 1; InterlockedExchange(&owner_,thread);
+    }
+    void Leave() {
+        if(--depth_ == 0) { InterlockedExchange(&owner_,0); ReleaseSRWLockExclusive(&section_); }
+    }
 };
 inline Gate& SharedGate() { static Gate gate; return gate; }
 class Loan {

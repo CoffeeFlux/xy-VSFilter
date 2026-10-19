@@ -104,7 +104,12 @@ typename XyFlyWeight<V, DEFAULT_CACHE_SIZE, VTraits>::IdType XyFlyWeight<V, DEFA
     return cur_id; 
 }
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+#include "xy_rust_string_flyweight.h"
+typedef XyRust::StringFlyweight XyFwStringW;
+#else
 typedef XyFlyWeight<CStringW, 16*1024, CStringElementTraits<CStringW>> XyFwStringW;
+#endif
 
 static inline std::size_t hash_value(const double& d)
 {

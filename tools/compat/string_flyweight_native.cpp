@@ -6,6 +6,36 @@
 #include <vector>
 #include <memory>
 #include <stdexcept>
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+#include <RustDocumentOwner.h>
+#include <thread>
+#include <type_traits>
+static_assert(std::is_trivially_destructible<XyRust::DocumentDetail::Gate>::value,"gate must survive late cache destruction");
+static void gate_controls() {
+    unsigned count=0;
+    auto worker=[&]() {
+        for(unsigned i=0;i<10000;++i) {
+            XyRust::DocumentDetail::Loan outer;
+            XyRust::DocumentDetail::Loan inner;
+            ++count;
+        }
+    };
+    std::thread first(worker),second(worker);worker();first.join();second.join();
+    if(count!=30000)throw std::runtime_error("recursive gate serialization");
+}
+#endif
+
+// Constructed before main. Its destructor exercises owner release after local
+// statics (including the old admission gate) would have been destroyed.
+struct LateOwner {
+    std::shared_ptr<XyFwStringW> value;
+    ~LateOwner() {
+        if(!value)return;
+        value.reset();
+        printf("string-shutdown released=1\n");
+    }
+};
+static LateOwner late;
 
 static unsigned sequence=0;
 static std::vector<std::shared_ptr<XyFwStringW>> held(12);
@@ -60,6 +90,10 @@ int main() {
         cache->SetMaxItemNum(0);observe(11,0); // No construction at zero: native returns a freed list node.
         cache->RemoveTail();observe(12,0);cache->SetMaxItemNum(16384,true);observe(13,0);
         for(unsigned i=0;i<12;++i){held[i].reset();observe(14,i);}
+        late.value=std::make_shared<XyFwStringW>(new CStringW(L"late-owner"));
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        gate_controls();
+#endif
         printf("string-complete steps=%u\n",sequence);return 0;
     } catch(const std::exception& e) {fprintf(stderr,"unresolved: %s\n",e.what());return 2;}
 }

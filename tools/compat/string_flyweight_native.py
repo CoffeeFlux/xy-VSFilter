@@ -16,7 +16,7 @@ INPUTS = 16410 + 225 + 18
 
 def validate(data,bits):
     rows=data.splitlines()
-    if len(rows)!=STEPS*13+2:raise ValueError("missing string observations")
+    if len(rows)!=STEPS*13+3:raise ValueError("missing string observations")
     if not re.fullmatch(rb"string-provenance pointer_bits="+str(bits).encode()+rb" ansi=\d+ oem=\d+",rows[0]):raise ValueError("wrong architecture")
     for index in range(STEPS):
         if not re.fullmatch(f"string-step index={index} ".encode()+rb"op=\d+ slot=\d+ max=\d+ count=\d+ hits=\d+ queries=\d+",rows[1+index*13]):raise ValueError("wrong step/order")
@@ -24,7 +24,8 @@ def validate(data,bits):
             match=re.fullmatch(f"held slot={slot} ".encode()+rb"id=(\d+) units=(\d+) hex=([0-9a-f]*)",rows[2+index*13+slot])
             if not match or len(match[3])!=int(match[2])*4:raise ValueError("bad stored units")
             if int(match[1])==0 and int(match[2])!=0:raise ValueError("nonempty absent handle")
-    if rows[-1]!=f"string-complete steps={STEPS}".encode():raise ValueError("missing completion")
+    if rows[-2]!=f"string-complete steps={STEPS}".encode():raise ValueError("missing completion")
+    if rows[-1]!=b"string-shutdown released=1":raise ValueError("missing late owner destruction")
 
 def compare(traces,bits):
     if len(traces)!=4:raise ValueError("two runs per implementation required")

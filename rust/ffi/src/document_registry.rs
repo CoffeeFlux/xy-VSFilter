@@ -42,6 +42,7 @@ pub(crate) enum Kind {
     SearchRun,
     Effects,
     AssTree,
+    StringValue,
 }
 
 // Inline sessions avoid a new fallible box allocation after core ownership transfer.
@@ -49,6 +50,7 @@ pub(crate) enum Kind {
 // only with an explicit preallocated ownership envelope.
 #[allow(clippy::large_enum_variant)]
 pub(crate) enum Resource {
+    StringValue(alloc::sync::Arc<xy_vsfilter_compat::string_flyweight::Value>),
     AssTree(xy_vsfilter_compat::ass_tree::Tree),
     Effects {
         revision: u64,
@@ -119,6 +121,7 @@ impl Resource {
             Self::Document(_) => Kind::Document,
             Self::Effects { .. } => Kind::Effects,
             Self::AssTree(_) => Kind::AssTree,
+            Self::StringValue(_) => Kind::StringValue,
             Self::Snapshot(_) => Kind::Snapshot,
             Self::UnknownRun { .. } => Kind::UnknownRun,
             Self::StyleAddRun { .. } => Kind::StyleAddRun,
@@ -143,12 +146,14 @@ pub(crate) struct Registry {
     // None is permanent exhaustion. Removing resources never rewinds the ID.
     next: Option<Handle>,
     slots: Vec<(Handle, Resource)>,
+    pub(crate) strings: xy_vsfilter_compat::string_flyweight::Cache,
 }
 impl Registry {
     const fn new() -> Self {
         Self {
             next: Some(1),
             slots: Vec::new(),
+            strings: xy_vsfilter_compat::string_flyweight::Cache::new(),
         }
     }
 
@@ -198,6 +203,16 @@ impl Registry {
         let index = self.position(id)?;
         match &mut self.slots[index].1 {
             Resource::Effects { revision, state } => Ok((revision, state)),
+            _ => Err(Error::TypeMismatch),
+        }
+    }
+
+    pub(crate) fn string(
+        &self,
+        id: Handle,
+    ) -> Result<&xy_vsfilter_compat::string_flyweight::Value, Error> {
+        match &self.slots[self.position(id)?].1 {
+            Resource::StringValue(value) => Ok(value),
             _ => Err(Error::TypeMismatch),
         }
     }

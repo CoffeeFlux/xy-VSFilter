@@ -27,6 +27,7 @@
 #include "xy_rust_colors.h"
 #include "xy_rust_html_tag.h"
 #include "xy_rust_ass_override.h"
+#include "RustStringFlyweight.inl"
 #include <exception>
 #endif
 #ifdef XY_VSFILTER_RUST_TEXT

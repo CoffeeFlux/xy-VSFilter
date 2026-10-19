@@ -32,6 +32,17 @@ class OwnerDependencies(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'unchanged'):
             probe.owner_style_declarations(header, header.replace('double  fontSize;', 'float  fontSize;'))
 
+    def test_style_dependency_allows_only_the_string_alias_seam(self):
+        path='src/subtitles/flyweight_base_types.h'
+        pin=json.loads((probe.ROOT/'tools/compat/reference.json').read_text())['commit']
+        pinned=probe.subprocess.check_output(['git','show',f'{pin}:{path}'],cwd=probe.ROOT).decode('utf-8-sig').replace('\r\n','\n')
+        current=(probe.ROOT/path).read_text()
+        probe.owner_style_dependency(pinned,current)
+        with self.assertRaisesRegex(RuntimeError,'unchanged'):
+            probe.owner_style_dependency(pinned,current.replace('static std::shared_ptr<const T> Intern','static std::shared_ptr<T> Intern'))
+        with self.assertRaisesRegex(RuntimeError,'unchanged'):
+            probe.owner_style_dependency(pinned,current+'\n// unexpected change\n')
+
 
 if __name__ == '__main__':
     unittest.main()

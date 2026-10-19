@@ -210,6 +210,18 @@ def owner_style_declarations(pinned_header, current_header):
     return "\n".join(declarations)
 
 
+def owner_style_dependency(pinned, current):
+    # Only the XyFwStringW alias changed. None of this probe's STSStyle/FwRect
+    # code uses it. Remove that exact conditional seam, then compare EVERYTHING
+    # else, including the actual cleanup interner and MRU implementations.
+    alias='typedef XyFlyWeight<CStringW, 16*1024, CStringElementTraits<CStringW>> XyFwStringW;'
+    seam='#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL\n#include "xy_rust_string_flyweight.h"\ntypedef XyRust::StringFlyweight XyFwStringW;\n#else\n'+alias+'\n#endif'
+    if current.count(seam)==1:
+        current=current.replace(seam,alias)
+    if pinned!=current:
+        raise RuntimeError("Owner probe requires unchanged cleanup style dependency")
+
+
 def run_owner(out, generate_only):
     """Real ATL records + exact experimental wrapper versus pinned storage tails."""
     out.mkdir(parents=True, exist_ok=True)
@@ -221,7 +233,7 @@ def run_owner(out, generate_only):
     save()
     runner = Path(__file__).resolve()
     paths = ["src/subtitles/STS.h", "src/subtitles/STS.cpp", "src/subtitles/RustDocumentOwner.h",
-             "include/xy_rust_document.h", "tools/compat/document_owner_probe.cpp",
+             "include/xy_rust_document.h", "include/xy_rust_string_flyweight.h", "tools/compat/document_owner_probe.cpp",
              "src/subtitles/flyweight_base_types.h", "src/subtitles/mru_cache.h",
              "Cargo.toml", "Cargo.lock", "rust/compat/Cargo.toml", "rust/ffi/Cargo.toml"]
     paths += [str(p.relative_to(ROOT)) for parent in (ROOT / "rust/compat/src", ROOT / "rust/ffi/src")
@@ -263,9 +275,9 @@ def run_owner(out, generate_only):
     report["style_adapter_source_sha256"] = {}
     for dependency in ("src/subtitles/flyweight_base_types.h", "src/subtitles/mru_cache.h"):
         adapter = subprocess.check_output(["git", "show", f"{adapter_pin}:{dependency}"], cwd=ROOT, timeout=60)
-        if decode(inputs[dependency]) != decode(adapter):
-            raise RuntimeError("Owner probe requires unchanged cleanup style dependency: " + dependency)
+        owner_style_dependency(decode(adapter),decode(inputs[dependency]))
         report["style_adapter_source_sha256"][dependency] = sha(adapter)
+    report["style_dependency_scope"]["excluded_alias_change"] = "Only exact conditional XyFwStringW replacement; all remaining style/flyweight/cache code compared byte-for-byte after newline normalization"
     (out / "STS.h").write_bytes(("#pragma once\n#include \"flyweight_base_types.h\"\n" + styles + "\n" + entry + "\n" + segment + "\n").encode())
     shutil.copyfile(ROOT / "src/subtitles/RustDocumentOwner.h", out / "RustDocumentOwner.h")
     probe = decode(inputs["tools/compat/document_owner_probe.cpp"])

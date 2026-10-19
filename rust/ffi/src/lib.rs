@@ -34,6 +34,7 @@ mod realtext;
 mod runtime;
 mod segment_insert;
 mod segments;
+mod string_flyweight;
 mod subrip;
 mod text_reader;
 mod timeline_search;
