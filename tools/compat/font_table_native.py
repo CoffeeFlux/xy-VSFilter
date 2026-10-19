@@ -14,7 +14,7 @@ import subprocess
 from document_native_lifecycle import ROOT, PIN, LIBRARIES, SYSTEM_LIBRARIES, find_library, git, sha
 
 SOURCE = ROOT / 'tools/compat/font_table_native.cpp'
-STEPS = 3284
+STEPS = 3290
 
 def validate(data, bits):
     rows=data.splitlines()

@@ -49,7 +49,7 @@ static void state(unsigned slot){
 static void insert(unsigned slot,unsigned variant,uint64_t bits=0x4034000000000000ull,unsigned flags=0,unsigned name=65){
     STSStyle init;STSStyleBase s=init;
     wchar_t raw[]={wchar_t(name),0,wchar_t(++serial)};s.fontName=CStringW(raw,3);
-    s.charSet=variant;s.fontWeight=int(flags>>3);s.fItalic=bool(flags&1);s.fUnderline=bool(flags&2);s.fStrikeOut=bool(flags&4);memcpy(&s.fontSize,&bits,8);
+    s.charSet=int((variant%32)+(variant/32)*1024);s.fontWeight=int(flags>>3);s.fItalic=bool(flags&1);s.fUnderline=bool(flags&2);s.fStrikeOut=bool(flags&4);memcpy(&s.fontSize,&bits,8);
     printf("input %u %u %016llx ",step,slot,static_cast<unsigned long long>(hash_value(s)));wire(s);printf("\n");
     actual[slot]=std::make_shared<Actual>(s);slots[slot]=std::make_shared<Logged>(Key(s));state(slot);
 }
@@ -64,6 +64,7 @@ int main(){
     for(unsigned i=0;i<640;i+=3)drop(i);
     for(unsigned i=0;i<128;++i)insert(i,1+i*7%640);
     for(unsigned i=0;i<704;++i)drop((i*193)%704);
+    insert(0,0,0);insert(1,0,0x8000000000000000ull);copy(2,0);drop(0);drop(1);drop(2);
     const uint64_t sizes[]={0,0x8000000000000000ull,0x3ff0000000000000ull,0xbff0000000000000ull,1,
         0x0010000000000000ull,0x7fefffffffffffffull,0x7ff0000000000000ull,0xfff0000000000000ull,
         0x7ff8000000000001ull,0xfff8000000000001ull,0x7ff0000000000001ull};
@@ -71,7 +72,7 @@ int main(){
     for(unsigned flags=0;flags<24;++flags){insert(0,0,0x4034000000000000ull,flags);insert(1,0,0x4034000000000000ull,flags);drop(0);drop(1);}
     const unsigned names[]={0,65,0xd800,0xdc00,0xffff};
     for(auto name:names){insert(0,0,0x4034000000000000ull,0,name);insert(1,0,0x4034000000000000ull,0,name);drop(0);drop(1);}
-    // Force another growth with expired NaN keys still owned by the table.
+    // Reuse the grown table with expired NaN keys still owned by it.
     for(unsigned i=0;i<640;++i)insert(i,10000+i);
     for(unsigned i=0;i<704;++i)drop(i);
     printf("font-table-complete steps=%u fonts=%llu\n",step,static_cast<unsigned long long>(Logged::Count()));
