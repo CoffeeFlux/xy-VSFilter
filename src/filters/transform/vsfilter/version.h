@@ -2,7 +2,7 @@
 #define __VERSION_567B55CD_F1A7_49FB_B001_4A5A82CA666C_H__
 
 // Releases are numbered 1, 2, 3, ...; bump this by hand for each one
-#define XY_VSFILTER_VERSION 1
+#define XY_VSFILTER_VERSION 2
 
 #define XY_VAR_2_STR(x) #x
 #define XY_VAR_2_STR2(x) XY_VAR_2_STR(x)
