@@ -43,7 +43,7 @@ def validate(data, bits, edges=False):
             if not all(w.isdigit() for w in words[3:5]) or not re.fullmatch(rb'(?:-|[0-9a-f]{396})', words[5]): raise ValueError('invalid canonical value/count')
             pending = None; step += 1
         else: raise ValueError('unexpected trace row')
-    if pending is not None or step != steps or comparisons < 1000: raise ValueError('incomplete observations')
+    if pending is not None or step != steps or comparisons != (619 if edges else 21667): raise ValueError('incomplete observations')
     final='styles=45 rects=1' if edges else 'styles=1 rects=0'
     if rows[-1] != f'style-table-complete steps={steps} {final}'.encode(): raise ValueError('missing final release accounting')
     return comparisons
