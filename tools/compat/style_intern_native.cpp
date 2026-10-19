@@ -181,7 +181,23 @@ static int default_styles() {
     }
     printf("default-complete cases=%u\n",index);return 0;
 }
+static int document_rectangles(){
+    if(!AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0))return 2;
+    printf("document-rect-provenance pointer_bits=%u\n",unsigned(sizeof(void*)*8));
+    auto report=[](const char* stage){printf("document-rect stage=%s rectangles=%llu styles=%llu\n",stage,static_cast<unsigned long long>(FwRect::Count()),static_cast<unsigned long long>(FwSTSStyle::Count()));};
+    report("initial");auto source=std::make_unique<StyleDocument>();report("source");
+    auto destination=std::make_unique<StyleDocument>();report("destination");
+    auto input=std::make_unique<STSStyle>();input->marginRect=CRect(1,2,3,4);report("input");
+    source->SetDefaultStyle(*input);report("set-default");input.reset();report("drop-input");
+    destination->Copy(*source);report("copy");source->Empty();report("empty-source");
+    auto named=new STSStyle;named->marginRect=CRect(5,6,7,8);source->AddStyle(CString(L"Owned"),named);report("add-named");
+    destination->Copy(*source);report("copy-named");source->Empty();report("empty-source-again");
+    destination->Empty();report("empty-destination");source.reset();report("drop-source");destination.reset();report("drop-destination");
+    printf("document-rect-complete cases=14\n");return 0;
+}
+
 int main(int argc,char** argv) {
+    if(argc>1&&!strcmp(argv[1],"document-rectangles"))return document_rectangles();
     if(argc>1&&!strcmp(argv[1],"default-style"))return default_styles();
     if(argc>1&&!strcmp(argv[1],"map-lifecycle"))return map_lifecycle();
     if(argc>1&&!strcmp(argv[1],"map-growth"))return map_lifecycle(true);

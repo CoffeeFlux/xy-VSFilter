@@ -4,6 +4,14 @@ from style_intern_native import CASES, compare, validate, validate_lifecycle
 
 
 class StyleTraceControls(unittest.TestCase):
+    def test_document_rectangles_retain_default_named_and_copied_owners(self):
+        stages=['initial','source','destination','input','set-default','drop-input','copy','empty-source','add-named','copy-named','empty-source-again','empty-destination','drop-source','drop-destination']
+        counts=[0,1,1,2,2,2,1,1,2,2,2,1,1,0]
+        rows=[b'document-rect-provenance pointer_bits=64']+[f'document-rect stage={stage} rectangles={count} styles=0'.encode() for stage,count in zip(stages,counts)]+[b'document-rect-complete cases=14']
+        good=b'\n'.join(rows)+b'\n';compare([good]*4,64,'document-rectangles')
+        for bad in [good.replace(b'stage=source rectangles=1',b'stage=source rectangles=0'),good.replace(b'stage=copy ',b'stage=set-default '),good.replace(b'stage=drop-destination rectangles=0',b'stage=drop-destination rectangles=1'),good.replace(b'cases=14',b'cases=13')]:
+            with self.assertRaises(ValueError):validate(bad,64,'document-rectangles')
+
     def test_default_style_assignment_copy_self_copy_and_empty(self):
         value=self.trace().splitlines()[3]
         rows=[b'default-provenance pointer_bits=64']

@@ -2114,6 +2114,11 @@ pub unsafe extern "C" fn xy_vsfilter_document_add_style_begin_v1(
         .ok_or(COUNT_OVERFLOW));
     let (reply, run_id, retired) = required!(admitted(|registry| {
         registry.document(owner).map_err(registry_error)?;
+        if let Some(Some(style)) = &mut incoming {
+            registry
+                .retain_style_rectangle(style)
+                .map_err(registry_error)?;
+        }
         let (reply, run_id) = registry.reserve_two().map_err(registry_error)?;
         let mut bytes = Vec::with_capacity(packet_length);
         let result = xy_vsfilter_compat::document_style_add::begin_with(
@@ -2402,10 +2407,14 @@ pub unsafe extern "C" fn xy_vsfilter_document_set_default_style_v1(
     ));
     // Borrow pending ownership so rejected admission/handles also drop outside.
     let retired = required!(admitted(|registry| {
-        let document = registry.document_mut(owner).map_err(registry_error)?;
+        registry.document(owner).map_err(registry_error)?;
         if let Some(style) = &mut value {
+            registry
+                .retain_style_rectangle(style)
+                .map_err(registry_error)?;
             style.assign_floats_with(crate::style_assignment::copy_bits);
         }
+        let document = registry.document_mut(owner).map_err(registry_error)?;
         Ok(document.replace_default_style(value.take()))
     }));
     drop(retired);
@@ -2453,6 +2462,12 @@ pub unsafe extern "C" fn xy_vsfilter_document_commit_style_rename_v1(
     let input = required!(unsafe { copy_input(input, length) });
     let mut prepared = required!(wire::decode_style_rename(&input).map_err(wire_error));
     let retired = required!(admitted(|registry| {
+        registry.document(owner).map_err(registry_error)?;
+        if let Some(style) = &mut prepared.previous {
+            registry
+                .retain_style_rectangle(style)
+                .map_err(registry_error)?;
+        }
         registry
             .document_mut(owner)
             .map_err(registry_error)?
@@ -2798,6 +2813,12 @@ pub unsafe extern "C" fn xy_vsfilter_document_named_style_put_v1(
         ))
     });
     let retired = required!(admitted(|registry| {
+        registry.document(owner).map_err(registry_error)?;
+        if let Some(Some(style)) = &mut value {
+            registry
+                .retain_style_rectangle(style)
+                .map_err(registry_error)?;
+        }
         let map = registry
             .document_mut(owner)
             .map_err(registry_error)?

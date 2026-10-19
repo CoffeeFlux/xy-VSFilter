@@ -2,7 +2,7 @@
 //! Canonical rectangle values used by style ownership. Equality is four raw
 //! Windows LONG coordinates; an interned value exists while any owner retains it.
 use alloc::collections::BTreeMap;
-use alloc::sync::Arc;
+use alloc::sync::{Arc, Weak};
 
 #[derive(Debug)]
 pub struct Value {
@@ -18,7 +18,7 @@ impl Value {
     }
 }
 pub struct Table {
-    values: BTreeMap<[i32; 4], Arc<Value>>,
+    values: BTreeMap<[i32; 4], Weak<Value>>,
 }
 impl Default for Table {
     fn default() -> Self {
@@ -34,40 +34,70 @@ impl Table {
     /// A checked registry reserves a fresh nonzero identity before insertion.
     /// A hit keeps the existing canonical identity and creates another owner.
     pub fn intern(&mut self, identity: u64, coordinates: [i32; 4]) -> Arc<Value> {
-        self.values
-            .entry(coordinates)
-            .or_insert_with(|| {
-                Arc::new(Value {
-                    identity,
-                    coordinates,
-                })
-            })
-            .clone()
+        // Nested style owners can drop outside registry admission. Weak entries
+        // never keep a canonical payload alive; reclaim expired bookkeeping on
+        // insertion so repeated distinct histories do not accumulate entries.
+        self.values.retain(|_, value| value.strong_count() != 0);
+        if let Some(value) = self.lookup(coordinates) {
+            return value;
+        }
+        let value = Arc::new(Value {
+            identity,
+            coordinates,
+        });
+        self.values.insert(coordinates, Arc::downgrade(&value));
+        value
+    }
+    pub fn lookup(&self, coordinates: [i32; 4]) -> Option<Arc<Value>> {
+        self.values.get(&coordinates).and_then(Weak::upgrade)
     }
     /// Called under exclusive registry admission immediately before an owner's
-    /// removal. Every participating owner (a checked rectangle resource or a
-    /// canonical style value) calls this immediately before its final Arc drop.
-    /// Remove the table's reference when this is the last owner. The removed
+    /// removal. Explicit rectangle/style resources can retire their entry before
+    /// dropping outside admission. Nested owners need no callback: their final
+    /// Arc drop expires the weak entry. Remove bookkeeping for the last owner. The removed
     /// owner remains alive until destruction outside registry admission. Complete
     /// release/drop operations must be serialized, not only this method's call.
     pub fn release(&mut self, value: &Arc<Value>) {
-        if Arc::strong_count(value) == 2
+        if Arc::strong_count(value) == 1
             && self
                 .values
                 .get(&value.coordinates)
-                .is_some_and(|v| Arc::ptr_eq(v, value))
+                .is_some_and(|v| Weak::ptr_eq(v, &Arc::downgrade(value)))
         {
             self.values.remove(&value.coordinates);
         }
     }
     pub fn count(&self) -> usize {
-        self.values.len()
+        self.values
+            .values()
+            .filter(|value| value.strong_count() != 0)
+            .count()
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn nested_owners_expire_without_callbacks_and_reintern_with_fresh_identity() {
+        let mut table = Table::new();
+        let first = table.intern(1, [1, 2, 3, 4]);
+        let alias = first.clone();
+        drop(first);
+        assert_eq!(table.count(), 1);
+        assert!(Arc::ptr_eq(&alias, &table.lookup([1, 2, 3, 4]).unwrap()));
+        drop(alias);
+        assert_eq!(table.count(), 0);
+        assert!(table.lookup([1, 2, 3, 4]).is_none());
+        let fresh = table.intern(2, [1, 2, 3, 4]);
+        assert_eq!(fresh.identity(), 2);
+        drop(fresh);
+        for i in 3..1000 {
+            drop(table.intern(i, [i as i32; 4]));
+            assert_eq!(table.count(), 0);
+            assert_eq!(table.values.len(), 1); // Prior expired metadata reclaimed.
+        }
+    }
     #[test]
     fn aliases_survive_independent_owner_release_and_reintern() {
         let mut table = Table::new();

@@ -35,12 +35,22 @@ pub struct Begin {
     pub normalized_name: Vec<u16>,
     pub retired: Retired,
 }
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct Session {
     name: Vec<u16>,
     previous: Option<StyleValue>,
     incoming: Option<StyleValue>,
     finished: bool,
+}
+impl Clone for Session {
+    fn clone(&self) -> Self {
+        Self {
+            name: self.name.clone(),
+            previous: self.previous.as_ref().map(StyleValue::copy_owned),
+            incoming: self.incoming.as_ref().map(StyleValue::copy_owned),
+            finished: self.finished,
+        }
+    }
 }
 #[derive(Debug)]
 pub struct Submit {
@@ -100,7 +110,7 @@ pub fn begin_with(
                 retired.discarded_incoming = incoming.take().ok_or(Error::InvalidPreparedValue)?;
                 Action::Done
             } else {
-                let previous = Some(previous.clone());
+                let previous = Some(previous.copy_owned());
                 let value = incoming.take().ok_or(Error::InvalidPreparedValue)?;
                 Action::Conflict(Session {
                     name: normalized_name.clone(),

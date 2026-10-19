@@ -174,7 +174,7 @@ impl MetadataField {
 }
 /// The initialized/native-supplied Copy header, captured after virtual Empty.
 /// Optional absence is copied explicitly, never replaced with invented defaults.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct SelectedState {
     name: Vec<u16>,
     interpretation: [Option<i32>; 3],
@@ -182,6 +182,18 @@ pub struct SelectedState {
     scaled_bas: Option<bool>,
     default_style: Option<crate::document_style::StyleValue>,
     forced_default: Option<bool>,
+}
+impl Clone for SelectedState {
+    fn clone(&self) -> Self {
+        Self {
+            name: self.name.clone(),
+            default_style: self
+                .default_style
+                .as_ref()
+                .map(crate::document_style::StyleValue::copy_owned),
+            ..*self
+        }
+    }
 }
 /// Retired owned header payloads must be destroyed after boundary admission.
 #[derive(Debug)]
@@ -250,8 +262,8 @@ pub struct RetiredEmpty {
     pub segments: Vec<DocumentSegment>,
     pub entries: Vec<PreparedEntry>,
 }
-/// Clone creates independent storage; it does not emulate native Copy callbacks
-/// or the selective field assignments in native Copy.
+/// Clone creates a raw storage snapshot without canonical nested owners. Native
+/// Copy uses explicit selected-state/style-copy operations and owned style copies.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Document {
     layout: [Option<i32>; 2],
@@ -279,7 +291,10 @@ impl Document {
             interpretation: self.interpretation,
             script: self.script,
             scaled_bas: self.scaled_bas,
-            default_style: self.default_style.clone(),
+            default_style: self
+                .default_style
+                .as_ref()
+                .map(crate::document_style::StyleValue::copy_owned),
             forced_default: self.forced_default,
         }
     }

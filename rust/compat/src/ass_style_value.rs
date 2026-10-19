@@ -18,6 +18,7 @@ impl Default for Builder {
             alpha: 0,
             encoding: 0,
             value: StyleValue {
+                rectangle_owner: None,
                 char_set: 1,
                 font_name: alloc::vec![65, 114, 105, 97, 108],
                 font_size: 18.0,

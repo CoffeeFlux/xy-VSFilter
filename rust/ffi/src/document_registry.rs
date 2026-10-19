@@ -216,6 +216,25 @@ impl Registry {
             _ => Err(Error::TypeMismatch),
         }
     }
+    /// Raw packets acquire nested ownership only after typed owner validation.
+    /// Existing canonical values keep their identity; new payload identities use
+    /// the same non-rewinding space as externally held rectangle resources.
+    pub(crate) fn retain_style_rectangle(
+        &mut self,
+        style: &mut xy_vsfilter_compat::document_style::StyleValue,
+    ) -> Result<(), Error> {
+        let value = match self.rectangles.lookup(style.margins) {
+            Some(value) => value,
+            None => {
+                let id = self.next.ok_or(Error::Exhausted)?;
+                let value = self.rectangles.intern(id, style.margins);
+                self.next = id.checked_add(1);
+                value
+            }
+        };
+        style.retain_rectangle(value);
+        Ok(())
+    }
 
     pub(crate) fn effects(
         &mut self,

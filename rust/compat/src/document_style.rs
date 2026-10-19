@@ -12,6 +12,7 @@
 //! failure is outside this codec's domain. Native comparison is separate from
 //! bit-preserving encoding. Windows adapter differential validation is pending.
 #![forbid(unsafe_code)]
+use alloc::sync::Arc;
 use alloc::vec::Vec;
 
 pub const HEADER_BYTES: usize = 192;
@@ -24,8 +25,12 @@ pub enum Error {
     LengthOverflow,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct StyleValue {
+    // Raw decoding/builders leave this absent. Admission attaches the canonical
+    // rectangle for owned styles; native-style copy construction clones it.
+    // It is neither part of the wire representation nor raw value equality.
+    pub(crate) rectangle_owner: Option<Arc<crate::rect_intern::Value>>,
     pub char_set: i32,
     pub font_name: Vec<u16>,
     pub font_size: f64,
@@ -54,6 +59,17 @@ pub struct StyleValue {
     pub font_shift_y: f64,
     pub relative_to: i32,
 }
+/// Ordinary Clone is a raw value snapshot. Native style copy construction uses
+/// copy_owned explicitly, keeping metadata/packet snapshots from pinning owners.
+impl Clone for StyleValue {
+    fn clone(&self) -> Self {
+        Self {
+            font_name: self.font_name.clone(),
+            rectangle_owner: None,
+            ..*self
+        }
+    }
+}
 // Storage identity is complete raw units and float bits, unlike native equality.
 impl PartialEq for StyleValue {
     fn eq(&self, other: &Self) -> bool {
@@ -73,6 +89,18 @@ impl PartialEq for StyleValue {
 }
 impl Eq for StyleValue {}
 impl StyleValue {
+    pub fn copy_owned(&self) -> Self {
+        Self {
+            rectangle_owner: self.rectangle_owner.clone(),
+            ..self.clone()
+        }
+    }
+    /// Retain the actual nested owner before storing or copying an owned style.
+    /// Raw coordinates must already match; callers changing margins must rebind.
+    pub fn retain_rectangle(&mut self, owner: Arc<crate::rect_intern::Value>) {
+        assert_eq!(self.margins, owner.coordinates());
+        self.rectangle_owner = Some(owner);
+    }
     /// Apply native floating assignment effects in field order. Raw transport,
     /// storage cloning and copy construction deliberately do not call this.
     pub fn assign_floats_with(&mut self, mut assign: impl FnMut(u64) -> u64) {
@@ -262,6 +290,7 @@ pub fn decode(bytes: &[u8]) -> Result<StyleValue, Error> {
         .map(|v| u16::from_le_bytes([v[0], v[1]]))
         .collect();
     Ok(StyleValue {
+        rectangle_owner: None,
         char_set: ints[0],
         font_weight: ints[1],
         screen_alignment: ints[2],
@@ -298,6 +327,7 @@ mod tests {
     // Synthetic initialized transport fixture, deliberately not native defaults.
     fn fixture() -> StyleValue {
         StyleValue {
+            rectangle_owner: None,
             char_set: i32::MIN,
             font_name: alloc::vec![0xd800, 0, 0xdcff, 0xffff],
             font_size: -0.0,
@@ -393,6 +423,28 @@ mod tests {
         let decoded = decode(&b).unwrap();
         assert_eq!(encode(&decoded).unwrap(), b);
         assert_eq!(decoded.font_name, v.font_name);
+    }
+    #[test]
+    fn owned_style_copies_retain_rectangles_but_raw_packets_do_not() {
+        let mut table = crate::rect_intern::Table::new();
+        let mut value = fixture();
+        let before = encode(&value).unwrap();
+        value.retain_rectangle(table.intern(1, value.margins));
+        assert_eq!(encode(&value).unwrap(), before);
+        let raw = decode(&before).unwrap();
+        assert!(raw.rectangle_owner.is_none());
+        let snapshot = value.clone();
+        assert!(snapshot.rectangle_owner.is_none());
+        let copied = value.copy_owned();
+        assert!(Arc::ptr_eq(
+            value.rectangle_owner.as_ref().unwrap(),
+            copied.rectangle_owner.as_ref().unwrap()
+        ));
+        drop(value);
+        assert_eq!(table.count(), 1);
+        drop(copied);
+        assert_eq!(table.count(), 0);
+        assert_eq!(encode(&raw).unwrap(), before);
     }
     #[test]
     fn assignment_visits_all_raw_float_fields_in_order_without_rewriting_transport() {

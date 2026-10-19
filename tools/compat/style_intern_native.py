@@ -14,6 +14,7 @@ CASES = 196
 INPUTS = CASES
 
 def validate(data,bits,scenario="interning"):
+    if scenario=="document-rectangles":return validate_document_rectangles(data,bits)
     if scenario=="default-style":return validate_default(data,bits)
     if scenario in ("map-lifecycle","map-growth"):return validate_map(data,bits,scenario=="map-growth")
     if scenario=="add-style":return validate_add(data,bits)
@@ -51,6 +52,16 @@ def validate_add(data,bits):
                 if not value or int(value[3])*4!=len(value[4]):raise ValueError('invalid AddStyle raw value')
                 at+=1
     if rows[at:]!=[b'style-add-complete cases=360']:raise ValueError('invalid AddStyle completion')
+
+
+def validate_document_rectangles(data,bits):
+    rows=data.splitlines()
+    if len(rows)!=16 or rows[0]!=f'document-rect-provenance pointer_bits={bits}'.encode():raise ValueError('invalid document rectangle architecture/length')
+    stages=['initial','source','destination','input','set-default','drop-input','copy','empty-source','add-named','copy-named','empty-source-again','empty-destination','drop-source','drop-destination']
+    counts=[0,1,1,2,2,2,1,1,2,2,2,1,1,0]
+    for index,(stage,count) in enumerate(zip(stages,counts)):
+        if rows[index+1]!=f'document-rect stage={stage} rectangles={count} styles=0'.encode():raise ValueError('document rectangle ownership/order differs from reference')
+    if rows[-1]!=b'document-rect-complete cases=14':raise ValueError('missing document rectangle completion')
 
 
 def validate_default(data,bits):
@@ -101,14 +112,14 @@ def main():
     parser.add_argument("--reference-root", type=Path, required=True)
     parser.add_argument("--platform", choices=("Win32", "x64"), required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--scenario",choices=("interning","same-values","raw-twins","add-style","default-style","map-lifecycle","map-growth"),default="interning")
+    parser.add_argument("--scenario",choices=("interning","same-values","raw-twins","add-style","default-style","map-lifecycle","map-growth","document-rectangles"),default="interning")
     args = parser.parse_args()
     if os.name != "nt":
         parser.error("Windows ATL/MFC and built native libraries required")
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
     roots = (args.reference_root.resolve(), ROOT)
-    count={"add-style":360,"default-style":360,"map-lifecycle":712,"map-growth":1544}.get(args.scenario,CASES)
+    count={"add-style":360,"default-style":360,"map-lifecycle":712,"map-growth":1544,"document-rectangles":14}.get(args.scenario,CASES)
     report = dict(complete=False, equal=False, reference_commit=PIN, platform=args.platform,
                   kind="actual-renderer-style-interner", cases=count, inputs=count, scenario=args.scenario, builds={},
                   probe_sha256=sha(SOURCE.read_bytes()), 

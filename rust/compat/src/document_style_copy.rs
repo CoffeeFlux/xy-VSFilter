@@ -131,7 +131,7 @@ impl Run {
             .checked_add(1)
             .ok_or_else(|| error(ErrorKind::CountOverflow))?;
         let key = key.to_vec();
-        let mut incoming = Some(Some(value.clone()));
+        let mut incoming = Some(Some(value.copy_owned()));
         let mut retired = Retired {
             styles: Vec::with_capacity(1),
             row_key: Some(key),
