@@ -101,7 +101,7 @@ public:
         printf("style-add-name present=%u\n",present?1:0);if(present)describe(copy);
     }
 };
-static int map_lifecycle() {
+static int map_lifecycle(bool growth=false) {
     if(!AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0))return 2;
     printf("style-map-provenance pointer_bits=%u\n",unsigned(sizeof(void*)*8));
     unsigned index=0;
@@ -114,7 +114,7 @@ static int map_lifecycle() {
             if(doc)doc->names();else printf("style-map-names\n");
         };
         uint64_t before=reset();auto doc=new StyleDocument;report("construct",before,doc);
-        for(unsigned phase=0;phase<3;++phase)for(unsigned i=0;i<(phase==2?32:128);++i){
+        for(unsigned phase=0;phase<3;++phase)for(unsigned i=0;i<(phase==2?32:phase==0&&growth?512:128);++i){
             CString name;name.Format(L"Map%04u",i);auto value=new STSStyle;value->fontWeight=400+i+(phase==2?1000:0);
             before=reset();doc->AddStyle(name,value);report(phase==0?"insert":phase==1?"equal":"conflict",before,doc);
         }
@@ -122,6 +122,10 @@ static int map_lifecycle() {
         for(unsigned i=0;i<64;++i){
             CString name;name.Format(L"Reuse%04u",i);auto value=new STSStyle;value->fontWeight=400+i;
             before=reset();doc->AddStyle(name,value);report("reuse",before,doc);
+        }
+        if(growth)for(unsigned i=0;i<32;++i){
+            CString name;name.Format(L"Reuse%04u",i);auto value=new STSStyle;value->fontWeight=1400+i;
+            before=reset();doc->AddStyle(name,value);report("reuse-conflict",before,doc);
         }
         before=reset();doc->Empty();report("empty",before,doc);
         before=reset();delete doc;report("destroy",before,nullptr);
@@ -147,6 +151,7 @@ static int add_styles() {
 }
 int main(int argc,char** argv) {
     if(argc>1&&!strcmp(argv[1],"map-lifecycle"))return map_lifecycle();
+    if(argc>1&&!strcmp(argv[1],"map-growth"))return map_lifecycle(true);
     same_values=argc>1&&!strcmp(argv[1],"same-values");
     raw_twins=argc>1&&!strcmp(argv[1],"raw-twins");
     if(argc>1&&!strcmp(argv[1],"add-style"))return add_styles();

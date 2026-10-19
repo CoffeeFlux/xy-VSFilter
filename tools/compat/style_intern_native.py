@@ -14,7 +14,7 @@ CASES = 196
 INPUTS = CASES
 
 def validate(data,bits,scenario="interning"):
-    if scenario=="map-lifecycle":return validate_map(data,bits)
+    if scenario in ("map-lifecycle","map-growth"):return validate_map(data,bits,scenario=="map-growth")
     if scenario=="add-style":return validate_add(data,bits)
     rows=data.splitlines()
     if len(rows)!=CASES*4+4:raise ValueError("missing style observations")
@@ -52,18 +52,21 @@ def validate_add(data,bits):
     if rows[at:]!=[b'style-add-complete cases=360']:raise ValueError('invalid AddStyle completion')
 
 
-def validate_map(data,bits):
+def validate_map(data,bits,growth=False):
     rows=data.splitlines()
-    if len(rows)!=1426 or rows[0]!=f'style-map-provenance pointer_bits={bits}'.encode():raise ValueError('invalid map architecture/length')
-    operations=([('construct',0)]+[('insert',i+1) for i in range(128)]+[('equal',128)]*128+
-                [('conflict',129+i) for i in range(32)]+[('empty',0)]+[('reuse',i+1) for i in range(64)]+[('empty',0),('destroy',0)])
+    size=512 if growth else 128
+    operations=([('construct',0)]+[('insert',i+1) for i in range(size)]+[('equal',size)]*128+
+                [('conflict',size+1+i) for i in range(32)]+[('empty',0)]+[('reuse',i+1) for i in range(64)]+
+                ([('reuse-conflict',65+i) for i in range(32)] if growth else [])+[('empty',0),('destroy',0)])
+    cases=len(operations)*2
+    if len(rows)!=cases*2+2 or rows[0]!=f'style-map-provenance pointer_bits={bits}'.encode():raise ValueError('invalid map architecture/length')
     for index,(op,count) in enumerate(operations*2):
-        sticky=index//356
+        sticky=index//len(operations)
         m=re.fullmatch(f'style-map index={index} sticky={sticky} op={op} count={count} '.encode()+rb'fp=[0-9a-f]{8} domains=([0-9a-f]{16}),([0-9a-f]{16})',rows[1+index*2])
         if not m or bool(int(m[1],16))!=bool(sticky) or int(m[1],16)&int(m[2],16)!=int(m[1],16):raise ValueError('invalid map operation/status')
         names=rows[2+index*2].split(b' ')
         if names[0]!=b'style-map-names' or len(names)!=count+1 or any(not re.fullmatch(rb'(?:[0-9a-f]{4})+',name) for name in names[1:]):raise ValueError('invalid map enumeration')
-    if rows[-1]!=b'style-map-complete cases=712':raise ValueError('missing map completion')
+    if rows[-1]!=f'style-map-complete cases={cases}'.encode():raise ValueError('missing map completion')
 
 
 def compare(traces,bits,scenario="interning"):
@@ -84,14 +87,14 @@ def main():
     parser.add_argument("--reference-root", type=Path, required=True)
     parser.add_argument("--platform", choices=("Win32", "x64"), required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--scenario",choices=("interning","same-values","raw-twins","add-style","map-lifecycle"),default="interning")
+    parser.add_argument("--scenario",choices=("interning","same-values","raw-twins","add-style","map-lifecycle","map-growth"),default="interning")
     args = parser.parse_args()
     if os.name != "nt":
         parser.error("Windows ATL/MFC and built native libraries required")
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
     roots = (args.reference_root.resolve(), ROOT)
-    count={"add-style":360,"map-lifecycle":712}.get(args.scenario,CASES)
+    count={"add-style":360,"map-lifecycle":712,"map-growth":1544}.get(args.scenario,CASES)
     report = dict(complete=False, equal=False, reference_commit=PIN, platform=args.platform,
                   kind="actual-renderer-style-interner", cases=count, inputs=count, scenario=args.scenario, builds={},
                   probe_sha256=sha(SOURCE.read_bytes()), 

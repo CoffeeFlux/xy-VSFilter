@@ -4,6 +4,22 @@ from style_intern_native import CASES, compare, validate, validate_lifecycle
 
 
 class StyleTraceControls(unittest.TestCase):
+    def test_map_fractional_growth_and_shrink_after_reuse(self):
+        operations=([('construct',0)]+[('insert',i+1) for i in range(512)]+[('equal',512)]*128+
+                    [('conflict',513+i) for i in range(32)]+[('empty',0)]+[('reuse',i+1) for i in range(64)]+
+                    [('reuse-conflict',65+i) for i in range(32)]+[('empty',0),('destroy',0)])
+        rows=[b'style-map-provenance pointer_bits=64']
+        for index,(op,count) in enumerate(operations*2):
+            sticky=index//772;status=8 if sticky else 0
+            rows.append(f'style-map index={index} sticky={sticky} op={op} count={count} fp={status:08x} domains={status:016x},{status:016x}'.encode())
+            rows.append(b'style-map-names'+b''.join(f' {i:04x}'.encode() for i in range(count)))
+        rows.append(b'style-map-complete cases=1544');good=b'\n'.join(rows)+b'\n'
+        compare([good]*4,64,'map-growth')
+        for bad in [good.replace(b'op=reuse-conflict',b'op=reuse',1),good.replace(b'count=367',b'count=366',1),good.replace(b'cases=1544',b'cases=712')]:
+            with self.assertRaises(ValueError):validate(bad,64,'map-growth')
+        bad=good.replace(b'domains=0000000000000000,0000000000000000',b'domains=0000000000000000,0000000100000000',1)
+        with self.assertRaises(ValueError):compare([good,good,bad,bad],64,'map-growth')
+
     def test_map_operations_enumeration_sticky_domains_and_repeats(self):
         operations=([('construct',0)]+[('insert',i+1) for i in range(128)]+[('equal',128)]*128+
                     [('conflict',129+i) for i in range(32)]+[('empty',0)]+[('reuse',i+1) for i in range(64)]+[('empty',0),('destroy',0)])
