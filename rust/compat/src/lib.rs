@@ -168,6 +168,7 @@ pub mod usf_scalar;
 pub mod colors;
 pub mod html_tag;
 
+pub mod font_intern;
 pub mod rect_intern;
 pub mod string_flyweight;
 pub mod style_intern;
