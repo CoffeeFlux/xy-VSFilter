@@ -27,7 +27,55 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest port: owned scan conversion and curve evaluation (2026-10-19)
+## Latest port: owned widened outlines and linked-arc sweep (2026-10-19)
+
+Implementation `f72fa4ba` moves the experimental widened-outline operation and
+persistent output into safe Rust. ScanLineData2 now holds a checked region ID;
+it no longer owns a native span vector or border scalar. Under one registry
+admission, Rust reads the source scan directly and owns radius clamping, the two
+horizontal merges, linked-span insertion/removal, arc queues and deadlines,
+ordered row emission and result storage. Rasterization receives detached data.
+No span, list or queue pointer crosses the new ABI.
+
+The port preserves sentinel query order, left-before-right updates, the current
+node after insertion, per-call output flushing, queue slot/tail behavior and the
+signed-X extension in the native packing macro. Five private exports manage IDs,
+convert by IDs and read detached packets. IDs are never reused; short reads and
+invalid requests leave output intact. Tests exercise stale IDs, unaligned reads,
+null callbacks and refusal of reentrant scan/region destruction.
+
+Ellipse initialization, cached tables and floating arithmetic remain native
+behind a synchronous scalar callback. It receives copied integers and four
+temporary output bytes, retains no Rust address, and catches C++ exceptions
+before returning a status. The existing native gate serializes its cache; the
+Rust gate refuses reentry while the source and destination remain borrowed.
+Removing this callback and porting the ellipse arithmetic/cache is the next
+boundary. See the [boundary audit](rust-wide-owner-boundary.md).
+
+The maintained actual-method probe matches 672 reused-object calls / 89,378 trace
+lines on Windows x86 and x64, twice per role. It covers 24 straight/curved paths,
+14 radius pairs, negative clamping, zero axes, horizontal merging, empty/reset,
+lookup thresholds and unequal axes. Every packed span, border, return value,
+x87/SSE status, errno and LastError matches. All prior focused regressions pass.
+Both architectures build all three DLLs, preserve exports/dependencies, and pass
+ten COM cases plus two controls. Each rendering run matches all 1,222 cases /
+13,186 frames and 192 distinct-frame controls against cleanup `67da07cd`.
+
+Rust passes 363 core and 141 FFI tests per architecture, formatting and Clippy.
+The existing 202 Python tests pass with one skip; two new observer-control tests
+pass separately. The core remains free of unsafe code. The FFI inventory records
+590 production unsafe blocks, 417 unsafe functions, four unsafe Sync
+implementations and 26 assembly sites. See the [local evidence](rust-wide-owner-local-evidence.json).
+
+Invalid span/list/table shapes, the native leftover-A merge hang, allocator
+failure, Debug, other FP control modes and arbitrary host concurrency remain
+unclosed. Fresh native uninitialized fields are not parity claims. Earlier
+reference exit-crash and optimized ellipse FP-instability evidence is retained
+under its original scope. Raster output ownership, object graphs/caches, all
+host adapters and vendors remain in scope; the experimental flag stays opt-in.
+The full-library migration remains active.
+
+## Earlier port: owned scan conversion and curve evaluation (2026-10-19)
 
 Implementation `23f127f4` moves the complete experimental ScanConvert operation
 into Rust. The safe core owns path dispatch, figure bridges/closure, curve sample
