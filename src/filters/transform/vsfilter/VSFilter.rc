@@ -29,7 +29,7 @@ BEGIN
             VALUE "InternalName", "VSFilter"
             VALUE "LegalCopyright", "Copyright (C) 2001-2012 Yu Zhuohuang, Gabest et. al."
             VALUE "OriginalFilename", "VSFilter.dll"
-            VALUE "ProductName", "VSFilter"
+            VALUE "ProductName", "VSFilter CSRI-only"
             VALUE "ProductVersion", XY_VSFILTER_VERSION_STR
         END
     END

@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "..\..\..\subtitles\RTS.h"
+#include "version.h"
 
 #define CSRIAPI extern "C" __declspec(dllexport)
 #define CSRI_OWN_HANDLES
@@ -117,7 +118,7 @@ static struct csri_info csri_vsfilter_info = {
 #else
 	"pf-xy-vsfilter_textsub", // name
 #endif
-	"3.2", // version
+	XY_VSFILTER_VERSION_STR, // version
 	"xy-VSFilter/TextSub", // longname
 	"Gabest", // author
 	"Copyright (c) 2003-2014 by Gabest et al." // copyright
