@@ -43,6 +43,7 @@ pub(crate) enum Kind {
     Effects,
     AssTree,
     StringValue,
+    Rectangle,
 }
 
 // Inline sessions avoid a new fallible box allocation after core ownership transfer.
@@ -50,6 +51,7 @@ pub(crate) enum Kind {
 // only with an explicit preallocated ownership envelope.
 #[allow(clippy::large_enum_variant)]
 pub(crate) enum Resource {
+    Rectangle(alloc::sync::Arc<xy_vsfilter_compat::rect_intern::Value>),
     StringValue(alloc::sync::Arc<xy_vsfilter_compat::string_flyweight::Value>),
     AssTree(xy_vsfilter_compat::ass_tree::Tree),
     Effects {
@@ -122,6 +124,7 @@ impl Resource {
             Self::Effects { .. } => Kind::Effects,
             Self::AssTree(_) => Kind::AssTree,
             Self::StringValue(_) => Kind::StringValue,
+            Self::Rectangle(_) => Kind::Rectangle,
             Self::Snapshot(_) => Kind::Snapshot,
             Self::UnknownRun { .. } => Kind::UnknownRun,
             Self::StyleAddRun { .. } => Kind::StyleAddRun,
@@ -147,6 +150,7 @@ pub(crate) struct Registry {
     next: Option<Handle>,
     slots: Vec<(Handle, Resource)>,
     pub(crate) strings: xy_vsfilter_compat::string_flyweight::Cache,
+    pub(crate) rectangles: xy_vsfilter_compat::rect_intern::Table,
 }
 impl Registry {
     const fn new() -> Self {
@@ -154,6 +158,7 @@ impl Registry {
             next: Some(1),
             slots: Vec::new(),
             strings: xy_vsfilter_compat::string_flyweight::Cache::new(),
+            rectangles: xy_vsfilter_compat::rect_intern::Table::new(),
         }
     }
 
@@ -203,6 +208,16 @@ impl Registry {
         let index = self.position(id)?;
         match &mut self.slots[index].1 {
             Resource::Effects { revision, state } => Ok((revision, state)),
+            _ => Err(Error::TypeMismatch),
+        }
+    }
+
+    pub(crate) fn rectangle(
+        &self,
+        id: Handle,
+    ) -> Result<&xy_vsfilter_compat::rect_intern::Value, Error> {
+        match &self.slots[self.position(id)?].1 {
+            Resource::Rectangle(value) => Ok(value),
             _ => Err(Error::TypeMismatch),
         }
     }
@@ -746,7 +761,11 @@ impl Registry {
         if self.slots[index].1.kind() != kind {
             return Err(Error::TypeMismatch);
         }
-        Ok(self.slots.swap_remove(index).1)
+        let resource = self.slots.swap_remove(index).1;
+        if let Resource::Rectangle(value) = &resource {
+            self.rectangles.release(value);
+        }
+        Ok(resource)
     }
 }
 

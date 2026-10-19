@@ -8,7 +8,7 @@ class StringTraceControls(unittest.TestCase):
         for i in range(STEPS):
             rows.append(f'string-step index={i} op=0 slot=0 max=16384 count=1 hits=0 queries=1'.encode())
             rows.extend(f'held slot={s} id=1 units=2 hex=00410000'.encode() for s in range(12))
-        rows.extend([f'string-complete steps={STEPS}'.encode(),b'string-shutdown released=1'])
+        rows.extend([b'string-move source_id=1 intermediate_id=1 destination_id=1 text=1',f'string-complete steps={STEPS}'.encode(),b'string-shutdown released=1'])
         return b'\n'.join(rows)+b'\n'
 
     def test_complete_ordered_raw_values_and_late_release_are_required(self):

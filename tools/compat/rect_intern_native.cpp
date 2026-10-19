@@ -7,6 +7,7 @@
 #include <memory>
 #include <vector>
 #include <exception>
+#include <utility>
 
 struct LateRect {
     std::shared_ptr<FwRect> value;
@@ -61,6 +62,12 @@ int main() {
         held[0]=std::make_shared<FwRect>(*bulk[0]);observe(12,0);
         bulk.clear();observe(13,0);
         held[0].reset();observe(14,0);
+        {
+            FwRect a(CRect(4,3,2,1));FwRect b(std::move(a));FwRect empty(std::move(a));
+            printf("rect-move empty_alias=%u distinct=%u count=%llu\n",a==empty?1:0,a!=b?1:0,static_cast<unsigned long long>(FwRect::Count()));
+            a=b;empty=CRect(4,3,2,1);
+            printf("rect-move restored_alias=%u count=%llu\n",a==b && a==empty?1:0,static_cast<unsigned long long>(FwRect::Count()));
+        }
         late.value=std::make_shared<FwRect>(CRect(123,-456,789,-123));observe(15,0);
         printf("rect-complete steps=%u\n",step);return 0;
     } catch(const std::exception& e) {fprintf(stderr,"unresolved: %s\n",e.what());return 2;}

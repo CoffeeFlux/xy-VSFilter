@@ -30,6 +30,7 @@ mod hdmv;
 mod html_tag;
 mod mask;
 mod realtext;
+mod rect_intern;
 #[cfg(all(windows, any(feature = "native-runtime", test)))]
 mod runtime;
 mod segment_insert;

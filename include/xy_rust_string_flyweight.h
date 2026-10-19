@@ -9,6 +9,9 @@ namespace XyRust {
 class StringFlyweight {
     struct Owner;
     std::shared_ptr<Owner> owner_;
+    // The legacy scalar remains readable after an implicit move even though
+    // the source no longer owns text. Copy/move operations retain this scalar.
+    std::size_t legacy_id_;
 public:
     typedef std::size_t IdType;
     static const int INVALID_ID=0;

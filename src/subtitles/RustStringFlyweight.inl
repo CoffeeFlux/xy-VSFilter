@@ -23,17 +23,19 @@ struct StringFlyweight::Owner {
     Owner(const Owner&)=delete;
     Owner& operator=(const Owner&)=delete;
 };
-StringFlyweight::StringFlyweight(const CStringW* value) {
+StringFlyweight::StringFlyweight(const CStringW* value):legacy_id_(0) {
     std::unique_ptr<const CStringW> input(value);
     GetCacher(); // Register cache teardown before the first canonical insertion.
     DocumentDetail::Shape(value!=nullptr);owner_=std::make_shared<Owner>(*input);
+    legacy_id_=owner_->legacy_id;
 }
 CStringW StringFlyweight::Get()const {
+    DocumentDetail::Shape(owner_!=nullptr);
     DocumentDetail::Bytes out(DocumentDetail::MulSize(owner_->units,2));
     DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_string_read_v1(owner_->handle,out.data(),out.size());}));
     size_t offset=0;return DocumentDetail::String(out,offset,DocumentDetail::Count(owner_->units));
 }
-StringFlyweight::IdType StringFlyweight::GetId()const {return owner_->legacy_id;}
+StringFlyweight::IdType StringFlyweight::GetId()const {return legacy_id_;}
 size_t StringFlyweight::Cacher::Call(uint32_t action,size_t maximum,bool reset,unsigned field) {
     std::array<uint8_t,32> out;
     DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_string_cache_v1(action,maximum,reset?1:0,out.data());}));

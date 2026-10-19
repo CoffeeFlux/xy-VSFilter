@@ -211,11 +211,16 @@ def owner_style_declarations(pinned_header, current_header):
 
 
 def owner_style_dependency(pinned, current):
-    # Only the XyFwStringW alias changed. None of this probe's STSStyle/FwRect
-    # code uses it. Remove that exact conditional seam, then compare EVERYTHING
-    # else, including the actual cleanup interner and MRU implementations.
+    # Check all native template code after excluding ONLY the two exact adapter
+    # selection seams. FwRect now selects the current Rust adapter on BOTH sides
+    # of this storage-only harness; its behavior is independently checked by
+    # rect_intern_native against the actual cleanup class, not by this harness.
     alias='typedef XyFlyWeight<CStringW, 16*1024, CStringElementTraits<CStringW>> XyFwStringW;'
     seam='#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL\n#include "xy_rust_string_flyweight.h"\ntypedef XyRust::StringFlyweight XyFwStringW;\n#else\n'+alias+'\n#endif'
+    if current.count(seam)==1:
+        current=current.replace(seam,alias)
+    alias='typedef XyInterned<CRect> FwRect;'
+    seam='#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL\n#include "xy_rust_rect_intern.h"\ntypedef XyRust::RectIntern FwRect;\n#else\n'+alias+'\n#endif'
     if current.count(seam)==1:
         current=current.replace(seam,alias)
     if pinned!=current:
@@ -234,6 +239,7 @@ def run_owner(out, generate_only):
     runner = Path(__file__).resolve()
     paths = ["src/subtitles/STS.h", "src/subtitles/STS.cpp", "src/subtitles/RustDocumentOwner.h",
              "include/xy_rust_document.h", "include/xy_rust_string_flyweight.h", "tools/compat/document_owner_probe.cpp",
+             "include/xy_rust_rect_intern.h", "src/subtitles/RustRectIntern.inl",
              "src/subtitles/flyweight_base_types.h", "src/subtitles/mru_cache.h",
              "Cargo.toml", "Cargo.lock", "rust/compat/Cargo.toml", "rust/ffi/Cargo.toml"]
     paths += [str(p.relative_to(ROOT)) for parent in (ROOT / "rust/compat/src", ROOT / "rust/ffi/src")
@@ -267,23 +273,29 @@ def run_owner(out, generate_only):
         "runtime": "Static MFC and static CRT (/MT, no _AFXDLL); actual included SDK/repository headers captured by /showIncludes",
         "limits": "Compile dependencies only; no new style lifecycle or full-class parity claim",
     }
-    # The old storage algorithms are tested with the cleanup's value adapters.
-    # Their interning implementation is no longer Boost; validate and identify it
-    # independently rather than claiming an unchanged upstream dependency.
+    # Both storage algorithms use the current value adapters. Keep the native
+    # template comparison separate from the changed rectangle owner, and do not
+    # relabel historical results as current rectangle-interner parity.
     adapter_pin = json.loads((ROOT / "tools/compat/reference.json").read_text())["commit"]
-    report["style_adapter_commit"] = adapter_pin
-    report["style_adapter_source_sha256"] = {}
+    report["style_adapter_commit"] = report["candidate_commit"]
+    report["style_adapter_source_sha256"] = {p:sha(inputs[p]) for p in ("src/subtitles/flyweight_base_types.h","src/subtitles/mru_cache.h","include/xy_rust_rect_intern.h","src/subtitles/RustRectIntern.inl")}
+    report["native_template_reference_commit"] = adapter_pin
+    report["native_template_reference_source_sha256"] = {}
     for dependency in ("src/subtitles/flyweight_base_types.h", "src/subtitles/mru_cache.h"):
         adapter = subprocess.check_output(["git", "show", f"{adapter_pin}:{dependency}"], cwd=ROOT, timeout=60)
         owner_style_dependency(decode(adapter),decode(inputs[dependency]))
-        report["style_adapter_source_sha256"][dependency] = sha(adapter)
-    report["style_dependency_scope"]["excluded_alias_change"] = "Only exact conditional XyFwStringW replacement; all remaining style/flyweight/cache code compared byte-for-byte after newline normalization"
+        report["native_template_reference_source_sha256"][dependency] = sha(adapter)
+    report["style_dependency_scope"]["excluded_alias_changes"] = "Exact XyFwStringW and FwRect selections only; remaining native template/cache code compared byte-for-byte after newline normalization"
+    report["style_dependency_scope"]["rectangle_adapter"] = "Current Rust-backed FwRect on both storage-algorithm sides; not a rectangle comparison. Independent cleanup oracle: rect_intern_native.py"
     (out / "STS.h").write_bytes(("#pragma once\n#include \"flyweight_base_types.h\"\n" + styles + "\n" + entry + "\n" + segment + "\n").encode())
     shutil.copyfile(ROOT / "src/subtitles/RustDocumentOwner.h", out / "RustDocumentOwner.h")
     probe = decode(inputs["tools/compat/document_owner_probe.cpp"])
     if probe.count("#include <windows.h>") != 1:
         raise RuntimeError("Owner probe MFC include seam changed")
     probe = probe.replace("#include <windows.h>", "#include <afx.h>\n#include <afxwin.h>")
+    seam='#include "RustDocumentOwner.h"'
+    if probe.count(seam)!=1:raise RuntimeError("Owner rectangle adapter include seam changed")
+    probe=probe.replace(seam,seam+'\n#include "RustRectIntern.inl"')
     (out / "document_owner_probe.cpp").write_bytes(probe.encode())
     reference = ["""class PinnedOwner { public:
  enum {TIME,FRAME}; int m_mode=TIME,m_subtitleType=0; unsigned callbacks=0;
@@ -349,7 +361,7 @@ def run_owner(out, generate_only):
                   complete_reference_methods=complete_signatures,
                   extracted_experimental_facade_methods=facade_signatures,
                   seams=["Add/AddSTSEntryOnly from initialized record/readorder assignment; native preparation bypassed",
-                         "Copy storage tail and Empty arrays tail only; actual unchanged style declarations and FwRect dependencies compile adapter templates, native style/metadata lifecycle excluded",
+                         "Copy storage tail and Empty arrays tail only; unchanged style declarations and current Rust FwRect adapter on both sides; native style/metadata lifecycle and rectangle interner comparison excluded",
                          "SetStr prepared assignment and optional ConvertUnicode flag assignment only",
                          "Actual AddStyle entry-rename loop; style map/duplicate naming excluded",
                          "RTS animation OR assignment and MicroDVD correction with precomputed bound",

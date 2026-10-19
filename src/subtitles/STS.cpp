@@ -52,6 +52,7 @@
 #include "STS.h"
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 #include "RustDocumentOwner.h"
+#include "RustRectIntern.inl"
 #include "xy_rust_colors.h"
 #endif
 #include <atlbase.h>

@@ -267,4 +267,9 @@ private:
     std::shared_ptr<const V> m_value;
 };
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+#include "xy_rust_rect_intern.h"
+typedef XyRust::RectIntern FwRect;
+#else
 typedef XyInterned<CRect> FwRect;
+#endif

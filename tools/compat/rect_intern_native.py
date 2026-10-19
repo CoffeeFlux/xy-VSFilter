@@ -16,6 +16,9 @@ INPUTS = 256 + 2048
 
 def validate(data,bits):
     rows=data.splitlines()
+    at=1+293*17
+    if rows[at:at+2]!=[b'rect-move empty_alias=1 distinct=1 count=1',b'rect-move restored_alias=1 count=1']:raise ValueError("invalid moved-from ownership")
+    rows=rows[:at]+rows[at+2:]
     if len(rows)!=STEPS*17+3:raise ValueError("missing rectangle observations")
     if not re.fullmatch(rb"rect-provenance pointer_bits="+str(bits).encode()+rb" ansi=\d+ oem=\d+",rows[0]):raise ValueError("wrong architecture")
     for index in range(STEPS):

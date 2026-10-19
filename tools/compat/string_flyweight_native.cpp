@@ -91,6 +91,12 @@ int main() {
         cache->SetMaxItemNum(0);observe(11,0); // No construction at zero: native returns a freed list node.
         cache->RemoveTail();observe(12,0);cache->SetMaxItemNum(16384,true);observe(13,0);
         for(unsigned i=0;i<12;++i){held[i].reset();observe(14,i);}
+        {
+            XyFwStringW a(new CStringW(L"moved-text"));const auto id=a.GetId();
+            XyFwStringW b(std::move(a));XyFwStringW c(new CStringW(L"destination"));c=std::move(b);
+            printf("string-move source_id=%u intermediate_id=%u destination_id=%u text=%u\n",
+                a.GetId()==id?1:0,b.GetId()==id?1:0,c.GetId()==id?1:0,c.Get()==L"moved-text"?1:0);
+        }
         late.value=std::make_shared<XyFwStringW>(new CStringW(L"late-owner"));
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
         gate_controls();

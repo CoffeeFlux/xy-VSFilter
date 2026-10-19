@@ -21,6 +21,8 @@ class OwnerDependencies(unittest.TestCase):
             source = (out / 'document_owner_probe.cpp').read_text()
             self.assertLess(source.index('#include <afx.h>'), source.index('#include <atlstr.h>'))
             self.assertNotIn('#include <windows.h>', source)
+            self.assertIn('#include "RustRectIntern.inl"', source)
+            self.assertIn('both storage-algorithm sides',report['style_dependency_scope']['rectangle_adapter'])
             for path in ('src/subtitles/flyweight_base_types.h', 'src/subtitles/mru_cache.h'):
                 self.assertIn(path, report['candidate_source_sha256'])
                 self.assertIn(path, report['reference_source_sha256'])
