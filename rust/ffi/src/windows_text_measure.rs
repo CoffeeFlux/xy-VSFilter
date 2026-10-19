@@ -1,6 +1,30 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 //! Scalar arithmetic from cleanup CText::GetTextInfo's MSVC x86/x64 code.
 //! Preserve instruction order, x87 extended intermediates and CRT conversion.
+#[cfg(target_arch = "x86_64")]
+pub(crate) fn nonzero(bits: u64) -> bool {
+    let different: u8;
+    let unordered: u8;
+    // SAFETY: SSE2 is mandatory on x64; the initialized scalar stays live.
+    // Keep UCOMISD explicit: optimizing a Rust comparison against zero into
+    // integer bit tests would lose native denormal/signaling-NaN status flags.
+    unsafe {
+        core::arch::asm!(
+            "movsd xmm0, qword ptr [{bits}]", "xorps xmm1, xmm1",
+            "ucomisd xmm0, xmm1", "setne {different}", "setp {unordered}",
+            bits=in(reg) &bits, different=lateout(reg_byte) different,
+            unordered=lateout(reg_byte) unordered, out("xmm0") _, out("xmm1") _,
+            options(nostack, readonly),
+        );
+    }
+    different != 0 || unordered != 0
+}
+
+#[cfg(target_arch = "x86")]
+pub(crate) fn nonzero(bits: u64) -> bool {
+    !crate::windows_float::equal_f64(f64::from_bits(bits), 0.0)
+}
+
 #[cfg(target_arch = "x86")]
 extern "C" {
     fn _ftol2_sse() -> i32;

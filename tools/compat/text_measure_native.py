@@ -16,12 +16,18 @@ INPUTS = 432
 
 RAW_BITS=[0,0x8000000000000000,0x3ff4000000000000,0xbff4000000000000,0x4059000000000000,0xc059000000000000,1,0x0010000000000000,0x7fefffffffffffff,0x7ff0000000000000,0xfff0000000000000,0x7ff8000000000001,0x7ff0000000000001,0x41e0000000000000,0xc1e0000000000000,0x43e0000000000000,0x4059000000000001,0x4058ffffffffffff]
 
-def validate(data,bits):
+def validate(data,bits,raw_canonical=False):
     rows=data.splitlines()
-    if not rows or rows[0]!=f'text-measure pointer_bits={bits}'.encode():raise ValueError('wrong measurement architecture')
+    mode='raw-canonical' if raw_canonical else 'construction'
+    if not rows or rows[0]!=f'text-measure pointer_bits={bits} mode={mode}'.encode():raise ValueError('wrong measurement architecture/mode')
     status=rb'[0-9a-f]+,[0-9a-f]+,-?[0-9]+,[0-9]+'
     at=1
     for index in range(432):
+        if index%4==0:
+            expected=RAW_BITS[(index//4)%18]
+            pattern=f'text-measure-input index={index} bits='.encode()+(f'{expected:016x}'.encode() if raw_canonical else rb'[0-9a-f]{16}')
+            if at>=len(rows) or not re.fullmatch(pattern,rows[at]):raise ValueError('invalid canonical measurement input')
+            at+=1
         prefix=f'text-measure-case index={index} sticky={index//216} field={(index//72)%3} bits={RAW_BITS[(index//4)%18]:016x} history={index%4} '.encode()
         if at>=len(rows):raise ValueError('missing measurement case')
         match=re.fullmatch(prefix+rb'events=([0-9]+) output=-?[0-9]+,-?[0-9]+,-?[0-9]+ before='+status+rb' after='+status,rows[at])
@@ -36,9 +42,9 @@ def validate(data,bits):
     if rows[at:]!=[b'text-measure-complete cases=432']:raise ValueError('missing measurement completion')
 
 
-def compare(traces,bits):
+def compare(traces,bits,raw_canonical=False):
     if len(traces)!=4:raise ValueError('two runs per role required')
-    for t in traces:validate(t,bits)
+    for t in traces:validate(t,bits,raw_canonical)
     for n,t in enumerate(traces[1:],1):
         if t!=traces[0]:
             a=traces[0].splitlines();b=t.splitlines();at=next(i for i,pair in enumerate(zip(a,b)) if pair[0]!=pair[1])
@@ -50,6 +56,7 @@ def main():
     parser.add_argument("--reference-root", type=Path, required=True)
     parser.add_argument("--platform", choices=("Win32", "x64"), required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--raw-canonical", action="store_true", help="isolate measurement using identical raw canonical inputs; does not validate style construction")
     args = parser.parse_args()
     if os.name != "nt":
         parser.error("Windows ATL/MFC and built native libraries required")
@@ -58,6 +65,7 @@ def main():
     roots = (args.reference_root.resolve(), ROOT)
     report = dict(complete=False, equal=False, reference_commit=PIN, platform=args.platform,
                   kind="actual-text-measurement-arithmetic", cases=CASES, inputs=INPUTS, builds={},
+                  mode="raw-canonical" if args.raw_canonical else "construction",
                   probe_sha256=sha(SOURCE.read_bytes()), 
                   runner_sha256=sha(Path(__file__).read_bytes()),
                   environment={key:os.environ.get(key) for key in ("VCToolsVersion","WindowsSDKVersion","VSCMD_ARG_TGT_ARCH")},
@@ -113,14 +121,14 @@ def main():
             build["included_source_sha256"]=headers
             build["binary_sha256"]=sha(exe.read_bytes())
             for repeat in (1,2):
-                result=run([str(exe)],work,f"{label}-trace-{repeat}",120)
+                result=run([str(exe)]+(["raw-canonical"] if args.raw_canonical else []),work,f"{label}-trace-{repeat}",120)
                 if result.stderr:
                     raise ValueError("unexpected renderer DC probe stderr")
-                validate(result.stdout,bits);traces.append(result.stdout)
+                validate(result.stdout,bits,args.raw_canonical);traces.append(result.stdout)
             for path,digest in {**headers,**build["library_sha256"],str(exe):build["binary_sha256"]}.items():
                 if sha(Path(path).read_bytes())!=digest:
                     raise ValueError("native probe input or binary changed")
-        compare(traces,bits)
+        compare(traces,bits,args.raw_canonical)
         if [git(root,"rev-parse","HEAD") for root in roots]!=commits or any(git(root,"status","--porcelain","--untracked-files=no") for root in roots):
             raise ValueError("source changed during comparison")
         for path,key in ((SOURCE,"probe_sha256"),(Path(__file__),"runner_sha256")):

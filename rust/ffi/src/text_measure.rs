@@ -31,7 +31,7 @@ impl Backend for Windows {
         unsafe { SelectObject(self.dc, self.font) }
     }
     fn nonzero(&mut self, b: u64) -> bool {
-        !crate::windows_float::equal_f64(f64::from_bits(b), 0.0)
+        arithmetic::nonzero(b)
     }
     fn legacy_windows(&mut self) -> bool {
         // SAFETY: GetVersion has no pointer or ownership arguments.
