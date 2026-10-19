@@ -9,6 +9,5 @@
 /.git-rewrite
 /bin
 ipch
-/src/filters/BaseClasses/*.asm
 /src/filters/transform/VSFilter/*.asm
 /.vs

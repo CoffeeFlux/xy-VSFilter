@@ -34,8 +34,7 @@ jobs:
 
       - name: Build VSFilter (CSRI)
         run: |
-          # Version info in version_in.h is maintained by hand, so don't regenerate it
-          bash ./build_vsfilter.sh -platform "x64" -compiler VS2022 -voff
+          bash ./build_vsfilter.sh
           cp License.txt bin/
 
       - name: Check binary hardening
@@ -74,7 +73,7 @@ jobs:
       # Runs after publishing so unit_test.exe stays out of the artifact (it shares
       # the Release output dir).
       - name: Build unit tests
-        run: bash ./build_vsfilter.sh -platform "x64" -compiler VS2022 -voff -proj unit_test
+        run: bash ./build_vsfilter.sh -proj unit_test
 
       # OverallTest needs a script argument and is skipped; Encodings renders every
       # test/*.ass re-encoded as UTF-8 and UTF-16LE/BE against the original, and
