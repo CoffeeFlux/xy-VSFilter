@@ -35,13 +35,17 @@ static void describe(const STSStyle& value) {
 }
 static void pair(STSStyle& first,STSStyle& second) {
     _clearfp();
-    auto a=std::make_shared<FwSTSStyle>(first),b=std::make_shared<FwSTSStyle>(second),c=std::make_shared<FwSTSStyle>(*b);
+    auto a=std::make_shared<FwSTSStyle>(first);const unsigned fa=_statusfp();_clearfp();
+    auto b=std::make_shared<FwSTSStyle>(second);const unsigned fb=_statusfp();_clearfp();
+    auto c=std::make_shared<FwSTSStyle>(*b);const unsigned fc=_statusfp();_clearfp();
+    const STSStyle& av=a->get();const STSStyle& bv=b->get();const unsigned fr=_statusfp();_clearfp();
     const bool equal=(first==second),self=(second==second);
-    const unsigned flags=_statusfp();
+    const unsigned fe=_statusfp(),flags=fa|fb|fc|fr|fe;
     printf("style-intern index=%u alias=%u copy_alias=%u value_equal=%u self_equal=%u count=%llu rects=%llu fp=%08x hash=%016llx,%016llx\n",
         cases++,*a==*b?1:0,*b==*c?1:0,equal?1:0,self?1:0,static_cast<unsigned long long>(FwSTSStyle::Count()),
         static_cast<unsigned long long>(FwRect::Count()),flags,static_cast<unsigned long long>(hash_value(first)),static_cast<unsigned long long>(hash_value(second)));
-    describe(a->get());describe(b->get());retain(a);retain(b);retain(c);
+    printf("style-fp index=%u first=%08x second=%08x copy=%08x read=%08x equality=%08x\n",cases-1,fa,fb,fc,fr,fe);
+    describe(av);describe(bv);retain(a);retain(b);retain(c);
 }
 int main(int argc,char**) {
     if(argc>1) {
@@ -70,7 +74,8 @@ int main(int argc,char**) {
         STSStyle a;a.charSet=1000+cases;STSStyle b(a);
         b.marginRect=CRect(i%2?INT32_MIN:20,i%3?INT32_MAX:20,int(i)-4,-int(i));pair(a,b);
     }
-    finite_owners.clear();
+    _clearfp();finite_owners.clear();const unsigned released_flags=_statusfp();
+    printf("style-release-fp fp=%08x\n",released_flags);
     printf("style-final finite_released=1 retained_nan=%llu styles=%llu rects=%llu\n",static_cast<unsigned long long>(nan_owners.size()),
         static_cast<unsigned long long>(FwSTSStyle::Count()),static_cast<unsigned long long>(FwRect::Count()));
     printf("style-intern-complete cases=%u\n",cases);

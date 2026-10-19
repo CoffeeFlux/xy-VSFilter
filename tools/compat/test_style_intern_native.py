@@ -10,8 +10,9 @@ class StyleTraceControls(unittest.TestCase):
                  + b"0" * 40 + b" doubles=" + b"0" * 240)
         for i in range(CASES):
             rows.append(f"style-intern index={i} alias=1 copy_alias=1 value_equal=1 self_equal=1 count=1 rects=1 fp=00000000 hash=0000000000000000,0000000000000000".encode())
+            rows.append(f"style-fp index={i} first=00000000 second=00000000 copy=00000000 read=00000000 equality=00000000".encode())
             rows.extend([value, value])
-        rows.extend([b"style-final finite_released=1 retained_nan=90 styles=45 rects=1",
+        rows.extend([b"style-release-fp fp=00000000",b"style-final finite_released=1 retained_nan=90 styles=45 rects=1",
                      f"style-intern-complete cases={CASES}".encode()])
         return b"\n".join(rows) + b"\n"
 
@@ -22,6 +23,7 @@ class StyleTraceControls(unittest.TestCase):
                     good.replace(b"font=1:d800", b"font=2:d800", 1),
                     good.replace(b"retained_nan=90", b"retained_nan=89"),
                     good.replace(b"copy_alias=1", b"copy_alias=0", 1),
+                    good.replace(b"read=00000000", b"read=", 1),
                     good.replace(b"doubles=0", b"doubles=", 1)):
             with self.assertRaises(ValueError):
                 validate(bad, 64)

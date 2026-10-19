@@ -15,13 +15,15 @@ INPUTS = CASES
 
 def validate(data,bits):
     rows=data.splitlines()
-    if len(rows)!=CASES*3+3:raise ValueError("missing style observations")
+    if len(rows)!=CASES*4+4:raise ValueError("missing style observations")
     if not re.fullmatch(rb"style-provenance pointer_bits="+str(bits).encode()+rb" ansi=\d+ oem=\d+",rows[0]):raise ValueError("wrong architecture")
     for i in range(CASES):
-        if not re.fullmatch(f"style-intern index={i} ".encode()+rb"alias=[01] copy_alias=1 value_equal=[01] self_equal=[01] count=\d+ rects=\d+ fp=[0-9a-f]{8} hash=[0-9a-f]{16},[0-9a-f]{16}",rows[1+i*3]):raise ValueError("wrong style state/order")
-        for row in rows[2+i*3:4+i*3]:
+        if not re.fullmatch(f"style-intern index={i} ".encode()+rb"alias=[01] copy_alias=1 value_equal=[01] self_equal=[01] count=\d+ rects=\d+ fp=[0-9a-f]{8} hash=[0-9a-f]{16},[0-9a-f]{16}",rows[1+i*4]):raise ValueError("wrong style state/order")
+        if not re.fullmatch(f"style-fp index={i} ".encode()+rb"first=[0-9a-f]{8} second=[0-9a-f]{8} copy=[0-9a-f]{8} read=[0-9a-f]{8} equality=[0-9a-f]{8}",rows[2+i*4]):raise ValueError("missing separated floating status")
+        for row in rows[3+i*4:5+i*4]:
             m=re.fullmatch(rb"style-value rect=(-?\d+,){3}-?\d+ ints=(-?\d+,){7}-?\d+ font=(\d+):([0-9a-f]*) colors=[0-9a-f]{40} doubles=[0-9a-f]{240}",row)
             if not m or int(m[3])*4!=len(m[4]):raise ValueError("invalid full style value")
+    if not re.fullmatch(rb'style-release-fp fp=[0-9a-f]{8}',rows[-3]):raise ValueError("missing release status")
     if rows[-2]!=b'style-final finite_released=1 retained_nan=90 styles=45 rects=1':raise ValueError("missing retained NaN accounting")
     if rows[-1]!=f'style-intern-complete cases={CASES}'.encode():raise ValueError("missing completion")
 
