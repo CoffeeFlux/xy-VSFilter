@@ -27,7 +27,77 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest port: Rust-owned shared renderer device context (2026-10-19)
+## Latest port: Rust CText measurement and IA32 canonical copies (2026-10-19)
+
+Implementation `db474fa3`, completed by `c7916fe3`, moves GetTextInfo sequencing
+into the safe Rust core. The Windows boundary owns a detached raw-UTF16 packet
+and performs GDI calls and target arithmetic. It preserves first-NUL termination,
+the empty-string extent call in the unspaced branch, short-circuited GetVersion,
+partial width on extent failure, wrapping integer accumulation and font restore
+order. C++ now supplies style bits, font metrics and an operation-scoped HDC;
+no native string or style pointer is retained by Rust.
+
+The floating arithmetic follows disassembly of the pinned cleanup libraries.
+x86 retains the x87 100.0 intermediate between ascent/descent conversions and
+uses the native `_ftol2_sse` helper; x64 uses the matching SSE2 instruction order.
+The expanded probe caught an x64 comparison optimized into integer bit tests,
+which omitted native denormal status. An explicit UCOMISD preserves that status
+without clearing caller flags.
+
+The same probe exposed an earlier style-ownership gap. Win32 common.props selects
+NoExtensions (`/arch:IA32`), but the standalone style observer used MSVC's default
+SSE2. The observer's copy constructor used MOVSD and retained signaling-NaN bits;
+the renderer library's copy constructor used FLD/FSTP and quieted them. Maps and
+disassembly identify the different selected implementations. Rust canonical
+construction now applies those native copy effects only after lookup misses,
+then recomputes the copied key's hash before insertion. Packet transport and
+ordinary Rust storage clones remain bit preserving. Both style and measurement
+observers now explicitly select IA32 on Win32. Earlier SSE2 observer results are
+retained with their original provenance and do not establish IA32 copy parity.
+Other fixtures that instantiate inline C++ still need a compiler-target audit.
+
+Two measurement modes each compare 432 histories / 2,454 trace lines per
+architecture, with two runs per role. Construction mode observes the actual
+canonical input and calls CText::GetTextInfo. Raw-input mode explicitly isolates
+measurement: the reference temporarily substitutes raw bits in a uniquely owned
+canonical style, restores them before any style-table operation, and keeps NaN
+owners live; the candidate calls the production measurement adapter with a
+detached raw style. It is not evidence for construction by itself. Both modes
+now pass on x86 and x64. They cover 18 raw bit patterns in each scale/spacing
+field, sticky flags, extent failures, the legacy-version branch and overflowing
+widths. Original compilation failures and failed comparisons remain recorded.
+
+All nine style scenarios pass on both architectures with the corrected target
+flags. The real-GDI 40-case text/path probe, DC lifecycle and font probes pass.
+All three DLLs build for x86/x64, preserve exports/dependencies, and pass ten COM
+cases plus two controls per architecture. Each architecture matches all 1,222
+rendering cases / 13,186 frames with 192 distinct-frame controls. Rust passes 352
+core and 139 FFI tests per architecture, formatting and Clippy; Python passes
+196 tests with one skip. The safe core has no unsafe sites. The inventory now
+counts 547 production unsafe blocks across 88 FFI files and 13 assembly sites;
+counts alone are not a soundness proof.
+
+See [measurement evidence](rust-text-measure-local-evidence.json). The experimental
+switch remains required. These finite comparisons use default rounding and
+masked exceptions; other floating control modes, allocation failures and general
+host concurrency/reentry remain unaudited. Full-library migration is active.
+Next are CText path control and persistent PathData ownership, then remaining
+word/line/subtitle graphs, host adapters and vendored implementations. Preserve
+the native empty-source PathData assignment quirk (destination remains intact)
+and Release-build successful-path font-selection behavior. A negative/short
+GetPath result or native DebugBreak is an unresolved outcome, not passing parity.
+
+After the documented Windows build, run `tools/compat/text_measure_native.py`
+from the matching VS developer shell with `--reference-root
+artifacts/cleanup-reference --platform Win32` (or `x64`) and a new `--output`
+directory. Run again with `--raw-canonical` and a separate directory. Run all
+nine `style_intern_native.py --scenario ...` modes as well. These observers
+require clean committed source and pin the reference, libraries, included
+headers, executable and repeated traces. Local `measure-copy-*` artifacts record
+the current checkpoint; `measure-owned-*`, `measure-fixed-*` and `measure-flags-*`
+retain earlier attempts and must not be relabeled as this final source pin.
+
+## Earlier port: Rust-owned shared renderer device context (2026-10-19)
 
 Implementation `6eb59f42` moves the shared renderer HDC lifetime into Rust. A safe
 core state machine issues checked owner and operation IDs; one Windows context

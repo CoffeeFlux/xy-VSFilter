@@ -217,7 +217,7 @@
     "C++ word/line/subtitle graphs, raw path buffers, host adapters and vendors remain in scope. No production default switched."
   ],
   "next_work": [
-    "Port CText measurement and path control flow, retaining raw UTF16 and exact Windows numeric conversions/status effects.",
+    "CText measurement is ported and validated at c7916fe3; see rust-text-measure-local-evidence.json. Port the remaining CText path control flow, retaining raw UTF16 and exact Windows numeric conversions/status effects.",
     "Move persistent PathData points/types and partial-path growth into safe Rust ownership, using the new actual-CText probe as a direct regression baseline.",
     "Then continue word/line/subtitle graphs, all host adapters and vendors; retain x86/x64 exact rendering and host evidence."
   ]
