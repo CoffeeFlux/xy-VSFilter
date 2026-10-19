@@ -45,6 +45,7 @@ extern "system" {
 #[link(name = "kernel32")]
 extern "system" {
     fn MulDiv(number: i32, numerator: i32, denominator: i32) -> i32;
+    fn SetLastError(error: u32);
 }
 
 fn native_int(value: f64) -> i32 {
@@ -118,6 +119,15 @@ impl Font {
             // SAFETY: same initialized SDK structure after bounded replacement.
             handle = unsafe { CreateFontIndirectW(&lf) };
         }
+        if handle != 0 {
+            // Cleanup CFont::Attach calls afxMapHGDIOBJ/AfxGetModuleThreadState;
+            // MFC's TlsGetValue clears last-error on success. Preserve that
+            // observed side effect without retaining the native handle map.
+            // SAFETY: SetLastError changes only the calling thread's scalar.
+            unsafe {
+                SetLastError(0);
+            }
+        }
         let mut font = Self {
             handle,
             ascent: 0,
@@ -159,6 +169,8 @@ impl Drop for Font {
             // it is deleted once, after all external selections have ended.
             // Ignore failure exactly as CFont/CGdiObject destruction does.
             unsafe {
+                // CFont::Detach traverses the same MFC TLS map before deletion.
+                SetLastError(0);
                 DeleteObject(self.handle);
             }
         }
