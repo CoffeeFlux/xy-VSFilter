@@ -12,6 +12,44 @@ pub struct Storage {
     heads: Vec<u32>,
 }
 impl Storage {
+    /// Insert one ordered line as a single admitted operation. Invalid row or
+    /// counter ranges are unresolved native memory accesses, not clipped lines.
+    /// Errors: 3 invalid/unresolved shape, 5 allocation failure.
+    pub fn line(
+        &mut self,
+        next: u32,
+        start: crate::path_align::Point,
+        end: crate::path_align::Point,
+        up: bool,
+    ) -> Result<[u32; 2], u32> {
+        let line = crate::scan_line::Line::new(start, end, up).ok_or(3u32)?;
+        let capacity = u32::try_from(self.edges.len()).map_err(|_| 3u32)?;
+        if next == 0 || next > capacity {
+            return Err(3);
+        }
+        let Some((first, last)) = line.rows() else {
+            return Ok([next, capacity]);
+        };
+        if first < 0 || last as usize >= self.heads.len() {
+            return Err(3);
+        }
+        let count = (last - first + 1) as u32;
+        let required = next.checked_add(count).ok_or(3u32)?;
+        let mut grown = capacity;
+        while required > grown {
+            grown = grown.checked_mul(2).filter(|v| *v > grown).ok_or(3u32)?;
+        }
+        if grown != capacity && !self.resize(grown) {
+            return Err(5);
+        }
+        for (index, (row, position)) in line.enumerate() {
+            // All indices and row bounds were checked before allocation or
+            // mutation. No raw pointer or unchecked indexing is necessary.
+            let inserted = self.insert(next + index as u32, row, position);
+            debug_assert!(inserted);
+        }
+        Ok([required, grown])
+    }
     pub fn new(height: i32, capacity: u32) -> Option<Self> {
         if height < 0 || capacity == 0 {
             return None;
@@ -90,6 +128,25 @@ impl Storage {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn line_growth_retains_heads_and_invalid_rows_do_not_publish_edges() {
+        use crate::path_align::Point;
+        let mut edges = Storage::new(3, 2).unwrap();
+        assert!(edges.insert(1, 0, 99));
+        assert_eq!(
+            edges.line(2, Point { x: 0, y: 0 }, Point { x: 16, y: 24 }, true),
+            Ok([5, 8])
+        );
+        assert_eq!(edges.query(0, 0), Some(2));
+        assert_eq!(edges.query(1, 2), Some(1));
+        assert_eq!(edges.query(0, 2), Some(4));
+        assert_eq!(
+            edges.line(5, Point { x: 0, y: -8 }, Point { x: 0, y: 24 }, false),
+            Err(3)
+        );
+        assert_eq!(edges.query(0, 0), Some(2));
+        assert_eq!(edges.query(3, 0), Some(8));
+    }
     #[test]
     fn row_heads_retain_reverse_insertion_order_across_growth() {
         let mut edges = Storage::new(2, 4).unwrap();

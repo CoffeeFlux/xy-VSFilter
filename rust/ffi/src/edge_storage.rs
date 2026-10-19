@@ -3,6 +3,46 @@ use alloc::boxed::Box;
 use xy_vsfilter_compat::edge_storage::Storage;
 use xy_vsfilter_compat::scan_row::Row;
 /// # Safety
+/// owner is live and exclusive for the entire operation. output spans eight
+/// writable bytes, does not overlap owner storage, and may be unaligned. No
+/// pointer is retained. Status 3 is unresolved shape; 5 is allocation failure.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_edges_line_v1(
+    owner: *mut Storage,
+    next: u32,
+    x0: i32,
+    y0: i32,
+    x1: i32,
+    y1: i32,
+    up: u32,
+    output: *mut u8,
+) -> u32 {
+    if owner.is_null() || output.is_null() || up > 1 {
+        return 3;
+    }
+    use xy_vsfilter_compat::path_align::Point;
+    // SAFETY: caller's exclusive live owner; mutation uses checked safe indices.
+    let result = unsafe { &mut *owner }.line(
+        next,
+        Point { x: x0, y: y0 },
+        Point { x: x1, y: y1 },
+        up != 0,
+    );
+    match result {
+        Ok(values) => {
+            let mut bytes = [0; 8];
+            bytes[..4].copy_from_slice(&values[0].to_le_bytes());
+            bytes[4..].copy_from_slice(&values[1].to_le_bytes());
+            // SAFETY: detached initialized scalar packet and writable output.
+            unsafe {
+                core::ptr::copy_nonoverlapping(bytes.as_ptr(), output, 8);
+            }
+            0
+        }
+        Err(status) => status,
+    }
+}
+/// # Safety
 /// owner is live and immutable during construction; no storage pointer escapes.
 #[no_mangle]
 pub unsafe extern "C" fn xy_vsfilter_edges_spans(owner: *const Storage, row: i32) -> *mut Row {
@@ -73,6 +113,28 @@ pub unsafe extern "C" fn xy_vsfilter_edges_release(owner: *mut Storage) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn line_output_accepts_unaligned_bytes_and_failure_leaves_it_untouched() {
+        let owner = xy_vsfilter_edges_create(2, 2);
+        assert!(!owner.is_null());
+        let mut out = [0xa5; 10];
+        // SAFETY: unique initialized owner and disjoint writable unaligned output.
+        unsafe {
+            assert_eq!(
+                xy_vsfilter_edges_line_v1(owner, 1, 0, 0, 16, 16, 1, out.as_mut_ptr().add(1)),
+                0
+            );
+            assert_eq!(&out[1..9], &[3, 0, 0, 0, 4, 0, 0, 0]);
+            out.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_edges_line_v1(owner, 3, 0, -16, 16, 16, 1, out.as_mut_ptr().add(1)),
+                3
+            );
+            assert_eq!(out, [0xa5; 10]);
+            assert_eq!(xy_vsfilter_edges_query(owner, 0, 1), 2);
+            xy_vsfilter_edges_release(owner);
+        }
+    }
     #[test]
     fn row_result_is_independent_of_edge_owner_mutations_and_release() {
         let owner = xy_vsfilter_edges_create(1, 3);

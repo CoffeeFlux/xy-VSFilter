@@ -13,6 +13,7 @@ extern "C" {
 void* XY_EDGES_CDECL xy_vsfilter_edges_create(int32_t,uint32_t);
 uint32_t XY_EDGES_CDECL xy_vsfilter_edges_insert(void*,uint32_t,int32_t,int32_t);
 uint32_t XY_EDGES_CDECL xy_vsfilter_edges_resize(void*,uint32_t);
+uint32_t XY_EDGES_CDECL xy_vsfilter_edges_line_v1(void*,uint32_t,int32_t,int32_t,int32_t,int32_t,uint32_t,uint8_t*);
 int64_t XY_EDGES_CDECL xy_vsfilter_edges_query(const void*,uint32_t,size_t);
 void XY_EDGES_CDECL xy_vsfilter_edges_release(void*);
 void* XY_EDGES_CDECL xy_vsfilter_edges_spans(const void*,int32_t);
@@ -44,6 +45,11 @@ public:
     void Reset(){xy_vsfilter_edges_release(owner);owner=NULL;}
     void Resize(unsigned capacity){if(!xy_vsfilter_edges_resize(owner,capacity))throw std::bad_alloc();}
     void Insert(unsigned index,int row,int position){if(!xy_vsfilter_edges_insert(owner,index,row,position))throw std::out_of_range("scan edge index");}
+    void Line(unsigned& next,unsigned& capacity,int x0,int y0,int x1,int y1,bool up){
+        uint8_t bytes[8];const auto status=xy_vsfilter_edges_line_v1(owner,next,x0,y0,x1,y1,up?1:0,bytes);
+        if(status==5)throw std::bad_alloc();if(status)throw std::out_of_range("unresolved scan line geometry");
+        uint32_t result[2]={};for(unsigned i=0;i<8;++i)result[i/4]|=uint32_t(bytes[i])<<(8*(i%4));next=result[0];capacity=result[1];
+    }
     unsigned Capacity()const{return static_cast<unsigned>(Get(3,0));}
     unsigned Rows()const{return static_cast<unsigned>(Get(4,0));}
     unsigned Head(size_t row)const{return static_cast<unsigned>(Get(0,row));}

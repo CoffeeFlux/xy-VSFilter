@@ -2572,6 +2572,9 @@ void ScanLineData::_EvaluateLine(int x0, int y0, int x1, int y1)
 template<int flag>
 void ScanLineData::_EvaluateLine(int x0, int y0, int x1, int y1)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    m_edges.Line(mEdgeNext,mEdgeHeapSize,x0,y0,x1,y1,flag==LINE_UP);
+#else
     __int64 xacc = (__int64)x0 << 13;
 
     // prestep
@@ -2604,6 +2607,7 @@ void ScanLineData::_EvaluateLine(int x0, int y0, int x1, int y1)
             xacc += invslope;
         }
     }
+#endif
 }
 
 bool ScanLineData::ScanConvert(const PathData& path_data, const CSize& size)
@@ -2632,6 +2636,10 @@ bool ScanLineData::ScanConvert(const PathData& path_data, const CSize& size)
     // Initialize edge buffer.  We use edge 0 as a sentinel.
     mEdgeNext = 1;
     mEdgeHeapSize = 2048;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    if(!m_edges.Initialize(mHeight,mEdgeHeapSize))throw std::bad_alloc();
+    mpEdgeBuffer=NULL;mpScanBuffer=NULL;
+#else
 #ifdef XY_VSFILTER_RUST_TEXT
     if (m_edges.Initialize(mHeight, mEdgeHeapSize))
     {
@@ -2646,6 +2654,7 @@ bool ScanLineData::ScanConvert(const PathData& path_data, const CSize& size)
         mpScanBuffer = DEBUG_NEW unsigned int[mHeight];
         memset(mpScanBuffer, 0, mHeight*sizeof(unsigned int));
     }
+#endif
     // Scan convert the outline.  Yuck, Bezier curves....
     // Unfortunately, Windows 95/98 GDI has a bad habit of giving us text
     // paths with all but the first figure left open, so we can't rely
