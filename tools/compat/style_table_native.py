@@ -16,9 +16,11 @@ from document_native_lifecycle import ROOT, PIN, LIBRARIES, SYSTEM_LIBRARIES, fi
 SOURCE = ROOT / 'tools/compat/style_table_native.cpp'
 STEPS = 1760
 
-def validate(data, bits):
+def validate(data, bits, edges=False):
     rows = data.splitlines()
-    if not rows or rows[0] != f'style-table pointer_bits={bits}'.encode():
+    steps=720 if edges else STEPS
+    suffix=' mode=edges' if edges else ''
+    if not rows or rows[0] != f'style-table pointer_bits={bits}{suffix}'.encode():
         raise ValueError('wrong architecture or missing provenance')
     step = 0; pending = None; comparisons = 0
     for row in rows[1:-1]:
@@ -41,13 +43,14 @@ def validate(data, bits):
             if not all(w.isdigit() for w in words[3:5]) or not re.fullmatch(rb'(?:-|[0-9a-f]{396})', words[5]): raise ValueError('invalid canonical value/count')
             pending = None; step += 1
         else: raise ValueError('unexpected trace row')
-    if pending is not None or step != STEPS or comparisons < 1000: raise ValueError('incomplete observations')
-    if rows[-1] != f'style-table-complete steps={STEPS} styles=1 rects=0'.encode(): raise ValueError('missing final release accounting')
+    if pending is not None or step != steps or comparisons < 1000: raise ValueError('incomplete observations')
+    final='styles=45 rects=1' if edges else 'styles=1 rects=0'
+    if rows[-1] != f'style-table-complete steps={steps} {final}'.encode(): raise ValueError('missing final release accounting')
     return comparisons
 
-def compare(traces, bits):
+def compare(traces, bits, edges=False):
     if len(traces) != 4: raise ValueError('two runs per implementation required')
-    counts = [validate(trace, bits) for trace in traces]
+    counts = [validate(trace, bits, edges) for trace in traces]
     rows = [trace.splitlines() for trace in traces]
     if any(trace != rows[0] for trace in rows[1:]):
         for n, trace in enumerate(rows[1:], 1):
@@ -61,6 +64,7 @@ def main():
     parser.add_argument('--reference-root', type=Path, required=True)
     parser.add_argument('--platform', choices=['Win32', 'x64'], required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--edges', action='store_true')
     args = parser.parse_args()
     if os.name != 'nt': parser.error('Windows native libraries and MSVC required')
     out = args.output.resolve(); out.mkdir(parents=True, exist_ok=False)
@@ -68,9 +72,9 @@ def main():
     bits = 32 if args.platform == 'Win32' else 64
     target = 'i686-pc-windows-msvc' if bits == 32 else 'x86_64-pc-windows-msvc'
     report = dict(complete=False, equal=False, reference_commit=PIN, candidate_commit=git(ROOT, 'rev-parse', 'HEAD'),
-                  platform=args.platform, steps=STEPS, scope='Safe Rust style owner table; renderer adapter not switched',
+                  platform=args.platform, steps=720 if args.edges else STEPS, edges=args.edges, scope='Safe Rust style owner table; renderer adapter not switched',
                   limits=['Floating flags, traps, allocation failure and concurrency are not established by this trace.',
-                          'Final isolated NaN release observes count only; no later expired-key lookup is executed by reference.'],
+                          'Normal trace isolates one final NaN release; edge trace retains all NaN keys and skips destruction. No expired-key lookup executed by reference.'],
                   environment={k:os.environ.get(k) for k in ['VCToolsVersion','WindowsSDKVersion','VSCMD_ARG_TGT_ARCH']})
     inputs = [SOURCE, Path(__file__), ROOT/'rust/compat/examples/style_table_replay.rs', ROOT/'Cargo.toml', ROOT/'Cargo.lock', ROOT/'rust/compat/Cargo.toml'] + list((ROOT/'rust/compat/src').glob('*.rs'))
     report['source_sha256'] = {str(p):sha(p.read_bytes()) for p in inputs}
@@ -101,11 +105,11 @@ def main():
         run(['cargo','build','--locked','--offline','--release','--manifest-path',str(ROOT/'Cargo.toml'),'-p','xy-vsfilter-compat','--example','style_table_replay','--target',target,'--target-dir',str(ROOT/'artifacts/style-table-cargo')], 'rust-build')
         candidate = ROOT/'artifacts/style-table-cargo'/target/'release/examples/style_table_replay.exe'
         report['binary_sha256'] = {str(p):sha(p.read_bytes()) for p in [native,candidate]}; save()
-        results = [run([str(native)],f'reference-{i}') for i in [1,2]]
+        results = [run([str(native)]+(['edges'] if args.edges else []),f'reference-{i}') for i in [1,2]]
         results += [run([str(candidate),str(out/'reference-1.stdout')],f'candidate-{i}') for i in [1,2]]
         if any(r.stderr for r in results): raise ValueError('unexpected runtime stderr')
         traces = [r.stdout for r in results]
-        comparisons = compare(traces,bits)
+        comparisons = compare(traces,bits,args.edges)
         for p, digest in {**report['source_sha256'],**report['library_sha256'],**headers,**report['binary_sha256']}.items():
             if sha(Path(p).read_bytes()) != digest: raise ValueError('input or executable changed')
         if git(ROOT,'rev-parse','HEAD') != report['candidate_commit'] or any(git(p,'status','--porcelain','--untracked-files=no') for p in [root, ROOT]): raise ValueError('source changed')

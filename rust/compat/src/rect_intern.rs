@@ -45,9 +45,11 @@ impl Table {
             .clone()
     }
     /// Called under exclusive registry admission immediately before an owner's
-    /// removal. This table and its checked resources are the only Arc holders.
+    /// removal. Every participating owner (a checked rectangle resource or a
+    /// canonical style value) calls this immediately before its final Arc drop.
     /// Remove the table's reference when this is the last owner. The removed
-    /// resource remains alive until destruction outside registry admission.
+    /// owner remains alive until destruction outside registry admission. Complete
+    /// release/drop operations must be serialized, not only this method's call.
     pub fn release(&mut self, value: &Arc<Value>) {
         if Arc::strong_count(value) == 2
             && self

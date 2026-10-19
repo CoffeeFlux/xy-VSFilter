@@ -2,6 +2,7 @@
 //! Replay actual native inputs through the safe ownership engine. Expected
 //! native comparison/state rows are not used to make any algorithm decision.
 #![forbid(unsafe_code)]
+use std::fmt::Write;
 use std::sync::Arc;
 use xy_vsfilter_compat::{
     document_style::{self, StyleValue},
@@ -10,7 +11,10 @@ use xy_vsfilter_compat::{
 };
 
 fn hex(bytes: &[u8]) -> String {
-    bytes.iter().map(|v| format!("{v:02x}")).collect()
+    bytes.iter().fold(String::new(), |mut out, v| {
+        write!(out, "{v:02x}").unwrap();
+        out
+    })
 }
 fn unhex(text: &str) -> Vec<u8> {
     assert_eq!(text.len() % 2, 0);
@@ -36,7 +40,12 @@ fn main() {
     let mut slots: Vec<Option<Arc<Value>>> = vec![None; 704];
     let mut next = 1;
     let mut step = 0;
-    println!("style-table pointer_bits={}", usize::BITS);
+    let edges = input.lines().next().unwrap().ends_with("mode=edges");
+    println!(
+        "style-table pointer_bits={}{}",
+        usize::BITS,
+        if edges { " mode=edges" } else { "" }
+    );
     for row in input.lines() {
         let words: Vec<_> = row.split_whitespace().collect();
         if !matches!(words[0], "input" | "copy" | "drop") {
@@ -87,7 +96,11 @@ fn main() {
         );
         step += 1;
     }
-    assert!(slots.iter().all(Option::is_none));
+    if edges {
+        assert_eq!(slots.iter().filter(|v| v.is_some()).count(), 90);
+    } else {
+        assert!(slots.iter().all(Option::is_none));
+    }
     println!(
         "style-table-complete steps={step} styles={} rects={}",
         table.count(),

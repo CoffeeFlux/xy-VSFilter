@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
+#include <process.h>
 
 static unsigned tag(const STSStyle& s) { return unsigned(static_cast<uint16_t>(s.fontName[2])); }
 struct LoggedStyle {
@@ -64,6 +65,14 @@ static void insert(unsigned slot,unsigned variant,unsigned kind=0) {
     }
     state(slot);
 }
+static void supplied(unsigned slot,const STSStyle& input) {
+    {
+        STSStyle s(input);const wchar_t name[]={L'A',0,wchar_t(++serial)};s.fontName=CStringW(name,3);
+        printf("input %u %u %016llx ",step,slot,static_cast<unsigned long long>(hash_value(s)));wire(s);printf("\n");
+        actual[slot]=std::make_shared<FwSTSStyle>(s);slots[slot]=std::make_shared<Logged>(LoggedStyle(s));
+    }
+    state(slot);
+}
 static void copy(unsigned to,unsigned from) {
     printf("copy %u %u %u\n",step,to,from);
     actual[to]=actual[from];slots[to]=slots[from];state(to);
@@ -72,7 +81,30 @@ static void drop(unsigned slot) {
     printf("drop %u %u\n",step,slot);
     actual[slot].reset();slots[slot].reset();state(slot);
 }
-int main() {
+int main(int argc,char**) {
+    if(argc>1) {
+        printf("style-table pointer_bits=%u mode=edges\n",unsigned(sizeof(void*)*8));
+        double STSStyle::* fields[]={&STSStyle::fontSize,&STSStyle::outlineWidthX,&STSStyle::outlineWidthY,
+            &STSStyle::shadowDepthX,&STSStyle::shadowDepthY,&STSStyle::fontScaleX,&STSStyle::fontScaleY,
+            &STSStyle::fontSpacing,&STSStyle::fBlur,&STSStyle::fGaussianBlur,&STSStyle::fontAngleZ,
+            &STSStyle::fontAngleX,&STSStyle::fontAngleY,&STSStyle::fontShiftX,&STSStyle::fontShiftY};
+        const uint64_t values[]={0,0x8000000000000000ull,0x3ff0000000000000ull,0xbff0000000000000ull,1,
+            0x0010000000000000ull,0x7fefffffffffffffull,0x7ff0000000000000ull,0xfff0000000000000ull,
+            0x7ff8000000000001ull,0xfff8000000000001ull,0x7ff0000000000001ull};
+        bool nonreflexive[360]={};unsigned index=0;
+        for(auto field:fields)for(auto bits:values) {
+            STSStyle a;a.charSet=1000+index;a.*field=0.0;STSStyle b(a);memcpy(&(b.*field),&bits,8);
+            supplied(index*2,a);supplied(index*2+1,b);
+            nonreflexive[index*2+1]=(bits&0x7ff0000000000000ull)==0x7ff0000000000000ull && (bits&0xfffffffffffffull);
+            ++index;
+        }
+        unsigned held=0;
+        for(unsigned i=0;i<360;++i)if(nonreflexive[i])copy(360+held++,i);
+        for(unsigned i=0;i<360;++i)if(!nonreflexive[i])drop(i);
+        printf("style-table-complete steps=%u styles=%llu rects=%llu\n",step,static_cast<unsigned long long>(Logged::Count()),static_cast<unsigned long long>(FwRect::Count()));
+        // Keep all NaN keys alive; never execute an expired-key lookup on exit.
+        fflush(stdout);_exit(0);
+    }
     printf("style-table pointer_bits=%u\n",unsigned(sizeof(void*)*8));
     for(unsigned i=0;i<640;++i)insert(i,i);
     for(unsigned i=0;i<64;++i)copy(640+i,i*7%640);
