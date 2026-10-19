@@ -16,7 +16,7 @@ class MeasurementControls(unittest.TestCase):
 
     def test_all_cases_bits_event_counts_and_restoration_required(self):
         good=self.trace();compare([good]*4,32)
-        for bad in [good.replace(b'index=1 ',b'index=0 ',1),good.replace(b'events=3 ',b'events=4 ',1),good.replace(b'bits=0000000000000000',b'bits=0000000000000001',1),good.replace(b'name=select ',b'name=extent ',1),good.replace(b'cases=432',b'cases=431')]:
+        for bad in [good.replace(b'index=1 ',b'index=0 ',1),good.replace(b'events=3 ',b'events=4 ',1),good.replace(b'field=0 bits=0000000000000000',b'field=0 bits=0000000000000001',1),good.replace(b'name=select ',b'name=extent ',1),good.replace(b'cases=432',b'cases=431')]:
             with self.assertRaises(ValueError):validate(bad,32)
         with self.assertRaises(ValueError):validate(good,64)
 
