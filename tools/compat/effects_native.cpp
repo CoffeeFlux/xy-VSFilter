@@ -9,9 +9,34 @@ struct AssMethod {typedef bool (CRenderedTextSubtitle::*type)(CSubtitle*,const C
 template<class Tag,typename Tag::type M> struct EffectAccess {friend typename Tag::type member(Tag){return M;}};
 template struct EffectAccess<ColumnMethod,&CRenderedTextSubtitle::ParseEffect>;
 template struct EffectAccess<AssMethod,static_cast<AssMethod::type>(&CRenderedTextSubtitle::ParseSSATag)>;
+// The full Rust evaluator snapshots all renderer scalars, including fields
+// that the earlier effect-only native branches did not read. Initialize them
+// on both sides so this regression never depends on indeterminate storage.
+struct EffectTime {typedef int CRenderedTextSubtitle::*type;friend type member(EffectTime);};
+template struct EffectAccess<EffectTime,&CRenderedTextSubtitle::m_time>;
+struct EffectDelay {typedef int CRenderedTextSubtitle::*type;friend type member(EffectDelay);};
+template struct EffectAccess<EffectDelay,&CRenderedTextSubtitle::m_delay>;
+struct EffectStart {typedef int CRenderedTextSubtitle::*type;friend type member(EffectStart);};
+template struct EffectAccess<EffectStart,&CRenderedTextSubtitle::m_animStart>;
+struct EffectEnd {typedef int CRenderedTextSubtitle::*type;friend type member(EffectEnd);};
+template struct EffectAccess<EffectEnd,&CRenderedTextSubtitle::m_animEnd>;
+struct EffectAccel {typedef double CRenderedTextSubtitle::*type;friend type member(EffectAccel);};
+template struct EffectAccess<EffectAccel,&CRenderedTextSubtitle::m_animAccel>;
+struct EffectKType {typedef int CRenderedTextSubtitle::*type;friend type member(EffectKType);};
+template struct EffectAccess<EffectKType,&CRenderedTextSubtitle::m_ktype>;
+struct EffectKStart {typedef int CRenderedTextSubtitle::*type;friend type member(EffectKStart);};
+template struct EffectAccess<EffectKStart,&CRenderedTextSubtitle::m_kstart>;
+struct EffectKEnd {typedef int CRenderedTextSubtitle::*type;friend type member(EffectKEnd);};
+template struct EffectAccess<EffectKEnd,&CRenderedTextSubtitle::m_kend>;
+struct EffectPolygon {typedef int CRenderedTextSubtitle::*type;friend type member(EffectPolygon);};
+template struct EffectAccess<EffectPolygon,&CRenderedTextSubtitle::m_nPolygon>;
+struct EffectBaseline {typedef int CRenderedTextSubtitle::*type;friend type member(EffectBaseline);};
+template struct EffectAccess<EffectBaseline,&CRenderedTextSubtitle::m_polygonBaselineOffset>;
+struct EffectVideo {typedef CRectCoor2 CRenderedTextSubtitle::*type;friend type member(EffectVideo);};
+template struct EffectAccess<EffectVideo,&CRenderedTextSubtitle::m_video_rect>;
 static void raw(const CStringW& v){printf("%d:",v.GetLength());for(int i=0;i<v.GetLength();++i)printf("%04x",static_cast<unsigned>(static_cast<uint16_t>(v[i])));}
 static const uint64_t scales[]={0x3ff0000000000000ull,0x3fe0000000000000ull,0x4004000000000000ull,0xbff0000000000000ull,0,0x8000000000000000ull,0x7ff0000000000000ull,0xfff0000000000000ull,0x7ff8123456789abcull,0x0010000000000000ull,0x41e0000000000000ull,0x3ff199999999999aull};
-static void init(CSubtitle& sub,unsigned seed){memcpy(&sub.m_scalex,&scales[seed],8);memcpy(&sub.m_scaley,&scales[(seed+3)%12],8);sub.m_wrapStyle=3;sub.m_hard_position_level=seed%4-1;sub.m_fAnimated=false;sub.m_fAnimated2=false;sub.m_scrAlignment=2;sub.m_relativeTo=0;}
+static void init(CSubtitle& sub,unsigned seed){memcpy(&sub.m_scalex,&scales[seed],8);memcpy(&sub.m_scaley,&scales[(seed+3)%12],8);sub.m_wrapStyle=3;sub.m_hard_position_level=seed%4-1;sub.m_fAnimated=false;sub.m_fAnimated2=false;sub.m_scrAlignment=2;sub.m_relativeTo=0;sub.m_clip.SetRect(0,0,640,360);}
 static void snapshot(const CSubtitle& sub){for(int slot=0;slot<5;++slot){auto e=sub.m_effects[slot];printf("slot %d present=%u",slot,e?1:0);if(e){if(slot>=3)printf(" type=%d",static_cast<int>(e->type));for(int v:e->param)printf(" %d",v);for(int v:e->t)printf(" %d",v);}printf("\n");}}
 static void run(CRenderedTextSubtitle& renderer,CSubtitle& sub,const CStringW& input,unsigned index,unsigned seed,unsigned group,unsigned kind){STSStyle style,original;errno=1234;int accepted=-1;if(kind==0)(renderer.*member(ColumnMethod{}))(&sub,input);else accepted=(renderer.*member(AssMethod{}))(&sub,input,style,original,false)?1:0;const int error=errno;printf("effects-case index=%u seed=%u group=%u kind=%u accepted=%d errno=%d wrap=%d hard=%d animated=%u input=",index,seed,group,kind,accepted,error,sub.m_wrapStyle,sub.m_hard_position_level,sub.m_fAnimated2?1:0);raw(input);printf("\n");snapshot(sub);}
 int main(){try{check(AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0)!=FALSE,"AfxWinInit failed");printf("effects-provenance pointer_bits=%zu ansi=%u oem=%u\n",sizeof(void*)*8,GetACP(),GetOEMCP());std::vector<CStringW> column,ssa;
@@ -1131,7 +1156,19 @@ int main(){try{check(AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0)!=
 {static const wchar_t u[]={0x5c,0x6d,0x6f,0x76,0x65,0x28,0x31,0x2c,0x32,0x2c,0x33,0x2c,0x34,0x2c,0xd800,0x2c,0x36,0x29,0x0};ssa.push_back(CStringW(u,18));}
 {static const wchar_t u[]={0x5c,0x6f,0x72,0x67,0x28,0xd800,0x2c,0x32,0x29,0x0};ssa.push_back(CStringW(u,9));}
 {static const wchar_t u[]={0x5c,0x70,0x6f,0x73,0x28,0x31,0x2c,0xd800,0x29,0x0};ssa.push_back(CStringW(u,9));}
-CCritSec lock;CRenderedTextSubtitle renderer(&lock);unsigned index=0;
+CCritSec lock;CRenderedTextSubtitle renderer(&lock);
+renderer.*member(EffectTime{})=0;
+renderer.*member(EffectDelay{})=1000;
+renderer.*member(EffectStart{})=0;
+renderer.*member(EffectEnd{})=0;
+renderer.*member(EffectAccel{})=1.0;
+renderer.*member(EffectKType{})=0;
+renderer.*member(EffectKStart{})=0;
+renderer.*member(EffectKEnd{})=0;
+renderer.*member(EffectPolygon{})=0;
+renderer.*member(EffectBaseline{})=0;
+renderer.*member(EffectVideo{})=CRect(0,0,5120,2880);
+unsigned index=0;
 for(unsigned seed=0;seed<12;++seed){for(unsigned kind=0;kind<2;++kind)for(const auto& input:kind?ssa:column){CSubtitle sub;init(sub,seed);run(renderer,sub,input,index++,seed,0,kind);}CSubtitle sub;init(sub,seed);
 run(renderer,sub,CStringW(L"Banner;2;1;4"),index++,seed,1,0);
 run(renderer,sub,CStringW(L"Banner;3;0;5"),index++,seed,1,0);
