@@ -27,7 +27,57 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest port: ordered scan-line sampling and edge growth (2026-10-19)
+## Latest port: owned scan conversion and curve evaluation (2026-10-19)
+
+Implementation `23f127f4` moves the complete experimental ScanConvert operation
+into Rust. The safe core owns path dispatch, figure bridges/closure, curve sample
+iteration, line insertion, temporary edges, row/span collection and persistent
+scan results. C++ ScanLineData owns only a checked ID. It no longer retains
+native edge buffers, row heads, an opaque edge-owner pointer, first/last-point
+state or a persistent span vector. Rasterization and widening receive detached
+result snapshots.
+
+Path and scan IDs share one admitted registry operation: Rust borrows the path
+and scan from disjoint owned fields without exporting a path pointer, nesting
+admissions or calling back into C++. Five private exports create/destroy scans,
+convert by IDs, query packet length and read detached data. IDs are not reused;
+invalid/short output requests leave caller output untouched. The older edge
+pointer API is retired from the experimental scan path and remains only for
+legacy fallback/historical tests.
+
+The curve backend preserves cleanup MSVC x86/x64 arithmetic explicitly. x86
+retains extended first-sample coefficients and t increments around f64 spills;
+x64 retains SSE2 operand order, masks, square root and conversions. Initial
+origin casts are conditional X-before-Y; samples/endpoints cast Y-before-X.
+All eight arithmetic blocks touch only a fixed, initialized, aligned local
+buffer. Input points are copied integer bits; all indexing, edges and spans stay
+in safe Rust. See the [boundary audit](rust-scan-owner-boundary.md) and
+[reference provenance](../test/compat/scan-curve/provenance.json).
+
+Both architectures exactly match 384 ScanConvert histories / 70,692 trace lines,
+including every packed span, state field and floating/error status, twice per
+role. The direct observer reads detached candidate snapshots and actual reference
+fields. Transform, path ownership, both text-measurement modes, GDI text/path,
+DC and font regressions pass. All three DLLs build and preserve exports and
+dependencies; ten COM cases plus two controls pass per architecture. Each new
+rendering run matches all 1,222 cases / 13,186 frames with 192 distinct-frame
+controls. The earlier intermittent cleanup x64 exit crash remains unresolved
+and retained in the word-transform evidence, regardless of later passing runs.
+
+Rust passes 361 core and 141 FFI tests per architecture, formatting and Clippy;
+Python passes 202 tests with one skip. The safe core remains free of unsafe
+code. The FFI inventory now records 585 production unsafe blocks, 412 unsafe
+functions, four unsafe Sync implementations and 26 assembly sites. Detailed
+provenance is in [the local evidence](rust-scan-owner-local-evidence.json).
+
+Invalid prefix reads/rows and impossible counts remain unresolved native
+outcomes, refused without clipping or unsafe access. Allocation failure, Debug,
+other FP control modes, fresh native uninitialized state and arbitrary host
+concurrency are not closed by these tests. Widened-region ownership, raster
+output buffers, caches/object graphs, host adapters and vendors remain in scope.
+The experimental switch remains opt-in; the full-library migration stays active.
+
+## Earlier port: ordered scan-line sampling and edge growth (2026-10-19)
 
 Implementation `b8a8566b` moves the ordered integer line sampler into safe Rust.
 The experimental native adapter supplies endpoints/direction to the existing

@@ -1,0 +1,534 @@
+{
+  "schema": 1,
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "candidate_implementation_commit": "23f127f4b592d4f57d5c07daf071d1b4b05d0a30",
+  "status": "Experimental owned scan conversion checkpoint; full-library migration remains active",
+  "architectures": {
+    "x86": {
+      "native": {
+        "scan_lines_native": {
+          "path": "artifacts/scan-owned-scan_lines_native-x86/report.json",
+          "sha256": "ba67238b19f9da01c0e2b212bc484c075205897b3d70ff6f469549451294dd61",
+          "candidate_commit": "23f127f4b592d4f57d5c07daf071d1b4b05d0a30",
+          "cases": 384,
+          "trace_lines": 70692,
+          "trace_sha256": [
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f"
+          ],
+          "binary_sha256": {
+            "reference": "a3ee684dd37ad68c2d852f8fcfe4e678a8cf3f39ed8adf424faf69f772074ffc",
+            "candidate": "d84b0e22b05621cb8d30c7a8ab1cca2eb8e5d27d9a3ddcdf15abe5a620cf831c"
+          }
+        },
+        "word_transform_native": {
+          "path": "artifacts/scan-owned-word_transform_native-x86/report.json",
+          "sha256": "7f5927dc3002150e53e89785e1f1fab5e3c244b94936825673fbcad95dfd0e28",
+          "candidate_commit": "23f127f4b592d4f57d5c07daf071d1b4b05d0a30",
+          "cases": 4560,
+          "trace_lines": 9122,
+          "trace_sha256": [
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd"
+          ],
+          "binary_sha256": {
+            "reference": "c33f5ca8bfe12c77980a3db30b3f9e96839431b2097b5cae453e23968c5af5f3",
+            "candidate": "b60c9560c589a85cb8528a2b8197f8266d297bb51eac0e444e4acbc99a7d622b"
+          }
+        },
+        "path_data_native": {
+          "path": "artifacts/scan-owned-path_data_native-x86/report.json",
+          "sha256": "2aa7826ef3f970be903c949db2fe6b3d9b8acc42365bb79251a7fdf0f6ffce57",
+          "candidate_commit": "23f127f4b592d4f57d5c07daf071d1b4b05d0a30",
+          "cases": 39,
+          "trace_lines": 171,
+          "trace_sha256": [
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2"
+          ],
+          "binary_sha256": {
+            "reference": "af87b33dac26ee4179c4d9c1ad454829cda8b115a2857c7063b24c8b8bf113c8",
+            "candidate": "5876de84ec446a1da64025afbf390932a1bd264f513ef459718daf9fe1959b4f"
+          }
+        },
+        "text_measure_raw": {
+          "path": "artifacts/scan-owned-text_measure_raw-x86/report.json",
+          "sha256": "4465197e2bc6fe21329dd0d9e20af88f0845b74c57e2a697cb9d4b667c814ce2",
+          "candidate_commit": "23f127f4b592d4f57d5c07daf071d1b4b05d0a30",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd",
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd",
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd",
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd"
+          ],
+          "binary_sha256": {
+            "reference": "ad43992e9eceaeef1cd1e52bb9dfc0bef8b657c25a089b168f43bc84f30ef152",
+            "candidate": "78b3eca781426e836b050bbcb5f6dd2e8a8d902d804deedffa635af29dda2ae8"
+          }
+        },
+        "text_measure_construction": {
+          "path": "artifacts/scan-owned-text_measure_construction-x86/report.json",
+          "sha256": "a734760352ed62a439852b368e9cf6b16010ce918ca9adf0131cdfe661aef4d6",
+          "candidate_commit": "23f127f4b592d4f57d5c07daf071d1b4b05d0a30",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893",
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893",
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893",
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893"
+          ],
+          "binary_sha256": {
+            "reference": "4766e1c0370c3d76c7881759769a150967344d709990943f25798d00734c7ea3",
+            "candidate": "154872daf52cea1571616789514ca91cdbe107082f46fe08c67057e67d3116fc"
+          }
+        },
+        "renderer_dc_text_native": {
+          "path": "artifacts/scan-owned-renderer_dc_text_native-x86/report.json",
+          "sha256": "a69e33ad1a18fe93642b49b0ff19fcd94ffb48ff25b8765a15a00af20cb61c16",
+          "candidate_commit": "23f127f4b592d4f57d5c07daf071d1b4b05d0a30",
+          "cases": 40,
+          "trace_lines": 598,
+          "trace_sha256": [
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330"
+          ],
+          "binary_sha256": {
+            "reference": "2ac7b212cf6c74d612ce776afb63de8e47ed4579ca23efa580deebbc8ae97bf0",
+            "candidate": "bfc43c5de16f6ec107e61e8c6a8101e6baca333b0224ee40af88b723e294da00"
+          }
+        },
+        "renderer_dc_native": {
+          "path": "artifacts/scan-owned-renderer_dc_native-x86/report.json",
+          "sha256": "3fc6da0615c194ad60494cc8e7d9b8d1ba4051673f5ed0f0e8f36b12b572d6d4",
+          "candidate_commit": "23f127f4b592d4f57d5c07daf071d1b4b05d0a30",
+          "cases": 6,
+          "trace_lines": 116,
+          "trace_sha256": [
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983"
+          ],
+          "binary_sha256": {
+            "reference": "c65012f4a74ee64a32f757f123b0d90fd7cbe73bd33a34c0a6f46c79e4325b7a",
+            "candidate": "2852c94cd12f26123c1710a4271054b14739803ee41cfab0a9e1faeeeb7e4e7a"
+          }
+        },
+        "font_native": {
+          "path": "artifacts/scan-owned-font_native-x86/report.json",
+          "sha256": "e49dd24181636de134867476af515f90ac043235f67358ce718a8858d3439e22",
+          "candidate_commit": "23f127f4b592d4f57d5c07daf071d1b4b05d0a30",
+          "cases": 195,
+          "trace_lines": 392,
+          "trace_sha256": [
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f",
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f",
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f",
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f"
+          ],
+          "binary_sha256": {
+            "reference": "f0036a4d3fa3a13304d06542e94dbab177bbbdda7c98b268614e5704de17f32e",
+            "candidate": "1da69c4154af2906bcf78dc4b5c3c7272b52896bbfc3ff5ffd63f48b15c52e2a"
+          }
+        },
+        "font_gdi_calls": {
+          "path": "artifacts/scan-owned-font_gdi_calls-x86/report.json",
+          "sha256": "bb49874138a303ca32b220509652b02c318629385c2b5c2c21f91933f17e7581",
+          "candidate_commit": "23f127f4b592d4f57d5c07daf071d1b4b05d0a30",
+          "cases": 12,
+          "trace_lines": 126,
+          "trace_sha256": [
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5",
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5",
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5",
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5"
+          ],
+          "binary_sha256": {
+            "reference": "ad21bbeed3abc5c361f91346e274cfa48925c7f51fdbe7a5e8764dfb1896ec99",
+            "candidate": "b1493209139117712ff6a349e59cd043e1b9ba6d220c307fcddd25b2dd41024c"
+          }
+        }
+      },
+      "rendering": {
+        "path": "artifacts/scan-owned-csri-x86/summary.json",
+        "sha256": "2eadaabb21e018ba7d08724a9417c0424d30f9cc7d1e1e8a19a193dbe4b104fd",
+        "original_manifest_sha256": "2949bb98bfbc49bd3496af90ef9a8b3b386395637ff34bc54b0fc4e86fe61363",
+        "partition_exact": true,
+        "cases": 1222,
+        "frames": 13186,
+        "shard_results": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            7,
+            0
+          ]
+        ],
+        "complete": true,
+        "candidate_dll": {
+          "path": "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\bin\\lib_17.0\\Win32\\Release\\VSFilter.dll",
+          "sha256": "9916b5986fea67d5baf1bebf38477b1aef17a5deb9e17f3f8feb9366d754ef54"
+        },
+        "reference_source": {
+          "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+          "repository": "https://github.com/CoffeeFlux/xy-VSFilter"
+        },
+        "distinct_controls": 192,
+        "stable_equal_cases": 1222,
+        "stable_equal_frames": 13186,
+        "unresolved_cases": []
+      },
+      "contracts": {
+        "path": "artifacts/scan-owned-contracts-x86.log",
+        "sha256": "445a1347a43a8f59ccc7dfd18b9c878b4d225eeaaf4cc2cee89c7ff109d43161"
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "path": "bin/lib_17.0/Win32/Release/VSFilter.dll",
+          "sha256": "9916b5986fea67d5baf1bebf38477b1aef17a5deb9e17f3f8feb9366d754ef54"
+        },
+        "XySubFilter.dll": {
+          "path": "bin/lib_17.0/Win32/Release/XySubFilter.dll",
+          "sha256": "f88ca88bef76a943f82fd14776434bafff81fd96bb749302e89d7f87c0737b52"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "path": "bin/lib_17.0/Win32/Release/xy_sub_filter_consumer.dll",
+          "sha256": "900feb8113b6bf6afe830d6beb47780b22327d58be77cce8d7ccb67fa6c4b5fa"
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/scan-owned-build-x86.log",
+          "sha256": "94e54c016795061958c9916891353e99b360d039e0cc779a1d711cc71e56286c"
+        },
+        {
+          "path": "artifacts/scan-owned-build-rust-x86.log",
+          "sha256": "46052fdcc8ebc1860a49356dcb30f4ffa928537c36e56e1ff8f9f938f3b1600d"
+        }
+      ]
+    },
+    "x64": {
+      "native": {
+        "scan_lines_native": {
+          "path": "artifacts/scan-owned-scan_lines_native-x64/report.json",
+          "sha256": "ca5f504bdf963d261b3211c4937b80d010d9b678c78892d0e6e9ec2a4b2b762e",
+          "candidate_commit": "23f127f4b592d4f57d5c07daf071d1b4b05d0a30",
+          "cases": 384,
+          "trace_lines": 70692,
+          "trace_sha256": [
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2"
+          ],
+          "binary_sha256": {
+            "reference": "88efa743c260c02c512b3de704d88882ca79dc8dbcebb82f542ad02e50ea7aa0",
+            "candidate": "91536637733b9b907e6c0b6c0fe1c65fd3c55a1112bfd8a514666947aeb7a1b0"
+          }
+        },
+        "word_transform_native": {
+          "path": "artifacts/scan-owned-word_transform_native-x64/report.json",
+          "sha256": "35659b39383f262de5dd28cda630bf87b224b10c10a2c0f199dc529e4573d3a3",
+          "candidate_commit": "23f127f4b592d4f57d5c07daf071d1b4b05d0a30",
+          "cases": 4560,
+          "trace_lines": 9122,
+          "trace_sha256": [
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b"
+          ],
+          "binary_sha256": {
+            "reference": "da93f9398cad23fbfad4528c5253c0f56edcb07f2fa79bf9f8410a192decac31",
+            "candidate": "9c21ca01e8ca39bbf6c452fe5f6eb0a9b5f3da6379f6cacdf56c1ad89d4f8843"
+          }
+        },
+        "path_data_native": {
+          "path": "artifacts/scan-owned-path_data_native-x64/report.json",
+          "sha256": "d5aa37c565a3b672689366fbd290d779cb7e6c5d8b31cd45511bcfa1db7e2d82",
+          "candidate_commit": "23f127f4b592d4f57d5c07daf071d1b4b05d0a30",
+          "cases": 39,
+          "trace_lines": 171,
+          "trace_sha256": [
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031"
+          ],
+          "binary_sha256": {
+            "reference": "4d6b3a4b5d028685e16e642d0ad2fe6fa8f0d9a7b031432c4329f31e1d6e60e0",
+            "candidate": "1112f5b7d4793059d62f621ef80cf9a61d213a6bfa1d1e529fef8c91c65ea77e"
+          }
+        },
+        "text_measure_raw": {
+          "path": "artifacts/scan-owned-text_measure_raw-x64/report.json",
+          "sha256": "c0920aec7e5a300599daadad3146e5b439664f79784214a557f134c7aa182b08",
+          "candidate_commit": "23f127f4b592d4f57d5c07daf071d1b4b05d0a30",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054",
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054",
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054",
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054"
+          ],
+          "binary_sha256": {
+            "reference": "1dbef0657b96752603624be5d634b377def82551dad5ca6566febc59b679af26",
+            "candidate": "20ec9b03abaeedc6f46a9a91e77881ec9ecca08dc191481e8d56b92c3836d3b9"
+          }
+        },
+        "text_measure_construction": {
+          "path": "artifacts/scan-owned-text_measure_construction-x64/report.json",
+          "sha256": "f3d2ac46cabc752323e414a4c5c584e741b10327737b76a9eab3a402f5baeee3",
+          "candidate_commit": "23f127f4b592d4f57d5c07daf071d1b4b05d0a30",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3",
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3",
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3",
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3"
+          ],
+          "binary_sha256": {
+            "reference": "0f44a9967ab13fd2bb0fc945aa85510d6c2919ad7bc23a4341685a6c0319f937",
+            "candidate": "63181e7affbd5e6167a0f36fa481d5be9aeb7dca303c8a926e6617c3cfdd1605"
+          }
+        },
+        "renderer_dc_text_native": {
+          "path": "artifacts/scan-owned-renderer_dc_text_native-x64/report.json",
+          "sha256": "b1c794b4bbebb7c5229739d17c39cb18fc96b10c97db0cb7ad67c40dcba231e7",
+          "candidate_commit": "23f127f4b592d4f57d5c07daf071d1b4b05d0a30",
+          "cases": 40,
+          "trace_lines": 598,
+          "trace_sha256": [
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac"
+          ],
+          "binary_sha256": {
+            "reference": "3062014d755e0a2a4ff6e23a8b3103bae8bc6a729db1eddb1e0456a4e89d281b",
+            "candidate": "207ef5731896026473cd702c238a754a19d3b6c0e2817bb70843e670025f21b7"
+          }
+        },
+        "renderer_dc_native": {
+          "path": "artifacts/scan-owned-renderer_dc_native-x64/report.json",
+          "sha256": "2e69db6adc46d1fa285a9f2838c9c63f1a4df5a8d64ae696bbd996ba2c78bd68",
+          "candidate_commit": "23f127f4b592d4f57d5c07daf071d1b4b05d0a30",
+          "cases": 6,
+          "trace_lines": 116,
+          "trace_sha256": [
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd"
+          ],
+          "binary_sha256": {
+            "reference": "48524a3b90e87a60ac2579eace3c5b6d630ef38efac371301d03c4a0544d4826",
+            "candidate": "8ca5d3c3675aa96255bbc37d0a04899f27f43e9793dc3b1c9d7b1c95c9e006dd"
+          }
+        },
+        "font_native": {
+          "path": "artifacts/scan-owned-font_native-x64/report.json",
+          "sha256": "56b75d0f931cd6deaf603e8a66c7418e3aaec2063c44290be3e15e40d934ac59",
+          "candidate_commit": "23f127f4b592d4f57d5c07daf071d1b4b05d0a30",
+          "cases": 195,
+          "trace_lines": 392,
+          "trace_sha256": [
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7",
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7",
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7",
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7"
+          ],
+          "binary_sha256": {
+            "reference": "2d7b9c8fb9165c99ad0f042bc21e4e8a3a54640d509c92b880e7802246ea6bed",
+            "candidate": "2e4838193e9806d563b516ef7bf314bed07bcb7bb8f3104a22da8648bc1bdadb"
+          }
+        },
+        "font_gdi_calls": {
+          "path": "artifacts/scan-owned-font_gdi_calls-x64/report.json",
+          "sha256": "cf9614ebed52bae006feff7d780ff721990f6473353a74974ab29bb0be524847",
+          "candidate_commit": "23f127f4b592d4f57d5c07daf071d1b4b05d0a30",
+          "cases": 12,
+          "trace_lines": 126,
+          "trace_sha256": [
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93",
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93",
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93",
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93"
+          ],
+          "binary_sha256": {
+            "reference": "f400a859eeff28aa529db13b9ff48d7787f8ae9b585ca065730fca688efa3138",
+            "candidate": "75142af2881794a44d32271fa6737a650dacd6473613d3245c7b04babc80c3c5"
+          }
+        }
+      },
+      "rendering": {
+        "path": "artifacts/scan-owned-csri-x64/summary.json",
+        "sha256": "b540da71acfd1bd51eb11dab3de23cf5cc9a735f0c54be9b473d3b74966af0ee",
+        "original_manifest_sha256": "2949bb98bfbc49bd3496af90ef9a8b3b386395637ff34bc54b0fc4e86fe61363",
+        "partition_exact": true,
+        "cases": 1222,
+        "frames": 13186,
+        "shard_results": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            7,
+            0
+          ]
+        ],
+        "complete": true,
+        "candidate_dll": {
+          "path": "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\bin\\lib_17.0\\x64\\Release\\VSFilter.dll",
+          "sha256": "7a0e12eb2f9d97dc8d283563b1af959540b817fe483f535b9271ac1ababb1d27"
+        },
+        "reference_source": {
+          "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+          "repository": "https://github.com/CoffeeFlux/xy-VSFilter"
+        },
+        "distinct_controls": 192,
+        "stable_equal_cases": 1222,
+        "stable_equal_frames": 13186,
+        "unresolved_cases": []
+      },
+      "contracts": {
+        "path": "artifacts/scan-owned-contracts-x64.log",
+        "sha256": "445a1347a43a8f59ccc7dfd18b9c878b4d225eeaaf4cc2cee89c7ff109d43161"
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "path": "bin/lib_17.0/x64/Release/VSFilter.dll",
+          "sha256": "7a0e12eb2f9d97dc8d283563b1af959540b817fe483f535b9271ac1ababb1d27"
+        },
+        "XySubFilter.dll": {
+          "path": "bin/lib_17.0/x64/Release/XySubFilter.dll",
+          "sha256": "4581ec1c50cffcfc5687ee79ad519dd310d283b0d51f58a748bd49cf5993cfb6"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "path": "bin/lib_17.0/x64/Release/xy_sub_filter_consumer.dll",
+          "sha256": "08c9d1be47d2086d53788941547c5dfaf9d53fafd01c030c932a5e25ab4d0f9f"
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/scan-owned-build-x64.log",
+          "sha256": "b3dbaf937aeeabc4dc0dc1a64a7547a47ed1de77ff814dff324bb54eb9171e99"
+        },
+        {
+          "path": "artifacts/scan-owned-build-rust-x64.log",
+          "sha256": "53db039c729ff7e2f3f42e3304ba615a46102588610c41bbd45bc024a683100a"
+        }
+      ]
+    }
+  },
+  "checks": {
+    "path": "artifacts/scan-owned-checks.log",
+    "sha256": "47cecd3ac01a0687cac51deade1754035f92a0935cd236c76346b253be7bae5d",
+    "core_per_architecture": 361,
+    "ffi_per_architecture": 141,
+    "python": 202,
+    "python_skipped": 1,
+    "fmt": true,
+    "clippy_both_architectures_and_native_runtime": true
+  },
+  "initial_clippy_failure": {
+    "path": "artifacts/scan-owned-checks-initial.log",
+    "sha256": "9eba8b44549461036a26d9485415c42ff6424e09eb69ffdd55c9998621bc8fa4",
+    "result": "Integer direction comparison chain lint; rewritten as match before final checks. Not a compatibility result."
+  },
+  "unsafe_inventory": {
+    "path": "artifacts/scan-owned-unsafe-inventory.json",
+    "sha256": "279fe16dc21a9875d452134c59d1cf99093a63cf7908ce31f1c383293cdea0b9"
+  },
+  "previous_unresolved_reference": {
+    "evidence": "rust-word-transform-local-evidence.json",
+    "case": "field-unicode-style-space-file",
+    "result": "Earlier x64 cleanup exit access violation remains unresolved; a later passing run does not erase it."
+  },
+  "limitations": [
+    "Finite Release/default Windows floating-control observations; Debug, unmasked exceptions, allocator failure and arbitrary host concurrency remain unclosed.",
+    "Negative/admitted prefix point bases, invalid rows and impossible counts/packed-span ranges are unresolved reference outcomes. The boundary refuses them without unsafe reads or silent clipping.",
+    "Fresh native scan state was uninitialized; Rust initializes safely, without claiming parity for private uninitialized fields. Failed conversion may retain partial internal state.",
+    "Fixed-buffer numeric assembly has scalar-only x86 CRT conversion calls. No foreign path/edge pointer or dynamic memory index enters assembly.",
+    "Widened region/output buffer ownership, caches and object graphs, host adapters and vendors remain in scope. No production default switched."
+  ],
+  "sources": {
+    "rust/compat/src/scan_convert.rs": "5a33c5d8512d6bac72cf508e73a130e3aee4f91bc873bacf44ad8ae56f9a00c4",
+    "rust/compat/src/path_data.rs": "77f53b08eaa23a8f2c6831ef02ab1e00829dd949cd725a9f27095535820a33f2",
+    "rust/compat/src/scan_row.rs": "a70d8ec32701e2b5ce4feb8abda5db7de6df3f77edda1e8ecadf5f1aa33a6fe7",
+    "rust/ffi/src/path_data.rs": "959faabb1a3a341b7daa83e0a2b1ecb3a92daa574aee0247cff8f9ffd28e9381",
+    "rust/ffi/src/windows_scan_curve.rs": "ac4d910ae8b39493c66ed5bbae106cd8e55d99e26a6b5769ab7ee828ccd95498",
+    "include/xy_rust_path_data.h": "ec59f26eb01044364f8b941cd57d10965f53885b3e98d11a8e542f7db220259c",
+    "include/xy_rust_scan_data.h": "c0bfb6d09e7a5b5e3248fbf32d6c1268d1f4afb49c8c317c44c1061d7a5cd68f",
+    "src/subtitles/Rasterizer.cpp": "592afd93c3074ed822cdcab008a9754ab887e74036b6c2049bce39557e18ee76",
+    "src/subtitles/Rasterizer.h": "aab96b9eeffadf6c8ce5ecc6c1deb557b2cf9b9f045e86e95f32a5e0f8259e39",
+    "src/subtitles/RustPathData.inl": "63d021802e134224fda1b214cac07f8515c74d57c618bebdba1cc88f6d15ee08",
+    "tools/compat/scan_lines_native.cpp": "57bebc901918b7597e2a4f6031a7d3fd4377f4452de6ff96e03e192d485e1eb4",
+    "docs/rust-scan-owner-boundary.md": "3c2b49b097a82ded48e875ab7fade5a04feb476194b8a643085fe861783becee",
+    "test/compat/scan-curve/provenance.json": "622916658cb0a2dd7887220ae1e641e0ca26c39b6528164aa82b1c63aba79358"
+  }
+}
