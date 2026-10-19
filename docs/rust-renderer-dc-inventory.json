@@ -1,0 +1,45 @@
+{
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "scope": "Source inventory for next shared renderer device-context ownership boundary; not a validated port.",
+  "sources": [
+    {
+      "path": "src/subtitles/RTS.cpp",
+      "sha256": "ef6aae1b68accd3da5cc9093377a118cf11f5754c597cec68173b06c80f71454"
+    },
+    {
+      "path": "src/subtitles/RTS.h",
+      "sha256": "7fa99ac55e37e9cbc66bb3b219dba1e860ed8bd02e34a44acb2ad8ad93957c26"
+    }
+  ],
+  "lifecycle": {
+    "acquire": [
+      "On first CRenderedTextSubtitle: CreateCompatibleDC(NULL)",
+      "SetBkMode(dc, TRANSPARENT=1)",
+      "SetTextColor(dc, 0x00ffffff)",
+      "SetMapMode(dc, MM_TEXT=1)",
+      "Increment global signed refcount, including after failed CreateCompatibleDC"
+    ],
+    "release": [
+      "CRenderedTextSubtitle destructor calls Deinit first",
+      "Decrement global refcount",
+      "At zero call DeleteDC; ignore result; native g_hDC retains scalar"
+    ],
+    "sharing": "All renderer instances in one module use one global context. Native source warns to use only one RTS at a time."
+  },
+  "borrowers": [
+    "CMyFont constructor selects new font, queries metrics, restores previous selection",
+    "CText::GetTextInfo selects font, measures each UTF16 unit when spacing != 0 or wcslen prefix otherwise, restores on all paths",
+    "CText::CreatePath selects font; error exits restore; successful restore is ASSERT-only and omitted in Release",
+    "PathData uses caller HDC for begin/end and partial path acquisition"
+  ],
+  "constraints": [
+    "Use typed monotonic owner IDs; keep canonical device-context ownership in Rust. Native wrappers remain temporary.",
+    "Do not initialize context for every renderer or preserve it indefinitely after last owner.",
+    "Do not add successful-path SelectObject restoration to CText::CreatePath.",
+    "Return Windows handle scalars only under explicit scoped lifetime/serialization contract. No Rust pointer or mutable loan crosses FFI.",
+    "Reference CreateCompatibleDC failure, setup-call failures, nested renderer owners, release order, recreation and selected-font deletion before deciding error mapping.",
+    "Device contexts created with NULL can depend on creating-thread lifetime. Do not invent cross-thread ownership or move GDI calls to a worker.",
+    "Registry admission alone does not serialize full native text/path operations; whole-operation guard and host lock/reentry order remain to be established."
+  ],
+  "next_probe": "IAT observer linked to actual cleanup renderer constructors/destructors, observing setup/delete calls and status across nested ownership and recreation. Then migrate shared ownership and compare x86/x64 lifecycle, font probes, rendering and hosts."
+}

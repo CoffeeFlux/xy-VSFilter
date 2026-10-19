@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 //! Checked font ownership. Native callers borrow only a Windows HFONT scalar,
-//! never the Rust owner or cache entry; the checked owner must outlive selection.
+//! never the Rust owner or cache entry. The owner must outlive new uses of the
+//! borrowed handle; existing DC selection may survive final release.
 use crate::document_registry::{Boundary, Error, Kind, Resource, DOCUMENTS};
 use crate::windows_font::Font;
 use xy_vsfilter_compat::{font_intern as core_font, font_key_wire as wire};
@@ -87,7 +88,8 @@ fn read(boundary: &Boundary, id: u64) -> Result<[u8; 16], u32> {
 }
 /// # Safety
 /// Output spans 16 writable bytes: HFONT u64 LE, ascent/descent i32 LE. This
-/// borrowed Windows handle must not be deleted or retained past owner release;
+/// borrowed Windows handle must not be externally deleted or used for new calls
+/// after owner release.
 /// Existing DC selection can survive final release in the cleanup release
 /// build. No new operation may use this borrowed handle after owner release.
 #[no_mangle]

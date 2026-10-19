@@ -27,15 +27,81 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## In progress: font key ownership (2026-10-19)
+## Latest integrated port: font ownership and Windows GDI boundary (2026-10-19)
+
+The experimental renderer now owns canonical font keys and HFONT lifetimes in
+Rust. The portable table owns raw UTF16 keys and weak payload references; typed
+registry IDs keep native wrappers away from Rust allocations. The Windows
+boundary performs the original LOGFONT construction, Arial fallback, metric
+query and rounding, selection restoration during construction, and final
+DeleteObject attempt. No production default was changed.
+
+Implementation `845adaf7` is compared directly with cleanup `67da07cd` on Windows
+x86 and x64. Each architecture passes 195 actual font cases / 392 trace lines
+and 12 intercepted GDI sequences / 126 lines, with two runs of each side. The
+probes retain raw LOGFONT and metric bytes, aliases, counts, errno, last-error,
+and separate x87/SSE status on x86. Scripted first/both font-creation failures
+exercise the actual fallback with real GDI handles, without exhausting resources.
+
+Direct comparisons found three compatibility details that are now preserved:
+MFC attachment/detachment clears last-error through TLS access; x86 converts
+font height before GetDeviceCaps while x64 converts it afterwards; and the x86
+reference computes and compares in x87. The Rust Windows boundary uses the
+reference FLD/FADD plus CRT conversion helper and FLD/FUCOMPP comparison
+sequence on x86. The safe core accepts a comparison callback and contains no
+assembly or unsafe code. Earlier combined floating-status checks concealed the
+x87/SSE difference; those earlier passes are not evidence of separate-domain
+parity. A subsequent style diagnostic confirms 15 x86 floating-domain mismatches
+while all original aggregate observations remain identical. The extended x64 style
+probe passes. This is an open compatibility defect, not a passing comparison;
+correct style equality before expanding the device-context port. The exact
+diagnostic source is preserved in `tools/compat/style_float_domains_diagnostic.cpp`;
+the evidence file retains differing rows and the original build provenance.
+
+Six isolated raw-size cases pass on each architecture, including signed zero,
+subnormal and minimum normal inputs. Six further extreme/NaN/infinite cases
+remain unresolved: the native observer cannot obtain valid metrics, and a
+separate diagnostic observes failed GetTextMetrics followed by native use of
+uninitialized metric storage. Rust releases the font and reports private status
+6. This is a safe refusal, not a passing compatibility result. Queries of expired
+Windows handles also disagree between native repeats and are not used as proof.
+
+All three DLLs build on both architectures. Each architecture passes 1,222
+rendering cases / 13,186 exact frames and 192 distinct-frame controls; style,
+rectangle, string and table probes; 15 native parser/document regressions;
+export/dependency checks; and 10 COM cases plus two controls. All 339 core and
+136 FFI tests pass per architecture, formatting and Clippy pass, and 181 Python
+tests pass with one skip. Historical document-storage results retain their
+original upstream reference attribution. See [font integration evidence](rust-font-intern-local-evidence.json) and [boundary inventory](rust-font-intern-inventory.json). The 115 portable-core files have zero unsafe
+sites. The FFI inventory is lexical, not a safety proof; the two x86 assembly
+sites are explicitly documented beside their native boundary contracts.
+
+Reproduce the focused comparisons with `tools/compat/font_native.py` and
+`tools/compat/font_gdi_calls.py`, using `--reference-root artifacts/cleanup-reference`,
+`--platform x64` or `Win32`, and a fresh `--output` directory. The font observer's
+`--edge 0` through `--edge 11` isolate raw floating inputs. Local final artifacts
+use `font-domain-*`; earlier failing observations remain separately attributed.
+
+After correcting the x86 style-status defect, the next ownership boundary is
+the shared renderer device context, followed by text/path operations and
+word/line/subtitle ownership. In cleanup Release builds,
+CText::CreatePath's successful restoration occurs only inside an omitted ASSERT;
+font deletion can therefore happen while the font is still selected. Preserve
+that selection and Windows deletion behavior. See the [next-boundary source
+inventory](rust-renderer-dc-inventory.json). This increment does not establish
+nondefault floating modes/traps, reentry, allocation failure, whole-renderer
+concurrency, or full host compatibility. All hosts and vendored code remain
+part of the full Rust migration.
+
+## Earlier font key core stage (2026-10-19)
 
 The safe Rust font interner core is implemented in `font_intern.rs`. It owns raw
 `STSStyleBase` keys independently from weak payload references and preserves the
 cleanup's target-width hashing, bucket traversal, construction timing and final
 release lookup. Payload construction follows the first lookup and precedes the
-map's insertion comparisons. Complete calls must remain serialized. The renderer
-still uses native `FwCMyFont` and `CMyFont`; GDI font handles and metrics have not
-switched to this engine yet.
+map's insertion comparisons. Complete calls must remain serialized. At that
+earlier stage, the renderer still used native `FwCMyFont` and `CMyFont`; the integrated stage above replaces
+font ownership and the GDI constructor/destructor boundary.
 
 Direct comparisons at `fe964cf8` pass on Windows x86 and x64, with two native and
 two Rust runs per architecture. Each trace has 3,290 operations, 35,079 ordered
@@ -64,15 +130,14 @@ artifacts/cleanup-reference --platform x64 --output <new-directory>` and repeat
 with `--platform Win32` from the x86 developer environment. Local artifacts use
 `font-owner-*`.
 
-Next, replace `CMyFont` ownership with audited Rust calls to Windows GDI while
-preserving LOGFONT conversion, fallback to Arial, metric rounding, selected-font
-restoration and resource release. These mock-payload traces do not establish
-GDI behavior, floating status/traps, allocation failure, reentry or concurrency.
+The later integrated font stage above supplies the audited Windows GDI calls,
+LOGFONT conversion, Arial fallback, metric rounding and resource release. These
+mock-payload traces do not establish GDI behavior, floating status/traps, allocation failure, reentry or concurrency.
 The renderer results below remain pinned to their earlier implementation and
 are not font-integration evidence. Word/line/subtitle graphs, the complete
 renderer, every host adapter and vendored code remain in scope.
 
-## Latest integrated port: renderer style ownership (2026-10-19)
+## Earlier integrated port: renderer style ownership (2026-10-19)
 
 The experimental renderer now uses the safe Rust canonical style table through
 typed checked resources. The native wrapper holds an owner ID, canonical identity

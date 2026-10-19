@@ -1,0 +1,1103 @@
+{
+  "schema": 1,
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "candidate_commit": "845adaf798524957b6ed8489bd646a6c5b53782c",
+  "baseline_probe_commit": "cf320a9875bbbdf7117c7c636aba995299eb3c29",
+  "architectures": {
+    "x64": {
+      "font_native": {
+        "path": "artifacts/font-domain-native-x64/report.json",
+        "sha256": "0846e7700155e3429c7c15f45f188141fb6d61b7c105319339f3439c32e28fbc",
+        "cases": 195,
+        "trace_lines": 392
+      },
+      "font_gdi_calls": {
+        "path": "artifacts/font-domain-gdi-x64/report.json",
+        "sha256": "264ccab05049159686d14d5d49d5391c35875d2f20db11a6025d6c98dae0e0ed",
+        "cases": 12,
+        "trace_lines": 126
+      },
+      "style_intern_native": {
+        "path": "artifacts/font-domain-style_intern_native-x64/report.json",
+        "sha256": "02731ec54465895d8bb32fb07f8e49bb6594e9ed176dc113320d69e73ee8f6f6",
+        "cases": 196,
+        "trace_lines": 788,
+        "isolated_nan_release": {
+          "count_before": 1,
+          "count_after": 1,
+          "post_release_lookup_executed": false,
+          "trace_sha256": [
+            "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+            "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+            "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+            "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062"
+          ]
+        },
+        "lifecycle": {
+          "trace_sha256": [
+            "182c04389a326a42a68b9f324049ee676c4e140bc2dcf4f5b5a1fc39485ccc58",
+            "182c04389a326a42a68b9f324049ee676c4e140bc2dcf4f5b5a1fc39485ccc58",
+            "182c04389a326a42a68b9f324049ee676c4e140bc2dcf4f5b5a1fc39485ccc58",
+            "182c04389a326a42a68b9f324049ee676c4e140bc2dcf4f5b5a1fc39485ccc58"
+          ],
+          "trace_lines": 5,
+          "late_owner": true,
+          "sticky_status": true
+        }
+      },
+      "style_table_adapter_native": {
+        "path": "artifacts/font-domain-style_table_adapter_native-x64/report.json",
+        "sha256": "00b959692bb7674a58c7058755e0a114371a7840ce9e0a9fccda369882a31352",
+        "cases": 1760,
+        "trace_lines": 25189
+      },
+      "rect_intern_native": {
+        "path": "artifacts/font-domain-rect_intern_native-x64/report.json",
+        "sha256": "537758963946d60c38e3ba2d92144424cb8d773d8c7a9fff6541b2363b4e59df",
+        "cases": 294,
+        "trace_lines": 5003
+      },
+      "string_flyweight_native": {
+        "path": "artifacts/font-domain-string_flyweight_native-x64/report.json",
+        "sha256": "a3a91a1f0631dd7e139c4954172a7df7d9e85f53e1761b40f03f2f450ab34348",
+        "cases": 410,
+        "trace_lines": 5334
+      },
+      "preport_font_baseline": {
+        "path": "artifacts/font-native-live-x64/report.json",
+        "sha256": "063be39e2b89ed85aa764a17e03d645bc8e0ce46d92720a48d14f61edf3b9148",
+        "scope": "Historical aggregate floating flags; current observer adds separate x87/SSE fields, so raw traces are not identical."
+      },
+      "raw_float_edges": [
+        {
+          "path": "artifacts/font-domain-edge-x64-0/report.json",
+          "sha256": "6999a60bcaf8fb13a9690e7592389f600775bbdecc34ccdb0caf2985bc244be2",
+          "edge": 0,
+          "complete": true,
+          "equal": true,
+          "unresolved": null
+        },
+        {
+          "path": "artifacts/font-domain-edge-x64-1/report.json",
+          "sha256": "9eff372cff16d1e8402e76b8da0e11b09aedd9d9f6c46b67db28f92880182d90",
+          "edge": 1,
+          "complete": true,
+          "equal": true,
+          "unresolved": null
+        },
+        {
+          "path": "artifacts/font-domain-edge-x64-2/report.json",
+          "sha256": "02049b4b6c95ebbc6652f51a8445393ef189066e580eed39eeda0e3900aa1c6f",
+          "edge": 2,
+          "complete": true,
+          "equal": true,
+          "unresolved": null
+        },
+        {
+          "path": "artifacts/font-domain-edge-x64-3/report.json",
+          "sha256": "6b63f7cb1616b28a2a4cca7b3e94c8221439365615829f1a0da04be572752c21",
+          "edge": 3,
+          "complete": true,
+          "equal": true,
+          "unresolved": null
+        },
+        {
+          "path": "artifacts/font-domain-edge-x64-4/report.json",
+          "sha256": "5a2cdd5c7c83347180dfdda6b523aa9d68fb0eacf8ea8bf718455de6a6fe3591",
+          "edge": 4,
+          "complete": true,
+          "equal": true,
+          "unresolved": null
+        },
+        {
+          "path": "artifacts/font-domain-edge-x64-5/report.json",
+          "sha256": "1ed8e6cde48462bb6b7006e12560baa11868c63568a39e91c65a141d1c011daa",
+          "edge": 5,
+          "complete": true,
+          "equal": true,
+          "unresolved": null
+        },
+        {
+          "path": "artifacts/font-domain-edge-x64-6/report.json",
+          "sha256": "d8825b1ab4e041598c7a70766e0088aa5a7b226158a1b68aac2a5165182f7f84",
+          "edge": 6,
+          "complete": false,
+          "equal": false,
+          "unresolved": "reference-trace-1 exited 2; unresolved"
+        },
+        {
+          "path": "artifacts/font-domain-edge-x64-7/report.json",
+          "sha256": "f906416204f8586653a4e0a87c65863760d7819c2f50f06821fba3dcac75ba45",
+          "edge": 7,
+          "complete": false,
+          "equal": false,
+          "unresolved": "reference-trace-1 exited 2; unresolved"
+        },
+        {
+          "path": "artifacts/font-domain-edge-x64-8/report.json",
+          "sha256": "a754301c9f0b041e7f6ca754e74238b96f848fde85db16dcd122c10ef32ffe15",
+          "edge": 8,
+          "complete": false,
+          "equal": false,
+          "unresolved": "reference-trace-1 exited 2; unresolved"
+        },
+        {
+          "path": "artifacts/font-domain-edge-x64-9/report.json",
+          "sha256": "a7da42c8cbffddf2f5089d6503793ba45afa194819a0ebc35923ac366032048a",
+          "edge": 9,
+          "complete": false,
+          "equal": false,
+          "unresolved": "reference-trace-1 exited 2; unresolved"
+        },
+        {
+          "path": "artifacts/font-domain-edge-x64-10/report.json",
+          "sha256": "aea03afd2f5ea28c883f5e98cfd9663e474563c3b724950e3d77d5927c302e29",
+          "edge": 10,
+          "complete": false,
+          "equal": false,
+          "unresolved": "reference-trace-1 exited 2; unresolved"
+        },
+        {
+          "path": "artifacts/font-domain-edge-x64-11/report.json",
+          "sha256": "262822a005c780136911a9e96b0174152295b1c7c00059dfab26179096417335",
+          "edge": 11,
+          "complete": false,
+          "equal": false,
+          "unresolved": "reference-trace-1 exited 2; unresolved"
+        }
+      ],
+      "adapter_table_scope": "Logging cleanup template plus parallel actual renderer styles. Actual styles assert canonical tags, all held alias relations and counts after each operation; printed comparison events are from the logging template.",
+      "regressions": {
+        "override_native": {
+          "path": "artifacts/font-domain-override_native-x64/report.json",
+          "sha256": "4309b47508687a73f9ed7863174ae20a3d06559ed7c5e0ab9a5cbd4c877dabe1",
+          "cases": 9312,
+          "trace_lines": 96014
+        },
+        "ass_tree_native": {
+          "path": "artifacts/font-domain-ass_tree_native-x64/report.json",
+          "sha256": "79617e01241a02eda9aa18a9d0ed2d63acdc8c00eabb64144cd4dfe0e1272525",
+          "cases": 5142,
+          "trace_lines": 10286
+        },
+        "effects_native": {
+          "path": "artifacts/font-domain-effects_native-x64/report.json",
+          "sha256": "56a4d9f3270d4b00b02e564dca38ae4ce5431a579b33441532f068ee44d1a9f4",
+          "cases": 13608,
+          "trace_lines": 81722
+        },
+        "html_tag_native": {
+          "path": "artifacts/font-domain-html_tag_native-x64/report.json",
+          "sha256": "54e761223b2a758b820fe424c908a02a9d1a3ca07bd6dc301a28a85ea2af8329",
+          "cases": 5728,
+          "trace_lines": 17186
+        },
+        "shared_color_native": {
+          "path": "artifacts/font-domain-shared_color_native-x64/report.json",
+          "sha256": "4b362c7b79cafcbc51d39ff5f9e874305a190642e5b7584fe0d9216158c1c2cb",
+          "cases": 8896,
+          "trace_lines": 12234
+        },
+        "usf_document_native": {
+          "path": "artifacts/font-domain-usf_document_native-x64/report.json",
+          "sha256": "4519bee44619dcc21a99c341c6f9e70af58552e91cf9e8088a3cd4d5fd85d335",
+          "cases": 1340,
+          "trace_lines": 40517
+        },
+        "realtext_document_native": {
+          "path": "artifacts/font-domain-realtext_document_native-x64/report.json",
+          "sha256": "7d490ad09e7028607dd2389351bd1204f30c32ac70d1ccc5e862c5e789b6d761",
+          "cases": 4532,
+          "trace_lines": 37887
+        },
+        "vtt_document_native": {
+          "path": "artifacts/font-domain-vtt_document_native-x64/report.json",
+          "sha256": "437ad191db49b7267a45d76fe55b9f28d50d629b7f84b98bb5277e599b189aa6",
+          "cases": 2292,
+          "trace_lines": 21939
+        },
+        "sami_document_native": {
+          "path": "artifacts/font-domain-sami_document_native-x64/report.json",
+          "sha256": "978f9194f84805efa2e734f5037322e5bc9e354a928a216db218a3c5a015ed32",
+          "cases": 2836,
+          "trace_lines": 26992
+        },
+        "text_document_native": {
+          "path": "artifacts/font-domain-text_document_native-x64/report.json",
+          "sha256": "0c404eb4daafc74df60133dc58124cddfe536085962dc4de20c6ee3b8eb7a6f2",
+          "cases": 5692,
+          "trace_lines": 44404
+        },
+        "microdvd_document_native": {
+          "path": "artifacts/font-domain-microdvd_document_native-x64/report.json",
+          "sha256": "5374acf223fe44776591ef092c95fe1798edf277b565b8d8a6d2bd90f4ac0233",
+          "cases": 4588,
+          "trace_lines": 41491
+        },
+        "ass_document_native": {
+          "path": "artifacts/font-domain-ass_document_native-x64/report.json",
+          "sha256": "975e3b47e13dec0667678d3d01c0ccab4e0f6e2e97cd2566581b8e7fec4bc37e",
+          "cases": 3266,
+          "trace_lines": 22286
+        },
+        "xombie_document_native": {
+          "path": "artifacts/font-domain-xombie_document_native-x64/report.json",
+          "sha256": "e2856440dcbee016e2e86e90536d6c8644217be96f39b5d475d66faeaa1df7d1",
+          "cases": 1242,
+          "trace_lines": 10441
+        },
+        "document_style_api_compile": {
+          "path": "artifacts/font-domain-document_style_api_compile-x64/report.json",
+          "sha256": "05629151c41b3bb896597c0af438671404dd861490190a87859938eb257a1e96",
+          "cases": null,
+          "trace_lines": null
+        },
+        "document_native_lifecycle": {
+          "path": "artifacts/font-domain-document_native_lifecycle-x64/report.json",
+          "sha256": "11b58b7435160d6e6807c69642403899402a6cd121f8b5eef474c963053bc23e",
+          "cases": null,
+          "trace_lines": 3693
+        }
+      },
+      "historical_storage_harness": {
+        "primitives": {
+          "path": "artifacts/font-domain-document-windows-x64/report.json",
+          "sha256": "d45d4e49c84d062d7affd64bd1c29e4b5c3f66138fb0d2c1edff0fa37aa37ed6",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 53711,
+          "rust_parity_within_harness_scope": false
+        },
+        "/facade": {
+          "path": "artifacts/font-domain-document-windows-x64/facade/report.json",
+          "sha256": "d5f9673e5c1d482037076a7a23a8953d83d13e1c496b2ee03011e4a530e790f6",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 166,
+          "rust_parity_within_harness_scope": false
+        },
+        "/owner": {
+          "path": "artifacts/font-domain-document-windows-x64/owner/report.json",
+          "sha256": "07d059037bbdfddc562d5d15699f7e58ea1223f93dbed65d480990fedb6bdefd",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 2361,
+          "rust_parity_within_harness_scope": true
+        }
+      },
+      "historical_storage_scope": "Historical upstream algorithms only; current Rust rectangle adapter on both storage sides. Actual cleanup rectangle parity comes from rect_intern_native.",
+      "rendering": {
+        "path": "artifacts/font-domain-csri-x64/summary.json",
+        "sha256": "d389e7587a6bcb96239747e5039c26b5e1b81b61eb03cc74c5bd2ef3310b2ce7",
+        "cases": 1222,
+        "frames": 13186,
+        "distinct_controls": 192,
+        "shards": [
+          {
+            "path": "artifacts/font-domain-csri-x64/shard-0/report.json",
+            "sha256": "58e3406edd296ce2081f3f8eb94ce6a76d33e68de56f3f7f4b96de547d49c8be"
+          },
+          {
+            "path": "artifacts/font-domain-csri-x64/shard-1/report.json",
+            "sha256": "51812b1a711032e85440c22e73845b9b483471626846879276673fe204a6acb1"
+          },
+          {
+            "path": "artifacts/font-domain-csri-x64/shard-2/report.json",
+            "sha256": "1280f278d26f16ee3392142797b6ca33abda396030cea1dba0ad8d89e01c9462"
+          },
+          {
+            "path": "artifacts/font-domain-csri-x64/shard-3/report.json",
+            "sha256": "06b8858064b2b411dd26eff76df7498ad5af8449758f5822743e4d1cb93fb1f5"
+          },
+          {
+            "path": "artifacts/font-domain-csri-x64/shard-4/report.json",
+            "sha256": "72094cad7dc593ec80c1e15f20bc25e1b895728887fd72c22ca5698e5d75d8fb"
+          },
+          {
+            "path": "artifacts/font-domain-csri-x64/shard-5/report.json",
+            "sha256": "b8ba9a75301b1c9ac9d03ec0794e953a6867c0a3f9d9b333f6d7629488ba0ff0"
+          },
+          {
+            "path": "artifacts/font-domain-csri-x64/shard-6/report.json",
+            "sha256": "c986f00c101d5795dcc219a848d459e7a810aea51a03e844036914448d0eb2d7"
+          },
+          {
+            "path": "artifacts/font-domain-csri-x64/shard-7/report.json",
+            "sha256": "7c51ac5e91b9ada4711f7e055c06a07fb3c54700e74e1718e51bc5478dbe05d6"
+          }
+        ]
+      },
+      "contracts": {
+        "path": "artifacts/font-domain-contracts-x64/summary.json",
+        "sha256": "6deb4b23cef7dce374bfde358d6b81124423ae0f0920ff2fbd68b1b082a7d9c9",
+        "com": {
+          "path": "artifacts/font-domain-contracts-x64/com/report.json",
+          "sha256": "6966767f314b8c3ca9d7df95fcc074898aaab522abe21ca6c05c0595ee1887a4"
+        },
+        "dlls": {
+          "VSFilter.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/x64/Release/VSFilter.dll",
+              "sha256": "2d254068a40e5f59cf191c3c6bbfc984b548193b668c4decac21dc1e94e02169"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/x64/Release/VSFilter.dll",
+              "sha256": "1f772b4c8334fe5cd4b716344b402bd8fe8a39aef48f35ff19147ad6ab4feb62"
+            },
+            "exports": {
+              "path": "artifacts/font-domain-contracts-x64/VSFilter.dll.pe_exports.json",
+              "sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1"
+            },
+            "dependencies": {
+              "path": "artifacts/font-domain-contracts-x64/VSFilter.dll.pe_dependencies.json",
+              "sha256": "805d7d7481b2774c2612b7cd7dd7fdaa4dd04a35111f3726a6704acf88c4a0d2"
+            }
+          },
+          "XySubFilter.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/x64/Release/XySubFilter.dll",
+              "sha256": "32b7c2cd6eb817120414db53b3c3005e719ae4b993c4a69d0d66c7f6ac363d5a"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/x64/Release/XySubFilter.dll",
+              "sha256": "850132f16965c08623dfb5fb6ace4353560a02a17e93909ee2231ac684854ed4"
+            },
+            "exports": {
+              "path": "artifacts/font-domain-contracts-x64/XySubFilter.dll.pe_exports.json",
+              "sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42"
+            },
+            "dependencies": {
+              "path": "artifacts/font-domain-contracts-x64/XySubFilter.dll.pe_dependencies.json",
+              "sha256": "2ce278d6be4d85c557490e59cb33e78ca53faf3e38061e9ca3eb225897be359a"
+            }
+          },
+          "xy_sub_filter_consumer.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/x64/Release/xy_sub_filter_consumer.dll",
+              "sha256": "f1165742064181b7fb73bacb16017d8e202c8bb0be90ed8c2eb812ac282c2df8"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/x64/Release/xy_sub_filter_consumer.dll",
+              "sha256": "be9a9ce5ff19a0273b1fa6de88865f64c6daf7b800aa26455f02993e1c60c162"
+            },
+            "exports": {
+              "path": "artifacts/font-domain-contracts-x64/xy_sub_filter_consumer.dll.pe_exports.json",
+              "sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b"
+            },
+            "dependencies": {
+              "path": "artifacts/font-domain-contracts-x64/xy_sub_filter_consumer.dll.pe_dependencies.json",
+              "sha256": "b0b48a3cf2bf2ecbbac4ecca863a815ab4a0c1137277a9b7d5830d9d1beca5c9"
+            }
+          }
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/font-domain-build-x64.log",
+          "sha256": "41478ef72d8fbca39f425f9e58f6edcfe2a2895e662bd177b3e254830319faa7"
+        },
+        {
+          "path": "artifacts/font-domain-build-rust-x64.log",
+          "sha256": "d3fd6ef3ed1995eb3ca2b7dc508b487305293f78b7ab51c36ab9c087fa018158"
+        }
+      ]
+    },
+    "x86": {
+      "font_native": {
+        "path": "artifacts/font-domain-native-x86/report.json",
+        "sha256": "69eb9c2becd3297b19b3a9f577fd971c697b9da4a67b7eec4925ba25fa628bd7",
+        "cases": 195,
+        "trace_lines": 392
+      },
+      "font_gdi_calls": {
+        "path": "artifacts/font-domain-gdi-x86/report.json",
+        "sha256": "caf86d6f27a20e64e814592d4dc0e4f3a79e64160020bc79cef94c40bab34433",
+        "cases": 12,
+        "trace_lines": 126
+      },
+      "style_intern_native": {
+        "path": "artifacts/font-domain-style_intern_native-x86/report.json",
+        "sha256": "8821d0d4670d6cabdebeac52d71f7797d6336b9b94fe9fb4c79695551c58f594",
+        "cases": 196,
+        "trace_lines": 788,
+        "isolated_nan_release": {
+          "count_before": 1,
+          "count_after": 1,
+          "post_release_lookup_executed": false,
+          "trace_sha256": [
+            "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+            "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+            "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+            "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16"
+          ]
+        },
+        "lifecycle": {
+          "trace_sha256": [
+            "182c04389a326a42a68b9f324049ee676c4e140bc2dcf4f5b5a1fc39485ccc58",
+            "182c04389a326a42a68b9f324049ee676c4e140bc2dcf4f5b5a1fc39485ccc58",
+            "182c04389a326a42a68b9f324049ee676c4e140bc2dcf4f5b5a1fc39485ccc58",
+            "182c04389a326a42a68b9f324049ee676c4e140bc2dcf4f5b5a1fc39485ccc58"
+          ],
+          "trace_lines": 5,
+          "late_owner": true,
+          "sticky_status": true
+        }
+      },
+      "style_table_adapter_native": {
+        "path": "artifacts/font-domain-style_table_adapter_native-x86/report.json",
+        "sha256": "0e770e50181f807f1993916ef54ea96955174109ef9abcde2ef364d3355f796f",
+        "cases": 1760,
+        "trace_lines": 25189
+      },
+      "rect_intern_native": {
+        "path": "artifacts/font-domain-rect_intern_native-x86/report.json",
+        "sha256": "70bb3ba46deb7e596e53b1b51dd7ebbfc0e27e58083ce77ad68065739f6426d2",
+        "cases": 294,
+        "trace_lines": 5003
+      },
+      "string_flyweight_native": {
+        "path": "artifacts/font-domain-string_flyweight_native-x86/report.json",
+        "sha256": "df53e39334d321741cb8202be36ff2158191429edae817bae0b0e6c038cb9eb9",
+        "cases": 410,
+        "trace_lines": 5334
+      },
+      "preport_font_baseline": {
+        "path": "artifacts/font-native-live-x86/report.json",
+        "sha256": "03fa6f102f6d5353f5b6041462e817049128587af05c7fdb3bde4db36a515b6d",
+        "scope": "Historical aggregate floating flags; current observer adds separate x87/SSE fields, so raw traces are not identical."
+      },
+      "raw_float_edges": [
+        {
+          "path": "artifacts/font-domain-edge-x86-0/report.json",
+          "sha256": "8deb993bd89bd23cd20094c9e4bc1a62d5dc26216deb9ff7f6dd70127c9fcaa2",
+          "edge": 0,
+          "complete": true,
+          "equal": true,
+          "unresolved": null
+        },
+        {
+          "path": "artifacts/font-domain-edge-x86-1/report.json",
+          "sha256": "710d14e00a0e1e0d86020b5feefeec5e0bcb79f0e10f6d9a237073f48fd14918",
+          "edge": 1,
+          "complete": true,
+          "equal": true,
+          "unresolved": null
+        },
+        {
+          "path": "artifacts/font-domain-edge-x86-2/report.json",
+          "sha256": "ee493f4445bc828c5a4b6ae76851cb168706cb8ae94f0674a1f133ba548e1edf",
+          "edge": 2,
+          "complete": true,
+          "equal": true,
+          "unresolved": null
+        },
+        {
+          "path": "artifacts/font-domain-edge-x86-3/report.json",
+          "sha256": "08ecbf64ba42d1674ea37880b9f6a8ce795b12b4208e6af8e64008544060670f",
+          "edge": 3,
+          "complete": true,
+          "equal": true,
+          "unresolved": null
+        },
+        {
+          "path": "artifacts/font-domain-edge-x86-4/report.json",
+          "sha256": "4dd59c45c122ac1b34aa015fe43f971137ae35a106590fe9d8f049bf8018789f",
+          "edge": 4,
+          "complete": true,
+          "equal": true,
+          "unresolved": null
+        },
+        {
+          "path": "artifacts/font-domain-edge-x86-5/report.json",
+          "sha256": "1b88658995c53be8cbc415c17dd3f956da0bdc3e82e1f5d8a5718e6558a78a6d",
+          "edge": 5,
+          "complete": true,
+          "equal": true,
+          "unresolved": null
+        },
+        {
+          "path": "artifacts/font-domain-edge-x86-6/report.json",
+          "sha256": "9f130a2020a454bfe90ce352f4c234307918a82005174945cbb84d07467139b9",
+          "edge": 6,
+          "complete": false,
+          "equal": false,
+          "unresolved": "reference-trace-1 exited 2; unresolved"
+        },
+        {
+          "path": "artifacts/font-domain-edge-x86-7/report.json",
+          "sha256": "2f373cb046b2997412715349ed8b95c7e669cf9d9c8e0b3c9919bf7e2d86ade5",
+          "edge": 7,
+          "complete": false,
+          "equal": false,
+          "unresolved": "reference-trace-1 exited 2; unresolved"
+        },
+        {
+          "path": "artifacts/font-domain-edge-x86-8/report.json",
+          "sha256": "35a0ca27174a16ef1fdda7bda2006a56ff58a6910a12cb47ac0388b67e230b59",
+          "edge": 8,
+          "complete": false,
+          "equal": false,
+          "unresolved": "reference-trace-1 exited 2; unresolved"
+        },
+        {
+          "path": "artifacts/font-domain-edge-x86-9/report.json",
+          "sha256": "bd9652e33bd0144a9483a8c75f835ee9dcbf7e2729d52fe9bb49768c4a2f0b44",
+          "edge": 9,
+          "complete": false,
+          "equal": false,
+          "unresolved": "reference-trace-1 exited 2; unresolved"
+        },
+        {
+          "path": "artifacts/font-domain-edge-x86-10/report.json",
+          "sha256": "62aa120702743d85208fa73a030af32c5a123c0e53ef4496670d1cce4b4ab3d2",
+          "edge": 10,
+          "complete": false,
+          "equal": false,
+          "unresolved": "reference-trace-1 exited 2; unresolved"
+        },
+        {
+          "path": "artifacts/font-domain-edge-x86-11/report.json",
+          "sha256": "6a0d8be09d4f9dbecd20bab2439e43b395123de7edb12e3af6f038df505f6a28",
+          "edge": 11,
+          "complete": false,
+          "equal": false,
+          "unresolved": "reference-trace-1 exited 2; unresolved"
+        }
+      ],
+      "adapter_table_scope": "Logging cleanup template plus parallel actual renderer styles. Actual styles assert canonical tags, all held alias relations and counts after each operation; printed comparison events are from the logging template.",
+      "regressions": {
+        "override_native": {
+          "path": "artifacts/font-domain-override_native-x86/report.json",
+          "sha256": "bbf6378beaf7e1482af854b5e800045ef0e6e5debd1541dd563cbafdefd9c7cd",
+          "cases": 9312,
+          "trace_lines": 96014
+        },
+        "ass_tree_native": {
+          "path": "artifacts/font-domain-ass_tree_native-x86/report.json",
+          "sha256": "ae1851b4aee619ad0e71573c4b657d166c635b7a1d4f4fb44c86f6661b115722",
+          "cases": 5142,
+          "trace_lines": 10286
+        },
+        "effects_native": {
+          "path": "artifacts/font-domain-effects_native-x86/report.json",
+          "sha256": "ccd08b6eaf7889f73e53b0953133f47af4bec973652568e0c8d91a9c2db00a72",
+          "cases": 13608,
+          "trace_lines": 81722
+        },
+        "html_tag_native": {
+          "path": "artifacts/font-domain-html_tag_native-x86/report.json",
+          "sha256": "85dd2bdda0e0d5418bd8699004d7671f8f4fec8ebd518f182d972335e2883a61",
+          "cases": 5728,
+          "trace_lines": 17186
+        },
+        "shared_color_native": {
+          "path": "artifacts/font-domain-shared_color_native-x86/report.json",
+          "sha256": "41ae2d0539468763878cf9e7316c96b9cb162b1f6b2358f37889ef5f0236ae4a",
+          "cases": 8896,
+          "trace_lines": 12234
+        },
+        "usf_document_native": {
+          "path": "artifacts/font-domain-usf_document_native-x86/report.json",
+          "sha256": "dc3033950f4738eaae67d0756b1ffec7e2357ee5b9c8d9ed72125c5f72145764",
+          "cases": 1340,
+          "trace_lines": 40517
+        },
+        "realtext_document_native": {
+          "path": "artifacts/font-domain-realtext_document_native-x86/report.json",
+          "sha256": "a955d0dd3e728e5efefc7177047c932b08445c11f376f0fe1b450439e5ecdd92",
+          "cases": 4532,
+          "trace_lines": 37887
+        },
+        "vtt_document_native": {
+          "path": "artifacts/font-domain-vtt_document_native-x86/report.json",
+          "sha256": "6d14eee821b50ce1c7e64fee91ddaed92a0f632bf7622d55e7fbe443df35be49",
+          "cases": 2292,
+          "trace_lines": 21939
+        },
+        "sami_document_native": {
+          "path": "artifacts/font-domain-sami_document_native-x86/report.json",
+          "sha256": "44e6c7995fe63384588f2bd02c0974df48077e8251de37bdecc0fda8f08be6e3",
+          "cases": 2836,
+          "trace_lines": 26992
+        },
+        "text_document_native": {
+          "path": "artifacts/font-domain-text_document_native-x86/report.json",
+          "sha256": "a91397d6573109784d30579e32d0a96ddd9c2ccb3da0034d2e47785f09528350",
+          "cases": 5692,
+          "trace_lines": 44404
+        },
+        "microdvd_document_native": {
+          "path": "artifacts/font-domain-microdvd_document_native-x86/report.json",
+          "sha256": "fc8618131d1b75f8c8c559ab3614241bf1c5139c392cf1b9e266ce9d702155a2",
+          "cases": 4588,
+          "trace_lines": 41491
+        },
+        "ass_document_native": {
+          "path": "artifacts/font-domain-ass_document_native-x86/report.json",
+          "sha256": "25bed3229c73b801b2d7611fe22fa9d6a22d5ed9a949ce874bb458e70424c8cb",
+          "cases": 3266,
+          "trace_lines": 22286
+        },
+        "xombie_document_native": {
+          "path": "artifacts/font-domain-xombie_document_native-x86/report.json",
+          "sha256": "5b5579f876772c8d409698ab53a54c301aaf410f61da4dd5138cf2c80f566e98",
+          "cases": 1242,
+          "trace_lines": 10441
+        },
+        "document_style_api_compile": {
+          "path": "artifacts/font-domain-document_style_api_compile-x86/report.json",
+          "sha256": "f3c347abce5ce586bdd787b21750aef7492514cb7333f87746ba4932d6eef1fa",
+          "cases": null,
+          "trace_lines": null
+        },
+        "document_native_lifecycle": {
+          "path": "artifacts/font-domain-document_native_lifecycle-x86/report.json",
+          "sha256": "5a799fb7bf54a5d6996f8b72dd57b1a5e4322d8fdd104d02129328b9ea4551ac",
+          "cases": null,
+          "trace_lines": 3693
+        }
+      },
+      "historical_storage_harness": {
+        "primitives": {
+          "path": "artifacts/font-domain-document-windows-x86/report.json",
+          "sha256": "33e2222b390c779c74f627ebfb311c45412dc9b28df3ead8047b124ad994f177",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 53711,
+          "rust_parity_within_harness_scope": false
+        },
+        "/facade": {
+          "path": "artifacts/font-domain-document-windows-x86/facade/report.json",
+          "sha256": "f6e2f3d2771d144174fe027932727af537457a89bd280ddb356a6fd0e95ce848",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 166,
+          "rust_parity_within_harness_scope": false
+        },
+        "/owner": {
+          "path": "artifacts/font-domain-document-windows-x86/owner/report.json",
+          "sha256": "4f6a4b009859c320d25d4cdb2d40cef272d6784c9a6134c5a10bd5cc14d1e118",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 2361,
+          "rust_parity_within_harness_scope": true
+        }
+      },
+      "historical_storage_scope": "Historical upstream algorithms only; current Rust rectangle adapter on both storage sides. Actual cleanup rectangle parity comes from rect_intern_native.",
+      "rendering": {
+        "path": "artifacts/font-domain-csri-x86/summary.json",
+        "sha256": "6e0b578b70ff59f26d27fc6eb50c33840ab3134b137de41fe0730fc59158346a",
+        "cases": 1222,
+        "frames": 13186,
+        "distinct_controls": 192,
+        "shards": [
+          {
+            "path": "artifacts/font-domain-csri-x86/shard-0/report.json",
+            "sha256": "4ed2917df41c446c4c89f5ac4f56cfeedd471279aa134172feeb8c13f0252b5d"
+          },
+          {
+            "path": "artifacts/font-domain-csri-x86/shard-1/report.json",
+            "sha256": "60605fe999feee6a0878cec8215096591f0870691d2b4558ba9cf076afecf4ff"
+          },
+          {
+            "path": "artifacts/font-domain-csri-x86/shard-2/report.json",
+            "sha256": "5b0ff2ff9ce2a42f7fd804e4a39f9a86bb1eae2e84a8edf9de89f8e27f38c23a"
+          },
+          {
+            "path": "artifacts/font-domain-csri-x86/shard-3/report.json",
+            "sha256": "8bf6fda843623d1061b4156c0e4f63ae2dada1e7545374b8994fce9ed3259b9e"
+          },
+          {
+            "path": "artifacts/font-domain-csri-x86/shard-4/report.json",
+            "sha256": "acd637a3fdd401fc005eccfc12c6cb0d48787e614367de1ea6ce77e6b001d3a4"
+          },
+          {
+            "path": "artifacts/font-domain-csri-x86/shard-5/report.json",
+            "sha256": "cfdf895eec4e7ccd737ad27bad4e2dcecbb4080dc3e7aead32157acea4593e93"
+          },
+          {
+            "path": "artifacts/font-domain-csri-x86/shard-6/report.json",
+            "sha256": "f8def39967454e573b49a4487d9c1836e149c25cd25722bedac2ffe4d1962a0f"
+          },
+          {
+            "path": "artifacts/font-domain-csri-x86/shard-7/report.json",
+            "sha256": "f95df8f9cf5e9d682d0f921e968d438904fa96e93ae56d4c46114a2effcd3c93"
+          }
+        ]
+      },
+      "contracts": {
+        "path": "artifacts/font-domain-contracts-x86/summary.json",
+        "sha256": "6deb4b23cef7dce374bfde358d6b81124423ae0f0920ff2fbd68b1b082a7d9c9",
+        "com": {
+          "path": "artifacts/font-domain-contracts-x86/com/report.json",
+          "sha256": "161114aa5418fb8dcd69bd9fbf79d62bf70c36befff482a761e42e0393718ba8"
+        },
+        "dlls": {
+          "VSFilter.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/Win32/Release/VSFilter.dll",
+              "sha256": "69faa2d5f90f35fe4184e9e9bd892adb76fee60295701988f61ab7af0664d9eb"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/Win32/Release/VSFilter.dll",
+              "sha256": "3458294f7adde13b0020f566b157c794ee8602c56625c99f74f7a7c85ef561ce"
+            },
+            "exports": {
+              "path": "artifacts/font-domain-contracts-x86/VSFilter.dll.pe_exports.json",
+              "sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c"
+            },
+            "dependencies": {
+              "path": "artifacts/font-domain-contracts-x86/VSFilter.dll.pe_dependencies.json",
+              "sha256": "8b0365bd8b1fa8ea13b65d8681836b85d870a46781d0a3cbfb851b1000a21ae7"
+            }
+          },
+          "XySubFilter.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/Win32/Release/XySubFilter.dll",
+              "sha256": "2c3b904d7f91902ef456e07b648c5d6351878318c235397eeb9b39eb3fffa34f"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/Win32/Release/XySubFilter.dll",
+              "sha256": "81be6ae84af0cbe15c4fab90c3acb7b2c9042c5b515ae5cd325376b7339c878f"
+            },
+            "exports": {
+              "path": "artifacts/font-domain-contracts-x86/XySubFilter.dll.pe_exports.json",
+              "sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11"
+            },
+            "dependencies": {
+              "path": "artifacts/font-domain-contracts-x86/XySubFilter.dll.pe_dependencies.json",
+              "sha256": "2a22ef471924cc53ea843b14cb2fb5e1dc765f9e308e8ed316172476b0696dd5"
+            }
+          },
+          "xy_sub_filter_consumer.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/Win32/Release/xy_sub_filter_consumer.dll",
+              "sha256": "3e7c20a4d6c42457d92eb56c42e4fd9f3bddb93276f2c1cd28bfb73edd06484c"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/Win32/Release/xy_sub_filter_consumer.dll",
+              "sha256": "e0461044dbf381156505bc4a58be28f3a7f7a428d66915a6a657e093a2ba423a"
+            },
+            "exports": {
+              "path": "artifacts/font-domain-contracts-x86/xy_sub_filter_consumer.dll.pe_exports.json",
+              "sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94"
+            },
+            "dependencies": {
+              "path": "artifacts/font-domain-contracts-x86/xy_sub_filter_consumer.dll.pe_dependencies.json",
+              "sha256": "bee8a1d975859e0ab8a9b6843e14f813df818b8538e6501927e792bb180eb7c1"
+            }
+          }
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/font-domain-build-x86.log",
+          "sha256": "13a90a0e47462c8fa5f54fd83ca793d1a9c772d4f5138fa141ed68e0bf924f71"
+        },
+        {
+          "path": "artifacts/font-domain-build-rust-x86.log",
+          "sha256": "b86c27e0773c071b0c9949368ac9ea34bdb20753a8a202276e5c9ea23202dde8"
+        }
+      ]
+    }
+  },
+  "checks": {
+    "path": "artifacts/font-domain-checks.log",
+    "sha256": "45006646fd771fc4c883c256bac330cf019691257195d4c44b742082470c4500",
+    "safe_core_per_architecture": 339,
+    "ffi_per_architecture": 136,
+    "python_existing": 181,
+    "python_skipped": 1,
+    "fmt": true,
+    "clippy_all_targets_and_native_runtime_both_architectures": true
+  },
+  "unsafe_inventory": {
+    "path": "artifacts/font-domain-unsafe-inventory.json",
+    "sha256": "84f1c842b5b78ac812454f9952aa85acaa1112683463d5be13c0ca2af1e096f4"
+  },
+  "initial_last_error_difference": {
+    "x64": {
+      "path": "artifacts/font-native-primary-x64/report.json",
+      "sha256": "9b3b1df5bb26ac2d1f920a9e5e653af64be0151b94ed15c027c41e0956368615",
+      "different_rows": 390,
+      "outcome": "Not passing. MFC Attach/Detach TLS access clears last-error; explicit equivalent effect added only when a nonnull font is attached/released."
+    },
+    "x86": {
+      "path": "artifacts/font-native-primary-x86/report.json",
+      "sha256": "c1fdcd2d7b7c123a075d26475dfdbc04260fe51525b841c04775c69a9d5a8b68",
+      "different_rows": 390,
+      "outcome": "Not passing. MFC Attach/Detach TLS access clears last-error; explicit equivalent effect added only when a nonnull font is attached/released."
+    }
+  },
+  "initial_x86_conversion_order_difference": {
+    "path": "artifacts/font-gdi-observed-x86/report.json",
+    "sha256": "1b9c933fc674fcd82fc43bf9f583b37a574a397567dbd7ab311182a8168ac288",
+    "outcome": "Not passing. Native x86 conversion raises inexact before GetDeviceCaps; x64 does so after. Final code preserves the architecture-specific order and both conversions."
+  },
+  "unresolved_expired_handle_queries": {
+    "x64": {
+      "path": "artifacts/font-native-observed-x64/report.json",
+      "sha256": "187fa04071f795fb81034c8b856840d889e0aa43294398014c2d8de139036856",
+      "outcome": "Two reference runs disagree on GetObjectType after final owner release, including after GdiFlush. No passing parity claim or emulation of expired Windows handle identity."
+    },
+    "x86": {
+      "path": "artifacts/font-native-observed-x86/report.json",
+      "sha256": "6cc2a350abde6e16eb23b94df883de24d6dcccac26136f67cca49086fd89675b",
+      "outcome": "Two reference runs disagree on GetObjectType after final owner release, including after GdiFlush. No passing parity claim or emulation of expired Windows handle identity."
+    }
+  },
+  "native_boundary_source_review": [
+    {
+      "path": "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/atlmfc/src/mfc/wingdi.cpp",
+      "sha256": "97fbce8461163a00f9b393586cdc25e33ebdec094696dbd1acd92b2c9695db88"
+    },
+    {
+      "path": "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/atlmfc/src/mfc/afxstate.cpp",
+      "sha256": "b3eef0ba60aa7ad7a92b26714b9c3e882f390c0203177e885849d62a48186d7c"
+    },
+    {
+      "path": "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/atlmfc/src/mfc/afxtls.cpp",
+      "sha256": "04c99d351c3c37512099db4ef4e114f027c1bd9ab8f575667e45166631175e1c"
+    },
+    {
+      "path": "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/atlmfc/include/afx.h",
+      "sha256": "2d3e833f618d2d30064eb69df3ebad80300fe6f4908bb1c212a8653269b26c52"
+    },
+    {
+      "path": "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/um/wingdi.h",
+      "sha256": "96f3528cabc7e5fe30e2f2c51daa01c018dd6cedb3768121202434758629b8a2"
+    }
+  ],
+  "selected_font_release": "Cleanup CText::CreatePath restores the old font only inside ASSERT on success; release builds omit that expression. Rust preserves DeleteObject on potentially still-selected fonts and ignores its result. Do not add a successful-path restoration as cleanup.",
+  "sources": [
+    {
+      "path": "rust/compat/src/font_intern.rs",
+      "sha256": "6c98b135363145ee68110225d93e9440a30a0e861cc1e6a844d6c44de048399c"
+    },
+    {
+      "path": "rust/compat/src/font_key_wire.rs",
+      "sha256": "0114f36d73a69ca0a8a91a272df3caf544f0f8c0d34c74c0c853dbdadb7ee542"
+    },
+    {
+      "path": "rust/ffi/src/font_intern.rs",
+      "sha256": "46f6461299d0074091a675d8cc14f067437590fff7e62906ebd2a54cb46a3f6e"
+    },
+    {
+      "path": "rust/ffi/src/windows_font.rs",
+      "sha256": "8893ee4eda78b3a3385d57b9d6a0e1ddde640dcfdf366dcf41515d18dc87c0f5"
+    },
+    {
+      "path": "rust/ffi/src/document_registry.rs",
+      "sha256": "eb97a1b94d05a3ad3061c9a69059d63b50832c66cb51fa5f1c223c2d7caa5ee3"
+    },
+    {
+      "path": "include/xy_rust_font_intern.h",
+      "sha256": "820c0e8e5c786c6573c096d5f82e8eca3230e0ab3b974ff8dbae83dc3ff8fd87"
+    },
+    {
+      "path": "src/subtitles/RustFontIntern.inl",
+      "sha256": "1ed51669605a9579cf0524de572a0985f4dce50a354335969a68a0f2a38602b2"
+    },
+    {
+      "path": "src/subtitles/RTS.cpp",
+      "sha256": "026e6413f97ae1580db5cb7b27e30e79fc5138f05054a42aeca665ea96df033a"
+    },
+    {
+      "path": "src/subtitles/RTS.h",
+      "sha256": "464d91a177959640068c3bfc9e8ccb4d2885ba36615f4130b4c8a03967b832c6"
+    },
+    {
+      "path": "tools/compat/font_native.cpp",
+      "sha256": "3abfb9eed8896c54d69445d78e0a3c7855b062da5478e17b86ff581a98e6d11d"
+    },
+    {
+      "path": "tools/compat/font_native.py",
+      "sha256": "95e1818eed38f6cf2c4e8a295bfd9f2bf2cd5cff672734868159292031b593a5"
+    },
+    {
+      "path": "tools/compat/font_gdi_calls.cpp",
+      "sha256": "5bbacc918d38d2003b4ddbc011169b73ec9c01576834f9d58f9ccb8a9707e0df"
+    },
+    {
+      "path": "tools/compat/font_gdi_calls.py",
+      "sha256": "39808cb7f97c57d0c4e1ea75bac336e54b5c20cd1cea07d849dfb11406a194e4"
+    },
+    {
+      "path": "tools/compat/test_font_native.py",
+      "sha256": "faf7d67d8043c68aa8771b7d24283d095d948be77c94cd644e50895c093cd774"
+    },
+    {
+      "path": "tools/compat/test_font_gdi_calls.py",
+      "sha256": "d9520a98deab6180ec2b46cfff54b75985bdba4ebf882432855136a0877d0ba8"
+    }
+  ],
+  "harnesses": [
+    {
+      "path": "artifacts/run-font-domain-host-corpus.py",
+      "sha256": "33c8a5dfce282e18f6aaf83fd8f95fef14a65c2e077db2372830651680f6f3e9"
+    },
+    {
+      "path": "artifacts/run-font-domain-contracts.py",
+      "sha256": "c8777a8046811f2e0c4c203ca2057cb39cca115753d06a734de4fa3097127fd0"
+    },
+    {
+      "path": "artifacts/write-font-domain-evidence.py",
+      "sha256": "8d179210370a9cf39435b5d16fdca8e1fc296a614983abcdc8029f3f1787a458"
+    },
+    {
+      "path": "tools/compat/audit_rust_boundary.py",
+      "sha256": "959ddcd63c7f0301ba1f1b56615333d3f2d31cbc0ee024d2a9b8b80eccd7a475"
+    }
+  ],
+  "limits": [
+    "A separate diagnostic confirms 15 x86 style-intern floating-domain mismatches at this commit. Existing style aggregate-status comparisons do not close this defect; x64 extended observations match. Fix this before continuing the shared-DC port.",
+    "Finite default-environment integration evidence, not whole-library completion or production default enablement.",
+    "Raw font edges6..11 do not yield complete native observer results and are explicitly unresolved.",
+    "Nondefault floating modes/traps, allocator failure/reentry and whole-renderer concurrency remain unclosed.",
+    "Opaque Windows handles may remain selected or become invalid after owner release. No stale handle dereference or pointer to Rust ownership is exposed.",
+    "C++ wrappers remain transitional. Shared device context, text/path GDI calls, word/line/subtitle graphs, all hosts and vendors remain in scope."
+  ],
+  "x86_domain_failures": [
+    {
+      "path": "artifacts/font-status2-native-x86/report.json",
+      "sha256": "a46cb13879bd0ddffa3b754356c0fc38d793ddfeb8482b690ff91b464e8b19e7",
+      "outcome": "Not passing; corrected by x87 height arithmetic and key comparison."
+    },
+    {
+      "path": "artifacts/font-x87-edge4-x86/report.json",
+      "sha256": "b6be53b409cb17af92d87d95f7d1dc01a97c2054b7b66cf020b6bd401f74e946",
+      "outcome": "Not passing; corrected by x87 height arithmetic and key comparison."
+    }
+  ],
+  "historical_invalid_metric_diagnostics": {
+    "x64": {
+      "path": "artifacts/font-edge-diagnostic-x64/summary.json",
+      "sha256": "1720273e5085720b3a0fb95fd732fa826b9360328002bee7a64993f8ff1c1786",
+      "candidate_commit": "9755d0bbcdc6a4b6246ee03f303517be38e1b8a5",
+      "scope": "Earlier aggregate-status diagnostic only, not final-domain parity. Failed native metric query leads to uninitialized native metric use; Rust reports unresolved construction and releases its font."
+    },
+    "x86": {
+      "path": "artifacts/font-edge-diagnostic-x86/summary.json",
+      "sha256": "4e3b1abc79aeaf6121a6b720708a96433d304a4d5bb15a0ebb8b4f2f3930af87",
+      "candidate_commit": "9755d0bbcdc6a4b6246ee03f303517be38e1b8a5",
+      "scope": "Earlier aggregate-status diagnostic only, not final-domain parity. Failed native metric query leads to uninitialized native metric use; Rust reports unresolved construction and releases its font."
+    }
+  },
+  "native_x86_disassembly": [
+    {
+      "path": "artifacts/font-native-map-x86/probe.map",
+      "sha256": "9aca7c289a5eee3a46b3ae0f3984314e1d0c60f7632b2187d143bba3fae4cae7"
+    },
+    {
+      "path": "artifacts/font-native-map-x86/disassembly.txt",
+      "sha256": "55295baa514c2c5652c5d9a596e1a94c448b2fb0dc863c46ae7f8b0f87b522d6"
+    },
+    {
+      "path": "artifacts/font-native-map-x86/command.json",
+      "sha256": "af8be8f0971f86c90588b18cc173f30be99e8f49bab81f6d5073d7ad9040ea4c"
+    }
+  ],
+  "additional_style_domain_diagnostic": {
+    "x64": {
+      "path": "artifacts/style-float-domains-diagnostic-x64/report.json",
+      "sha256": "7619faf3549c157c1b924bb4674d01f8611966635fe690ba26175680e41a2a5c",
+      "equal": true,
+      "different_rows": 0,
+      "differences": [],
+      "scope": "Prior style aggregate observations remain identical. Separate floating-domain observations expose an unresolved style implementation defect on x86, outside the corrected font comparator."
+    },
+    "x86": {
+      "path": "artifacts/style-float-domains-diagnostic-x86/report.json",
+      "sha256": "3a208edda5f0b10e823294fad22426237b452245923773eca563c9bfb7421171",
+      "equal": false,
+      "different_rows": 15,
+      "differences": [
+        {
+          "line": 66,
+          "reference": "style-fp index=16 first=00000000 second=00080000 copy=00000000 read=00000000 equality=00080000 domains=0000000000000000,0008000000000000,0000000000000000,0000000000000000,0008000000000000",
+          "candidate": "style-fp index=16 first=00000000 second=00080000 copy=00000000 read=00000000 equality=00080000 domains=0000000000000000,0000000000080000,0000000000000000,0000000000000000,0008000000000000"
+        },
+        {
+          "line": 94,
+          "reference": "style-fp index=23 first=00000000 second=00000010 copy=00000000 read=00000000 equality=00000010 domains=0000000000000000,0000001000000000,0000000000000000,0000000000000000,0000001000000000",
+          "candidate": "style-fp index=23 first=00000000 second=00000010 copy=00000000 read=00000000 equality=00000010 domains=0000000000000000,0000000000000010,0000000000000000,0000000000000000,0000001000000000"
+        },
+        {
+          "line": 114,
+          "reference": "style-fp index=28 first=00000000 second=00080000 copy=00000000 read=00000000 equality=00080000 domains=0000000000000000,0008000000000000,0000000000000000,0000000000000000,0008000000000000",
+          "candidate": "style-fp index=28 first=00000000 second=00080000 copy=00000000 read=00000000 equality=00080000 domains=0000000000000000,0000000000080000,0000000000000000,0000000000000000,0008000000000000"
+        },
+        {
+          "line": 142,
+          "reference": "style-fp index=35 first=00080010 second=00000010 copy=00000000 read=00000000 equality=00000010 domains=0008001000000000,0000001000000000,0000000000000000,0000000000000000,0000001000000000",
+          "candidate": "style-fp index=35 first=00080010 second=00000010 copy=00000000 read=00000000 equality=00000010 domains=0000000000080010,0000000000000010,0000000000000000,0000000000000000,0000001000000000"
+        },
+        {
+          "line": 162,
+          "reference": "style-fp index=40 first=00000000 second=00080000 copy=00000000 read=00000000 equality=00080000 domains=0000000000000000,0008000000000000,0000000000000000,0000000000000000,0008000000000000",
+          "candidate": "style-fp index=40 first=00000000 second=00080000 copy=00000000 read=00000000 equality=00080000 domains=0000000000000000,0000000000080000,0000000000000000,0000000000000000,0008000000000000"
+        },
+        {
+          "line": 190,
+          "reference": "style-fp index=47 first=00000000 second=00000010 copy=00000000 read=00000000 equality=00000010 domains=0000000000000000,0000001000000000,0000000000000000,0000000000000000,0000001000000000",
+          "candidate": "style-fp index=47 first=00000000 second=00000010 copy=00000000 read=00000000 equality=00000010 domains=0000000000000000,0000000000000010,0000000000000000,0000000000000000,0000001000000000"
+        },
+        {
+          "line": 210,
+          "reference": "style-fp index=52 first=00000000 second=00080000 copy=00000000 read=00000000 equality=00080000 domains=0000000000000000,0008000000000000,0000000000000000,0000000000000000,0008000000000000",
+          "candidate": "style-fp index=52 first=00000000 second=00080000 copy=00000000 read=00000000 equality=00080000 domains=0000000000000000,0000000000080000,0000000000000000,0000000000000000,0008000000000000"
+        },
+        {
+          "line": 238,
+          "reference": "style-fp index=59 first=00000000 second=00000010 copy=00000000 read=00000000 equality=00000010 domains=0000000000000000,0000001000000000,0000000000000000,0000000000000000,0000001000000000",
+          "candidate": "style-fp index=59 first=00000000 second=00000010 copy=00000000 read=00000000 equality=00000010 domains=0000000000000000,0000000000000010,0000000000000000,0000000000000000,0000001000000000"
+        },
+        {
+          "line": 354,
+          "reference": "style-fp index=88 first=00000000 second=00080000 copy=00000000 read=00000000 equality=00080000 domains=0000000000000000,0008000000000000,0000000000000000,0000000000000000,0008000000000000",
+          "candidate": "style-fp index=88 first=00000000 second=00080000 copy=00000000 read=00000000 equality=00080000 domains=0000000000000000,0000000000080000,0000000000000000,0000000000000000,0008000000000000"
+        },
+        {
+          "line": 382,
+          "reference": "style-fp index=95 first=00000000 second=00000010 copy=00000000 read=00000000 equality=00000010 domains=0000000000000000,0000001000000000,0000000000000000,0000000000000000,0000001000000000",
+          "candidate": "style-fp index=95 first=00000000 second=00000010 copy=00000000 read=00000000 equality=00000010 domains=0000000000000000,0000000000000010,0000000000000000,0000000000000000,0000001000000000"
+        },
+        {
+          "line": 402,
+          "reference": "style-fp index=100 first=00000000 second=00080000 copy=00000000 read=00000000 equality=00080000 domains=0000000000000000,0008000000000000,0000000000000000,0000000000000000,0008000000000000",
+          "candidate": "style-fp index=100 first=00000000 second=00080000 copy=00000000 read=00000000 equality=00080000 domains=0000000000000000,0000000000080000,0000000000000000,0000000000000000,0008000000000000"
+        },
+        {
+          "line": 430,
+          "reference": "style-fp index=107 first=00000000 second=00000010 copy=00000000 read=00000000 equality=00000010 domains=0000000000000000,0000001000000000,0000000000000000,0000000000000000,0000001000000000",
+          "candidate": "style-fp index=107 first=00000000 second=00000010 copy=00000000 read=00000000 equality=00000010 domains=0000000000000000,0000000000000010,0000000000000000,0000000000000000,0000001000000000"
+        },
+        {
+          "line": 450,
+          "reference": "style-fp index=112 first=00000000 second=00080000 copy=00000000 read=00000000 equality=00080000 domains=0000000000000000,0008000000000000,0000000000000000,0000000000000000,0008000000000000",
+          "candidate": "style-fp index=112 first=00000000 second=00080000 copy=00000000 read=00000000 equality=00080000 domains=0000000000000000,0000000000080000,0000000000000000,0000000000000000,0008000000000000"
+        },
+        {
+          "line": 478,
+          "reference": "style-fp index=119 first=00000000 second=00000010 copy=00000000 read=00000000 equality=00000010 domains=0000000000000000,0000001000000000,0000000000000000,0000000000000000,0000001000000000",
+          "candidate": "style-fp index=119 first=00000000 second=00000010 copy=00000000 read=00000000 equality=00000010 domains=0000000000000000,0000000000000010,0000000000000000,0000000000000000,0000001000000000"
+        },
+        {
+          "line": 742,
+          "reference": "style-fp index=185 first=00080000 second=00080000 copy=00000000 read=00000000 equality=00000000 domains=0008000000000000,0008000000000000,0000000000000000,0000000000000000,0000000000000000",
+          "candidate": "style-fp index=185 first=00080000 second=00080000 copy=00000000 read=00000000 equality=00000000 domains=0000000000080000,0000000000080000,0000000000000000,0000000000000000,0000000000000000"
+        }
+      ],
+      "scope": "Prior style aggregate observations remain identical. Separate floating-domain observations expose an unresolved style implementation defect on x86, outside the corrected font comparator."
+    },
+    "sources": [
+      {
+        "path": "artifacts/style-float-domains-diagnostic.cpp",
+        "sha256": "266edaa43fbec32bd09908d03dfea546476caafe5d3bce599cb6f97c09fd1b06"
+      },
+      {
+        "path": "artifacts/run-style-float-domains-diagnostic.py",
+        "sha256": "b74cd1290cbfcc7de8b4baa70d37e95c425d657e17192166d49f36185f9117f0"
+      }
+    ],
+    "preserved_probe": {
+      "path": "tools/compat/style_float_domains_diagnostic.cpp",
+      "sha256": "266edaa43fbec32bd09908d03dfea546476caafe5d3bce599cb6f97c09fd1b06",
+      "scope": "Exact diagnostic source compiled at implementation 845adaf7; compile with the corresponding style_intern_native report build command and compare four outputs. This fixture preserves the failing separate-domain observations for the next correction."
+    }
+  }
+}
