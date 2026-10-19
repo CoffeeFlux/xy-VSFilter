@@ -1,0 +1,103 @@
+{
+  "x86": {
+    "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+    "reference_library_sha256": {
+      "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\strmbaseR.lib": "5926e97d337eebffe4ea20b996f2f0e62a33f67d6562e18a829c4f45888a954e",
+      "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\dsutilR.lib": "3333bc109c61750684684cafa818c90d68af49906e6c08994013e8e0bb711b0b",
+      "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\subtitlesR.lib": "46495e9e54830b1ee76e90021b0cd688be766a46fc9d354b52958651f3888f59",
+      "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\subpicR.lib": "2e3315a04138a6822958356c79dafdf47bdd51e6ddd32cf7ce6da8eae54a3e1f",
+      "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\basevideofilterR.lib": "3598e7cf095d9fefc68de1393902310c4c621a0b792b16098df40554cd6d2ada",
+      "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\libssfR.lib": "3eaa482d6d3b16a0b48816cf21cb96f3bb932963eb7b114c76372c785e4bbc09",
+      "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\unrarR.lib": "2a77b674333a0ac1e05fc155374268e7395d3e8163f1dc212788d446f3eb75cf"
+    },
+    "compiler_environment": {
+      "VCToolsVersion": "14.44.35207",
+      "WindowsSDKVersion": "10.0.26100.0\\",
+      "VSCMD_ARG_TGT_ARCH": "x86"
+    },
+    "binary_sha256": "477976c64a3306f4c44d9cb457b79e0744516818fdedce0c2f167092cb27185f",
+    "probe_sha256": "e7d406e3412a79f9dff2173e75ca21d23a3f0775edec7759ca60dde093e281e3",
+    "trace_sha256": "399966d0cdef8d0af179eb027403c9cb1ff68e4f36ff52472d9da369ae1a7642",
+    "functions": [
+      {
+        "name": "?init_cross_point@XyEllipse@@QAEHXZ",
+        "address": "0x407fc0",
+        "end": "0x408320",
+        "file": "function-0.txt",
+        "lines": 303
+      },
+      {
+        "name": "?cross_left@XyEllipse@@ABEHHH@Z",
+        "address": "0x408320",
+        "end": "0x408450",
+        "file": "function-1.txt",
+        "lines": 108
+      }
+    ],
+    "initialization_and_helpers": [
+      {
+        "name": "_sqrtf",
+        "address": "0x403760",
+        "end": "0x403780",
+        "file": "sqrtf.txt",
+        "lines": 17
+      },
+      {
+        "name": "?xy_overlap_region@WidenRegionCreaterImpl@@QAEXPAV?$vector@U?$pair@_K_K@std@@V?$allocator@U?$pair@_K_K@std@@@2@@std@@ABV23@HH@Z",
+        "address": "0x406ee0",
+        "end": "0x407460",
+        "file": "sweep-with-inlined-init.txt",
+        "lines": 463
+      }
+    ],
+    "capture_observer_commit": "f72fa4ba30a71cd2354ca16f5ce1121df3ca1832",
+    "capture_observer_file": "reference-observer.cpp"
+  },
+  "x64": {
+    "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+    "reference_library_sha256": {
+      "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\strmbaseR.lib": "e4a3eed835fc6dcfdd7b81e684678cce0aaf032187e1ff2611b7f4146d6a9067",
+      "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\dsutilR.lib": "3dfc9f2eb59caef227f3ab723a1f10b672ab44f3efb61a75030d5b0a8730892b",
+      "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\subtitlesR.lib": "d6d48a179e28d70404ff870f6c6b640b9c768940065a95039695f7684689e50d",
+      "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\subpicR.lib": "23aed7e98c3c33cf31a956900fc720faf5d603edbb27c1f821964e9ccf87c5de",
+      "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\basevideofilterR.lib": "738d7f288e53690373e814f00ab7edcc8419e40de46a96f7a888a549ce8ca39e",
+      "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\libssfR.lib": "58a84c5e08a8c4c75e60e0f53b2590e6696e7f5938d52cc46b895ad326b4f1d8",
+      "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\unrarR.lib": "3dcfd1c32bc6261c168c841ebeb86c8dd4177f5698730424cbf39628f3e8a56c"
+    },
+    "compiler_environment": {
+      "VCToolsVersion": "14.44.35207",
+      "WindowsSDKVersion": "10.0.26100.0\\",
+      "VSCMD_ARG_TGT_ARCH": "x64"
+    },
+    "binary_sha256": "18bff9c27d26ba8d85a54916f4d376fcb53ee8a393c5eeb29df5a4e54e5895d0",
+    "probe_sha256": "e7d406e3412a79f9dff2173e75ca21d23a3f0775edec7759ca60dde093e281e3",
+    "trace_sha256": "9edd0ed4aa8ea5db34021d0c6f157f7f530559dd600afdcc3b3b211183aee6ae",
+    "functions": [
+      {
+        "name": "?init_cross_point@XyEllipse@@QEAAHXZ",
+        "address": "0x1400080a0",
+        "end": "0x140008420",
+        "file": "function-0.txt",
+        "lines": 252
+      },
+      {
+        "name": "?cross_left@XyEllipse@@AEBAHHH@Z",
+        "address": "0x140008420",
+        "end": "0x140008550",
+        "file": "function-1.txt",
+        "lines": 87
+      }
+    ],
+    "initialization_and_helpers": [
+      {
+        "name": "?xy_overlap_region@WidenRegionCreaterImpl@@QEAAXPEAV?$vector@U?$pair@_K_K@std@@V?$allocator@U?$pair@_K_K@std@@@2@@std@@AEBV23@HH@Z",
+        "address": "0x140006fe0",
+        "end": "0x140007620",
+        "file": "sweep-with-inlined-init.txt",
+        "lines": 437
+      }
+    ],
+    "capture_observer_commit": "f72fa4ba30a71cd2354ca16f5ce1121df3ca1832",
+    "capture_observer_file": "reference-observer.cpp"
+  }
+}

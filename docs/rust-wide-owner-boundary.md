@@ -1,5 +1,10 @@
 # Rust-owned widened outlines
 
+This audit records implementation `f72fa4ba`. Its temporary ellipse callback is
+superseded by the [Rust ellipse owner](rust-ellipse-owner-boundary.md). The
+current maintained observer has 1,536 calls and 32 radius pairs; the 672-call
+counts below retain their original checkpoint scope.
+
 Under the experimental renderer flag, `ScanLineData2` keeps a checked Rust
 region ID instead of a persistent C++ span vector and border scalar. Safe Rust
 owns radius clamping, the two horizontal merges, ordered linked-span insertion

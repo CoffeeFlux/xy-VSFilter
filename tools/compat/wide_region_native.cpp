@@ -23,7 +23,7 @@ int main(){try{
     check(AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0)!=FALSE);
     auto scan=std::make_shared<ScanLineData>();ScanLineData2 wide(CPoint(7,-9),scan);unsigned index=0;
     printf("widen pointer_bits=%u\n",unsigned(sizeof(void*)*8));
-    const int radii[][2]={{-3,-5},{0,0},{1,0},{8,0},{0,1},{1,1},{3,7},{7,3},{15,19},{19,15},{64,64},{65,65},{128,33},{33,128}};
+    const int radii[][2]={{-3,-5},{0,0},{1,0},{8,0},{0,1},{1,1},{3,7},{7,3},{15,19},{19,15},{64,64},{65,65},{128,33},{33,128},{2,2},{0,19},{19,1},{63,65},{65,63},{1,127},{127,1},{129,64},{64,129},{15,20},{20,15},{2,255},{255,2},{64,65},{65,64},{3,128},{128,3},{0,128}};
     for(unsigned scenario=0;scenario<24;++scenario){
         std::vector<POINT> points;std::vector<BYTE> types;uint32_t rng=0x4b19de37u+scenario;
         for(unsigned i=0;i<8;++i){rng^=rng<<13;rng^=rng>>17;rng^=rng<<5;
@@ -37,7 +37,7 @@ int main(){try{
         if(scenario%8==7)for(auto& p:points)p.y=16;
         if(scenario==23){points.clear();types.clear();}
         PathData path;seed_path(path,points,types);scan->ScanConvert(path,CSize(256,128));
-        for(unsigned radius=0;radius<14;++radius)for(unsigned sticky=0;sticky<2;++sticky){
+        for(unsigned radius=0;radius<32;++radius)for(unsigned sticky=0;sticky<2;++sticky){
             reset();if(sticky)std::feraiseexcept(FE_DIVBYZERO);const Status before=status();
             const bool result=wide.CreateWidenedRegion(radii[radius][0],radii[radius][1]);const Status after=status();
             #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL

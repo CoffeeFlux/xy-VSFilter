@@ -1,0 +1,17 @@
+  00403760: 55                 push        ebp
+  00403761: 8B EC              mov         ebp,esp
+  00403763: 83 E4 F8           and         esp,0FFFFFFF8h
+  00403766: 83 EC 08           sub         esp,8
+  00403769: D9 45 08           fld         dword ptr [ebp+8]
+  0040376C: D9 FA              fsqrt
+  0040376E: D9 5C 24 04        fstp        dword ptr [esp+4]
+  00403772: D9 44 24 04        fld         dword ptr [esp+4]
+  00403776: 8B E5              mov         esp,ebp
+  00403778: 5D                 pop         ebp
+  00403779: C3                 ret
+  0040377A: CC                 int         3
+  0040377B: CC                 int         3
+  0040377C: CC                 int         3
+  0040377D: CC                 int         3
+  0040377E: CC                 int         3
+  0040377F: CC                 int         3

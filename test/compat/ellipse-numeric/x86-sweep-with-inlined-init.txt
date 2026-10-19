@@ -1,0 +1,463 @@
+  00406EE0: 55                 push        ebp
+  00406EE1: 8B EC              mov         ebp,esp
+  00406EE3: 6A FF              push        0FFFFFFFFh
+  00406EE5: 68 A0 F3 42 00     push        42F3A0h
+  00406EEA: 64 A1 00 00 00 00  mov         eax,dword ptr fs:[00000000h]
+  00406EF0: 50                 push        eax
+  00406EF1: 83 EC 5C           sub         esp,5Ch
+  00406EF4: 53                 push        ebx
+  00406EF5: 56                 push        esi
+  00406EF6: 57                 push        edi
+  00406EF7: A1 80 64 44 00     mov         eax,dword ptr ds:[00446480h]
+  00406EFC: 33 C5              xor         eax,ebp
+  00406EFE: 50                 push        eax
+  00406EFF: 8D 45 F4           lea         eax,[ebp-0Ch]
+  00406F02: 64 A3 00 00 00 00  mov         dword ptr fs:[00000000h],eax
+  00406F08: 8B D9              mov         ebx,ecx
+  00406F0A: 89 5D EC           mov         dword ptr [ebp-14h],ebx
+  00406F0D: 8B 33              mov         esi,dword ptr [ebx]
+  00406F0F: 8B 7D 10           mov         edi,dword ptr [ebp+10h]
+  00406F12: 85 F6              test        esi,esi
+  00406F14: 74 3A              je          00406F50
+  00406F16: 39 3E              cmp         dword ptr [esi],edi
+  00406F18: 75 0F              jne         00406F29
+  00406F1A: 3E 3E 3E 8B 45 14  mov         eax,dword ptr ds:[ebp+14h]
+  00406F20: 39 46 04           cmp         dword ptr [esi+4],eax
+  00406F23: 0F 84 11 01 00 00  je          0040703A
+  00406F29: FF 76 24           push        dword ptr [esi+24h]
+  00406F2C: E8 D2 46 00 00     call        0040B603
+  00406F31: 83 C4 04           add         esp,4
+  00406F34: FF 76 2C           push        dword ptr [esi+2Ch]
+  00406F37: E8 C7 46 00 00     call        0040B603
+  00406F3C: 83 C4 04           add         esp,4
+  00406F3F: 6A 30              push        30h
+  00406F41: 56                 push        esi
+  00406F42: E8 23 08 01 00     call        0041776A
+  00406F47: 83 C4 08           add         esp,8
+  00406F4A: C7 03 00 00 00 00  mov         dword ptr [ebx],0
+  00406F50: 6A 30              push        30h
+  00406F52: E8 B9 40 00 00     call        0040B010
+  00406F57: 3E 8B F0           mov         esi,eax
+  00406F5A: 83 C4 04           add         esp,4
+  00406F5D: 89 75 D4           mov         dword ptr [ebp-2Ch],esi
+  00406F60: 85 F6              test        esi,esi
+  00406F62: 0F 84 C3 04 00 00  je          0040742B
+  00406F68: C7 06 00 00 00 00  mov         dword ptr [esi],0
+  00406F6E: C7 46 04 00 00 00  mov         dword ptr [esi+4],0
+  00406F75: C7 46 20 00 00 00  mov         dword ptr [esi+20h],0
+  00406F7C: C7 46 24 00 00 00  mov         dword ptr [esi+24h],0
+  00406F83: C7 46 28 00 00 00  mov         dword ptr [esi+28h],0
+  00406F8A: C7 46 2C 00 00 00  mov         dword ptr [esi+2Ch],0
+  00406F91: 89 33              mov         dword ptr [ebx],esi
+  00406F93: 85 FF              test        edi,edi
+  00406F95: 0F 88 96 04 00 00  js          00407431
+  00406F9B: 3E 3E 8B 5D 14     mov         ebx,dword ptr ds:[ebp+14h]
+  00406FA0: 85 DB              test        ebx,ebx
+  00406FA2: 0F 8E 89 04 00 00  jle         00407431
+  00406FA8: B9 04 00 00 00     mov         ecx,4
+  00406FAD: 8D 04 5D 02 00 00  lea         eax,[ebx*2+00000002h]
+  00406FB4: F7 E1              mul         eax,ecx
+  00406FB6: 0F 92 C1           setb        cl
+  00406FB9: 0F BE C9           movsx       ecx,cl
+  00406FBC: F7 D9              neg         ecx
+  00406FBE: 0B C8              or          ecx,eax
+  00406FC0: 51                 push        ecx
+  00406FC1: E8 34 46 00 00     call        0040B5FA
+  00406FC6: 83 C4 04           add         esp,4
+  00406FC9: 89 46 24           mov         dword ptr [esi+24h],eax
+  00406FCC: 85 C0              test        eax,eax
+  00406FCE: 0F 84 5D 04 00 00  je          00407431
+  00406FD4: 53                 push        ebx
+  00406FD5: 8B D7              mov         edx,edi
+  00406FD7: 8B C8              mov         ecx,eax
+  00406FD9: E8 A2 0B 00 00     call        00407B80
+  00406FDE: 8B 46 24           mov         eax,dword ptr [esi+24h]
+  00406FE1: 83 C4 04           add         esp,4
+  00406FE4: 89 3E              mov         dword ptr [esi],edi
+  00406FE6: 89 5E 04           mov         dword ptr [esi+4],ebx
+  00406FE9: DB 45 10           fild        dword ptr [ebp+10h]
+  00406FEC: 8D 04 98           lea         eax,[eax+ebx*4]
+  00406FEF: 89 46 20           mov         dword ptr [esi+20h],eax
+  00406FF2: D9 5D E0           fstp        dword ptr [ebp-20h]
+  00406FF5: D9 45 E0           fld         dword ptr [ebp-20h]
+  00406FF8: D9 5D E0           fstp        dword ptr [ebp-20h]
+  00406FFB: D9 45 E0           fld         dword ptr [ebp-20h]
+  00406FFE: D9 56 08           fst         dword ptr [esi+8]
+  00407001: DB 45 14           fild        dword ptr [ebp+14h]
+  00407004: D9 5D E0           fstp        dword ptr [ebp-20h]
+  00407007: D9 45 E0           fld         dword ptr [ebp-20h]
+  0040700A: D9 5D E0           fstp        dword ptr [ebp-20h]
+  0040700D: D9 45 E0           fld         dword ptr [ebp-20h]
+  00407010: D9 56 0C           fst         dword ptr [esi+0Ch]
+  00407013: DD 05 F0 D1 43 00  fld         qword ptr ds:[0043D1F0h]
+  00407019: 85 FF              test        edi,edi
+  0040701B: 7E 06              jle         00407023
+  0040701D: D9 C0              fld         st(0)
+  0040701F: DE F3              fdivrp      st(3),st
+  00407021: EB 06              jmp         00407029
+  00407023: DD DA              fstp        st(2)
+  00407025: D9 EE              fldz
+  00407027: D9 CA              fxch        st(2)
+  00407029: D9 CA              fxch        st(2)
+  0040702B: 8B CE              mov         ecx,esi
+  0040702D: DD 5E 10           fstp        qword ptr [esi+10h]
+  00407030: DE F9              fdivp       st(1),st
+  00407032: DD 5E 18           fstp        qword ptr [esi+18h]
+  00407035: E8 86 0F 00 00     call        00407FC0
+  0040703A: 3E 3E C7 45 BC 00  mov         dword ptr ds:[ebp-44h],0
+  00407043: C7 45 C0 00 00 00  mov         dword ptr [ebp-40h],0
+  0040704A: C7 45 C4 00 00 00  mov         dword ptr [ebp-3Ch],0
+  00407051: C7 45 C8 00 00 00  mov         dword ptr [ebp-38h],0
+  00407058: C7 45 CC 00 00 00  mov         dword ptr [ebp-34h],0
+  0040705F: C7 45 D0 0A 00 00  mov         dword ptr [ebp-30h],0Ah
+  00407066: 8B 45 0C           mov         eax,dword ptr [ebp+0Ch]
+  00407069: 8D 4D BC           lea         ecx,[ebp-44h]
+  0040706C: C7 45 FC 00 00 00  mov         dword ptr [ebp-4],0
+  00407073: 33 DB              xor         ebx,ebx
+  00407075: 89 5D E8           mov         dword ptr [ebp-18h],ebx
+  00407078: 8B 30              mov         esi,dword ptr [eax]
+  0040707A: 8B 40 04           mov         eax,dword ptr [eax+4]
+  0040707D: 89 45 E0           mov         dword ptr [ebp-20h],eax
+  00407080: E8 DB 15 00 00     call        00408660
+  00407085: 8B 7D CC           mov         edi,dword ptr [ebp-34h]
+  00407088: 8B 07              mov         eax,dword ptr [edi]
+  0040708A: 8D 4F 18           lea         ecx,[edi+18h]
+  0040708D: 89 5F 08           mov         dword ptr [edi+8],ebx
+  00407090: 89 5F 0C           mov         dword ptr [edi+0Ch],ebx
+  00407093: 89 5F 10           mov         dword ptr [edi+10h],ebx
+  00407096: 89 5F 14           mov         dword ptr [edi+14h],ebx
+  00407099: 89 19              mov         dword ptr [ecx],ebx
+  0040709B: 89 59 04           mov         dword ptr [ecx+4],ebx
+  0040709E: 89 59 08           mov         dword ptr [ecx+8],ebx
+  004070A1: 89 59 0C           mov         dword ptr [ecx+0Ch],ebx
+  004070A4: 89 45 CC           mov         dword ptr [ebp-34h],eax
+  004070A7: 89 5F 04           mov         dword ptr [edi+4],ebx
+  004070AA: 89 1F              mov         dword ptr [edi],ebx
+  004070AC: FF 45 C4           inc         dword ptr [ebp-3Ch]
+  004070AF: 8B 45 C0           mov         eax,dword ptr [ebp-40h]
+  004070B2: 89 4D E4           mov         dword ptr [ebp-1Ch],ecx
+  004070B5: 85 C0              test        eax,eax
+  004070B7: 74 04              je          004070BD
+  004070B9: 89 38              mov         dword ptr [eax],edi
+  004070BB: EB 03              jmp         004070C0
+  004070BD: 89 7D BC           mov         dword ptr [ebp-44h],edi
+  004070C0: 89 7D C0           mov         dword ptr [ebp-40h],edi
+  004070C3: 85 FF              test        edi,edi
+  004070C5: 0F 84 7A 03 00 00  je          00407445
+  004070CB: 3E 3E 3E 3E 8B 45  mov         eax,dword ptr ds:[ebp+14h]
+  004070D2: 8D 4F 08           lea         ecx,[edi+8]
+  004070D5: 8D 04 45 02 00 00  lea         eax,[eax*2+00000002h]
+  004070DC: 50                 push        eax
+  004070DD: 89 45 F0           mov         dword ptr [ebp-10h],eax
+  004070E0: E8 3B 14 00 00     call        00408520
+  004070E5: FF 75 F0           push        dword ptr [ebp-10h]
+  004070E8: 8B 4D E4           mov         ecx,dword ptr [ebp-1Ch]
+  004070EB: E8 30 14 00 00     call        00408520
+  004070F0: 3E 8B 47 10        mov         eax,dword ptr ds:[edi+10h]
+  004070F4: 33 D2              xor         edx,edx
+  004070F6: 8B 4F 14           mov         ecx,dword ptr [edi+14h]
+  004070F9: 40                 inc         eax
+  004070FA: 03 C1              add         eax,ecx
+  004070FC: F7 F1              div         eax,ecx
+  004070FE: 8D 41 FF           lea         eax,[ecx-1]
+  00407101: 89 57 10           mov         dword ptr [edi+10h],edx
+  00407104: 03 C2              add         eax,edx
+  00407106: 33 D2              xor         edx,edx
+  00407108: F7 F1              div         eax,ecx
+  0040710A: C1 E2 04           shl         edx,4
+  0040710D: 03 57 08           add         edx,dword ptr [edi+8]
+  00407110: C7 02 FF FF FF 7F  mov         dword ptr [edx],7FFFFFFFh
+  00407116: 89 5A 04           mov         dword ptr [edx+4],ebx
+  00407119: C7 42 08 FF FF FF  mov         dword ptr [edx+8],7FFFFFFFh
+  00407120: 3B 75 E0           cmp         esi,dword ptr [ebp-20h]
+  00407123: 0F 84 CF 02 00 00  je          004073F8
+  00407129: 8D A4 24 00 00 00  lea         esp,[esp+00000000h]
+  00407130: 8B 06              mov         eax,dword ptr [esi]
+  00407132: B1 20              mov         cl,20h
+  00407134: 8B 56 04           mov         edx,dword ptr [esi+4]
+  00407137: E8 B4 69 02 00     call        0042DAF0
+  0040713C: 8B F8              mov         edi,eax
+  0040713E: 89 45 E4           mov         dword ptr [ebp-1Ch],eax
+  00407141: 2B 7D 14           sub         edi,dword ptr [ebp+14h]
+  00407144: 8B 45 E8           mov         eax,dword ptr [ebp-18h]
+  00407147: 3B F8              cmp         edi,eax
+  00407149: 7E 45              jle         00407190
+  0040714B: 8B 4D EC           mov         ecx,dword ptr [ebp-14h]
+  0040714E: 57                 push        edi
+  0040714F: 50                 push        eax
+  00407150: 8D 45 BC           lea         eax,[ebp-44h]
+  00407153: 50                 push        eax
+  00407154: FF 75 08           push        dword ptr [ebp+8]
+  00407157: E8 64 06 00 00     call        004077C0
+  0040715C: 8B 4D C0           mov         ecx,dword ptr [ebp-40h]
+  0040715F: 89 7D E8           mov         dword ptr [ebp-18h],edi
+  00407162: 85 C9              test        ecx,ecx
+  00407164: 0F 84 DB 02 00 00  je          00407445
+  0040716A: 8B 41 0C           mov         eax,dword ptr [ecx+0Ch]
+  0040716D: 33 D2              xor         edx,edx
+  0040716F: F7 71 14           div         eax,dword ptr [ecx+14h]
+  00407172: 8B 45 E4           mov         eax,dword ptr [ebp-1Ch]
+  00407175: 33 FF              xor         edi,edi
+  00407177: 8B 49 08           mov         ecx,dword ptr [ecx+8]
+  0040717A: 8B DA              mov         ebx,edx
+  0040717C: 48                 dec         eax
+  0040717D: 81 CF FF FF FF 7F  or          edi,7FFFFFFFh
+  00407183: 03 DB              add         ebx,ebx
+  00407185: 99                 cdq
+  00407186: 89 3C D9           mov         dword ptr [ecx+ebx*8],edi
+  00407189: 89 44 D9 04        mov         dword ptr [ecx+ebx*8+4],eax
+  0040718D: 8B 5D BC           mov         ebx,dword ptr [ebp-44h]
+  00407190: 85 DB              test        ebx,ebx
+  00407192: 0F 84 AD 02 00 00  je          00407445
+  00407198: 8B 53 14           mov         edx,dword ptr [ebx+14h]
+  0040719B: 8D 7B 08           lea         edi,[ebx+8]
+  0040719E: 8B 47 08           mov         eax,dword ptr [edi+8]
+  004071A1: 4A                 dec         edx
+  004071A2: 03 C2              add         eax,edx
+  004071A4: 8B 0F              mov         ecx,dword ptr [edi]
+  004071A6: 33 D2              xor         edx,edx
+  004071A8: F7 77 0C           div         eax,dword ptr [edi+0Ch]
+  004071AB: 8B 07              mov         eax,dword ptr [edi]
+  004071AD: 03 D2              add         edx,edx
+  004071AF: 8B 0C D1           mov         ecx,dword ptr [ecx+edx*8]
+  004071B2: 8B 44 D0 04        mov         eax,dword ptr [eax+edx*8+4]
+  004071B6: 2B 46 04           sub         eax,dword ptr [esi+4]
+  004071B9: 8B 55 EC           mov         edx,dword ptr [ebp-14h]
+  004071BC: 2B 0E              sub         ecx,dword ptr [esi]
+  004071BE: 50                 push        eax
+  004071BF: 51                 push        ecx
+  004071C0: 8B 12              mov         edx,dword ptr [edx]
+  004071C2: 8B CA              mov         ecx,edx
+  004071C4: 89 55 DC           mov         dword ptr [ebp-24h],edx
+  004071C7: E8 54 11 00 00     call        00408320
+  004071CC: 3D FF FF FF 7F     cmp         eax,7FFFFFFFh
+  004071D1: 7C 07              jl          004071DA
+  004071D3: B9 FF FF FF 7F     mov         ecx,7FFFFFFFh
+  004071D8: EB 36              jmp         00407210
+  004071DA: 8B 47 04           mov         eax,dword ptr [edi+4]
+  004071DD: 33 D2              xor         edx,edx
+  004071DF: F7 77 0C           div         eax,dword ptr [edi+0Ch]
+  004071E2: 8B 07              mov         eax,dword ptr [edi]
+  004071E4: 8B 4D DC           mov         ecx,dword ptr [ebp-24h]
+  004071E7: 03 D2              add         edx,edx
+  004071E9: 8B 3C D0           mov         edi,dword ptr [eax+edx*8]
+  004071EC: 8B 44 D0 04        mov         eax,dword ptr [eax+edx*8+4]
+  004071F0: 2B 46 04           sub         eax,dword ptr [esi+4]
+  004071F3: 2B 3E              sub         edi,dword ptr [esi]
+  004071F5: 50                 push        eax
+  004071F6: 57                 push        edi
+  004071F7: E8 24 11 00 00     call        00408320
+  004071FC: 33 C9              xor         ecx,ecx
+  004071FE: 8D 7B 08           lea         edi,[ebx+8]
+  00407201: 3D 00 00 00 80     cmp         eax,80000000h
+  00407206: 0F 9F C1           setg        cl
+  00407209: 49                 dec         ecx
+  0040720A: 81 E1 00 00 00 80  and         ecx,80000000h
+  00407210: 8B 45 14           mov         eax,dword ptr [ebp+14h]
+  00407213: 3B C8              cmp         ecx,eax
+  00407215: 7E 07              jle         0040721E
+  00407217: 8B 1B              mov         ebx,dword ptr [ebx]
+  00407219: E9 72 FF FF FF     jmp         00407190
+  0040721E: F7 D8              neg         eax
+  00407220: 3B C8              cmp         ecx,eax
+  00407222: 7C 28              jl          0040724C
+  00407224: FF 76 04           push        dword ptr [esi+4]
+  00407227: 8B 4D EC           mov         ecx,dword ptr [ebp-14h]
+  0040722A: FF 36              push        dword ptr [esi]
+  0040722C: 57                 push        edi
+  0040722D: E8 4E 02 00 00     call        00407480
+  00407232: 3E FF 76 0C        push        dword ptr ds:[esi+0Ch]
+  00407236: 8B 4D EC           mov         ecx,dword ptr [ebp-14h]
+  00407239: 8D 47 10           lea         eax,[edi+10h]
+  0040723C: FF 76 08           push        dword ptr [esi+8]
+  0040723F: 50                 push        eax
+  00407240: E8 DB 03 00 00     call        00407620
+  00407245: 8B 1B              mov         ebx,dword ptr [ebx]
+  00407247: E9 A0 01 00 00     jmp         004073EC
+  0040724C: 33 C0              xor         eax,eax
+  0040724E: 89 45 9C           mov         dword ptr [ebp-64h],eax
+  00407251: 89 45 A0           mov         dword ptr [ebp-60h],eax
+  00407254: 89 45 A4           mov         dword ptr [ebp-5Ch],eax
+  00407257: 89 45 A8           mov         dword ptr [ebp-58h],eax
+  0040725A: 89 45 AC           mov         dword ptr [ebp-54h],eax
+  0040725D: 89 45 B0           mov         dword ptr [ebp-50h],eax
+  00407260: 89 45 B4           mov         dword ptr [ebp-4Ch],eax
+  00407263: 89 45 B8           mov         dword ptr [ebp-48h],eax
+  00407266: C6 45 FC 01        mov         byte ptr [ebp-4],1
+  0040726A: 8D 4D BC           lea         ecx,[ebp-44h]
+  0040726D: 8B 7B 04           mov         edi,dword ptr [ebx+4]
+  00407270: E8 EB 13 00 00     call        00408660
+  00407275: 8B 4D CC           mov         ecx,dword ptr [ebp-34h]
+  00407278: 89 4D DC           mov         dword ptr [ebp-24h],ecx
+  0040727B: 8B 01              mov         eax,dword ptr [ecx]
+  0040727D: C7 41 08 00 00 00  mov         dword ptr [ecx+8],0
+  00407284: C7 41 0C 00 00 00  mov         dword ptr [ecx+0Ch],0
+  0040728B: C7 41 10 00 00 00  mov         dword ptr [ecx+10h],0
+  00407292: C7 41 14 00 00 00  mov         dword ptr [ecx+14h],0
+  00407299: C7 41 18 00 00 00  mov         dword ptr [ecx+18h],0
+  004072A0: C7 41 1C 00 00 00  mov         dword ptr [ecx+1Ch],0
+  004072A7: C7 41 20 00 00 00  mov         dword ptr [ecx+20h],0
+  004072AE: C7 41 24 00 00 00  mov         dword ptr [ecx+24h],0
+  004072B5: 89 45 CC           mov         dword ptr [ebp-34h],eax
+  004072B8: 89 79 04           mov         dword ptr [ecx+4],edi
+  004072BB: 89 19              mov         dword ptr [ecx],ebx
+  004072BD: FF 45 C4           inc         dword ptr [ebp-3Ch]
+  004072C0: 8B 43 04           mov         eax,dword ptr [ebx+4]
+  004072C3: 85 C0              test        eax,eax
+  004072C5: 74 04              je          004072CB
+  004072C7: 89 08              mov         dword ptr [eax],ecx
+  004072C9: EB 03              jmp         004072CE
+  004072CB: 89 4D BC           mov         dword ptr [ebp-44h],ecx
+  004072CE: 6A 00              push        0
+  004072D0: 89 4B 04           mov         dword ptr [ebx+4],ecx
+  004072D3: C6 45 FC 00        mov         byte ptr [ebp-4],0
+  004072D7: E8 27 43 00 00     call        0040B603
+  004072DC: 83 C4 04           add         esp,4
+  004072DF: 6A 00              push        0
+  004072E1: E8 1D 43 00 00     call        0040B603
+  004072E6: 8B 7D DC           mov         edi,dword ptr [ebp-24h]
+  004072E9: B9 10 00 00 00     mov         ecx,10h
+  004072EE: 8B 45 F0           mov         eax,dword ptr [ebp-10h]
+  004072F1: 83 C4 04           add         esp,4
+  004072F4: 89 45 DC           mov         dword ptr [ebp-24h],eax
+  004072F7: 89 47 14           mov         dword ptr [edi+14h],eax
+  004072FA: F7 E1              mul         eax,ecx
+  004072FC: 0F 92 C1           setb        cl
+  004072FF: 0F BE C9           movsx       ecx,cl
+  00407302: F7 D9              neg         ecx
+  00407304: 0B C8              or          ecx,eax
+  00407306: 51                 push        ecx
+  00407307: E8 EE 42 00 00     call        0040B5FA
+  0040730C: 83 C4 04           add         esp,4
+  0040730F: 89 45 D8           mov         dword ptr [ebp-28h],eax
+  00407312: C6 45 FC 02        mov         byte ptr [ebp-4],2
+  00407316: 85 C0              test        eax,eax
+  00407318: 74 15              je          0040732F
+  0040731A: 68 30 1B 40 00     push        401B30h
+  0040731F: FF 75 F0           push        dword ptr [ebp-10h]
+  00407322: 6A 10              push        10h
+  00407324: 50                 push        eax
+  00407325: E8 36 ED FF FF     call        00406060
+  0040732A: 8B 45 D8           mov         eax,dword ptr [ebp-28h]
+  0040732D: EB 02              jmp         00407331
+  0040732F: 33 C0              xor         eax,eax
+  00407331: C6 45 FC 00        mov         byte ptr [ebp-4],0
+  00407335: 33 D2              xor         edx,edx
+  00407337: 89 47 08           mov         dword ptr [edi+8],eax
+  0040733A: 8B 4F 14           mov         ecx,dword ptr [edi+14h]
+  0040733D: 8B 47 10           mov         eax,dword ptr [edi+10h]
+  00407340: 40                 inc         eax
+  00407341: 03 C1              add         eax,ecx
+  00407343: F7 F1              div         eax,ecx
+  00407345: 8D 41 FF           lea         eax,[ecx-1]
+  00407348: 89 57 10           mov         dword ptr [edi+10h],edx
+  0040734B: 03 C2              add         eax,edx
+  0040734D: 33 D2              xor         edx,edx
+  0040734F: F7 F1              div         eax,ecx
+  00407351: 8B 06              mov         eax,dword ptr [esi]
+  00407353: 8B 4E 04           mov         ecx,dword ptr [esi+4]
+  00407356: C1 E2 04           shl         edx,4
+  00407359: 03 57 08           add         edx,dword ptr [edi+8]
+  0040735C: 89 4A 04           mov         dword ptr [edx+4],ecx
+  0040735F: 8B 4D E4           mov         ecx,dword ptr [ebp-1Ch]
+  00407362: 41                 inc         ecx
+  00407363: 89 02              mov         dword ptr [edx],eax
+  00407365: 8B 45 14           mov         eax,dword ptr [ebp+14h]
+  00407368: 03 C1              add         eax,ecx
+  0040736A: B9 10 00 00 00     mov         ecx,10h
+  0040736F: 89 42 08           mov         dword ptr [edx+8],eax
+  00407372: 89 45 DC           mov         dword ptr [ebp-24h],eax
+  00407375: 8B 45 F0           mov         eax,dword ptr [ebp-10h]
+  00407378: 89 47 24           mov         dword ptr [edi+24h],eax
+  0040737B: 89 45 E4           mov         dword ptr [ebp-1Ch],eax
+  0040737E: F7 E1              mul         eax,ecx
+  00407380: 0F 92 C1           setb        cl
+  00407383: 0F BE C9           movsx       ecx,cl
+  00407386: F7 D9              neg         ecx
+  00407388: 0B C8              or          ecx,eax
+  0040738A: 51                 push        ecx
+  0040738B: E8 6A 42 00 00     call        0040B5FA
+  00407390: 83 C4 04           add         esp,4
+  00407393: 89 45 D4           mov         dword ptr [ebp-2Ch],eax
+  00407396: C6 45 FC 03        mov         byte ptr [ebp-4],3
+  0040739A: 85 C0              test        eax,eax
+  0040739C: 74 15              je          004073B3
+  0040739E: 68 30 1B 40 00     push        401B30h
+  004073A3: FF 75 F0           push        dword ptr [ebp-10h]
+  004073A6: 6A 10              push        10h
+  004073A8: 50                 push        eax
+  004073A9: E8 B2 EC FF FF     call        00406060
+  004073AE: 8B 45 D4           mov         eax,dword ptr [ebp-2Ch]
+  004073B1: EB 02              jmp         004073B5
+  004073B3: 33 C0              xor         eax,eax
+  004073B5: C6 45 FC 00        mov         byte ptr [ebp-4],0
+  004073B9: 33 D2              xor         edx,edx
+  004073BB: 89 47 18           mov         dword ptr [edi+18h],eax
+  004073BE: 8B 4F 24           mov         ecx,dword ptr [edi+24h]
+  004073C1: 8B 47 20           mov         eax,dword ptr [edi+20h]
+  004073C4: 40                 inc         eax
+  004073C5: 03 C1              add         eax,ecx
+  004073C7: F7 F1              div         eax,ecx
+  004073C9: 8D 41 FF           lea         eax,[ecx-1]
+  004073CC: 89 57 20           mov         dword ptr [edi+20h],edx
+  004073CF: 03 C2              add         eax,edx
+  004073D1: 33 D2              xor         edx,edx
+  004073D3: F7 F1              div         eax,ecx
+  004073D5: 8B 46 08           mov         eax,dword ptr [esi+8]
+  004073D8: 8B 4E 0C           mov         ecx,dword ptr [esi+0Ch]
+  004073DB: C1 E2 04           shl         edx,4
+  004073DE: 03 57 18           add         edx,dword ptr [edi+18h]
+  004073E1: 89 02              mov         dword ptr [edx],eax
+  004073E3: 8B 45 DC           mov         eax,dword ptr [ebp-24h]
+  004073E6: 89 4A 04           mov         dword ptr [edx+4],ecx
+  004073E9: 89 42 08           mov         dword ptr [edx+8],eax
+  004073EC: 83 C6 10           add         esi,10h
+  004073EF: 3B 75 E0           cmp         esi,dword ptr [ebp-20h]
+  004073F2: 0F 85 38 FD FF FF  jne         00407130
+  004073F8: 8B 4D EC           mov         ecx,dword ptr [ebp-14h]
+  004073FB: 8D 45 BC           lea         eax,[ebp-44h]
+  004073FE: 68 FF FF FF 7F     push        7FFFFFFFh
+  00407403: FF 75 E8           push        dword ptr [ebp-18h]
+  00407406: 50                 push        eax
+  00407407: FF 75 08           push        dword ptr [ebp+8]
+  0040740A: E8 B1 03 00 00     call        004077C0
+  0040740F: 8D 4D BC           lea         ecx,[ebp-44h]
+  00407412: E8 A9 11 00 00     call        004085C0
+  00407417: 8B 4D F4           mov         ecx,dword ptr [ebp-0Ch]
+  0040741A: 64 89 0D 00 00 00  mov         dword ptr fs:[00000000h],ecx
+  00407421: 59                 pop         ecx
+  00407422: 5F                 pop         edi
+  00407423: 5E                 pop         esi
+  00407424: 5B                 pop         ebx
+  00407425: 8B E5              mov         esp,ebp
+  00407427: 5D                 pop         ebp
+  00407428: C2 10 00           ret         10h
+  0040742B: C7 03 00 00 00 00  mov         dword ptr [ebx],0
+  00407431: 8B 4D F4           mov         ecx,dword ptr [ebp-0Ch]
+  00407434: 64 89 0D 00 00 00  mov         dword ptr fs:[00000000h],ecx
+  0040743B: 59                 pop         ecx
+  0040743C: 5F                 pop         edi
+  0040743D: 5E                 pop         esi
+  0040743E: 5B                 pop         ebx
+  0040743F: 8B E5              mov         esp,ebp
+  00407441: 5D                 pop         ebp
+  00407442: C2 10 00           ret         10h
+  00407445: 68 05 40 00 80     push        80004005h
+  0040744A: E8 51 F7 FF FF     call        00406BA0
+  0040744F: CC                 int         3
+  00407450: CC                 int         3
+  00407451: CC                 int         3
+  00407452: CC                 int         3
+  00407453: CC                 int         3
+  00407454: CC                 int         3
+  00407455: CC                 int         3
+  00407456: CC                 int         3
+  00407457: CC                 int         3
+  00407458: CC                 int         3
+  00407459: CC                 int         3
+  0040745A: CC                 int         3
+  0040745B: CC                 int         3
+  0040745C: CC                 int         3
+  0040745D: CC                 int         3
+  0040745E: CC                 int         3
+  0040745F: CC                 int         3

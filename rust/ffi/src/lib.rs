@@ -215,3 +215,6 @@ mod ssf_literal;
 mod windows_scan_curve;
 #[cfg(windows)]
 mod windows_word_transform;
+
+#[cfg(windows)]
+mod windows_ellipse_numeric;

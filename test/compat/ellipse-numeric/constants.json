@@ -1,0 +1,7 @@
+{
+  "x86-zero": "0000000000000000",
+  "x86-half": "000000000000e03f",
+  "x64-half": "0000003f",
+  "x64-one": "0000803f",
+  "x64-abs": "ffffff7fffffff7fffffff7fffffff7f"
+}

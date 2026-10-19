@@ -2,11 +2,9 @@
 // Included once by Rasterizer.cpp. All Rust data crosses as detached bytes.
 #include "RustDocumentOwner.h"
 extern "C" {
-typedef uint32_t (__cdecl *XyEllipseCall)(uint32_t,uint64_t,uint64_t,uint8_t*);
-uint32_t __cdecl xy_rust_widen_numeric(uint32_t,uint64_t,uint64_t,uint8_t*);
 uint32_t __cdecl xy_vsfilter_region_create_v1(uint8_t*);
 uint32_t __cdecl xy_vsfilter_region_destroy_v1(uint64_t);
-uint32_t __cdecl xy_vsfilter_region_convert_v1(uint64_t,uint64_t,int32_t,int32_t,XyEllipseCall,uint8_t*);
+uint32_t __cdecl xy_vsfilter_region_convert_v1(uint64_t,uint64_t,int32_t,int32_t,uint8_t*);
 uint32_t __cdecl xy_vsfilter_region_info_v1(uint64_t,uint8_t*);
 uint32_t __cdecl xy_vsfilter_region_read_v1(uint64_t,uint8_t*,size_t);
 uint32_t __cdecl xy_vsfilter_scan_create_v1(uint8_t*);
@@ -36,7 +34,7 @@ std::array<uint8_t,12> PathInfo(uint64_t id){std::array<uint8_t,12> out;
 RegionOwner::RegionOwner(){std::array<uint8_t,8> out;DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_region_create_v1(out.data());}));id_=DocumentDetail::Load(out,0,8);}
 RegionOwner::~RegionOwner(){DocumentDetail::Release(DocumentDetail::Invoke([&](){return xy_vsfilter_region_destroy_v1(id_);}));}
 bool RegionOwner::Convert(const ScanOwner& scan,int rx,int ry){std::array<uint8_t,4> out;
-    DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_region_convert_v1(id_,scan.id_,rx,ry,xy_rust_widen_numeric,out.data());}));return DocumentDetail::Load(out,0,4)!=0;}
+    DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_region_convert_v1(id_,scan.id_,rx,ry,out.data());}));return DocumentDetail::Load(out,0,4)!=0;}
 RegionSnapshot RegionOwner::Read()const{
     DocumentDetail::Loan gate;std::array<uint8_t,8> info;DocumentDetail::Check(xy_vsfilter_region_info_v1(id_,info.data()));const uint64_t length=DocumentDetail::Load(info,0,8);
     DocumentDetail::Shape(length>=12&&length<=SIZE_MAX);DocumentDetail::Bytes bytes(static_cast<size_t>(length));DocumentDetail::Check(xy_vsfilter_region_read_v1(id_,bytes.data(),bytes.size()));

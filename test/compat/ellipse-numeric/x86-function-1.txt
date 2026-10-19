@@ -1,0 +1,108 @@
+  00408320: 8B 54 24 04        mov         edx,dword ptr [esp+4]
+  00408324: 83 EC 1C           sub         esp,1Ch
+  00408327: 56                 push        esi
+  00408328: 8B 31              mov         esi,dword ptr [ecx]
+  0040832A: 8B C6              mov         eax,esi
+  0040832C: F7 D8              neg         eax
+  0040832E: 3B D0              cmp         edx,eax
+  00408330: 7D 0C              jge         0040833E
+  00408332: B8 FF FF FF 7F     mov         eax,7FFFFFFFh
+  00408337: 5E                 pop         esi
+  00408338: 83 C4 1C           add         esp,1Ch
+  0040833B: C2 08 00           ret         8
+  0040833E: 8B FF              mov         edi,edi
+  00408340: 3B D6              cmp         edx,esi
+  00408342: 7E 0C              jle         00408350
+  00408344: B8 00 00 00 80     mov         eax,80000000h
+  00408349: 5E                 pop         esi
+  0040834A: 83 C4 1C           add         esp,1Ch
+  0040834D: C2 08 00           ret         8
+  00408350: 57                 push        edi
+  00408351: 8B 79 28           mov         edi,dword ptr [ecx+28h]
+  00408354: 85 FF              test        edi,edi
+  00408356: 74 19              je          00408371
+  00408358: 8D 04 75 01 00 00  lea         eax,[esi*2+00000001h]
+  0040835F: 0F AF 44 24 2C     imul        eax,dword ptr [esp+2Ch]
+  00408364: 03 C2              add         eax,edx
+  00408366: 8B 04 87           mov         eax,dword ptr [edi+eax*4]
+  00408369: 5F                 pop         edi
+  0040836A: 5E                 pop         esi
+  0040836B: 83 C4 1C           add         esp,1Ch
+  0040836E: C2 08 00           ret         8
+  00408371: DB 44 24 28        fild        dword ptr [esp+28h]
+  00408375: DD 5C 24 0C        fstp        qword ptr [esp+0Ch]
+  00408379: DD 44 24 0C        fld         qword ptr [esp+0Ch]
+  0040837D: DC 49 10           fmul        qword ptr [ecx+10h]
+  00408380: D9 5C 24 08        fstp        dword ptr [esp+8]
+  00408384: D9 44 24 08        fld         dword ptr [esp+8]
+  00408388: DD 54 24 1C        fst         qword ptr [esp+1Ch]
+  0040838C: DB 44 24 2C        fild        dword ptr [esp+2Ch]
+  00408390: DD 5C 24 0C        fstp        qword ptr [esp+0Ch]
+  00408394: DD 44 24 0C        fld         qword ptr [esp+0Ch]
+  00408398: DC 49 18           fmul        qword ptr [ecx+18h]
+  0040839B: D9 5C 24 0C        fstp        dword ptr [esp+0Ch]
+  0040839F: D9 44 24 0C        fld         dword ptr [esp+0Ch]
+  004083A3: DD 54 24 14        fst         qword ptr [esp+14h]
+  004083A7: DC C8              fmul        st(0),st
+  004083A9: D9 C1              fld         st(1)
+  004083AB: DE CA              fmulp       st(2),st
+  004083AD: DE C1              faddp       st(1),st
+  004083AF: D9 E8              fld1
+  004083B1: D9 C0              fld         st(0)
+  004083B3: DE F2              fdivrp      st(2),st
+  004083B5: DE E9              fsubp       st(1),st
+  004083B7: D9 5C 24 0C        fstp        dword ptr [esp+0Ch]
+  004083BB: D9 EE              fldz
+  004083BD: D9 44 24 0C        fld         dword ptr [esp+0Ch]
+  004083C1: D8 D1              fcom        st(1)
+  004083C3: DF E0              fnstsw      ax
+  004083C5: DD D9              fstp        st(1)
+  004083C7: F6 C4 01           test        ah,1
+  004083CA: 75 6B              jne         00408437
+  004083CC: 51                 push        ecx
+  004083CD: D9 1C 24           fstp        dword ptr [esp]
+  004083D0: E8 8B B3 FF FF     call        00403760
+  004083D5: D9 44 24 0C        fld         dword ptr [esp+0Ch]
+  004083D9: 83 C4 04           add         esp,4
+  004083DC: D9 E1              fabs
+  004083DE: D9 C1              fld         st(1)
+  004083E0: DD 44 24 14        fld         qword ptr [esp+14h]
+  004083E4: DC C9              fmul        st(1),st
+  004083E6: D9 CA              fxch        st(2)
+  004083E8: DE C1              faddp       st(1),st
+  004083EA: DC 1D E0 D1 43 00  fcomp       qword ptr ds:[0043D1E0h]
+  004083F0: DF E0              fnstsw      ax
+  004083F2: F6 C4 41           test        ah,41h
+  004083F5: 7A 3E              jp          00408435
+  004083F7: DD 44 24 1C        fld         qword ptr [esp+1Ch]
+  004083FB: 83 EC 08           sub         esp,8
+  004083FE: DE CA              fmulp       st(2),st
+  00408400: DE E1              fsubrp      st(1),st
+  00408402: D9 5C 24 14        fstp        dword ptr [esp+14h]
+  00408406: D9 44 24 14        fld         dword ptr [esp+14h]
+  0040840A: D8 49 0C           fmul        dword ptr [ecx+0Ch]
+  0040840D: D9 5C 24 14        fstp        dword ptr [esp+14h]
+  00408411: D9 44 24 14        fld         dword ptr [esp+14h]
+  00408415: DD 1C 24           fstp        qword ptr [esp]
+  00408418: E8 93 3D 02 00     call        0042C1B0
+  0040841D: 83 C4 08           add         esp,8
+  00408420: D9 5C 24 0C        fstp        dword ptr [esp+0Ch]
+  00408424: D9 44 24 0C        fld         dword ptr [esp+0Ch]
+  00408428: E8 63 5B 02 00     call        0042DF90
+  0040842D: 5F                 pop         edi
+  0040842E: 5E                 pop         esi
+  0040842F: 83 C4 1C           add         esp,1Ch
+  00408432: C2 08 00           ret         8
+  00408435: DD D8              fstp        st(0)
+  00408437: 33 C0              xor         eax,eax
+  00408439: DD D8              fstp        st(0)
+  0040843B: 85 D2              test        edx,edx
+  0040843D: 5F                 pop         edi
+  0040843E: 0F 9F C0           setg        al
+  00408441: 05 FF FF FF 7F     add         eax,7FFFFFFFh
+  00408446: 5E                 pop         esi
+  00408447: 83 C4 1C           add         esp,1Ch
+  0040844A: C2 08 00           ret         8
+  0040844D: CC                 int         3
+  0040844E: CC                 int         3
+  0040844F: CC                 int         3

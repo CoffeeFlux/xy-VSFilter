@@ -18,13 +18,14 @@ struct Owners {
     paths: Store,
     scans: xy_vsfilter_compat::scan_convert::Store,
     regions: xy_vsfilter_compat::wide_region::Store,
+    ellipse: xy_vsfilter_compat::ellipse::Cache<crate::windows_ellipse_numeric::Numeric>,
 }
 // SAFETY: all access uses the atomic gate; HRTB closures cannot return borrowed
 // references, and all three registries own only Send data. No native pointer is
 // stored. Path->scan conversion uses disjoint fields under this single gate,
 // so it never nests admissions or releases a path loan across a callback.
-// Region arithmetic callbacks receive only detached scalars and temporary output;
-// the gate refuses reentry while scan/region borrows remain admitted.
+// The ellipse cache owns only scalar numeric state, an arc and a table. Region
+// conversion holds disjoint scan/region/cache borrows and makes no callbacks.
 unsafe impl Sync for Boundary {}
 struct Guard<'a>(&'a Boundary);
 impl Drop for Guard<'_> {
@@ -40,6 +41,7 @@ impl Boundary {
                 paths: Store::new(),
                 scans: xy_vsfilter_compat::scan_convert::Store::new(),
                 regions: xy_vsfilter_compat::wide_region::Store::new(),
+                ellipse: xy_vsfilter_compat::ellipse::Cache::new(),
             }),
         }
     }
@@ -61,33 +63,6 @@ impl Boundary {
     }
 }
 static PATHS: Boundary = Boundary::new();
-type EllipseCall = unsafe extern "C" fn(u32, u64, u64, *mut u8) -> u32;
-struct NativeEllipse(EllipseCall);
-impl NativeEllipse {
-    fn call(&mut self, op: u32, a: u64, b: u64) -> Result<i32, u32> {
-        let mut out = [0u8; 4];
-        // SAFETY: only the unsafe region export constructs this adapter. Its
-        // callback contract permits synchronous scalar calls, writes four bytes,
-        // retains no address and cannot unwind or access any admitted owner.
-        let status = unsafe { (self.0)(op, a, b, out.as_mut_ptr()) };
-        if status == 0 {
-            Ok(i32::from_le_bytes(out))
-        } else {
-            Err(status)
-        }
-    }
-}
-impl xy_vsfilter_compat::wide_region::Ellipse for NativeEllipse {
-    fn initialize(&mut self, rx: i32, ry: i32) -> Result<(), u32> {
-        self.call(0, rx as u32 as u64, ry as u32 as u64).map(|_| ())
-    }
-    fn cross(&mut self, right: bool, center: u64, base: u64) -> Result<i32, u32> {
-        self.call(if right { 2 } else { 1 }, center, base)
-    }
-    fn arc(&mut self, right: bool, center: u64, line: i32) -> Result<i32, u32> {
-        self.call(if right { 4 } else { 3 }, center, line as u32 as u64)
-    }
-}
 /// # Safety
 /// output spans eight writable bytes. No owner address is exported.
 #[no_mangle]
@@ -113,23 +88,16 @@ pub extern "C" fn xy_vsfilter_region_destroy_v1(id: u64) -> u32 {
     }
 }
 /// # Safety
-/// output spans four writable bytes. callback is live for this call only,
-/// serializes its ellipse cache, writes exactly four bytes on success, and
-/// neither unwinds nor retains any pointer. It receives only copied scalars and
-/// a temporary output; it must not access admitted path/scan/region data. A
-/// reentrant registry request is refused Busy, including destruction.
+/// output spans four writable bytes. Scan, region and ellipse cache are admitted
+/// together. No native callback or foreign input pointer participates.
 #[no_mangle]
 pub unsafe extern "C" fn xy_vsfilter_region_convert_v1(
     id: u64,
     scan: u64,
     rx: i32,
     ry: i32,
-    callback: Option<EllipseCall>,
     output: *mut u8,
 ) -> u32 {
-    let Some(callback) = callback else {
-        return 3;
-    };
     if output.is_null() {
         return 3;
     }
@@ -137,7 +105,7 @@ pub unsafe extern "C" fn xy_vsfilter_region_convert_v1(
         let source = o.scans.get(scan)?;
         o.regions
             .get_mut(id)?
-            .convert(source.spans(), rx, ry, &mut NativeEllipse(callback))
+            .convert(source.spans(), rx, ry, &mut o.ellipse)
     }) {
         Ok(v) => u32::from(v),
         Err(e) => return e,
@@ -661,16 +629,6 @@ pub unsafe extern "C" fn xy_vsfilter_path_action_v1(
 #[cfg(test)]
 mod tests {
     use super::*;
-    unsafe extern "C" fn ellipse(op: u32, _: u64, _: u64, out: *mut u8) -> u32 {
-        assert_eq!(op, 0);
-        assert_eq!(xy_vsfilter_region_destroy_v1(u64::MAX), 2);
-        assert_eq!(xy_vsfilter_scan_destroy_v1(u64::MAX), 2);
-        // SAFETY: the adapter supplies four initialized writable bytes.
-        unsafe {
-            core::ptr::write_bytes(out, 0, 4);
-        }
-        0
-    }
     #[test]
     fn checked_ids_detached_packets_and_failed_admission_preserve_output() {
         let mut out = [0xa5; 32];
@@ -735,12 +693,12 @@ mod tests {
             let region = u64::from_le_bytes(scan_id);
             out.fill(0xa5);
             assert_eq!(
-                xy_vsfilter_region_convert_v1(region, scan, 1, 1, None, out.as_mut_ptr()),
-                3
+                xy_vsfilter_region_convert_v1(region, u64::MAX, 1, 1, out.as_mut_ptr()),
+                1
             );
             assert_eq!(out, [0xa5; 32]);
             assert_eq!(
-                xy_vsfilter_region_convert_v1(region, scan, 1, 1, Some(ellipse), out.as_mut_ptr()),
+                xy_vsfilter_region_convert_v1(region, scan, 1, 1, out.as_mut_ptr()),
                 0
             );
             assert_eq!(out[0], 1);

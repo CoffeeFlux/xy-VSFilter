@@ -10,17 +10,17 @@ import subprocess
 from document_native_lifecycle import ROOT, PIN, LIBRARIES, SYSTEM_LIBRARIES, find_library, git, sha
 
 SOURCE = ROOT / "tools/compat/wide_region_native.cpp"
-CASES = 672
+CASES = 1536
 INPUTS = 24
 
-BORDERS = (0,0,1,8,1,1,7,7,19,19,64,65,128,128)
+BORDERS = (0,0,1,8,1,1,7,7,19,19,64,65,128,128,2,19,19,65,65,127,127,129,129,20,20,255,255,65,65,128,128,128)
 
 def validate(data,bits):
     rows=data.splitlines();at=1
     if not rows or rows[0]!=f'widen pointer_bits={bits}'.encode():raise ValueError('wrong widening architecture')
     status=rb'[0-9a-f]+,[0-9a-f]+,-?[0-9]+,[0-9]+'
     for index in range(CASES):
-        scenario=index//28;radius=index//2%14;sticky=index%2
+        scenario=index//64;radius=index//2%32;sticky=index%2
         prefix=f'widen-case index={index} scenario={scenario} radius={radius} sticky={sticky} result=1 border={BORDERS[radius]}'.encode()
         if at>=len(rows) or not rows[at].startswith(prefix):raise ValueError('missing/reordered widening case')
         m=re.fullmatch(rb' spans=([0-9]+) before='+status+rb' after='+status,rows[at][len(prefix):])
@@ -31,7 +31,7 @@ def validate(data,bits):
         for row in rows[at:at+spans]:
             if not re.fullmatch(rb'widen-span [0-9a-f]{16},[0-9a-f]{16}',row):raise ValueError('missing/malformed widened span')
         at+=spans
-    if rows[at:]!=[b'widen-complete cases=672']:raise ValueError('missing widening completion')
+    if rows[at:]!=[b'widen-complete cases=1536']:raise ValueError('missing widening completion')
 
 def compare(traces,bits):
     if len(traces)!=4:raise ValueError('two runs per role required')
@@ -58,9 +58,9 @@ def main():
                   probe_sha256=sha(SOURCE.read_bytes()), 
                   runner_sha256=sha(Path(__file__).read_bytes()),
                   environment={key:os.environ.get(key) for key in ("VCToolsVersion","WindowsSDKVersion","VSCMD_ARG_TGT_ARCH")},
-                  limits=["24 paths / 672 reused-object widening calls; straight and curved paths, 14 radius pairs including negative/zero/horizontal radii, empty/reset, lookup thresholds and asymmetric ellipses",
+                  limits=["24 paths / 1536 reused-object widening calls; straight and curved paths, 32 radius pairs including negative/zero/horizontal radii, empty/reset, lookup thresholds and asymmetric ellipses",
                           "Initialized bounded scan paths; negative radius clamping is reference behavior. Invalid span/queue/matrix shapes, allocation failure and arbitrary native concurrency remain unresolved",
-                          "Default FP controls, Release build; actual CreateWidenedRegion and all packed spans; native ellipse arithmetic remains transitional, not whole-host closure"])
+                          "Default FP controls, Release build; actual CreateWidenedRegion and all packed spans with Rust-owned ellipse cache/arithmetic; not whole-host closure"])
     def save():
         (out/"report.json").write_text(json.dumps(report,indent=2)+"\n",encoding="utf-8")
     def run(command, cwd, label, timeout):

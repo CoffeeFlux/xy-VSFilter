@@ -123,6 +123,7 @@ pub mod wide_region;
 
 pub mod arc_queue;
 
+pub mod ellipse;
 pub mod ellipse_arc;
 
 pub mod ellipse_matrix;
