@@ -42,12 +42,20 @@ static void run(const STSStyleBase& style,HDC dc){
         printf("font-expired index=%u types=%lu,%lu flushed=%lu,%lu\n",sequence-1,ta,tb,GetObjectType(ha),GetObjectType(hb));
     }
 }
-int main(int argc,char**){try{
-    expired_handle_diagnostic=argc>1;
+int main(int argc,char** argv){try{
+    const bool edge=argc==3&&strcmp(argv[1],"edge")==0;
+    expired_handle_diagnostic=argc>1&&!edge;
     check(AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0)!=FALSE);
     CCritSec lock;CRenderedTextSubtitle renderer(&lock);
     HDC dc=CreateCompatibleDC(NULL);check(dc!=NULL);
     printf("font-provenance pointer_bits=%u ansi=%u oem=%u logfont=%u metric=%u\n",unsigned(sizeof(void*)*8),GetACP(),GetOEMCP(),unsigned(sizeof(LOGFONTW)),unsigned(sizeof(TEXTMETRICW)));
+    if(edge){
+        const uint64_t raw[]={0,0x8000000000000000ull,0x3ff0000000000000ull,0xbff0000000000000ull,1,
+            0x0010000000000000ull,0x7fefffffffffffffull,0x7ff0000000000000ull,0xfff0000000000000ull,
+            0x7ff8000000000001ull,0xfff8000000000001ull,0x7ff0000000000001ull};
+        unsigned which=unsigned(atoi(argv[2]));check(which<12);STSStyle s;s.fontName=L"Arial";memcpy(&s.fontSize,&raw[which],8);run(s,dc);
+        check(DeleteDC(dc)!=FALSE);printf("font-complete cases=%u count=%llu\n",sequence,static_cast<unsigned long long>(FwCMyFont::Count()));return 0;
+    }
     std::vector<CStringW> names={L"Arial",L"Times New Roman",L"Courier New",L"Segoe UI",L"xy-no-such-font-compat",L"",L"@Arial",L"arial"};
     for(int n:{30,31,32,70})names.push_back(CStringW(L'x',n));
     const wchar_t a[]={L'A',L'r',L'i',L'a',L'l',0,L'X'};names.push_back(CStringW(a,7));

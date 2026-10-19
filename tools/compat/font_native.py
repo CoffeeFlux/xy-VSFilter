@@ -14,18 +14,19 @@ STEPS = 195
 CASES = STEPS
 INPUTS = 195
 
-def validate(data,bits):
+def validate(data,bits,edge=False):
+    cases=1 if edge else CASES
     rows=data.splitlines()
-    if len(rows)!=CASES*2+2:raise ValueError('missing font observations')
+    if len(rows)!=cases*2+2:raise ValueError('missing font observations')
     if not re.fullmatch(rb'font-provenance pointer_bits='+str(bits).encode()+rb' ansi=\d+ oem=\d+ logfont=92 metric=60',rows[0]):raise ValueError('wrong font ABI')
-    for i in range(CASES):
-        if not re.fullmatch(f'font-case index={i} '.encode()+rb'count=1 aliases=11 ascent=-?\d+ descent=-?\d+ extent=-?\d+,-?\d+(?: (?:first|second|copy|read)=[0-9a-f]+,-?\d+,\d+){4} logfont=[0-9a-f]{184} metric=[0-9a-f]{120}',rows[1+2*i]):raise ValueError(f'invalid font case {i}')
-        if not re.fullmatch(f'font-release index={i} '.encode()+rb'count=0(?: (?:a|b|c)=[0-9a-f]+,-?\d+,\d+){3}',rows[2+2*i]):raise ValueError(f'invalid release {i}')
-    if rows[-1]!=f'font-complete cases={CASES} count=0'.encode():raise ValueError('incomplete font release')
+    for i in range(cases):
+        if not re.fullmatch(f'font-case index={i} '.encode()+(rb'count=[12] aliases=[01]1' if edge else rb'count=1 aliases=11')+rb' ascent=-?\d+ descent=-?\d+ extent=-?\d+,-?\d+(?: (?:first|second|copy|read)=[0-9a-f]+,-?\d+,\d+){4} logfont=[0-9a-f]{184} metric=[0-9a-f]{120}',rows[1+2*i]):raise ValueError(f'invalid font case {i}')
+        if not re.fullmatch(f'font-release index={i} '.encode()+(rb'count=[02]' if edge else rb'count=0')+rb'(?: (?:a|b|c)=[0-9a-f]+,-?\d+,\d+){3}',rows[2+2*i]):raise ValueError(f'invalid release {i}')
+    if not re.fullmatch(f'font-complete cases={cases} '.encode()+(rb'count=[02]' if edge else rb'count=0'),rows[-1]):raise ValueError('incomplete font release')
 
-def compare(traces,bits):
+def compare(traces,bits,edge=False):
     if len(traces)!=4:raise ValueError('two runs per role required')
-    for t in traces:validate(t,bits)
+    for t in traces:validate(t,bits,edge)
     for n,t in enumerate(traces[1:],1):
         if t!=traces[0]:
             a=traces[0].splitlines();b=t.splitlines();at=next(i for i,pair in enumerate(zip(a,b)) if pair[0]!=pair[1])
@@ -37,6 +38,7 @@ def main():
     parser.add_argument("--reference-root", type=Path, required=True)
     parser.add_argument("--platform", choices=("Win32", "x64"), required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument('--edge',type=int,choices=range(12))
     args = parser.parse_args()
     if os.name != "nt":
         parser.error("Windows ATL/MFC and built native libraries required")
@@ -44,7 +46,7 @@ def main():
     out.mkdir(parents=True, exist_ok=False)
     roots = (args.reference_root.resolve(), ROOT)
     report = dict(complete=False, equal=False, reference_commit=PIN, platform=args.platform,
-                  kind="actual-renderer-font", cases=CASES, inputs=INPUTS, builds={},
+                  kind="actual-renderer-font", cases=1 if args.edge is not None else CASES, inputs=1 if args.edge is not None else INPUTS, edge=args.edge, builds={},
                   probe_sha256=sha(SOURCE.read_bytes()), 
                   runner_sha256=sha(Path(__file__).read_bytes()),
                   environment={key:os.environ.get(key) for key in ("VCToolsVersion","WindowsSDKVersion","VSCMD_ARG_TGT_ARCH")},
@@ -100,14 +102,14 @@ def main():
             build["included_source_sha256"]=headers
             build["binary_sha256"]=sha(exe.read_bytes())
             for repeat in (1,2):
-                result=run([str(exe)],work,f"{label}-trace-{repeat}",120)
+                result=run([str(exe)]+([] if args.edge is None else ["edge",str(args.edge)]),work,f"{label}-trace-{repeat}",120)
                 if result.stderr:
                     raise ValueError("unexpected font probe stderr")
-                validate(result.stdout,bits);traces.append(result.stdout)
+                validate(result.stdout,bits,args.edge is not None);traces.append(result.stdout)
             for path,digest in {**headers,**build["library_sha256"],str(exe):build["binary_sha256"]}.items():
                 if sha(Path(path).read_bytes())!=digest:
                     raise ValueError("native probe input or binary changed")
-        compare(traces,bits)
+        compare(traces,bits,args.edge is not None)
         if [git(root,"rev-parse","HEAD") for root in roots]!=commits or any(git(root,"status","--porcelain","--untracked-files=no") for root in roots):
             raise ValueError("source changed during comparison")
         for path,key in ((SOURCE,"probe_sha256"),(Path(__file__),"runner_sha256")):
@@ -118,7 +120,7 @@ def main():
     except Exception as error:
         report["unresolved"]=str(error);save();raise
     save()
-    print(json.dumps({"output":str(out),"complete":True,"equal":True,"cases":CASES}))
+    print(json.dumps({"output":str(out),"complete":True,"equal":True,"cases":report["cases"]}))
 
 
 if __name__=="__main__":
