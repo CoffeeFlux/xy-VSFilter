@@ -37,6 +37,7 @@ public:
     bool path(PathData& output){return CreatePath(&output);}
     static void measure(TextInfo& out,const FwSTSStyle& s,const CStringW& text){GetTextInfo(&out,s,text);}
 };
+#ifndef XY_TEXT_MEASURE_INCLUDED
 int main(){try{
     check(AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0)!=FALSE);CCritSec lock;
     Import a("CreateCompatibleDC",captureCreate,realCreate),b("SelectObject",text_select,text_real_select),c("GetTextExtentPoint32W",text_extent,text_real_extent),
@@ -61,3 +62,5 @@ int main(){try{
     }
     printf("dc-text-complete cases=%u\n",index);return 0;
 }catch(const std::exception& e){fprintf(stderr,"unresolved: %s\n",e.what());return 2;}}
+
+#endif

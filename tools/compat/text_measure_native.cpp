@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Actual CText measurement with scripted initialized extents and raw float bits.
-#define main unused_text_path_main
+#define XY_TEXT_MEASURE_INCLUDED
 #include "renderer_dc_text_native.cpp"
-#undef main
+#undef XY_TEXT_MEASURE_INCLUDED
 #include <cfenv>
 #include <process.h>
 static unsigned history,extent_count;static bool observing;
