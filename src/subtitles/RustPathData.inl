@@ -2,6 +2,7 @@
 // Included once by Rasterizer.cpp. All Rust data crosses as detached bytes.
 #include "RustDocumentOwner.h"
 extern "C" {
+uint32_t __cdecl xy_vsfilter_path_transform_v1(uint64_t,const uint8_t*,size_t);
 uint32_t __cdecl xy_vsfilter_path_create_v1(uint64_t,uint8_t*);
 uint32_t __cdecl xy_vsfilter_path_destroy_v1(uint64_t);
 uint32_t __cdecl xy_vsfilter_path_info_v1(uint64_t,uint8_t*);
@@ -41,6 +42,11 @@ void PathOwner::Replace(const PathSnapshot& value){
     DocumentDetail::Bytes bytes(4+count*9);DocumentDetail::Put(bytes,0,count,4);
     for(size_t i=0;i<count;++i){DocumentDetail::Put(bytes,4+9*i,static_cast<uint32_t>(value.points[i].x),4);DocumentDetail::Put(bytes,8+9*i,static_cast<uint32_t>(value.points[i].y),4);bytes[12+9*i]=value.types[i];}
     DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_path_write_v1(id_,bytes.data(),bytes.size());}));
+}
+void PathOwner::Transform(const uint64_t* values,long x,long y,bool round){
+    std::array<uint8_t,81> bytes;for(size_t i=0;i<9;++i)DocumentDetail::Put(bytes,8*i,values[i],8);
+    DocumentDetail::Put(bytes,72,static_cast<uint32_t>(x),4);DocumentDetail::Put(bytes,76,static_cast<uint32_t>(y),4);bytes[80]=round?1:0;
+    DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_path_transform_v1(id_,bytes.data(),bytes.size());}));
 }
 void PathOwner::Clear(){PathAction(id_,0);}
 bool PathOwner::Text(HDC dc,uintptr_t font,uint64_t spacing,const uint16_t* units,size_t count){

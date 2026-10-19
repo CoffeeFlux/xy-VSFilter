@@ -67,6 +67,7 @@ public:
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     XyRust::PathSnapshot Snapshot()const{return m_path.Read();}
     void Replace(const XyRust::PathSnapshot& value){m_path.Replace(value);}
+    void Transform(const uint64_t* values,long x,long y,bool round){m_path.Transform(values,x,y,round);}
     int Count()const{return m_path.Count();}
     ULONG Hash()const{return m_path.Hash();}
     bool Text(HDC dc,uintptr_t font,uint64_t spacing,const uint16_t* units,size_t count){return m_path.Text(dc,font,spacing,units,count);}

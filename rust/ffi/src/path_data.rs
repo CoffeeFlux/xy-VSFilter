@@ -41,6 +41,51 @@ impl Boundary {
     }
 }
 static PATHS: Boundary = Boundary::new();
+/// # Safety
+/// `input` spans exactly `length` initialized bytes: nine raw double words,
+/// signed origin x/y, and a 0/1 rounding flag. No foreign pointer is retained.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_path_transform_v1(
+    id: u64,
+    input: *const u8,
+    length: usize,
+) -> u32 {
+    if input.is_null() || length != 81 {
+        return 3;
+    }
+    // SAFETY: caller's readable span; integer-only decoding preserves NaN bits.
+    let bytes = unsafe { core::slice::from_raw_parts(input, length) };
+    if bytes[80] > 1 {
+        return 3;
+    }
+    let mut values = [0; 9];
+    for (value, chunk) in values.iter_mut().zip(bytes[..72].chunks_exact(8)) {
+        *value = u64::from_le_bytes(chunk.try_into().unwrap());
+    }
+    let parameters = xy_vsfilter_compat::word_transform::Parameters {
+        values,
+        origin: Point {
+            x: i32::from_le_bytes(bytes[72..76].try_into().unwrap()),
+            y: i32::from_le_bytes(bytes[76..80].try_into().unwrap()),
+        },
+        round: bytes[80] != 0,
+    };
+    match PATHS.with(|store| {
+        let path = store.get_mut(id)?;
+        // Prepare even for an empty path: native trig/arithmetic has observable
+        // errno and floating exception effects before it checks the point count.
+        let mut numeric = crate::windows_word_transform::Numeric::new(&parameters);
+        xy_vsfilter_compat::word_transform::transform(
+            path.buffers().0,
+            parameters.round,
+            &mut numeric,
+        );
+        Ok(())
+    }) {
+        Ok(()) => 0,
+        Err(status) => status,
+    }
+}
 #[link(name = "gdi32")]
 extern "system" {
     fn BeginPath(dc: usize) -> i32;
@@ -398,6 +443,22 @@ mod tests {
                 4
             );
             assert!(out.iter().all(|v| *v == 0xa5));
+            assert_eq!(xy_vsfilter_path_read_v1(a, out.as_mut_ptr().add(1), 31), 0);
+            assert_eq!(&out[1..1 + packet.len()], packet);
+            // Malformed transform packets and stale owners must not change data.
+            let mut transform = [0u8; 82];
+            assert_eq!(xy_vsfilter_path_transform_v1(a, core::ptr::null(), 81), 3);
+            assert_eq!(xy_vsfilter_path_transform_v1(a, transform.as_ptr(), 80), 3);
+            transform[81] = 2;
+            assert_eq!(
+                xy_vsfilter_path_transform_v1(a, transform.as_ptr().add(1), 81),
+                3
+            );
+            transform[81] = 0;
+            assert_eq!(
+                xy_vsfilter_path_transform_v1(u64::MAX, transform.as_ptr().add(1), 81),
+                1
+            );
             assert_eq!(xy_vsfilter_path_read_v1(a, out.as_mut_ptr().add(1), 31), 0);
             assert_eq!(&out[1..1 + packet.len()], packet);
             assert_eq!(

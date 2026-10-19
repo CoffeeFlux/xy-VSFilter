@@ -450,10 +450,12 @@ void CWord::Transform(PathData* path_data, const CPointCoor2 &org )
 {
     ASSERT(path_data);
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    auto path_snapshot=path_data->Snapshot();POINT* path_points=path_snapshot.points.data();const int path_count=static_cast<int>(path_snapshot.points.size());
+    const STSStyle& style=m_style.get();uint64_t values[9];
+    const double* fields[]={&style.fontScaleX,&style.fontScaleY,&style.fontAngleZ,&style.fontAngleX,&style.fontAngleY,&style.fontShiftX,&style.fontShiftY,&m_target_scale_x,&m_target_scale_y};
+    for(size_t i=0;i<9;++i)memcpy(&values[i],fields[i],8);
+    path_data->Transform(values,org.x,org.y,m_round_to_whole_pixel_after_scale_to_target);
 #else
     POINT* path_points=path_data->mpPathPoints;const int path_count=path_data->mPathPoints;
-#endif
 
     const STSStyle& style = m_style.get();
 
@@ -586,8 +588,6 @@ void CWord::Transform(PathData* path_data, const CPointCoor2 &org )
             path_points[i].y = (path_points[i].y + 32)&~63;//fix me: readability
         }
     }
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    path_data->Replace(path_snapshot);
 #endif
 }
 

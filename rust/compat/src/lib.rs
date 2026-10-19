@@ -177,3 +177,5 @@ pub mod rect_intern;
 pub mod string_flyweight;
 pub mod style_intern;
 pub mod text_path;
+
+pub mod word_transform;

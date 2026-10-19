@@ -14,6 +14,7 @@ public:
     ~PathOwner();
     int Count()const;ULONG Hash()const;bool Equal(const PathOwner&)const;
     PathSnapshot Read()const;void Replace(const PathSnapshot&);
+    void Transform(const uint64_t*,long,long,bool);
     void Clear();bool Begin(HDC,bool);bool End(HDC,bool,long,long);
     void Align(CPoint*,CSize*);
     bool Text(HDC,uintptr_t,uint64_t,const uint16_t*,size_t);
