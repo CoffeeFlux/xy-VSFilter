@@ -41,6 +41,7 @@ pub(crate) enum Kind {
     SamiRun,
     SearchRun,
     Effects,
+    AssTree,
 }
 
 // Inline sessions avoid a new fallible box allocation after core ownership transfer.
@@ -48,6 +49,7 @@ pub(crate) enum Kind {
 // only with an explicit preallocated ownership envelope.
 #[allow(clippy::large_enum_variant)]
 pub(crate) enum Resource {
+    AssTree(xy_vsfilter_compat::ass_tree::Tree),
     Effects {
         revision: u64,
         state: xy_vsfilter_compat::effects::State,
@@ -116,6 +118,7 @@ impl Resource {
         match self {
             Self::Document(_) => Kind::Document,
             Self::Effects { .. } => Kind::Effects,
+            Self::AssTree(_) => Kind::AssTree,
             Self::Snapshot(_) => Kind::Snapshot,
             Self::UnknownRun { .. } => Kind::UnknownRun,
             Self::StyleAddRun { .. } => Kind::StyleAddRun,
@@ -195,6 +198,17 @@ impl Registry {
         let index = self.position(id)?;
         match &mut self.slots[index].1 {
             Resource::Effects { revision, state } => Ok((revision, state)),
+            _ => Err(Error::TypeMismatch),
+        }
+    }
+
+    pub(crate) fn ass_tree(
+        &mut self,
+        id: Handle,
+    ) -> Result<&mut xy_vsfilter_compat::ass_tree::Tree, Error> {
+        let index = self.position(id)?;
+        match &mut self.slots[index].1 {
+            Resource::AssTree(tree) => Ok(tree),
             _ => Err(Error::TypeMismatch),
         }
     }

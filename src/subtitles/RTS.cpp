@@ -1820,7 +1820,9 @@ CRect CScreenLayoutAllocator::AllocRect(CSubtitle* s, int segment, int entry, in
 
 // CRenderedTextSubtitle
 
+#ifndef XY_VSFILTER_RUST_ASS_TREE
 CAtlMap<CStringW, CRenderedTextSubtitle::AssCmdType, CStringElementTraits<CStringW>> CRenderedTextSubtitle::m_cmdMap;
+#endif
 
 std::size_t CRenderedTextSubtitle::s_max_cache_size = SIZE_MAX;
 
@@ -1831,16 +1833,20 @@ std::size_t CRenderedTextSubtitle::SetMaxCacheSize( std::size_t max_cache_size )
     return s_max_cache_size;
 }
 
+#ifndef XY_VSFILTER_RUST_ASS_TREE
 CAtlArray<AssCmdPosLevel> CRenderedTextSubtitle::m_cmd_pos_level;
+#endif
 
 CRenderedTextSubtitle::CRenderedTextSubtitle(CCritSec* pLock)
     : CSubPicProviderImpl(pLock)
     , m_target_scale_x(1.0), m_target_scale_y(1.0)
 {
+#ifndef XY_VSFILTER_RUST_ASS_TREE
     if( m_cmdMap.IsEmpty() )
     {
         InitCmdMap();
     }
+#endif
     m_size = CSize(0, 0);
     if(g_hDC_refcnt == 0)
     {
@@ -1860,6 +1866,7 @@ CRenderedTextSubtitle::~CRenderedTextSubtitle()
     if(g_hDC_refcnt == 0) DeleteDC(g_hDC);
 }
 
+#ifndef XY_VSFILTER_RUST_ASS_TREE
 void CRenderedTextSubtitle::InitCmdMap()
 {
     if( m_cmdMap.IsEmpty() )
@@ -1986,6 +1993,8 @@ void CRenderedTextSubtitle::InitCmdMap()
 
     m_cmd_pos_level[CMD_COUNT] = POS_LVL_NONE;
 }
+
+#endif
 
 void CRenderedTextSubtitle::Copy(CSimpleTextSubtitle& sts)
 {
@@ -2239,6 +2248,11 @@ void CRenderedTextSubtitle::ParsePolygon(CSubtitle* sub, const CStringW& str, co
 
 bool CRenderedTextSubtitle::ParseSSATag( AssTagList *assTags, const CStringW& str )
 {
+#ifdef XY_VSFILTER_RUST_ASS_TREE
+    if(!assTags)return false;
+    assTags->Append(str);
+    return true;
+#else
     if (!assTags) return(false);
     int nTags = 0, nUnrecognizedTags = 0;
 #ifdef XY_VSFILTER_RUST_TEXT
@@ -2421,21 +2435,36 @@ bool CRenderedTextSubtitle::ParseSSATag( AssTagList *assTags, const CStringW& st
         nTags++;
     }
     return(true);
+#endif
 }
 
 bool CRenderedTextSubtitle::ParseSSATag( CSubtitle* sub, const AssTagList& assTags, STSStyle& style, const STSStyle& org, bool fAnimate /*= false*/ )
 {
     if(!sub) return(false);
     
+#ifdef XY_VSFILTER_RUST_ASS_TREE
+    const auto count=assTags.Count();
+    for(uint32_t index=0;index<count;++index)
+    {
+        AssTag assTag;uint32_t command;
+        assTags.Read(index,command,assTag.strParams,assTag.embeded);
+        assTag.cmdType=static_cast<AssCmdType>(command);
+#else
     POSITION pos = assTags.GetHeadPosition();
     while(pos)
     {
         const AssTag& assTag = assTags.GetNext(pos);
+#endif
         AssCmdType cmd_type = assTag.cmdType;
         const CAtlArray<CStringW>& params = assTag.strParams;
 
+#ifdef XY_VSFILTER_RUST_ASS_TREE
+        const int level=XyRust::AssTree::PositionLevel(cmd_type);
+        sub->m_hard_position_level=(std::max)(sub->m_hard_position_level,level);
+#else
         sub->m_hard_position_level = sub->m_hard_position_level > m_cmd_pos_level[cmd_type] ?
                                      sub->m_hard_position_level : m_cmd_pos_level[cmd_type];
+#endif
         // TODO: call ParseStyleModifier(cmd, params, ..) and move the rest there
         const CStringW& p = params.GetCount() > 0 ? params[0] : CStringW("");
         switch ( cmd_type )

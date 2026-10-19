@@ -212,6 +212,8 @@ public:
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 #include "xy_rust_effects.h"
+#include "xy_rust_ass_tree.h"
+#define XY_VSFILTER_RUST_ASS_TREE 1
 #endif
 
 class CClipper
@@ -406,12 +408,18 @@ public:
     };
     static const int MIN_CMD_LENGTH = 1;//c etc
     static const int MAX_CMD_LENGTH = 5;//alpha, iclip, xbord, xshad, ybord, yshad
+#ifndef XY_VSFILTER_RUST_ASS_TREE
     static CAtlMap<CStringW, AssCmdType, CStringElementTraits<CStringW>> m_cmdMap;
 
     static CAtlArray<AssCmdPosLevel> m_cmd_pos_level;
+#endif
 
     struct AssTag;
+#ifdef XY_VSFILTER_RUST_ASS_TREE
+    typedef XyRust::AssTree AssTagList;
+#else
     typedef CAtlList<AssTag> AssTagList;
+#endif
     typedef std::shared_ptr<const AssTagList> SharedPtrConstAssTagList;
     struct AssTag
     {
@@ -444,7 +452,9 @@ private:
     double                   m_target_scale_x, m_target_scale_y;
     bool                     m_movable;
 
+#ifndef XY_VSFILTER_RUST_ASS_TREE
     static void InitCmdMap();
+#endif
 
     void ParseEffect (CSubtitle* sub, const CString& str);
     void ParseString (CSubtitle* sub, CStringW str, const FwSTSStyle& style);

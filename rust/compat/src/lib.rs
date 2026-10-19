@@ -13,6 +13,7 @@ pub mod ass_fonts;
 pub mod ass_input;
 pub mod ass_style_value;
 pub mod ass_tags;
+pub mod ass_tree;
 pub mod be_blur;
 pub mod be_filter;
 pub mod bilinear;

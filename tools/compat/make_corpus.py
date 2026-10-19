@@ -884,6 +884,29 @@ def realtext_parser_variants():
 
 
 
+
+def ass_tree_variants():
+    for name,tags in {
+        'control':r'\b0\i0\u0\1c&HFFFFFF&',
+        'prefix-bold':r'\bold1',
+        'bold':r'\b1',
+        'parenthesized-bold':r'\b(1)0',
+        'prefix-underline':r'\unknown(1,2)',
+        'parenthesized-color':r'\1c(FF0000)&H00FF00&',
+        'trim-color':r'\1cHH&&00FF00H&H',
+        'uppercase-color':r'\1C&H00FF00&',
+        'transform-multiple':r'\t(0,1600,\bord8\frz20\fscx150)',
+        'transform-nested':r'\t(0,1600,\t(200,1200,\bord8)\frz20)',
+        'transform-extra':r'\t(0,1,2,3,\bord8)',
+        'transform-empty-fields':r'\t(,0,,1600,\bord8)',
+        'empty-command':r'\ (\b1)\i1',
+        'command-case':r'\K50First\k20',
+        'no-closing-parenthesis':r'\t(0,1600,\bord8\frz20',
+        'duplicate-scalar-param':r'\fs(18,80)45\bord(1,8)4',
+    }.items():
+        caption=('{'+tags+r'\shad0}Command tree sample').encode('ascii')
+        yield 'ass-tree-'+name+'.ass',SEED.replace(b'COMPAT_TEXT',caption)
+
 def effects_variants():
     for name,tags in {
         'control':r'\pos(320,180)',
@@ -1027,6 +1050,8 @@ def make_cases(files):
                 for apartment in ("sta", "mta"):
                     cases.append({**uninitialized, "id": uninitialized["id"] + "-" + apartment,
                                   "com_apartment": apartment})
+            if path.stem.startswith("ass-tree-"):
+                cases[-1]["times"] = ["0", "0.9999999", "1", "1.1", "1.5", "2", "2.6", "3.9999999", "4", "2", "1.1"]
             if path.stem.startswith("effects-"):
                 cases[-1]["times"] = ["0", "0.9999999", "1", "1.125", "1.5", "1.9", "2", "2.5", "3.1", "3.5", "3.9999999", "4", "2", "1.125"]
             if path.stem.startswith("html-tag-"):
@@ -1122,6 +1147,11 @@ def make_cases(files):
                                    ("fade-first","control"),("fad-first","control"),
                                    ("origin-first","origin-last"),("banner","banner-reverse"),
                                    ("scroll-up","scroll-down"),("banner","banner-negative"))
+                       for mode in ("file","memory")]
+                    + [[f"ass-tree-{a}-{mode}",f"ass-tree-{b}-{mode}"]
+                       for a,b in (("bold","prefix-bold"),("prefix-underline","control"),
+                                   ("parenthesized-color","control"),("trim-color","control"),
+                                   ("transform-multiple","control"),("duplicate-scalar-param","control"))
                        for mode in ("file","memory")], "cases": cases}
 
 
@@ -1176,6 +1206,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in shared_color_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in html_tag_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in effects_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in ass_tree_variants()]
     manifest = json.dumps(make_cases(files + generated), indent=2) + "\n"
     expected = generated + [(DEST / "cases.json", manifest.encode("utf-8"))]
     for path, data in expected:

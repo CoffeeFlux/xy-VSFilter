@@ -641,6 +641,54 @@
     [
       "effects-banner-memory",
       "effects-banner-negative-memory"
+    ],
+    [
+      "ass-tree-bold-file",
+      "ass-tree-prefix-bold-file"
+    ],
+    [
+      "ass-tree-bold-memory",
+      "ass-tree-prefix-bold-memory"
+    ],
+    [
+      "ass-tree-prefix-underline-file",
+      "ass-tree-control-file"
+    ],
+    [
+      "ass-tree-prefix-underline-memory",
+      "ass-tree-control-memory"
+    ],
+    [
+      "ass-tree-parenthesized-color-file",
+      "ass-tree-control-file"
+    ],
+    [
+      "ass-tree-parenthesized-color-memory",
+      "ass-tree-control-memory"
+    ],
+    [
+      "ass-tree-trim-color-file",
+      "ass-tree-control-file"
+    ],
+    [
+      "ass-tree-trim-color-memory",
+      "ass-tree-control-memory"
+    ],
+    [
+      "ass-tree-transform-multiple-file",
+      "ass-tree-control-file"
+    ],
+    [
+      "ass-tree-transform-multiple-memory",
+      "ass-tree-control-memory"
+    ],
+    [
+      "ass-tree-duplicate-scalar-param-file",
+      "ass-tree-control-file"
+    ],
+    [
+      "ass-tree-duplicate-scalar-param-memory",
+      "ass-tree-control-memory"
     ]
   ],
   "cases": [
@@ -27064,6 +27112,742 @@
         "4",
         "2",
         "1.125"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-control-file",
+      "script": "test/compat/generated/ass-tree-control.ass",
+      "sha256": "3eb5f4eb316fd9ab3b81d3eb1bbf8b1a90f1a0c9ef1e232a43f2c62a8aa3d394",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-control-memory",
+      "script": "test/compat/generated/ass-tree-control.ass",
+      "sha256": "3eb5f4eb316fd9ab3b81d3eb1bbf8b1a90f1a0c9ef1e232a43f2c62a8aa3d394",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-prefix-bold-file",
+      "script": "test/compat/generated/ass-tree-prefix-bold.ass",
+      "sha256": "edf5fb311abc78eb3e0485c9287601b9a9165f0e6be2e0ddd9f3fb763883ae25",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-prefix-bold-memory",
+      "script": "test/compat/generated/ass-tree-prefix-bold.ass",
+      "sha256": "edf5fb311abc78eb3e0485c9287601b9a9165f0e6be2e0ddd9f3fb763883ae25",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-bold-file",
+      "script": "test/compat/generated/ass-tree-bold.ass",
+      "sha256": "9bc30666984c8c2b8003c63365da0478b99c1d5327dc0329262d9a15ca9c5cb8",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-bold-memory",
+      "script": "test/compat/generated/ass-tree-bold.ass",
+      "sha256": "9bc30666984c8c2b8003c63365da0478b99c1d5327dc0329262d9a15ca9c5cb8",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-parenthesized-bold-file",
+      "script": "test/compat/generated/ass-tree-parenthesized-bold.ass",
+      "sha256": "62871d2ba5dacca29a33ff0623007aad482822abd8a9a015610d2a838e8c12b2",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-parenthesized-bold-memory",
+      "script": "test/compat/generated/ass-tree-parenthesized-bold.ass",
+      "sha256": "62871d2ba5dacca29a33ff0623007aad482822abd8a9a015610d2a838e8c12b2",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-prefix-underline-file",
+      "script": "test/compat/generated/ass-tree-prefix-underline.ass",
+      "sha256": "401b0c347752c52bd66344311eed329a44dd6353ad5de490031debb8310a358a",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-prefix-underline-memory",
+      "script": "test/compat/generated/ass-tree-prefix-underline.ass",
+      "sha256": "401b0c347752c52bd66344311eed329a44dd6353ad5de490031debb8310a358a",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-parenthesized-color-file",
+      "script": "test/compat/generated/ass-tree-parenthesized-color.ass",
+      "sha256": "269fd09943d2d7812c2d0061f78f31db6a64b6f70b2acc3c645e3ea5cc8bf83f",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-parenthesized-color-memory",
+      "script": "test/compat/generated/ass-tree-parenthesized-color.ass",
+      "sha256": "269fd09943d2d7812c2d0061f78f31db6a64b6f70b2acc3c645e3ea5cc8bf83f",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-trim-color-file",
+      "script": "test/compat/generated/ass-tree-trim-color.ass",
+      "sha256": "685ee6271fcf643049a31d0c098e0935c25634c0385f79fd65660b73917f7714",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-trim-color-memory",
+      "script": "test/compat/generated/ass-tree-trim-color.ass",
+      "sha256": "685ee6271fcf643049a31d0c098e0935c25634c0385f79fd65660b73917f7714",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-uppercase-color-file",
+      "script": "test/compat/generated/ass-tree-uppercase-color.ass",
+      "sha256": "f1950323d37c5d119fbd4a6d6aea8c7d6b8b1bf4def6a20b63603d44eb16b3b6",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-uppercase-color-memory",
+      "script": "test/compat/generated/ass-tree-uppercase-color.ass",
+      "sha256": "f1950323d37c5d119fbd4a6d6aea8c7d6b8b1bf4def6a20b63603d44eb16b3b6",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-transform-multiple-file",
+      "script": "test/compat/generated/ass-tree-transform-multiple.ass",
+      "sha256": "9ed54a8b848614d2cc6f22bc21761d03ae1cddba06fb1273441a749c50444198",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-transform-multiple-memory",
+      "script": "test/compat/generated/ass-tree-transform-multiple.ass",
+      "sha256": "9ed54a8b848614d2cc6f22bc21761d03ae1cddba06fb1273441a749c50444198",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-transform-nested-file",
+      "script": "test/compat/generated/ass-tree-transform-nested.ass",
+      "sha256": "425f1095b85664662fc05a7494eef229c42921bad8506d5f3b252fd113d676b8",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-transform-nested-memory",
+      "script": "test/compat/generated/ass-tree-transform-nested.ass",
+      "sha256": "425f1095b85664662fc05a7494eef229c42921bad8506d5f3b252fd113d676b8",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-transform-extra-file",
+      "script": "test/compat/generated/ass-tree-transform-extra.ass",
+      "sha256": "b46f22d8cf65e9dbf2c032a9d67c6c43726e01146fe96ae5346e07f18003fd08",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-transform-extra-memory",
+      "script": "test/compat/generated/ass-tree-transform-extra.ass",
+      "sha256": "b46f22d8cf65e9dbf2c032a9d67c6c43726e01146fe96ae5346e07f18003fd08",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-transform-empty-fields-file",
+      "script": "test/compat/generated/ass-tree-transform-empty-fields.ass",
+      "sha256": "e3d42282d9e1d8c27cb6b39ee8ce9a55523457ce7083249a2a17967ae456297a",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-transform-empty-fields-memory",
+      "script": "test/compat/generated/ass-tree-transform-empty-fields.ass",
+      "sha256": "e3d42282d9e1d8c27cb6b39ee8ce9a55523457ce7083249a2a17967ae456297a",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-empty-command-file",
+      "script": "test/compat/generated/ass-tree-empty-command.ass",
+      "sha256": "2614d00ed551bbd39203e2a65ad49dc96143569e3d7f5795d816c53f46e97a3c",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-empty-command-memory",
+      "script": "test/compat/generated/ass-tree-empty-command.ass",
+      "sha256": "2614d00ed551bbd39203e2a65ad49dc96143569e3d7f5795d816c53f46e97a3c",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-command-case-file",
+      "script": "test/compat/generated/ass-tree-command-case.ass",
+      "sha256": "a032a315d34b91a4967c9245a996c4c877e30f4bfc70b402484181bdf83f0a79",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-command-case-memory",
+      "script": "test/compat/generated/ass-tree-command-case.ass",
+      "sha256": "a032a315d34b91a4967c9245a996c4c877e30f4bfc70b402484181bdf83f0a79",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-no-closing-parenthesis-file",
+      "script": "test/compat/generated/ass-tree-no-closing-parenthesis.ass",
+      "sha256": "cf6b4bc1912ad1ecbbf545cab7859ec6fa46fdd4b9467f58e1ba08eb93ac365d",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-no-closing-parenthesis-memory",
+      "script": "test/compat/generated/ass-tree-no-closing-parenthesis.ass",
+      "sha256": "cf6b4bc1912ad1ecbbf545cab7859ec6fa46fdd4b9467f58e1ba08eb93ac365d",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-duplicate-scalar-param-file",
+      "script": "test/compat/generated/ass-tree-duplicate-scalar-param.ass",
+      "sha256": "eef1ec6036b373fdd41335cff68a295caf36e97bc3deb9c6072d007edf7c48c0",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-tree-duplicate-scalar-param-memory",
+      "script": "test/compat/generated/ass-tree-duplicate-scalar-param.ass",
+      "sha256": "eef1ec6036b373fdd41335cff68a295caf36e97bc3deb9c6072d007edf7c48c0",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
       ],
       "stride_padding": 16,
       "fill_seed": 31

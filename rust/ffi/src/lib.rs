@@ -6,6 +6,8 @@
 extern crate alloc;
 
 mod ass_tags;
+#[cfg(windows)]
+mod ass_tree;
 mod be_blur;
 mod be_filter;
 mod bilinear;
