@@ -201,7 +201,7 @@
     "Local rendering and host contract regressions do not establish complete migration of all host interfaces or native object graphs."
   ],
   "next_work": [
-    "Migrate shared renderer HDC ownership with a separate operation/lifetime guard and explicit lock/reentry/thread contract, using the retained GDI lifecycle baseline.",
-    "Continue text/path, word/line/subtitle ownership, all host adapters and vendored implementations in Rust."
+    "Shared renderer HDC ownership is implemented at 6eb59f42; see rust-renderer-dc-local-evidence.json for current exact lifecycle/text/rendering evidence.",
+    "Port text measurement/path control flow and persistent path buffers, then word/line/subtitle ownership, all host adapters and vendored implementations."
   ]
 }

@@ -1,89 +1,224 @@
 {
   "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
-  "scope": "Source inventory plus directly observed cleanup lifecycle baseline for the next shared renderer device-context ownership port. Ownership is still C++.",
+  "candidate_implementation_commit": "6eb59f42d6b53d73f1af7ba2f39339016da70ec1",
+  "scope": "Shared renderer device-context ownership and checked operation lifetimes are now Rust-owned. Text/path algorithms and buffers remain native.",
+  "preimplementation_inventory": {
+    "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+    "scope": "Source inventory plus directly observed cleanup lifecycle baseline for the next shared renderer device-context ownership port. Ownership is still C++.",
+    "sources": [
+      {
+        "path": "src/subtitles/RTS.cpp",
+        "sha256": "ef6aae1b68accd3da5cc9093377a118cf11f5754c597cec68173b06c80f71454"
+      },
+      {
+        "path": "src/subtitles/RTS.h",
+        "sha256": "7fa99ac55e37e9cbc66bb3b219dba1e860ed8bd02e34a44acb2ad8ad93957c26"
+      }
+    ],
+    "lifecycle": {
+      "acquire": [
+        "On first CRenderedTextSubtitle: CreateCompatibleDC(NULL)",
+        "SetBkMode(dc, TRANSPARENT=1)",
+        "SetTextColor(dc, 0x00ffffff)",
+        "SetMapMode(dc, MM_TEXT=1)",
+        "Increment global signed refcount, including after failed CreateCompatibleDC"
+      ],
+      "release": [
+        "CRenderedTextSubtitle destructor calls Deinit first",
+        "Decrement global refcount",
+        "At zero call DeleteDC; ignore result; native g_hDC retains scalar"
+      ],
+      "sharing": "All renderer instances in one module use one global context. Native source warns to use only one RTS at a time."
+    },
+    "borrowers": [
+      "CMyFont constructor selects new font, queries metrics, restores previous selection",
+      "CText::GetTextInfo selects font, measures each UTF16 unit when spacing != 0 or wcslen prefix otherwise, restores on all paths",
+      "CText::CreatePath selects font; error exits restore; successful restore is ASSERT-only and omitted in Release",
+      "PathData uses caller HDC for begin/end and partial path acquisition"
+    ],
+    "constraints": [
+      "Use typed monotonic owner IDs; keep canonical device-context ownership in Rust. Native wrappers remain temporary.",
+      "Do not initialize context for every renderer or preserve it indefinitely after last owner.",
+      "Do not add successful-path SelectObject restoration to CText::CreatePath.",
+      "Return Windows handle scalars only under explicit scoped lifetime/serialization contract. No Rust pointer or mutable loan crosses FFI.",
+      "Reference CreateCompatibleDC failure, setup-call failures, nested renderer owners, release order, recreation and selected-font deletion before deciding error mapping.",
+      "Device contexts created with NULL can depend on creating-thread lifetime. Do not invent cross-thread ownership or move GDI calls to a worker.",
+      "Registry admission alone does not serialize full native text/path operations; whole-operation guard and host lock/reentry order remain to be established.",
+      "Canonical font construction re-enters DOCUMENTS; a whole text/path operation guard cannot simply hold that nonblocking registry admission across native calls. Establish separate operation/lifetime serialization and lock order.",
+      "The current font-create boundary rejects a null DC; failed-DC constructor lifecycle parity does not imply later text/font failure-path parity.",
+      "Keep explicit release at its original destructor point after Deinit and before remaining native member/base destruction. Preserve one unconditional DeleteDC attempt, including null."
+    ],
+    "next_probe": "Nested document rectangle ownership is corrected at 03d78ffa and validated at ebd25901 (rust-document-rectangle-local-evidence.json). Promote the retained DC lifecycle fixture into the maintained runner/validator; extend DeleteDC failure and selected-font/text/path histories. Move shared canonical DC lifetime into Rust with typed owner IDs and an explicit whole-operation/thread-lifetime contract, then rerun lifecycle, font/GDI, exact rendering and hosts.",
+    "lifecycle_baseline": {
+      "candidate_commit": "9105c8f5e21ea63a5aa6046898310e49fbbefa9f",
+      "source": {
+        "path": "artifacts/renderer-dc-native-draft.cpp",
+        "sha256": "476d9520db4691f09b2fb123ca6c6a762b14faa6a7506dce86e074d10ef5c0cb"
+      },
+      "runner": {
+        "path": "artifacts/run-default-copy-dc-observe.py",
+        "sha256": "094fb28c7244d7704ed710c7e7024ee5deb0bfffad70dbc15fb81d4e2986ceb1"
+      },
+      "cases_per_architecture": 5,
+      "trace_lines": 97,
+      "ownership_migrated": false,
+      "architectures": {
+        "x86": {
+          "path": "artifacts/default-copy-dc-observe-x86/report.json",
+          "sha256": "e97c41e2cb831409c476a8df122be364dcd935adbf426d42fcf6f5593a5507f9",
+          "repeat_equal": true,
+          "equal": true
+        },
+        "x64": {
+          "path": "artifacts/default-copy-dc-observe-x64/report.json",
+          "sha256": "83cef7eeeaeb85c273fd5882e51d29025537e3a4b74c9be78273cc9102295ef7",
+          "repeat_equal": true,
+          "equal": true
+        }
+      },
+      "retained_source": {
+        "path": "tools/compat/renderer_dc_lifecycle_diagnostic.cpp",
+        "sha256": "476d9520db4691f09b2fb123ca6c6a762b14faa6a7506dce86e074d10ef5c0cb"
+      },
+      "limits": "This historical scoped GDI/status baseline does not compare nested document rectangle counts. That separate probe failed at 9105c8f5; the correction and current passing evidence are separately recorded in rust-document-rectangle-local-evidence.json."
+    },
+    "observed_lifecycle_details": [
+      "Nested owners share one DC; eight measured constructor/destructor phases have cumulative call counts 4,4,4,4,4,5,9,10. Last release deletes once; the next first owner recreates.",
+      "The four setup calls are CreateCompatibleDC(NULL), SetBkMode(1), SetTextColor(0x00ffffff), SetMapMode(1), in that order.",
+      "A scripted null creation still executes all three setup calls and counts nested owners. Last release still calls DeleteDC(NULL); do not use a generic non-null-only handle destructor.",
+      "In the retained null-creation trace, setup calls change last-error through 6,6,87; final DeleteDC(NULL) sets 6. Preserve API side effects rather than restoring caller errors around the complete operation.",
+      "Scripted individual SetBkMode, SetTextColor and SetMapMode failures do not stop subsequent setup or change sharing/release counts.",
+      "Two runs per role/architecture match raw return values, normalized handle generations, errno, last-error and separate x87/SSE flags at every call boundary and lifecycle phase."
+    ]
+  },
   "sources": [
     {
+      "path": "rust/compat/src/renderer_dc.rs",
+      "sha256": "cd27473ba8550db5c55c025961fd1173c5b138464bbfe3bf238f0db07bf7b5ff"
+    },
+    {
+      "path": "rust/ffi/src/renderer_dc.rs",
+      "sha256": "47be698553e76d0a7a3a7ec9b5ecf26cb96f04530c8e0495e507025c9612df8f"
+    },
+    {
+      "path": "src/subtitles/RustRendererDc.h",
+      "sha256": "9b3ccad489e8c922ac8fa1a2a0a3bb7df17f8fcb54792821c4a2b74efd1909e7"
+    },
+    {
+      "path": "src/subtitles/RustFontIntern.inl",
+      "sha256": "d3d61ed0f596a62b8e9ff2bbe3906a454a6499c4e46fa7a0c5e380be4343aa9f"
+    },
+    {
       "path": "src/subtitles/RTS.cpp",
-      "sha256": "ef6aae1b68accd3da5cc9093377a118cf11f5754c597cec68173b06c80f71454"
+      "sha256": "42f039e2b0a23cabcb86426ba90a107a3738266cefbb3d06c8f45f546f52d18d"
     },
     {
       "path": "src/subtitles/RTS.h",
-      "sha256": "7fa99ac55e37e9cbc66bb3b219dba1e860ed8bd02e34a44acb2ad8ad93957c26"
+      "sha256": "2439d816c3565392e0aac6715d78fe15fb92a82265cffd84c113b62eb43bbba5"
+    },
+    {
+      "path": "include/xy_rust_renderer_dc.h",
+      "sha256": "5b3749e287c6b38e4516e473ba907d16ba65435b41313ad91140d6a219bca888"
+    },
+    {
+      "path": "tools/compat/renderer_dc_native.cpp",
+      "sha256": "840c7f5930fb04d87c069e66a42261b6ad19090f9f57770a2894bc8d772fce51"
+    },
+    {
+      "path": "tools/compat/renderer_dc_native.py",
+      "sha256": "ba1b83b3fc9f035574b23840902168f48c1338c8d50b8ff52b2b1216fe1aa542"
+    },
+    {
+      "path": "tools/compat/renderer_dc_text_native.cpp",
+      "sha256": "8c8b96fbd66d3832d353e6159ba59f0e5ce43dbdfc7fdfe75363778937c5a1b7"
+    },
+    {
+      "path": "tools/compat/renderer_dc_text_native.py",
+      "sha256": "d0bd37c2d272a7dd4a9ca0177b720577173b839809fd6b3291d89b86efc6288a"
     }
   ],
-  "lifecycle": {
-    "acquire": [
-      "On first CRenderedTextSubtitle: CreateCompatibleDC(NULL)",
-      "SetBkMode(dc, TRANSPARENT=1)",
-      "SetTextColor(dc, 0x00ffffff)",
-      "SetMapMode(dc, MM_TEXT=1)",
-      "Increment global signed refcount, including after failed CreateCompatibleDC"
-    ],
-    "release": [
-      "CRenderedTextSubtitle destructor calls Deinit first",
-      "Decrement global refcount",
-      "At zero call DeleteDC; ignore result; native g_hDC retains scalar"
-    ],
-    "sharing": "All renderer instances in one module use one global context. Native source warns to use only one RTS at a time."
-  },
-  "borrowers": [
-    "CMyFont constructor selects new font, queries metrics, restores previous selection",
-    "CText::GetTextInfo selects font, measures each UTF16 unit when spacing != 0 or wcslen prefix otherwise, restores on all paths",
-    "CText::CreatePath selects font; error exits restore; successful restore is ASSERT-only and omitted in Release",
-    "PathData uses caller HDC for begin/end and partial path acquisition"
-  ],
-  "constraints": [
-    "Use typed monotonic owner IDs; keep canonical device-context ownership in Rust. Native wrappers remain temporary.",
-    "Do not initialize context for every renderer or preserve it indefinitely after last owner.",
-    "Do not add successful-path SelectObject restoration to CText::CreatePath.",
-    "Return Windows handle scalars only under explicit scoped lifetime/serialization contract. No Rust pointer or mutable loan crosses FFI.",
-    "Reference CreateCompatibleDC failure, setup-call failures, nested renderer owners, release order, recreation and selected-font deletion before deciding error mapping.",
-    "Device contexts created with NULL can depend on creating-thread lifetime. Do not invent cross-thread ownership or move GDI calls to a worker.",
-    "Registry admission alone does not serialize full native text/path operations; whole-operation guard and host lock/reentry order remain to be established.",
-    "Canonical font construction re-enters DOCUMENTS; a whole text/path operation guard cannot simply hold that nonblocking registry admission across native calls. Establish separate operation/lifetime serialization and lock order.",
-    "The current font-create boundary rejects a null DC; failed-DC constructor lifecycle parity does not imply later text/font failure-path parity.",
-    "Keep explicit release at its original destructor point after Deinit and before remaining native member/base destruction. Preserve one unconditional DeleteDC attempt, including null."
-  ],
-  "next_probe": "Nested document rectangle ownership is corrected at 03d78ffa and validated at ebd25901 (rust-document-rectangle-local-evidence.json). Promote the retained DC lifecycle fixture into the maintained runner/validator; extend DeleteDC failure and selected-font/text/path histories. Move shared canonical DC lifetime into Rust with typed owner IDs and an explicit whole-operation/thread-lifetime contract, then rerun lifecycle, font/GDI, exact rendering and hosts.",
-  "lifecycle_baseline": {
-    "candidate_commit": "9105c8f5e21ea63a5aa6046898310e49fbbefa9f",
-    "source": {
-      "path": "artifacts/renderer-dc-native-draft.cpp",
-      "sha256": "476d9520db4691f09b2fb123ca6c6a762b14faa6a7506dce86e074d10ef5c0cb"
-    },
-    "runner": {
-      "path": "artifacts/run-default-copy-dc-observe.py",
-      "sha256": "094fb28c7244d7704ed710c7e7024ee5deb0bfffad70dbc15fb81d4e2986ceb1"
-    },
-    "cases_per_architecture": 5,
-    "trace_lines": 97,
-    "ownership_migrated": false,
-    "architectures": {
-      "x86": {
-        "path": "artifacts/default-copy-dc-observe-x86/report.json",
-        "sha256": "e97c41e2cb831409c476a8df122be364dcd935adbf426d42fcf6f5593a5507f9",
-        "repeat_equal": true,
-        "equal": true
+  "validation": {
+    "x86": {
+      "renderer_dc_native": {
+        "path": "artifacts/dc-owned-renderer_dc_native-x86/report.json",
+        "sha256": "dfa9c460b0211bacb73cf118b49eb31cde6252c3992de016e06044e4f2c1fcd6",
+        "cases": 6,
+        "trace_lines": 116,
+        "trace_sha256": [
+          "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+          "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+          "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+          "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983"
+        ]
       },
-      "x64": {
-        "path": "artifacts/default-copy-dc-observe-x64/report.json",
-        "sha256": "83cef7eeeaeb85c273fd5882e51d29025537e3a4b74c9be78273cc9102295ef7",
-        "repeat_equal": true,
-        "equal": true
+      "renderer_dc_text_native": {
+        "path": "artifacts/dc-owned-renderer_dc_text_native-x86/report.json",
+        "sha256": "bffdd3ae4e9c0e038641bcda05543a3bf46ffeda67f7174c701149082e48b212",
+        "cases": 40,
+        "trace_lines": 598,
+        "trace_sha256": [
+          "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+          "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+          "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+          "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330"
+        ]
       }
     },
-    "retained_source": {
-      "path": "tools/compat/renderer_dc_lifecycle_diagnostic.cpp",
-      "sha256": "476d9520db4691f09b2fb123ca6c6a762b14faa6a7506dce86e074d10ef5c0cb"
-    },
-    "limits": "This historical scoped GDI/status baseline does not compare nested document rectangle counts. That separate probe failed at 9105c8f5; the correction and current passing evidence are separately recorded in rust-document-rectangle-local-evidence.json."
+    "x64": {
+      "renderer_dc_native": {
+        "path": "artifacts/dc-owned-renderer_dc_native-x64/report.json",
+        "sha256": "8516e5110c48f538587961dbb6fad06618f1da962a86340a65becbae4ab08e3a",
+        "cases": 6,
+        "trace_lines": 116,
+        "trace_sha256": [
+          "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+          "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+          "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+          "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd"
+        ]
+      },
+      "renderer_dc_text_native": {
+        "path": "artifacts/dc-owned-renderer_dc_text_native-x64/report.json",
+        "sha256": "fb779440ecb364e3a668fd9e721a8b32c710422ee280c3bfdd75f60d1c58303b",
+        "cases": 40,
+        "trace_lines": 598,
+        "trace_sha256": [
+          "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+          "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+          "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+          "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac"
+        ]
+      }
+    }
   },
-  "observed_lifecycle_details": [
-    "Nested owners share one DC; eight measured constructor/destructor phases have cumulative call counts 4,4,4,4,4,5,9,10. Last release deletes once; the next first owner recreates.",
-    "The four setup calls are CreateCompatibleDC(NULL), SetBkMode(1), SetTextColor(0x00ffffff), SetMapMode(1), in that order.",
-    "A scripted null creation still executes all three setup calls and counts nested owners. Last release still calls DeleteDC(NULL); do not use a generic non-null-only handle destructor.",
-    "In the retained null-creation trace, setup calls change last-error through 6,6,87; final DeleteDC(NULL) sets 6. Preserve API side effects rather than restoring caller errors around the complete operation.",
-    "Scripted individual SetBkMode, SetTextColor and SetMapMode failures do not stop subsequent setup or change sharing/release counts.",
-    "Two runs per role/architecture match raw return values, normalized handle generations, errno, last-error and separate x87/SSE flags at every call boundary and lifecycle phase."
+  "ownership": [
+    "A safe generic state machine issues non-rewinding checked owner and operation IDs. One native Context value is owned while any renderer owner remains.",
+    "First acquisition creates and configures the DC in the original call order; null creation remains an owned context and still receives setup calls.",
+    "Final release remains after renderer Deinit and before native member/base destruction. Context Drop attempts DeleteDC once, including null or failed deletion, without retry.",
+    "An operation token retains the context and excludes overlapping operations and owner changes. Its ABI packet contains only a Windows HDC scalar and checked token, never a Rust pointer."
+  ],
+  "lock_and_thread_contract": [
+    "The shared recursive native adapter gate surrounds complete CText measurement/path calls, including font destruction. Nested font registry calls take that same gate recursively.",
+    "Short Rust DC admission ends before text/font calls. The retained operation token is separate from DOCUMENTS admission, avoiding a held registry loan during font creation.",
+    "Standalone FontIntern construction takes its own operation token; text methods pass the already active operation to the font adapter.",
+    "The creating thread must remain alive through final owner release. Calls run on the existing caller threads; no worker or cross-thread lifetime extension is introduced.",
+    "Busy/reentry and concurrent admission tests prove Rust exclusion/refusal behavior, not compatibility for arbitrary host reentry or concurrency. Native object lifetime and caches remain a separate migration boundary."
+  ],
+  "observed_quirks": [
+    "Six lifecycle histories preserve call order, handle generations, return values, errno, last-error and independent x87/SSE status across nested owners, final release and recreation.",
+    "Create failure still executes all setup calls and DeleteDC(NULL). Setup failures do not stop subsequent calls. Scripted DeleteDC failure is ignored, and the next first owner creates a new DC. Probe-only cleanup occurs after observation.",
+    "Forty CText histories preserve raw path types/points, measurements, font-selection state and GDI call/status traces for spacing, embedded NUL, unpaired surrogate and empty inputs, with extent/begin/text/end failures.",
+    "Successful CreatePath leaves the font selected because the cleanup restoration is ASSERT-only. Tested checked failure exits restore it. Partial-path code retains its ignored failure behavior.",
+    "Measurement and spaced paths stop at the first NUL; unspaced path TextOut uses the CString length, including an embedded-NUL tail. These remain code-unit operations."
+  ],
+  "limits": [
+    "Null constructor lifecycle parity does not establish later font/path behavior on a null DC; the existing font boundary safely refuses it. Font construction with no live renderer owner is also outside this comparison.",
+    "No claim for arbitrary allocator failures, GetPath negative/uninitialized results, selected-object teardown under arbitrary concurrency, or creating-thread termination.",
+    "C++ word/line/subtitle graphs, raw path buffers, host adapters and vendors remain in scope. No production default switched."
+  ],
+  "next_work": [
+    "Port CText measurement and path control flow, retaining raw UTF16 and exact Windows numeric conversions/status effects.",
+    "Move persistent PathData points/types and partial-path growth into safe Rust ownership, using the new actual-CText probe as a direct regression baseline.",
+    "Then continue word/line/subtitle graphs, all host adapters and vendors; retain x86/x64 exact rendering and host evidence."
   ]
 }

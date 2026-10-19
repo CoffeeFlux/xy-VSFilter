@@ -27,7 +27,60 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest correction: document styles retain rectangle owners (2026-10-19)
+## Latest port: Rust-owned shared renderer device context (2026-10-19)
+
+Implementation `6eb59f42` moves the shared renderer HDC lifetime into Rust. A safe
+core state machine issues checked owner and operation IDs; one Windows context
+exists while any renderer owner remains. Creation and setup preserve the native
+call order, including null creation and setup failures. Final release remains
+after Deinit and attempts DeleteDC exactly once, including null or deletion
+failure. C++ retains only an owner ID and short-lived Windows handle scalars.
+
+A separate operation token prevents owner changes and overlapping DC operations.
+The transitional adapter gate covers entire CText measurement/path calls and font
+destruction, while Rust DC admission ends before font calls enter DOCUMENTS.
+Standalone font construction takes its own token; text methods pass their active
+operation to the font adapter. This avoids holding a Rust document-registry loan
+across GDI work. The creating thread must remain alive through final release;
+no worker or automatic cross-thread lifetime extension is introduced. General
+host reentry/concurrency and native cache lifetimes remain separate work.
+
+Direct cleanup comparisons pass on x86 and x64: six DC lifecycle/failure histories
+produce 116 exact trace lines, and 40 actual CText histories produce 598 exact
+lines per architecture. Both repeat twice per role. The latter covers spacing,
+embedded NUL, an unpaired surrogate, empty text and extent/begin/text/end failures,
+including raw path points/types, measured values, font selection, GDI returns,
+errno, last-error and independent floating domains. Successful path construction
+still leaves its font selected; checked failure exits restore it. Ignored
+partial-path failure results remain unchanged. DeleteDC failure cleanup occurs
+only in the observer after recording and is not added to production.
+
+All nine style scenarios, five other ownership probes, 15 format/document
+regressions and historical storage checks pass. All three DLLs build, retain
+exports/dependencies and pass ten COM cases plus two controls per architecture.
+Each architecture matches all 1,222 rendering cases / 13,186 frames exactly, with
+192 distinct-frame controls. Rust passes 348 core and 138 FFI tests per
+architecture, formatting and Clippy; Python passes 193 tests with one skip.
+The portable core still forbids unsafe code. The FFI module adds five unsafe
+blocks, two unsafe exports and one audited Sync implementation; the inventory is
+now 535 blocks across 86 FFI files, with seven assembly sites unchanged.
+
+See [DC ownership evidence](rust-renderer-dc-local-evidence.json) and the updated
+[device-context inventory](rust-renderer-dc-inventory.json). The experimental
+switch remains in place. Next is CText measurement/path control flow and
+persistent PathData storage, then word/line/subtitle graphs, all host adapters
+and vendored implementations. Null-DC constructor parity does not establish
+later font/path behavior on null; the existing safe refusal remains qualified.
+
+The maintained probes are `tools/compat/renderer_dc_native.py` and
+`tools/compat/renderer_dc_text_native.py`. After the documented Windows build,
+run each from the matching Visual Studio developer shell with
+`--reference-root artifacts/cleanup-reference --platform Win32` (or `x64`) and
+`--output` pointing to a new directory. They require clean committed source,
+verify the cleanup reference pin, repeat both roles, validate complete traces,
+and record library/header/binary hashes. Failed or unstable runs remain unresolved.
+
+## Previous correction: document styles retain rectangle owners (2026-10-19)
 
 Implementation `03d78ffa`, validated with fixture checkpoint `ebd25901`, gives
 persistent Rust default and named document styles real canonical rectangle
