@@ -5141,6 +5141,32 @@ void STSStyle::SetDefault()
     relativeTo    = 2;
 }
 
+#if defined(XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL) && defined(_M_IX86)
+extern "C" uint64_t __cdecl xy_vsfilter_style_assign_double_v1(uint64_t);
+STSStyle& STSStyle::operator=(const STSStyle& s)
+{
+    // Cleanup MSVC's implicit assignment uses x87 FLD/FSTP, unlike its copy
+    // constructor. Preserve signaling-NaN quieting and status through Rust's
+    // audited scalar boundary; raw-bit transport alone changes this operation.
+    const auto assign=[](double& destination,const double& source) {
+        uint64_t bits;memcpy(&bits,&source,8);
+        bits=xy_vsfilter_style_assign_double_v1(bits);memcpy(&destination,&bits,8);
+    };
+    charSet=s.charSet;fontName=s.fontName;assign(fontSize,s.fontSize);
+    fontWeight=s.fontWeight;fItalic=s.fItalic;fUnderline=s.fUnderline;fStrikeOut=s.fStrikeOut;
+    marginRect=s.marginRect;scrAlignment=s.scrAlignment;borderStyle=s.borderStyle;
+    assign(outlineWidthX,s.outlineWidthX);assign(outlineWidthY,s.outlineWidthY);
+    assign(shadowDepthX,s.shadowDepthX);assign(shadowDepthY,s.shadowDepthY);
+    for(unsigned i=0;i<4;++i)colors[i]=s.colors[i];
+    for(unsigned i=0;i<4;++i)alpha[i]=s.alpha[i];
+    assign(fontScaleX,s.fontScaleX);assign(fontScaleY,s.fontScaleY);assign(fontSpacing,s.fontSpacing);
+    assign(fBlur,s.fBlur);assign(fGaussianBlur,s.fGaussianBlur);
+    assign(fontAngleZ,s.fontAngleZ);assign(fontAngleX,s.fontAngleX);assign(fontAngleY,s.fontAngleY);
+    assign(fontShiftX,s.fontShiftX);assign(fontShiftY,s.fontShiftY);relativeTo=s.relativeTo;
+    return *this;
+}
+#endif
+
 bool STSStyle::operator == (const STSStyle& s) const
 {
     return(marginRect          == s.marginRect

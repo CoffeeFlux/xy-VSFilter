@@ -20,12 +20,12 @@ def validate(data,bits,scenario="interning"):
     if not re.fullmatch(rb"style-provenance pointer_bits="+str(bits).encode()+rb" ansi=\d+ oem=\d+",rows[0]):raise ValueError("wrong architecture")
     for i in range(CASES):
         if not re.fullmatch(f"style-intern index={i} ".encode()+rb"alias=[01] copy_alias=1 value_equal=[01] self_equal=[01] count=\d+ rects=\d+ fp=[0-9a-f]{8} hash=[0-9a-f]{16},[0-9a-f]{16}",rows[1+i*4]):raise ValueError("wrong style state/order")
-        if not re.fullmatch(f"style-fp index={i} ".encode()+rb"first=[0-9a-f]{8} second=[0-9a-f]{8} copy=[0-9a-f]{8} read=[0-9a-f]{8} equality=[0-9a-f]{8} domains=[0-9a-f]{16}(?:,[0-9a-f]{16}){4}",rows[2+i*4]):raise ValueError("missing separated floating status")
+        if not re.fullmatch(f"style-fp index={i} ".encode()+rb"first=[0-9a-f]{8} second=[0-9a-f]{8} copy=[0-9a-f]{8} read=[0-9a-f]{8} equality=[0-9a-f]{8} assigned=[0-9a-f]{8} assigned_domain=[0-9a-f]{16} domains=[0-9a-f]{16}(?:,[0-9a-f]{16}){4}",rows[2+i*4]):raise ValueError("missing separated floating status")
         for row in rows[3+i*4:5+i*4]:
             m=re.fullmatch(rb"style-value rect=(-?\d+,){3}-?\d+ ints=(-?\d+,){7}-?\d+ font=(\d+):([0-9a-f]*) colors=[0-9a-f]{40} doubles=[0-9a-f]{240}",row)
             if not m or int(m[3])*4!=len(m[4]):raise ValueError("invalid full style value")
     if not re.fullmatch(rb'style-release-fp fp=[0-9a-f]{8} domains=[0-9a-f]{16}',rows[-3]):raise ValueError("missing release status")
-    expected_final=b'style-final finite_released=1 retained_nan=135 styles=90 rects=1' if scenario=='same-values' else b'style-final finite_released=1 retained_nan=90 styles=45 rects=1'
+    expected_final=b'style-final finite_released=1 retained_nan=135 styles=90 rects=1' if scenario in ('same-values','raw-twins') else b'style-final finite_released=1 retained_nan=90 styles=45 rects=1'
     if rows[-2]!=expected_final:raise ValueError("missing retained NaN accounting")
     if rows[-1]!=f'style-intern-complete cases={CASES}'.encode():raise ValueError("missing completion")
 
@@ -69,7 +69,7 @@ def main():
     parser.add_argument("--reference-root", type=Path, required=True)
     parser.add_argument("--platform", choices=("Win32", "x64"), required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--scenario",choices=("interning","same-values","add-style"),default="interning")
+    parser.add_argument("--scenario",choices=("interning","same-values","raw-twins","add-style"),default="interning")
     args = parser.parse_args()
     if os.name != "nt":
         parser.error("Windows ATL/MFC and built native libraries required")

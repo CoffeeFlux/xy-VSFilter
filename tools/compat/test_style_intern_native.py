@@ -15,7 +15,7 @@ class StyleTraceControls(unittest.TestCase):
                  + b"0" * 40 + b" doubles=" + b"0" * 240)
         for i in range(CASES):
             rows.append(f"style-intern index={i} alias=1 copy_alias=1 value_equal=1 self_equal=1 count=1 rects=1 fp=00000000 hash=0000000000000000,0000000000000000".encode())
-            rows.append(f"style-fp index={i} first=00000000 second=00000000 copy=00000000 read=00000000 equality=00000000 domains=0000000000000000,0000000000000000,0000000000000000,0000000000000000,0000000000000000".encode())
+            rows.append(f"style-fp index={i} first=00000000 second=00000000 copy=00000000 read=00000000 equality=00000000 assigned=00000000 assigned_domain=0000000000000000 domains=0000000000000000,0000000000000000,0000000000000000,0000000000000000,0000000000000000".encode())
             rows.extend([value, value])
         rows.extend([b"style-release-fp fp=00000000 domains=0000000000000000",b"style-final finite_released=1 retained_nan=90 styles=45 rects=1",
                      f"style-intern-complete cases={CASES}".encode()])
@@ -47,6 +47,7 @@ class StyleTraceControls(unittest.TestCase):
         with self.assertRaises(ValueError):validate(good.replace(b' domains=0000000000000000,',b' ',1),64)
         same=good.replace(b'retained_nan=90 styles=45',b'retained_nan=135 styles=90')
         compare([same]*4,64,'same-values')
+        compare([same]*4,64,'raw-twins')
         with self.assertRaises(ValueError):validate(good,64,'same-values')
 
     def test_add_style_names_values_status_and_completion(self):

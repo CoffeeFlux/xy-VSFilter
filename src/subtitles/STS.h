@@ -86,6 +86,9 @@ public:
                            // Edit: NOT supported now
 
     STSStyle();
+#if defined(XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL) && defined(_M_IX86)
+    STSStyle& operator=(const STSStyle& other);
+#endif
 
     void SetDefault();
 

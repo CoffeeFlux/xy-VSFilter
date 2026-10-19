@@ -42,7 +42,7 @@ static struct LateStyle {
         printf("style-late count=%llu rects=%llu valid=%u\n",static_cast<unsigned long long>(FwSTSStyle::Count()),static_cast<unsigned long long>(FwRect::Count()),valid?1:0);
     }
 } late_style;
-static unsigned cases=0;static bool same_values=false;
+static unsigned cases=0;static bool same_values=false,raw_twins=false;
 static void retain(const std::shared_ptr<FwSTSStyle>& value) {(nan(value->get())?nan_owners:finite_owners).push_back(value);}
 static void describe(const STSStyle& value) {
     const CRect r=value.marginRect.get();
@@ -54,7 +54,9 @@ static void describe(const STSStyle& value) {
     printf("\n");
 }
 static void pair(STSStyle& first,STSStyle& second) {
-    if(same_values)first=second;
+    unsigned assigned=0;uint64_t assigned_domains=0;
+    if(same_values){_clearfp();first=second;assigned=_statusfp();assigned_domains=domains();}
+    if(raw_twins){first=second;for(auto field:fields)memcpy(&(first.*field),&(second.*field),8);}
     _clearfp();
     auto a=std::make_shared<FwSTSStyle>(first);const unsigned fa=_statusfp();const uint64_t dfa=domains();_clearfp();
     auto b=std::make_shared<FwSTSStyle>(second);const unsigned fb=_statusfp();const uint64_t dfb=domains();_clearfp();
@@ -65,7 +67,7 @@ static void pair(STSStyle& first,STSStyle& second) {
     printf("style-intern index=%u alias=%u copy_alias=%u value_equal=%u self_equal=%u count=%llu rects=%llu fp=%08x hash=%016llx,%016llx\n",
         cases++,*a==*b?1:0,*b==*c?1:0,equal?1:0,self?1:0,static_cast<unsigned long long>(FwSTSStyle::Count()),
         static_cast<unsigned long long>(FwRect::Count()),flags,static_cast<unsigned long long>(hash_value(first)),static_cast<unsigned long long>(hash_value(second)));
-    printf("style-fp index=%u first=%08x second=%08x copy=%08x read=%08x equality=%08x domains=%016llx,%016llx,%016llx,%016llx,%016llx\n",cases-1,fa,fb,fc,fr,fe,static_cast<unsigned long long>(dfa),static_cast<unsigned long long>(dfb),static_cast<unsigned long long>(dfc),static_cast<unsigned long long>(dfr),static_cast<unsigned long long>(dfe));
+    printf("style-fp index=%u first=%08x second=%08x copy=%08x read=%08x equality=%08x assigned=%08x assigned_domain=%016llx domains=%016llx,%016llx,%016llx,%016llx,%016llx\n",cases-1,fa,fb,fc,fr,fe,assigned,static_cast<unsigned long long>(assigned_domains),static_cast<unsigned long long>(dfa),static_cast<unsigned long long>(dfb),static_cast<unsigned long long>(dfc),static_cast<unsigned long long>(dfr),static_cast<unsigned long long>(dfe));
     describe(av);describe(bv);retain(a);retain(b);retain(c);
 }
 class StyleDocument : public CSimpleTextSubtitle {
@@ -107,6 +109,7 @@ static int add_styles() {
 }
 int main(int argc,char** argv) {
     same_values=argc>1&&!strcmp(argv[1],"same-values");
+    raw_twins=argc>1&&!strcmp(argv[1],"raw-twins");
     if(argc>1&&!strcmp(argv[1],"add-style"))return add_styles();
     if(argc>1 && !strcmp(argv[1],"lifecycle")) {
         {
@@ -123,7 +126,7 @@ int main(int argc,char** argv) {
         printf("style-lifecycle-complete count=%llu\n",static_cast<unsigned long long>(FwSTSStyle::Count()));
         return 0;
     }
-    if(argc>1 && !same_values) {
+    if(argc>1 && !same_values && !raw_twins) {
         // No lookup occurs after release. Count() itself never dereferences keys.
         STSStyle value;const uint64_t n=0x7ff8000000000001ull;memcpy(&value.fontSize,&n,8);
         auto owner=std::make_shared<FwSTSStyle>(value);
