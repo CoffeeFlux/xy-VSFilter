@@ -27,7 +27,74 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: ASS override evaluation (2026-10-18)
+## Current port: renderer text ownership (2026-10-18)
+
+The experimental renderer now keeps the shared text used by words and polygons
+in safe Rust. Rust owns the complete raw UTF-16 values, cache identity, MRU order,
+statistics and eviction. Native wrappers retain checked IDs and immutable scalar
+metadata; reads return detached CString values. The native text flyweight
+instantiation is excluded on this path. Styles, fonts and word/line/subtitle
+objects still have native ownership and remain part of the migration.
+
+The cleanup cache compares strings only through their first NUL, but retains the
+first matching insertion's entire stored contents. The port preserves that
+behavior, including lone surrogates and different tails after a NUL. Hits update
+MRU order; copies keep their identity without another cache query. Existing
+owners survive eviction and cache clearing, while reinsertion after eviction
+gets a new legacy ID. Clear/reset operations do not rewind IDs. Counts and IDs
+wrap at the target size_t width, with zero skipped for new IDs.
+
+Teardown review found that global renderer caches can release owners after
+function-local destructors run. The shared native admission gate now uses
+zero-initialized SRW storage and interlocked owner-thread recursion, with trivial
+destruction and no heap-allocated gate. The text-cache facade releases Rust's
+cache storage at module teardown; retained owners remain readable and can release
+later. A late global owner and three threads making nested admissions exercise
+those boundaries. This does not establish whole-renderer concurrency safety.
+
+Final implementation `e6580bb0` is validated against cleanup `67da07cd` on Windows
+x86 and x64:
+
+* 410 observed state transitions / 5,333 trace lines per run, with two reference
+  and two candidate runs. The probe makes 16,653 text insertions/lookups plus a
+  late-destroyed owner, exceeds the real 16,384-entry capacity, and covers raw
+  strings, aliases, copying, MRU ordering, resize/clear/tail removal and counters.
+  All original pre-port observations from `e4efb44a` remain identical.
+* Final rendering corpus: 1,222 cases / 13,186 frames / 192 distinct-frame
+  controls per architecture, all exact. Includes file and memory loading,
+  malformed inputs, timing boundaries and backward seeks. No corpus cases were
+  removed or changed for this port.
+* Final override and effect comparisons remain exact across 96,014 and 81,722
+  trace lines respectively. All three DLLs pass exports, dependency and scoped
+  COM checks, including 10 reference cases and two candidate-only controls.
+* Broader tree, HTML, color, USF, RealText, WebVTT, SAMI, text, MicroDVD, ASS,
+  XombieSub, nine compile probes and 3,693 lifecycle trace lines passed at
+  `0035522f`. Those reports retain that revision. Final native/rendering/ABI
+  checks cover the subsequent cache teardown correction; the admission gate is
+  unchanged between those revisions.
+* 330 safe-core and 134 FFI tests on each architecture; formatting, Clippy for
+  all targets and native-runtime configurations; 174 Python tests with one skip.
+  All 111 portable-core source files remain free of unsafe code. The new FFI
+  boundary adds three unsafe function declarations, four unsafe blocks, one
+  copied shared input slice and three detached output writes.
+
+See the [text ownership inventory](rust-string-flyweight-inventory.json) and
+[local evidence manifest](rust-string-flyweight-local-evidence.json). Construction
+with a zero-capacity native cache returns a freed list node; construction after
+native cache destruction also uses an expired lifetime. These source-level
+unsafe cases remain unresolved and are safely refused, not counted as matching
+comparisons. Counter rollover is unit-tested, not claimed as billions of native
+allocations. Allocation failures, native wrapper concurrency, reentry through
+allocation hooks and public mapping of experimental internal errors remain
+unclosed. No production switch or whole-library completion is claimed.
+
+The next ownership work is style interning and the word/line/subtitle graph,
+including copy/append/compaction and layout behavior. Preserve native style
+identity, raw font names, floating-point equality and cache-visible aliasing;
+do not substitute bitwise style equality without direct evidence. The complete
+renderer, every host adapter and vendored implementation remain in scope.
+
+## Previous port: ASS override evaluation (2026-10-18)
 
 The experimental renderer now evaluates all 54 ASS commands in safe Rust,
 including style changes, nested transforms, animation, alignment, wrap, karaoke,

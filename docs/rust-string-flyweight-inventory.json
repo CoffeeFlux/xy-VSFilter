@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "candidate_commit": "e6580bb0e1338637a2dec6c075fd5a3167c8a85f",
+  "scope": "Experimental renderer raw text flyweight storage, identity, MRU cache, owner release and module teardown; not whole renderer/host completion",
+  "operations": [
+    {
+      "operation": "Canonical raw text ownership",
+      "source": {
+        "path": "rust/compat/src/string_flyweight.rs",
+        "line": 9,
+        "sha256": "a90c4f0e5e7634ce0d12a89279e223ee14c38e0f5f3dfa7898cb492c14afe242"
+      },
+      "behavior": "Owned raw UTF-16 Vec behind safe Arc. Cache and live checked resources share ownership. Detached native CString reads never expose canonical pointers."
+    },
+    {
+      "operation": "Legacy string identity",
+      "source": {
+        "path": "rust/compat/src/string_flyweight.rs",
+        "line": 52,
+        "sha256": "a90c4f0e5e7634ce0d12a89279e223ee14c38e0f5f3dfa7898cb492c14afe242"
+      },
+      "behavior": "Compare up to first NUL, but retain the first inserter's complete stored contents. Case-sensitive raw code units, including lone surrogates. IDs wrap at target usize width and skip zero; only a cache miss allocates a legacy ID."
+    },
+    {
+      "operation": "MRU and exposed counters",
+      "source": {
+        "path": "rust/compat/src/string_flyweight.rs",
+        "line": 86,
+        "sha256": "a90c4f0e5e7634ce0d12a89279e223ee14c38e0f5f3dfa7898cb492c14afe242"
+      },
+      "behavior": "Hits move to head; insertion evicts least-recently-used entry beyond capacity. Shrink evicts oldest entries. Clear/reset statistics do not reset legacy IDs. Counters wrap at target usize width. Retained owners stay valid through eviction, clear and reinsertion."
+    },
+    {
+      "operation": "Checked native boundary",
+      "source": {
+        "path": "rust/ffi/src/string_flyweight.rs",
+        "line": 69,
+        "sha256": "0ceb95b39f3144f0463a3eb5d05e7e5209ca55277c50775b764eef2443263d41"
+      },
+      "behavior": "Validated typed IDs, copied input and detached output. No raw owner pointer or mutable foreign slice. Short/malformed/stale/wrong-type calls leave output unchanged. Aliased input/output is copied before mutation. Registry capacity reserved before cache mutation."
+    },
+    {
+      "operation": "Native adapter",
+      "source": {
+        "path": "src/subtitles/RustStringFlyweight.inl",
+        "line": 10,
+        "sha256": "fa2480e274a4fedef8c24fc67b6441db5c9ebcf719ba4f8a47e49950124b634a"
+      },
+      "behavior": "Transitional shared native wrapper owns checked ID plus immutable scalar metadata. Constructor consumes the supplied native CString; Get materializes a detached value. All in-repo Get call sites reviewed for temporary lifetime."
+    },
+    {
+      "operation": "Shutdown",
+      "source": {
+        "path": "rust/compat/src/string_flyweight.rs",
+        "line": 94,
+        "sha256": "a90c4f0e5e7634ce0d12a89279e223ee14c38e0f5f3dfa7898cb492c14afe242"
+      },
+      "behavior": "Native cache facade registers teardown before the first insertion. Rust releases cache entries and backing storage; retained text owners remain readable and can release later. New construction after native cache destruction is an unresolved lifetime, safely refused."
+    },
+    {
+      "operation": "Admission lifetime",
+      "source": {
+        "path": "src/subtitles/RustDocumentOwner.h",
+        "line": 66,
+        "sha256": "dbef5aa61b3cf682e105b1ebc15efe5d485b877dbbe42e1d2788ed9c5d51a19e"
+      },
+      "behavior": "Replace destructed CRITICAL_SECTION with statically zero-initialized SRWLOCK storage and interlocked owner-thread recursion. Trivial destruction, no allocated gate or leaked lock handle. Only the owning thread accesses recursion depth. Three-thread nested-admission probe checks serialization; no claim of whole-renderer concurrency safety."
+    }
+  ],
+  "boundary_review": {
+    "new_production_unsafe_function_sites": 3,
+    "new_production_unsafe_blocks": 4,
+    "new_shared_foreign_slices": 1,
+    "new_nonoverlapping_copies": 3,
+    "details": "Three input/output exports copy caller bytes through one short shared input slice and three detached output writes. Scalar destroy export is safe. Reuses checked Registry and its Send assertions. No new unsafe impl, mutable static, raw owner pointer, mutable foreign slice, assembly, unchecked indexing or transmute."
+  },
+  "evidence": {
+    "primary": "tools/compat/string_flyweight_native.cpp",
+    "runner": "tools/compat/string_flyweight_native.py",
+    "steps_per_architecture": 410,
+    "measured_constructions_per_run": 16653,
+    "late_owner_constructions_per_run": 1,
+    "trace_lines_per_run": 5333,
+    "runs_per_architecture": {
+      "reference": 2,
+      "candidate": 2
+    },
+    "controls": "Capacities 1/2/3/17/16384, 16410 unique strings at real default capacity, live copies/assignment/self-assignment, MRU hits, resize/clear/tail removal/stat resets, embedded NUL, empty/raw-surrogate strings, raw-key hash collision, late global owner read/release, recursive native admission on three threads."
+  },
+  "limits": [
+    "Finite default-environment evidence, not whole-library or production-switch approval.",
+    "usize rollover is unit-tested by seeded internal counters; billions of native allocations are not claimed.",
+    "Capacity-zero native construction returns a removed node; late construction after cache destruction uses a dead cache. These source-level unsafe outcomes are unresolved, excluded from passing comparisons, and safely refused.",
+    "Allocator failures, native wrapper concurrency, allocation-hook reentry and public mapping of experimental internal errors remain unresolved.",
+    "Styles, fonts, word/line/subtitle graphs, clipper/cache policies, rasterization, host adapters and vendored code remain in the complete migration scope."
+  ]
+}
