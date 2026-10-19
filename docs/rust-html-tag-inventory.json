@@ -1,0 +1,141 @@
+{
+  "schema": 1,
+  "candidate_commit": "07f34a544383f38dbb8e18e8b6b3dfaec28796e3",
+  "reference": {
+    "repository": "https://github.com/CoffeeFlux/xy-VSFilter",
+    "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d"
+  },
+  "scope": "Complete renderer ParseHtmlTag tokenization, attribute order, style mutations, closing-tag semantics and karaoke updates in safe Rust, with copied Windows CRT services.",
+  "production_sources": {
+    "rust/compat/src/html_tag.rs": "7ffa276ffc24d09ab41f133fed09b6b301e8138883c6fcb281eace24b5ddbcc1",
+    "rust/compat/src/colors.rs": "2c53cc4e5860372d08357ab021e4c708f72cfc22c611be1677685004c386365b",
+    "rust/compat/src/document_style.rs": "bdfffedb13b7a46798cba530243f68f3b2e46247fac1cd5831fbd126389e5378",
+    "rust/compat/src/lib.rs": "033edacbf255efea9aa308af6b11bd7a84822e862bb6b4c63e649ed0a77f3ea7",
+    "rust/ffi/src/html_tag.rs": "25540a77df4d71dd4f520101c7a0742a027835acf42a2906bcf1518ac5c5ee38",
+    "rust/ffi/src/windows_crt.rs": "107877c01fa0405e4c60c7f54438bdc9ac2cfd33bdd1997fb4fa06bfe1663dda",
+    "rust/ffi/src/lib.rs": "04890f8c51969c14d11049887d0ba92011c78854ddcdc65d594307bc931e9138",
+    "include/xy_rust_html_tag.h": "3e7334bc64e3c037ded6c46785f805bbee4264223b7fac331ecd46aac4ef556d",
+    "src/subtitles/RTS.cpp": "56f85a7dcc0d508abd270f81e6cd927213ec92f4618a5bf3914b8a55a89ab48b",
+    "src/subtitles/RustDocumentOwner.h": "203a44c583a3d217a94508d4e69be8b35bf214e79db2786f3c44809503caf674"
+  },
+  "reference_sources": {
+    "src/subtitles/RTS.cpp": "ef6aae1b68accd3da5cc9093377a118cf11f5754c597cec68173b06c80f71454",
+    "src/subtitles/RTS.h": "7fa99ac55e37e9cbc66bb3b219dba1e860ed8bd02e34a44acb2ad8ad93957c26"
+  },
+  "operations": [
+    {
+      "operation": "Raw CString-compatible parsing",
+      "source": {
+        "path": "rust/compat/src/html_tag.rs",
+        "line": 52,
+        "sha256": "7ffa276ffc24d09ab41f133fed09b6b301e8138883c6fcb281eace24b5ddbcc1"
+      },
+      "behavior": "Comment prefix exits immediately. Closing flag reads the original first unit before trim. TrimRight scans the first-NUL prefix; a trailing match truncates all later data. TrimLeft shifts the stored suffix, retaining post-NUL units if no right truncation occurred. Find uses first-NUL search but missing delimiters use stored length. Ordered attribute names/values are trimmed and lowered before style mutation."
+    },
+    {
+      "operation": "Style dispatch",
+      "source": {
+        "path": "rust/compat/src/html_tag.rs",
+        "line": 94,
+        "sha256": "7ffa276ffc24d09ab41f133fed09b6b301e8138883c6fcb281eace24b5ddbcc1"
+      },
+      "behavior": "Preserve text no-op, b/strong weight700, i/em, u and s/strike/del flags with closing restores. Font names retain lowercased raw units. Relative negative size subtracts a signed negative wcstol value and may increase size. Duplicate attributes apply in order. Closingfont resets only name,size and4colors, leaving alpha and outline/shadow widths intact. Color operations reuse validated shared Rust logic. Unknown tags refuse without style/karaoke mutation."
+    },
+    {
+      "operation": "Karaoke",
+      "source": {
+        "path": "rust/compat/src/html_tag.rs",
+        "line": 145,
+        "sha256": "7ffa276ffc24d09ab41f133fed09b6b301e8138883c6fcb281eace24b5ddbcc1"
+      },
+      "behavior": "Only k with exactly1attribute namedt is accepted. Setkind1, copypriorend tostart, then add wcstol10 with wrappingi32. Empty values still convert as in reference; duplicate/extra attributes refuse. State is supplied and returned as scalar bits."
+    },
+    {
+      "operation": "Floating-point state",
+      "source": {
+        "path": "rust/compat/src/html_tag.rs",
+        "line": 118,
+        "sha256": "7ffa276ffc24d09ab41f133fed09b6b301e8138883c6fcb281eace24b5ddbcc1"
+      },
+      "behavior": "Native signed32bit number converts exactly to f64. Addition/subtraction and direct assignment keep reference ordering. Existing full style wire preserves unmodified double bits; tests include finite23.5, negativezero, positiveinfinity and quietNaN0x7ff8123456789abc."
+    },
+    {
+      "operation": "Windows string services",
+      "source": {
+        "path": "rust/ffi/src/windows_crt.rs",
+        "line": 20,
+        "sha256": "107877c01fa0405e4c60c7f54438bdc9ac2cfd33bdd1997fb4fa06bfe1663dda"
+      },
+      "behavior": "CString MakeLower is _wcslwr_s with original length+1, unlike BSTR CharLowerBuffW. Rust copies a terminated buffer, ignores result like CString, then retains the original stored length including post-NUL units. IsSpace uses Windows iswspace on16bit units. Numeric services retain wcstol locale/errno behavior. All services run outside registry admission/native gates."
+    }
+  ],
+  "boundary_review": {
+    "source": {
+      "path": "rust/ffi/src/html_tag.rs",
+      "line": 24,
+      "sha256": "25540a77df4d71dd4f520101c7a0742a027835acf42a2906bcf1518ac5c5ee38"
+    },
+    "native_adapter": {
+      "path": "include/xy_rust_html_tag.h",
+      "line": 8,
+      "sha256": "3e7334bc64e3c037ded6c46785f805bbee4264223b7fac331ecd46aac4ef556d"
+    },
+    "new_private_entries": [
+      "xy_vsfilter_html_tag_v1"
+    ],
+    "contract": "Stateless byte packet contains rawtag,2complete192byte-header style records and3karaoke scalars. Counts and overflow are checked; reply capacity covers max(tag,currentfont,originalfont) before parsing. Output contains accepted,3karaoke scalars,actualstyle length and complete style bytes. Input/output may overlap; no borrowed native storage survives into CRT calls. Output is never read, and failures leave it untouched. Native shim only transports/materializes values.",
+    "unsafe_delta": {
+      "unsafe_functions": 1,
+      "unsafe_blocks": 4,
+      "new_raw_shared_slice_constructors": 1,
+      "new_raw_nonoverlapping_copies": 1,
+      "note": "Two of the4blocks are Windows lowercase/whitespace service calls."
+    },
+    "tests": "Trim/NUL preservation and truncation, lowercased rawfont, negative size, closing flag beforetrim, closingfont subset, comment preserving NaN bits, duplicatekaraoke refusal, wrapping state, complete packet bounds, invalidstyle bool, oversize/null counts, uninitialized output and buffer overlap."
+  },
+  "direct_probe": {
+    "baseline_commit": "4c2a18e79dcf420dff7eeb9cd10df6b82ae414dc",
+    "source": {
+      "path": "tools/compat/html_tag_native.cpp",
+      "line": 39,
+      "sha256": "e1f3f1dc72ccd4f535d9ed24d006ed2063f9db6a183e6c32259405a046a10bde"
+    },
+    "runner": {
+      "path": "tools/compat/html_tag_native.py",
+      "line": 17,
+      "sha256": "a438446b385601eb4e577ce33073bd883176d247b2c56f253d16deb26e762a9f"
+    },
+    "inputs": 1408,
+    "cases": 5728,
+    "style_snapshots": 11456,
+    "trace_lines": 17186,
+    "coverage": "44literal tags +7attributes x22values x2quoted/unquoted +264rawcodeunits x4positions =1408inputs, each with4floatingpoint/karaoke seeds. Additional12-tag sequences run twice for eachseed=96stateful calls. Original and current full style snapshots, accepted flag, errno and3karaoke fields captured after every call.",
+    "method": "Actual selected linked renderer private method and private karaoke fields accessed with explicitly instantiated member addresses; no implementation or access/layout rewrite. Two reference and two candidate executions per architecture; all traces must also equal pre-port baseline."
+  },
+  "limits": [
+    "Experimental document-owner path only. No production switch or complete renderer/host/library claim.",
+    "Windows iswspace, _wcslwr_s and wcstol remain system CRT services through audited Rust FFI. Native STSStyle/CString marshaling and renderer field storage remain transitional; no native parser decisions remain on the experimental ParseHtmlTag path.",
+    "Finite Unicode Windows MSVC14.44 x86/x64 evidence. No claim for allocator/new-handler reentry, injected faults, arbitrary locale changes, uninitialized input style fields, non-Unicode builds or non-Windows renderer behavior.",
+    "Input pointer validity and output writable capacity remain unsafe FFI preconditions. Packet counts, complete style shapes, representations and reply capacity are checked before platform services; output is staged after input copying and parsing.",
+    "Lexical unsafe counts are an inventory rather than soundness proof or migration percentage. Crashes/hangs/nondeterminism remain unresolved; previous evidence retains original provenance."
+  ],
+  "next_work": [
+    "Migrate subtitle-effect parsing and effect ownership into Rust, covering Banner/Scroll and effects produced by ASS tags, with reference state/lifetime probes.",
+    "Continue renderer, document/host adapters, all formats/options/interfaces and vendored implementation; preserve unresolved reference outcomes."
+  ],
+  "cstring_evidence": {
+    "path": "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/atlmfc/include/cstringt.h",
+    "sha256": "946be7ebc817f7d3214920af5a57d4f71175444f78c5bc408fae3ff5019e127d",
+    "methods": [
+      "CStringT::Trim",
+      "TrimRight",
+      "TrimLeft",
+      "Find",
+      "Mid",
+      "MakeLower",
+      "ChTraitsCRT<wchar_t>::IsSpace",
+      "StringLowercase"
+    ],
+    "note": "Local SDK code defines exact service/string behavior; actual linked differential probes govern compatibility."
+  }
+}

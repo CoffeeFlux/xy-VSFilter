@@ -27,7 +27,57 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Current port: shared color handling (2026-10-18)
+## Current port: renderer HTML tag parser (2026-10-18)
+
+The experimental renderer now runs complete ParseHtmlTag decisions in safe Rust:
+raw code-unit tokenization, attribute order, style changes, closing-tag restores
+and karaoke state updates. The native method transports two complete styles and
+three karaoke scalars through a stateless boundary, then materializes the result.
+Windows whitespace, lowercase and numeric operations remain narrow CRT services.
+
+The port preserves CString's first-NUL searches and stored-length distinctions.
+Right trimming can discard a post-NUL suffix; lowercasing instead retains the
+original length. Closing is detected before trimming. Negative relative font
+sizes subtract a signed negative value and can increase size. Closing font tags
+restore name, size and colors only. Karaoke requires exactly one `t` attribute
+and adds with wrapping 32-bit arithmetic. No Unicode normalization is introduced.
+
+Implementation `07f34a54` passes cleanup `67da07cd` checks on **each** Windows
+architecture (x86 and x64):
+
+* 5,728 actual renderer method calls across 1,408 inputs and repeated tag
+  sequences, with 11,456 complete current/original style snapshots. All 17,186
+  trace lines match across two runs per implementation and equal pre-port
+  baseline `4c2a18e7`, including errno and karaoke state. Four seeds cover finite
+  size, negative zero, infinity and a specific quiet-NaN payload.
+* Expanded rendering corpus: 1,102 cases / 11,734 frames / 144 distinct-frame
+  controls. The previous 1,066 cases are unchanged. Eighteen new scripts add
+  36 file/memory cases, 396 frames and 16 controls for style tags, face/size
+  changes, closing behavior and karaoke transitions, including backward seeks.
+* Previous 12,234-line shared-color and 40,517-line USF traces remain unchanged.
+  RealText, WebVTT, SAMI, text-parser, MicroDVD, ASS and XombieSub regressions pass,
+  along with 3,693 lifecycle trace lines, nine compile probes, all three DLLs'
+  exports/dependencies and scoped COM checks.
+* 310 safe-core and 128 FFI tests, formatting and Clippy on both architectures;
+  167 Python tests with one skip. The 106-file portable core has zero unsafe
+  sites. The new boundary adds one unsafe function and four unsafe blocks,
+  including two CRT service calls, one bounded input copy and one output write.
+
+See the [HTML parser inventory](rust-html-tag-inventory.json) and
+[local evidence manifest](rust-html-tag-local-evidence.json). Packet validation
+and capacity checks precede platform calls; input/output may overlap and output
+may be uninitialized. No pointer or native-buffer borrow survives into CRT work.
+Native style marshaling, renderer storage and other adapters remain transitional.
+Allocation/reentry and injected failures remain unclosed. No production switch
+or whole-renderer/library completion is claimed.
+
+Next: migrate subtitle-effect parsing and ownership, covering Banner/Scroll and
+effects created by ASS tags. Continue the renderer, remaining document/host
+adapters, all formats/options/interfaces and vendored implementation. Earlier
+evidence retains its original provenance.
+
+
+## Previous port: shared color handling (2026-10-18)
 
 The experimental path now uses safe Rust for the shared 138-entry named-color
 table, HTML/SAMI numeric fallback, channel conversion and complete SSA color-tag
