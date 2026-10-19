@@ -22,6 +22,9 @@ pub struct Scan {
     spans: Vec<[u64; 2]>,
 }
 impl Scan {
+    pub fn spans(&self) -> &[[u64; 2]] {
+        &self.spans
+    }
     pub fn convert<C: Curve>(&mut self, path: &Path, size: [i32; 2]) -> Result<bool, u32> {
         self.spans.clear();
         if path.points().is_empty() {

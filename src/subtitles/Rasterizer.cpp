@@ -446,10 +446,15 @@ bool Rasterizer::Rasterize(const ScanLineData2& scan_line_data2, int xsub, int y
     //xsub = ysub = 0;
     int width = scan_line_data.mWidth + xsub;
     int height = scan_line_data.mHeight + ysub;
-    overlay->mfWideOutlineEmpty = scan_line_data2.mWideOutline.empty();
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    const auto region=scan_line_data2.Snapshot();
+#else
+    const auto& region=scan_line_data2;
+#endif
+    overlay->mfWideOutlineEmpty = region.mWideOutline.empty();
     if(!overlay->mfWideOutlineEmpty)
     {
-        int wide_border = (scan_line_data2.mWideBorder+7)&~7;
+        int wide_border = (region.mWideBorder+7)&~7;
 
         width += 2*wide_border ;
         height += 2*wide_border ;
@@ -503,7 +508,7 @@ bool Rasterizer::Rasterize(const ScanLineData2& scan_line_data2, int xsub, int y
     }
 
     // Are we doing a border?
-    const tSpanBuffer* pOutline[2] = {&(scan_line_data.mOutline), &(scan_line_data2.mWideOutline)};
+    const tSpanBuffer* pOutline[2] = {&(scan_line_data.mOutline), &(region.mWideOutline)};
     for(int i = countof(pOutline)-1; i >= 0; i--)
     {
         tSpanBuffer::const_iterator it = pOutline[i]->begin();
@@ -2749,16 +2754,15 @@ bool ScanLineData::ScanConvert(const PathData& path_data, const CSize& size)
 
 bool ScanLineData2::CreateWidenedRegion(int rx, int ry)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return m_region.Convert(m_scan_line_data->m_scan,rx,ry);
+#else
     if(rx < 0) rx = 0;
     if(ry < 0) ry = 0;
     mWideBorder = max(rx,ry);
     mWideOutline.clear();
 
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    const auto snapshot=m_scan_line_data->Snapshot();const tSpanBuffer& out_line=snapshot.mOutline;
-#else
     const tSpanBuffer& out_line = m_scan_line_data->mOutline;
-#endif
     if (ry > 0)
     {
         WidenRegionCreater *widen_region_creater = WidenRegionCreater::GetDefaultWidenRegionCreater();
@@ -2771,4 +2775,5 @@ bool ScanLineData2::CreateWidenedRegion(int rx, int ry)
         OverlapRegion(mWideOutline, out_line, rx, 0);
     }
     return true;
+#endif
 }

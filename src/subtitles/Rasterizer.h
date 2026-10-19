@@ -154,7 +154,11 @@ typedef std::shared_ptr<ScanLineData> SharedPtrScanLineData;
 class ScanLineData2
 {
 public:
-    ScanLineData2():mPathOffsetX(0),mPathOffsetY(0),mWideBorder(0){}
+    ScanLineData2():mPathOffsetX(0),mPathOffsetY(0)
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        ,mWideBorder(0)
+#endif
+    {}
     ScanLineData2(const CPoint& left_top, const SharedPtrConstScanLineData& scan_line_data)
         :m_scan_line_data(scan_line_data)
         ,mPathOffsetX(left_top.x)
@@ -165,8 +169,15 @@ public:
 private:
     SharedPtrConstScanLineData m_scan_line_data;
     int mPathOffsetX, mPathOffsetY;	
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    XyRust::RegionOwner m_region;
+public:
+    XyRust::RegionSnapshot Snapshot()const{return m_region.Read();}
+private:
+#else
     tSpanBuffer mWideOutline;
     int mWideBorder;
+#endif
 
     friend class Rasterizer;
 };

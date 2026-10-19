@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-//! Checked persistent paths and scan results. No owner pointer or buffer loan
+//! Checked persistent paths, scan results and widened outlines. No owner pointer or buffer loan
 //! crosses the ABI.
 //! A separate admission excludes mutation/release during GDI calls; reentry
 //! refuses Busy. Caller serializes full native operations and exclusively owns
@@ -17,11 +17,14 @@ struct Boundary {
 struct Owners {
     paths: Store,
     scans: xy_vsfilter_compat::scan_convert::Store,
+    regions: xy_vsfilter_compat::wide_region::Store,
 }
 // SAFETY: all access uses the atomic gate; HRTB closures cannot return borrowed
-// references, and both registries own only Send data. No native pointer is
+// references, and all three registries own only Send data. No native pointer is
 // stored. Path->scan conversion uses disjoint fields under this single gate,
 // so it never nests admissions or releases a path loan across a callback.
+// Region arithmetic callbacks receive only detached scalars and temporary output;
+// the gate refuses reentry while scan/region borrows remain admitted.
 unsafe impl Sync for Boundary {}
 struct Guard<'a>(&'a Boundary);
 impl Drop for Guard<'_> {
@@ -36,6 +39,7 @@ impl Boundary {
             state: UnsafeCell::new(Owners {
                 paths: Store::new(),
                 scans: xy_vsfilter_compat::scan_convert::Store::new(),
+                regions: xy_vsfilter_compat::wide_region::Store::new(),
             }),
         }
     }
@@ -57,6 +61,137 @@ impl Boundary {
     }
 }
 static PATHS: Boundary = Boundary::new();
+type EllipseCall = unsafe extern "C" fn(u32, u64, u64, *mut u8) -> u32;
+struct NativeEllipse(EllipseCall);
+impl NativeEllipse {
+    fn call(&mut self, op: u32, a: u64, b: u64) -> Result<i32, u32> {
+        let mut out = [0u8; 4];
+        // SAFETY: only the unsafe region export constructs this adapter. Its
+        // callback contract permits synchronous scalar calls, writes four bytes,
+        // retains no address and cannot unwind or access any admitted owner.
+        let status = unsafe { (self.0)(op, a, b, out.as_mut_ptr()) };
+        if status == 0 {
+            Ok(i32::from_le_bytes(out))
+        } else {
+            Err(status)
+        }
+    }
+}
+impl xy_vsfilter_compat::wide_region::Ellipse for NativeEllipse {
+    fn initialize(&mut self, rx: i32, ry: i32) -> Result<(), u32> {
+        self.call(0, rx as u32 as u64, ry as u32 as u64).map(|_| ())
+    }
+    fn cross(&mut self, right: bool, center: u64, base: u64) -> Result<i32, u32> {
+        self.call(if right { 2 } else { 1 }, center, base)
+    }
+    fn arc(&mut self, right: bool, center: u64, line: i32) -> Result<i32, u32> {
+        self.call(if right { 4 } else { 3 }, center, line as u32 as u64)
+    }
+}
+/// # Safety
+/// output spans eight writable bytes. No owner address is exported.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_region_create_v1(output: *mut u8) -> u32 {
+    if output.is_null() {
+        return 3;
+    }
+    let id = match PATHS.with_owners(|o| o.regions.create()) {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    // SAFETY: detached scalar and caller's writable eight-byte output.
+    unsafe {
+        core::ptr::copy_nonoverlapping(id.to_le_bytes().as_ptr(), output, 8);
+    }
+    0
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_region_destroy_v1(id: u64) -> u32 {
+    match PATHS.with_owners(|o| o.regions.remove(id)) {
+        Ok(()) => 0,
+        Err(e) => e,
+    }
+}
+/// # Safety
+/// output spans four writable bytes. callback is live for this call only,
+/// serializes its ellipse cache, writes exactly four bytes on success, and
+/// neither unwinds nor retains any pointer. It receives only copied scalars and
+/// a temporary output; it must not access admitted path/scan/region data. A
+/// reentrant registry request is refused Busy, including destruction.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_region_convert_v1(
+    id: u64,
+    scan: u64,
+    rx: i32,
+    ry: i32,
+    callback: Option<EllipseCall>,
+    output: *mut u8,
+) -> u32 {
+    let Some(callback) = callback else {
+        return 3;
+    };
+    if output.is_null() {
+        return 3;
+    }
+    let result = match PATHS.with_owners(|o| {
+        let source = o.scans.get(scan)?;
+        o.regions
+            .get_mut(id)?
+            .convert(source.spans(), rx, ry, &mut NativeEllipse(callback))
+    }) {
+        Ok(v) => u32::from(v),
+        Err(e) => return e,
+    };
+    // SAFETY: detached scalar, after callback and all registry borrows end.
+    unsafe {
+        core::ptr::copy_nonoverlapping(result.to_le_bytes().as_ptr(), output, 4);
+    }
+    0
+}
+/// # Safety
+/// output spans eight writable bytes for the detached snapshot length.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_region_info_v1(id: u64, output: *mut u8) -> u32 {
+    if output.is_null() {
+        return 3;
+    }
+    let length = match PATHS.with_owners(|o| o.regions.get(id)?.wire_len().ok_or(5)) {
+        Ok(v) => v as u64,
+        Err(e) => return e,
+    };
+    // SAFETY: detached scalar and caller's writable output.
+    unsafe {
+        core::ptr::copy_nonoverlapping(length.to_le_bytes().as_ptr(), output, 8);
+    }
+    0
+}
+/// # Safety
+/// output spans capacity writable bytes. Invalid/short requests leave it intact.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_region_read_v1(
+    id: u64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    if output.is_null() || capacity > isize::MAX as usize {
+        return 3;
+    }
+    let bytes = match PATHS.with_owners(|o| {
+        let region = o.regions.get(id)?;
+        if region.wire_len().ok_or(5u32)? > capacity {
+            return Err(4);
+        }
+        region.encode()
+    }) {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    // SAFETY: detached packet after registry borrow ends; capacity was checked.
+    unsafe {
+        core::ptr::copy_nonoverlapping(bytes.as_ptr(), output, bytes.len());
+    }
+    0
+}
 /// # Safety
 /// output spans eight writable bytes for the new checked scan ID.
 #[no_mangle]
@@ -526,6 +661,16 @@ pub unsafe extern "C" fn xy_vsfilter_path_action_v1(
 #[cfg(test)]
 mod tests {
     use super::*;
+    unsafe extern "C" fn ellipse(op: u32, _: u64, _: u64, out: *mut u8) -> u32 {
+        assert_eq!(op, 0);
+        assert_eq!(xy_vsfilter_region_destroy_v1(u64::MAX), 2);
+        assert_eq!(xy_vsfilter_scan_destroy_v1(u64::MAX), 2);
+        // SAFETY: the adapter supplies four initialized writable bytes.
+        unsafe {
+            core::ptr::write_bytes(out, 0, 4);
+        }
+        0
+    }
     #[test]
     fn checked_ids_detached_packets_and_failed_admission_preserve_output() {
         let mut out = [0xa5; 32];
@@ -586,6 +731,34 @@ mod tests {
                 xy_vsfilter_scan_convert_v1(scan, u64::MAX, 32, 8, out.as_mut_ptr()),
                 1
             );
+            assert_eq!(xy_vsfilter_region_create_v1(scan_id.as_mut_ptr()), 0);
+            let region = u64::from_le_bytes(scan_id);
+            out.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_region_convert_v1(region, scan, 1, 1, None, out.as_mut_ptr()),
+                3
+            );
+            assert_eq!(out, [0xa5; 32]);
+            assert_eq!(
+                xy_vsfilter_region_convert_v1(region, scan, 1, 1, Some(ellipse), out.as_mut_ptr()),
+                0
+            );
+            assert_eq!(out[0], 1);
+            snapshot.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_region_read_v1(region, snapshot.as_mut_ptr().add(1), 11),
+                4
+            );
+            assert_eq!(snapshot, [0xa5; 64]);
+            assert_eq!(
+                xy_vsfilter_region_read_v1(region, snapshot.as_mut_ptr().add(1), 63),
+                0
+            );
+            assert_eq!(&snapshot[1..13], &[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+            assert_eq!(xy_vsfilter_region_info_v1(region, scan_id.as_mut_ptr()), 0);
+            assert_eq!(u64::from_le_bytes(scan_id), 12);
+            assert_eq!(xy_vsfilter_region_destroy_v1(region), 0);
+            assert_eq!(xy_vsfilter_region_info_v1(region, scan_id.as_mut_ptr()), 1);
             assert_eq!(xy_vsfilter_scan_destroy_v1(scan), 0);
             assert_eq!(xy_vsfilter_scan_info_v1(scan, scan_id.as_mut_ptr()), 1);
             // Malformed transform packets and stale owners must not change data.

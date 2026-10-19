@@ -2,6 +2,13 @@
 // Included once by Rasterizer.cpp. All Rust data crosses as detached bytes.
 #include "RustDocumentOwner.h"
 extern "C" {
+typedef uint32_t (__cdecl *XyEllipseCall)(uint32_t,uint64_t,uint64_t,uint8_t*);
+uint32_t __cdecl xy_rust_widen_numeric(uint32_t,uint64_t,uint64_t,uint8_t*);
+uint32_t __cdecl xy_vsfilter_region_create_v1(uint8_t*);
+uint32_t __cdecl xy_vsfilter_region_destroy_v1(uint64_t);
+uint32_t __cdecl xy_vsfilter_region_convert_v1(uint64_t,uint64_t,int32_t,int32_t,XyEllipseCall,uint8_t*);
+uint32_t __cdecl xy_vsfilter_region_info_v1(uint64_t,uint8_t*);
+uint32_t __cdecl xy_vsfilter_region_read_v1(uint64_t,uint8_t*,size_t);
 uint32_t __cdecl xy_vsfilter_scan_create_v1(uint8_t*);
 uint32_t __cdecl xy_vsfilter_scan_destroy_v1(uint64_t);
 uint32_t __cdecl xy_vsfilter_scan_convert_v1(uint64_t,uint64_t,int32_t,int32_t,uint8_t*);
@@ -25,6 +32,17 @@ std::array<uint8_t,16> PathAction(uint64_t id,uint32_t op,HDC dc=nullptr,long dx
     DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_path_action_v1(id,op,reinterpret_cast<uintptr_t>(dc),dx,dy,out.data());}));return out;}
 std::array<uint8_t,12> PathInfo(uint64_t id){std::array<uint8_t,12> out;
     DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_path_info_v1(id,out.data());}));return out;}
+}
+RegionOwner::RegionOwner(){std::array<uint8_t,8> out;DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_region_create_v1(out.data());}));id_=DocumentDetail::Load(out,0,8);}
+RegionOwner::~RegionOwner(){DocumentDetail::Release(DocumentDetail::Invoke([&](){return xy_vsfilter_region_destroy_v1(id_);}));}
+bool RegionOwner::Convert(const ScanOwner& scan,int rx,int ry){std::array<uint8_t,4> out;
+    DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_region_convert_v1(id_,scan.id_,rx,ry,xy_rust_widen_numeric,out.data());}));return DocumentDetail::Load(out,0,4)!=0;}
+RegionSnapshot RegionOwner::Read()const{
+    DocumentDetail::Loan gate;std::array<uint8_t,8> info;DocumentDetail::Check(xy_vsfilter_region_info_v1(id_,info.data()));const uint64_t length=DocumentDetail::Load(info,0,8);
+    DocumentDetail::Shape(length>=12&&length<=SIZE_MAX);DocumentDetail::Bytes bytes(static_cast<size_t>(length));DocumentDetail::Check(xy_vsfilter_region_read_v1(id_,bytes.data(),bytes.size()));
+    const uint64_t count=DocumentDetail::Load(bytes,4,8);DocumentDetail::Shape(count<=(SIZE_MAX-12)/16&&12+16*count==length);
+    RegionSnapshot out;out.mWideBorder=DocumentDetail::I32(DocumentDetail::Load(bytes,0,4));out.mWideOutline.reserve(static_cast<size_t>(count));
+    for(size_t i=0;i<count;++i)out.mWideOutline.emplace_back(DocumentDetail::Load(bytes,12+16*i,8),DocumentDetail::Load(bytes,20+16*i,8));return out;
 }
 ScanOwner::ScanOwner(){std::array<uint8_t,8> out;DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_scan_create_v1(out.data());}));id_=DocumentDetail::Load(out,0,8);}
 ScanOwner::~ScanOwner(){DocumentDetail::Release(DocumentDetail::Invoke([&](){return xy_vsfilter_scan_destroy_v1(id_);}));}

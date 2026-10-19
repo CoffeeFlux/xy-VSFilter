@@ -150,6 +150,9 @@ public:
     ~WidenRegionCreaterImpl();
 
     void xy_overlap_region(SpanBuffer* dst, const SpanBuffer& src, int rx, int ry);
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    uint32_t Numeric(uint32_t op,uint64_t a,uint64_t b,uint8_t* output);
+#endif
 private:
     //return <ry if arc(o)<inner_pl, >ry if arc(0)>inner_pl, else cross_line exists
     int cross_left(const LinkArc& arc, XY_POINT center);
@@ -202,6 +205,38 @@ WidenRegionCreaterImpl::~WidenRegionCreaterImpl()
 {
     delete m_ellipse;
 }
+
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+// Transitional scalar arithmetic boundary. No span, list, queue or Rust owner
+// address enters this cache. The outer native gate serializes every call, and
+// all C++ exceptions are converted to status before returning to Rust.
+uint32_t WidenRegionCreaterImpl::Numeric(uint32_t op,uint64_t a,uint64_t b,uint8_t* output)
+{
+    try {
+        int value=0;
+        if(op==0) {
+            const int rx=static_cast<int>(a),ry=static_cast<int>(b);
+            if(m_ellipse!=NULL&&(m_ellipse->m_rx!=rx||m_ellipse->m_ry!=ry)){delete m_ellipse;m_ellipse=NULL;}
+            if(m_ellipse==NULL){m_ellipse=DEBUG_NEW XyEllipse();if(m_ellipse==NULL)return 5;if(m_ellipse->init(rx,ry)<0)return 6;}
+        } else {
+            if(m_ellipse==NULL)return 6;
+            switch(op){
+            case 1:value=m_ellipse->cross_left(a,b);break;
+            case 2:value=m_ellipse->cross_right(a,b);break;
+            case 3:value=m_ellipse->get_left_arc_x(a,static_cast<int>(b));break;
+            case 4:value=m_ellipse->get_right_arc_x(a,static_cast<int>(b));break;
+            default:return 3;
+            }
+        }
+        memcpy(output,&value,4);return 0;
+    }catch(const std::bad_alloc&){return 5;}catch(...){return 6;}
+}
+extern "C" uint32_t __cdecl xy_rust_widen_numeric(uint32_t op,uint64_t a,uint64_t b,uint8_t* output)
+{
+    static WidenRegionCreaterImpl numeric;
+    return numeric.Numeric(op,a,b,output);
+}
+#endif
 
 void WidenRegionCreaterImpl::xy_overlap_region(SpanBuffer* dst, const SpanBuffer& src, int rx, int ry)
 {
