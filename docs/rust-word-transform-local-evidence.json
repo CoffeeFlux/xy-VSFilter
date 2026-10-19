@@ -1,0 +1,668 @@
+{
+  "schema": 1,
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "candidate_implementation_commit": "d03d00bc9cf39fab80e6cb045e845be1b55c8ae5",
+  "probe_fix_commit": "309049cd989c9a132730486aa9934add41ad31fc",
+  "status": "Experimental CWord transform checkpoint; full-library migration remains active",
+  "architectures": {
+    "x86": {
+      "native": {
+        "path_data_native": {
+          "path": "artifacts/word-transform-path_data_native-x86/report.json",
+          "sha256": "e280116c9e8ee05a1f4f5e4ee16500b93e28f39f0a2a9b4c0ec4d6920f0f14a0",
+          "candidate_commit": "d03d00bc9cf39fab80e6cb045e845be1b55c8ae5",
+          "cases": 39,
+          "trace_lines": 171,
+          "trace_sha256": [
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2"
+          ],
+          "binary_sha256": {
+            "reference": "aa4f969b53c5448647f6c0635a267296a79e967c05c75b1dbbb1992f9bde7c22",
+            "candidate": "707dea055a89c9e1b0e341389c154db866d7e5a66e9f26225d0460f9d473e5f9"
+          }
+        },
+        "text_measure_raw": {
+          "path": "artifacts/word-transform-text_measure_raw-x86/report.json",
+          "sha256": "5b89cd5ca92571a976e1e172a97f284290f95d9726106b559eeefe7880d8f6c3",
+          "candidate_commit": "d03d00bc9cf39fab80e6cb045e845be1b55c8ae5",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd",
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd",
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd",
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd"
+          ],
+          "binary_sha256": {
+            "reference": "5d0b4de3ae674781325c80893f83da7c5b764f99b8d0ee344e768de1f431ecd4",
+            "candidate": "19762d4d718d506ddcf680930dd57a7ef58c026d54e3d2021495187d0f761ec8"
+          }
+        },
+        "text_measure_construction": {
+          "path": "artifacts/word-transform-text_measure_construction-x86/report.json",
+          "sha256": "37399364edddea91bc87639427c7bd2d1b0a6b49010c42acd0df66917b06c26d",
+          "candidate_commit": "d03d00bc9cf39fab80e6cb045e845be1b55c8ae5",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893",
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893",
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893",
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893"
+          ],
+          "binary_sha256": {
+            "reference": "ee0c825fe35664991260cd7c56ad5740de67001efe4861d014d876056bdca4ee",
+            "candidate": "acf2141a539d8f2e7d1c348165969f72b8acef348d4fc249f896e1defac5f20c"
+          }
+        },
+        "renderer_dc_text_native": {
+          "path": "artifacts/word-transform-renderer_dc_text_native-x86/report.json",
+          "sha256": "708c7ee2d20a0265ab30a0d3aa49525b5843596ae17682e75f123f6695011913",
+          "candidate_commit": "d03d00bc9cf39fab80e6cb045e845be1b55c8ae5",
+          "cases": 40,
+          "trace_lines": 598,
+          "trace_sha256": [
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330"
+          ],
+          "binary_sha256": {
+            "reference": "f2b7be7f25550d54f690a3f0e327a7f10ab76734914b93111260c50ee78d6b25",
+            "candidate": "b42cb8149eb8446bdb372bd22441689055c642c32e6f78f1a9a1762da9e27e82"
+          }
+        },
+        "renderer_dc_native": {
+          "path": "artifacts/word-transform-renderer_dc_native-x86/report.json",
+          "sha256": "18e9eb0077fb4cbbe09f04c5fa42865cb357e0cf89a6c152d7e0557747e5c126",
+          "candidate_commit": "d03d00bc9cf39fab80e6cb045e845be1b55c8ae5",
+          "cases": 6,
+          "trace_lines": 116,
+          "trace_sha256": [
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983"
+          ],
+          "binary_sha256": {
+            "reference": "144d975b3cc5dafc4ed531f187051316d200721e842e394454ee9e9bf2642c2a",
+            "candidate": "4a5aa9605690bc615f630623aca8c0d26cdabc2fc2a7cb2f69693b6def97e64b"
+          }
+        },
+        "font_native": {
+          "path": "artifacts/word-transform-font_native-x86/report.json",
+          "sha256": "bf7bdfdc6912446dc66e56a924cca05305f6e7c73c94b8b43f8eb34931c88342",
+          "candidate_commit": "d03d00bc9cf39fab80e6cb045e845be1b55c8ae5",
+          "cases": 195,
+          "trace_lines": 392,
+          "trace_sha256": [
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f",
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f",
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f",
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f"
+          ],
+          "binary_sha256": {
+            "reference": "4d51c817c1b3016635836cd382fb53c096a1b2e5172558ee98769790a299d672",
+            "candidate": "a05f68399aba0c295a7084d41668063044952208895bf9514c55af21f2e548aa"
+          }
+        },
+        "font_gdi_calls": {
+          "path": "artifacts/word-transform-font_gdi_calls-x86/report.json",
+          "sha256": "5c11052d9b5cd692afaba60d36ebfdb0b368159d2b484e6f98737ab08eb4a553",
+          "candidate_commit": "d03d00bc9cf39fab80e6cb045e845be1b55c8ae5",
+          "cases": 12,
+          "trace_lines": 126,
+          "trace_sha256": [
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5",
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5",
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5",
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5"
+          ],
+          "binary_sha256": {
+            "reference": "b9215912bd1437dcd7bb7277ea837504ffd2eff18c9ac9cdf77b8856a237f5fb",
+            "candidate": "a07da8e4fc8415bab896cc8ce7ebccd4d1bfa9895ce1a49413dc79f8c12a00f9"
+          }
+        },
+        "word_transform": {
+          "path": "artifacts/word-transform-verified-x86/report.json",
+          "sha256": "c44d63ace55bef8e230bab0f1cd0e1d2fd7086456a86fe517697e6dcf20e152b",
+          "candidate_commit": "309049cd989c9a132730486aa9934add41ad31fc",
+          "cases": 4560,
+          "trace_lines": 9122,
+          "trace_sha256": [
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd"
+          ],
+          "binary_sha256": {
+            "reference": "754e60a11de3897350f3a23ecfa454743b78826ba314c85ad762b4baf11aaa95",
+            "candidate": "958dcc345777977d776f65d3f24b537831eb35a12c06341b78858478513d61b4"
+          }
+        }
+      },
+      "rendering": {
+        "path": "artifacts/word-transform-csri-x86/summary.json",
+        "sha256": "d15864d132198cc1bef1d6268316ad05e22b1c45267ac163ef0e1469c591c22c",
+        "original_manifest_sha256": "2949bb98bfbc49bd3496af90ef9a8b3b386395637ff34bc54b0fc4e86fe61363",
+        "partition_exact": true,
+        "cases": 1222,
+        "frames": 13186,
+        "shard_results": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            7,
+            0
+          ]
+        ],
+        "complete": true,
+        "candidate_dll": {
+          "path": "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\bin\\lib_17.0\\Win32\\Release\\VSFilter.dll",
+          "sha256": "a940102089929c140eee09e32ba88d2414843cb2d34383a9df99d2f9494bd0fd"
+        },
+        "reference_source": {
+          "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+          "repository": "https://github.com/CoffeeFlux/xy-VSFilter"
+        },
+        "distinct_controls": 192,
+        "stable_equal_cases": 1222,
+        "stable_equal_frames": 13186,
+        "unresolved_cases": []
+      },
+      "contracts": {
+        "path": "artifacts/word-transform-contracts-x86.log",
+        "sha256": "445a1347a43a8f59ccc7dfd18b9c878b4d225eeaaf4cc2cee89c7ff109d43161"
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "path": "bin/lib_17.0/Win32/Release/VSFilter.dll",
+          "sha256": "a940102089929c140eee09e32ba88d2414843cb2d34383a9df99d2f9494bd0fd"
+        },
+        "XySubFilter.dll": {
+          "path": "bin/lib_17.0/Win32/Release/XySubFilter.dll",
+          "sha256": "d9b78c339daffc6f177401ec9c39d5a3cd38e218a93385645c490ff3908ccf86"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "path": "bin/lib_17.0/Win32/Release/xy_sub_filter_consumer.dll",
+          "sha256": "590131f66eeb079f3626cf7c456152677ae2e04f80b7e9247aea116f06102783"
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/word-transform-build-x86.log",
+          "sha256": "04ee6b9f871c58b5002c455b4755d5f7be81a45e7ca9b6c1cd51ddb29f5203c6"
+        },
+        {
+          "path": "artifacts/word-transform-build-rust-x86.log",
+          "sha256": "398290e169125144cc091168a2ba157f3515924dc96bb701b5931d0638f62d72"
+        }
+      ],
+      "failed_probe_build": {
+        "path": "artifacts/word-transform-word_transform_native-x86/report.json",
+        "sha256": "ed847933b86ea9250d6869eb13f1ebc3f074f7503cc927139997e0bf2e96f4f9",
+        "result": "Expanded observer failed to compile because a local PRNG variable shadowed the path-seeding helper. This is a harness build failure, not a comparison. Fixed probe verified separately."
+      },
+      "production_library_hashes_unchanged_after_probe_only_fix": true
+    },
+    "x64": {
+      "native": {
+        "path_data_native": {
+          "path": "artifacts/word-transform-path_data_native-x64/report.json",
+          "sha256": "bda01cad407ae3ccc17685d51728a85a96f3416a8d4bf28fc009330047585237",
+          "candidate_commit": "d03d00bc9cf39fab80e6cb045e845be1b55c8ae5",
+          "cases": 39,
+          "trace_lines": 171,
+          "trace_sha256": [
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031"
+          ],
+          "binary_sha256": {
+            "reference": "4428ddfa379ace24848bc758589c07a462aaf57a2d67deabfa2106347b4ab965",
+            "candidate": "5a20caea2ffe94d813725ea0967973c691f5d05d5dc0d80bbf2a6aa012ec8ea9"
+          }
+        },
+        "text_measure_raw": {
+          "path": "artifacts/word-transform-text_measure_raw-x64/report.json",
+          "sha256": "2b97a2dba4175ca8f08eda18a5b6bae2b1f1cd79926c4173e4f9d3be991cd484",
+          "candidate_commit": "d03d00bc9cf39fab80e6cb045e845be1b55c8ae5",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054",
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054",
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054",
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054"
+          ],
+          "binary_sha256": {
+            "reference": "18ba7e160a7f14658d7b2132ab82ce331db5fa2bc3af8d1671e25c157eadd491",
+            "candidate": "ffc1d8330484354110a3931537789acf271be4607e21fc02b687756db59bf922"
+          }
+        },
+        "text_measure_construction": {
+          "path": "artifacts/word-transform-text_measure_construction-x64/report.json",
+          "sha256": "ebfb790218d0b9b0af74f28046d774aff6c6bdbc1b7e0d90e83452b25f42950f",
+          "candidate_commit": "d03d00bc9cf39fab80e6cb045e845be1b55c8ae5",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3",
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3",
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3",
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3"
+          ],
+          "binary_sha256": {
+            "reference": "106486d99ee9ba8aed3d820ef0701ca18ef1639e3f265a34ceec0270c828176a",
+            "candidate": "d65a261beaae9376a09b9439fa19213831cfc432943e72029397b7136d0b37e8"
+          }
+        },
+        "renderer_dc_text_native": {
+          "path": "artifacts/word-transform-renderer_dc_text_native-x64/report.json",
+          "sha256": "926ab9dcb60f99a65f2b24a8f3e9a62487bf57ad252d8f325c03689235f3276d",
+          "candidate_commit": "d03d00bc9cf39fab80e6cb045e845be1b55c8ae5",
+          "cases": 40,
+          "trace_lines": 598,
+          "trace_sha256": [
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac"
+          ],
+          "binary_sha256": {
+            "reference": "80c5e655853675444d9549a09a5ef83e450004c262bec419c7beec304a3bb2cb",
+            "candidate": "7142c1b6f683f7be232aa4861c73658e07adb345b3a9e994a709f059592022a5"
+          }
+        },
+        "renderer_dc_native": {
+          "path": "artifacts/word-transform-renderer_dc_native-x64/report.json",
+          "sha256": "9e0a2aa391ef654669e7db753f47d8858f504030b9c9b682260427c93d91f697",
+          "candidate_commit": "d03d00bc9cf39fab80e6cb045e845be1b55c8ae5",
+          "cases": 6,
+          "trace_lines": 116,
+          "trace_sha256": [
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd"
+          ],
+          "binary_sha256": {
+            "reference": "eef970865fd67a04113a0f43e6469c15adad6303b1f0b92eaf562a86380d0228",
+            "candidate": "8e20a65cfd17cadb4b1bf4afd8459eddd897af758ba18b24efb1283ded62c7af"
+          }
+        },
+        "font_native": {
+          "path": "artifacts/word-transform-font_native-x64/report.json",
+          "sha256": "ce5bbf0b6db5f1351070e3b261034b1ca435af966de356b3705333ba2f5c848e",
+          "candidate_commit": "d03d00bc9cf39fab80e6cb045e845be1b55c8ae5",
+          "cases": 195,
+          "trace_lines": 392,
+          "trace_sha256": [
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7",
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7",
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7",
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7"
+          ],
+          "binary_sha256": {
+            "reference": "fa794288d82912fbd76856a183f88db6fd5b96726259bd755a5d7c0c5889f279",
+            "candidate": "6b352709e360478af9c090c71cbcc64c32ca14f20f8c08a2cd83980cf7202e9a"
+          }
+        },
+        "font_gdi_calls": {
+          "path": "artifacts/word-transform-font_gdi_calls-x64/report.json",
+          "sha256": "65b4df8b3fad564fb434a9d13c8f7adde499205b76258f48a000572c5bc70d91",
+          "candidate_commit": "d03d00bc9cf39fab80e6cb045e845be1b55c8ae5",
+          "cases": 12,
+          "trace_lines": 126,
+          "trace_sha256": [
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93",
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93",
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93",
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93"
+          ],
+          "binary_sha256": {
+            "reference": "060432ec1732e8b27554b39aeabc7455e981eca199af804ad505a1882fd43efc",
+            "candidate": "c7c9f992efd1d254e591eda3eae4606ae6919157396d7324f7839c023f61d261"
+          }
+        },
+        "word_transform": {
+          "path": "artifacts/word-transform-verified-x64/report.json",
+          "sha256": "cda150e96b8d95ecf734182c8d7f520521b52d9ff645c8144b71ad8caaf89836",
+          "candidate_commit": "309049cd989c9a132730486aa9934add41ad31fc",
+          "cases": 4560,
+          "trace_lines": 9122,
+          "trace_sha256": [
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b"
+          ],
+          "binary_sha256": {
+            "reference": "cfce16ba0f1cc7f55dabfd68b719420cf8c80bd7308a4b4508d23393ff741016",
+            "candidate": "b141966267df66e8513e230f7869400f828dd286649c6959c52ab39f88154086"
+          }
+        }
+      },
+      "rendering": {
+        "path": "artifacts/word-transform-csri-x64/summary.json",
+        "sha256": "50b1673e3938a7b445aa5ba18ffb1c997ec58fa3da115610a226bef0cdfb6b01",
+        "original_manifest_sha256": "2949bb98bfbc49bd3496af90ef9a8b3b386395637ff34bc54b0fc4e86fe61363",
+        "partition_exact": true,
+        "cases": 1222,
+        "frames": 13186,
+        "shard_results": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            7,
+            0
+          ]
+        ],
+        "complete": false,
+        "candidate_dll": {
+          "path": "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\bin\\lib_17.0\\x64\\Release\\VSFilter.dll",
+          "sha256": "8ba4e079d25f6a99e8bf1a6ef85e6ebad7789045539b9e0bbece21a9fbc0323f"
+        },
+        "reference_source": {
+          "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+          "repository": "https://github.com/CoffeeFlux/xy-VSFilter"
+        },
+        "distinct_controls": 192,
+        "stable_equal_cases": 1221,
+        "stable_equal_frames": 13180,
+        "unresolved_cases": [
+          {
+            "candidate_status": "ok",
+            "directory": "case-00021",
+            "id": "field-unicode-style-space-file",
+            "reference_status": "crash",
+            "verdict": {
+              "kind": "unresolved_reference",
+              "repeat_results": [
+                {
+                  "kind": "unresolved",
+                  "left": "crash",
+                  "right": "ok"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "contracts": {
+        "path": "artifacts/word-transform-contracts-x64.log",
+        "sha256": "445a1347a43a8f59ccc7dfd18b9c878b4d225eeaaf4cc2cee89c7ff109d43161"
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "path": "bin/lib_17.0/x64/Release/VSFilter.dll",
+          "sha256": "8ba4e079d25f6a99e8bf1a6ef85e6ebad7789045539b9e0bbece21a9fbc0323f"
+        },
+        "XySubFilter.dll": {
+          "path": "bin/lib_17.0/x64/Release/XySubFilter.dll",
+          "sha256": "31f055c571f07022a0b24be0489128b3d8a9d9a21e865255539e8c6827490c9c"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "path": "bin/lib_17.0/x64/Release/xy_sub_filter_consumer.dll",
+          "sha256": "0a6a3301045f718efe729c2db6599d95169ce5731bc3932963f64df59c202441"
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/word-transform-build-x64.log",
+          "sha256": "973e03182ca6f35c3b6471f147574271cb0b95dd78764246994bd42a991fe6df"
+        },
+        {
+          "path": "artifacts/word-transform-build-rust-x64.log",
+          "sha256": "31cc526c428a65789c5d6cec194ac6136c5d429904aa93b6e117732c9a5ffc5e"
+        }
+      ],
+      "failed_probe_build": {
+        "path": "artifacts/word-transform-word_transform_native-x64/report.json",
+        "sha256": "9ccb3497aad8fa7b395204626b04fc022b7fa077864910e0232301767bad5332",
+        "result": "Expanded observer failed to compile because a local PRNG variable shadowed the path-seeding helper. This is a harness build failure, not a comparison. Fixed probe verified separately."
+      },
+      "production_library_hashes_unchanged_after_probe_only_fix": true
+    }
+  },
+  "checks": {
+    "path": "artifacts/word-transform-checks.log",
+    "sha256": "47bd51ebd39535fd25bba34e4a169880d079fa850f497f317542927e5e034473",
+    "core_per_architecture": 357,
+    "ffi_per_architecture": 140,
+    "python": 200,
+    "python_skipped": 1,
+    "fmt": true,
+    "clippy_both_architectures_and_native_runtime": true
+  },
+  "unsafe_inventory": {
+    "path": "artifacts/word-transform-unsafe-inventory.json",
+    "sha256": "0b997d91bb3520804f60a87cf20ee82694d891f49e097d59c7b0c27c3773cbb3"
+  },
+  "unresolved_reference": {
+    "id": "field-unicode-style-space-file",
+    "architecture": "x64",
+    "first_result": {
+      "dialogs": [
+        {
+          "class": "#32770",
+          "controls": [
+            {
+              "class": "Button",
+              "id": 1,
+              "style": 1342373889,
+              "text": "OK"
+            },
+            {
+              "class": "Button",
+              "id": 2,
+              "style": 1342242816,
+              "text": "Cancel"
+            },
+            {
+              "class": "Static",
+              "id": 20,
+              "style": 1342308355,
+              "text": null
+            },
+            {
+              "class": "Static",
+              "id": 65535,
+              "style": 1342316672,
+              "text": "Unknown style found: \"\u2003Default\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."
+            }
+          ],
+          "response": "cancel",
+          "title": "Warning"
+        }
+      ],
+      "last_progress": {
+        "stage": "complete"
+      },
+      "returncode": 3221225477,
+      "status": "crash"
+    },
+    "original_result": {
+      "path": "artifacts/word-transform-csri-x64/shard-2/case-00021/reference-0/result.json",
+      "sha256": "334a2532192279c55731ea7c7e3bd0c34ee908a7bebadd0ef64d75da4c81eb13"
+    },
+    "original_manifest": {
+      "path": "artifacts/word-transform-csri-x64/shard-2/case-00021/case.json",
+      "sha256": "6298a626cd5b687f0eb49430146aa31eb77db4da2f6ba88a49d8c61c13a04ad9"
+    },
+    "follow_up": {
+      "path": "artifacts/word-transform-reference-recheck-x64/report.json",
+      "sha256": "a87acda89e8dd997682579bb171a4d4194b9c8be1104aa476c80bf779b3820c3"
+    },
+    "follow_up_reference_repeats": 10,
+    "classification": "Original exit access violation remains unresolved; subsequent stable captures do not erase it. No whole-corpus x64 pass claimed.",
+    "rendered_frames": [
+      {
+        "reference-0": {
+          "path": "artifacts/word-transform-csri-x64/shard-2/case-00021/reference-0/frame-00000.bin",
+          "sha256": "3c5d7ae2515ee7392324c9390202f383dafdd21d4c1067ce0f10d9d57edbf509"
+        },
+        "reference-1": {
+          "path": "artifacts/word-transform-csri-x64/shard-2/case-00021/reference-1/frame-00000.bin",
+          "sha256": "3c5d7ae2515ee7392324c9390202f383dafdd21d4c1067ce0f10d9d57edbf509"
+        },
+        "candidate": {
+          "path": "artifacts/word-transform-csri-x64/shard-2/case-00021/candidate/frame-00000.bin",
+          "sha256": "3c5d7ae2515ee7392324c9390202f383dafdd21d4c1067ce0f10d9d57edbf509"
+        }
+      },
+      {
+        "reference-0": {
+          "path": "artifacts/word-transform-csri-x64/shard-2/case-00021/reference-0/frame-00001.bin",
+          "sha256": "30b3a667610b311784edadf376b883d3cd2c4ae7a573f5c3d175b7483227bf3e"
+        },
+        "reference-1": {
+          "path": "artifacts/word-transform-csri-x64/shard-2/case-00021/reference-1/frame-00001.bin",
+          "sha256": "30b3a667610b311784edadf376b883d3cd2c4ae7a573f5c3d175b7483227bf3e"
+        },
+        "candidate": {
+          "path": "artifacts/word-transform-csri-x64/shard-2/case-00021/candidate/frame-00001.bin",
+          "sha256": "30b3a667610b311784edadf376b883d3cd2c4ae7a573f5c3d175b7483227bf3e"
+        }
+      },
+      {
+        "reference-0": {
+          "path": "artifacts/word-transform-csri-x64/shard-2/case-00021/reference-0/frame-00002.bin",
+          "sha256": "30b3a667610b311784edadf376b883d3cd2c4ae7a573f5c3d175b7483227bf3e"
+        },
+        "reference-1": {
+          "path": "artifacts/word-transform-csri-x64/shard-2/case-00021/reference-1/frame-00002.bin",
+          "sha256": "30b3a667610b311784edadf376b883d3cd2c4ae7a573f5c3d175b7483227bf3e"
+        },
+        "candidate": {
+          "path": "artifacts/word-transform-csri-x64/shard-2/case-00021/candidate/frame-00002.bin",
+          "sha256": "30b3a667610b311784edadf376b883d3cd2c4ae7a573f5c3d175b7483227bf3e"
+        }
+      },
+      {
+        "reference-0": {
+          "path": "artifacts/word-transform-csri-x64/shard-2/case-00021/reference-0/frame-00003.bin",
+          "sha256": "30b3a667610b311784edadf376b883d3cd2c4ae7a573f5c3d175b7483227bf3e"
+        },
+        "reference-1": {
+          "path": "artifacts/word-transform-csri-x64/shard-2/case-00021/reference-1/frame-00003.bin",
+          "sha256": "30b3a667610b311784edadf376b883d3cd2c4ae7a573f5c3d175b7483227bf3e"
+        },
+        "candidate": {
+          "path": "artifacts/word-transform-csri-x64/shard-2/case-00021/candidate/frame-00003.bin",
+          "sha256": "30b3a667610b311784edadf376b883d3cd2c4ae7a573f5c3d175b7483227bf3e"
+        }
+      },
+      {
+        "reference-0": {
+          "path": "artifacts/word-transform-csri-x64/shard-2/case-00021/reference-0/frame-00004.bin",
+          "sha256": "3c5d7ae2515ee7392324c9390202f383dafdd21d4c1067ce0f10d9d57edbf509"
+        },
+        "reference-1": {
+          "path": "artifacts/word-transform-csri-x64/shard-2/case-00021/reference-1/frame-00004.bin",
+          "sha256": "3c5d7ae2515ee7392324c9390202f383dafdd21d4c1067ce0f10d9d57edbf509"
+        },
+        "candidate": {
+          "path": "artifacts/word-transform-csri-x64/shard-2/case-00021/candidate/frame-00004.bin",
+          "sha256": "3c5d7ae2515ee7392324c9390202f383dafdd21d4c1067ce0f10d9d57edbf509"
+        }
+      },
+      {
+        "reference-0": {
+          "path": "artifacts/word-transform-csri-x64/shard-2/case-00021/reference-0/frame-00005.bin",
+          "sha256": "30b3a667610b311784edadf376b883d3cd2c4ae7a573f5c3d175b7483227bf3e"
+        },
+        "reference-1": {
+          "path": "artifacts/word-transform-csri-x64/shard-2/case-00021/reference-1/frame-00005.bin",
+          "sha256": "30b3a667610b311784edadf376b883d3cd2c4ae7a573f5c3d175b7483227bf3e"
+        },
+        "candidate": {
+          "path": "artifacts/word-transform-csri-x64/shard-2/case-00021/candidate/frame-00005.bin",
+          "sha256": "30b3a667610b311784edadf376b883d3cd2c4ae7a573f5c3d175b7483227bf3e"
+        }
+      }
+    ]
+  },
+  "initial_unit_build_failure": {
+    "path": "artifacts/word-transform-checks-initial.log",
+    "sha256": "ed7789605aa96ef636d926b32554110e51a2cf71b238791e9c2254205aaa0810",
+    "result": "New no_std core test lacked alloc::vec::Vec import; fixed before final checks."
+  },
+  "limitations": [
+    "Finite Release/default Windows floating-control observations; unmasked exceptions, Debug and other FP control modes remain unaudited.",
+    "The x64 cleanup reference had one post-completion access violation in field-unicode-style-space-file. Captured pixels and ten follow-up repeats match, but the original reference outcome remains unresolved.",
+    "Numeric assembly operates on one initialized fixed-size local buffer only; native CRT cos/sin and x86 conversion remain scalar Windows arithmetic dependencies.",
+    "No allocation failure or arbitrary host concurrency/reentry closure. Private raw packet ABI calls require valid caller spans.",
+    "Scan conversion, polygon preparation, word/line/subtitle graphs, host adapters and vendors remain in scope. No production default switched."
+  ],
+  "sources": {
+    "rust/compat/src/word_transform.rs": "111df5883cbf90b33de2141377b8bcec1409813a8c0a33350d8d045fec44a7d9",
+    "rust/ffi/src/windows_word_transform.rs": "f3e76013f6f627d8411eb629e70a14cde08ee7ef72bd332d176010998d8a84c9",
+    "rust/ffi/src/path_data.rs": "cbdb50f63b98925c3ed8378b5b617e1c2acbac2223c46dc3ef3592c8dc552e03",
+    "include/xy_rust_path_data.h": "f7e921754e465203360877b3760acd4816215c392d19c50fb32053bc69be015d",
+    "src/subtitles/RustPathData.inl": "71f969d94fc9bb67b59304f87cc51c86b1954d6e6a4c7437298c9066f091d3bf",
+    "src/subtitles/Rasterizer.h": "35263130e31b03550a2c156468307b5ca0695f11b5ff1b70183572976dfcf099",
+    "src/subtitles/RTS.cpp": "99ae1dfb7a73c86ec94b08a9c0d005e5f1b198c335e8100e0a62ca75d8c992fb",
+    "tools/compat/word_transform_native.cpp": "4e70d158c24e855c1c35e31470035feec41c11cb584d79a037ad071d3f973d81",
+    "tools/compat/word_transform_native.py": "b11757e0055bf6b93ef7f64fccc935466799cee291bf7b0bb573f422aadad878",
+    "tools/compat/test_word_transform_native.py": "525066df98eb5d886a1ce64d2b283d9aaac1596e3081ef0bdfdc6499d7090774",
+    "test/compat/word-transform/provenance.json": "7a04141990de6eac5c5b9bca6c99c0a8e15f5ae2a1228eebe414bb160b06bb06",
+    "docs/rust-word-transform-boundary.md": "e228b0aeba4bb25242dbf516123f643f522d481b663abeaa0554faf7a51f722a"
+  }
+}

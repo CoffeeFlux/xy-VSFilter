@@ -27,7 +27,64 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest port: persistent path ownership and text-path control (2026-10-19)
+## Latest port: word transforms over Rust-owned paths (2026-10-19)
+
+Implementation `d03d00bc` moves CWord::Transform into Rust under the existing
+experimental renderer flag. C++ sends only nine raw floating bit patterns, two
+origin coordinates and the rounding flag. The checked path registry admits the
+operation, safe Rust iterates its owned points, and wrapping pixel rounding runs
+in the core. No path snapshot, path-buffer pointer or mutable Rust loan crosses
+this transform boundary. Point types remain unchanged.
+
+The arithmetic is architecture-specific because the cleanup reference's x86
+compiler uses x87 extended intermediates and f64 spills, while x64 uses SSE2 and
+CRT trigonometry. In particular, the first x86 point uses retained extended z22;
+later points reload its f64 spill. Fixed-size assembly kernels in the Rust
+boundary preserve these instructions, operand order, integer overflow results
+and floating side effects. They touch only a local initialized 768-byte array;
+all path indexing and ownership stay in safe Rust. Scalar Windows CRT arithmetic
+remains an external dependency. See the [boundary audit](rust-word-transform-boundary.md)
+and [reference disassembly provenance](../test/compat/word-transform/provenance.json).
+
+The maintained direct probe passes 4,560 cases / 9,122 trace lines on each
+architecture, twice per role: raw and mixed scale/rotation/shear values, special
+floating patterns, sticky exceptions, origin limits, both pixel-rounding flags and
+empty/nonempty paths. It compares exact points/types/hashes, x87/SSE exception
+state, errno and LastError against cleanup `67da07cd`. An initial expanded-probe
+compile failure was corrected in `309049cd` by renaming the local PRNG
+variable that shadowed the path-seeding helper. That was a harness failure,
+not parity evidence.
+Production library hashes are unchanged across that probe-only correction.
+
+Both architectures also pass the PathData, raw/construction text-measurement,
+real-GDI text/path, DC and font regressions. All three DLLs build with matching
+exports and dependencies; ten COM cases and two controls pass per architecture.
+x86 matches 1,222 rendering cases / 13,186 frames exactly; x64 has 1,221 stable
+equal cases / 13,180 frames and one unresolved reference outcome. All 192
+distinct-frame controls pass per architecture. Rust passes 357 core and 140 FFI
+tests per architecture, formatting and Clippy; Python passes 200 tests with one skip.
+The core remains free of unsafe code. The inventory now records 571 production
+unsafe blocks, 407 unsafe functions, four unsafe Sync implementations and 18
+assembly sites in the FFI crate; counts are inventory, not a safety proof.
+Detailed provenance and limitations are in
+[the local evidence](rust-word-transform-local-evidence.json).
+
+The unresolved x64 case is `field-unicode-style-space-file`: cleanup reference
+repeat zero exited with access violation `0xc0000005` after its progress record
+reached `complete`; repeat one and the candidate completed. Its six captured
+frames are byte-identical, and a separate ten-reference-repeat follow-up passes.
+The original crash remains unresolved and is not counted as parity. No overall
+x64 corpus pass is claimed. The failure record, hashes and follow-up provenance
+are retained in the evidence; this is not a reason to emulate memory corruption.
+
+This remains a migration checkpoint. The experimental flag stays opt-in.
+Scan conversion and curve evaluation, polygon preparation, word/line/subtitle
+graphs, all host adapters and vendors remain in scope. Other floating-control
+modes, Debug behavior, allocation failure and arbitrary host concurrency remain
+unclosed. The next geometry boundary is native line/curve evaluation and scan
+conversion over the already Rust-owned path and edge storage.
+
+## Earlier port: persistent path ownership and text-path control (2026-10-19)
 
 Implementation `815dc601` moves persistent PathData points/types into the safe
 Rust core. Experimental C++ PathData now owns a checked integer ID rather than
