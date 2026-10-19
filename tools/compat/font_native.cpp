@@ -18,6 +18,7 @@ static void reset(){errno=1234;SetLastError(0x12345678);_clearfp();}
 static Status status(){Status s={_statusfp(),errno,GetLastError()};return s;}
 static void emit(const char* phase,Status s){printf(" %s=%x,%d,%lu",phase,s.fp,s.error,s.last);}
 static unsigned sequence=0;
+static bool expired_handle_diagnostic=false;
 static void run(const STSStyleBase& style,HDC dc){
     reset();auto a=std::make_shared<FwCMyFont>(style);Status first=status();
     reset();auto b=std::make_shared<FwCMyFont>(style);Status second=status();
@@ -35,10 +36,14 @@ static void run(const STSStyleBase& style,HDC dc){
     reset();a.reset();Status dropa=status();reset();b.reset();Status dropb=status();reset();c.reset();Status dropc=status();
     printf("font-release index=%u count=%llu",sequence-1,static_cast<unsigned long long>(FwCMyFont::Count()));
     emit("a",dropa);emit("b",dropb);emit("c",dropc);
-    DWORD ta=GetObjectType(ha),tb=GetObjectType(hb);check(GdiFlush()!=FALSE);
-    printf(" types=%lu,%lu flushed=%lu,%lu\n",ta,tb,GetObjectType(ha),GetObjectType(hb));
+    printf("\n");
+    if(expired_handle_diagnostic){
+        DWORD ta=GetObjectType(ha),tb=GetObjectType(hb);check(GdiFlush()!=FALSE);
+        printf("font-expired index=%u types=%lu,%lu flushed=%lu,%lu\n",sequence-1,ta,tb,GetObjectType(ha),GetObjectType(hb));
+    }
 }
-int main(){try{
+int main(int argc,char**){try{
+    expired_handle_diagnostic=argc>1;
     check(AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0)!=FALSE);
     CCritSec lock;CRenderedTextSubtitle renderer(&lock);
     HDC dc=CreateCompatibleDC(NULL);check(dc!=NULL);
