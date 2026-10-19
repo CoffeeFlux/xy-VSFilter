@@ -20,12 +20,17 @@ pub struct Key {
 }
 impl Key {
     pub fn native_eq(&self, other: &Self) -> bool {
+        self.native_eq_with(other, |a, b| a == b)
+    }
+    /// Windows callers can supply the native floating-domain comparison while
+    /// preserving this exact key-field and short-circuit order in safe Rust.
+    pub fn native_eq_with(&self, other: &Self, mut equal: impl FnMut(f64, f64) -> bool) -> bool {
         fn prefix(v: &[u16]) -> &[u16] {
             &v[..v.iter().position(|&x| x == 0).unwrap_or(v.len())]
         }
         self.char_set == other.char_set
             && prefix(&self.font_name) == prefix(&other.font_name)
-            && self.font_size == other.font_size
+            && equal(self.font_size, other.font_size)
             && self.font_weight == other.font_weight
             && self.italic == other.italic
             && self.underline == other.underline

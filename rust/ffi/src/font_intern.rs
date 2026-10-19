@@ -55,7 +55,7 @@ pub unsafe extern "C" fn xy_vsfilter_font_create_v1(
                     // SAFETY: export's exclusive DC loan persists through construction.
                     unsafe { Font::new(k, dc) }
                 },
-                &mut core_font::Key::native_eq,
+                &mut crate::windows_font::key_equal,
             )
             .map_err(core_error)?;
         r.insert_reserved(id, Resource::Font(value));

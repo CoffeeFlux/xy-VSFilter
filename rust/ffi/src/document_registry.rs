@@ -803,7 +803,7 @@ impl Registry {
             #[cfg(windows)]
             Resource::Font(value) => {
                 self.fonts
-                    .release_with(value, &mut xy_vsfilter_compat::font_intern::Key::native_eq);
+                    .release_with(value, &mut crate::windows_font::key_equal);
                 Ok(())
             }
             Resource::Rectangle(value) => {
