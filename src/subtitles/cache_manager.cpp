@@ -239,7 +239,13 @@ ULONG OverlayKey::UpdateHashValue()
 {
     m_hash_value = __super::UpdateHashValue();
     m_hash_value += (m_hash_value<<5);
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    const STSStyle style=m_style.get();
+    UINT blur_bits;memcpy(&blur_bits,&style.fBlur,sizeof blur_bits);
+    m_hash_value += blur_bits;
+#else
     m_hash_value += *(UINT*)(&m_style.get().fBlur);
+#endif
     m_hash_value += (m_hash_value<<5);
     m_hash_value += hash_value(m_style.get().fGaussianBlur);
     return  m_hash_value;

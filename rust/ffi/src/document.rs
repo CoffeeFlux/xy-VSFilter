@@ -41,6 +41,7 @@ fn registry_error(error: RegistryError) -> u32 {
         RegistryError::Busy => BUSY,
         RegistryError::InvalidHandle | RegistryError::TypeMismatch => BAD_HANDLE,
         RegistryError::Exhausted => COUNT_OVERFLOW,
+        RegistryError::Unresolved => UNRESOLVED_REFERENCE,
     }
 }
 fn refusal(error: Refusal) -> u32 {
@@ -9658,6 +9659,7 @@ mod tests {
             crate::ass_tree::test_exports(fresh);
             crate::string_flyweight::test_exports(fresh);
             crate::rect_intern::test_exports(fresh);
+            crate::style_intern::test_exports(fresh);
             #[cfg(windows)]
             crate::ass_override::test_exports(fresh);
             assert_eq!(xy_vsfilter_document_destroy_v1(fresh), OK);

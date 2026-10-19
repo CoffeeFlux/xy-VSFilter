@@ -19,6 +19,7 @@ pub(crate) enum Error {
     InvalidHandle,
     TypeMismatch,
     Exhausted,
+    Unresolved,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -44,6 +45,7 @@ pub(crate) enum Kind {
     AssTree,
     StringValue,
     Rectangle,
+    StyleValue,
 }
 
 // Inline sessions avoid a new fallible box allocation after core ownership transfer.
@@ -51,6 +53,7 @@ pub(crate) enum Kind {
 // only with an explicit preallocated ownership envelope.
 #[allow(clippy::large_enum_variant)]
 pub(crate) enum Resource {
+    StyleValue(alloc::sync::Arc<xy_vsfilter_compat::style_intern::Value>),
     Rectangle(alloc::sync::Arc<xy_vsfilter_compat::rect_intern::Value>),
     StringValue(alloc::sync::Arc<xy_vsfilter_compat::string_flyweight::Value>),
     AssTree(xy_vsfilter_compat::ass_tree::Tree),
@@ -125,6 +128,7 @@ impl Resource {
             Self::AssTree(_) => Kind::AssTree,
             Self::StringValue(_) => Kind::StringValue,
             Self::Rectangle(_) => Kind::Rectangle,
+            Self::StyleValue(_) => Kind::StyleValue,
             Self::Snapshot(_) => Kind::Snapshot,
             Self::UnknownRun { .. } => Kind::UnknownRun,
             Self::StyleAddRun { .. } => Kind::StyleAddRun,
@@ -151,6 +155,7 @@ pub(crate) struct Registry {
     slots: Vec<(Handle, Resource)>,
     pub(crate) strings: xy_vsfilter_compat::string_flyweight::Cache,
     pub(crate) rectangles: xy_vsfilter_compat::rect_intern::Table,
+    pub(crate) styles: xy_vsfilter_compat::style_intern::Table,
 }
 impl Registry {
     const fn new() -> Self {
@@ -159,6 +164,7 @@ impl Registry {
             slots: Vec::new(),
             strings: xy_vsfilter_compat::string_flyweight::Cache::new(),
             rectangles: xy_vsfilter_compat::rect_intern::Table::new(),
+            styles: xy_vsfilter_compat::style_intern::Table::new(),
         }
     }
 
@@ -218,6 +224,16 @@ impl Registry {
     ) -> Result<&xy_vsfilter_compat::rect_intern::Value, Error> {
         match &self.slots[self.position(id)?].1 {
             Resource::Rectangle(value) => Ok(value),
+            _ => Err(Error::TypeMismatch),
+        }
+    }
+
+    pub(crate) fn style_value(
+        &self,
+        id: Handle,
+    ) -> Result<&xy_vsfilter_compat::style_intern::Value, Error> {
+        match &self.slots[self.position(id)?].1 {
+            Resource::StyleValue(value) => Ok(value),
             _ => Err(Error::TypeMismatch),
         }
     }
@@ -756,17 +772,30 @@ impl Registry {
     }
 
     /// Removal transfers ownership; callers perform destruction after unlocking.
-    pub(crate) fn remove(&mut self, id: Handle, kind: Kind) -> Result<Resource, Error> {
+    pub(crate) fn remove(&mut self, id: Handle, kind: Kind) -> Result<Removed, Error> {
         let index = self.position(id)?;
         if self.slots[index].1.kind() != kind {
             return Err(Error::TypeMismatch);
         }
         let resource = self.slots.swap_remove(index).1;
-        if let Resource::Rectangle(value) = &resource {
-            self.rectangles.release(value);
-        }
-        Ok(resource)
+        let result = match &resource {
+            Resource::Rectangle(value) => {
+                self.rectangles.release(value);
+                Ok(())
+            }
+            Resource::StyleValue(value) => self
+                .styles
+                .release(value, &mut self.rectangles)
+                .map_err(|_| Error::Unresolved),
+            _ => Ok(()),
+        };
+        Ok(Removed { resource, result })
     }
+}
+
+pub(crate) struct Removed {
+    resource: Resource,
+    result: Result<(), Error>,
 }
 
 pub(crate) struct Boundary {
@@ -827,10 +856,11 @@ impl Boundary {
     }
 
     pub(crate) fn destroy(&self, id: Handle, kind: Kind) -> Result<(), Error> {
-        let removed = self.try_with(|registry| registry.remove(id, kind))??;
+        let Removed { resource, result } =
+            self.try_with(|registry| registry.remove(id, kind))??;
         // Registry no longer owns this payload; admission has already ended.
-        drop(removed);
-        Ok(())
+        drop(resource);
+        result
     }
 }
 

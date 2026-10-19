@@ -36,6 +36,7 @@ mod runtime;
 mod segment_insert;
 mod segments;
 mod string_flyweight;
+mod style_intern;
 mod subrip;
 mod text_reader;
 mod timeline_search;

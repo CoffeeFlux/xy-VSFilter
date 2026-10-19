@@ -101,7 +101,12 @@ public:
     friend STSStyle& operator <<= (STSStyle& s, const CString& style);
 };
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+#include "xy_rust_style_intern.h"
+typedef XyRust::StyleIntern FwSTSStyle;
+#else
 typedef XyInterned<STSStyle> FwSTSStyle;
+#endif
 
 //for FwSTSStyle
 static inline std::size_t hash_value(const STSStyleBase& s)

@@ -9,6 +9,7 @@ fn error(e: Error) -> u32 {
     match e {
         Error::Busy => 2,
         Error::InvalidHandle | Error::TypeMismatch => 1,
+        Error::Unresolved => 6,
         Error::Exhausted => 5,
     }
 }
