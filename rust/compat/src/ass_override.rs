@@ -402,10 +402,9 @@ impl Evaluation {
                     };
                 }
                 23 => {
-                    // CString comparison stops at NUL; Trim stops scanning at
-                    // NUL but retains the remaining stored code units.
-                    let nul = p.iter().position(|u| *u == 0).unwrap_or(p.len());
-                    if p.is_empty() || p[..nul] == [b'0' as u16] {
+                    // CString's character comparison checks the stored length.
+                    // TrimRight instead scans only up to the first NUL.
+                    if p.is_empty() || p == [b'0' as u16] {
                         current.font_name = original.font_name.clone();
                     } else {
                         current.font_name = p.to_vec();
@@ -683,6 +682,29 @@ mod tests {
         assert!(State::decode(&bytes[..131]).is_none());
         bytes[12] = 2;
         assert!(State::decode(&bytes).is_none());
+    }
+    #[test]
+    fn font_reset_uses_stored_length_and_trim_retains_native_nul_rules() {
+        let mut e = eval();
+        for (tag, expected) in [
+            ("\\fn0\0tail", "0\0tail"),
+            ("\\fn  Arial \0tail", "Arial"),
+            ("\\fn Arial\0tail", "Arial\0tail"),
+            ("\\fn0\0", "0\0"),
+        ] {
+            e.apply(
+                &tree(tag),
+                0,
+                false,
+                &StyleMap::default(),
+                &mut Native::default(),
+            )
+            .unwrap();
+            assert_eq!(
+                e.style.font_name,
+                expected.encode_utf16().collect::<Vec<_>>()
+            );
+        }
     }
     #[test]
     fn animation_threshold_before_start_and_nan_are_observable() {

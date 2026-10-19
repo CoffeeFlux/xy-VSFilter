@@ -1,5 +1,5 @@
 import unittest
-from override_native import INPUTS, CASES, ANIMATIONS, RELATIVES, compare, validate
+from override_native import INPUTS, CASES, ANIMATIONS, RELATIVES, RAWFONTS, compare, validate
 
 class OverrideTraceControls(unittest.TestCase):
     def trace(self):
@@ -12,7 +12,9 @@ class OverrideTraceControls(unittest.TestCase):
             lines.append(f'animation index={index} seed={index//288} animate={index%2} errno=1234 0000000000000000 0000000000000000 0000000000000000'.encode())
         for index in range(RELATIVES):
             lines.append(f'relative index={index} accepted=1 errno=1234 0000000000000000 0000000000000000'.encode())
-        lines.append(f'override-complete cases={CASES} inputs={INPUTS} animations={ANIMATIONS} relatives={RELATIVES}'.encode())
+        for index in range(RAWFONTS):
+            lines.extend([f'rawfont index={index} accepted=1 errno=1234'.encode(),b'style raw'])
+        lines.append(f'override-complete cases={CASES} inputs={INPUTS} animations={ANIMATIONS} relatives={RELATIVES} rawfonts={RAWFONTS}'.encode())
         return b'\n'.join(lines)+b'\n'
     def test_complete_order_architecture_and_repeats_are_required(self):
         good=self.trace();compare([good]*4,64)
