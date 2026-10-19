@@ -4,6 +4,9 @@ use alloc::vec::Vec;
 
 pub struct Row(Vec<[u64; 2]>);
 impl Row {
+    pub fn as_slice(&self) -> &[[u64; 2]] {
+        &self.0
+    }
     pub fn new(mut positions: Vec<i32>, y: i32) -> Option<Self> {
         if y < 0 {
             return None;

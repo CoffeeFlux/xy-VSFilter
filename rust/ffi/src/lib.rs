@@ -212,4 +212,6 @@ mod path_data;
 mod ssf_literal;
 
 #[cfg(windows)]
+mod windows_scan_curve;
+#[cfg(windows)]
 mod windows_word_transform;

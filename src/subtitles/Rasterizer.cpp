@@ -432,7 +432,11 @@ bool Rasterizer::Rasterize(const ScanLineData2& scan_line_data2, int xsub, int y
         return false;
     }
     overlay->CleanUp();
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    const auto scan_line_data=scan_line_data2.m_scan_line_data->Snapshot();
+#else
     const ScanLineData& scan_line_data = *scan_line_data2.m_scan_line_data;
+#endif
     if(!scan_line_data.mWidth || !scan_line_data.mHeight)
     {
         return true;
@@ -2428,6 +2432,9 @@ ScanLineData::~ScanLineData()
 {    
 }
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+bool ScanLineData::ScanConvert(const PathData& path_data,const CSize& size){return path_data.Scan(m_scan,size);}
+#else
 void ScanLineData::_ReallocEdgeBuffer(unsigned edges)
 {
     mEdgeHeapSize = edges;
@@ -2457,11 +2464,7 @@ void ScanLineData::_AddEdge(int row, int position)
 
 void ScanLineData::_EvaluateBezier(const PathDataRead& path_data, int ptbase, bool fBSpline)
 {
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    const POINT* path_points=path_data.points.data();
-#else
     const POINT* path_points=path_data.mpPathPoints;
-#endif
 
     const POINT* pt0 = path_points + ptbase;
     const POINT* pt1 = path_points + ptbase + 1;
@@ -2541,11 +2544,7 @@ void ScanLineData::_EvaluateBezier(const PathDataRead& path_data, int ptbase, bo
 
 void ScanLineData::_EvaluateLine(const PathDataRead& path_data, int pt1idx, int pt2idx)
 {
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    const POINT* path_points=path_data.points.data();
-#else
     const POINT* path_points=path_data.mpPathPoints;
-#endif
 
     const POINT* pt1 = path_points + pt1idx;
     const POINT* pt2 = path_points + pt2idx;
@@ -2572,9 +2571,6 @@ void ScanLineData::_EvaluateLine(int x0, int y0, int x1, int y1)
 template<int flag>
 void ScanLineData::_EvaluateLine(int x0, int y0, int x1, int y1)
 {
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    m_edges.Line(mEdgeNext,mEdgeHeapSize,x0,y0,x1,y1,flag==LINE_UP);
-#else
     __int64 xacc = (__int64)x0 << 13;
 
     // prestep
@@ -2607,19 +2603,12 @@ void ScanLineData::_EvaluateLine(int x0, int y0, int x1, int y1)
             xacc += invslope;
         }
     }
-#endif
 }
 
 bool ScanLineData::ScanConvert(const PathData& path_data, const CSize& size)
 {
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    const auto snapshot=path_data.Snapshot();const PathDataRead& view=snapshot;
-    const int path_count=static_cast<int>(snapshot.points.size());
-    const POINT* path_points=snapshot.points.data();const BYTE* path_types=snapshot.types.data();
-#else
     const PathDataRead& view=path_data;const int path_count=path_data.mPathPoints;
     const POINT* path_points=path_data.mpPathPoints;const BYTE* path_types=path_data.mpPathTypes;
-#endif
 
     int lastmoveto = -1;
     int i;
@@ -2636,10 +2625,6 @@ bool ScanLineData::ScanConvert(const PathData& path_data, const CSize& size)
     // Initialize edge buffer.  We use edge 0 as a sentinel.
     mEdgeNext = 1;
     mEdgeHeapSize = 2048;
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    if(!m_edges.Initialize(mHeight,mEdgeHeapSize))throw std::bad_alloc();
-    mpEdgeBuffer=NULL;mpScanBuffer=NULL;
-#else
 #ifdef XY_VSFILTER_RUST_TEXT
     if (m_edges.Initialize(mHeight, mEdgeHeapSize))
     {
@@ -2654,7 +2639,6 @@ bool ScanLineData::ScanConvert(const PathData& path_data, const CSize& size)
         mpScanBuffer = DEBUG_NEW unsigned int[mHeight];
         memset(mpScanBuffer, 0, mHeight*sizeof(unsigned int));
     }
-#endif
     // Scan convert the outline.  Yuck, Bezier curves....
     // Unfortunately, Windows 95/98 GDI has a bad habit of giving us text
     // paths with all but the first figure left open, so we can't rely
@@ -2761,6 +2745,8 @@ bool ScanLineData::ScanConvert(const PathData& path_data, const CSize& size)
     return true;
 }
 
+#endif
+
 bool ScanLineData2::CreateWidenedRegion(int rx, int ry)
 {
     if(rx < 0) rx = 0;
@@ -2768,7 +2754,11 @@ bool ScanLineData2::CreateWidenedRegion(int rx, int ry)
     mWideBorder = max(rx,ry);
     mWideOutline.clear();
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    const auto snapshot=m_scan_line_data->Snapshot();const tSpanBuffer& out_line=snapshot.mOutline;
+#else
     const tSpanBuffer& out_line = m_scan_line_data->mOutline;
+#endif
     if (ry > 0)
     {
         WidenRegionCreater *widen_region_creater = WidenRegionCreater::GetDefaultWidenRegionCreater();

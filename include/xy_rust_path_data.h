@@ -7,6 +7,7 @@ namespace XyRust {
 // explicitly Replace after editing; readers cannot retain a canonical pointer.
 struct PathSnapshot {std::vector<POINT> points;std::vector<uint8_t> types;};
 class PathOwner {
+    friend class ScanOwner;
     uint64_t id_;
 public:
     PathOwner();PathOwner(const PathOwner&);

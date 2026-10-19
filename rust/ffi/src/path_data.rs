@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-//! Checked persistent paths. No owner pointer or buffer loan crosses the ABI.
+//! Checked persistent paths and scan results. No owner pointer or buffer loan
+//! crosses the ABI.
 //! A separate admission excludes mutation/release during GDI calls; reentry
 //! refuses Busy. Caller serializes full native operations and exclusively owns
 //! the borrowed HDC, with its creating thread alive. No native unwind is allowed.
@@ -11,10 +12,16 @@ use xy_vsfilter_compat::path_align::Point;
 use xy_vsfilter_compat::path_data::{Path, Store};
 struct Boundary {
     busy: AtomicBool,
-    state: UnsafeCell<Store>,
+    state: UnsafeCell<Owners>,
+}
+struct Owners {
+    paths: Store,
+    scans: xy_vsfilter_compat::scan_convert::Store,
 }
 // SAFETY: all access uses the atomic gate; HRTB closures cannot return borrowed
-// references, and Store owns only Send data. No native pointer is stored.
+// references, and both registries own only Send data. No native pointer is
+// stored. Path->scan conversion uses disjoint fields under this single gate,
+// so it never nests admissions or releases a path loan across a callback.
 unsafe impl Sync for Boundary {}
 struct Guard<'a>(&'a Boundary);
 impl Drop for Guard<'_> {
@@ -26,10 +33,19 @@ impl Boundary {
     const fn new() -> Self {
         Self {
             busy: AtomicBool::new(false),
-            state: UnsafeCell::new(Store::new()),
+            state: UnsafeCell::new(Owners {
+                paths: Store::new(),
+                scans: xy_vsfilter_compat::scan_convert::Store::new(),
+            }),
         }
     }
     fn with<T>(&self, f: impl for<'a> FnOnce(&'a mut Store) -> Result<T, u32>) -> Result<T, u32> {
+        self.with_owners(|owners| f(&mut owners.paths))
+    }
+    fn with_owners<T>(
+        &self,
+        f: impl for<'a> FnOnce(&'a mut Owners) -> Result<T, u32>,
+    ) -> Result<T, u32> {
         self.busy
             .compare_exchange(false, true, Ordering::Acquire, Ordering::Relaxed)
             .map_err(|_| 2u32)?;
@@ -41,6 +57,106 @@ impl Boundary {
     }
 }
 static PATHS: Boundary = Boundary::new();
+/// # Safety
+/// output spans eight writable bytes for the new checked scan ID.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_scan_create_v1(output: *mut u8) -> u32 {
+    if output.is_null() {
+        return 3;
+    }
+    let id = match PATHS.with_owners(|owners| owners.scans.create()) {
+        Ok(id) => id,
+        Err(e) => return e,
+    };
+    // SAFETY: detached ID and caller's writable span; no owner pointer escapes.
+    unsafe {
+        core::ptr::copy_nonoverlapping(id.to_le_bytes().as_ptr(), output, 8);
+    }
+    0
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_scan_destroy_v1(id: u64) -> u32 {
+    match PATHS.with_owners(|owners| owners.scans.remove(id)) {
+        Ok(()) => 0,
+        Err(e) => e,
+    }
+}
+/// # Safety
+/// output spans four writable bytes. Both checked owners remain admitted for the
+/// operation; no callbacks, foreign buffers or retained path loans are involved.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_scan_convert_v1(
+    id: u64,
+    path: u64,
+    width: i32,
+    height: i32,
+    output: *mut u8,
+) -> u32 {
+    if output.is_null() {
+        return 3;
+    }
+    let result = match PATHS.with_owners(|owners| {
+        let path = owners.paths.get(path)?;
+        owners
+            .scans
+            .get_mut(id)?
+            .convert::<crate::windows_scan_curve::Numeric>(path, [width, height])
+    }) {
+        Ok(v) => u32::from(v),
+        Err(e) => return e,
+    };
+    // SAFETY: detached scalar, after all registry borrows have ended.
+    unsafe {
+        core::ptr::copy_nonoverlapping(result.to_le_bytes().as_ptr(), output, 4);
+    }
+    0
+}
+/// # Safety
+/// output spans eight writable bytes for the encoded snapshot length.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_scan_info_v1(id: u64, output: *mut u8) -> u32 {
+    if output.is_null() {
+        return 3;
+    }
+    let length = match PATHS.with_owners(|owners| owners.scans.get(id)?.wire_len().ok_or(5)) {
+        Ok(v) => v as u64,
+        Err(e) => return e,
+    };
+    // SAFETY: detached scalar and caller's writable eight-byte span.
+    unsafe {
+        core::ptr::copy_nonoverlapping(length.to_le_bytes().as_ptr(), output, 8);
+    }
+    0
+}
+/// # Safety
+/// output spans capacity writable bytes. Invalid/short requests leave it intact.
+/// The detached snapshot never aliases the registry or caller's other data.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_scan_read_v1(
+    id: u64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    if output.is_null() || capacity > isize::MAX as usize {
+        return 3;
+    }
+    let bytes = match PATHS.with_owners(|owners| {
+        let scan = owners.scans.get(id)?;
+        if scan.wire_len().ok_or(5u32)? > capacity {
+            return Err(4);
+        }
+        scan.encode()
+    }) {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    // SAFETY: caller's capacity checked before encoding; detached bytes copied
+    // after the admission/borrow ends, so overlapping foreign packets are safe.
+    unsafe {
+        core::ptr::copy_nonoverlapping(bytes.as_ptr(), output, bytes.len());
+    }
+    0
+}
 /// # Safety
 /// `input` spans exactly `length` initialized bytes: nine raw double words,
 /// signed origin x/y, and a 0/1 rounding flag. No foreign pointer is retained.
@@ -445,6 +561,33 @@ mod tests {
             assert!(out.iter().all(|v| *v == 0xa5));
             assert_eq!(xy_vsfilter_path_read_v1(a, out.as_mut_ptr().add(1), 31), 0);
             assert_eq!(&out[1..1 + packet.len()], packet);
+            let mut scan_id = [0; 8];
+            assert_eq!(xy_vsfilter_scan_create_v1(scan_id.as_mut_ptr()), 0);
+            let scan = u64::from_le_bytes(scan_id);
+            assert_eq!(
+                xy_vsfilter_scan_convert_v1(scan, a, 32, 8, out.as_mut_ptr()),
+                0
+            );
+            assert_eq!(out[0], 1);
+            let mut snapshot = [0xa5; 64];
+            assert_eq!(
+                xy_vsfilter_scan_read_v1(scan, snapshot.as_mut_ptr().add(1), 43),
+                4
+            );
+            assert_eq!(snapshot, [0xa5; 64]);
+            assert_eq!(xy_vsfilter_scan_info_v1(scan, scan_id.as_mut_ptr()), 0);
+            assert_eq!(u64::from_le_bytes(scan_id), 44);
+            assert_eq!(
+                xy_vsfilter_scan_read_v1(scan, snapshot.as_mut_ptr().add(1), 63),
+                0
+            );
+            assert_eq!(&snapshot[1..9], &[32, 0, 0, 0, 8, 0, 0, 0]);
+            assert_eq!(
+                xy_vsfilter_scan_convert_v1(scan, u64::MAX, 32, 8, out.as_mut_ptr()),
+                1
+            );
+            assert_eq!(xy_vsfilter_scan_destroy_v1(scan), 0);
+            assert_eq!(xy_vsfilter_scan_info_v1(scan, scan_id.as_mut_ptr()), 1);
             // Malformed transform packets and stale owners must not change data.
             let mut transform = [0u8; 82];
             assert_eq!(xy_vsfilter_path_transform_v1(a, core::ptr::null(), 81), 3);

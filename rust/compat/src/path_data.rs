@@ -8,6 +8,9 @@ pub struct Path {
     types: Vec<u8>,
 }
 impl Path {
+    pub fn types(&self) -> &[u8] {
+        &self.types
+    }
     pub fn points(&self) -> &[Point] {
         &self.points
     }

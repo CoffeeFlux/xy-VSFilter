@@ -2,6 +2,11 @@
 // Included once by Rasterizer.cpp. All Rust data crosses as detached bytes.
 #include "RustDocumentOwner.h"
 extern "C" {
+uint32_t __cdecl xy_vsfilter_scan_create_v1(uint8_t*);
+uint32_t __cdecl xy_vsfilter_scan_destroy_v1(uint64_t);
+uint32_t __cdecl xy_vsfilter_scan_convert_v1(uint64_t,uint64_t,int32_t,int32_t,uint8_t*);
+uint32_t __cdecl xy_vsfilter_scan_info_v1(uint64_t,uint8_t*);
+uint32_t __cdecl xy_vsfilter_scan_read_v1(uint64_t,uint8_t*,size_t);
 uint32_t __cdecl xy_vsfilter_path_transform_v1(uint64_t,const uint8_t*,size_t);
 uint32_t __cdecl xy_vsfilter_path_create_v1(uint64_t,uint8_t*);
 uint32_t __cdecl xy_vsfilter_path_destroy_v1(uint64_t);
@@ -20,6 +25,19 @@ std::array<uint8_t,16> PathAction(uint64_t id,uint32_t op,HDC dc=nullptr,long dx
     DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_path_action_v1(id,op,reinterpret_cast<uintptr_t>(dc),dx,dy,out.data());}));return out;}
 std::array<uint8_t,12> PathInfo(uint64_t id){std::array<uint8_t,12> out;
     DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_path_info_v1(id,out.data());}));return out;}
+}
+ScanOwner::ScanOwner(){std::array<uint8_t,8> out;DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_scan_create_v1(out.data());}));id_=DocumentDetail::Load(out,0,8);}
+ScanOwner::~ScanOwner(){DocumentDetail::Release(DocumentDetail::Invoke([&](){return xy_vsfilter_scan_destroy_v1(id_);}));}
+bool ScanOwner::Convert(const PathOwner& path,int width,int height){std::array<uint8_t,4> out;
+    DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_scan_convert_v1(id_,path.id_,width,height,out.data());}));return DocumentDetail::Load(out,0,4)!=0;}
+ScanSnapshot ScanOwner::Read()const{
+    DocumentDetail::Loan gate;std::array<uint8_t,8> info;DocumentDetail::Check(xy_vsfilter_scan_info_v1(id_,info.data()));const uint64_t length=DocumentDetail::Load(info,0,8);
+    DocumentDetail::Shape(length>=44&&length<=SIZE_MAX);DocumentDetail::Bytes bytes(static_cast<size_t>(length));DocumentDetail::Check(xy_vsfilter_scan_read_v1(id_,bytes.data(),bytes.size()));
+    const uint64_t count=DocumentDetail::Load(bytes,36,8);DocumentDetail::Shape(count<=(SIZE_MAX-44)/16&&44+16*count==length);
+    ScanSnapshot out;out.mWidth=DocumentDetail::I32(DocumentDetail::Load(bytes,0,4));out.mHeight=DocumentDetail::I32(DocumentDetail::Load(bytes,4,4));
+    out.mEdgeNext=static_cast<unsigned>(DocumentDetail::Load(bytes,8,4));out.mEdgeHeapSize=static_cast<unsigned>(DocumentDetail::Load(bytes,12,4));out.fFirstSet=DocumentDetail::Load(bytes,16,4)!=0;
+    out.firstp=CPoint(DocumentDetail::I32(DocumentDetail::Load(bytes,20,4)),DocumentDetail::I32(DocumentDetail::Load(bytes,24,4)));out.lastp=CPoint(DocumentDetail::I32(DocumentDetail::Load(bytes,28,4)),DocumentDetail::I32(DocumentDetail::Load(bytes,32,4)));
+    out.mOutline.reserve(static_cast<size_t>(count));for(size_t i=0;i<count;++i)out.mOutline.emplace_back(DocumentDetail::Load(bytes,44+16*i,8),DocumentDetail::Load(bytes,52+16*i,8));return out;
 }
 PathOwner::PathOwner():id_(NewPath(0)){}
 PathOwner::PathOwner(const PathOwner& other):id_(NewPath(other.id_)){}

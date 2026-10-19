@@ -4,12 +4,14 @@
 #undef main
 #include <process.h>
 #include <cfenv>
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 template<class Tag,typename Tag::type Member>struct Access {friend typename Tag::type member(Tag){return Member;}};
 #define FIELD(tag,type_,name) struct tag {typedef type_ ScanLineData::*type;friend type member(tag);};template struct Access<tag,&ScanLineData::name>;
 FIELD(Outline,tSpanBuffer,mOutline)
 FIELD(Width,int,mWidth) FIELD(Height,int,mHeight)
 FIELD(Next,unsigned,mEdgeNext) FIELD(Capacity,unsigned,mEdgeHeapSize)
 FIELD(FirstSet,bool,fFirstSet) FIELD(First,CPoint,firstp) FIELD(Last,CPoint,lastp)
+#endif
 static void seed(PathData& p,const std::vector<POINT>& points,const std::vector<BYTE>& types){
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     XyRust::PathSnapshot snapshot;snapshot.points=points;snapshot.types=types;p.Replace(snapshot);
@@ -43,8 +45,14 @@ int main(){try{
             // geometry operation between reset and the actual method call.
             if(sticky)std::feraiseexcept(FE_DIVBYZERO);
             const Status before=status();const bool result=scan.ScanConvert(path,CSize(256+scenario,128));const Status after=status();
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            const auto snapshot=scan.Snapshot();const auto& spans=snapshot.mOutline;const auto first=snapshot.firstp,last=snapshot.lastp;
+            const auto width=snapshot.mWidth,height=snapshot.mHeight;const auto next=snapshot.mEdgeNext,capacity=snapshot.mEdgeHeapSize;const bool first_set=snapshot.fFirstSet;
+#else
             const auto& spans=scan.*member(Outline{});const auto first=scan.*member(First{}),last=scan.*member(Last{});
-            printf("scan-case index=%u scenario=%u sticky=%u points=%u result=%u size=%d,%d next=%u capacity=%u first=%u:%ld,%ld last=%ld,%ld spans=%u",index++,scenario,sticky,unsigned(points.size()),unsigned(result),scan.*member(Width{}),scan.*member(Height{}),scan.*member(Next{}),scan.*member(Capacity{}),unsigned(scan.*member(FirstSet{})),first.x,first.y,last.x,last.y,unsigned(spans.size()));emit("before",before);emit("after",after);printf("\n");
+            const auto width=scan.*member(Width{}),height=scan.*member(Height{});const auto next=scan.*member(Next{}),capacity=scan.*member(Capacity{});const bool first_set=scan.*member(FirstSet{});
+#endif
+            printf("scan-case index=%u scenario=%u sticky=%u points=%u result=%u size=%d,%d next=%u capacity=%u first=%u:%ld,%ld last=%ld,%ld spans=%u",index++,scenario,sticky,unsigned(points.size()),unsigned(result),width,height,next,capacity,unsigned(first_set),first.x,first.y,last.x,last.y,unsigned(spans.size()));emit("before",before);emit("after",after);printf("\n");
             for(const auto& span:spans)printf("scan-span %016llx,%016llx\n",span.first,span.second);
         }
     }

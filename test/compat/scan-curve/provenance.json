@@ -1,0 +1,55 @@
+{
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "toolchain": "MSVC 14.44.35207 Release; Win32 /arch:IA32; x64 SSE2",
+  "description": "Actual cleanup ScanLineData::_EvaluateBezier linked into the direct ScanConvert baseline probe. Addresses belong to the recorded executable, not a generic ABI.",
+  "architectures": {
+    "x86": {
+      "reference": {
+        "library_sha256": {
+          "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\strmbaseR.lib": "5926e97d337eebffe4ea20b996f2f0e62a33f67d6562e18a829c4f45888a954e",
+          "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\dsutilR.lib": "3333bc109c61750684684cafa818c90d68af49906e6c08994013e8e0bb711b0b",
+          "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\subtitlesR.lib": "46495e9e54830b1ee76e90021b0cd688be766a46fc9d354b52958651f3888f59",
+          "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\subpicR.lib": "2e3315a04138a6822958356c79dafdf47bdd51e6ddd32cf7ce6da8eae54a3e1f",
+          "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\basevideofilterR.lib": "3598e7cf095d9fefc68de1393902310c4c621a0b792b16098df40554cd6d2ada",
+          "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\libssfR.lib": "3eaa482d6d3b16a0b48816cf21cb96f3bb932963eb7b114c76372c785e4bbc09",
+          "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\unrarR.lib": "2a77b674333a0ac1e05fc155374268e7395d3e8163f1dc212788d446f3eb75cf"
+        },
+        "binary_sha256": "a6d8a289b9ae0ba3784c9920e25af1fc605fc1fbdcc6b5f6ce8db5a5033e46c7"
+      },
+      "pre_port_candidate_commit": "770722c32d6ff1a318413a3aeb07a8dba57c870e",
+      "baseline_probe_sha256": "60150f7a7bf82f5ffbcddb9b473e4dd9a5d955b695ccb7b52234b476b51d4b2e",
+      "trace_sha256": [
+        "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+        "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+        "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+        "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f"
+      ],
+      "trace_lines": 70692,
+      "disassembly_sha256": "3287ec47a928cc2c5c2c9ae687c5314a86af293a9f1aa8b943ebc4d8950be5ed"
+    },
+    "x64": {
+      "reference": {
+        "library_sha256": {
+          "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\strmbaseR.lib": "e4a3eed835fc6dcfdd7b81e684678cce0aaf032187e1ff2611b7f4146d6a9067",
+          "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\dsutilR.lib": "3dfc9f2eb59caef227f3ab723a1f10b672ab44f3efb61a75030d5b0a8730892b",
+          "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\subtitlesR.lib": "d6d48a179e28d70404ff870f6c6b640b9c768940065a95039695f7684689e50d",
+          "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\subpicR.lib": "23aed7e98c3c33cf31a956900fc720faf5d603edbb27c1f821964e9ccf87c5de",
+          "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\basevideofilterR.lib": "738d7f288e53690373e814f00ab7edcc8419e40de46a96f7a888a549ce8ca39e",
+          "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\libssfR.lib": "58a84c5e08a8c4c75e60e0f53b2590e6696e7f5938d52cc46b895ad326b4f1d8",
+          "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\unrarR.lib": "3dcfd1c32bc6261c168c841ebeb86c8dd4177f5698730424cbf39628f3e8a56c"
+        },
+        "binary_sha256": "7f9a7473ebc4b221a3f835c48e74d5ef71d55f14846310c2c1c7362b1dd6e6c4"
+      },
+      "pre_port_candidate_commit": "770722c32d6ff1a318413a3aeb07a8dba57c870e",
+      "baseline_probe_sha256": "60150f7a7bf82f5ffbcddb9b473e4dd9a5d955b695ccb7b52234b476b51d4b2e",
+      "trace_sha256": [
+        "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+        "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+        "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+        "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2"
+      ],
+      "trace_lines": 70692,
+      "disassembly_sha256": "f541e98491fb69c60bd7f65d8f59d61a0fb05944587cd1496a0c0aa11b35ff6b"
+    }
+  }
+}

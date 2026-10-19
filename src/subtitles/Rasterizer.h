@@ -45,6 +45,7 @@ typedef struct {
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 #include "xy_rust_path_data.h"
+#include "xy_rust_scan_data.h"
 #endif
 struct PathData
 {
@@ -65,6 +66,7 @@ public:
     void AlignLeftTop(CPoint *left_top, CSize *size);
 
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    bool Scan(XyRust::ScanOwner& scan,const CSize& size)const{return scan.Convert(m_path,size.cx,size.cy);}
     XyRust::PathSnapshot Snapshot()const{return m_path.Read();}
     void Replace(const XyRust::PathSnapshot& value){m_path.Replace(value);}
     void Transform(const uint64_t* values,long x,long y,bool round){m_path.Transform(values,x,y,round);}
@@ -80,9 +82,7 @@ private:
 #endif
 };
 
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-typedef XyRust::PathSnapshot PathDataRead;
-#else
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 typedef PathData PathDataRead;
 #endif
 
@@ -95,6 +95,9 @@ typedef std::vector<tSpan> tSpanBuffer;
 
 class ScanLineData
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    XyRust::ScanOwner m_scan;
+#else
     bool fFirstSet;
     CPoint firstp, lastp;
 
@@ -131,7 +134,11 @@ private:
     // The following function is templated and forcingly inlined for performance sake
     template<int flag> __forceinline void _EvaluateLine(int x0, int y0, int x1, int y1);
 
+#endif
 public:
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    XyRust::ScanSnapshot Snapshot()const{return m_scan.Read();}
+#endif
     ScanLineData();
     virtual ~ScanLineData();
 
