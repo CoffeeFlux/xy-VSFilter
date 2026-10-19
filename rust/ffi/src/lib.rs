@@ -5,6 +5,8 @@
 
 extern crate alloc;
 
+#[cfg(windows)]
+mod ass_override;
 mod ass_tags;
 #[cfg(windows)]
 mod ass_tree;

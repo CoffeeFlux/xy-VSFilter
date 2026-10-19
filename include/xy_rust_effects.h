@@ -11,6 +11,7 @@ uint32_t __cdecl xy_vsfilter_effects_apply_v1(uint64_t,const uint8_t*,size_t,uin
 }
 namespace XyRust {
 class Effects {
+    friend class AssOverride;
     uint64_t id_;
     Effects(const Effects&)=delete;
     Effects& operator=(const Effects&)=delete;

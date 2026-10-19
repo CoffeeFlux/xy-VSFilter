@@ -26,6 +26,8 @@
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 #include "xy_rust_colors.h"
 #include "xy_rust_html_tag.h"
+#include "xy_rust_ass_override.h"
+#include <exception>
 #endif
 #ifdef XY_VSFILTER_RUST_TEXT
 #include "xy_rust_ass.h"
@@ -2441,6 +2443,53 @@ bool CRenderedTextSubtitle::ParseSSATag( AssTagList *assTags, const CStringW& st
 bool CRenderedTextSubtitle::ParseSSATag( CSubtitle* sub, const AssTagList& assTags, STSStyle& style, const STSStyle& org, bool fAnimate /*= false*/ )
 {
     if(!sub) return(false);
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    using namespace XyRust;
+    const auto current=DocumentDetail::StyleBytes(style),original=DocumentDetail::StyleBytes(org);
+    DocumentDetail::Bytes input;
+    for(int value:{sub->m_scrAlignment,sub->m_wrapStyle,sub->m_hard_position_level,int(sub->m_fAnimated),int(sub->m_fAnimated2),
+        int(sub->m_clipInverse),int(bool(sub->m_pClipper)),int(sub->m_clip.left),int(sub->m_clip.top),int(sub->m_clip.right),int(sub->m_clip.bottom),
+        m_time,m_delay,m_animStart,m_animEnd,m_ktype,m_kstart,m_kend,m_nPolygon,m_polygonBaselineOffset,
+        m_video_rect.Width()>>3,m_video_rect.Height()>>3,GetDocumentWrapStyle()})DocumentDetail::Append(input,static_cast<uint32_t>(value),4);
+    for(double value:{sub->m_scalex,sub->m_scaley,m_animAccel,m_target_scale_x,m_target_scale_y}) {
+        uint64_t bits;memcpy(&bits,&value,8);DocumentDetail::Append(input,bits,8);
+    }
+    for(uint32_t value:{DocumentDetail::Count(current.size()),DocumentDetail::Count(original.size()),uint32_t(fAnimate)})DocumentDetail::Append(input,value,4);
+    input.insert(input.end(),current.begin(),current.end());input.insert(input.end(),original.begin(),original.end());
+    struct Context {CRenderedTextSubtitle* renderer;CSubtitle* sub;STSStyle* style;std::exception_ptr exception;};
+    Context context={this,sub,&style,{}};
+    const auto status=AssOverride::Apply(assTags,*m_document,sub->m_effects,input,&context,
+        [](void* opaque,const uint8_t* packet,size_t length)->uint32_t {
+            auto& c=*static_cast<Context*>(opaque);
+            try {
+                const DocumentDetail::Bytes bytes(packet,packet+length);
+                DocumentDetail::Shape(bytes.size()>=164);
+                auto integer=[&](size_t index){return DocumentDetail::I32(DocumentDetail::Load(bytes,index*4,4));};
+                auto floating=[&](size_t offset){uint64_t bits=DocumentDetail::Load(bytes,offset,8);double value;memcpy(&value,&bits,8);return value;};
+                const auto size=DocumentDetail::Size(DocumentDetail::Load(bytes,132,4));
+                const auto clip=DocumentDetail::Load(bytes,136,4);
+                const auto units=DocumentDetail::Size(DocumentDetail::Load(bytes,140,4));
+                DocumentDetail::Shape(clip<=1 && size>=DocumentDetail::StyleHeaderBytes &&
+                    DocumentDetail::AddSize(164,DocumentDetail::AddSize(size,DocumentDetail::MulSize(units,2)))==bytes.size());
+                DocumentDetail::Bytes value(bytes.begin()+164,bytes.begin()+164+size);
+                *c.style=DocumentDetail::StyleValue(value);
+                c.sub->m_scrAlignment=integer(0);c.sub->m_wrapStyle=integer(1);c.sub->m_hard_position_level=integer(2);
+                c.sub->m_fAnimated=integer(3)!=0;c.sub->m_fAnimated2=integer(4)!=0;c.sub->m_clipInverse=integer(5)!=0;
+                c.sub->m_clip.SetRect(integer(7),integer(8),integer(9),integer(10));
+                c.renderer->m_animStart=integer(13);c.renderer->m_animEnd=integer(14);c.renderer->m_animAccel=floating(108);
+                c.renderer->m_ktype=integer(15);c.renderer->m_kstart=integer(16);c.renderer->m_kend=integer(17);
+                c.renderer->m_nPolygon=integer(18);c.renderer->m_polygonBaselineOffset=integer(19);
+                if(clip) {
+                    size_t offset=164+size;const auto shape=DocumentDetail::String(bytes,offset,units);
+                    c.sub->m_pClipper.reset(DEBUG_NEW CClipper(shape,CSize(integer(20),integer(21)),floating(148),floating(156),
+                        DocumentDetail::Load(bytes,144,4)!=0,floating(116),floating(124)));
+                }
+                return 0;
+            } catch(...) {c.exception=std::current_exception();return 6;}
+        });
+    if(context.exception)std::rethrow_exception(context.exception);
+    DocumentDetail::Check(status);return true;
+#else
     
 #ifdef XY_VSFILTER_RUST_ASS_TREE
     const auto count=assTags.Count();
@@ -2987,6 +3036,7 @@ bool CRenderedTextSubtitle::ParseSSATag( CSubtitle* sub, const AssTagList& assTa
         }
     }
     return(true);
+#endif
 }
 
 bool CRenderedTextSubtitle::ParseSSATag(CSubtitle* sub, const CStringW& str, STSStyle& style, const STSStyle& org, bool fAnimate)
@@ -3125,6 +3175,9 @@ bool CRenderedTextSubtitle::ParseHtmlTag(CSubtitle* sub, CStringW str, STSStyle&
 
 double CRenderedTextSubtitle::CalcAnimation(double dst, double src, bool fAnimate)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    return xy_vsfilter_ass_animation_v1(dst,src,fAnimate,m_time,m_delay,m_animStart,m_animEnd,m_animAccel);
+#else
     int s = m_animStart ? m_animStart : 0;
     int e = m_animEnd ? m_animEnd : m_delay;
     if(fabs(dst-src) >= 0.0001 && fAnimate)
@@ -3138,6 +3191,7 @@ double CRenderedTextSubtitle::CalcAnimation(double dst, double src, bool fAnimat
 //      else dst = dst;
     }
     return(dst);
+#endif
 }
 
 CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)

@@ -11,6 +11,7 @@ int32_t __cdecl xy_vsfilter_ass_tree_position_v1(uint32_t);
 }
 namespace XyRust {
 class AssTree {
+    friend class AssOverride;
     struct Owner {
         uint64_t id;
         Owner():id(0) {

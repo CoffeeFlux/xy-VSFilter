@@ -298,6 +298,7 @@ struct DocumentTextOperation {
 };
 
 class DocumentOwner {
+    friend class AssOverride;
     friend class TranslatedDocumentSearch;
     friend class OpenLifecycle;
     friend class AssDocument;

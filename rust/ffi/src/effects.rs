@@ -35,13 +35,13 @@ fn create(boundary: &Boundary) -> Result<u64, u32> {
         }
     }
 }
-fn snapshot(boundary: &Boundary, id: u64) -> Result<(u64, State), u32> {
+pub(crate) fn snapshot(boundary: &Boundary, id: u64) -> Result<(u64, State), u32> {
     with(boundary, |r| {
         let (rev, state) = r.effects(id).map_err(error)?;
         Ok((*rev, state.clone()))
     })
 }
-fn commit(boundary: &Boundary, id: u64, expected: u64, state: State) -> Result<(), u32> {
+pub(crate) fn commit(boundary: &Boundary, id: u64, expected: u64, state: State) -> Result<(), u32> {
     with(boundary, |r| {
         let (rev, current) = r.effects(id).map_err(error)?;
         if *rev != expected {
@@ -72,12 +72,12 @@ impl Services for Windows {
     }
 }
 type GateCall = unsafe extern "C" fn();
-struct Admission {
-    enter: Option<GateCall>,
-    leave: Option<GateCall>,
+pub(crate) struct Admission {
+    pub(crate) enter: Option<GateCall>,
+    pub(crate) leave: Option<GateCall>,
 }
 impl Admission {
-    fn call<T>(&self, operation: impl FnOnce() -> T) -> T {
+    pub(crate) fn call<T>(&self, operation: impl FnOnce() -> T) -> T {
         struct Leave(Option<GateCall>);
         impl Drop for Leave {
             fn drop(&mut self) {

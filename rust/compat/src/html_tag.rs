@@ -21,7 +21,7 @@ fn find(s: &[u16], ch: u16) -> Option<usize> {
 fn mid(s: &[u16], first: usize) -> Vec<u16> {
     s[first.min(s.len())..].to_vec()
 }
-fn trim(s: &mut Vec<u16>, mut matches: impl FnMut(u16) -> bool) {
+pub(crate) fn trim(s: &mut Vec<u16>, mut matches: impl FnMut(u16) -> bool) {
     // CString TrimRight scans only to the first NUL. A trailing match there
     // truncates the entire stored string, including any post-NUL suffix.
     let mut last = None;

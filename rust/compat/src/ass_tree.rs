@@ -31,14 +31,14 @@ fn command(input: &[u16]) -> (u32, usize) {
     (UNKNOWN, 0)
 }
 #[derive(Clone, Debug, PartialEq, Eq)]
-struct Node {
-    command: u32,
-    params: Vec<Vec<u16>>,
-    children: Vec<usize>,
+pub(crate) struct Node {
+    pub(crate) command: u32,
+    pub(crate) params: Vec<Vec<u16>>,
+    pub(crate) children: Vec<usize>,
 }
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Tree {
-    nodes: Vec<Node>,
+    pub(crate) nodes: Vec<Node>,
     roots: Vec<usize>,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -48,7 +48,7 @@ pub enum Error {
     Overflow,
 }
 impl Tree {
-    fn list(&self, list: u32) -> Result<&[usize], Error> {
+    pub(crate) fn list(&self, list: u32) -> Result<&[usize], Error> {
         if list == 0 {
             Ok(&self.roots)
         } else {

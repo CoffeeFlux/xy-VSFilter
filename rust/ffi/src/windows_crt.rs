@@ -3,11 +3,17 @@
 use alloc::vec::Vec;
 use core::ptr;
 extern "C" {
+    fn pow(base: f64, exponent: f64) -> f64;
     fn wcstol(text: *const u16, end: *mut *mut u16, base: i32) -> i32;
     fn wcstod(text: *const u16, end: *mut *mut u16) -> f64;
     fn _wcsicmp(a: *const u16, b: *const u16) -> i32;
     fn _wcslwr_s(text: *mut u16, capacity: usize) -> i32;
     fn iswspace(unit: u16) -> i32;
+}
+pub(crate) fn power(base: f64, exponent: f64) -> f64 {
+    // SAFETY: CRT pow accepts all double bit patterns; errno is deliberately
+    // neither cleared nor translated. No pointers or resources cross this call.
+    unsafe { pow(base, exponent) }
 }
 fn terminated(input: &[u16]) -> Vec<u16> {
     let mut out = input.to_vec();
