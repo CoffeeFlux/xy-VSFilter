@@ -199,8 +199,17 @@ def run_facade(out, generate_only):
     save()
 
 
+OWNER_STYLE_ASSIGNMENT_SEAM = "\n#if defined(XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL) && defined(_M_IX86)\n    STSStyle& operator=(const STSStyle& other);\n#endif"
+
+
 def owner_style_declarations(pinned_header, current_header):
-    """Exact real value declarations; never a layout-compatible surrogate."""
+    """Pinned declarations on both storage sides; exclude one exact assignment seam."""
+    # This historical storage harness deliberately keeps its implicit native
+    # assignment on BOTH sides. The actual current x86 assignment is compared
+    # separately by style_intern_native's same-values scenario. Do not relabel
+    # this harness as assignment or cleanup style parity.
+    if current_header.count(OWNER_STYLE_ASSIGNMENT_SEAM) == 1:
+        current_header = current_header.replace(OWNER_STYLE_ASSIGNMENT_SEAM, "")
     declarations = []
     for signature in ("struct STSStyleBase", "struct STSStyle: public STSStyleBase"):
         declaration = function(pinned_header, signature) + ";"
@@ -267,6 +276,7 @@ def run_owner(out, generate_only):
     styles = owner_style_declarations(pinned_header, decode(inputs["src/subtitles/STS.h"]))
     report["style_dependency_scope"] = {
         "declarations": ["STSStyleBase", "STSStyle"],
+        "assignment": "Pinned compiler-generated STSStyle assignment on both storage-algorithm sides; exact current x86 assignment declaration excluded. Independent actual cleanup comparison: style_intern_native.py --scenario same-values",
         "declaration_sha256": sha(styles.encode()),
         "fwrect_header": "src/subtitles/flyweight_base_types.h",
         "cstring_type": "Actual MFC CString selected by afx.h before ATL headers; prior isolated ATL-alias evidence is not relabeled",

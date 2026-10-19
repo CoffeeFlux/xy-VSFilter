@@ -23,11 +23,20 @@ class OwnerDependencies(unittest.TestCase):
             self.assertNotIn('#include <windows.h>', source)
             self.assertIn('#include "RustRectIntern.inl"', source)
             self.assertIn('both storage-algorithm sides',report['style_dependency_scope']['rectangle_adapter'])
+            self.assertIn('both storage-algorithm sides',report['style_dependency_scope']['assignment'])
             for path in ('src/subtitles/flyweight_base_types.h', 'src/subtitles/mru_cache.h'):
                 self.assertIn(path, report['candidate_source_sha256'])
                 self.assertIn(path, report['reference_source_sha256'])
             self.assertFalse(report['complete'])
             self.assertTrue(report['generation_only'])
+
+    def test_only_exact_assignment_seam_is_excluded_from_historical_storage(self):
+        pinned=probe.source('src/subtitles/STS.h').decode('utf-8-sig').replace('\r\n','\n')
+        current=pinned.replace('    STSStyle();','    STSStyle();'+probe.OWNER_STYLE_ASSIGNMENT_SEAM)
+        self.assertIn(probe.OWNER_STYLE_ASSIGNMENT_SEAM,current)
+        self.assertEqual(probe.owner_style_declarations(pinned,current),probe.owner_style_declarations(pinned,pinned))
+        with self.assertRaisesRegex(RuntimeError,'unchanged'):
+            probe.owner_style_declarations(pinned,current.replace('operator=(const STSStyle& other)','operator=(STSStyle& other)'))
 
     def test_changed_real_style_declaration_refused(self):
         header = probe.source('src/subtitles/STS.h').decode('utf-8-sig').replace('\r\n', '\n')
