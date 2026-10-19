@@ -61,7 +61,7 @@ int main(){try{
     for(unsigned name=0;name<4;++name)for(mode=0;mode<3;++mode){
         STSStyle s;s.fontSize=20.25;s.fontName=name==0?CStringW(L"Arial"):name==1?CStringW(L'x',62):name==2?CStringW(L"@Arial"):CStringW(L"Times New Roman");
         used=attempt=identity_count=0;reset();recording=true;
-        auto first=std::make_shared<FwCMyFont>(s);auto second=std::make_shared<FwCMyFont>(s);auto snap=first->get();
+        auto first=std::make_shared<FwCMyFont>(s);auto second=std::make_shared<FwCMyFont>(s);const auto& snap=first->get();
         HFONT font=snap;int ascent=snap.m_ascent,descent=snap.m_descent;first.reset();second.reset();Status final=status();recording=false;
         printf("font-gdi-case index=%u mode=%u events=%u count=%llu font=%u ascent=%d descent=%d",index++,mode,used,static_cast<unsigned long long>(FwCMyFont::Count()),font!=nullptr,ascent,descent);emit("final",final);printf("\n");
         for(unsigned i=0;i<used;++i){const auto& v=events[i];
