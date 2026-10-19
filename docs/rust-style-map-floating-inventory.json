@@ -1,80 +1,132 @@
 {
   "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
-  "scope": "Next named-style-map arithmetic boundary: source review and reproduced AddStyle mismatch, not a completed correction.",
-  "sources": [
-    {
-      "path": "rust/compat/src/document_style_map.rs",
-      "sha256": "a8c113e7ed5e0111507763b977eebf08f37ade03ae482076925239c0573508c7"
+  "scope": "Named-style map initial discrepancy and validated lifecycle/target-arithmetic correction. Complete library and default-style assignment remain open.",
+  "initial_review": {
+    "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+    "scope": "Next named-style-map arithmetic boundary: source review and reproduced AddStyle mismatch, not a completed correction.",
+    "sources": [
+      {
+        "path": "rust/compat/src/document_style_map.rs",
+        "sha256": "a8c113e7ed5e0111507763b977eebf08f37ade03ae482076925239c0573508c7"
+      },
+      {
+        "path": "rust/compat/src/document_style_add.rs",
+        "sha256": "82c019855f1fd1ea377991f1116862d2544ccb5ac3cbba77238f38c0828f2179"
+      },
+      {
+        "path": "rust/compat/src/document.rs",
+        "sha256": "110ff9535f7a741f12d80ec408a31c6cfcb0f2a80ee98f296f0dd927a6560921"
+      },
+      {
+        "path": "rust/ffi/src/document.rs",
+        "sha256": "bafafc089faee87a8cebf6e66614be88ea4fbfe741d9a770c8b24948c9fc924d"
+      },
+      {
+        "path": "rust/ffi/src/document_registry.rs",
+        "sha256": "ec5b89bd753711da1b3af347c9656be810c4e8827af05a01d97f583f883ad731"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "sha256": "a354d1a1939d576f19ffdcc8c0496d5d390fba0f7409edf324dc018a78df9c89"
+      },
+      {
+        "path": "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/atlmfc/include/atlcoll.h",
+        "sha256": "7fc0634c45fb4788cf2c78572040a082fb763e51c7cb517e1c3cb701265cb38f"
+      },
+      {
+        "path": "artifacts/font-native-map-x86/probe.map",
+        "sha256": "9aca7c289a5eee3a46b3ae0f3984314e1d0c60f7632b2187d143bba3fae4cae7"
+      },
+      {
+        "path": "artifacts/font-native-map-x86/disassembly.txt",
+        "sha256": "55295baa514c2c5652c5d9a596e1a94c448b2fb0dc863c46ae7f8b0f87b522d6"
+      }
+    ],
+    "confirmed_source_differences": [
+      "Rust computes the high threshold in every insert and the low threshold in every successful removal; ATL caches both.",
+      "ATL updates thresholds in SetOptimalLoad, InitHashTable and successful Rehash. Its constructor calls SetOptimalLoad; compiler folding of default constants still needs direct constructor observations.",
+      "The native bins pointer is initially null and becomes null again on RemoveAll. First insertion allocates bins and updates thresholds; removing the final node does not release bins. Count==0 alone cannot model this distinction.",
+      "RemoveAll holds the automatic-rehash lock, so it retains bin count and does not recalculate thresholds while freeing nodes.",
+      "Native x86 InitHashTable converts unsigned bin count through x87 into a stored f32, then multiplies in x87 and calls __ftol2 (64-bit return; EAX retained for size_t), high before low. This is NOT the __ftol2_sse signed-i32 helper used for font heights.",
+      "Native x86 PickSize converts count to a stored f32, divides by 0.75 in x87, and calls __ftol2 without rounding the division result to f32 first. Rust currently rounds through f32 and uses saturating casts. Large-count reachability and allocation failure must stay qualified."
+    ],
+    "x86_addresses": {
+      "InitHashTable": "0041cfc0",
+      "PickSize": "0041d200",
+      "ftol2": "004acf70"
     },
-    {
-      "path": "rust/compat/src/document_style_add.rs",
-      "sha256": "82c019855f1fd1ea377991f1116862d2544ccb5ac3cbba77238f38c0828f2179"
-    },
-    {
-      "path": "rust/compat/src/document.rs",
-      "sha256": "110ff9535f7a741f12d80ec408a31c6cfcb0f2a80ee98f296f0dd927a6560921"
-    },
-    {
-      "path": "rust/ffi/src/document.rs",
-      "sha256": "bafafc089faee87a8cebf6e66614be88ea4fbfe741d9a770c8b24948c9fc924d"
-    },
-    {
-      "path": "rust/ffi/src/document_registry.rs",
-      "sha256": "ec5b89bd753711da1b3af347c9656be810c4e8827af05a01d97f583f883ad731"
-    },
-    {
-      "path": "src/subtitles/STS.cpp",
-      "sha256": "a354d1a1939d576f19ffdcc8c0496d5d390fba0f7409edf324dc018a78df9c89"
-    },
-    {
-      "path": "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/atlmfc/include/atlcoll.h",
-      "sha256": "7fc0634c45fb4788cf2c78572040a082fb763e51c7cb517e1c3cb701265cb38f"
-    },
-    {
-      "path": "artifacts/font-native-map-x86/probe.map",
-      "sha256": "9aca7c289a5eee3a46b3ae0f3984314e1d0c60f7632b2187d143bba3fae4cae7"
-    },
-    {
-      "path": "artifacts/font-native-map-x86/disassembly.txt",
-      "sha256": "55295baa514c2c5652c5d9a596e1a94c448b2fb0dc863c46ae7f8b0f87b522d6"
+    "next_work": [
+      "Observe actual constructor, first insertion, existing-key update, conflict removal/reinsertion, growth, Empty and reuse, plus sticky x87/SSE status. Keep two repeats per role and both architectures.",
+      "Add cached thresholds and a logical bins-initialized state to the safe map. Keep raw key order, primes, growth/shrink and retired value order unchanged.",
+      "Supply target arithmetic at the Windows boundary without unsafe code in the portable core. Avoid function callbacks or temporary Document constructions accidentally raising new floating exceptions.",
+      "Revalidate all 360 AddStyle cases, map growth/lifecycle, all format/document probes and actual rendering/hosts. Never count the current mismatch as passing.",
+      "Audit native style assignment versus Rust-owned default-style setters and selected-state copying separately. Transitional C++ assignment correction does not establish those Rust storage copy semantics for signaling NaNs."
+    ],
+    "deferred_ownership": "After these compatibility gaps, shared renderer HDC and text/path operations, then word/line/subtitle ownership; all hosts and vendored code remain in scope.",
+    "candidate_implementation_commit": "a518992aae3315977003a07cdfc7d9f65f9b37fd",
+    "current_failed_comparisons": {
+      "x86": {
+        "path": "artifacts/style-copy-add-style-x86/report.json",
+        "cases": 360,
+        "different_status_rows": 360,
+        "raw_values_and_names_equal": true,
+        "passing": false
+      },
+      "x64": {
+        "path": "artifacts/style-copy-add-style-x64/report.json",
+        "cases": 360,
+        "different_status_rows": 195,
+        "raw_values_and_names_equal": true,
+        "passing": false
+      }
     }
-  ],
-  "confirmed_source_differences": [
-    "Rust computes the high threshold in every insert and the low threshold in every successful removal; ATL caches both.",
-    "ATL updates thresholds in SetOptimalLoad, InitHashTable and successful Rehash. Its constructor calls SetOptimalLoad; compiler folding of default constants still needs direct constructor observations.",
-    "The native bins pointer is initially null and becomes null again on RemoveAll. First insertion allocates bins and updates thresholds; removing the final node does not release bins. Count==0 alone cannot model this distinction.",
-    "RemoveAll holds the automatic-rehash lock, so it retains bin count and does not recalculate thresholds while freeing nodes.",
-    "Native x86 InitHashTable converts unsigned bin count through x87 into a stored f32, then multiplies in x87 and calls __ftol2 (64-bit return; EAX retained for size_t), high before low. This is NOT the __ftol2_sse signed-i32 helper used for font heights.",
-    "Native x86 PickSize converts count to a stored f32, divides by 0.75 in x87, and calls __ftol2 without rounding the division result to f32 first. Rust currently rounds through f32 and uses saturating casts. Large-count reachability and allocation failure must stay qualified."
-  ],
-  "x86_addresses": {
-    "InitHashTable": "0041cfc0",
-    "PickSize": "0041d200",
-    "ftol2": "004acf70"
+  },
+  "correction": {
+    "candidate_implementation_commit": "4234af68deb4bdf81e178fe3a805085b519b3465",
+    "growth_probe_commit": "62975a170ab1b20d1c4a53476ae625af2297895e",
+    "sources": [
+      {
+        "path": "rust/compat/src/document_style_map.rs",
+        "sha256": "c85f4defc7168561cf4157bc24dc537eb91a03ede88dfe5138dff290928b780f"
+      },
+      {
+        "path": "rust/ffi/src/windows_style_map.rs",
+        "sha256": "cf3543d25a896405789112328d8dc0e67d719d732d360a90073c12a366781f90"
+      },
+      {
+        "path": "rust/ffi/src/document.rs",
+        "sha256": "9255e501f50a83048c3a1ebf829f5cf62205b996120cf5dcb59150abfbfbd9c1"
+      },
+      {
+        "path": "tools/compat/style_intern_native.cpp",
+        "sha256": "de55a79c2c45a82d17efd455635193fe9baa83a10917fdf3b31dfcd9531fb474"
+      },
+      {
+        "path": "tools/compat/style_intern_native.py",
+        "sha256": "8d30fcdb288bea5c0a1d5e6f98498261e80f730039bbda566b186fce0fe47b24"
+      }
+    ],
+    "evidence": {
+      "path": "docs/rust-style-map-local-evidence.json",
+      "sha256": "8cc4a1775fcf56bbcb3cbffe74f5069007afcaccd691121c2a5b13b22a7c30d9"
+    },
+    "observations": [
+      "Actual construction raises inexact in x87 on x86 and SSE on x64; default constants were not folded away in these native constructors.",
+      "Cache high/low thresholds; recompute on constructor, logical first allocation and actual rehash only. RemoveAll retains bin count and cached thresholds but requires initialization on reuse. Removing the last node retains initialized bins.",
+      "Portable default and scratch Documents do not run host callbacks. Clones retain the static arithmetic service, cached thresholds and logical initialization state.",
+      "x86: unsigned count conversion, f32 spill, x87 products/division and __ftol2 retaining EAX. EDI holds the live local threshold scratch array across the exact callee-preserved helper. x64: scalar SSE f32 conversion/product/division and native truncation.",
+      "Two repeats per role and architecture match 360 AddStyle, 712 map lifecycle and 1544 extended growth/shrink observations. Existing sticky flags and complete name enumeration match.",
+      "All current rendering, ownership, format/document and scoped host regression checks pass; no production switch."
+    ],
+    "unsafe_scope": "Four scalar assembly blocks, all local memory. No new foreign-memory reads, borrowed slices, copied foreign buffers or native map ownership.",
+    "limits": [
+      "Default floating modes/masked traps only.",
+      "Large-count conversion branches are source-derived, not allocation-scale differential evidence.",
+      "Allocation failure, reentry, host concurrency and complete renderer/host/vendor migration remain open."
+    ]
   },
   "next_work": [
-    "Observe actual constructor, first insertion, existing-key update, conflict removal/reinsertion, growth, Empty and reuse, plus sticky x87/SSE status. Keep two repeats per role and both architectures.",
-    "Add cached thresholds and a logical bins-initialized state to the safe map. Keep raw key order, primes, growth/shrink and retired value order unchanged.",
-    "Supply target arithmetic at the Windows boundary without unsafe code in the portable core. Avoid function callbacks or temporary Document constructions accidentally raising new floating exceptions.",
-    "Revalidate all 360 AddStyle cases, map growth/lifecycle, all format/document probes and actual rendering/hosts. Never count the current mismatch as passing.",
-    "Audit native style assignment versus Rust-owned default-style setters and selected-state copying separately. Transitional C++ assignment correction does not establish those Rust storage copy semantics for signaling NaNs."
-  ],
-  "deferred_ownership": "After these compatibility gaps, shared renderer HDC and text/path operations, then word/line/subtitle ownership; all hosts and vendored code remain in scope.",
-  "candidate_implementation_commit": "a518992aae3315977003a07cdfc7d9f65f9b37fd",
-  "current_failed_comparisons": {
-    "x86": {
-      "path": "artifacts/style-copy-add-style-x86/report.json",
-      "cases": 360,
-      "different_status_rows": 360,
-      "raw_values_and_names_equal": true,
-      "passing": false
-    },
-    "x64": {
-      "path": "artifacts/style-copy-add-style-x64/report.json",
-      "cases": 360,
-      "different_status_rows": 195,
-      "raw_values_and_names_equal": true,
-      "passing": false
-    }
-  }
+    "Correct Rust-owned default-style setter, selected-state Copy and self-Copy assignment semantics; see rust-default-style-assignment-inventory.json.",
+    "Continue shared renderer HDC/text/path ownership, word/line/subtitle graphs, every host ABI and vendored code."
+  ]
 }

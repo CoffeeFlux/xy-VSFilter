@@ -27,7 +27,65 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest correction: style floating comparisons and assignment (2026-10-19)
+## Latest correction: named-style map lifecycle and arithmetic (2026-10-19)
+
+Implementation `4234af68` corrects the named-style map's floating-status mismatch.
+The safe map caches its high/low thresholds and tracks whether native bins would
+be initialized. Construction, first insertion, growth and shrink run the target
+arithmetic; ordinary insertions, replacements and removals use cached values.
+Clear retains the bin count but marks the bins uninitialized for reuse. Scratch
+Document construction and cloning do not spuriously run host arithmetic.
+
+The Windows boundary uses the cleanup's x87 conversions and extended division
+on x86, including its exact `__ftol2` helper, and scalar SSE conversions on x64.
+Four bounded assembly blocks operate on local scalar values; no foreign map or
+Rust pointer ownership crosses this boundary. All 115 portable core files remain
+free of unsafe code. The lexical FFI inventory now covers 84 files, 530 unsafe
+blocks and seven assembly sites; these counts are not a soundness proof.
+
+The original 360 AddStyle cases now match raw values, conflict names and floating
+status on both architectures. Direct actual-class probes also match 712 lifecycle
+observations and an extended 1,544-observation history covering fractional growth
+past 367 styles and shrinking after clear/reuse. Each comparison has two reference
+and two candidate runs, including separate x87/SSE status, existing sticky flags
+and complete name enumeration. The extended probe is pinned separately at
+`62975a17`; only probe/validator files changed after the implementation checkpoint.
+The initial failed observations remain attributed to their original checkpoints.
+
+Both architectures build all three DLLs and pass 1,222 rendering cases / 13,186
+exact frames with 192 distinct-frame controls, three style interning scenarios,
+font/GDI, rectangle/string/table ownership probes, 15 format/document regressions,
+DLL export/dependency checks and 10 COM cases plus two controls. Each architecture
+passes 341 core and 136 FFI tests, with formatting and Clippy checks. Python passes
+185 tests at the implementation checkpoint and 186 after extending the probe,
+with one skip in each run. Historical storage results retain their original
+upstream reference and scoped implicit-assignment seam.
+
+The next actual-class diagnostic confirms a separate **unresolved x86 default-style
+assignment defect**. Across 180 inputs, setter/Copy/self-Copy/Empty produce 120
+differing rows: 60 raw-value rows from signaling-NaN quieting and 60 floating-status
+rows from signaling NaNs or denormals. x64 matches all 1,442 trace lines. Native
+self-assignment still loads/stores the default style's floating fields; the Rust
+registry currently returns early for equal handles. Empty retains the prior style
+and therefore retains any earlier bit discrepancy. The transitional C++ assignment
+helper does not cover these Rust-owned storage operations. Correct those explicit
+assignment boundaries next; raw transport and copy construction stay distinct.
+
+See [named-map evidence](rust-style-map-local-evidence.json),
+[map boundary inventory](rust-style-map-floating-inventory.json), and
+[default-style assignment handoff](rust-default-style-assignment-inventory.json).
+The diagnostic's exact source is retained in
+`tools/compat/style_default_assignment_diagnostic.cpp`. Reproduce map comparisons
+with `tools/compat/style_intern_native.py --reference-root artifacts/cleanup-reference
+--platform x64 --scenario map-growth --output <new-directory>`, repeating for
+Win32 and scenarios `map-lifecycle` and `add-style`. Local artifacts use `map-*`.
+
+No production default was switched. Nondefault floating modes/traps, allocation
+failure, reentry, concurrency and allocation-scale arithmetic remain unclosed.
+Shared renderer HDC/text/path ownership, word/line/subtitle ownership, every host
+interface and vendored code remain in the complete Rust migration.
+
+## Earlier style floating comparisons and assignment (2026-10-19)
 
 Implementation `a518992a` preserves the cleanup's floating-point domains during
 canonical style lookup/release and the equality decision in AddStyle. The safe
@@ -66,18 +124,18 @@ upstream reference remains unchanged; its passing results are not current style
 assignment parity. Actual assignment evidence comes from the cleanup probes
 above. The harness update has separate commit provenance from the implementation.
 
-The new 360-case AddStyle probe is **not passing**. After the assignment fix, all
+At that checkpoint, the new 360-case AddStyle probe was **not passing**. After the assignment fix, all
 raw style values and conflict names agree, but floating status differs in 360
 x86 rows and 195 x64 rows. Source/disassembly review identifies the remaining
 named-map issue: ATL caches load thresholds and updates them at initialization
-or rehash; Rust currently recomputes them during insertion/removal, also using
-the wrong floating domain on x86. Do not hide this difference by clearing status
-or count these cases as parity. Correct the map lifecycle and arithmetic next,
-then audit the remaining native assignment versus Rust storage-copy boundaries.
+or rehash; Rust then recomputed them during insertion/removal, also using
+the wrong floating domain on x86. These failed captures remain non-passing
+historical evidence. The later named-map correction above closes those observed
+differences; the default-style storage-copy boundary remains unresolved.
 
 See [style floating evidence](rust-style-floating-local-evidence.json),
 [boundary inventory](rust-style-floating-inventory.json), and the
-[next named-map review](rust-style-map-floating-inventory.json). All 115 portable
+[named-map review and correction](rust-style-map-floating-inventory.json). All 115 portable
 core files remain free of unsafe code. The 83-file FFI inventory includes one
 additional unsafe block for the bounded scalar assignment helper; its lexical
 counts are not a soundness proof. Reproduce the focused checks with
