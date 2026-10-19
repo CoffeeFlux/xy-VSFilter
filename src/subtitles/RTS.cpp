@@ -67,6 +67,9 @@ const double MAX_SUB_PIXEL_F = 8.0;
 // WARNING: this isn't very thread safe, use only one RTS a time.
 static HDC g_hDC;
 static int g_hDC_refcnt = 0;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+#include "RustFontIntern.inl"
+#endif
 
 static long revcolor(long c)
 {
@@ -130,6 +133,7 @@ inline CStringW::PCXSTR FindChar(CStringW::PCXSTR start, CStringW::PCXSTR end, W
 
 // CMyFont
 
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 CMyFont::CMyFont(const STSStyleBase& style)
 {
     LOGFONT lf;
@@ -152,6 +156,8 @@ CMyFont::CMyFont(const STSStyleBase& style)
     m_descent = ((tm.tmDescent + 4) >> 3);
     SelectFont(g_hDC, hOldFont);
 }
+
+#endif
 
 // CWord
 

@@ -24,6 +24,8 @@ mod dvb;
 mod effects;
 mod fields;
 mod fill;
+#[cfg(windows)]
+mod font_intern;
 mod golomb;
 mod hdmv;
 #[cfg(windows)]
@@ -43,6 +45,8 @@ mod timeline_search;
 mod webvtt;
 #[cfg(windows)]
 mod windows_crt;
+#[cfg(windows)]
+mod windows_font;
 #[cfg(windows)]
 mod windows_usf;
 #[cfg(all(feature = "native-runtime", not(windows)))]

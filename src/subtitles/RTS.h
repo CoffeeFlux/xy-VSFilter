@@ -42,6 +42,10 @@ enum AssCmdPosLevel
     POS_LVL_HARD
 };
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+#include "xy_rust_font_intern.h"
+typedef XyRust::FontIntern FwCMyFont;
+#else
 class CMyFont : public CFont
 {
 public:
@@ -51,6 +55,7 @@ public:
 };
 
 typedef XyInternedByKey<STSStyleBase, CMyFont> FwCMyFont;
+#endif
 
 class CPolygon;
 

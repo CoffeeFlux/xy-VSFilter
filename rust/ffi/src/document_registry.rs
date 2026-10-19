@@ -46,6 +46,8 @@ pub(crate) enum Kind {
     StringValue,
     Rectangle,
     StyleValue,
+    #[cfg(windows)]
+    Font,
 }
 
 // Inline sessions avoid a new fallible box allocation after core ownership transfer.
@@ -53,6 +55,8 @@ pub(crate) enum Kind {
 // only with an explicit preallocated ownership envelope.
 #[allow(clippy::large_enum_variant)]
 pub(crate) enum Resource {
+    #[cfg(windows)]
+    Font(alloc::sync::Arc<xy_vsfilter_compat::font_intern::Value<crate::windows_font::Font>>),
     StyleValue(alloc::sync::Arc<xy_vsfilter_compat::style_intern::Value>),
     Rectangle(alloc::sync::Arc<xy_vsfilter_compat::rect_intern::Value>),
     StringValue(alloc::sync::Arc<xy_vsfilter_compat::string_flyweight::Value>),
@@ -123,6 +127,8 @@ pub(crate) enum Resource {
 impl Resource {
     fn kind(&self) -> Kind {
         match self {
+            #[cfg(windows)]
+            Self::Font(_) => Kind::Font,
             Self::Document(_) => Kind::Document,
             Self::Effects { .. } => Kind::Effects,
             Self::AssTree(_) => Kind::AssTree,
@@ -156,6 +162,8 @@ pub(crate) struct Registry {
     pub(crate) strings: xy_vsfilter_compat::string_flyweight::Cache,
     pub(crate) rectangles: xy_vsfilter_compat::rect_intern::Table,
     pub(crate) styles: xy_vsfilter_compat::style_intern::Table,
+    #[cfg(windows)]
+    pub(crate) fonts: xy_vsfilter_compat::font_intern::Table<crate::windows_font::Font>,
 }
 impl Registry {
     const fn new() -> Self {
@@ -165,6 +173,8 @@ impl Registry {
             strings: xy_vsfilter_compat::string_flyweight::Cache::new(),
             rectangles: xy_vsfilter_compat::rect_intern::Table::new(),
             styles: xy_vsfilter_compat::style_intern::Table::new(),
+            #[cfg(windows)]
+            fonts: xy_vsfilter_compat::font_intern::Table::new(),
         }
     }
 
@@ -234,6 +244,17 @@ impl Registry {
     ) -> Result<&xy_vsfilter_compat::style_intern::Value, Error> {
         match &self.slots[self.position(id)?].1 {
             Resource::StyleValue(value) => Ok(value),
+            _ => Err(Error::TypeMismatch),
+        }
+    }
+
+    #[cfg(windows)]
+    pub(crate) fn font(
+        &self,
+        id: Handle,
+    ) -> Result<&xy_vsfilter_compat::font_intern::Value<crate::windows_font::Font>, Error> {
+        match &self.slots[self.position(id)?].1 {
+            Resource::Font(v) => Ok(v),
             _ => Err(Error::TypeMismatch),
         }
     }
@@ -779,6 +800,12 @@ impl Registry {
         }
         let resource = self.slots.swap_remove(index).1;
         let result = match &resource {
+            #[cfg(windows)]
+            Resource::Font(value) => {
+                self.fonts
+                    .release_with(value, &mut xy_vsfilter_compat::font_intern::Key::native_eq);
+                Ok(())
+            }
             Resource::Rectangle(value) => {
                 self.rectangles.release(value);
                 Ok(())
