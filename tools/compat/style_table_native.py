@@ -39,8 +39,10 @@ def validate(data, bits, edges=False):
             comparisons += 1
         elif row.startswith(b'state '):
             words = row.split()
-            if pending is None or len(words) != 6 or int(words[1]) != step or int(words[2]) != pending: raise ValueError('wrong state')
-            if not all(w.isdigit() for w in words[3:5]) or not re.fullmatch(rb'(?:-|[0-9a-f]{396})', words[5]): raise ValueError('invalid canonical value/count')
+            if pending is None or len(words) != 7 or int(words[1]) != step or int(words[2]) != pending: raise ValueError('wrong state')
+            if not all(w.isdigit() for w in words[3:5]) or not re.fullmatch(rb'(?:-|[0-9a-f]{396})', words[6]) or not re.fullmatch(rb'[0-9a-f]{176}',words[5]): raise ValueError('invalid canonical value/count/aliases')
+            aliases=int.from_bytes(bytes.fromhex(words[5].decode()),'little')
+            if (words[6]==b'-' and aliases) or (words[6]!=b'-' and not aliases&(1<<pending)):raise ValueError('invalid self alias')
             pending = None; step += 1
         else: raise ValueError('unexpected trace row')
     if pending is not None or step != steps or comparisons != (619 if edges else 21667): raise ValueError('incomplete observations')

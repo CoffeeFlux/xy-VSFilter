@@ -48,6 +48,11 @@ static void state(unsigned slot) {
         if(slots[slot] && ((*slots[i]==*slots[slot])!=(*actual[i]==*actual[slot])))abort();
     }
     printf("state %u %u %llu %llu ",step++,slot,static_cast<unsigned long long>(Logged::Count()),static_cast<unsigned long long>(FwRect::Count()));
+    for(unsigned i=0;i<704;i+=8) {
+        unsigned mask=0;for(unsigned j=0;j<8;++j)if(slots[slot] && slots[i+j] && *slots[slot]==*slots[i+j])mask|=1u<<j;
+        write_byte(mask);
+    }
+    printf(" ");
     if(slots[slot])wire(slots[slot]->get().value);else printf("-");
     printf("\n");
 }

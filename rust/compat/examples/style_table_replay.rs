@@ -85,14 +85,27 @@ fn main() {
             drop(old);
         }
         slots[slot] = replacement;
+        let mut aliases = [0u8; 88];
+        if let Some(current) = &slots[slot] {
+            for (i, other) in slots.iter().enumerate() {
+                if let Some(other) = other {
+                    let same = current.identity() == other.identity();
+                    assert_eq!(same, Arc::ptr_eq(current, other));
+                    if same {
+                        aliases[i / 8] |= 1 << (i % 8);
+                    }
+                }
+            }
+        }
         let value = slots[slot]
             .as_ref()
             .map(|v| hex(&document_style::encode(v.style()).unwrap()))
             .unwrap_or_else(|| "-".into());
         println!(
-            "state {step} {slot} {} {} {value}",
+            "state {step} {slot} {} {} {} {value}",
             table.count(),
-            rectangles.count()
+            rectangles.count(),
+            hex(&aliases)
         );
         step += 1;
     }

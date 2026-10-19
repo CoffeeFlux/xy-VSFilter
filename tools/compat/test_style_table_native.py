@@ -10,7 +10,7 @@ class StyleTableTraceControls(unittest.TestCase):
         for i in range(steps):
             rows += [f'drop {i} 0'.encode()]
             rows += [b'eq 1 1 1']*(comparisons//steps + (i < comparisons%steps))
-            rows += [f'state {i} 0 1 0 -'.encode()]
+            rows += [f'state {i} 0 1 0 '.encode()+b'0'*176+b' -']
         final='styles=45 rects=1' if edges else 'styles=1 rects=0'
         rows += [f'style-table-complete steps={steps} {final}'.encode()]
         return b'\n'.join(rows) + b'\n'
@@ -26,6 +26,7 @@ class StyleTableTraceControls(unittest.TestCase):
         for bad in [good.replace(b'drop 1 0', b'drop 0 0'),
                     good.replace(b'state 1 0', b'state 1 1'),
                     good.replace(b'eq 1 1 1', b'eq 1 1 2', 1),
+                    good.replace(b'0'*176+b' -',b'01'+b'0'*174+b' -',1),
                     good.replace(b'styles=1 rects=0', b'styles=0 rects=0')]:
             with self.assertRaises(ValueError): validate(bad, 64)
         with self.assertRaises(ValueError): validate(good, 32)
