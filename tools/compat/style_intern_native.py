@@ -14,6 +14,7 @@ CASES = 196
 INPUTS = CASES
 
 def validate(data,bits,scenario="interning"):
+    if scenario=="document-rectangle-history":return validate_document_history(data,bits)
     if scenario=="document-rectangles":return validate_document_rectangles(data,bits)
     if scenario=="default-style":return validate_default(data,bits)
     if scenario in ("map-lifecycle","map-growth"):return validate_map(data,bits,scenario=="map-growth")
@@ -52,6 +53,17 @@ def validate_add(data,bits):
                 if not value or int(value[3])*4!=len(value[4]):raise ValueError('invalid AddStyle raw value')
                 at+=1
     if rows[at:]!=[b'style-add-complete cases=360']:raise ValueError('invalid AddStyle completion')
+
+
+HISTORY_STAGES = "initial source destination input set-default alias-input drop-input add-alias drop-alias conflict snapshot equal-conflict interned copy self-copy-source drop-source empty-destination drop-destination drop-snapshot recreate add-retained drop-interned self-copy-recreated drop-recreated".split()
+
+def validate_document_history(data,bits):
+    rows=data.splitlines()
+    if len(rows)!=26 or rows[0]!=f'document-history-provenance pointer_bits={bits}'.encode():raise ValueError('invalid document history architecture/length')
+    for row,stage in zip(rows[1:-1],HISTORY_STAGES):
+        if not re.fullmatch(rb'document-history stage='+stage.encode()+rb' rectangles=[0-9]+ styles=[0-9]+',row):raise ValueError('invalid document history phase')
+    if rows[1]!=b'document-history stage=initial rectangles=0 styles=0' or rows[-2]!=b'document-history stage=drop-recreated rectangles=0 styles=0':raise ValueError('document history owner leak')
+    if rows[-1]!=b'document-history-complete cases=24':raise ValueError('missing document history completion')
 
 
 def validate_document_rectangles(data,bits):
@@ -112,14 +124,14 @@ def main():
     parser.add_argument("--reference-root", type=Path, required=True)
     parser.add_argument("--platform", choices=("Win32", "x64"), required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--scenario",choices=("interning","same-values","raw-twins","add-style","default-style","map-lifecycle","map-growth","document-rectangles"),default="interning")
+    parser.add_argument("--scenario",choices=("interning","same-values","raw-twins","add-style","default-style","map-lifecycle","map-growth","document-rectangles","document-rectangle-history"),default="interning")
     args = parser.parse_args()
     if os.name != "nt":
         parser.error("Windows ATL/MFC and built native libraries required")
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
     roots = (args.reference_root.resolve(), ROOT)
-    count={"add-style":360,"default-style":360,"map-lifecycle":712,"map-growth":1544,"document-rectangles":14}.get(args.scenario,CASES)
+    count={"add-style":360,"default-style":360,"map-lifecycle":712,"map-growth":1544,"document-rectangles":14,"document-rectangle-history":24}.get(args.scenario,CASES)
     report = dict(complete=False, equal=False, reference_commit=PIN, platform=args.platform,
                   kind="actual-renderer-style-interner", cases=count, inputs=count, scenario=args.scenario, builds={},
                   probe_sha256=sha(SOURCE.read_bytes()), 

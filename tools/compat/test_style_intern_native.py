@@ -1,9 +1,17 @@
 import unittest
 
-from style_intern_native import CASES, compare, validate, validate_lifecycle
+from style_intern_native import HISTORY_STAGES, CASES, compare, validate, validate_lifecycle
 
 
 class StyleTraceControls(unittest.TestCase):
+    def test_document_history_requires_every_phase_repeat_and_final_release(self):
+        rows=[b'document-history-provenance pointer_bits=32']+[f'document-history stage={stage} rectangles=0 styles=0'.encode() for stage in HISTORY_STAGES]+[b'document-history-complete cases=24']
+        good=b'\n'.join(rows)+b'\n';compare([good]*4,32,'document-rectangle-history')
+        for bad in [good.replace(b'stage=conflict ',b'stage=snapshot '),good.replace(b'stage=drop-recreated rectangles=0',b'stage=drop-recreated rectangles=1'),good.replace(b'cases=24',b'cases=23')]:
+            with self.assertRaises(ValueError):validate(bad,32,'document-rectangle-history')
+        changed=good.replace(b'stage=conflict rectangles=0',b'stage=conflict rectangles=1')
+        with self.assertRaises(ValueError):compare([good,good,changed,changed],32,'document-rectangle-history')
+
     def test_document_rectangles_retain_default_named_and_copied_owners(self):
         stages=['initial','source','destination','input','set-default','drop-input','copy','empty-source','add-named','copy-named','empty-source-again','empty-destination','drop-source','drop-destination']
         counts=[0,1,1,2,2,2,1,1,2,2,2,1,1,0]

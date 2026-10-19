@@ -100,6 +100,14 @@ public:
         return m_styles.GetCount();
 #endif
     }
+    bool copy_named(const wchar_t* name, STSStyle& copy) const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        return GetNamedStyleCopy(CString(name),copy);
+#else
+        STSStyle* value=nullptr;if(!m_styles.Lookup(CString(name),value)||!value)return false;
+        copy=*value;return true;
+#endif
+    }
     void show(const wchar_t* name) const {
         STSStyle copy;bool present;
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
@@ -196,7 +204,36 @@ static int document_rectangles(){
     printf("document-rect-complete cases=14\n");return 0;
 }
 
+static int document_rectangle_history() {
+    if(!AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0))return 2;
+    printf("document-history-provenance pointer_bits=%u\n",unsigned(sizeof(void*)*8));
+    unsigned phases=0;
+    auto report=[&](const char* stage){++phases;printf("document-history stage=%s rectangles=%llu styles=%llu\n",stage,static_cast<unsigned long long>(FwRect::Count()),static_cast<unsigned long long>(FwSTSStyle::Count()));};
+    report("initial");auto source=std::make_unique<StyleDocument>();report("source");
+    auto destination=std::make_unique<StyleDocument>();report("destination");
+    auto input=std::make_unique<STSStyle>();input->marginRect=CRect(1,2,3,4);report("input");
+    source->SetDefaultStyle(*input);report("set-default");
+    auto alias=std::make_unique<STSStyle>(*input);report("alias-input");
+    input.reset();report("drop-input");
+    source->AddStyle(CString(L"Owned"),new STSStyle(*alias));report("add-alias");
+    alias.reset();report("drop-alias");
+    auto incoming=new STSStyle;incoming->marginRect=CRect(5,6,7,8);
+    source->AddStyle(CString(L"Owned"),incoming);report("conflict");
+    auto snapshot=std::make_unique<STSStyle>();if(!source->copy_named(L"Owned",*snapshot))return 3;
+    report("snapshot");source->AddStyle(CString(L"Owned"),new STSStyle(*snapshot));report("equal-conflict");
+    auto interned=std::make_unique<FwSTSStyle>(*snapshot);report("interned");
+    destination->Copy(*source);report("copy");source->Copy(*source);report("self-copy-source");
+    source.reset();report("drop-source");destination->Empty();report("empty-destination");
+    destination.reset();report("drop-destination");snapshot.reset();report("drop-snapshot");
+    auto recreated=std::make_unique<StyleDocument>();report("recreate");
+    recreated->AddStyle(CString(L"Owned"),new STSStyle(interned->get()));report("add-retained");
+    interned.reset();report("drop-interned");recreated->Copy(*recreated);report("self-copy-recreated");
+    recreated.reset();report("drop-recreated");
+    printf("document-history-complete cases=%u\n",phases);return 0;
+}
+
 int main(int argc,char** argv) {
+    if(argc>1&&!strcmp(argv[1],"document-rectangle-history"))return document_rectangle_history();
     if(argc>1&&!strcmp(argv[1],"document-rectangles"))return document_rectangles();
     if(argc>1&&!strcmp(argv[1],"default-style"))return default_styles();
     if(argc>1&&!strcmp(argv[1],"map-lifecycle"))return map_lifecycle();
