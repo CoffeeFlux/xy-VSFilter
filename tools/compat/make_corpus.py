@@ -883,6 +883,39 @@ def realtext_parser_variants():
         yield "realtext-parser-"+name+".rt",data
 
 
+
+def effects_variants():
+    for name,tags in {
+        'control':r'\pos(320,180)',
+        'position-first':r'\pos(140,120)\pos(500,240)',
+        'position-last':r'\pos(500,240)',
+        'position-move':r'\pos(140,120)\move(320,180,480,240)',
+        'move-first':r'\move(120,100,480,250,200,2200)\pos(320,180)',
+        'move-second':r'\move(120,100,480,250)\move(480,250,120,100)',
+        'fade-first':r'\pos(320,180)\fade(255,0,180,0,700,1500,2700)\fad(50,50)',
+        'fad-first':r'\pos(320,180)\fad(900,900)\fade(0,0,0,0,0,0,0)',
+        'fade-two':r'\pos(320,180)\fade(900,900)',
+        'fad-seven':r'\pos(320,180)\fad(255,0,180,0,700,1500,2700)',
+        'origin-first':r'\pos(320,180)\org(140,120)\org(500,240)\frz25',
+        'origin-last':r'\pos(320,180)\org(500,240)\frz25',
+        'empty-parameters':r'\pos(,120)\move(120,,480,250)\fad(,900)',
+        'numeric-suffix':r'\pos(140x,120x)\fad(900x,900x)',
+    }.items():
+        caption=('{'+tags+r'\bord1\shad0}Effect ownership sample').encode('ascii')
+        yield 'effects-'+name+'.ass',SEED.replace(br'{\pos(320,180)\bord2}COMPAT_TEXT',caption)
+    for name,column in {
+        'banner':'Banner;4;0;32',
+        'banner-reverse':'Banner;4;1;32',
+        'banner-junk':'Banner;4x;1;32',
+        'banner-negative':'Banner;-4;1;32',
+        'scroll-up':'Scroll up;280;40;5;48',
+        'scroll-down':'Scroll down;280;40;5;48',
+        'scroll-short':'Scroll up;280;40',
+        'column-space':' BANNER; 4; 1; 32 ',
+    }.items():
+        data=SEED.replace(b',0,0,0,,',b',0,0,0,'+column.encode('ascii')+b',')
+        yield 'effects-'+name+'.ass',data.replace(br'{\pos(320,180)\bord2}COMPAT_TEXT',br'{\bord1\shad0}Effect ownership sample')
+
 def html_tag_variants():
     for name,text in {
         'control':'First caption','bold':'<strong>First caption</strong>',
@@ -994,6 +1027,8 @@ def make_cases(files):
                 for apartment in ("sta", "mta"):
                     cases.append({**uninitialized, "id": uninitialized["id"] + "-" + apartment,
                                   "com_apartment": apartment})
+            if path.stem.startswith("effects-"):
+                cases[-1]["times"] = ["0", "0.9999999", "1", "1.125", "1.5", "1.9", "2", "2.5", "3.1", "3.5", "3.9999999", "4", "2", "1.125"]
             if path.stem.startswith("html-tag-"):
                 cases[-1]["times"] = ["0", "0.9999999", "1", "1.005", "1.015", "1.025", "1.05", "2", "3.9999999", "4", "1.005"]
             warning_styles = {"field-tab-prefixes": "\tDefault", "field-unicode-style-space": "\u2003Default"}
@@ -1081,6 +1116,12 @@ def make_cases(files):
                        for apartment in ("sta", "mta")]
                     + [[f"html-tag-{name}-{mode}",f"html-tag-control-{mode}"]
                        for name in ("bold","italic","underline","strike","negative-size","face","closing-font","karaoke")
+                       for mode in ("file","memory")]
+                    + [[f"effects-{a}-{mode}",f"effects-{b}-{mode}"]
+                       for a,b in (("position-first","position-last"),("move-first","control"),
+                                   ("fade-first","control"),("fad-first","control"),
+                                   ("origin-first","origin-last"),("banner","banner-reverse"),
+                                   ("scroll-up","scroll-down"),("banner","banner-negative"))
                        for mode in ("file","memory")], "cases": cases}
 
 
@@ -1134,6 +1175,7 @@ def main():
     generated += [(DEST / "generated" / name, data) for name, data in usf_conversion_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in shared_color_variants()]
     generated += [(DEST / "generated" / name, data) for name, data in html_tag_variants()]
+    generated += [(DEST / "generated" / name, data) for name, data in effects_variants()]
     manifest = json.dumps(make_cases(files + generated), indent=2) + "\n"
     expected = generated + [(DEST / "cases.json", manifest.encode("utf-8"))]
     for path, data in expected:

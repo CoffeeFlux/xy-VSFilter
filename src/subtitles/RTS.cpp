@@ -1479,7 +1479,9 @@ int CLine::GetWordCount()
 
 CSubtitle::CSubtitle()
 {
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
     memset(m_effects, 0, sizeof(Effect*)*EF_NUMBEROFEFFECTS);
+#endif
     m_clipInverse = false;
     m_scalex = m_scaley = 1;
     m_fAnimated2 = false;
@@ -1499,8 +1501,12 @@ void CSubtitle::Empty()
     while(pos) delete GetNext(pos);
 //    pos = m_words.GetHeadPosition();
 //    while(pos) delete m_words.GetNext(pos);
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    m_effects.Clear();
+#else
     for(int i = 0; i < EF_NUMBEROFEFFECTS; i++) {if(m_effects[i]) delete m_effects[i];}
     memset(m_effects, 0, sizeof(Effect*)*EF_NUMBEROFEFFECTS);
+#endif
 }
 
 int CSubtitle::GetFullLineWidth(POSITION pos)
@@ -2076,6 +2082,9 @@ void CRenderedTextSubtitle::Deinit()
 
 void CRenderedTextSubtitle::ParseEffect(CSubtitle* sub, const CStringW& str)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    if(sub)sub->m_effects.Column(str,sub->m_scalex,sub->m_scaley,sub->m_wrapStyle,sub->m_hard_position_level,sub->m_fAnimated2);
+#else
     CStringW::PCXSTR str_start = str.GetString();
     CStringW::PCXSTR str_end   = str.GetLength() + str_start;
     str_start = SkipWhiteSpaceLeft(str_start, str_end);
@@ -2122,6 +2131,7 @@ void CRenderedTextSubtitle::ParseEffect(CSubtitle* sub, const CStringW& str)
 
         sub->m_hard_position_level = POS_LVL_HARD;
     }
+#endif
 }
 
 void CRenderedTextSubtitle::ParseString(CSubtitle* sub, CStringW str, const FwSTSStyle& style)
@@ -2571,6 +2581,9 @@ bool CRenderedTextSubtitle::ParseSSATag( CSubtitle* sub, const AssTagList& assTa
         case CMD_fade:
         case CMD_fad:
             {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                sub->m_effects.Apply(1,params,sub->m_scalex,sub->m_scaley,sub->m_wrapStyle,sub->m_hard_position_level,sub->m_fAnimated2);
+#else
                 sub->m_fAnimated2 = true;
                 if(params.GetCount() == 7 && !sub->m_effects[EF_FADE])// {\fade(a1=param[0], a2=param[1], a3=param[2], t1=t[0], t2=t[1], t3=t[2], t4=t[3])
                 {
@@ -2595,6 +2608,7 @@ bool CRenderedTextSubtitle::ParseSSATag( CSubtitle* sub, const AssTagList& assTa
                         sub->m_effects[EF_FADE] = e;
                     }
                 }
+#endif
                 break;
             }
         case CMD_fax:
@@ -2750,6 +2764,9 @@ bool CRenderedTextSubtitle::ParseSSATag( CSubtitle* sub, const AssTagList& assTa
             }
         case CMD_move: // {\move(x1=param[0], y1=param[1], x2=param[2], y2=param[3][, t1=t[0], t2=t[1]])}
             {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                sub->m_effects.Apply(2,params,sub->m_scalex,sub->m_scaley,sub->m_wrapStyle,sub->m_hard_position_level,sub->m_fAnimated2);
+#else
                 if((params.GetCount() == 4 || params.GetCount() == 6) && !sub->m_effects[EF_MOVE])
                 {
                     if(Effect* e = DEBUG_NEW Effect)
@@ -2768,10 +2785,14 @@ bool CRenderedTextSubtitle::ParseSSATag( CSubtitle* sub, const AssTagList& assTa
                         sub->m_fAnimated2 = true;
                     }
                 }
+#endif
                 break;
             }
         case CMD_org: // {\org(x=param[0], y=param[1])}
             {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                sub->m_effects.Apply(3,params,sub->m_scalex,sub->m_scaley,sub->m_wrapStyle,sub->m_hard_position_level,sub->m_fAnimated2);
+#else
                 if(params.GetCount() == 2 && !sub->m_effects[EF_ORG])
                 {
                     if(Effect* e = DEBUG_NEW Effect)
@@ -2781,6 +2802,7 @@ bool CRenderedTextSubtitle::ParseSSATag( CSubtitle* sub, const AssTagList& assTa
                         sub->m_effects[EF_ORG] = e;
                     }
                 }
+#endif
                 break;
             }
         case CMD_pbo:
@@ -2790,6 +2812,9 @@ bool CRenderedTextSubtitle::ParseSSATag( CSubtitle* sub, const AssTagList& assTa
             }
         case CMD_pos:
             {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                sub->m_effects.Apply(4,params,sub->m_scalex,sub->m_scaley,sub->m_wrapStyle,sub->m_hard_position_level,sub->m_fAnimated2);
+#else
                 if(params.GetCount() == 2 && !sub->m_effects[EF_MOVE])
                 {
                     if(Effect* e = DEBUG_NEW Effect)
@@ -2800,6 +2825,7 @@ bool CRenderedTextSubtitle::ParseSSATag( CSubtitle* sub, const AssTagList& assTa
                         sub->m_effects[EF_MOVE] = e;
                     }
                 }
+#endif
                 break;
             }
         case CMD_p:

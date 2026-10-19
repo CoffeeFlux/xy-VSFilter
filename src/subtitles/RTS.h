@@ -210,6 +210,10 @@ public:
     int t[4];
 };
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+#include "xy_rust_effects.h"
+#endif
+
 class CClipper
 {
 private:
@@ -269,7 +273,11 @@ public:
     bool                     m_fAnimated;
     bool                     m_fAnimated2; //If this Subtitle has animate effect
     int                      m_relativeTo;
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    XyRust::Effects          m_effects;
+#else
     Effect*                  m_effects[EF_NUMBEROFEFFECTS];
+#endif
     CAtlList<SharedPtrCWord> m_words;
     SharedPtrCClipper        m_pClipper;
     CRect                    m_rect, m_clip;

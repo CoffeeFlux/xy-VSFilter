@@ -40,6 +40,7 @@ pub(crate) enum Kind {
     VttRun,
     SamiRun,
     SearchRun,
+    Effects,
 }
 
 // Inline sessions avoid a new fallible box allocation after core ownership transfer.
@@ -47,6 +48,10 @@ pub(crate) enum Kind {
 // only with an explicit preallocated ownership envelope.
 #[allow(clippy::large_enum_variant)]
 pub(crate) enum Resource {
+    Effects {
+        revision: u64,
+        state: xy_vsfilter_compat::effects::State,
+    },
     Document(Box<Document>),
     Snapshot(Vec<u8>),
     UnknownRun {
@@ -110,6 +115,7 @@ impl Resource {
     fn kind(&self) -> Kind {
         match self {
             Self::Document(_) => Kind::Document,
+            Self::Effects { .. } => Kind::Effects,
             Self::Snapshot(_) => Kind::Snapshot,
             Self::UnknownRun { .. } => Kind::UnknownRun,
             Self::StyleAddRun { .. } => Kind::StyleAddRun,
@@ -178,6 +184,17 @@ impl Registry {
         let index = self.position(id)?;
         match &mut self.slots[index].1 {
             Resource::Document(document) => Ok(document),
+            _ => Err(Error::TypeMismatch),
+        }
+    }
+
+    pub(crate) fn effects(
+        &mut self,
+        id: Handle,
+    ) -> Result<(&mut u64, &mut xy_vsfilter_compat::effects::State), Error> {
+        let index = self.position(id)?;
+        match &mut self.slots[index].1 {
+            Resource::Effects { revision, state } => Ok((revision, state)),
             _ => Err(Error::TypeMismatch),
         }
     }
@@ -724,7 +741,7 @@ impl Drop for Guard<'_> {
 }
 
 impl Boundary {
-    const fn new() -> Self {
+    pub(crate) const fn new() -> Self {
         // Keep the unsafe Sync proof tied to the actual resource types, including
         // future enum variants. A non-Send addition must fail compilation here.
         const fn assert_send<T: Send>() {}

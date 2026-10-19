@@ -9652,6 +9652,8 @@ mod tests {
             let fresh = create();
             assert!(fresh > owner);
             assert!(fresh > entry_snapshot);
+            #[cfg(windows)]
+            crate::effects::test_exports(fresh);
             assert_eq!(xy_vsfilter_document_destroy_v1(fresh), OK);
         }
     }

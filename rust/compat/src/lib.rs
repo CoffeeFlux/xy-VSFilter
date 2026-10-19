@@ -27,6 +27,7 @@ pub mod document_wire;
 pub mod drawing;
 pub mod drawing_tokens;
 pub mod dvb;
+pub mod effects;
 pub mod fields;
 pub mod fill;
 pub mod font;

@@ -16,6 +16,8 @@ mod document_registry;
 mod drawing;
 mod drawing_tokens;
 mod dvb;
+#[cfg(windows)]
+mod effects;
 mod fields;
 mod fill;
 mod golomb;
