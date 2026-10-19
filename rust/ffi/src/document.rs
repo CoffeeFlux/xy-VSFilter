@@ -2361,7 +2361,15 @@ fn units(bytes: &[u8]) -> Vec<u16> {
 #[no_mangle]
 pub unsafe extern "C" fn xy_vsfilter_document_create_v1(output: *mut u8, capacity: usize) -> u32 {
     required!(output_capacity(output, capacity, 8));
-    let id = required!(insert(Resource::Document(Box::default())));
+    let mut document = Box::<Document>::default();
+    #[cfg(windows)]
+    {
+        *document.named_styles_mut() =
+            xy_vsfilter_compat::document_style_map::StyleMap::with_arithmetic(
+                &crate::windows_style_map::ARITHMETIC,
+            );
+    }
+    let id = required!(insert(Resource::Document(document)));
     // SAFETY: caller contract and capacity were validated before insertion.
     unsafe { write_output(output, &id.to_le_bytes()) };
     OK

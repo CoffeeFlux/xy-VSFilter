@@ -92,6 +92,40 @@ struct Entry<V> {
     value: V,
 }
 
+/// Target arithmetic supplied by the boundary. Callbacks return (high, low)
+/// thresholds and the size estimate before prime selection, respectively.
+/// A static service keeps cloning storage free of floating operations.
+#[derive(Debug)]
+pub struct Arithmetic {
+    thresholds: fn(u32) -> (usize, usize),
+    estimate: fn(usize) -> usize,
+}
+impl Arithmetic {
+    pub const fn new(thresholds: fn(u32) -> (usize, usize), estimate: fn(usize) -> usize) -> Self {
+        Self {
+            thresholds,
+            estimate,
+        }
+    }
+}
+impl PartialEq for Arithmetic {
+    fn eq(&self, other: &Self) -> bool {
+        // Compare static service identity, never compiler-dependent function
+        // addresses. Services are borrowed, not copied into the map.
+        core::ptr::eq(self, other)
+    }
+}
+impl Eq for Arithmetic {}
+static PORTABLE_ARITHMETIC: Arithmetic = Arithmetic::new(
+    |bins| {
+        (
+            (2.25f32 * bins as f32) as usize,
+            (0.25f32 * bins as f32) as usize,
+        )
+    },
+    |count| (count as f32 / 0.75f32) as usize,
+);
+
 /// Native default bins/load thresholds, with ascending-bin, head-first order.
 /// Values are owned; replacing/removing/clearing returns retired values so an
 /// adapter can destroy them after leaving its admission gate.
@@ -99,6 +133,10 @@ struct Entry<V> {
 pub struct StyleMap<V> {
     buckets: Vec<Vec<Entry<V>>>,
     count: usize,
+    high: usize,
+    low: usize,
+    initialized: bool,
+    arithmetic: &'static Arithmetic,
 }
 
 impl<V> Default for StyleMap<V> {
@@ -112,7 +150,29 @@ impl<V> StyleMap<V> {
         Self {
             buckets: empty_buckets(17),
             count: 0,
+            high: 38,
+            low: 0,
+            initialized: false,
+            arithmetic: &PORTABLE_ARITHMETIC,
         }
+    }
+    /// Construct a host map, including observable native constructor arithmetic.
+    /// Portable defaults used for scratch storage do not run host callbacks.
+    pub fn with_arithmetic(arithmetic: &'static Arithmetic) -> Self {
+        let mut map = Self {
+            arithmetic,
+            ..Self::new()
+        };
+        map.update_thresholds();
+        map
+    }
+    fn update_thresholds(&mut self) {
+        let (high, low) = (self.arithmetic.thresholds)(self.bin_count());
+        self.high = high;
+        self.low = if low < 17 { 0 } else { low };
+    }
+    fn pick_size(&self) -> u32 {
+        prime_for_estimate((self.arithmetic.estimate)(self.count))
     }
     pub fn count(&self) -> usize {
         self.count
@@ -144,12 +204,16 @@ impl<V> StyleMap<V> {
         {
             return Some(core::mem::replace(&mut entry.value, value));
         }
+        if !self.initialized {
+            self.update_thresholds();
+            self.initialized = true;
+        }
         key.truncate(prefix(&key).len());
         let hash = string_hash(&key);
         self.buckets[bucket].insert(0, Entry { key, hash, value });
         self.count += 1;
-        if self.count > (2.25f32 * self.bin_count() as f32) as usize {
-            self.rehash(pick_size(self.count));
+        if self.count > self.high {
+            self.rehash(self.pick_size());
         }
         None
     }
@@ -160,9 +224,8 @@ impl<V> StyleMap<V> {
             .position(|entry| entry.key == prefix(key))?;
         let entry = self.buckets[bucket].remove(position);
         self.count -= 1;
-        let low = (0.25f32 * self.bin_count() as f32) as usize;
-        if low >= 17 && self.count < low {
-            self.rehash(pick_size(self.count));
+        if self.count < self.low {
+            self.rehash(self.pick_size());
         }
         Some(entry.value)
     }
@@ -174,6 +237,7 @@ impl<V> StyleMap<V> {
             retired.extend(bucket.drain(..).map(|entry| entry.value));
         }
         self.count = 0;
+        self.initialized = false;
         retired
     }
     pub fn iter(&self) -> impl Iterator<Item = (&[u16], &V)> {
@@ -195,15 +259,15 @@ impl<V> StyleMap<V> {
             }
         }
         self.buckets = replacement;
+        self.update_thresholds();
     }
 }
 
 fn empty_buckets<V>(bins: u32) -> Vec<Vec<Entry<V>>> {
     (0..bins).map(|_| Vec::new()).collect()
 }
-fn pick_size(count: usize) -> u32 {
-    // Native size_t / float converts to f32 first; estimate clamps at UINT_MAX.
-    let estimate = ((count as f32 / 0.75f32) as usize).min(u32::MAX as usize) as u32;
+fn prime_for_estimate(estimate: usize) -> u32 {
+    let estimate = estimate.min(u32::MAX as usize) as u32;
     match PRIMES.iter().copied().find(|&prime| prime >= estimate) {
         Some(prime) if prime != u32::MAX => prime,
         _ => estimate,
@@ -216,6 +280,48 @@ mod tests {
     use alloc::vec;
     fn key(n: u16) -> Vec<u16> {
         vec![n]
+    }
+    fn pick_size(count: usize) -> u32 {
+        prime_for_estimate((PORTABLE_ARITHMETIC.estimate)(count))
+    }
+    #[test]
+    fn arithmetic_runs_at_native_lifecycle_boundaries() {
+        use core::sync::atomic::{AtomicUsize, Ordering::SeqCst};
+        static THRESHOLDS: AtomicUsize = AtomicUsize::new(0);
+        static ESTIMATES: AtomicUsize = AtomicUsize::new(0);
+        static OBSERVED: Arithmetic = Arithmetic::new(
+            |bins| {
+                THRESHOLDS.fetch_add(1, SeqCst);
+                (PORTABLE_ARITHMETIC.thresholds)(bins)
+            },
+            |count| {
+                ESTIMATES.fetch_add(1, SeqCst);
+                (PORTABLE_ARITHMETIC.estimate)(count)
+            },
+        );
+        let mut map = StyleMap::with_arithmetic(&OBSERVED);
+        assert_eq!(THRESHOLDS.load(SeqCst), 1);
+        for n in 1..=128 {
+            map.insert(key(n), n);
+        }
+        assert_eq!(THRESHOLDS.load(SeqCst), 4); // first allocation, two growths
+        assert_eq!(ESTIMATES.load(SeqCst), 2);
+        for n in 1..=128 {
+            assert_eq!(map.insert(key(n), n), Some(n));
+        }
+        let copy = map.clone();
+        assert_eq!(map, copy);
+        map.clear();
+        assert_eq!(THRESHOLDS.load(SeqCst), 4);
+        map.insert(key(7), 7);
+        assert_eq!(THRESHOLDS.load(SeqCst), 5);
+        map.remove(&[7]); // shrinks 163 -> 17, keeps logical bins allocated
+        assert_eq!(THRESHOLDS.load(SeqCst), 6);
+        assert_eq!(ESTIMATES.load(SeqCst), 3);
+        map.insert(key(8), 8);
+        map.remove(&[8]);
+        map.insert(key(9), 9);
+        assert_eq!(THRESHOLDS.load(SeqCst), 6);
     }
     #[test]
     fn raw_keys_and_retired_values() {

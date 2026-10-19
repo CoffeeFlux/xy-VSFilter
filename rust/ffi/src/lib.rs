@@ -51,6 +51,8 @@ mod windows_float;
 #[cfg(windows)]
 mod windows_font;
 #[cfg(windows)]
+mod windows_style_map;
+#[cfg(windows)]
 mod windows_usf;
 #[cfg(all(feature = "native-runtime", not(windows)))]
 compile_error!("native-runtime uses the Windows C runtime; omit it for portable tests");
