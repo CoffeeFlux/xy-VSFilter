@@ -2361,14 +2361,16 @@ fn units(bytes: &[u8]) -> Vec<u16> {
 #[no_mangle]
 pub unsafe extern "C" fn xy_vsfilter_document_create_v1(output: *mut u8, capacity: usize) -> u32 {
     required!(output_capacity(output, capacity, 8));
-    let mut document = Box::<Document>::default();
+    let document = Box::<Document>::default();
     #[cfg(windows)]
-    {
+    let document = {
+        let mut document = document;
         *document.named_styles_mut() =
             xy_vsfilter_compat::document_style_map::StyleMap::with_arithmetic(
                 &crate::windows_style_map::ARITHMETIC,
             );
-    }
+        document
+    };
     let id = required!(insert(Resource::Document(document)));
     // SAFETY: caller contract and capacity were validated before insertion.
     unsafe { write_output(output, &id.to_le_bytes()) };
@@ -2401,6 +2403,9 @@ pub unsafe extern "C" fn xy_vsfilter_document_set_default_style_v1(
     // Borrow pending ownership so rejected admission/handles also drop outside.
     let retired = required!(admitted(|registry| {
         let document = registry.document_mut(owner).map_err(registry_error)?;
+        if let Some(style) = &mut value {
+            style.assign_floats_with(crate::style_assignment::copy_bits);
+        }
         Ok(document.replace_default_style(value.take()))
     }));
     drop(retired);
@@ -7919,7 +7924,7 @@ mod tests {
                 assert_eq!(xy_vsfilter_document_snapshot_drop_v1(id), OK);
             }
 
-            // Default-style transport and ownership are independent of storage.
+            // Default-style assignment is distinct from raw input transport.
             let source = create();
             let target = create();
             let mut output = [0xa5; 8];
@@ -7942,7 +7947,12 @@ mod tests {
                 OK
             );
             let snapshot = open_snapshot(source, 2);
-            assert_eq!(read_snapshot(snapshot), style);
+            let mut assigned = style.clone();
+            if cfg!(all(windows, target_arch = "x86")) {
+                assigned[72..80].copy_from_slice(&0x7ff8000000000042u64.to_le_bytes());
+            }
+            assert_eq!(read_snapshot(snapshot), assigned);
+            assert_eq!(&style[72..80], &0x7ff0000000000042u64.to_le_bytes());
             assert_eq!(
                 xy_vsfilter_document_snapshot_open_v1(source, 2, 1, output.as_mut_ptr(), 8),
                 OUT_OF_RANGE

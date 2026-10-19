@@ -286,12 +286,23 @@ impl Document {
     /// Successful-allocation header assignment only: no callbacks, named-map
     /// clearing, prepared copy, or native partial-allocation-failure emulation.
     pub fn replace_selected_state(&mut self, state: SelectedState) -> RetiredSelectedState {
+        self.replace_selected_state_with(state, |bits| bits)
+    }
+    /// Selected Copy assignments with the target's floating copy effects.
+    pub fn replace_selected_state_with(
+        &mut self,
+        mut state: SelectedState,
+        assign: impl FnMut(u64) -> u64,
+    ) -> RetiredSelectedState {
         let name = core::mem::replace(&mut self.name, state.name);
         self.interpretation[0] = state.interpretation[0];
         self.interpretation[1] = state.interpretation[1];
         self.script = state.script;
         self.scaled_bas = state.scaled_bas;
         self.interpretation[2] = state.interpretation[2];
+        if let Some(style) = &mut state.default_style {
+            style.assign_floats_with(assign);
+        }
         let default_style = core::mem::replace(&mut self.default_style, state.default_style);
         self.forced_default = state.forced_default;
         RetiredSelectedState {
@@ -426,6 +437,12 @@ impl Document {
     /// Absent until the native adapter supplies an initialized style.
     pub fn default_style(&self) -> Option<&crate::document_style::StyleValue> {
         self.default_style.as_ref()
+    }
+    /// Native self-assignment still loads/stores each floating field.
+    pub fn assign_default_style_with(&mut self, assign: impl FnMut(u64) -> u64) {
+        if let Some(style) = &mut self.default_style {
+            style.assign_floats_with(assign);
+        }
     }
     /// Transfers retired storage to the caller for destruction after admission.
     pub fn replace_default_style(
@@ -1384,6 +1401,33 @@ mod tests {
         assert_eq!(destination.default_style(), Some(&second));
         assert_eq!(destination.replace_default_style(None), Some(second));
         assert_eq!(source.default_style(), Some(&first));
+    }
+    #[test]
+    fn selected_assignment_and_self_assignment_are_distinct_from_raw_storage() {
+        let mut source = Document::default();
+        source.replace_default_style(Some(rename_value(7)));
+        let original = source.clone();
+        let mut destination = Document::default();
+        let mut calls = 0;
+        destination.replace_selected_state_with(source.selected_state(), |bits| {
+            calls += 1;
+            bits.wrapping_add(1)
+        });
+        assert_eq!(calls, 15);
+        assert_eq!(source, original);
+        assert_ne!(destination.default_style(), source.default_style());
+        let assigned = destination.default_style().unwrap().clone();
+        destination.assign_default_style_with(|bits| {
+            calls += 1;
+            bits.wrapping_add(1)
+        });
+        assert_eq!(calls, 30);
+        assert_ne!(destination.default_style(), Some(&assigned));
+        destination.replace_selected_state_with(Document::default().selected_state(), |_| {
+            panic!("absent style")
+        });
+        destination.assign_default_style_with(|_| panic!("absent style"));
+        assert!(destination.default_style().is_none());
     }
     #[test]
     fn named_style_clone_and_storage_operations_are_independent() {

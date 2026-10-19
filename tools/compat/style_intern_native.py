@@ -14,6 +14,7 @@ CASES = 196
 INPUTS = CASES
 
 def validate(data,bits,scenario="interning"):
+    if scenario=="default-style":return validate_default(data,bits)
     if scenario in ("map-lifecycle","map-growth"):return validate_map(data,bits,scenario=="map-growth")
     if scenario=="add-style":return validate_add(data,bits)
     rows=data.splitlines()
@@ -52,6 +53,19 @@ def validate_add(data,bits):
     if rows[at:]!=[b'style-add-complete cases=360']:raise ValueError('invalid AddStyle completion')
 
 
+def validate_default(data,bits):
+    rows=data.splitlines()
+    if len(rows)!=2882 or rows[0]!=f'default-provenance pointer_bits={bits}'.encode():raise ValueError('invalid default-style architecture/length')
+    for index in range(360):
+        sticky=index//180
+        for phase,op in enumerate(('set','copy','self','empty')):
+            m=re.fullmatch(f'default-style index={index} sticky={sticky} op={op} '.encode()+rb'fp=[0-9a-f]{8} domains=([0-9a-f]{16}),([0-9a-f]{16})',rows[1+index*8+phase*2])
+            if not m or bool(int(m[1],16))!=bool(sticky) or int(m[1],16)&int(m[2],16)!=int(m[1],16):raise ValueError('invalid default-style order/sticky status')
+            value=re.fullmatch(rb'style-value rect=(-?\d+,){3}-?\d+ ints=(-?\d+,){7}-?\d+ font=(\d+):([0-9a-f]*) colors=[0-9a-f]{40} doubles=[0-9a-f]{240}',rows[2+index*8+phase*2])
+            if not value or int(value[3])*4!=len(value[4]):raise ValueError('invalid default-style raw value')
+    if rows[-1]!=b'default-complete cases=360':raise ValueError('missing default-style completion')
+
+
 def validate_map(data,bits,growth=False):
     rows=data.splitlines()
     size=512 if growth else 128
@@ -87,14 +101,14 @@ def main():
     parser.add_argument("--reference-root", type=Path, required=True)
     parser.add_argument("--platform", choices=("Win32", "x64"), required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--scenario",choices=("interning","same-values","raw-twins","add-style","map-lifecycle","map-growth"),default="interning")
+    parser.add_argument("--scenario",choices=("interning","same-values","raw-twins","add-style","default-style","map-lifecycle","map-growth"),default="interning")
     args = parser.parse_args()
     if os.name != "nt":
         parser.error("Windows ATL/MFC and built native libraries required")
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
     roots = (args.reference_root.resolve(), ROOT)
-    count={"add-style":360,"map-lifecycle":712,"map-growth":1544}.get(args.scenario,CASES)
+    count={"add-style":360,"default-style":360,"map-lifecycle":712,"map-growth":1544}.get(args.scenario,CASES)
     report = dict(complete=False, equal=False, reference_commit=PIN, platform=args.platform,
                   kind="actual-renderer-style-interner", cases=count, inputs=count, scenario=args.scenario, builds={},
                   probe_sha256=sha(SOURCE.read_bytes()), 

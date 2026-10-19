@@ -73,6 +73,29 @@ impl PartialEq for StyleValue {
 }
 impl Eq for StyleValue {}
 impl StyleValue {
+    /// Apply native floating assignment effects in field order. Raw transport,
+    /// storage cloning and copy construction deliberately do not call this.
+    pub fn assign_floats_with(&mut self, mut assign: impl FnMut(u64) -> u64) {
+        for value in [
+            &mut self.font_size,
+            &mut self.outline_width_x,
+            &mut self.outline_width_y,
+            &mut self.shadow_depth_x,
+            &mut self.shadow_depth_y,
+            &mut self.font_scale_x,
+            &mut self.font_scale_y,
+            &mut self.font_spacing,
+            &mut self.blur,
+            &mut self.gaussian_blur,
+            &mut self.font_angle_z,
+            &mut self.font_angle_x,
+            &mut self.font_angle_y,
+            &mut self.font_shift_x,
+            &mut self.font_shift_y,
+        ] {
+            *value = f64::from_bits(assign(value.to_bits()));
+        }
+    }
     fn ints(&self) -> [i32; 9] {
         [
             self.char_set,
@@ -370,6 +393,32 @@ mod tests {
         let decoded = decode(&b).unwrap();
         assert_eq!(encode(&decoded).unwrap(), b);
         assert_eq!(decoded.font_name, v.font_name);
+    }
+    #[test]
+    fn assignment_visits_all_raw_float_fields_in_order_without_rewriting_transport() {
+        let original = encode(&fixture()).unwrap();
+        let mut value = decode(&original).unwrap();
+        let clone = value.clone();
+        let mut seen = Vec::new();
+        value.assign_floats_with(|bits| {
+            seen.push(bits);
+            bits ^ 0x8000_0000_0000_0000
+        });
+        let expected: Vec<_> = original[72..192]
+            .chunks_exact(8)
+            .map(|bytes| u64::from_le_bytes(bytes.try_into().unwrap()))
+            .collect();
+        assert_eq!(seen, expected);
+        assert_eq!(encode(&clone).unwrap(), original);
+        let actual = encode(&value).unwrap();
+        assert_eq!(&actual[..72], &original[..72]);
+        assert_eq!(&actual[192..], &original[192..]);
+        for (index, bits) in expected.into_iter().enumerate() {
+            assert_eq!(
+                &actual[72 + index * 8..80 + index * 8],
+                &(bits ^ (1 << 63)).to_le_bytes()
+            );
+        }
     }
     #[test]
     fn rejects_all_truncations_and_extra_input() {

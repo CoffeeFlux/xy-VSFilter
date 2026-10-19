@@ -4,6 +4,9 @@
 // included as passing evidence. A separate child observes count after one drop.
 #include <stdafx.h>
 #include <STS.h>
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+#include <RustDocumentOwner.h>
+#endif
 #include <cstdio>
 #include <cstring>
 #include <cstdint>
@@ -72,6 +75,13 @@ static void pair(STSStyle& first,STSStyle& second) {
 }
 class StyleDocument : public CSimpleTextSubtitle {
 public:
+    void show_default() const {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        const auto value=m_document->DefaultStyle();describe(value);
+#else
+        describe(m_defaultStyle);
+#endif
+    }
     void names() const {
         printf("style-map-names");
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
@@ -149,7 +159,30 @@ static int add_styles() {
     }
     printf("style-add-complete cases=%u\n",index);return 0;
 }
+static int default_styles() {
+    if(!AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0))return 2;
+    printf("default-provenance pointer_bits=%u\n",unsigned(sizeof(void*)*8));
+    const uint64_t values[]={0,0x8000000000000000ull,0x3ff0000000000000ull,0xbff0000000000000ull,1,
+        0x0010000000000000ull,0x7fefffffffffffffull,0x7ff0000000000000ull,0xfff0000000000000ull,
+        0x7ff8000000000001ull,0xfff8000000000001ull,0x7ff0000000000001ull};
+    unsigned index=0;
+    for(unsigned sticky=0;sticky<2;++sticky)for(auto field:fields)for(auto n:values){
+        StyleDocument source,destination;STSStyle input;memcpy(&(input.*field),&n,8);
+        auto reset=[&](){_clearfp();if(sticky && std::feraiseexcept(FE_DIVBYZERO))abort();return domains();};
+        auto report=[&](const char* op,uint64_t before,StyleDocument& doc){
+            const unsigned status=_statusfp();const uint64_t d=domains();
+            printf("default-style index=%u sticky=%u op=%s fp=%08x domains=%016llx,%016llx\n",index,sticky,op,status,static_cast<unsigned long long>(before),static_cast<unsigned long long>(d));doc.show_default();
+        };
+        uint64_t before=reset();source.SetDefaultStyle(input);report("set",before,source);
+        before=reset();destination.Copy(source);report("copy",before,destination);
+        before=reset();source.Copy(source);report("self",before,source);
+        before=reset();source.Empty();report("empty",before,source);
+        ++index;
+    }
+    printf("default-complete cases=%u\n",index);return 0;
+}
 int main(int argc,char** argv) {
+    if(argc>1&&!strcmp(argv[1],"default-style"))return default_styles();
     if(argc>1&&!strcmp(argv[1],"map-lifecycle"))return map_lifecycle();
     if(argc>1&&!strcmp(argv[1],"map-growth"))return map_lifecycle(true);
     same_values=argc>1&&!strcmp(argv[1],"same-values");

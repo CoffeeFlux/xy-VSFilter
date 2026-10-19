@@ -774,7 +774,8 @@ impl Registry {
 
     /// Selected native Copy header only, after the caller's virtual Empty.
     /// Both typed handles are validated before cloning; retired payloads leave
-    /// this acquisition. Self-copy observes current state and needs no clone.
+    /// this acquisition. Self-copy needs no clone, but preserves native floating
+    /// assignment effects after validating both handles.
     pub(crate) fn copy_selected_state(
         &mut self,
         destination: Handle,
@@ -783,12 +784,14 @@ impl Registry {
         self.document(destination)?;
         let source_document = self.document(source)?;
         if destination == source {
+            self.document_mut(destination)?
+                .assign_default_style_with(crate::style_assignment::copy_bits);
             return Ok(None);
         }
         let state = source_document.selected_state();
         Ok(Some(
             self.document_mut(destination)?
-                .replace_selected_state(state),
+                .replace_selected_state_with(state, crate::style_assignment::copy_bits),
         ))
     }
 

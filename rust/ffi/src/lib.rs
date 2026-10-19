@@ -38,6 +38,7 @@ mod runtime;
 mod segment_insert;
 mod segments;
 mod string_flyweight;
+mod style_assignment;
 mod style_compare;
 mod style_intern;
 mod subrip;

@@ -4,6 +4,20 @@ from style_intern_native import CASES, compare, validate, validate_lifecycle
 
 
 class StyleTraceControls(unittest.TestCase):
+    def test_default_style_assignment_copy_self_copy_and_empty(self):
+        value=self.trace().splitlines()[3]
+        rows=[b'default-provenance pointer_bits=64']
+        for index in range(360):
+            sticky=index//180;status=8 if sticky else 0
+            for op in ('set','copy','self','empty'):
+                rows.extend([f'default-style index={index} sticky={sticky} op={op} fp={status:08x} domains={status:016x},{status:016x}'.encode(),value])
+        rows.append(b'default-complete cases=360');good=b'\n'.join(rows)+b'\n'
+        compare([good]*4,64,'default-style')
+        for bad in [good.replace(b'op=self',b'op=copy',1),good.replace(b'index=1 ',b'index=0 ',1),good.replace(b'cases=360',b'cases=359'),good.replace(b'font=1:d800',b'font=2:d800',1),good.replace(b'0000000000000008,0000000000000008',b'0000000000000008,0000000000000000',1)]:
+            with self.assertRaises(ValueError):validate(bad,64,'default-style')
+        for bad in [good.replace(b'domains=0000000000000000,0000000000000000',b'domains=0000000000000000,0000000100000000',1),good.replace(b'doubles=0',b'doubles=1',1)]:
+            with self.assertRaises(ValueError):compare([good,good,bad,bad],64,'default-style')
+
     def test_map_fractional_growth_and_shrink_after_reuse(self):
         operations=([('construct',0)]+[('insert',i+1) for i in range(512)]+[('equal',512)]*128+
                     [('conflict',513+i) for i in range(32)]+[('empty',0)]+[('reuse',i+1) for i in range(64)]+
