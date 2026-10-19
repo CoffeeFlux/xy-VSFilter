@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "candidate_commit": "dd2e258521148bb7c77df9027155b6135646b894",
+  "scope": "Experimental renderer canonical style ownership; C++ adapters remain transitional.",
+  "operations": [
+    {
+      "source": "rust/compat/src/style_intern.rs",
+      "behavior": "Safe Arc style values own raw UTF16/f64 data and canonical rectangle references. Weak entries preserve MSVC bucket traversal and non-reflexive counted entries; later expired-key access returns an unresolved outcome."
+    },
+    {
+      "source": "rust/ffi/src/style_intern.rs",
+      "behavior": "Typed checked resources return separate owner ID, canonical identity and encoded length. Decode copies all input before registry admission or writes. Reads encode detached style packets; stale/wrong-kind/short output fails without writes."
+    },
+    {
+      "source": "rust/ffi/src/document_registry.rs",
+      "behavior": "Style and rectangle release accounting runs under admission. Removed resource destruction follows outside the registry guard, including unresolved release. Complete calls remain serialized by the native gate."
+    },
+    {
+      "source": "src/subtitles/RustStyleIntern.inl",
+      "behavior": "Shared wrapper holds only checked handle, identity and packet length. get returns a detached STSStyle. Assignment interns before releasing its old owner; copied and moved wrappers preserve aliases. Canonical data is Rust owned."
+    },
+    {
+      "source": "src/subtitles/cache_manager.cpp",
+      "behavior": "Experimental overlay hashing binds the detached style snapshot and copies the original low four blur bytes; no address of a temporary field is retained."
+    }
+  ],
+  "boundary_review": {
+    "new_unsafe_functions": 3,
+    "new_unsafe_blocks": 4,
+    "shared_input_slices": 1,
+    "detached_output_copies": 3,
+    "new_unsafe_impl": 0,
+    "contract": "Caller supplies live initialized input and writable output spans. Inputs may be unaligned or overlap output. No native style pointer or canonical rectangle reference crosses the boundary."
+  },
+  "evidence": "rust-style-intern-local-evidence.json",
+  "limits": [
+    "Finite default-environment integration evidence, not whole-library completion or a production-default switch.",
+    "Nondefault floating modes/traps, allocator failure/reentry and whole-renderer concurrency remain unclosed.",
+    "Native NaN count after release is preserved with weak entries; later expired-key access is explicitly unresolved and never counted as a matching reference outcome.",
+    "C++ wrappers remain transitional. Fonts, word/line/subtitle graphs, rendering, all hosts and vendored implementations remain in scope."
+  ]
+}

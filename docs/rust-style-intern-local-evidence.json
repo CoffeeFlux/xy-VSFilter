@@ -1,0 +1,741 @@
+{
+  "schema": 1,
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "candidate_commit": "dd2e258521148bb7c77df9027155b6135646b894",
+  "baseline_probe_commit": "262e8800a413313bc44b20fd9e7fa90a84827709",
+  "architectures": {
+    "x64": {
+      "style_intern_native": {
+        "path": "artifacts/style-fixed-style_intern_native-x64/report.json",
+        "sha256": "8fb5e80c97885bb2657acc89c71452cf3a4ebb7e528ccf025ce6877cbe55413b",
+        "cases": 196,
+        "trace_lines": 788,
+        "isolated_nan_release": {
+          "count_before": 1,
+          "count_after": 1,
+          "post_release_lookup_executed": false,
+          "trace_sha256": [
+            "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+            "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+            "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+            "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062"
+          ]
+        },
+        "lifecycle": {
+          "trace_sha256": [
+            "182c04389a326a42a68b9f324049ee676c4e140bc2dcf4f5b5a1fc39485ccc58",
+            "182c04389a326a42a68b9f324049ee676c4e140bc2dcf4f5b5a1fc39485ccc58",
+            "182c04389a326a42a68b9f324049ee676c4e140bc2dcf4f5b5a1fc39485ccc58",
+            "182c04389a326a42a68b9f324049ee676c4e140bc2dcf4f5b5a1fc39485ccc58"
+          ],
+          "trace_lines": 5,
+          "late_owner": true,
+          "sticky_status": true
+        }
+      },
+      "style_table_adapter_native": {
+        "path": "artifacts/style-fixed-style_table_adapter_native-x64/report.json",
+        "sha256": "23bdae7bb539d48e7063e5778cb8ac228e9694828c4bd5afe6c549b12bf6ae6f",
+        "cases": 1760,
+        "trace_lines": 25189
+      },
+      "rect_intern_native": {
+        "path": "artifacts/style-fixed-rect_intern_native-x64/report.json",
+        "sha256": "7c42b429beb1c1d294640f8ddd7359d2b9489d62a6be99f6aa1420965cfa7623",
+        "cases": 294,
+        "trace_lines": 5003
+      },
+      "string_flyweight_native": {
+        "path": "artifacts/style-fixed-string_flyweight_native-x64/report.json",
+        "sha256": "7efc7319841dee0b9f543d1fb8e3c236ed39ac13ba0147b1fd0212736a7d9b91",
+        "cases": 410,
+        "trace_lines": 5334
+      },
+      "preport_style_baseline": {
+        "path": "artifacts/style-adapter-baseline-x64/report.json",
+        "sha256": "247acef48355893a32caf92cdb8ba07453647b0310635dbe5fca3fc2731cccbe",
+        "original_observations_unchanged": true
+      },
+      "adapter_table_scope": "Logging cleanup template plus parallel actual renderer styles. Actual styles assert canonical tags, all held alias relations and counts after each operation; printed comparison events are from the logging template.",
+      "regressions": {
+        "override_native": {
+          "path": "artifacts/style-adapter-override_native-x64/report.json",
+          "sha256": "d238b85e2b82ad443ae4d37669a2e745af0b25a474611a38ebd8a08961a9bb64",
+          "cases": 9312,
+          "trace_lines": 96014
+        },
+        "ass_tree_native": {
+          "path": "artifacts/style-adapter-ass_tree_native-x64/report.json",
+          "sha256": "79b4119f97a73ebfd52f2bf6af7eb703b589ec15fc8eaf0a4901d6740e0876e5",
+          "cases": 5142,
+          "trace_lines": 10286
+        },
+        "effects_native": {
+          "path": "artifacts/style-adapter-effects_native-x64/report.json",
+          "sha256": "04beea2b78716f6f0b57dd053eab53bf58981893b87bd141d851463c8f611228",
+          "cases": 13608,
+          "trace_lines": 81722
+        },
+        "html_tag_native": {
+          "path": "artifacts/style-adapter-html_tag_native-x64/report.json",
+          "sha256": "ac14ae17dc5a57b9e5c9d6b8105c2b9273fbcf08d3e0f4c027cac7246dce2cc3",
+          "cases": 5728,
+          "trace_lines": 17186
+        },
+        "shared_color_native": {
+          "path": "artifacts/style-adapter-shared_color_native-x64/report.json",
+          "sha256": "ee94799b52e2241308c11aa765f45c67be0bc5a1f7b1dc3cb971a7df44c9d847",
+          "cases": 8896,
+          "trace_lines": 12234
+        },
+        "usf_document_native": {
+          "path": "artifacts/style-adapter-usf_document_native-x64/report.json",
+          "sha256": "31b84a7f7272e21a846706c8775b7791b21fca50435258e903a8241c5a5ff7dd",
+          "cases": 1340,
+          "trace_lines": 40517
+        },
+        "realtext_document_native": {
+          "path": "artifacts/style-adapter-realtext_document_native-x64/report.json",
+          "sha256": "2d6a4acc12c0c91521ed4f0f38f2107e08053143e64231583f99de65284a86a9",
+          "cases": 4532,
+          "trace_lines": 37887
+        },
+        "vtt_document_native": {
+          "path": "artifacts/style-adapter-vtt_document_native-x64/report.json",
+          "sha256": "d6ddfd73a1f31e954c21aa07cd7503ada50952b9130991fe78b8a4a83a882376",
+          "cases": 2292,
+          "trace_lines": 21939
+        },
+        "sami_document_native": {
+          "path": "artifacts/style-adapter-sami_document_native-x64/report.json",
+          "sha256": "52b5297227182d0fb7925111d353301f9376cbe4a19850b5d9f4361467cc595f",
+          "cases": 2836,
+          "trace_lines": 26992
+        },
+        "text_document_native": {
+          "path": "artifacts/style-adapter-text_document_native-x64/report.json",
+          "sha256": "566cc4140a00cc528399c5d03c421f2d065aae65e6b25d6ad4e9bff67c7bf69b",
+          "cases": 5692,
+          "trace_lines": 44404
+        },
+        "microdvd_document_native": {
+          "path": "artifacts/style-adapter-microdvd_document_native-x64/report.json",
+          "sha256": "46fdae9d224fd180ff6469c029a95013519cfb5b8792cafab11e42d9a713d50b",
+          "cases": 4588,
+          "trace_lines": 41491
+        },
+        "ass_document_native": {
+          "path": "artifacts/style-adapter-ass_document_native-x64/report.json",
+          "sha256": "df69fb5a55d887ce86f10a7c957419277587668d4d742a85ce4daa569e08d41b",
+          "cases": 3266,
+          "trace_lines": 22286
+        },
+        "xombie_document_native": {
+          "path": "artifacts/style-adapter-xombie_document_native-x64/report.json",
+          "sha256": "a3f787e2e690293bf6064bd7505753f9e7194fd4d6f98d0bb9bcc8df107ff773",
+          "cases": 1242,
+          "trace_lines": 10441
+        },
+        "document_style_api_compile": {
+          "path": "artifacts/style-adapter-document_style_api_compile-x64/report.json",
+          "sha256": "d27055045aab3a907e2feb10ee6864be7f2382a4fe0b4c0a3b8aca00d77b6448",
+          "cases": null,
+          "trace_lines": null
+        },
+        "document_native_lifecycle": {
+          "path": "artifacts/style-adapter-document_native_lifecycle-x64/report.json",
+          "sha256": "23287241b249e6cf04851414b5d05841abc77f639be6da894b5a7291db9f097b",
+          "cases": null,
+          "trace_lines": 3693
+        }
+      },
+      "historical_storage_harness": {
+        "primitives": {
+          "path": "artifacts/style-adapter-document-windows-x64/report.json",
+          "sha256": "400b8864a3a13d3e19f4d77af08dc644f9c2ca91db07222e3e3f5b0a9c15e82a",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 53711,
+          "rust_parity_within_harness_scope": false
+        },
+        "/facade": {
+          "path": "artifacts/style-adapter-document-windows-x64/facade/report.json",
+          "sha256": "9fd1dc390c4f33e0ab0e048fb3dac121cdcb2bd4467c2060f7ef2d41b75fe6c8",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 166,
+          "rust_parity_within_harness_scope": false
+        },
+        "/owner": {
+          "path": "artifacts/style-adapter-document-windows-x64/owner/report.json",
+          "sha256": "df365b1c2d7c271d22826e2c7bba1ff79f5065248393352080379d91d2d0883e",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 2361,
+          "rust_parity_within_harness_scope": true
+        }
+      },
+      "historical_storage_scope": "Historical upstream algorithms only; current Rust rectangle adapter on both storage sides. Actual cleanup rectangle parity comes from rect_intern_native.",
+      "rendering": {
+        "path": "artifacts/style-adapter-csri-x64/summary.json",
+        "sha256": "b42b64cf70c2e74a7282080e7c97aced9e694ebd6aa8bf3efda50836ba578fe7",
+        "cases": 1222,
+        "frames": 13186,
+        "distinct_controls": 192,
+        "shards": [
+          {
+            "path": "artifacts/style-adapter-csri-x64/shard-0/report.json",
+            "sha256": "a31b9744bddb6898a8a2b51a027098a8b85e14e02dc307b3d5a8e87ef042b63e"
+          },
+          {
+            "path": "artifacts/style-adapter-csri-x64/shard-1/report.json",
+            "sha256": "7836656c86354f822fa77687f8b76d8ff564631643c31ded65009337860654b4"
+          },
+          {
+            "path": "artifacts/style-adapter-csri-x64/shard-2/report.json",
+            "sha256": "78ed7059063185d45e186fcc34159ccea9283b9ff05089213178537f31622dc7"
+          },
+          {
+            "path": "artifacts/style-adapter-csri-x64/shard-3/report.json",
+            "sha256": "3ebbcc40cb459ebbb92a3845e44b425efbee23bdc19b18404d543e8de1ed11e3"
+          },
+          {
+            "path": "artifacts/style-adapter-csri-x64/shard-4/report.json",
+            "sha256": "2d22109ab05ac1d692596a30fcbdef99a48ad2c4418174d91f30fe51196fa3fa"
+          },
+          {
+            "path": "artifacts/style-adapter-csri-x64/shard-5/report.json",
+            "sha256": "dc9b512488f98340479382895155916635308b6454212e48ef85020d22cd9760"
+          },
+          {
+            "path": "artifacts/style-adapter-csri-x64/shard-6/report.json",
+            "sha256": "7aa4364be053d8a4f4ab4d0ef051da384fb0659ccf92b1d4988c803a9bcf609d"
+          },
+          {
+            "path": "artifacts/style-adapter-csri-x64/shard-7/report.json",
+            "sha256": "81f392edde7a50b3728c7e5f5312ea3d46078beac477d27323567556214edeb6"
+          }
+        ]
+      },
+      "contracts": {
+        "path": "artifacts/style-adapter-contracts-x64/summary.json",
+        "sha256": "6deb4b23cef7dce374bfde358d6b81124423ae0f0920ff2fbd68b1b082a7d9c9",
+        "com": {
+          "path": "artifacts/style-adapter-contracts-x64/com/report.json",
+          "sha256": "83ec584ccd5405aa650291d776ac7584d9b055eaa8ce4a933845ffeb3a6bec4b"
+        },
+        "dlls": {
+          "VSFilter.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/x64/Release/VSFilter.dll",
+              "sha256": "2d254068a40e5f59cf191c3c6bbfc984b548193b668c4decac21dc1e94e02169"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/x64/Release/VSFilter.dll",
+              "sha256": "e0bb6cc29e15dbde2fc6384e2e19b757de2c040799164a6b4d10535936d45059"
+            },
+            "exports": {
+              "path": "artifacts/style-adapter-contracts-x64/VSFilter.dll.pe_exports.json",
+              "sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1"
+            },
+            "dependencies": {
+              "path": "artifacts/style-adapter-contracts-x64/VSFilter.dll.pe_dependencies.json",
+              "sha256": "805d7d7481b2774c2612b7cd7dd7fdaa4dd04a35111f3726a6704acf88c4a0d2"
+            }
+          },
+          "XySubFilter.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/x64/Release/XySubFilter.dll",
+              "sha256": "32b7c2cd6eb817120414db53b3c3005e719ae4b993c4a69d0d66c7f6ac363d5a"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/x64/Release/XySubFilter.dll",
+              "sha256": "8ad5d6627c4912edcd37fd088c83cee0b44d80d3a40960345f255de9ac630c7c"
+            },
+            "exports": {
+              "path": "artifacts/style-adapter-contracts-x64/XySubFilter.dll.pe_exports.json",
+              "sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42"
+            },
+            "dependencies": {
+              "path": "artifacts/style-adapter-contracts-x64/XySubFilter.dll.pe_dependencies.json",
+              "sha256": "2ce278d6be4d85c557490e59cb33e78ca53faf3e38061e9ca3eb225897be359a"
+            }
+          },
+          "xy_sub_filter_consumer.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/x64/Release/xy_sub_filter_consumer.dll",
+              "sha256": "f1165742064181b7fb73bacb16017d8e202c8bb0be90ed8c2eb812ac282c2df8"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/x64/Release/xy_sub_filter_consumer.dll",
+              "sha256": "3430f902c9bbe560190ea4d1d9f5069bb2f78f284d34f9344d6a452761bd20ca"
+            },
+            "exports": {
+              "path": "artifacts/style-adapter-contracts-x64/xy_sub_filter_consumer.dll.pe_exports.json",
+              "sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b"
+            },
+            "dependencies": {
+              "path": "artifacts/style-adapter-contracts-x64/xy_sub_filter_consumer.dll.pe_dependencies.json",
+              "sha256": "b0b48a3cf2bf2ecbbac4ecca863a815ab4a0c1137277a9b7d5830d9d1beca5c9"
+            }
+          }
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/style-adapter-fixed-build-x64.log",
+          "sha256": "1906522ea17dd9e2fd75b080f49d08ca8224afa2d0340c51fa65c2bcf677083a"
+        },
+        {
+          "path": "artifacts/style-adapter-fixed-build-rust-x64.log",
+          "sha256": "67723cc8e98d6696a090fc5f3a66e0257bc5faf0539febb6be9bcfbe3e09d9e2"
+        }
+      ]
+    },
+    "x86": {
+      "style_intern_native": {
+        "path": "artifacts/style-fixed-style_intern_native-x86/report.json",
+        "sha256": "36ecf355f0168444d8bb31f3129c61187b8ec5ba9f286a3d05dcd5f26edd6770",
+        "cases": 196,
+        "trace_lines": 788,
+        "isolated_nan_release": {
+          "count_before": 1,
+          "count_after": 1,
+          "post_release_lookup_executed": false,
+          "trace_sha256": [
+            "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+            "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+            "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+            "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16"
+          ]
+        },
+        "lifecycle": {
+          "trace_sha256": [
+            "182c04389a326a42a68b9f324049ee676c4e140bc2dcf4f5b5a1fc39485ccc58",
+            "182c04389a326a42a68b9f324049ee676c4e140bc2dcf4f5b5a1fc39485ccc58",
+            "182c04389a326a42a68b9f324049ee676c4e140bc2dcf4f5b5a1fc39485ccc58",
+            "182c04389a326a42a68b9f324049ee676c4e140bc2dcf4f5b5a1fc39485ccc58"
+          ],
+          "trace_lines": 5,
+          "late_owner": true,
+          "sticky_status": true
+        }
+      },
+      "style_table_adapter_native": {
+        "path": "artifacts/style-fixed-style_table_adapter_native-x86/report.json",
+        "sha256": "ae992c71629f7ec0b8edd57efbf504d0b0632b151af34df3328c16615ee38799",
+        "cases": 1760,
+        "trace_lines": 25189
+      },
+      "rect_intern_native": {
+        "path": "artifacts/style-fixed-rect_intern_native-x86/report.json",
+        "sha256": "8fc615230c237292d3903c8bdd672c1aa9bddb5797d60727a2aaea75b7550d70",
+        "cases": 294,
+        "trace_lines": 5003
+      },
+      "string_flyweight_native": {
+        "path": "artifacts/style-fixed-string_flyweight_native-x86/report.json",
+        "sha256": "62b6caaba3b73b211117d21b4c5de6d81d714cbf10de4cab0997e356b81c2e45",
+        "cases": 410,
+        "trace_lines": 5334
+      },
+      "preport_style_baseline": {
+        "path": "artifacts/style-adapter-baseline-x86/report.json",
+        "sha256": "7337676616d94f89a74aa101f46aca845abc49a80f1cbf07fa38239a889a5924",
+        "original_observations_unchanged": true
+      },
+      "adapter_table_scope": "Logging cleanup template plus parallel actual renderer styles. Actual styles assert canonical tags, all held alias relations and counts after each operation; printed comparison events are from the logging template.",
+      "regressions": {
+        "override_native": {
+          "path": "artifacts/style-adapter-override_native-x86/report.json",
+          "sha256": "cf4cd53292d6a50b894b9b67e44e3fbf6aee75f25aef07ac3d2431f22de80aa9",
+          "cases": 9312,
+          "trace_lines": 96014
+        },
+        "ass_tree_native": {
+          "path": "artifacts/style-adapter-ass_tree_native-x86/report.json",
+          "sha256": "1f33dc4ed9d2baae7a24b79fe3d8f50c55161dc50d3ae99b9e1d2a6075a655bc",
+          "cases": 5142,
+          "trace_lines": 10286
+        },
+        "effects_native": {
+          "path": "artifacts/style-adapter-effects_native-x86/report.json",
+          "sha256": "2d0d91d600ed7cfd4bb6ca9eead2e454e64c92b1ada85a6287b44e5cf016e504",
+          "cases": 13608,
+          "trace_lines": 81722
+        },
+        "html_tag_native": {
+          "path": "artifacts/style-adapter-html_tag_native-x86/report.json",
+          "sha256": "882f6f99c7c0101fbf05e8ebe60a02a2bb761837464b55408d2ce7d45a8bc071",
+          "cases": 5728,
+          "trace_lines": 17186
+        },
+        "shared_color_native": {
+          "path": "artifacts/style-adapter-shared_color_native-x86/report.json",
+          "sha256": "7943fda57d4a77f1cf3ae584194731b18038c686d26cd0c642170fcdd464e96c",
+          "cases": 8896,
+          "trace_lines": 12234
+        },
+        "usf_document_native": {
+          "path": "artifacts/style-adapter-usf_document_native-x86/report.json",
+          "sha256": "1aeb60c89e4b754c581f358bd4f0f0fe581a92b59b2ccb2f054689b4bc395b89",
+          "cases": 1340,
+          "trace_lines": 40517
+        },
+        "realtext_document_native": {
+          "path": "artifacts/style-adapter-realtext_document_native-x86/report.json",
+          "sha256": "9f845c3496403a4f7e0e9f2883926af033e9fc16c9c103a525efc3bce1c9076f",
+          "cases": 4532,
+          "trace_lines": 37887
+        },
+        "vtt_document_native": {
+          "path": "artifacts/style-adapter-vtt_document_native-x86/report.json",
+          "sha256": "564b2b2cd220c11614d74d0a62c5a4a6ef30f0966feccf2afd458560970af9d3",
+          "cases": 2292,
+          "trace_lines": 21939
+        },
+        "sami_document_native": {
+          "path": "artifacts/style-adapter-sami_document_native-x86/report.json",
+          "sha256": "5369af33eddcba2a76a15a547ceb48bcb248d81533458181977ee51e43d0a43c",
+          "cases": 2836,
+          "trace_lines": 26992
+        },
+        "text_document_native": {
+          "path": "artifacts/style-adapter-text_document_native-x86/report.json",
+          "sha256": "38468c84363de741162eb7fbc902352c7f79ecb0de5a45911f27f5f9387eeb67",
+          "cases": 5692,
+          "trace_lines": 44404
+        },
+        "microdvd_document_native": {
+          "path": "artifacts/style-adapter-microdvd_document_native-x86/report.json",
+          "sha256": "91c351802c60438df8cf5abb0ce49c5a63f15e82b4cd9efa84a38941acc33603",
+          "cases": 4588,
+          "trace_lines": 41491
+        },
+        "ass_document_native": {
+          "path": "artifacts/style-adapter-ass_document_native-x86/report.json",
+          "sha256": "97238154904b41ca53cdb4e4a8545f4ee60618f30a920465207ff91b680a5a75",
+          "cases": 3266,
+          "trace_lines": 22286
+        },
+        "xombie_document_native": {
+          "path": "artifacts/style-adapter-xombie_document_native-x86/report.json",
+          "sha256": "5101a714f4145923a3066a2e77b89649e9d41420329f387b1ac7c4d5d1e16ea3",
+          "cases": 1242,
+          "trace_lines": 10441
+        },
+        "document_style_api_compile": {
+          "path": "artifacts/style-adapter-document_style_api_compile-x86/report.json",
+          "sha256": "d9d310e4aff618e7a9aa8bcbdbb9fd324a8ed5c83b37eb55a552b99d31881d00",
+          "cases": null,
+          "trace_lines": null
+        },
+        "document_native_lifecycle": {
+          "path": "artifacts/style-adapter-document_native_lifecycle-x86/report.json",
+          "sha256": "a935159b6c207e338ef558c16baff6277c73789481d916fc569645cf05c4d784",
+          "cases": null,
+          "trace_lines": 3693
+        }
+      },
+      "historical_storage_harness": {
+        "primitives": {
+          "path": "artifacts/style-adapter-document-windows-x86/report.json",
+          "sha256": "d78889a61e872f85f21cad04261489870409956c416e17bbf5f7eaed5159650a",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 53711,
+          "rust_parity_within_harness_scope": false
+        },
+        "/facade": {
+          "path": "artifacts/style-adapter-document-windows-x86/facade/report.json",
+          "sha256": "8b66c9c7a3e5816471794fb30dca446371e76990153c8f592de8550fd4c49b62",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 166,
+          "rust_parity_within_harness_scope": false
+        },
+        "/owner": {
+          "path": "artifacts/style-adapter-document-windows-x86/owner/report.json",
+          "sha256": "bedb2f761ec0ec6a384a233888f51ee0311798ffeace7b0f1fa48ca2d15a5612",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 2361,
+          "rust_parity_within_harness_scope": true
+        }
+      },
+      "historical_storage_scope": "Historical upstream algorithms only; current Rust rectangle adapter on both storage sides. Actual cleanup rectangle parity comes from rect_intern_native.",
+      "rendering": {
+        "path": "artifacts/style-adapter-csri-x86/summary.json",
+        "sha256": "de051274ad847de935901b82b619580ca76d444f11a3b135e18ba9b14cdcaf62",
+        "cases": 1222,
+        "frames": 13186,
+        "distinct_controls": 192,
+        "shards": [
+          {
+            "path": "artifacts/style-adapter-csri-x86/shard-0/report.json",
+            "sha256": "22078dd5c0d6c9036f20edf7ea35a89b1892cd3b472f6dd1be33279e8604beab"
+          },
+          {
+            "path": "artifacts/style-adapter-csri-x86/shard-1/report.json",
+            "sha256": "fae7f1373b7d68c59cdddcf724ff088bd1ba195c88712ff374749e7f9cd60023"
+          },
+          {
+            "path": "artifacts/style-adapter-csri-x86/shard-2/report.json",
+            "sha256": "d89a81c2303e035e3e6065fa61cdc03518d50de83cab8cc214ccbbb10693e24c"
+          },
+          {
+            "path": "artifacts/style-adapter-csri-x86/shard-3/report.json",
+            "sha256": "06f942b99be8712bc207f0a3908045628bb87a51e61a4b181cd8f06c83d96090"
+          },
+          {
+            "path": "artifacts/style-adapter-csri-x86/shard-4/report.json",
+            "sha256": "1af5fb94f80481c959cd0525f500f2b0bc7f44514d9a738a4f31adb65060e98e"
+          },
+          {
+            "path": "artifacts/style-adapter-csri-x86/shard-5/report.json",
+            "sha256": "cbd28b297aba49fb3f830a800ad4b204e3593aac1547409f6d224aec570ffccc"
+          },
+          {
+            "path": "artifacts/style-adapter-csri-x86/shard-6/report.json",
+            "sha256": "0b862a44ec8f3a9186dee0740b96770034d0a319bb9010649c1cc8e8328642ad"
+          },
+          {
+            "path": "artifacts/style-adapter-csri-x86/shard-7/report.json",
+            "sha256": "54ff8fef18ab8e5a0787607a30d1e8c27ee36d8261fc7c883e465868f4c3ce0b"
+          }
+        ]
+      },
+      "contracts": {
+        "path": "artifacts/style-adapter-contracts-x86/summary.json",
+        "sha256": "6deb4b23cef7dce374bfde358d6b81124423ae0f0920ff2fbd68b1b082a7d9c9",
+        "com": {
+          "path": "artifacts/style-adapter-contracts-x86/com/report.json",
+          "sha256": "e1c4c8040b55ef9128fd7c75f26524d56e918fbdabed07ba354ec5c2ef3c415d"
+        },
+        "dlls": {
+          "VSFilter.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/Win32/Release/VSFilter.dll",
+              "sha256": "69faa2d5f90f35fe4184e9e9bd892adb76fee60295701988f61ab7af0664d9eb"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/Win32/Release/VSFilter.dll",
+              "sha256": "c060bc7dc31125e855f7b192d3e1f5890fad56177b6f4d67f1e377622e95e30e"
+            },
+            "exports": {
+              "path": "artifacts/style-adapter-contracts-x86/VSFilter.dll.pe_exports.json",
+              "sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c"
+            },
+            "dependencies": {
+              "path": "artifacts/style-adapter-contracts-x86/VSFilter.dll.pe_dependencies.json",
+              "sha256": "8b0365bd8b1fa8ea13b65d8681836b85d870a46781d0a3cbfb851b1000a21ae7"
+            }
+          },
+          "XySubFilter.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/Win32/Release/XySubFilter.dll",
+              "sha256": "2c3b904d7f91902ef456e07b648c5d6351878318c235397eeb9b39eb3fffa34f"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/Win32/Release/XySubFilter.dll",
+              "sha256": "64cf4362b142190d487ad8c9416dea814269d1924c0b0f3d6bb298822603cd67"
+            },
+            "exports": {
+              "path": "artifacts/style-adapter-contracts-x86/XySubFilter.dll.pe_exports.json",
+              "sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11"
+            },
+            "dependencies": {
+              "path": "artifacts/style-adapter-contracts-x86/XySubFilter.dll.pe_dependencies.json",
+              "sha256": "2a22ef471924cc53ea843b14cb2fb5e1dc765f9e308e8ed316172476b0696dd5"
+            }
+          },
+          "xy_sub_filter_consumer.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/Win32/Release/xy_sub_filter_consumer.dll",
+              "sha256": "3e7c20a4d6c42457d92eb56c42e4fd9f3bddb93276f2c1cd28bfb73edd06484c"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/Win32/Release/xy_sub_filter_consumer.dll",
+              "sha256": "0e49898c79612d712de750bbd41898563b66d7e94a46440ec20bc0dabadfe7f3"
+            },
+            "exports": {
+              "path": "artifacts/style-adapter-contracts-x86/xy_sub_filter_consumer.dll.pe_exports.json",
+              "sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94"
+            },
+            "dependencies": {
+              "path": "artifacts/style-adapter-contracts-x86/xy_sub_filter_consumer.dll.pe_dependencies.json",
+              "sha256": "bee8a1d975859e0ab8a9b6843e14f813df818b8538e6501927e792bb180eb7c1"
+            }
+          }
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/style-adapter-fixed-build-x86.log",
+          "sha256": "d684f1d2dc93acda6088c08b9ac71fa96b922d83d94f69accfe436787414ddc9"
+        },
+        {
+          "path": "artifacts/style-adapter-fixed-build-rust-x86.log",
+          "sha256": "1d332a919f0c3db4a71ccecdfb6d8b28cf3bf9d16bc7301b4a964f3e645b7372"
+        }
+      ]
+    }
+  },
+  "checks": {
+    "path": "artifacts/style-adapter-checks.log",
+    "sha256": "4ac0e64022916491567253afe8295e24ba10a5d5c13d7af3feec96ffa3179ef9",
+    "safe_core_per_architecture": 336,
+    "ffi_per_architecture": 136,
+    "python_existing": 178,
+    "python_skipped": 1,
+    "fmt": true,
+    "clippy_all_targets_and_native_runtime_both_architectures": true
+  },
+  "unsafe_inventory": {
+    "path": "artifacts/style-adapter-unsafe-inventory.json",
+    "sha256": "1227ed0b7a3389af01b67dee1e2e6040c5a65f06799b3090cb315e0814b585a2"
+  },
+  "initial_precision_difference": {
+    "x64": {
+      "path": "artifacts/style-adapter-primary-x64/report.json",
+      "sha256": "082ac27dd26e97ad399969242d9475ced6f538c6e7bbb232cd6203680d2852e4",
+      "differences": [
+        {
+          "line": 21,
+          "reference": "style-intern index=5 alias=0 copy_alias=1 value_equal=0 self_equal=1 count=10 rects=1 fp=00000000 hash=3d511ca03c1555a9,22c4d0a3d62555a9",
+          "candidate": "style-intern index=5 alias=0 copy_alias=1 value_equal=0 self_equal=1 count=10 rects=1 fp=00000001 hash=3d511ca03c1555a9,22c4d0a3d62555a9"
+        },
+        {
+          "line": 22,
+          "reference": "style-fp index=5 first=00000000 second=00000000 copy=00000000 read=00000000 equality=00000000",
+          "candidate": "style-fp index=5 first=00000001 second=00000000 copy=00000000 read=00000000 equality=00000000"
+        },
+        {
+          "line": 141,
+          "reference": "style-intern index=35 alias=0 copy_alias=1 value_equal=0 self_equal=0 count=66 rects=1 fp=00080010 hash=e12312eadfe63247,e12312eadfe63247",
+          "candidate": "style-intern index=35 alias=0 copy_alias=1 value_equal=0 self_equal=0 count=66 rects=1 fp=00080011 hash=e12312eadfe63247,e12312eadfe63247"
+        },
+        {
+          "line": 142,
+          "reference": "style-fp index=35 first=00080010 second=00000010 copy=00000000 read=00000000 equality=00000010",
+          "candidate": "style-fp index=35 first=00080011 second=00000010 copy=00000000 read=00000000 equality=00000010"
+        }
+      ],
+      "outcome": "Extra inexact flag during growth at 9 and 65 entries; not passing evidence."
+    },
+    "x86": {
+      "path": "artifacts/style-adapter-primary-x86/report.json",
+      "sha256": "1d8a0185b6dc712794ae484fb286c243ff5e55d91ad3a6adb604198044240566",
+      "differences": [
+        {
+          "line": 21,
+          "reference": "style-intern index=5 alias=0 copy_alias=1 value_equal=0 self_equal=1 count=10 rects=1 fp=00000000 hash=000000003c1555a9,00000000d62555a9",
+          "candidate": "style-intern index=5 alias=0 copy_alias=1 value_equal=0 self_equal=1 count=10 rects=1 fp=00000001 hash=000000003c1555a9,00000000d62555a9"
+        },
+        {
+          "line": 22,
+          "reference": "style-fp index=5 first=00000000 second=00000000 copy=00000000 read=00000000 equality=00000000",
+          "candidate": "style-fp index=5 first=00000001 second=00000000 copy=00000000 read=00000000 equality=00000000"
+        },
+        {
+          "line": 141,
+          "reference": "style-intern index=35 alias=0 copy_alias=1 value_equal=0 self_equal=0 count=66 rects=1 fp=00080010 hash=00000000dfe63247,00000000dfe63247",
+          "candidate": "style-intern index=35 alias=0 copy_alias=1 value_equal=0 self_equal=0 count=66 rects=1 fp=00080011 hash=00000000dfe63247,00000000dfe63247"
+        },
+        {
+          "line": 142,
+          "reference": "style-fp index=35 first=00080010 second=00000010 copy=00000000 read=00000000 equality=00000010",
+          "candidate": "style-fp index=35 first=00080011 second=00000010 copy=00000000 read=00000000 equality=00000010"
+        }
+      ],
+      "outcome": "Extra inexact flag during growth at 9 and 65 entries; not passing evidence."
+    }
+  },
+  "growth_fix": {
+    "before": {
+      "path": "artifacts/style-growth-cast-before.asm.txt",
+      "sha256": "519b983f73f7d53c5bd98735aae2892c1263c8f671fbe3cceea603a1ec87ce8d"
+    },
+    "after": {
+      "path": "artifacts/style-growth-cast-after.asm.txt",
+      "sha256": "c1424d628186640d20c1b0c68c397fff7b4e161ca99a680d2a8727a26d532c8f"
+    },
+    "behavior": "Observed Rust1.85 unsigned float-to-size conversion lowered to an unconditional unused subtraction. Signed intermediate with range guard avoids the extra operation; no ambient status is cleared."
+  },
+  "sources": [
+    {
+      "path": "rust/compat/src/style_intern.rs",
+      "sha256": "533de43b861baa68c520ec81ed6475380f2baa18ba3588d72f833e7196c9b90b"
+    },
+    {
+      "path": "rust/ffi/src/style_intern.rs",
+      "sha256": "e66acb9df4edf802e646af7110119d20a08fe9b904c16250077b0a7ccfe7657a"
+    },
+    {
+      "path": "rust/ffi/src/document_registry.rs",
+      "sha256": "7395c2fb822ab4bc80f19111d5cd9539564ed1da3233022730031c0b939f545f"
+    },
+    {
+      "path": "include/xy_rust_style_intern.h",
+      "sha256": "1d344ceafefaf2d6ef405ed1b2945f605c4dc6fe34981972be7bd3f555746e99"
+    },
+    {
+      "path": "src/subtitles/RustStyleIntern.inl",
+      "sha256": "552268a4623d0796b415f19598c7be36267f9bb2d563a0d9a45b4edb106fc50f"
+    },
+    {
+      "path": "src/subtitles/STS.cpp",
+      "sha256": "b69575fd31f594850ebf95b756e11cf0f2267338eded0fc8afdfeba61e266a69"
+    },
+    {
+      "path": "src/subtitles/STS.h",
+      "sha256": "4e06b126e46f5356199cd5378aac42799063447c02d7ec98c0eb750972e4d828"
+    },
+    {
+      "path": "src/subtitles/cache_manager.cpp",
+      "sha256": "63a8416d5597e3412052f884fbe8661bbcd1268f0f839be49e9f7ecf215fc66f"
+    },
+    {
+      "path": "tools/compat/style_intern_native.cpp",
+      "sha256": "4391f7b622d0e461210cf7899112b6cae8a4aca8b5b9ffe0295ebea24e5c8763"
+    },
+    {
+      "path": "tools/compat/style_intern_native.py",
+      "sha256": "bf5810ef42be5fad42ee7241c82d9f6c30545f856e5ead8a5a71d23f64515b27"
+    },
+    {
+      "path": "tools/compat/test_style_intern_native.py",
+      "sha256": "b53459ef93fdb064b79db4317a67f1d2d231a09c454855e997a62920e4a7c190"
+    },
+    {
+      "path": "tools/compat/style_table_adapter_native.py",
+      "sha256": "86a5de1d3737d4519b750a545f4f36cec4edfaf56f3f17356407fe49580b04b5"
+    },
+    {
+      "path": "tools/compat/style_table_native.cpp",
+      "sha256": "eaba7e0882b64d65b74b2fa8ba8adb05b75fdbc563946d4b0c8d0c4e3ca7c6b4"
+    },
+    {
+      "path": "tools/compat/style_table_native.py",
+      "sha256": "e2284a99a64648be18d8b514375deb7c1cec38821d240669c3245528bb996e5b"
+    }
+  ],
+  "harnesses": [
+    {
+      "path": "artifacts/run-style-adapter-host-corpus.py",
+      "sha256": "3125bb1e16a6a5ec235e43188f791d40ccfa9e1abcf5ae72e491476160c88f4a"
+    },
+    {
+      "path": "artifacts/run-style-adapter-contracts.py",
+      "sha256": "12fb0342e5930a1ff188817194908168673f5c3dcdd3a2a5f42870356215933f"
+    },
+    {
+      "path": "artifacts/write-style-adapter-evidence.py",
+      "sha256": "954b17decba95b904ebd2713092df576c022949ac672f06d1a8c8f69b65d874b"
+    },
+    {
+      "path": "tools/compat/audit_rust_boundary.py",
+      "sha256": "959ddcd63c7f0301ba1f1b56615333d3f2d31cbc0ee024d2a9b8b80eccd7a475"
+    }
+  ],
+  "limits": [
+    "Finite default-environment integration evidence, not whole-library completion or a production-default switch.",
+    "Nondefault floating modes/traps, allocator failure/reentry and whole-renderer concurrency remain unclosed.",
+    "Native NaN count after release is preserved with weak entries; later expired-key access is explicitly unresolved and never counted as a matching reference outcome.",
+    "C++ wrappers remain transitional. Fonts, word/line/subtitle graphs, rendering, all hosts and vendored implementations remain in scope."
+  ]
+}

@@ -27,12 +27,64 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## In progress: canonical style ownership (2026-10-19)
+## Current port: renderer style ownership (2026-10-19)
 
-The safe Rust style owner table is implemented in `style_intern.rs`. It owns
+The experimental renderer now uses the safe Rust canonical style table through
+typed checked resources. The native wrapper holds an owner ID, canonical identity
+and packet length; complete style data and rectangle references live in Rust.
+Reads return detached styles preserving raw UTF16 and floating bits. Overlay
+hashing binds that snapshot before reading the low four blur bytes. Copies,
+moves, replacement and late global release are covered by direct probes.
+
+The implementation at `dd2e2585` passes Windows x86 and x64 comparisons against
+cleanup `67da07cd`. Each architecture has two reference and two candidate runs:
+
+* Style values: 196 cases / 788 lines, including all 15 floating fields with
+  12 raw patterns, raw font names, margins and floating status after each phase.
+  Separate children cover moved owners, sticky caller flags, late global release
+  and Count after a final NaN release. No native expired-key lookup is executed.
+* Integrated table: 1,760 operations / 25,189 lines. Actual renderer styles assert
+  every held alias relation, canonical tag and count against a logging native
+  template. Printed comparison events come from that template; the earlier core
+  replay below separately observes Rust's internal comparison sequence.
+* Rectangle and string ownership: 294 / 410 steps and 5,003 / 5,334 lines.
+
+An initial integrated build produced an extra inexact flag at table growth to
+9 and 65 entries. Rust 1.85's unsigned float-to-size conversion evaluated an
+unused subtraction. A guarded signed intermediate removes that operation without
+clearing caller status. Both initial failures and final passing observations are
+retained; the correction is not a claim about nondefault rounding modes or traps.
+
+All three DLLs build on both architectures. Each architecture passes all 1,222
+rendering cases / 13,186 exact frames, 192 distinct-frame controls, 15 native
+regression probes, export/dependency checks, and 10 COM cases plus two controls.
+Historical document storage probes retain their upstream reference attribution
+and use current adapters on both sides; they are not independent cleanup parity.
+All 336 core and 136 FFI tests pass per architecture, with formatting, Clippy and
+178 Python tests (one skip). The inventory has 113 portable-core files with zero
+unsafe sites. The new style boundary has three unsafe functions, four unsafe
+blocks, one short input slice and three detached output copies; no unsafe impl.
+
+Reproduce using `style_intern_native.py` and `style_table_adapter_native.py` in
+`tools/compat`, with `--reference-root artifacts/cleanup-reference`, `--platform
+x64` or `Win32`, and a fresh output directory from the matching developer shell.
+Local artifacts use `style-fixed-*` and `style-adapter-*`. See the
+[style boundary inventory](rust-style-intern-inventory.json) and
+[pinned evidence](rust-style-intern-local-evidence.json) for hashes and scopes.
+
+Fonts and word/line/subtitle ownership, rendering, every host and vendored code
+remain in scope. Native wrappers remain transitional. Allocation failures,
+reentry, nondefault floating environments and whole-renderer concurrency remain
+unclosed. This does not enable the experimental path by default or complete the
+whole-library migration. The next source review is in
+`artifacts/style-adapter-next-ownership.txt`.
+
+## Earlier step: canonical style ownership core (2026-10-19)
+
+At this earlier step, the safe Rust style owner table was implemented in `style_intern.rs`. It owns
 complete raw style values and their canonical rectangle references, preserves
 target-width hashing and the cleanup's MSVC bucket traversal, and keeps the
-first matching style's complete data. The renderer still uses native
+first matching style's complete data. The renderer at that commit still used native
 `XyInterned<STSStyle>`: the checked FFI resources and native lifetime wrapper are
 the next integration work. This is not a completed style-adapter switch.
 
@@ -84,7 +136,7 @@ Reproduce with `style_table_native.py --reference-root artifacts/cleanup-referen
 `artifacts/style-owner-next-integration.txt`. The full renderer, every host
 adapter and vendored implementation remain in scope.
 
-## Current port: shared rectangle ownership (2026-10-19)
+## Previous port: shared rectangle ownership (2026-10-19)
 
 The experimental renderer now keeps canonical style-margin rectangles in safe
 Rust. The native `XyInterned<CRect>` instantiation is excluded on this path. A
