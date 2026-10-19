@@ -39,9 +39,9 @@ int main(){try{
     const double finite[]={0.125,-0.25,0.5,-1,1,1.125,12.75,45,90,120.25,179.999,270,360,1000};
     for(unsigned scenario=0;scenario<190;++scenario){
         const unsigned field=scenario<126?scenario/14:9+scenario-126,value=scenario%14;
-        uint64_t mixed[9],seed=0x9e3779b97f4a7c15ull+scenario;
-        for(unsigned i=0;i<9;++i){seed^=seed<<13;seed^=seed>>7;seed^=seed<<17;
-            if(scenario<158)memcpy(&mixed[i],&finite[seed%14],8);else mixed[i]=values[seed%14];}
+        uint64_t mixed[9],rng=0x9e3779b97f4a7c15ull+scenario;
+        for(unsigned i=0;i<9;++i){rng^=rng<<13;rng^=rng>>7;rng^=rng<<17;
+            if(scenario<158)memcpy(&mixed[i],&finite[rng%14],8);else mixed[i]=values[rng%14];}
         STSStyle s;s.scrAlignment=1000+index;
         if(field<7)memcpy(&(s.*fields[field]),&values[value],8);
         if(scenario>=126)for(unsigned i=0;i<7;++i)memcpy(&(s.*fields[i]),&mixed[i],8);
