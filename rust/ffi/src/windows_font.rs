@@ -49,22 +49,51 @@ extern "system" {
     fn SetLastError(error: u32);
 }
 
+#[cfg(target_arch = "x86_64")]
 fn native_int(value: f64) -> i32 {
     // SAFETY: the supported Windows x86/x64 renderer already requires SSE2.
     // CVTTSD2SI preserves native invalid/inexact status as well as INT_MIN for
     // nonrepresentable inputs; Rust's saturating cast does not have that contract.
     unsafe {
-        #[cfg(target_arch = "x86")]
-        use core::arch::x86::{_mm_cvttsd_si32, _mm_set_sd};
-        #[cfg(target_arch = "x86_64")]
         use core::arch::x86_64::{_mm_cvttsd_si32, _mm_set_sd};
         _mm_cvttsd_si32(_mm_set_sd(value))
     }
 }
+#[cfg(target_arch = "x86_64")]
 fn height(size: f64) -> i32 {
     // Keep both source conversions and their position relative to Windows
     // calls. API-boundary observations can see floating status before return.
     core::hint::black_box(native_int(core::hint::black_box(size) + 0.5))
+}
+#[cfg(target_arch = "x86")]
+fn height(size: f64) -> i32 {
+    extern "C" {
+        // MSVC's private compiler helper takes one x87 stack value and returns
+        // an i32 in EAX. Use only as an asm symbol, never as a normal Rust call.
+        fn _ftol2_sse() -> i32;
+    }
+    let half = 0.5f64;
+    let result: i32;
+    // SAFETY: live initialized f64 inputs, one balanced x87 push/consume pair.
+    // The pinned native constructor uses FLD/FADD then this exact CRT helper
+    // twice. Modern CRT dispatches to FISTTP dword or its older-CPU fallback;
+    // both return EAX and leave control modes unchanged. Declare C ABI volatile
+    // registers, flags and memory effects, and allow the helper's stack use.
+    // This preserves x87 precision/exponent range and status without touching
+    // the independent SSE flags or clearing the caller's existing exceptions.
+    unsafe {
+        core::arch::asm!(
+            "fld qword ptr [{size}]",
+            "fadd qword ptr [{half}]",
+            "call {convert}",
+            size=in(reg) &size,
+            half=in(reg) &half,
+            convert=sym _ftol2_sse,
+            lateout("eax") result,
+            clobber_abi("C"),
+        );
+    }
+    result
 }
 pub(crate) struct Font {
     handle: usize,
