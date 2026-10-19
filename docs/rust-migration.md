@@ -27,7 +27,71 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest correction: named-style map lifecycle and arithmetic (2026-10-19)
+## Latest correction: Rust-owned default-style assignment (2026-10-19)
+
+Implementation `9105c8f5` corrects the x86 default-style setter, selected-state
+Copy and self-Copy mismatch. The safe core applies assignment effects to all
+15 floating fields in native field order. The Windows boundary reuses the
+existing audited scalar assignment helper: x86 preserves FLD/FSTP signaling-NaN
+quieting and denormal flags, while x64 preserves raw bits. Handles are validated
+before applying effects. Self-copy retains the effects without cloning storage.
+Raw packet decoding, ordinary Clone and copy construction remain distinct from
+assignment; caller input bytes are not rewritten. No unsafe block was added.
+
+The actual-class probe matches 360 inputs / 2,882 trace lines on each architecture,
+with two reference and two candidate runs. It checks setter, Copy, self-Copy and
+Empty, including full raw values and independent floating domains both with and
+without pre-existing exception flags. The original failing x86 diagnostic remains
+preserved at its original `4234af68` checkpoint; it is not relabeled as passing.
+All three interning scenarios, AddStyle and both named-map lifecycle histories
+also remain exact.
+
+Both x86 and x64 build all three DLLs and pass 1,222 rendering cases / 13,186 exact
+frames with 192 distinct-frame controls, font/GDI and rectangle/string/table
+ownership probes, all 15 format/document regressions, export/dependency checks,
+and 10 COM cases plus two controls. Each architecture passes 343 core and 136
+FFI tests, with formatting and Clippy checks; Python passes 187 tests with one
+skip. Historical storage checks retain their original upstream provenance and
+implicit-assignment seam, rather than claiming cleanup floating-assignment proof.
+The portable core remains free of unsafe code; the new assignment routing module
+is safe Rust. The 85-file FFI inventory still has 530 unsafe blocks and seven
+assembly sites, unchanged from the named-map correction.
+
+A further actual-document ownership diagnostic is **not passing** on either
+architecture: 12 of 14 phase rows differ in canonical rectangle counts across
+construction, default-style assignment, named-style insertion, Copy, Empty and
+final release. Native stored STSStyle values retain their FwRect owners. Rust
+Document currently retains raw margin values. The canonical style interner
+retains a rectangle Arc, but document styles do not. This releases canonical
+entries too early. The next implementation must retain the actual nested owners, including
+replacement and retirement behavior; counter adjustment would not restore the
+ownership graph. See [nested rectangle handoff](rust-document-rectangle-inventory.json).
+The exact fixture is `tools/compat/document_rectangle_lifetime_diagnostic.cpp`.
+
+The shared renderer HDC boundary also now has a direct lifecycle baseline. On
+both architectures, five actual renderer histories / 97 trace lines match across
+two repeats per role: nested owners, final release and recreation, plus injected
+CreateCompatibleDC, SetBkMode, SetTextColor and SetMapMode failures. Observations
+include call order, handle generations, return values, errno, last-error and
+separate floating domains. This is a baseline for the port following nested
+document ownership: shared HDC ownership and text/path operations are still native. DeleteDC failure handling,
+full-operation serialization, creating-thread lifetime and selected-font behavior
+still need corresponding boundary work.
+
+See [default-style evidence](rust-default-style-local-evidence.json),
+[assignment inventory](rust-default-style-assignment-inventory.json) and the
+[renderer context handoff](rust-renderer-dc-inventory.json). The retained context
+fixture is `tools/compat/renderer_dc_lifecycle_diagnostic.cpp`. Reproduce style
+comparisons with `tools/compat/style_intern_native.py --reference-root
+artifacts/cleanup-reference --platform x64 --scenario default-style --output
+<new-directory>`, repeating for Win32. Local artifacts use `default-copy-*`.
+
+No production default was switched. Nondefault floating modes/traps, allocation
+failure, reentry and host concurrency remain unclosed. Shared context/text/path
+ownership, word/line/subtitle graphs, every host interface and vendored code
+remain in scope for the complete Rust replacement.
+
+## Earlier named-style map lifecycle and arithmetic (2026-10-19)
 
 Implementation `4234af68` corrects the named-style map's floating-status mismatch.
 The safe map caches its high/low thresholds and tracks whether native bins would
@@ -61,15 +125,16 @@ passes 341 core and 136 FFI tests, with formatting and Clippy checks. Python pas
 with one skip in each run. Historical storage results retain their original
 upstream reference and scoped implicit-assignment seam.
 
-The next actual-class diagnostic confirms a separate **unresolved x86 default-style
-assignment defect**. Across 180 inputs, setter/Copy/self-Copy/Empty produce 120
+At that checkpoint, the next actual-class diagnostic confirmed a separate
+**unresolved x86 default-style assignment defect**. Across 180 inputs, setter/Copy/self-Copy/Empty produce 120
 differing rows: 60 raw-value rows from signaling-NaN quieting and 60 floating-status
 rows from signaling NaNs or denormals. x64 matches all 1,442 trace lines. Native
 self-assignment still loads/stores the default style's floating fields; the Rust
 registry currently returns early for equal handles. Empty retains the prior style
 and therefore retains any earlier bit discrepancy. The transitional C++ assignment
-helper does not cover these Rust-owned storage operations. Correct those explicit
-assignment boundaries next; raw transport and copy construction stay distinct.
+helper did not cover those Rust-owned storage operations. The subsequent correction
+above adds the explicit Rust-owned assignment boundaries; raw transport and copy
+construction remain distinct.
 
 See [named-map evidence](rust-style-map-local-evidence.json),
 [map boundary inventory](rust-style-map-floating-inventory.json), and

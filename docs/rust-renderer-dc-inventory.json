@@ -1,6 +1,6 @@
 {
   "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
-  "scope": "Source inventory for next shared renderer device-context ownership boundary; not a validated port.",
+  "scope": "Source inventory plus directly observed cleanup lifecycle baseline for the next shared renderer device-context ownership port. Ownership is still C++.",
   "sources": [
     {
       "path": "src/subtitles/RTS.cpp",
@@ -39,7 +39,51 @@
     "Return Windows handle scalars only under explicit scoped lifetime/serialization contract. No Rust pointer or mutable loan crosses FFI.",
     "Reference CreateCompatibleDC failure, setup-call failures, nested renderer owners, release order, recreation and selected-font deletion before deciding error mapping.",
     "Device contexts created with NULL can depend on creating-thread lifetime. Do not invent cross-thread ownership or move GDI calls to a worker.",
-    "Registry admission alone does not serialize full native text/path operations; whole-operation guard and host lock/reentry order remain to be established."
+    "Registry admission alone does not serialize full native text/path operations; whole-operation guard and host lock/reentry order remain to be established.",
+    "Canonical font construction re-enters DOCUMENTS; a whole text/path operation guard cannot simply hold that nonblocking registry admission across native calls. Establish separate operation/lifetime serialization and lock order.",
+    "The current font-create boundary rejects a null DC; failed-DC constructor lifecycle parity does not imply later text/font failure-path parity.",
+    "Keep explicit release at its original destructor point after Deinit and before remaining native member/base destruction. Preserve one unconditional DeleteDC attempt, including null."
   ],
-  "next_probe": "IAT observer linked to actual cleanup renderer constructors/destructors, observing setup/delete calls and status across nested ownership and recreation. Then migrate shared ownership and compare x86/x64 lifecycle, font probes, rendering and hosts."
+  "next_probe": "First correct nested document rectangle ownership (rust-document-rectangle-inventory.json). Then Promote the retained lifecycle fixture into the maintained probe/validator; extend DeleteDC failure and selected-font/text/path histories. Move shared canonical DC lifetime into Rust with typed owner IDs and an explicit whole-operation/thread-lifetime contract, then rerun lifecycle, font/GDI, exact rendering and hosts.",
+  "lifecycle_baseline": {
+    "candidate_commit": "9105c8f5e21ea63a5aa6046898310e49fbbefa9f",
+    "source": {
+      "path": "artifacts/renderer-dc-native-draft.cpp",
+      "sha256": "476d9520db4691f09b2fb123ca6c6a762b14faa6a7506dce86e074d10ef5c0cb"
+    },
+    "runner": {
+      "path": "artifacts/run-default-copy-dc-observe.py",
+      "sha256": "094fb28c7244d7704ed710c7e7024ee5deb0bfffad70dbc15fb81d4e2986ceb1"
+    },
+    "cases_per_architecture": 5,
+    "trace_lines": 97,
+    "ownership_migrated": false,
+    "architectures": {
+      "x86": {
+        "path": "artifacts/default-copy-dc-observe-x86/report.json",
+        "sha256": "e97c41e2cb831409c476a8df122be364dcd935adbf426d42fcf6f5593a5507f9",
+        "repeat_equal": true,
+        "equal": true
+      },
+      "x64": {
+        "path": "artifacts/default-copy-dc-observe-x64/report.json",
+        "sha256": "83cef7eeeaeb85c273fd5882e51d29025537e3a4b74c9be78273cc9102295ef7",
+        "repeat_equal": true,
+        "equal": true
+      }
+    },
+    "retained_source": {
+      "path": "tools/compat/renderer_dc_lifecycle_diagnostic.cpp",
+      "sha256": "476d9520db4691f09b2fb123ca6c6a762b14faa6a7506dce86e074d10ef5c0cb"
+    },
+    "limits": "This scoped GDI/status baseline does not compare nested document rectangle counts; that separate probe is failing on both architectures."
+  },
+  "observed_lifecycle_details": [
+    "Nested owners share one DC; eight measured constructor/destructor phases have cumulative call counts 4,4,4,4,4,5,9,10. Last release deletes once; the next first owner recreates.",
+    "The four setup calls are CreateCompatibleDC(NULL), SetBkMode(1), SetTextColor(0x00ffffff), SetMapMode(1), in that order.",
+    "A scripted null creation still executes all three setup calls and counts nested owners. Last release still calls DeleteDC(NULL); do not use a generic non-null-only handle destructor.",
+    "In the retained null-creation trace, setup calls change last-error through 6,6,87; final DeleteDC(NULL) sets 6. Preserve API side effects rather than restoring caller errors around the complete operation.",
+    "Scripted individual SetBkMode, SetTextColor and SetMapMode failures do not stop subsequent setup or change sharing/release counts.",
+    "Two runs per role/architecture match raw return values, normalized handle generations, errno, last-error and separate x87/SSE flags at every call boundary and lifecycle phase."
+  ]
 }

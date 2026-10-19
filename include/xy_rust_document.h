@@ -54,14 +54,17 @@ uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_copy_storage_v1(uint64_t destina
 // reserved-zero bytes59..64, font u16-unit count:u32@64, reserved-zero68..72,
 // fifteen f64 bit patterns@72 (size, outlineX/Y, shadowX/Y, scaleX/Y, spacing,
 // blur, gaussianBlur, angleZ/X/Y, shiftX/Y), then raw UTF16LE font units.
-// Count <=INT32_MAX; exact total length required. No native defaults/layout or
-// floating-point normalization. Retired values are destroyed after admission.
+// Count <=INT32_MAX; exact total length required. No native defaults/layout.
+// Wire decoding preserves bits. A successful Windows setter applies native
+// STSStyle assignment effects (x86 sNaN quieting and x87 status). Input bytes
+// remain unchanged; retired values are destroyed after admission.
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_set_default_style_v1(uint64_t owner, const uint8_t*, size_t);
 // Selected Copy state AFTER caller's virtual Empty: name, mode/type/encoding,
 // script size/wrap/collisions/scaled, default style, forced-default. Source optional
 // absence is copied explicitly (native constructor normally initializes it).
-// Destination path/PAR/colors/named map/records remain untouched. No callbacks;
-// retired name/default payloads are dropped after admission. Typed self-copy no-op.
+// Destination path/PAR/colors/named map/records remain untouched. No host
+// callbacks; retired name/default payloads are dropped after admission. Self-copy
+// does not clone storage, but still applies default-style floating assignment.
 // Caller still performs native CopyNamedStylesFrom(false), then prepared copy.
 uint32_t XY_DOCUMENT_CDECL xy_vsfilter_document_copy_selected_state_v1(uint64_t destination, uint64_t source);
 

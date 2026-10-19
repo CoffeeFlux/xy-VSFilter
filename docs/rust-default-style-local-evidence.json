@@ -1,0 +1,1101 @@
+{
+  "schema": 1,
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "candidate_implementation_commit": "9105c8f5e21ea63a5aa6046898310e49fbbefa9f",
+  "architectures": {
+    "x64": {
+      "style_scenarios": {
+        "interning": {
+          "path": "artifacts/default-copy-interning-x64/report.json",
+          "sha256": "d87b53eb46fdaee18211f0910bee634cfca77e83f57a76d05176f5b20738bd34",
+          "cases": 196,
+          "trace_lines": 788,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062"
+            ]
+          }
+        },
+        "same-values": {
+          "path": "artifacts/default-copy-same-values-x64/report.json",
+          "sha256": "1a301038f1e22d800bf9ced935f2cad35e2cbe6a2bb8c5e38f6cbc34b1d8eb8c",
+          "cases": 196,
+          "trace_lines": 788,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062"
+            ]
+          }
+        },
+        "raw-twins": {
+          "path": "artifacts/default-copy-raw-twins-x64/report.json",
+          "sha256": "67a3ae50827435a8fd2e5cb558e2e18f2d8dc35707d0f1239f7b3dbcb6116547",
+          "cases": 196,
+          "trace_lines": 788,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062"
+            ]
+          }
+        },
+        "add-style": {
+          "path": "artifacts/default-copy-add-style-x64/report.json",
+          "sha256": "0e5068a7590be329111e8578b752a4f513743f7d8033c6521d74088e497ec590",
+          "cases": 360,
+          "trace_lines": 1637,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062"
+            ]
+          }
+        },
+        "map-lifecycle": {
+          "path": "artifacts/default-copy-map-lifecycle-x64/report.json",
+          "sha256": "fe87e274322515c0f1c37a0e23302b9f710751f57ebb51d188faf62531ce318b",
+          "cases": 712,
+          "trace_lines": 1426,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062"
+            ]
+          }
+        },
+        "map-growth": {
+          "path": "artifacts/default-copy-map-growth-x64/report.json",
+          "sha256": "4560e7a2d24bfad4528b6bb7f6895ecdfb3416716f0fd19b28bd12552f3d50a7",
+          "cases": 1544,
+          "trace_lines": 3090,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062"
+            ]
+          }
+        },
+        "default-style": {
+          "path": "artifacts/default-copy-default-style-x64/report.json",
+          "sha256": "f59df354bb380d8ff25688ad22cfb234be0d26b9dd198258c5f869bdf2669158",
+          "cases": 360,
+          "trace_lines": 2882,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062",
+              "cced68019ad23ac58f4d57ff2480b97763d1b6539f653bbd8bd9df06c69ab062"
+            ]
+          }
+        }
+      },
+      "other_ownership": {
+        "font_native": {
+          "path": "artifacts/default-copy-font_native-x64/report.json",
+          "sha256": "ca8a08b75313de7e776333d19fdbf7345a8fe15ce1fd06d4bffa0e7b6bda219b",
+          "cases": 195,
+          "trace_lines": 392
+        },
+        "font_gdi_calls": {
+          "path": "artifacts/default-copy-font_gdi_calls-x64/report.json",
+          "sha256": "3fa7f07b7459694fdd5fd4e8346074068fae3471b2272b36ea9f50d8594a2011",
+          "cases": 12,
+          "trace_lines": 126
+        },
+        "rect_intern_native": {
+          "path": "artifacts/default-copy-rect_intern_native-x64/report.json",
+          "sha256": "297ac25bc5cb374e359a7e7eac310b9ac21c2c16f15e19e18ac1dbdebc608008",
+          "cases": 294,
+          "trace_lines": 5003
+        },
+        "string_flyweight_native": {
+          "path": "artifacts/default-copy-string_flyweight_native-x64/report.json",
+          "sha256": "5485c2f079cd1c28b60a8ab5e63eeacebd16353ac8a8bdb7338fe0c593cb81a4",
+          "cases": 410,
+          "trace_lines": 5334
+        },
+        "style_table_adapter_native": {
+          "path": "artifacts/default-copy-style_table_adapter_native-x64/report.json",
+          "sha256": "50954a577f00dd6bc9168130621b01aefb23c27573eb84095109b74d1e551872",
+          "cases": 1760,
+          "trace_lines": 25189
+        }
+      },
+      "regressions": {
+        "override_native": {
+          "path": "artifacts/default-copy-override_native-x64/report.json",
+          "sha256": "755063a41e803bfe9270bf8cba2532967398e8a01552a5d83807aa9540b4cfb0",
+          "cases": 9312,
+          "trace_lines": 96014
+        },
+        "ass_tree_native": {
+          "path": "artifacts/default-copy-ass_tree_native-x64/report.json",
+          "sha256": "bcd58ee7e5a191c8c0ec6b503815033a1e25369cd98e93df734e6eb24b820c4a",
+          "cases": 5142,
+          "trace_lines": 10286
+        },
+        "effects_native": {
+          "path": "artifacts/default-copy-effects_native-x64/report.json",
+          "sha256": "89b61460e31d256044be73648f86deb1569f4c57b376b07c01bc2599cbf13efa",
+          "cases": 13608,
+          "trace_lines": 81722
+        },
+        "html_tag_native": {
+          "path": "artifacts/default-copy-html_tag_native-x64/report.json",
+          "sha256": "690857c643c49decc869b5df43c21f20d58c3b6b5400fa4b2fccfff57294913e",
+          "cases": 5728,
+          "trace_lines": 17186
+        },
+        "shared_color_native": {
+          "path": "artifacts/default-copy-shared_color_native-x64/report.json",
+          "sha256": "c0f2a2043623d5a33b2c79e82ddc0cf5e135716ac6d42b112acf891a6b9779ac",
+          "cases": 8896,
+          "trace_lines": 12234
+        },
+        "usf_document_native": {
+          "path": "artifacts/default-copy-usf_document_native-x64/report.json",
+          "sha256": "141e2fbe6fb664babdac1e9a1b93b1b1a793ce75db67b8a6b32b11d1064f78b0",
+          "cases": 1340,
+          "trace_lines": 40517
+        },
+        "realtext_document_native": {
+          "path": "artifacts/default-copy-realtext_document_native-x64/report.json",
+          "sha256": "a8d4387cb1d6b2418530815b57809493e44d6308ada7310e826523ed9ca41bf0",
+          "cases": 4532,
+          "trace_lines": 37887
+        },
+        "vtt_document_native": {
+          "path": "artifacts/default-copy-vtt_document_native-x64/report.json",
+          "sha256": "888f67a42c1d85fffa9eb5fd8dd580e3d56d2458b0bfa6db24a8e097ffa16595",
+          "cases": 2292,
+          "trace_lines": 21939
+        },
+        "sami_document_native": {
+          "path": "artifacts/default-copy-sami_document_native-x64/report.json",
+          "sha256": "bfd12711dedeaa52ed46f247c7bb80f323c58d3cdf80feaa1eadb09761f035f6",
+          "cases": 2836,
+          "trace_lines": 26992
+        },
+        "text_document_native": {
+          "path": "artifacts/default-copy-text_document_native-x64/report.json",
+          "sha256": "dccc765902697d9f267fec7e4a2b6e6527b2267622897ffdcb57009ba255b6c6",
+          "cases": 5692,
+          "trace_lines": 44404
+        },
+        "microdvd_document_native": {
+          "path": "artifacts/default-copy-microdvd_document_native-x64/report.json",
+          "sha256": "f41b6055a4a23ad05b956869d36cd7a1da8bb53cfb3cbaa4e5c55601145d4fe8",
+          "cases": 4588,
+          "trace_lines": 41491
+        },
+        "ass_document_native": {
+          "path": "artifacts/default-copy-ass_document_native-x64/report.json",
+          "sha256": "391b9519459b066fa27553da29a9a594f375c5fdc44d258055bbe03c6dc9e4e5",
+          "cases": 3266,
+          "trace_lines": 22286
+        },
+        "xombie_document_native": {
+          "path": "artifacts/default-copy-xombie_document_native-x64/report.json",
+          "sha256": "b88c787a87f229a78203b8fe33a518976fa5f236763e1f08f5ba44aec5ee825e",
+          "cases": 1242,
+          "trace_lines": 10441
+        },
+        "document_style_api_compile": {
+          "path": "artifacts/default-copy-document_style_api_compile-x64/report.json",
+          "sha256": "c2c234a3ca0634faadaeb4ae405d9a617cf47df4d0605d5a384b71315eda2cc9",
+          "cases": null,
+          "trace_lines": null
+        },
+        "document_native_lifecycle": {
+          "path": "artifacts/default-copy-document_native_lifecycle-x64/report.json",
+          "sha256": "169147692cf5e5a2bd73a90d2152ed9e8738750fb28cbb9f7b8a68fd24d222bf",
+          "cases": null,
+          "trace_lines": 3693
+        }
+      },
+      "historical_storage": {
+        "primitives": {
+          "path": "artifacts/default-copy-document-windows-x64/report.json",
+          "sha256": "2c0d6c2404f35ab56d825eebca1ae561cf1044eeedf09bb4473ec804b0f096d0",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 53711,
+          "rust_parity": false
+        },
+        "/facade": {
+          "path": "artifacts/default-copy-document-windows-x64/facade/report.json",
+          "sha256": "eb622ee44be1123094263475387ad7d430455a7a6e5e62324c945c60204709ed",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 166,
+          "rust_parity": false
+        },
+        "/owner": {
+          "path": "artifacts/default-copy-document-windows-x64/owner/report.json",
+          "sha256": "988a8c3cfedd47cf408755c13e88db04c5e7bc32c0bd68a7c20b9f4e1752a1a0",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 2361,
+          "rust_parity": true
+        },
+        "assignment_scope": "Pinned compiler-generated STSStyle assignment on both storage-algorithm sides; exact current x86 assignment declaration excluded. Independent actual cleanup comparison: style_intern_native.py --scenario same-values"
+      },
+      "rendering": {
+        "path": "artifacts/default-copy-csri-x64/summary.json",
+        "sha256": "f456afc965d1e96938a155483c773bf31a9c58a74755797400179c287c1c2d9a",
+        "cases": 1222,
+        "frames": 13186,
+        "controls": 192,
+        "shards": [
+          {
+            "path": "artifacts/default-copy-csri-x64/shard-0/report.json",
+            "sha256": "f4a5fc2b8971b002c509f724e861de22aa44a446a3a1220070a06c8649bdd9b7"
+          },
+          {
+            "path": "artifacts/default-copy-csri-x64/shard-1/report.json",
+            "sha256": "d6c81d22cd63f326c037f52bf62244d026fa81311fa1f09a4f8847fd2eebd482"
+          },
+          {
+            "path": "artifacts/default-copy-csri-x64/shard-2/report.json",
+            "sha256": "dba71b460b4524fa256fad83ce9d1f710186bcdec7cc005e3639cf36c3fb2df8"
+          },
+          {
+            "path": "artifacts/default-copy-csri-x64/shard-3/report.json",
+            "sha256": "5ff9e19be927f3c3a9f491fc01ad4a11a4067c48c442fc528be42195250c7516"
+          },
+          {
+            "path": "artifacts/default-copy-csri-x64/shard-4/report.json",
+            "sha256": "5ce81edffea8c2e2985b0cf3f4d2a7ca3863b4dd957da4a579f5ea8d3f3bbea0"
+          },
+          {
+            "path": "artifacts/default-copy-csri-x64/shard-5/report.json",
+            "sha256": "79e23486c92fc2d5448d8ae97a1064b77ecdb6960f3a1b4aa5e641c186e5e37e"
+          },
+          {
+            "path": "artifacts/default-copy-csri-x64/shard-6/report.json",
+            "sha256": "b9cbfc0eb8caeb55cbab1a5f51fe81a78155fbcd9e543dd6cc42790fa33c2ec8"
+          },
+          {
+            "path": "artifacts/default-copy-csri-x64/shard-7/report.json",
+            "sha256": "56e4262e2f3be1b72ca98dc2703d3df2ec262a9c30b487ca0e270b54e2e4fd25"
+          }
+        ]
+      },
+      "contracts": {
+        "path": "artifacts/default-copy-contracts-x64/summary.json",
+        "sha256": "6deb4b23cef7dce374bfde358d6b81124423ae0f0920ff2fbd68b1b082a7d9c9",
+        "com": {
+          "path": "artifacts/default-copy-contracts-x64/com/report.json",
+          "sha256": "1c9e304116fa7c96e40e88d511900f4ad58767f7a5f231e9d485db7590c00ad8"
+        },
+        "dlls": {
+          "VSFilter.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/x64/Release/VSFilter.dll",
+              "sha256": "2d254068a40e5f59cf191c3c6bbfc984b548193b668c4decac21dc1e94e02169"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/x64/Release/VSFilter.dll",
+              "sha256": "0c1065bcc8627c05a3934d34347e42425d07d89bc7b3877326d3b6e1aa72b956"
+            },
+            "exports": {
+              "path": "artifacts/default-copy-contracts-x64/VSFilter.dll.pe_exports.json",
+              "sha256": "eb7285762b2cc627e99f7879f49facf7a4122d65c4da58c25210539790cc98d1"
+            },
+            "dependencies": {
+              "path": "artifacts/default-copy-contracts-x64/VSFilter.dll.pe_dependencies.json",
+              "sha256": "805d7d7481b2774c2612b7cd7dd7fdaa4dd04a35111f3726a6704acf88c4a0d2"
+            }
+          },
+          "XySubFilter.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/x64/Release/XySubFilter.dll",
+              "sha256": "32b7c2cd6eb817120414db53b3c3005e719ae4b993c4a69d0d66c7f6ac363d5a"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/x64/Release/XySubFilter.dll",
+              "sha256": "897a545c996b9532613a9d07f2382d6e1428d297525bf6b79397327cf12ec511"
+            },
+            "exports": {
+              "path": "artifacts/default-copy-contracts-x64/XySubFilter.dll.pe_exports.json",
+              "sha256": "894a5896d3b2be923c4f72dfc3a155fc6f4a6487d2662158e3a9865b9153fe42"
+            },
+            "dependencies": {
+              "path": "artifacts/default-copy-contracts-x64/XySubFilter.dll.pe_dependencies.json",
+              "sha256": "2ce278d6be4d85c557490e59cb33e78ca53faf3e38061e9ca3eb225897be359a"
+            }
+          },
+          "xy_sub_filter_consumer.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/x64/Release/xy_sub_filter_consumer.dll",
+              "sha256": "f1165742064181b7fb73bacb16017d8e202c8bb0be90ed8c2eb812ac282c2df8"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/x64/Release/xy_sub_filter_consumer.dll",
+              "sha256": "fe106077ea383ef80ccfda91040f5da253060f73f6a523a70f76de58a879660d"
+            },
+            "exports": {
+              "path": "artifacts/default-copy-contracts-x64/xy_sub_filter_consumer.dll.pe_exports.json",
+              "sha256": "fc3af55398e360c3dbe12cad4ae8756afd969ff6f22a247d4c7fd4104669a43b"
+            },
+            "dependencies": {
+              "path": "artifacts/default-copy-contracts-x64/xy_sub_filter_consumer.dll.pe_dependencies.json",
+              "sha256": "b0b48a3cf2bf2ecbbac4ecca863a815ab4a0c1137277a9b7d5830d9d1beca5c9"
+            }
+          }
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/default-copy-build-x64.log",
+          "sha256": "b5eae0b6bd52f9e8144217993476a9d6b4e510d550488a96d90e6d3dbe7e9cf1"
+        },
+        {
+          "path": "artifacts/default-copy-build-rust-x64.log",
+          "sha256": "3ab3c99eb7da20f5d041490b69f585f5cdd93e62b195e67153de2dd1f5631d05"
+        }
+      ],
+      "initial_default_assignment_diagnostic": {
+        "path": "artifacts/map-default-diagnostic-x64/report.json",
+        "sha256": "2ecb570aee35516515fc75940dc156ae864e7454958af86d31f8bd8ffdd110cd",
+        "cases": 180,
+        "trace_lines": 1442,
+        "equal": true,
+        "different_rows": 0,
+        "scope": "Historical setter/Copy/self-Copy/Empty diagnostic before the correction. x86 was not passing."
+      },
+      "next_dc_lifecycle_baseline": {
+        "path": "artifacts/default-copy-dc-observe-x64/report.json",
+        "sha256": "83cef7eeeaeb85c273fd5882e51d29025537e3a4b74c9be78273cc9102295ef7",
+        "cases": 5,
+        "trace_lines": 97,
+        "ownership_migrated": false,
+        "scope": "Actual renderer constructors/destructors with scripted GDI failures and separate floating/errno/last-error observations."
+      },
+      "unresolved_nested_rectangle_lifetime": {
+        "path": "artifacts/default-copy-document-rect-x64/report.json",
+        "sha256": "c87e3aeb547d0ccc757688cfc2a6bdd6e68ca2b3ce3c4b9dedd1e704d7f9a195",
+        "cases": 14,
+        "trace_lines": 16,
+        "different_rows": 12,
+        "passing": false,
+        "scope": "Actual document constructor/default-style/named-style/Copy/Empty/drop counts. Raw style data lacks native nested canonical rectangle ownership."
+      }
+    },
+    "x86": {
+      "style_scenarios": {
+        "interning": {
+          "path": "artifacts/default-copy-interning-x86/report.json",
+          "sha256": "2e31b12ec68522a5d5845584a8f4e4fe2c5bcd75fa107181f65adc2686672692",
+          "cases": 196,
+          "trace_lines": 788,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16"
+            ]
+          }
+        },
+        "same-values": {
+          "path": "artifacts/default-copy-same-values-x86/report.json",
+          "sha256": "4eafab854c492b7b1469cb3465ffd6b90b38dc39be88222c2b2ff0c3ab1eae72",
+          "cases": 196,
+          "trace_lines": 788,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16"
+            ]
+          }
+        },
+        "raw-twins": {
+          "path": "artifacts/default-copy-raw-twins-x86/report.json",
+          "sha256": "ec96be796ebe6cef3512114098824ae4a6e93fa1a0985f40975c21a50890139a",
+          "cases": 196,
+          "trace_lines": 788,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16"
+            ]
+          }
+        },
+        "add-style": {
+          "path": "artifacts/default-copy-add-style-x86/report.json",
+          "sha256": "ff34961d7c621362532391727fec5d44ddf53dd7016073568b2453f58a609c90",
+          "cases": 360,
+          "trace_lines": 1637,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16"
+            ]
+          }
+        },
+        "map-lifecycle": {
+          "path": "artifacts/default-copy-map-lifecycle-x86/report.json",
+          "sha256": "dca6b3900f612864c7023f892a6a71314daec02475771448cd9f373a0e0c643d",
+          "cases": 712,
+          "trace_lines": 1426,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16"
+            ]
+          }
+        },
+        "map-growth": {
+          "path": "artifacts/default-copy-map-growth-x86/report.json",
+          "sha256": "c3db895a20a841a4b8abea222a6a210272c7bf73727005c9971eea95d4f4b16e",
+          "cases": 1544,
+          "trace_lines": 3090,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16"
+            ]
+          }
+        },
+        "default-style": {
+          "path": "artifacts/default-copy-default-style-x86/report.json",
+          "sha256": "d9ccf7fac9bb3ebfdaed76668e32a3fbb9985ac5574376d03ef4b5cfd19ab3ba",
+          "cases": 360,
+          "trace_lines": 2882,
+          "lifecycle": {
+            "trace_sha256": [
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731",
+              "6c5167565255caa593a1ccb726b733f707255bb1b6bf622d47aa1883fef9e731"
+            ],
+            "trace_lines": 5,
+            "late_owner": true,
+            "sticky_status": true
+          },
+          "isolated_nan_release": {
+            "count_before": 1,
+            "count_after": 1,
+            "post_release_lookup_executed": false,
+            "trace_sha256": [
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16",
+              "07f8631ef3cf2b8fe05ae1314b2266957904a5f0780db7229d798ae832fe5e16"
+            ]
+          }
+        }
+      },
+      "other_ownership": {
+        "font_native": {
+          "path": "artifacts/default-copy-font_native-x86/report.json",
+          "sha256": "0d956e5650bbe93e0f43d7bcc8662812e0af1717a5202a578a5dee842f202f5f",
+          "cases": 195,
+          "trace_lines": 392
+        },
+        "font_gdi_calls": {
+          "path": "artifacts/default-copy-font_gdi_calls-x86/report.json",
+          "sha256": "4ef05e7e26e47aea5223ba8b3b6d2ed3a4674c28c5b27e793b95626a2e879086",
+          "cases": 12,
+          "trace_lines": 126
+        },
+        "rect_intern_native": {
+          "path": "artifacts/default-copy-rect_intern_native-x86/report.json",
+          "sha256": "7c1d595d19b3ca5b34e701509edff6f2185fbec6ab3ba1773eca5c314e33e07b",
+          "cases": 294,
+          "trace_lines": 5003
+        },
+        "string_flyweight_native": {
+          "path": "artifacts/default-copy-string_flyweight_native-x86/report.json",
+          "sha256": "b20486b8960f95f0d38f0e625518303a1295efb64db0161f721e0bd163efffdc",
+          "cases": 410,
+          "trace_lines": 5334
+        },
+        "style_table_adapter_native": {
+          "path": "artifacts/default-copy-style_table_adapter_native-x86/report.json",
+          "sha256": "a2ab81ceeb103952b404252d07f2d33f249f690e4cb7d7b2e6b11a1451b3ba65",
+          "cases": 1760,
+          "trace_lines": 25189
+        }
+      },
+      "regressions": {
+        "override_native": {
+          "path": "artifacts/default-copy-override_native-x86/report.json",
+          "sha256": "1a6678c9691a956a1795204c66a68e29c347507fa113f729254c0635b6452d6d",
+          "cases": 9312,
+          "trace_lines": 96014
+        },
+        "ass_tree_native": {
+          "path": "artifacts/default-copy-ass_tree_native-x86/report.json",
+          "sha256": "585579b75ce6fb418039645e1f61f21fd5ac0206accf45890fb47328533d4c28",
+          "cases": 5142,
+          "trace_lines": 10286
+        },
+        "effects_native": {
+          "path": "artifacts/default-copy-effects_native-x86/report.json",
+          "sha256": "ff80c84fb680ccac26f3ebf025fe924a17898cb99095de368482169c94ba3fff",
+          "cases": 13608,
+          "trace_lines": 81722
+        },
+        "html_tag_native": {
+          "path": "artifacts/default-copy-html_tag_native-x86/report.json",
+          "sha256": "b892fcb9c0f39e1a54f1dd500dbb4cfbb05a88c455a70904b19b68fdfd8f0fc5",
+          "cases": 5728,
+          "trace_lines": 17186
+        },
+        "shared_color_native": {
+          "path": "artifacts/default-copy-shared_color_native-x86/report.json",
+          "sha256": "1be34d1b5d48a8248d6686afd89236bde456db27df0469793eba0ab4733630f0",
+          "cases": 8896,
+          "trace_lines": 12234
+        },
+        "usf_document_native": {
+          "path": "artifacts/default-copy-usf_document_native-x86/report.json",
+          "sha256": "ff77dc29c4a6bee41f67555239e8891f2e875f463fd19536c41edeae08280cc9",
+          "cases": 1340,
+          "trace_lines": 40517
+        },
+        "realtext_document_native": {
+          "path": "artifacts/default-copy-realtext_document_native-x86/report.json",
+          "sha256": "e6772b9bad73652798fab890b01db9d0cd068579885ad48da84303949b94f325",
+          "cases": 4532,
+          "trace_lines": 37887
+        },
+        "vtt_document_native": {
+          "path": "artifacts/default-copy-vtt_document_native-x86/report.json",
+          "sha256": "dd7458d7bdd50a4df9fb69af6eb50c80e791692588f11489c2993b93ad035176",
+          "cases": 2292,
+          "trace_lines": 21939
+        },
+        "sami_document_native": {
+          "path": "artifacts/default-copy-sami_document_native-x86/report.json",
+          "sha256": "e9d2faf05092f1ea7627da79c6a0c0f8ca95a1b2c26b84e9297a830b253f2920",
+          "cases": 2836,
+          "trace_lines": 26992
+        },
+        "text_document_native": {
+          "path": "artifacts/default-copy-text_document_native-x86/report.json",
+          "sha256": "0dad5a306fbeb2fa5f4711c2e9d31048a7fcf79e2f92f2f1ee970696104989bb",
+          "cases": 5692,
+          "trace_lines": 44404
+        },
+        "microdvd_document_native": {
+          "path": "artifacts/default-copy-microdvd_document_native-x86/report.json",
+          "sha256": "9491dcf300908d0954097bb840fa4b856458d19d0da972be7f609663126c30fd",
+          "cases": 4588,
+          "trace_lines": 41491
+        },
+        "ass_document_native": {
+          "path": "artifacts/default-copy-ass_document_native-x86/report.json",
+          "sha256": "dbfc2ec9ca7376e667b8559b5bf29fb6e759a6ee0a961b31ee509d24c92eec09",
+          "cases": 3266,
+          "trace_lines": 22286
+        },
+        "xombie_document_native": {
+          "path": "artifacts/default-copy-xombie_document_native-x86/report.json",
+          "sha256": "053dfe0951f61d58b5c41a54f301f8b60e41f6f27ec78efee1cab01404ff2b9c",
+          "cases": 1242,
+          "trace_lines": 10441
+        },
+        "document_style_api_compile": {
+          "path": "artifacts/default-copy-document_style_api_compile-x86/report.json",
+          "sha256": "d71dc6d451b32708983e98093f1ef92298711a9fd12506a770ac3a23f9f20381",
+          "cases": null,
+          "trace_lines": null
+        },
+        "document_native_lifecycle": {
+          "path": "artifacts/default-copy-document_native_lifecycle-x86/report.json",
+          "sha256": "30acbab2ba5a8f1e66e2ee4bcc72732a904df7be42f198fa33a8c4505918c719",
+          "cases": null,
+          "trace_lines": 3693
+        }
+      },
+      "historical_storage": {
+        "primitives": {
+          "path": "artifacts/default-copy-document-windows-x86/report.json",
+          "sha256": "5b21c9b3c7ca88d9b78ed337b4c43347bf8519f4a71f0cd9698de9f141fa7032",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 53711,
+          "rust_parity": false
+        },
+        "/facade": {
+          "path": "artifacts/default-copy-document-windows-x86/facade/report.json",
+          "sha256": "175a4ffde1842eb07091a03a39dbdd9cc83dffa9bc6aa5b30c08b3464a67b5d1",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 166,
+          "rust_parity": false
+        },
+        "/owner": {
+          "path": "artifacts/default-copy-document-windows-x86/owner/report.json",
+          "sha256": "2299be909d80f5668266fd432ad3c52ff961c6c1fad9401998f68f1f0647c1c2",
+          "reference_commit": "4911cacb102bc0cbd41449793e54473265b04e62",
+          "trace_lines": 2361,
+          "rust_parity": true
+        },
+        "assignment_scope": "Pinned compiler-generated STSStyle assignment on both storage-algorithm sides; exact current x86 assignment declaration excluded. Independent actual cleanup comparison: style_intern_native.py --scenario same-values"
+      },
+      "rendering": {
+        "path": "artifacts/default-copy-csri-x86/summary.json",
+        "sha256": "1212e2f32fe68e79bcd940d0a0e3e42ad3e3c5ac4abd760245cdf57506ef2f1b",
+        "cases": 1222,
+        "frames": 13186,
+        "controls": 192,
+        "shards": [
+          {
+            "path": "artifacts/default-copy-csri-x86/shard-0/report.json",
+            "sha256": "2ea9ef0aec89349725da6ec8ef109ceaa203589e2135bc358426fd7b5bb7043e"
+          },
+          {
+            "path": "artifacts/default-copy-csri-x86/shard-1/report.json",
+            "sha256": "9da8c6d8092119fe6ba2b63168e8fde9139b05f936ffca5894ca1c0ad3dcd342"
+          },
+          {
+            "path": "artifacts/default-copy-csri-x86/shard-2/report.json",
+            "sha256": "043f24ed502e4c2ce6c6d6355383afb250a3706b9d62682d8ee250a6886d733f"
+          },
+          {
+            "path": "artifacts/default-copy-csri-x86/shard-3/report.json",
+            "sha256": "3317dc4d516bcbc252f769df4c6591dc5c2a6f9d01d904955735cb69abe1cefe"
+          },
+          {
+            "path": "artifacts/default-copy-csri-x86/shard-4/report.json",
+            "sha256": "7685fbe779ca1efd6c2e58a48792c31f2c97a1eadfa7851239d0254bde05e20e"
+          },
+          {
+            "path": "artifacts/default-copy-csri-x86/shard-5/report.json",
+            "sha256": "c70c189b2a989601256dba060e7b48ef92eb728f521b34ffd5450e603e2ec883"
+          },
+          {
+            "path": "artifacts/default-copy-csri-x86/shard-6/report.json",
+            "sha256": "b7f9425719490ee3ad10982af972cc059dfc6b3ad26cc15277de3852fd6b29e9"
+          },
+          {
+            "path": "artifacts/default-copy-csri-x86/shard-7/report.json",
+            "sha256": "c300514835ce30189a2988267fabd504c6071db6b81498ecd19d3c8065be4ee5"
+          }
+        ]
+      },
+      "contracts": {
+        "path": "artifacts/default-copy-contracts-x86/summary.json",
+        "sha256": "6deb4b23cef7dce374bfde358d6b81124423ae0f0920ff2fbd68b1b082a7d9c9",
+        "com": {
+          "path": "artifacts/default-copy-contracts-x86/com/report.json",
+          "sha256": "143e6e84ca7877567fdf9963159734d94f005010b2acf7e13e23f81dd8e0d9e1"
+        },
+        "dlls": {
+          "VSFilter.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/Win32/Release/VSFilter.dll",
+              "sha256": "69faa2d5f90f35fe4184e9e9bd892adb76fee60295701988f61ab7af0664d9eb"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/Win32/Release/VSFilter.dll",
+              "sha256": "2177112c84b269d61778fb8ad9b57f05b75c2c358318eb2ffa20b7add06731a7"
+            },
+            "exports": {
+              "path": "artifacts/default-copy-contracts-x86/VSFilter.dll.pe_exports.json",
+              "sha256": "a3aa14d35364372d6f2c768f1c1c024b66cebfc47d43d9aa48a559ef1fae625c"
+            },
+            "dependencies": {
+              "path": "artifacts/default-copy-contracts-x86/VSFilter.dll.pe_dependencies.json",
+              "sha256": "8b0365bd8b1fa8ea13b65d8681836b85d870a46781d0a3cbfb851b1000a21ae7"
+            }
+          },
+          "XySubFilter.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/Win32/Release/XySubFilter.dll",
+              "sha256": "2c3b904d7f91902ef456e07b648c5d6351878318c235397eeb9b39eb3fffa34f"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/Win32/Release/XySubFilter.dll",
+              "sha256": "8bf1178db04864c40a5688c6c6113e816b3b4806ab82114520fb32e0c4e612be"
+            },
+            "exports": {
+              "path": "artifacts/default-copy-contracts-x86/XySubFilter.dll.pe_exports.json",
+              "sha256": "a0b9979df42f02b62e4ee3d06b3c41a64d6874f291cbbc47f9ebf7a0ecac3a11"
+            },
+            "dependencies": {
+              "path": "artifacts/default-copy-contracts-x86/XySubFilter.dll.pe_dependencies.json",
+              "sha256": "2a22ef471924cc53ea843b14cb2fb5e1dc765f9e308e8ed316172476b0696dd5"
+            }
+          },
+          "xy_sub_filter_consumer.dll": {
+            "reference": {
+              "path": "artifacts/cleanup-reference/bin/lib_17.0/Win32/Release/xy_sub_filter_consumer.dll",
+              "sha256": "3e7c20a4d6c42457d92eb56c42e4fd9f3bddb93276f2c1cd28bfb73edd06484c"
+            },
+            "candidate": {
+              "path": "bin/lib_17.0/Win32/Release/xy_sub_filter_consumer.dll",
+              "sha256": "5fb564269a860fcccd5257766f7c77e6d3d8696ab50cf1165a065b5f68a68f74"
+            },
+            "exports": {
+              "path": "artifacts/default-copy-contracts-x86/xy_sub_filter_consumer.dll.pe_exports.json",
+              "sha256": "058b92de2894c1511b8570ddd6613c8dc544543dffae3ced39c31076147dda94"
+            },
+            "dependencies": {
+              "path": "artifacts/default-copy-contracts-x86/xy_sub_filter_consumer.dll.pe_dependencies.json",
+              "sha256": "bee8a1d975859e0ab8a9b6843e14f813df818b8538e6501927e792bb180eb7c1"
+            }
+          }
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/default-copy-build-x86.log",
+          "sha256": "7addcb746d68c407a30456354db25c16c14bd649861f66d44ecf1337d46bbfa5"
+        },
+        {
+          "path": "artifacts/default-copy-build-rust-x86.log",
+          "sha256": "a1442e997de3ce92dde0ff8d71dbd8335645ec12cb76eb2e7c5f499960638322"
+        }
+      ],
+      "initial_default_assignment_diagnostic": {
+        "path": "artifacts/map-default-diagnostic-x86/report.json",
+        "sha256": "21e5c3879c1bd097993a1c470c5c9172f89b4b0046fe14e623dad3d64cae268c",
+        "cases": 180,
+        "trace_lines": 1442,
+        "equal": false,
+        "different_rows": 120,
+        "scope": "Historical setter/Copy/self-Copy/Empty diagnostic before the correction. x86 was not passing."
+      },
+      "next_dc_lifecycle_baseline": {
+        "path": "artifacts/default-copy-dc-observe-x86/report.json",
+        "sha256": "e97c41e2cb831409c476a8df122be364dcd935adbf426d42fcf6f5593a5507f9",
+        "cases": 5,
+        "trace_lines": 97,
+        "ownership_migrated": false,
+        "scope": "Actual renderer constructors/destructors with scripted GDI failures and separate floating/errno/last-error observations."
+      },
+      "unresolved_nested_rectangle_lifetime": {
+        "path": "artifacts/default-copy-document-rect-x86/report.json",
+        "sha256": "a91aa7a18365b8165d134f55242bdbd09c7bec46dedc8088304654472b5d0b1f",
+        "cases": 14,
+        "trace_lines": 16,
+        "different_rows": 12,
+        "passing": false,
+        "scope": "Actual document constructor/default-style/named-style/Copy/Empty/drop counts. Raw style data lacks native nested canonical rectangle ownership."
+      }
+    }
+  },
+  "checks": {
+    "path": "artifacts/default-copy-checks.log",
+    "sha256": "e38466c33a19c5f26452f60784e2861c8b646ab41a3f2fe49f6e92b526ab9092",
+    "safe_core_per_architecture": 343,
+    "ffi_per_architecture": 136,
+    "fmt": true,
+    "clippy_all_targets_and_native_runtime_both_architectures": true,
+    "python_tests": 187,
+    "skipped": 1
+  },
+  "unsafe_inventory": {
+    "path": "artifacts/default-copy-unsafe-inventory.json",
+    "sha256": "c9fc088a0c5781daa49aad0ff0c443ff49223f76255552b825c2aa23ac4693e0"
+  },
+  "sources": [
+    {
+      "path": "rust/compat/src/document.rs",
+      "sha256": "a4ff267819e9dd61d6f2431f9eaca5dfebc38d03936da9c79dba0ae29ed07ea4"
+    },
+    {
+      "path": "rust/compat/src/document_style.rs",
+      "sha256": "f8363c29b4626aa526df69d7d90c0ebb12ce7cdbede664fd169560cdfae38fab"
+    },
+    {
+      "path": "rust/ffi/src/document.rs",
+      "sha256": "41348cc1186d1c33c0b4ec328362a1b20a8d876e737974ae7e13a3654be8619a"
+    },
+    {
+      "path": "rust/ffi/src/document_registry.rs",
+      "sha256": "49e52f12d5ce50b6d4a0ec9fd30bba41b92ad9e94b269f215e6fb7008b3eecf1"
+    },
+    {
+      "path": "rust/ffi/src/style_assignment.rs",
+      "sha256": "3dee99c4eaa4174d8207f2c5bf28b11c1d286bcaa82fdc438c07739d92bc3c8e"
+    },
+    {
+      "path": "rust/ffi/src/windows_float.rs",
+      "sha256": "dd91d406e8ae0eb16785b50c60f552bbfcde15ef36c57d318d9f1b22e42d379d"
+    },
+    {
+      "path": "rust/ffi/src/lib.rs",
+      "sha256": "409c82473027cacb08c370c0b3b67108994f8284e311bcb1e2f047e8d1910985"
+    },
+    {
+      "path": "include/xy_rust_document.h",
+      "sha256": "d8a49f6a0e8761ff94f333d2be13831b0b9e144d4862cfc6e2aaa86b90afac4e"
+    },
+    {
+      "path": "tools/compat/style_intern_native.cpp",
+      "sha256": "7c201aaacf996447290c677505993286cfa55af9ad74fa6445d6262c0460cfde"
+    },
+    {
+      "path": "tools/compat/style_intern_native.py",
+      "sha256": "923d738634c7f49d1dc594bfc514fe717898883dd17e36b9f8e9e21c7c349920"
+    },
+    {
+      "path": "tools/compat/test_style_intern_native.py",
+      "sha256": "530e950d371c551d2f433c33c6bc8aa79b8a02afdf27fbe0df0a19aee0b9c361"
+    }
+  ],
+  "reference_assignment_disassembly": [
+    {
+      "path": "artifacts/font-native-map-x86/probe.map",
+      "sha256": "9aca7c289a5eee3a46b3ae0f3984314e1d0c60f7632b2187d143bba3fae4cae7"
+    },
+    {
+      "path": "artifacts/font-native-map-x86/disassembly.txt",
+      "sha256": "55295baa514c2c5652c5d9a596e1a94c448b2fb0dc863c46ae7f8b0f87b522d6"
+    },
+    {
+      "path": "artifacts/font-native-map-x86/command.json",
+      "sha256": "af8be8f0971f86c90588b18cc173f30be99e8f49bab81f6d5073d7ad9040ea4c"
+    }
+  ],
+  "limits": [
+    "Finite default-mode observations with masked exceptions; allocation failure, nondefault floating modes/traps, reentry and host concurrency remain unclosed.",
+    "Raw style transport and ordinary Clone remain bit-preserving; only explicit default-style assignment boundaries use the target helper.",
+    "Document styles do not yet retain nested canonical rectangle owners; the new 14-phase diagnostic is not passing on either architecture.",
+    "Shared renderer HDC ownership is still native. Its initial lifecycle probe is a baseline, not a Rust ownership claim.",
+    "Historical storage retains its original upstream reference and implicit-assignment seam; not cleanup floating-assignment parity.",
+    "No production default switched; remaining renderer graphs, all host interfaces and vendored code remain in the full Rust objective."
+  ],
+  "verification_harnesses": [
+    {
+      "path": "artifacts/write-default-copy-evidence.py",
+      "sha256": "82810ef7b7a172ee9ff6b2b5d666f8565f776febe5a696af6aa837f4fbdec28d"
+    },
+    {
+      "path": "artifacts/run-default-copy-host-corpus.py",
+      "sha256": "221b909ea2533843e735cf5ba970bda20f64e7a5c7c45d1389ada19247f5dc43"
+    },
+    {
+      "path": "artifacts/run-default-copy-contracts.py",
+      "sha256": "57c4192ee6a33b1e8e8077e3bd5e84f711a808d29b2ebedddc85fe86469b70fe"
+    },
+    {
+      "path": "artifacts/run-default-copy-dc-observe.py",
+      "sha256": "094fb28c7244d7704ed710c7e7024ee5deb0bfffad70dbc15fb81d4e2986ceb1"
+    },
+    {
+      "path": "artifacts/renderer-dc-native-draft.cpp",
+      "sha256": "476d9520db4691f09b2fb123ca6c6a762b14faa6a7506dce86e074d10ef5c0cb"
+    },
+    {
+      "path": "artifacts/run-default-copy-document-rect.py",
+      "sha256": "0862931caafea3576b2cf8a015fa5d471d10613815b9718c3a4a64e87b671fd5"
+    },
+    {
+      "path": "artifacts/document-rectangle-lifetime-diagnostic.cpp",
+      "sha256": "e5bad97e9d32c38a11d782563d1e31551d2c91b80cfac44d5e85af270c8d7e2b"
+    },
+    {
+      "path": "tools/compat/audit_rust_boundary.py",
+      "sha256": "959ddcd63c7f0301ba1f1b56615333d3f2d31cbc0ee024d2a9b8b80eccd7a475"
+    }
+  ]
+}

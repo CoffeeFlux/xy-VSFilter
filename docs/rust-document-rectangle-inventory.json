@@ -1,0 +1,86 @@
+{
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "candidate_implementation_commit": "9105c8f5e21ea63a5aa6046898310e49fbbefa9f",
+  "scope": "Unresolved actual-document nested canonical rectangle ownership. Finite successful allocations; not passing on either architecture.",
+  "sources": [
+    {
+      "path": "rust/compat/src/document.rs",
+      "sha256": "a4ff267819e9dd61d6f2431f9eaca5dfebc38d03936da9c79dba0ae29ed07ea4"
+    },
+    {
+      "path": "rust/compat/src/document_style.rs",
+      "sha256": "f8363c29b4626aa526df69d7d90c0ebb12ce7cdbede664fd169560cdfae38fab"
+    },
+    {
+      "path": "rust/compat/src/style_intern.rs",
+      "sha256": "600e21aa9e8a976d8ca60a786f0fad7610a979dc945e70bc649c33006c90a7a5"
+    },
+    {
+      "path": "rust/compat/src/rect_intern.rs",
+      "sha256": "1c4742e8f89b8e74c46acdfd69eea64e669fa6fd47ce30626ded63f8e6f6e0d2"
+    },
+    {
+      "path": "rust/ffi/src/document.rs",
+      "sha256": "41348cc1186d1c33c0b4ec328362a1b20a8d876e737974ae7e13a3654be8619a"
+    },
+    {
+      "path": "rust/ffi/src/document_registry.rs",
+      "sha256": "49e52f12d5ce50b6d4a0ec9fd30bba41b92ad9e94b269f215e6fb7008b3eecf1"
+    },
+    {
+      "path": "rust/ffi/src/style_intern.rs",
+      "sha256": "95d7c631f624420f6ecb426fdee6ca010b422e309b9bd0b954f1fc9e3fbac1a0"
+    },
+    {
+      "path": "src/subtitles/STS.cpp",
+      "sha256": "a354d1a1939d576f19ffdcc8c0496d5d390fba0f7409edf324dc018a78df9c89"
+    },
+    {
+      "path": "src/subtitles/RustDocumentOwner.h",
+      "sha256": "dbef5aa61b3cf682e105b1ebc15efe5d485b877dbbe42e1d2788ed9c5d51a19e"
+    },
+    {
+      "path": "tools/compat/document_rectangle_lifetime_diagnostic.cpp",
+      "sha256": "e5bad97e9d32c38a11d782563d1e31551d2c91b80cfac44d5e85af270c8d7e2b"
+    },
+    {
+      "path": "artifacts/run-default-copy-document-rect.py",
+      "sha256": "0862931caafea3576b2cf8a015fa5d471d10613815b9718c3a4a64e87b671fd5"
+    }
+  ],
+  "diagnostics": {
+    "x86": {
+      "path": "artifacts/default-copy-document-rect-x86/report.json",
+      "sha256": "a91aa7a18365b8165d134f55242bdbd09c7bec46dedc8088304654472b5d0b1f",
+      "cases": 14,
+      "trace_lines": 16,
+      "different_rows": 12,
+      "repeat_equal": true,
+      "passing": false
+    },
+    "x64": {
+      "path": "artifacts/default-copy-document-rect-x64/report.json",
+      "sha256": "c87e3aeb547d0ccc757688cfc2a6bdd6e68ca2b3ce3c4b9dedd1e704d7f9a195",
+      "cases": 14,
+      "trace_lines": 16,
+      "different_rows": 12,
+      "repeat_equal": true,
+      "passing": false
+    }
+  },
+  "findings": [
+    "Native stored STSStyle objects own FwRect canonical references. Document StyleValue currently stores only raw margin coordinates. The style interner Value already retains a rectangle Arc, but Document default/named styles do not.",
+    "Constructing one or two empty native documents leaves one canonical default rectangle. Candidate leaves none.",
+    "After replacing the source default style and releasing the temporary input, native retains two rectangle values (source and destination defaults); candidate retains none.",
+    "Copy reuses the source rectangle and releases the old destination default. Empty retains default ownership while clearing named styles. Native named styles add a distinct retained rectangle and Copy preserves it until the corresponding named owners are cleared.",
+    "The 14-phase native rectangle counts are 0,1,1,2,2,2,1,1,2,2,2,1,1,0. Candidate counts are 0,0,0,1,1,0,0,0,0,0,0,0,0,0. All style-interner counts remain zero in this fixture.",
+    "Rendering and floating-copy fixtures remain passing, but do not prove this nested lifetime invariant. Do not replace actual nested ownership with a synthetic counter."
+  ],
+  "next_work": [
+    "Promote the exact diagnostic into the maintained native runner/validator with wrong-count/order/lifetime negative controls.",
+    "Retain real canonical rectangle owners for persistent default and named document styles. Separate raw style packets/snapshots from owned style payloads; avoid attaching ownership indiscriminately to every temporary Clone.",
+    "Preserve canonical sharing and retirement during replacement, AddStyle conflict renaming, Copy/CopyStyles, Empty, self-Copy and final document release. Inspect all mutation paths; coordinate canonical-table release with registry admission and retired payload destruction.",
+    "Validate nested lifetimes, aliases/identity, counts and release/recreate histories against actual cleanup on both architectures, retaining the current floating-copy and map ordering/status behavior.",
+    "After this ownership graph is correct, migrate shared renderer HDC/text/path ownership using the retained lifecycle baseline; then word/line/subtitle graphs, all hosts and vendors."
+  ]
+}

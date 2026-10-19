@@ -1,88 +1,150 @@
 {
   "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
-  "candidate_implementation_commit": "4234af68deb4bdf81e178fe3a805085b519b3465",
-  "scope": "Actual default-style setter, Copy, self-Copy and Empty observations; unresolved x86 discrepancy, not passing whole-document semantics.",
-  "diagnostics": {
-    "x86": {
-      "path": "artifacts/map-default-diagnostic-x86/report.json",
-      "sha256": "21e5c3879c1bd097993a1c470c5c9172f89b4b0046fe14e623dad3d64cae268c",
-      "cases": 180,
-      "trace_lines": 1442,
-      "repeat_equal": true,
-      "equal": false,
-      "different_rows": 120,
-      "different_status_rows": 60,
-      "different_raw_value_rows": 60,
-      "completion_is_observations_only": true
+  "scope": "Initial default-style floating-copy discrepancy and validated correction. Nested document rectangle ownership remains unresolved.",
+  "initial_review": {
+    "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+    "candidate_implementation_commit": "4234af68deb4bdf81e178fe3a805085b519b3465",
+    "scope": "Actual default-style setter, Copy, self-Copy and Empty observations; unresolved x86 discrepancy, not passing whole-document semantics.",
+    "diagnostics": {
+      "x86": {
+        "path": "artifacts/map-default-diagnostic-x86/report.json",
+        "sha256": "21e5c3879c1bd097993a1c470c5c9172f89b4b0046fe14e623dad3d64cae268c",
+        "cases": 180,
+        "trace_lines": 1442,
+        "repeat_equal": true,
+        "equal": false,
+        "different_rows": 120,
+        "different_status_rows": 60,
+        "different_raw_value_rows": 60,
+        "completion_is_observations_only": true
+      },
+      "x64": {
+        "path": "artifacts/map-default-diagnostic-x64/report.json",
+        "sha256": "2ecb570aee35516515fc75940dc156ae864e7454958af86d31f8bd8ffdd110cd",
+        "cases": 180,
+        "trace_lines": 1442,
+        "repeat_equal": true,
+        "equal": true,
+        "different_rows": 0,
+        "different_status_rows": 0,
+        "different_raw_value_rows": 0,
+        "completion_is_observations_only": true
+      }
     },
-    "x64": {
-      "path": "artifacts/map-default-diagnostic-x64/report.json",
-      "sha256": "2ecb570aee35516515fc75940dc156ae864e7454958af86d31f8bd8ffdd110cd",
-      "cases": 180,
-      "trace_lines": 1442,
-      "repeat_equal": true,
-      "equal": true,
-      "different_rows": 0,
-      "different_status_rows": 0,
-      "different_raw_value_rows": 0,
-      "completion_is_observations_only": true
-    }
-  },
-  "sources": [
-    {
-      "path": "rust/ffi/src/document.rs",
-      "sha256": "9255e501f50a83048c3a1ebf829f5cf62205b996120cf5dcb59150abfbfbd9c1"
-    },
-    {
-      "path": "rust/ffi/src/document_registry.rs",
-      "sha256": "ec5b89bd753711da1b3af347c9656be810c4e8827af05a01d97f583f883ad731"
-    },
-    {
-      "path": "rust/compat/src/document.rs",
-      "sha256": "110ff9535f7a741f12d80ec408a31c6cfcb0f2a80ee98f296f0dd927a6560921"
-    },
-    {
-      "path": "rust/compat/src/document_style.rs",
-      "sha256": "3aa9e4cfe2a2e0f57e82bc5f35d501f0f1866183e6e38e2f678657cd020f4c87"
-    },
-    {
-      "path": "rust/ffi/src/windows_float.rs",
-      "sha256": "dd91d406e8ae0eb16785b50c60f552bbfcde15ef36c57d318d9f1b22e42d379d"
-    },
-    {
-      "path": "src/subtitles/STS.cpp",
-      "sha256": "a354d1a1939d576f19ffdcc8c0496d5d390fba0f7409edf324dc018a78df9c89"
-    },
-    {
-      "path": "src/subtitles/RustDocumentOwner.h",
-      "sha256": "dbef5aa61b3cf682e105b1ebc15efe5d485b877dbbe42e1d2788ed9c5d51a19e"
-    },
-    {
-      "path": "artifacts/style-default-assignment-diagnostic.cpp",
+    "sources": [
+      {
+        "path": "rust/ffi/src/document.rs",
+        "sha256": "9255e501f50a83048c3a1ebf829f5cf62205b996120cf5dcb59150abfbfbd9c1"
+      },
+      {
+        "path": "rust/ffi/src/document_registry.rs",
+        "sha256": "ec5b89bd753711da1b3af347c9656be810c4e8827af05a01d97f583f883ad731"
+      },
+      {
+        "path": "rust/compat/src/document.rs",
+        "sha256": "110ff9535f7a741f12d80ec408a31c6cfcb0f2a80ee98f296f0dd927a6560921"
+      },
+      {
+        "path": "rust/compat/src/document_style.rs",
+        "sha256": "3aa9e4cfe2a2e0f57e82bc5f35d501f0f1866183e6e38e2f678657cd020f4c87"
+      },
+      {
+        "path": "rust/ffi/src/windows_float.rs",
+        "sha256": "dd91d406e8ae0eb16785b50c60f552bbfcde15ef36c57d318d9f1b22e42d379d"
+      },
+      {
+        "path": "src/subtitles/STS.cpp",
+        "sha256": "a354d1a1939d576f19ffdcc8c0496d5d390fba0f7409edf324dc018a78df9c89"
+      },
+      {
+        "path": "src/subtitles/RustDocumentOwner.h",
+        "sha256": "dbef5aa61b3cf682e105b1ebc15efe5d485b877dbbe42e1d2788ed9c5d51a19e"
+      },
+      {
+        "path": "artifacts/style-default-assignment-diagnostic.cpp",
+        "sha256": "b2eb42ba74db9d91f5663c49832d29b4aff5b2a112a13d6201359ee5042da69b"
+      },
+      {
+        "path": "artifacts/run-map-default-diagnostic.py",
+        "sha256": "3e293415704e779a4950b35e424447bcd6de5b1e690cbbb77943d90cecdb15aa"
+      }
+    ],
+    "confirmed_findings": [
+      "The native SetDefaultStyle assignment quiets signaling NaNs in all 15 floating fields on x86. Rust currently retains their raw bits; x64 retains raw bits on both sides.",
+      "For the 15 denormal cases, setter, Copy and self-Copy each leave the native x87 denormal flag. Rust-owned copies do not currently perform those loads/stores.",
+      "Registry copy_selected_state returns early for self-copy. Native default-style assignment still has floating effects in this history; equal handles are not sufficient reason to suppress them.",
+      "Empty retains the default style on both sides. The earlier setter bit discrepancy therefore persists after Empty; Empty is not itself an assignment boundary.",
+      "C++ STSStyle operator= correction does not cover raw packets decoded into Rust-owned default style or selected-state storage."
+    ],
+    "next_work": [
+      "Promote the focused default-style scenario into the tracked native probe/validator, including negative controls. Keep this initial failed diagnostic immutable.",
+      "Use the existing audited x86 scalar assignment helper for all 15 floating fields at actual assignment boundaries, preserving field order and rejecting invalid handles before applying effects. Raw transport and copy-construction remain bit-preserving.",
+      "Correct selected-state copy and self-copy without suppressing observable native floating effects. Do not blindly replace all Clone operations with assignment.",
+      "Recheck default-style diagnostic and named-map/style ownership probes, then actual x86/x64 rendering and host contracts; keep experimental production flags."
+    ],
+    "later_ownership": "Shared renderer HDC/text/path operations, word/line/subtitle ownership, all host interfaces and vendored code remain in the full Rust endpoint.",
+    "retained_diagnostic_source": {
+      "path": "tools/compat/style_default_assignment_diagnostic.cpp",
       "sha256": "b2eb42ba74db9d91f5663c49832d29b4aff5b2a112a13d6201359ee5042da69b"
     },
-    {
-      "path": "artifacts/run-map-default-diagnostic.py",
-      "sha256": "3e293415704e779a4950b35e424447bcd6de5b1e690cbbb77943d90cecdb15aa"
-    }
-  ],
-  "confirmed_findings": [
-    "The native SetDefaultStyle assignment quiets signaling NaNs in all 15 floating fields on x86. Rust currently retains their raw bits; x64 retains raw bits on both sides.",
-    "For the 15 denormal cases, setter, Copy and self-Copy each leave the native x87 denormal flag. Rust-owned copies do not currently perform those loads/stores.",
-    "Registry copy_selected_state returns early for self-copy. Native default-style assignment still has floating effects in this history; equal handles are not sufficient reason to suppress them.",
-    "Empty retains the default style on both sides. The earlier setter bit discrepancy therefore persists after Empty; Empty is not itself an assignment boundary.",
-    "C++ STSStyle operator= correction does not cover raw packets decoded into Rust-owned default style or selected-state storage."
-  ],
-  "next_work": [
-    "Promote the focused default-style scenario into the tracked native probe/validator, including negative controls. Keep this initial failed diagnostic immutable.",
-    "Use the existing audited x86 scalar assignment helper for all 15 floating fields at actual assignment boundaries, preserving field order and rejecting invalid handles before applying effects. Raw transport and copy-construction remain bit-preserving.",
-    "Correct selected-state copy and self-copy without suppressing observable native floating effects. Do not blindly replace all Clone operations with assignment.",
-    "Recheck default-style diagnostic and named-map/style ownership probes, then actual x86/x64 rendering and host contracts; keep experimental production flags."
-  ],
-  "later_ownership": "Shared renderer HDC/text/path operations, word/line/subtitle ownership, all host interfaces and vendored code remain in the full Rust endpoint.",
-  "retained_diagnostic_source": {
-    "path": "tools/compat/style_default_assignment_diagnostic.cpp",
-    "sha256": "b2eb42ba74db9d91f5663c49832d29b4aff5b2a112a13d6201359ee5042da69b"
+    "retained_source_matches_compiled_fixture": true
   },
-  "retained_source_matches_compiled_fixture": true
+  "correction": {
+    "candidate_implementation_commit": "9105c8f5e21ea63a5aa6046898310e49fbbefa9f",
+    "sources": [
+      {
+        "path": "rust/compat/src/document.rs",
+        "sha256": "a4ff267819e9dd61d6f2431f9eaca5dfebc38d03936da9c79dba0ae29ed07ea4"
+      },
+      {
+        "path": "rust/compat/src/document_style.rs",
+        "sha256": "f8363c29b4626aa526df69d7d90c0ebb12ce7cdbede664fd169560cdfae38fab"
+      },
+      {
+        "path": "rust/ffi/src/document.rs",
+        "sha256": "41348cc1186d1c33c0b4ec328362a1b20a8d876e737974ae7e13a3654be8619a"
+      },
+      {
+        "path": "rust/ffi/src/document_registry.rs",
+        "sha256": "49e52f12d5ce50b6d4a0ec9fd30bba41b92ad9e94b269f215e6fb7008b3eecf1"
+      },
+      {
+        "path": "rust/ffi/src/style_assignment.rs",
+        "sha256": "3dee99c4eaa4174d8207f2c5bf28b11c1d286bcaa82fdc438c07739d92bc3c8e"
+      },
+      {
+        "path": "rust/ffi/src/windows_float.rs",
+        "sha256": "dd91d406e8ae0eb16785b50c60f552bbfcde15ef36c57d318d9f1b22e42d379d"
+      }
+    ],
+    "evidence": {
+      "path": "docs/rust-default-style-local-evidence.json",
+      "sha256": "9baed89c0708e81d18915f0e3ac5a1c2f9d2192074ec3ef05e00be84f1c6000c"
+    },
+    "cases_per_architecture": 360,
+    "trace_lines": 2882,
+    "two_runs_per_role": true,
+    "operations": [
+      "SetDefaultStyle",
+      "Copy",
+      "self-Copy",
+      "Empty"
+    ],
+    "semantics": [
+      "All 15 floating fields are assigned in native order using the existing audited helper. No new unsafe block.",
+      "Only explicit default-style assignment uses this policy. Raw packets, ordinary Clone and copy construction remain bit-preserving.",
+      "Both handles are validated before copy effects, including self-copy. Setter input bytes remain unchanged.",
+      "Selected-state replacement runs style effects at its original assignment point; self-copy keeps the effects without cloning."
+    ]
+  },
+  "next_work": [
+    "Correct persistent nested document rectangle ownership; see rust-document-rectangle-inventory.json.",
+    "Then migrate shared renderer HDC/text/path ownership using rust-renderer-dc-inventory.json; remaining graphs, hosts and vendors stay in scope."
+  ],
+  "private_abi_documentation_update": {
+    "path": "include/xy_rust_document.h",
+    "compiled_header_sha256": "d8a49f6a0e8761ff94f333d2be13831b0b9e144d4862cfc6e2aaa86b90afac4e",
+    "updated_header_sha256": "3847c7d8d80c43e82b8b9c92339023fcb3310c9d6f4e9bd3b360f3672c34f3dd",
+    "noncomment_lines_unchanged": true
+  }
 }

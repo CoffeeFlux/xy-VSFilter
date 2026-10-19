@@ -1,6 +1,6 @@
 {
   "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
-  "scope": "Named-style map initial discrepancy and validated lifecycle/target-arithmetic correction. Complete library and default-style assignment remain open.",
+  "scope": "Named-style map discrepancy and validated correction. Default-style floating assignment is subsequently corrected; nested document rectangle ownership and the complete library remain open.",
   "initial_review": {
     "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
     "scope": "Next named-style-map arithmetic boundary: source review and reproduced AddStyle mismatch, not a completed correction.",
@@ -126,7 +126,8 @@
     ]
   },
   "next_work": [
-    "Correct Rust-owned default-style setter, selected-state Copy and self-Copy assignment semantics; see rust-default-style-assignment-inventory.json.",
-    "Continue shared renderer HDC/text/path ownership, word/line/subtitle graphs, every host ABI and vendored code."
+    "Default-style floating assignment correction is recorded in rust-default-style-assignment-inventory.json.",
+    "Correct nested document rectangle ownership; see rust-document-rectangle-inventory.json.",
+    "Then continue shared renderer HDC/text/path ownership, word/line/subtitle graphs, every host ABI and vendored code."
   ]
 }
