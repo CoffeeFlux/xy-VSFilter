@@ -715,6 +715,22 @@
       "ass-override-control-memory"
     ],
     [
+      "ass-override-alpha-negative-one-file",
+      "ass-override-control-file"
+    ],
+    [
+      "ass-override-alpha-negative-one-memory",
+      "ass-override-control-memory"
+    ],
+    [
+      "ass-override-alpha-negative-two-file",
+      "ass-override-control-file"
+    ],
+    [
+      "ass-override-alpha-negative-two-memory",
+      "ass-override-control-memory"
+    ],
+    [
       "ass-override-rotation-file",
       "ass-override-control-file"
     ],
@@ -27989,6 +28005,98 @@
       "id": "ass-override-relative-size-memory",
       "script": "test/compat/generated/ass-override-relative-size.ass",
       "sha256": "7ac119619a5328a82ca1b5e6193592a4a9d12b29ddb91b7ff3c9fab732d73ffb",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-override-alpha-negative-one-file",
+      "script": "test/compat/generated/ass-override-alpha-negative-one.ass",
+      "sha256": "a854f60e2cff86fbbc01dd7b7fdaa257867fafac09d64d50670d47b545479e3d",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-override-alpha-negative-one-memory",
+      "script": "test/compat/generated/ass-override-alpha-negative-one.ass",
+      "sha256": "a854f60e2cff86fbbc01dd7b7fdaa257867fafac09d64d50670d47b545479e3d",
+      "open": "memory",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-override-alpha-negative-two-file",
+      "script": "test/compat/generated/ass-override-alpha-negative-two.ass",
+      "sha256": "063f141d4a3ce03f9697de4914c8f7a542b3131117edd950ea69ce1d0aa504f5",
+      "open": "file",
+      "width": 1280,
+      "height": 720,
+      "times": [
+        "0",
+        "0.9999999",
+        "1",
+        "1.1",
+        "1.5",
+        "2",
+        "2.6",
+        "3.9999999",
+        "4",
+        "2",
+        "1.1"
+      ],
+      "stride_padding": 16,
+      "fill_seed": 31
+    },
+    {
+      "id": "ass-override-alpha-negative-two-memory",
+      "script": "test/compat/generated/ass-override-alpha-negative-two.ass",
+      "sha256": "063f141d4a3ce03f9697de4914c8f7a542b3131117edd950ea69ce1d0aa504f5",
       "open": "memory",
       "width": 1280,
       "height": 720,

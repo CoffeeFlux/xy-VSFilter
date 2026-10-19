@@ -16,11 +16,12 @@ CASES = 9312
 ANIMATIONS = 2304
 RELATIVES = 400
 RAWFONTS = 4
+ALPHAS = 180
 
 def validate(data,bits):
  lines=data.splitlines()
  if not lines or not re.fullmatch(rb"override-provenance pointer_bits="+str(bits).encode()+rb" ansi=\d+ oem=\d+",lines[0]):raise ValueError("missing override architecture/environment")
- if len(lines)!=CASES*10+ANIMATIONS+RELATIVES+RAWFONTS*2+2:raise ValueError("missing override observations")
+ if len(lines)!=CASES*10+ANIMATIONS+RELATIVES+RAWFONTS*2+ALPHAS+2:raise ValueError("missing override observations")
  for index in range(CASES):
   seed=index//(INPUTS+20);case=index%(INPUTS+20);group=int(case>=INPUTS);animate=(seed%2) if not group else int(case-INPUTS>=10)
   prefix=f"override-case index={index} seed={seed} group={group} animate={animate} accepted=1 errno=".encode()
@@ -39,7 +40,10 @@ def validate(data,bits):
  for index in range(RAWFONTS):
   prefix=f"rawfont index={index} accepted=1 errno=".encode();offset=CASES*10+ANIMATIONS+RELATIVES+1+index*2
   if not re.fullmatch(re.escape(prefix)+rb"\d+",lines[offset]) or not lines[offset+1].startswith(b'style '):raise ValueError("invalid raw-font observation")
- if lines[-1]!=f"override-complete cases={CASES} inputs={INPUTS} animations={ANIMATIONS} relatives={RELATIVES} rawfonts={RAWFONTS}".encode():raise ValueError("missing override completion")
+ for index in range(ALPHAS):
+  prefix=f"alpha index={index} accepted=1 errno=".encode();offset=CASES*10+ANIMATIONS+RELATIVES+RAWFONTS*2+1+index
+  if not re.fullmatch(re.escape(prefix)+rb"\d+( \d+){4}",lines[offset]):raise ValueError("invalid alpha conversion observation")
+ if lines[-1]!=f"override-complete cases={CASES} inputs={INPUTS} animations={ANIMATIONS} relatives={RELATIVES} rawfonts={RAWFONTS} alphas={ALPHAS}".encode():raise ValueError("missing override completion")
 
 def compare(traces,bits):
  if len(traces)!=4:raise ValueError("two executions of each implementation required")

@@ -56,6 +56,22 @@ pub fn native_int(value: f64) -> i32 {
         value as i32
     }
 }
+// MSVC Win32 converts double to BYTE through a signed 64-bit result;
+// Win64 uses the signed 32-bit conversion. Both retain only its low byte.
+fn native_byte(value: f64) -> u8 {
+    #[cfg(target_arch = "x86")]
+    {
+        (if value.is_nan() || value >= 9223372036854775808.0 {
+            i64::MIN
+        } else {
+            value as i64
+        }) as u8
+    }
+    #[cfg(not(target_arch = "x86"))]
+    {
+        native_int(value) as u8
+    }
+}
 pub fn animation(
     state: &State,
     mut dst: f64,
@@ -271,7 +287,7 @@ impl Evaluation {
                             original.alpha[index]
                         } else {
                             let dst = f64::from(svc.integer_base(p, 16));
-                            native_int(anim!(dst, f64::from(current.alpha[index]))) as u8
+                            native_byte(anim!(dst, f64::from(current.alpha[index])))
                         };
                     }
                 }
@@ -692,8 +708,12 @@ mod tests {
             ("\\fn Arial\0tail", "Arial\0tail"),
             ("\\fn0\0", "0\0"),
         ] {
+            // Exercise application of an owned parameter directly. The string
+            // tokenizer itself stops at NUL, covered by the native rawfont probe.
+            let mut tags = tree("\\fnX");
+            tags.nodes[0].params[0] = tag.encode_utf16().skip(3).collect();
             e.apply(
-                &tree(tag),
+                &tags,
                 0,
                 false,
                 &StyleMap::default(),
@@ -705,6 +725,17 @@ mod tests {
                 expected.encode_utf16().collect::<Vec<_>>()
             );
         }
+    }
+    #[test]
+    fn alpha_byte_conversion_keeps_architecture_specific_overflow() {
+        assert_eq!(native_byte(f64::NAN), 0);
+        assert_eq!(native_byte(f64::INFINITY), 0);
+        assert_eq!(native_byte(-1.5), 255);
+        assert_eq!(native_byte(255.99), 255);
+        #[cfg(target_arch = "x86")]
+        assert_eq!(native_byte(4294967291.0), 251);
+        #[cfg(not(target_arch = "x86"))]
+        assert_eq!(native_byte(4294967291.0), 0);
     }
     #[test]
     fn animation_threshold_before_start_and_nan_are_observable() {

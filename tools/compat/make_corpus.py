@@ -890,6 +890,8 @@ def ass_override_variants():
     for name,caption in {
         'control':r'{\shad0}Override sample',
         'relative-size':r'{\shad0\fs+3}Override sample',
+        'alpha-negative-one':r'{\shad0\t(0,1000,-1,\alpha&H7FFFFFFF&)}Override sample',
+        'alpha-negative-two':r'{\shad0\t(0,1000,-2,\alpha&H7FFFFFFF&)}Override sample',
         'border':r'{\shad0\xbord8\ybord4}Override sample',
         'alpha':r'{\shad0\alpha&H80&\3a&H00&}Override sample',
         'rotation':r'{\shad0\frz25\fax0.2}Override sample',
@@ -1180,7 +1182,7 @@ def make_cases(files):
                                    ("transform-multiple","control"),("duplicate-scalar-param","control"))
                        for mode in ("file","memory")]
                     + [[f"ass-override-{a}-{mode}",f"ass-override-control-{mode}"]
-                       for a in ("relative-size","border","alpha","rotation","rectangle","inverse-rectangle","karaoke","transform")
+                       for a in ("relative-size","border","alpha","alpha-negative-one","alpha-negative-two","rotation","rectangle","inverse-rectangle","karaoke","transform")
                        for mode in ("file","memory")], "cases": cases}
 
 
