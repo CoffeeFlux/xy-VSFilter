@@ -28,7 +28,7 @@ static void exercise(unsigned index,unsigned kind,int w,int h,unsigned direction
         bounds(static_cast<long long>(destination)+plane*pitch*dh+row*pitch,w*pixel);
         bounds(static_cast<long long>(destination)+plane*pitch*dh+(row+pos.y)*pitch+pos.x*pixel,w*pixel);
     }
-    SIZE size={w,h};SubPicDesc spd;spd.type=planar?MSP_AYUV_PLANAR:MSP_RGB32;spd.w=dw;spd.h=dh;spd.bpp=planar?8:(index%3==0?24:32);spd.pitch=pitch;spd.bits=data.data()+destination;
+    SIZE size={w,h};SubPicDesc spd;spd.type=planar?MSP_AYUV_PLANAR:MSP_RGB32;if(kind<4){spd.w=dw;spd.h=dh;spd.bpp=planar?8:(index%3==0?24:32);}else if(planar){spd.h=dh;}spd.pitch=pitch;spd.bits=data.data()+destination;
     XyPlannerFormatExtra planes;for(int i=0;i<4;++i)planes.plans[i]=planar?data.data()+source+i*pitch*dh:nullptr;
     const unsigned alphas[]={0,1,127,128,255};const DWORD color=(alphas[index%5]<<24)|((index*0x91e10da5U)&0xffffff);
     for(unsigned stage=0;stage<2;++stage){

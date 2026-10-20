@@ -56,3 +56,10 @@ These are rejected comparisons, preserved under `surface-owned-final-*`.
 The corrected observer uses 4,096 bytes and checks conservative source/output
 footprints before invoking native code. This fixes the harness, not production;
 no memory-corruption outcome is accepted as compatible.
+
+Review after the first bounded comparisons found unnecessary descriptor reads
+in the solid-fill adapter. The corrected packet never reads descriptor width
+or bpp, and reads height only for planar fills. The observer now deliberately
+leaves those unused fields uninitialized. Earlier focused/corpus jobs were
+stopped before changing tracked sources and are not complete-suite evidence.
+The final build must rerun all comparisons at this corrected checkpoint.

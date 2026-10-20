@@ -1773,7 +1773,9 @@ void Rasterizer::Draw(XyBitmap* bitmap, SharedPtrOverlay overlay, const CRect& c
 void Rasterizer::FillSolidRect(SubPicDesc& spd, int x, int y, int nWidth, int nHeight, DWORD argb)
 {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    const int32_t fields[]={4,spd.w,spd.h,spd.bpp,spd.pitch,x,y,nWidth,nHeight,0,static_cast<int32_t>(argb),spd.type==MSP_AYUV_PLANAR?1:0};
+    const bool planar=spd.type==MSP_AYUV_PLANAR;
+    // Solid fills never consume descriptor width/bpp; height is planar-only.
+    const int32_t fields[]={4,0,planar?spd.h:0,0,spd.pitch,x,y,nWidth,nHeight,0,static_cast<int32_t>(argb),planar?1:0};
     XyRust::Surface(fields,spd.bits);
 #else
 
