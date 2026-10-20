@@ -35,10 +35,14 @@ copy sizes return an unresolved error rather than silently becoming empty work.
 The separate FFI ownership test uses an initially uninitialized destination that
 becomes readable only after a prior row writes it.
 
-Direct Windows comparisons are pending at this implementation checkpoint. The
-observer covers 11,916 cases per architecture, twice per role, with two operations
-per case. Lossless deltas compare every byte in initialized 4,096-byte backing
-allocations, including guard regions, plus native allocation and FP/error state.
+Validated at `1a3c26db`: 11,916 direct cases passed on x86 and x64, twice per
+role, with two operations per case. Lossless deltas cover every byte in the
+4,096-byte initialized backing allocations, including all guards, plus native
+allocation and FP/error state. Eighteen prior focused probes, the full
+1,222-case / 13,186-frame CSRI corpus with 192 distinct controls, all three DLL
+contracts and scoped COM checks passed per architecture. Rust passed 398 core
+and 144 FFI tests per architecture, formatting and Clippy; Python passed 225
+tests with one existing skip. See [the evidence](rust-surface-owned-local-evidence.json).
 Reference disassembly and provenance are archived under
 `test/compat/surface-reference`; inspection captures alone establish no parity.
 Experimental switches remain opt-in. Frame/creator state, color conversion,
@@ -62,4 +66,4 @@ in the solid-fill adapter. The corrected packet never reads descriptor width
 or bpp, and reads height only for planar fills. The observer now deliberately
 leaves those unused fields uninitialized. Earlier focused/corpus jobs were
 stopped before changing tracked sources and are not complete-suite evidence.
-The final build must rerun all comparisons at this corrected checkpoint.
+All final comparisons were rerun at the corrected checkpoint, with unchanged tracked sources and HEAD throughout those suites.

@@ -27,15 +27,52 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## In progress: host surface output operations (2026-10-19)
+## Latest port: host surface output operations (2026-10-19)
 
-The experimental path now routes packed/planar bitmap alpha blits, packed
-copies, external alpha inversion and solid-fill traversal through safe Rust.
-The boundary preserves alias-sensitive pixel/row/plane order and imports only
-initially required bytes. Direct Windows comparison is pending; this is not a
-production switch or a completed whole-library migration. See
-[the surface boundary](rust-surface-boundary.md). The previous validated
-checkpoint remains the owned-bitmap evidence below.
+Validated implementation `1a3c26db` moves packed/planar bitmap alpha blits,
+packed copies, external alpha inversion and solid-fill traversal into safe Rust.
+The core owns the planned byte image and preserves overlapping pixel, row and
+plane traversal. Initial-read planning excludes bytes initialized by preceding
+writes. The boundary retains original pointer provenance and exports only
+written runs. Solid fills never read unused descriptor width/bpp fields and
+read height only for planar output. See [the boundary](rust-surface-boundary.md)
+and [validated evidence](rust-surface-owned-local-evidence.json).
+
+Both x86 and x64 passed 11,916 direct cases, twice per role, with two operations
+per case. These cover eleven widths around vector thresholds, positive/negative/
+zero pitches, clipping, noncanonical packed bpp offsets and exact/forward/
+backward/cross-row aliases. Lossless deltas compare every byte of initialized
+4,096-byte backing allocations, including guard regions, plus native allocation
+and FP/errno/LastError state. An FFI test separately verifies a copy destination
+that becomes initialized before a later row reads it.
+
+All eighteen previous focused regression probes passed per architecture. The
+full CSRI corpus matched 1,222 cases / 13,186 frames and 192 distinct controls
+per architecture. All three DLLs built with matching exports and dependencies;
+ten scoped COM cases and two pin-ID controls passed per architecture. Rust
+passed 398 core and 144 FFI tests per architecture, formatting and Clippy,
+including native-runtime builds. Python passed 225 tests with one existing skip.
+
+The inventory has 133 portable files with no unsafe constructs and 101 FFI
+files: 683 unsafe blocks, 446 unsafe functions, four unsafe Sync implementations,
+78 assembly sites and 559 extern functions. This port adds three documented
+unsafe copy sites and no assembly or shared registry. Counts overlap and do not
+establish whole-library soundness or a completion percentage.
+
+Initial observer failures remain recorded: a missing array include prevented
+compilation; then insufficient backing for unclipped solid fills crashed both
+reference runs. The corrected observer bounds-checks its fixtures before native
+calls. Neither failure is accepted parity. Earlier regression jobs were stopped
+before the final descriptor-read correction; all final suites were rerun against
+the corrected fixed commit. Earlier reference instability retains its original
+attribution. Experimental switches remain opt-in.
+
+Invalid backing storage, unknown initial-read bytes, metadata aliases,
+overflowing geometry, allocation failure and arbitrary concurrency remain
+unclosed. Next are frame/creator state and lifetime, color conversion, caches,
+full host adapters and vendors. Preparation notes record the different frame,
+creator and wrapper return codes and initialization rules; linked inspection
+captures alone establish no behavioral compatibility.
 
 ## Previous port: owned bitmaps and drawing (2026-10-19)
 
