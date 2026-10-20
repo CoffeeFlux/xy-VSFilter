@@ -10,8 +10,10 @@ import subprocess
 from document_native_lifecycle import ROOT, PIN, LIBRARIES, SYSTEM_LIBRARIES, find_library, git, sha
 
 SOURCE = ROOT / "tools/compat/bitmap_draw_native.cpp"
-CASES = 7074
-INPUTS = 3528 + 18
+DRAW_INPUTS = 7 * 2 * 2 * 3 * 3 * 7
+EMPTY_INPUTS = 3 * 2 * 3
+CASES = DRAW_INPUTS * 2 + EMPTY_INPUTS
+INPUTS = DRAW_INPUTS + EMPTY_INPUTS
 
 def validate(data,bits):
     rows=data.splitlines()
@@ -65,7 +67,7 @@ def main():
                   probe_sha256=sha(SOURCE.read_bytes()),
                   runner_sha256=sha(Path(__file__).read_bytes()),
                   environment={key:os.environ.get(key) for key in ("VCToolsVersion","WindowsSDKVersion","VSCMD_ARG_TGT_ARCH")},
-                  limits=["7056 drawing cases (3528 inputs with two sticky states), plus 18 zero-sized bitmap cases, twice per role",
+                  limits=["3528 drawing cases (1764 inputs with two sticky states), plus 18 zero-sized bitmap cases, twice per role",
                           "Seven widths around SIMD thresholds, packed/planar, normal/addition dispatch, three origins and clips, seven color histories including backward/empty segments and nonzero first boundary",
                           "Creation, two draws, final packed alpha flip, surviving shared bitmap after alpha release, final release. Exact initialized bytes, plane offsets, alignment residue, native allocation deltas and FP/errno/LastError",
                           "Packed padding and uninitialized bpp are never sampled. Planar addition follows production DrawItem routing to normal Draw. Malformed unbounded switches, unsupported layout, debug-box macro, failure injection and arbitrary aliases/concurrency remain unclosed"])

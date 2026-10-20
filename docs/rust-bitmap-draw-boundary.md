@@ -36,7 +36,7 @@ aliasing/concurrency, debug-macro integration and complete host/vendor migration
 remain unclosed. Experimental switches stay opt-in.
 
 Both Windows DLL builds and Rust unit/Clippy checks pass at this implementation
-checkpoint. A new linked observer covers 7,056 drawing cases and 18 zero-sized
+checkpoint. A new linked observer covers 3,528 drawing cases and 18 zero-sized
 bitmap cases, repeated twice per role, with initialization, repeated draws,
 final alpha, shared survival and release. Direct and whole-renderer comparison
 results are pending. Reference functions are archived separately from runtime
