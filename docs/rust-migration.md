@@ -27,14 +27,54 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest port in progress: owned bitmaps and drawing (2026-10-19)
+## Latest port: owned bitmaps and drawing (2026-10-19)
 
-The experimental path now owns bitmap initialization, Draw/AdditionDraw color
-traversal, pixels, final alpha adjustment and bitmap lifetime in safe Rust.
-Both native builds and Rust checks pass. Direct linked drawing and complete
-renderer comparisons are pending; see [the boundary](rust-bitmap-draw-boundary.md).
-This implementation checkpoint does not establish completed compatibility or
-change experimental opt-in switches. Full library/host/vendor migration remains active.
+Implementation `12a1a2be`, validated at `42e6cb2f`, moves experimental XyBitmap
+initialization, complete Draw/AdditionDraw traversal, final packed alpha and
+bitmap lifetime into safe Rust. Packed padding remains unknown; planar clearing
+initializes all four planes including padding. The port preserves packed color
+carry across rows and the distinct planar/addition rules for backward boundaries.
+Canonical bitmap state survives source-overlay and composite-mask release.
+Detached native views preserve pitch, alignment residue, plane pointers,
+zero-sized allocation identity, shared aliases and xy allocation accounting.
+See [the boundary](rust-bitmap-draw-boundary.md) and
+[validated evidence](rust-draw-owned-local-evidence.json).
+
+Both x86 and x64 passed 3,546 direct cases, twice per role: 1,764 drawing inputs
+with two sticky-state variants, plus 18 zero-sized allocations. Each observes
+creation, two draws, final packed alpha inversion, surviving shared bitmap after
+composite release and final destruction. Initialized bytes, geometry, pointer
+residue/plane offsets, allocation deltas and FP/errno/LastError match exactly.
+The initial runner incorrectly expected 7,074 cases; both reference executions
+completed 3,546, but validation stopped before repeat/candidate runs. Those logs
+remain rejected evidence. The metadata correction changed no production code.
+
+All seventeen focused regression probes passed per architecture, including
+13,824 composite-mask, 5,152 clipper and 17,924 overlay cases. The full CSRI corpus
+matched 1,222 cases / 13,186 frames and 192 distinct-frame controls per architecture.
+All three DLLs built with matching exports and dependencies; ten scoped COM cases
+and two pin-ID controls passed per architecture. Rust passed 393 core and 142 FFI
+tests per architecture, formatting and Clippy including native-runtime builds.
+Python passed 223 tests with one existing skip.
+
+The current inventory has 132 portable source files with no unsafe constructs
+and 100 FFI source files: 680 unsafe blocks, 445 unsafe functions, four unsafe
+Sync implementations, 78 assembly sites and 558 extern functions. This increment
+adds seven checked copy sites and no assembly. Counts overlap and do not prove
+whole-library soundness or a completion percentage.
+
+Production planar addition follows DrawItem's ordinary-Draw route. Direct
+unsupported planar AdditionDraw diagnostics, unsupported layouts, debug-macro
+integration, allocation failures, arbitrary aliasing/concurrency and unknown
+pixels actually consumed remain unclosed. Earlier unstable/crashing reference
+outcomes retain their original attribution. Experimental switches remain opt-in.
+
+Next are external-surface bitmap blits and remaining solid-fill orchestration,
+then frame/creator state, color conversion, caches, hosts and vendors. The next
+notes record alias-sensitive traversal, inverse alpha, narrowing and caller
+buffer layouts. `bitmap-output-next-final-reference-{x86,x64}` captures link unchanged
+cleanup functions for inspection only; the executables were not run and do not
+establish output-operation parity.
 
 ## Previous port: owned composite alpha masks (2026-10-19)
 
@@ -7575,13 +7615,13 @@ reference and isolated workers for every experiment.
 
 ## Current Windows handoff
 
-Owned composite alpha masks are validated at `69d9a694` against the cleanup
-reference; see the latest-port section and
-[evidence](rust-composite-owned-local-evidence.json). Continue with owned
-Draw/AdditionDraw and bitmap initialization/lifetime. Packed, planar and addition
-color traversal differ; preserve those differences and unknown padding.
-Reference drawing captures and next-boundary notes are recorded in the evidence.
-Full host and vendor migration remains active. Preserve historical unresolved
+Owned bitmap initialization and drawing are validated at `42e6cb2f` against
+the cleanup reference; see [the evidence](rust-draw-owned-local-evidence.json).
+Continue with external-surface bitmap blits and solid fills. These use borrowed
+SubPicDesc buffers and potentially alias-sensitive traversal; preserve their
+format, pitch, byte-order and initialization contracts. Frame/creator state,
+color conversion, caches, hosts and vendors remain in scope. Next-boundary
+captures and notes are recorded in the evidence. Preserve historical unresolved
 reference outcomes and experimental opt-in switches.
 
 Serialize native links within each architecture: LTCG can write generated

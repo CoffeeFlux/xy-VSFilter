@@ -35,9 +35,17 @@ planar AdditionDraw diagnostics remain unclosed. Allocation failures, arbitrary
 aliasing/concurrency, debug-macro integration and complete host/vendor migration
 remain unclosed. Experimental switches stay opt-in.
 
-Both Windows DLL builds and Rust unit/Clippy checks pass at this implementation
-checkpoint. A new linked observer covers 3,528 drawing cases and 18 zero-sized
-bitmap cases, repeated twice per role, with initialization, repeated draws,
-final alpha, shared survival and release. Direct and whole-renderer comparison
-results are pending. Reference functions are archived separately from runtime
-evidence under `test/compat/bitmap-draw-reference`.
+Validated at `42e6cb2f` with production implementation `12a1a2be`: all 3,546
+direct bitmap/draw cases passed on x86 and x64, twice per role, as did seventeen
+focused probes, the full 1,222-case / 13,186-frame CSRI corpus with 192 distinct
+controls per architecture, all three DLL contracts and scoped COM checks.
+Rust passed 393 core and 142 FFI tests per architecture, formatting and Clippy;
+Python passed 223 tests with one existing skip. See
+[the evidence](rust-draw-owned-local-evidence.json) for hashes and scope.
+
+The initial runner doubled its expected matrix count and rejected the completed
+reference traces before repeats/candidate runs. The correction at `42e6cb2f`
+changed only observer metadata and its boundary documentation. Initial rejected
+reports remain recorded separately; no production code changed for the rerun.
+Reference functions are archived under `test/compat/bitmap-draw-reference`,
+separately from runtime comparison evidence.
