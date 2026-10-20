@@ -23,7 +23,7 @@ struct Owners {
     ellipse: xy_vsfilter_compat::ellipse::Cache<crate::windows_ellipse_numeric::Numeric>,
 }
 // SAFETY: all access uses the atomic gate; HRTB closures cannot return borrowed
-// references, and all four registries own only Send data. No native pointer is
+// references, and all registries own only Send data. No native pointer is
 // stored. Path->scan conversion uses disjoint fields under this single gate,
 // so it never nests admissions or releases a path loan across a callback.
 // The ellipse cache owns only scalar numeric state, an arc and a table. Region
@@ -79,8 +79,7 @@ pub unsafe extern "C" fn xy_vsfilter_gaussian_coefficients_create_v1(
     }
     let (id, len) = match PATHS.with_owners(|o| {
         let mut numeric = crate::windows_gaussian_numeric::Numeric::new(sigma);
-        let value =
-            xy_vsfilter_compat::gaussian_coefficients::Coefficients::build(sigma, &mut numeric)?;
+        let value = xy_vsfilter_compat::gaussian_coefficients::Coefficients::build(&mut numeric)?;
         let len = value.bytes().len() as u64;
         Ok((o.coefficients.insert(value)?, len))
     }) {

@@ -17,9 +17,9 @@ impl Numeric {
     }
 }
 impl Backend for Numeric {
-    fn begin(&mut self) -> Option<i32> {
+    fn begin(&mut self) -> Option<(i32, u64)> {
         self.prepare();
-        ((self.data[2] >> 32) != 0).then_some(self.data[2] as u32 as i32)
+        ((self.data[2] >> 32) != 0).then_some((self.data[2] as u32 as i32, self.data[3]))
     }
     fn start(&mut self) {
         self.initialize();
@@ -73,6 +73,7 @@ impl Numeric {
             fnstsw ax
             test ah,0x44
             jnp 2f
+            fst qword ptr [edi + 24]
             fmul qword ptr [edi + 200]
             sub esp,8
             fstp qword ptr [esp]
@@ -169,7 +170,8 @@ impl Numeric {
             ucomisd xmm1,xmm2
             jp 2f
             je 5f
-            2: mulsd xmm2,qword ptr [r10 + 200]
+            2: movsd qword ptr [r10 + 24],xmm2
+            mulsd xmm2,qword ptr [r10 + 200]
             mov rax,0x8000000000000000
             xorps xmm0,xmm0
             cvttsd2si rcx,xmm2

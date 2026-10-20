@@ -6,7 +6,7 @@ use alloc::{collections::BTreeMap, vec::Vec};
 pub trait Numeric {
     /// Always evaluates the exponential before the constructor's zero test.
     /// None is the original early return for sigma equal to initialized zero.
-    fn begin(&mut self) -> Option<i32>;
+    fn begin(&mut self) -> Option<(i32, u64)>;
     fn start(&mut self);
     fn next(&mut self) -> u32;
     fn normalize(&mut self, bits: u32) -> u32;
@@ -15,8 +15,8 @@ pub struct Coefficients {
     bytes: Vec<u8>,
 }
 impl Coefficients {
-    pub fn build(sigma: u64, numeric: &mut impl Numeric) -> Result<Self, u32> {
-        let Some(width) = numeric.begin() else {
+    pub fn build(numeric: &mut impl Numeric) -> Result<Self, u32> {
+        let Some((width, sigma)) = numeric.begin() else {
             return Ok(Self {
                 bytes: crate::be_blur::zeroed(24)?,
             });
@@ -100,8 +100,8 @@ mod tests {
         n: u32,
     }
     impl Numeric for Steps {
-        fn begin(&mut self) -> Option<i32> {
-            self.width
+        fn begin(&mut self) -> Option<(i32, u64)> {
+            self.width.map(|w| (w, 123))
         }
         fn start(&mut self) {
             assert_eq!(self.n, 0);
@@ -120,7 +120,7 @@ mod tests {
             width: Some(4),
             n: 0,
         };
-        let out = Coefficients::build(123, &mut numeric).unwrap();
+        let out = Coefficients::build(&mut numeric).unwrap();
         let words: Vec<u32> = out.bytes()[24..]
             .chunks_exact(4)
             .map(|b| u32::from_le_bytes(b.try_into().unwrap()))
@@ -132,18 +132,15 @@ mod tests {
     #[test]
     fn constructor_zero_and_negative_width_keep_the_original_metadata() {
         let mut numeric = Steps { width: None, n: 0 };
-        assert_eq!(
-            Coefficients::build(1 << 63, &mut numeric).unwrap().bytes(),
-            &[0; 24]
-        );
+        assert_eq!(Coefficients::build(&mut numeric).unwrap().bytes(), &[0; 24]);
         numeric.width = Some(-2);
-        let out = Coefficients::build(123, &mut numeric).unwrap();
+        let out = Coefficients::build(&mut numeric).unwrap();
         assert_eq!(
             &out.bytes()[..12],
             &[0, 0, 0, 0, 255, 255, 255, 255, 0, 0, 0, 0]
         );
         assert_eq!(out.bytes().len(), 24);
         numeric.width = Some(i32::MAX);
-        assert!(Coefficients::build(123, &mut numeric).is_err());
+        assert!(Coefficients::build(&mut numeric).is_err());
     }
 }
