@@ -1,0 +1,2 @@
+ 0001:0002cbc0       memcpy                     000000014002dbc0 f   libvcruntime:memcpy.obj
+ 0001:0002cbc0       memmove                    000000014002dbc0 f   libvcruntime:memcpy.obj

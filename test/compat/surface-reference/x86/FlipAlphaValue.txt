@@ -1,0 +1,57 @@
+  00405380: 55                 push        ebp
+  00405381: 8B EC              mov         ebp,esp
+  00405383: 83 E4 F8           and         esp,0FFFFFFF8h
+  00405386: 56                 push        esi
+  00405387: 8B 75 0C           mov         esi,dword ptr [ebp+0Ch]
+  0040538A: 57                 push        edi
+  0040538B: 85 F6              test        esi,esi
+  0040538D: 7E 64              jle         004053F3
+  0040538F: 8B 4D 10           mov         ecx,dword ptr [ebp+10h]
+  00405392: 85 C9              test        ecx,ecx
+  00405394: 7E 5D              jle         004053F3
+  00405396: 0F AF 4D 14        imul        ecx,dword ptr [ebp+14h]
+  0040539A: 8B 55 08           mov         edx,dword ptr [ebp+8]
+  0040539D: 03 CA              add         ecx,edx
+  0040539F: 89 4D 10           mov         dword ptr [ebp+10h],ecx
+  004053A2: 3B D1              cmp         edx,ecx
+  004053A4: 73 4D              jae         004053F3
+  004053A6: 0F 28 0D D0 5F 43  movaps      xmm1,xmmword ptr ds:[00435FD0h]
+  004053AD: 8B FE              mov         edi,esi
+  004053AF: 83 E7 FC           and         edi,0FFFFFFFCh
+  004053B2: 85 FF              test        edi,edi
+  004053B4: 74 20              je          004053D6
+  004053B6: 8D 4F FF           lea         ecx,[edi-1]
+  004053B9: 8B C2              mov         eax,edx
+  004053BB: C1 E9 02           shr         ecx,2
+  004053BE: 41                 inc         ecx
+  004053BF: 90                 nop
+  004053C0: 8D 40 10           lea         eax,[eax+10h]
+  004053C3: 0F 10 40 F0        movups      xmm0,xmmword ptr [eax-10h]
+  004053C7: 0F 57 C1           xorps       xmm0,xmm1
+  004053CA: 0F 11 40 F0        movups      xmmword ptr [eax-10h],xmm0
+  004053CE: 83 E9 01           sub         ecx,1
+  004053D1: 75 ED              jne         004053C0
+  004053D3: 8B 4D 10           mov         ecx,dword ptr [ebp+10h]
+  004053D6: 8B C7              mov         eax,edi
+  004053D8: 3B FE              cmp         edi,esi
+  004053DA: 7D 10              jge         004053EC
+  004053DC: 8D 64 24 00        lea         esp,[esp]
+  004053E0: 81 34 82 00 00 00  xor         dword ptr [edx+eax*4],0FF000000h
+  004053E7: 40                 inc         eax
+  004053E8: 3B C6              cmp         eax,esi
+  004053EA: 7C F4              jl          004053E0
+  004053EC: 03 55 14           add         edx,dword ptr [ebp+14h]
+  004053EF: 3B D1              cmp         edx,ecx
+  004053F1: 72 BF              jb          004053B2
+  004053F3: 5F                 pop         edi
+  004053F4: 5E                 pop         esi
+  004053F5: 8B E5              mov         esp,ebp
+  004053F7: 5D                 pop         ebp
+  004053F8: C3                 ret
+  004053F9: CC                 int         3
+  004053FA: CC                 int         3
+  004053FB: CC                 int         3
+  004053FC: CC                 int         3
+  004053FD: CC                 int         3
+  004053FE: CC                 int         3
+  004053FF: CC                 int         3

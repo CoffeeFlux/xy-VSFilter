@@ -37,6 +37,7 @@
 #include "RustPathData.inl"
 #include "RustOverlay.inl"
 #include "RustComposite.inl"
+#include "xy_rust_surface.h"
 #endif
 #include <math.h>
 #ifdef XY_VSFILTER_RUST_TEXT
@@ -1771,6 +1772,11 @@ void Rasterizer::Draw(XyBitmap* bitmap, SharedPtrOverlay overlay, const CRect& c
 
 void Rasterizer::FillSolidRect(SubPicDesc& spd, int x, int y, int nWidth, int nHeight, DWORD argb)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    const int32_t fields[]={4,spd.w,spd.h,spd.bpp,spd.pitch,x,y,nWidth,nHeight,0,static_cast<int32_t>(argb),spd.type==MSP_AYUV_PLANAR?1:0};
+    XyRust::Surface(fields,spd.bits);
+#else
+
     bool AYUV_PLANAR = (spd.type==MSP_AYUV_PLANAR);
     int draw_method = 0;
     if(AYUV_PLANAR)
@@ -1801,6 +1807,7 @@ void Rasterizer::FillSolidRect(SubPicDesc& spd, int x, int y, int nWidth, int nH
     }
     break;
     }
+#endif
 }
 
 ///////////////////////////////////////////////////////////////

@@ -44,6 +44,7 @@ mod style_assignment;
 mod style_compare;
 mod style_intern;
 mod subrip;
+mod surface;
 #[cfg(windows)]
 mod text_measure;
 mod text_reader;

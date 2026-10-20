@@ -3,6 +3,7 @@
 #include "xy_malloc.h"
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 #include "RustDocumentOwner.h"
+#include "xy_rust_surface.h"
 #include "RustBitmap.inl"
 #endif
 #include "../SubPic/ISubPic.h"
@@ -116,6 +117,11 @@ void XyBitmap::ClearBitmap( XyBitmap *bitmap )
 
 void XyBitmap::AlphaBltPack( SubPicDesc& spd, POINT pos, SIZE size, LPCVOID pixels, int pitch )
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    const int32_t fields[]={0,spd.w,spd.h,spd.bpp,spd.pitch,pos.x,pos.y,size.cx,size.cy,pitch,0,0};
+    XyRust::Surface(fields,spd.bits,pixels);
+#else
+
     ASSERT( spd.type!=MSP_AYUV_PLANAR );
     CRect r(0, 0, spd.w, spd.h);
 
@@ -146,10 +152,16 @@ void XyBitmap::AlphaBltPack( SubPicDesc& spd, POINT pos, SIZE size, LPCVOID pixe
                 | (((((*d2&0x0000ff00)*tmp)>>8) + (*((DWORD*)s2)&0x0000ff00))&0x0000ff00);
         }
     }
+#endif
 }
 
 void XyBitmap::AlphaBltPlannar( SubPicDesc& spd, POINT pos, SIZE size, const XyPlannerFormatExtra& pixels, int pitch )
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    const int32_t fields[]={1,spd.w,spd.h,spd.bpp,spd.pitch,pos.x,pos.y,size.cx,size.cy,pitch,0,0};
+    XyRust::Surface(fields,spd.bits,pixels.plans[0],pixels.plans[1],pixels.plans[2],pixels.plans[3]);
+#else
+
     ASSERT( spd.type==MSP_AYUV_PLANAR );
 
     CRect r(0, 0, spd.w, spd.h);
@@ -210,10 +222,16 @@ void XyBitmap::AlphaBltPlannar( SubPicDesc& spd, POINT pos, SIZE size, const XyP
             dst_V[j] = ((dst_V[j]*(src_A[j]+1))>>8) + src_V[j];
         }
     }
+#endif
 }
 
 void XyBitmap::FlipAlphaValue( LPVOID pixels, int w, int h, int pitch )
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    const int32_t fields[]={3,0,0,0,pitch,0,0,w,h,0,0,0};
+    XyRust::Surface(fields,pixels);
+#else
+
     ASSERT(pixels);
 
     if (w<=0 || h<=0)
@@ -230,10 +248,16 @@ void XyBitmap::FlipAlphaValue( LPVOID pixels, int w, int h, int pitch )
     }
 
     return;
+#endif
 }
 
 void XyBitmap::BltPack( SubPicDesc& spd, POINT pos, SIZE size, LPCVOID pixels, int pitch )
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    const int32_t fields[]={2,spd.w,spd.h,spd.bpp,spd.pitch,pos.x,pos.y,size.cx,size.cy,pitch,0,0};
+    XyRust::Surface(fields,spd.bits,pixels);
+#else
+
     ASSERT( spd.type!=MSP_AYUV_PLANAR );
     CRect r(0, 0, spd.w, spd.h);
 
@@ -256,6 +280,7 @@ void XyBitmap::BltPack( SubPicDesc& spd, POINT pos, SIZE size, LPCVOID pixels, i
     {
         memcpy(dst, src, w*4);
     }
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////////

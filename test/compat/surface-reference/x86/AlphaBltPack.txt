@@ -1,0 +1,130 @@
+  00404F00: 83 EC 14           sub         esp,14h
+  00404F03: 8B 44 24 18        mov         eax,dword ptr [esp+18h]
+  00404F07: 8B 54 24 1C        mov         edx,dword ptr [esp+1Ch]
+  00404F0B: 8B 4C 24 24        mov         ecx,dword ptr [esp+24h]
+  00404F0F: 53                 push        ebx
+  00404F10: 8B 5C 24 2C        mov         ebx,dword ptr [esp+2Ch]
+  00404F14: 55                 push        ebp
+  00404F15: 56                 push        esi
+  00404F16: 8B 70 04           mov         esi,dword ptr [eax+4]
+  00404F19: 33 ED              xor         ebp,ebp
+  00404F1B: 8B 40 08           mov         eax,dword ptr [eax+8]
+  00404F1E: 89 44 24 18        mov         dword ptr [esp+18h],eax
+  00404F22: 89 54 24 14        mov         dword ptr [esp+14h],edx
+  00404F26: 89 5C 24 0C        mov         dword ptr [esp+0Ch],ebx
+  00404F2A: C7 44 24 10 00 00  mov         dword ptr [esp+10h],0
+  00404F32: 57                 push        edi
+  00404F33: 8B 7C 24 30        mov         edi,dword ptr [esp+30h]
+  00404F37: 85 D2              test        edx,edx
+  00404F39: 79 10              jns         00404F4B
+  00404F3B: 8B C2              mov         eax,edx
+  00404F3D: 03 CA              add         ecx,edx
+  00404F3F: F7 D8              neg         eax
+  00404F41: 33 D2              xor         edx,edx
+  00404F43: 89 44 24 14        mov         dword ptr [esp+14h],eax
+  00404F47: 89 54 24 18        mov         dword ptr [esp+18h],edx
+  00404F4B: 85 FF              test        edi,edi
+  00404F4D: 79 0C              jns         00404F5B
+  00404F4F: 8B EF              mov         ebp,edi
+  00404F51: 03 DF              add         ebx,edi
+  00404F53: F7 DD              neg         ebp
+  00404F55: 89 5C 24 10        mov         dword ptr [esp+10h],ebx
+  00404F59: 33 FF              xor         edi,edi
+  00404F5B: 3E 3E 8D 04 11     lea         eax,ds:[ecx+edx]
+  00404F60: 3B C6              cmp         eax,esi
+  00404F62: 7E 04              jle         00404F68
+  00404F64: 8B CE              mov         ecx,esi
+  00404F66: 2B CA              sub         ecx,edx
+  00404F68: 8B 54 24 1C        mov         edx,dword ptr [esp+1Ch]
+  00404F6C: 8D 04 3B           lea         eax,[ebx+edi]
+  00404F6F: 3B C2              cmp         eax,edx
+  00404F71: 7E 08              jle         00404F7B
+  00404F73: 8B DA              mov         ebx,edx
+  00404F75: 2B DF              sub         ebx,edi
+  00404F77: 89 5C 24 10        mov         dword ptr [esp+10h],ebx
+  00404F7B: 8B 74 24 40        mov         esi,dword ptr [esp+40h]
+  00404F7F: 8B 44 24 14        mov         eax,dword ptr [esp+14h]
+  00404F83: 0F AF EE           imul        ebp,esi
+  00404F86: 03 6C 24 3C        add         ebp,dword ptr [esp+3Ch]
+  00404F8A: 8D 6C 85 00        lea         ebp,[ebp+eax*4]
+  00404F8E: 8B 44 24 28        mov         eax,dword ptr [esp+28h]
+  00404F92: 89 6C 24 1C        mov         dword ptr [esp+1Ch],ebp
+  00404F96: 8B 50 0C           mov         edx,dword ptr [eax+0Ch]
+  00404F99: 0F AF 54 24 18     imul        edx,dword ptr [esp+18h]
+  00404F9E: 8B 40 10           mov         eax,dword ptr [eax+10h]
+  00404FA1: 0F AF C7           imul        eax,edi
+  00404FA4: C1 FA 03           sar         edx,3
+  00404FA7: 03 D0              add         edx,eax
+  00404FA9: 8B 44 24 28        mov         eax,dword ptr [esp+28h]
+  00404FAD: 03 50 18           add         edx,dword ptr [eax+18h]
+  00404FB0: 89 54 24 18        mov         dword ptr [esp+18h],edx
+  00404FB4: 85 DB              test        ebx,ebx
+  00404FB6: 0F 8E B0 00 00 00  jle         0040506C
+  00404FBC: 8D 0C 8D 00 00 00  lea         ecx,[ecx*4+00000000h]
+  00404FC3: 03 CD              add         ecx,ebp
+  00404FC5: 89 4C 24 14        mov         dword ptr [esp+14h],ecx
+  00404FC9: 8D A4 24 00 00 00  lea         esp,[esp+00000000h]
+  00404FD0: 8B C5              mov         eax,ebp
+  00404FD2: 3B E9              cmp         ebp,ecx
+  00404FD4: 73 72              jae         00405048
+  00404FD6: 8B CA              mov         ecx,edx
+  00404FD8: 2B CD              sub         ecx,ebp
+  00404FDA: 8B 6C 24 14        mov         ebp,dword ptr [esp+14h]
+  00404FDE: 89 4C 24 20        mov         dword ptr [esp+20h],ecx
+  00404FE2: 8B 1C 08           mov         ebx,dword ptr [eax+ecx]
+  00404FE5: 8B FB              mov         edi,ebx
+  00404FE7: 0F B6 70 03        movzx       esi,byte ptr [eax+3]
+  00404FEB: 81 E7 00 FF 00 00  and         edi,0FF00h
+  00404FF1: 8B 10              mov         edx,dword ptr [eax]
+  00404FF3: 81 E3 FF 00 FF 00  and         ebx,0FF00FFh
+  00404FF9: 46                 inc         esi
+  00404FFA: 8B CA              mov         ecx,edx
+  00404FFC: 0F AF FE           imul        edi,esi
+  00404FFF: 81 E1 00 FF FF FF  and         ecx,0FFFFFF00h
+  00405005: 0F AF DE           imul        ebx,esi
+  00405008: 81 E2 FF 00 FF FF  and         edx,0FFFF00FFh
+  0040500E: C1 EF 08           shr         edi,8
+  00405011: C1 EB 08           shr         ebx,8
+  00405014: 03 F9              add         edi,ecx
+  00405016: 8B 4C 24 20        mov         ecx,dword ptr [esp+20h]
+  0040501A: 03 DA              add         ebx,edx
+  0040501C: 81 E7 00 FF 00 00  and         edi,0FF00h
+  00405022: 81 E3 FF 00 FF 00  and         ebx,0FF00FFh
+  00405028: 0B FB              or          edi,ebx
+  0040502A: 89 3C 08           mov         dword ptr [eax+ecx],edi
+  0040502D: 83 C0 04           add         eax,4
+  00405030: 3B C5              cmp         eax,ebp
+  00405032: 72 AE              jb          00404FE2
+  00405034: 8B 6C 24 1C        mov         ebp,dword ptr [esp+1Ch]
+  00405038: 8B 4C 24 14        mov         ecx,dword ptr [esp+14h]
+  0040503C: 8B 54 24 18        mov         edx,dword ptr [esp+18h]
+  00405040: 8B 5C 24 10        mov         ebx,dword ptr [esp+10h]
+  00405044: 8B 74 24 40        mov         esi,dword ptr [esp+40h]
+  00405048: 8B 44 24 28        mov         eax,dword ptr [esp+28h]
+  0040504C: 03 EE              add         ebp,esi
+  0040504E: 03 CE              add         ecx,esi
+  00405050: 89 6C 24 1C        mov         dword ptr [esp+1Ch],ebp
+  00405054: 89 4C 24 14        mov         dword ptr [esp+14h],ecx
+  00405058: 03 50 10           add         edx,dword ptr [eax+10h]
+  0040505B: 83 EB 01           sub         ebx,1
+  0040505E: 89 54 24 18        mov         dword ptr [esp+18h],edx
+  00405062: 89 5C 24 10        mov         dword ptr [esp+10h],ebx
+  00405066: 0F 85 64 FF FF FF  jne         00404FD0
+  0040506C: 5F                 pop         edi
+  0040506D: 5E                 pop         esi
+  0040506E: 5D                 pop         ebp
+  0040506F: 5B                 pop         ebx
+  00405070: 83 C4 14           add         esp,14h
+  00405073: C3                 ret
+  00405074: CC                 int         3
+  00405075: CC                 int         3
+  00405076: CC                 int         3
+  00405077: CC                 int         3
+  00405078: CC                 int         3
+  00405079: CC                 int         3
+  0040507A: CC                 int         3
+  0040507B: CC                 int         3
+  0040507C: CC                 int         3
+  0040507D: CC                 int         3
+  0040507E: CC                 int         3
+  0040507F: CC                 int         3

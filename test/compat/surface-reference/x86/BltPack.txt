@@ -1,0 +1,100 @@
+  00405400: 83 EC 08           sub         esp,8
+  00405403: 8B 54 24 14        mov         edx,dword ptr [esp+14h]
+  00405407: 8B 4C 24 18        mov         ecx,dword ptr [esp+18h]
+  0040540B: 53                 push        ebx
+  0040540C: 8B 5C 24 14        mov         ebx,dword ptr [esp+14h]
+  00405410: 55                 push        ebp
+  00405411: 8B 6C 24 14        mov         ebp,dword ptr [esp+14h]
+  00405415: 56                 push        esi
+  00405416: 33 F6              xor         esi,esi
+  00405418: 89 5C 24 10        mov         dword ptr [esp+10h],ebx
+  0040541C: C7 44 24 0C 00 00  mov         dword ptr [esp+0Ch],0
+  00405424: 57                 push        edi
+  00405425: 8B 7C 24 2C        mov         edi,dword ptr [esp+2Ch]
+  00405429: 85 DB              test        ebx,ebx
+  0040542B: 79 10              jns         0040543D
+  0040542D: 8B C3              mov         eax,ebx
+  0040542F: 03 CB              add         ecx,ebx
+  00405431: F7 D8              neg         eax
+  00405433: 33 DB              xor         ebx,ebx
+  00405435: 89 44 24 10        mov         dword ptr [esp+10h],eax
+  00405439: 89 5C 24 14        mov         dword ptr [esp+14h],ebx
+  0040543D: 8D 49 00           lea         ecx,[ecx]
+  00405440: 85 D2              test        edx,edx
+  00405442: 79 08              jns         0040544C
+  00405444: 8B F2              mov         esi,edx
+  00405446: 03 FA              add         edi,edx
+  00405448: F7 DE              neg         esi
+  0040544A: 33 D2              xor         edx,edx
+  0040544C: 8D 04 19           lea         eax,[ecx+ebx]
+  0040544F: 3B 45 04           cmp         eax,dword ptr [ebp+4]
+  00405452: 7E 05              jle         00405459
+  00405454: 8B 4D 04           mov         ecx,dword ptr [ebp+4]
+  00405457: 2B CB              sub         ecx,ebx
+  00405459: 36 8B 5D 08        mov         ebx,dword ptr ss:[ebp+8]
+  0040545D: 8D 04 17           lea         eax,[edi+edx]
+  00405460: 3B C3              cmp         eax,ebx
+  00405462: 7E 04              jle         00405468
+  00405464: 8B FB              mov         edi,ebx
+  00405466: 2B FA              sub         edi,edx
+  00405468: 0F AF 74 24 34     imul        esi,dword ptr [esp+34h]
+  0040546D: 8B 44 24 10        mov         eax,dword ptr [esp+10h]
+  00405471: 03 74 24 30        add         esi,dword ptr [esp+30h]
+  00405475: 8D 1C 86           lea         ebx,[esi+eax*4]
+  00405478: 8B 75 0C           mov         esi,dword ptr [ebp+0Ch]
+  0040547B: 0F AF 74 24 14     imul        esi,dword ptr [esp+14h]
+  00405480: 8B 45 10           mov         eax,dword ptr [ebp+10h]
+  00405483: 0F AF C2           imul        eax,edx
+  00405486: C1 FE 03           sar         esi,3
+  00405489: 03 F0              add         esi,eax
+  0040548B: 03 75 18           add         esi,dword ptr [ebp+18h]
+  0040548E: 85 FF              test        edi,edi
+  00405490: 7E 29              jle         004054BB
+  00405492: 8D 04 8D 00 00 00  lea         eax,[ecx*4+00000000h]
+  00405499: 89 44 24 14        mov         dword ptr [esp+14h],eax
+  0040549D: 8D 49 00           lea         ecx,[ecx]
+  004054A0: 50                 push        eax
+  004054A1: 53                 push        ebx
+  004054A2: 56                 push        esi
+  004054A3: E8 18 FC 00 00     call        004150C0
+  004054A8: 03 5C 24 40        add         ebx,dword ptr [esp+40h]
+  004054AC: 83 C4 0C           add         esp,0Ch
+  004054AF: 03 75 10           add         esi,dword ptr [ebp+10h]
+  004054B2: 8B 44 24 14        mov         eax,dword ptr [esp+14h]
+  004054B6: 83 EF 01           sub         edi,1
+  004054B9: 75 E5              jne         004054A0
+  004054BB: 5F                 pop         edi
+  004054BC: 5E                 pop         esi
+  004054BD: 5D                 pop         ebp
+  004054BE: 5B                 pop         ebx
+  004054BF: 83 C4 08           add         esp,8
+  004054C2: C3                 ret
+  004054C3: CC                 int         3
+  004054C4: CC                 int         3
+  004054C5: CC                 int         3
+  004054C6: CC                 int         3
+  004054C7: CC                 int         3
+  004054C8: CC                 int         3
+  004054C9: CC                 int         3
+  004054CA: CC                 int         3
+  004054CB: CC                 int         3
+  004054CC: CC                 int         3
+  004054CD: CC                 int         3
+  004054CE: CC                 int         3
+  004054CF: CC                 int         3
+  004054D0: CC                 int         3
+  004054D1: CC                 int         3
+  004054D2: CC                 int         3
+  004054D3: CC                 int         3
+  004054D4: CC                 int         3
+  004054D5: CC                 int         3
+  004054D6: CC                 int         3
+  004054D7: CC                 int         3
+  004054D8: CC                 int         3
+  004054D9: CC                 int         3
+  004054DA: CC                 int         3
+  004054DB: CC                 int         3
+  004054DC: CC                 int         3
+  004054DD: CC                 int         3
+  004054DE: CC                 int         3
+  004054DF: CC                 int         3

@@ -27,7 +27,17 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest port: owned bitmaps and drawing (2026-10-19)
+## In progress: host surface output operations (2026-10-19)
+
+The experimental path now routes packed/planar bitmap alpha blits, packed
+copies, external alpha inversion and solid-fill traversal through safe Rust.
+The boundary preserves alias-sensitive pixel/row/plane order and imports only
+initially required bytes. Direct Windows comparison is pending; this is not a
+production switch or a completed whole-library migration. See
+[the surface boundary](rust-surface-boundary.md). The previous validated
+checkpoint remains the owned-bitmap evidence below.
+
+## Previous port: owned bitmaps and drawing (2026-10-19)
 
 Implementation `12a1a2be`, validated at `42e6cb2f`, moves experimental XyBitmap
 initialization, complete Draw/AdditionDraw traversal, final packed alpha and

@@ -1,0 +1,80 @@
+{
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "source_sha256": "585f5aa3f44e9b5fed6b4b3d0965a98bd7070441efd18cfd3bdc420635518e28",
+  "library_sha256": {
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\strmbaseR.lib": "e4a3eed835fc6dcfdd7b81e684678cce0aaf032187e1ff2611b7f4146d6a9067",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\dsutilR.lib": "3dfc9f2eb59caef227f3ab723a1f10b672ab44f3efb61a75030d5b0a8730892b",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\subtitlesR.lib": "d6d48a179e28d70404ff870f6c6b640b9c768940065a95039695f7684689e50d",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\subpicR.lib": "23aed7e98c3c33cf31a956900fc720faf5d603edbb27c1f821964e9ccf87c5de",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\basevideofilterR.lib": "738d7f288e53690373e814f00ab7edcc8419e40de46a96f7a888a549ce8ca39e",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\libssfR.lib": "58a84c5e08a8c4c75e60e0f53b2590e6696e7f5938d52cc46b895ad326b4f1d8",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\unrarR.lib": "3dcfd1c32bc6261c168c841ebeb86c8dd4177f5698730424cbf39628f3e8a56c"
+  },
+  "functions": [
+    {
+      "name": "?AlphaBlt8bppSingleAlphaC@@YAXPEAEEEHHH@Z",
+      "address": "0x140001400",
+      "end": "0x1400015a0",
+      "file": "AlphaBlt8bppSingleAlphaC.txt",
+      "lines": 98
+    },
+    {
+      "name": "?AlphaBlt8bppSingleAlphaSse2@@YAXPEAEEEHHH@Z",
+      "address": "0x1400015a0",
+      "end": "0x140001920",
+      "file": "AlphaBlt8bppSingleAlphaSse2.txt",
+      "lines": 224
+    },
+    {
+      "name": "?FillSolidRect@Rasterizer@@SAXAEAUSubPicDesc@@HHHHK@Z",
+      "address": "0x140001920",
+      "end": "0x140001db0",
+      "file": "FillSolidRect.txt",
+      "lines": 278
+    },
+    {
+      "name": "?AlphaBltPack@XyBitmap@@SAXAEAUSubPicDesc@@UtagPOINT@@UtagSIZE@@PEBXH@Z",
+      "address": "0x1400052c0",
+      "end": "0x140005440",
+      "file": "AlphaBltPack.txt",
+      "lines": 111
+    },
+    {
+      "name": "?AlphaBltPlannar@XyBitmap@@SAXAEAUSubPicDesc@@UtagPOINT@@UtagSIZE@@AEBUXyPlannerFormatExtra@@H@Z",
+      "address": "0x140005440",
+      "end": "0x140005c20",
+      "file": "AlphaBltPlannar.txt",
+      "lines": 496
+    },
+    {
+      "name": "?FlipAlphaValue@XyBitmap@@SAXPEAXHHH@Z",
+      "address": "0x140005c20",
+      "end": "0x140005d60",
+      "file": "FlipAlphaValue.txt",
+      "lines": 90
+    },
+    {
+      "name": "?BltPack@XyBitmap@@SAXAEAUSubPicDesc@@UtagPOINT@@UtagSIZE@@PEBXH@Z",
+      "address": "0x140005d60",
+      "end": "0x140005e70",
+      "file": "BltPack.txt",
+      "lines": 82
+    }
+  ],
+  "files": {
+    "AlphaBlt8bppSingleAlphaC.txt": "2e0934b5f5d8981f992c3260c74a3850507c47836f0c9fa0c82e698d1d31663f",
+    "AlphaBlt8bppSingleAlphaSse2.txt": "076754f3b120061dbe0fbd9f9b85c9f36d69d091cd4b527340f2e236aa433cda",
+    "AlphaBltPack.txt": "3ee6d05e1eaa9c90541c68c1d0aa34f364e263ed99a72d235f3fdb27a825cadc",
+    "AlphaBltPlannar.txt": "fe8e0b7e52dc7073d0befd225741f38ee22feb0f27a3c590df20412752757c6c",
+    "BltPack.txt": "339d0f48a784ee6312a2d545ae1a03462e1cf14a439d40ad2c28b2f2e614fa99",
+    "build.log": "d7e96f1b75258f0ac9dba593db0ed115941b8534b2412f501021d2fd2be740b1",
+    "command.json": "50f979926b95d893b222185de68e18560b9223623177be726b1506b8ed0959b2",
+    "disassembly.txt": "662b0b73eec0116de04b813c59d5a91eae3e6bf4f81f73fffae0654f862a02b2",
+    "FillSolidRect.txt": "431b435c43a9e1a6e8af0ea9ccf94c9485690def20b3dd85f0eef3674d23ea22",
+    "FlipAlphaValue.txt": "16b743cb2dcce03892fa2e8efe03cb4a1437833e38b361df60ad36352ab6d6fd",
+    "probe.exe": "e208808ba2cdb49b53d3b1300203725829492fe935cdd906438ae816475b9f23",
+    "probe.map": "a7cfc90123d038e51f81281085c9ed3a1ac9e5f1694160e4e024003f0b0d67c4",
+    "probe.obj": "27fa54e9655aba1af1030e507670338aa1f5eed319ad54a45622f97daf18e99e"
+  },
+  "scope": "Unchanged pinned bitmap output and solid-fill functions linked for numeric and control-flow inspection. Executable not run; no behavior or parity claim."
+}

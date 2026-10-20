@@ -1,0 +1,17 @@
+{
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "source_capture": "artifacts/bitmap-output-next-final-reference-x86",
+  "scope": "Unchanged linked reference functions, not runtime comparison. memcpy and memmove share a linked CRT address on this architecture; overlap behavior still requires direct executable comparison.",
+  "files": {
+    "AlphaBlt8bppSingleAlphaSse2.txt": "7f9d61308cb03472563607df59bf5b293cefd58460e2ff819298331a70b54cd2",
+    "AlphaBltPack.txt": "c32bf49a421838b7423116c3420056b1f0bf760cb4f14fa9b90c21bbf65825b8",
+    "AlphaBltPlannar.txt": "b584ca27525ed05f790eddc3a43b32186bfa777fa57d0da01898b5ea585de766",
+    "BltPack.txt": "05c087a13004298ab86abe31438bb156417413141443ae8c1c1905f89a7d80ee",
+    "capture-source.cpp": "585f5aa3f44e9b5fed6b4b3d0965a98bd7070441efd18cfd3bdc420635518e28",
+    "command.json": "cbde26c5afc11dced3df08a87df6fd31b99e6cc5ea9a6f578c8fe6decc5ff51f",
+    "copy-symbols.txt": "5f0c3ab8a2c40d646c1ca6ad3b7ddf5baf6d1447fae5a8264654b6aca16864ee",
+    "FillSolidRect.txt": "b6843d3d1ca307d0df9336697c5efc747c8cd6471bbbfd570404f0ba700292c5",
+    "FlipAlphaValue.txt": "28f72b0a5633ba54abb18857b2bf5ef4c8d3b1a42d2a9571e7c0c409cf61043f",
+    "provenance.json": "25cb38da6aed3527a41cdfa4f40d57dfb8dca41ad9a57a22461bd2a9cec70564"
+  }
+}
