@@ -1,0 +1,908 @@
+{
+  "schema": 1,
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "candidate_implementation_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+  "production_code_commit": "e8b07faa481447602e1c0dfac81daecf51ac0595",
+  "status": "Experimental owned Gaussian cache and complete blur orchestration checkpoint; full-library Rust migration remains active",
+  "architectures": {
+    "x86": {
+      "native": {
+        "gaussian_cache_native": {
+          "path": "artifacts/blur-owned-gaussian_cache_native-x86/report.json",
+          "sha256": "2c05c9a489e8809eb6a4f361cd8ee57fa6c82b4811793d18ddc0d692c2171e72",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 404,
+          "trace_lines": 1406,
+          "trace_sha256": [
+            "227caab3d12e61bbe7c7fc91b590214fddcc4a7911987cf120300a61a5534ee4",
+            "227caab3d12e61bbe7c7fc91b590214fddcc4a7911987cf120300a61a5534ee4",
+            "227caab3d12e61bbe7c7fc91b590214fddcc4a7911987cf120300a61a5534ee4",
+            "227caab3d12e61bbe7c7fc91b590214fddcc4a7911987cf120300a61a5534ee4"
+          ],
+          "binary_sha256": {
+            "reference": "69714c64243dcaa89aa41dc38d091b988af25ad83c8cea12345e74911477a0ad",
+            "candidate": "9131e5bc2f79e9acae0f244bf96c6b6240ab4f985dedf62e5de9385b337d92d8"
+          }
+        },
+        "gaussian_coefficients_native": {
+          "path": "artifacts/blur-owned-gaussian_coefficients_native-x86/report.json",
+          "sha256": "421be463b1737531292b6e505a87874ae10fb002577ebec942e4a82f8c4a1a9c",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 212,
+          "trace_lines": 638,
+          "trace_sha256": [
+            "36bb5760e0bb84dad82343aac8a3221ba0ff23f2ea5cc429165e06457077cf47",
+            "36bb5760e0bb84dad82343aac8a3221ba0ff23f2ea5cc429165e06457077cf47",
+            "36bb5760e0bb84dad82343aac8a3221ba0ff23f2ea5cc429165e06457077cf47",
+            "36bb5760e0bb84dad82343aac8a3221ba0ff23f2ea5cc429165e06457077cf47"
+          ],
+          "binary_sha256": {
+            "reference": "9f24d719e4806474a50692d6b6180993fc8b364734795bfe84213aa5b487dc8b",
+            "candidate": "35ce3185103fc67633e6d1b842c8d33723aa5ecf8ca81d2682b8f6f0ab7d7748"
+          }
+        },
+        "overlay_native": {
+          "path": "artifacts/blur-owned-overlay_native-x86/report.json",
+          "sha256": "4f5d8726e5118d91fb0f9875b9de2ce4623960b6e27dc396f8500e0da5e5d9e1",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 17924,
+          "trace_lines": 53774,
+          "trace_sha256": [
+            "35ea60e7b54d8be5017f986d51e3f52f579bc1f35ab5a805e8e65bee41b5a7f6",
+            "35ea60e7b54d8be5017f986d51e3f52f579bc1f35ab5a805e8e65bee41b5a7f6",
+            "35ea60e7b54d8be5017f986d51e3f52f579bc1f35ab5a805e8e65bee41b5a7f6",
+            "35ea60e7b54d8be5017f986d51e3f52f579bc1f35ab5a805e8e65bee41b5a7f6"
+          ],
+          "binary_sha256": {
+            "reference": "738893714f20b6d48677de5026c755379f12622da748fe3234e0725224ff1414",
+            "candidate": "86d08e21f6edc11e43aa26b65cc155a8926daa6598282d92e0d929f536bb88fc"
+          }
+        },
+        "raster_native": {
+          "path": "artifacts/blur-owned-raster_native-x86/report.json",
+          "sha256": "6568ad5ea3a517ab663ec397460c58f0bf6e7a696ce4a88d498b13ccfa634591",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 512,
+          "trace_lines": 2050,
+          "trace_sha256": [
+            "05a2bd9b09c7b6c1d19519dc8dfc39b6685d652db7bcf780ed47a371d8e63f1f",
+            "05a2bd9b09c7b6c1d19519dc8dfc39b6685d652db7bcf780ed47a371d8e63f1f",
+            "05a2bd9b09c7b6c1d19519dc8dfc39b6685d652db7bcf780ed47a371d8e63f1f",
+            "05a2bd9b09c7b6c1d19519dc8dfc39b6685d652db7bcf780ed47a371d8e63f1f"
+          ],
+          "binary_sha256": {
+            "reference": "a2d781d677503c3fbb14f61a08ee0fec95030cf67053e93daebfbff4b6570c42",
+            "candidate": "b612c554e3450fb57430496e96d8a48fc44d49dcb99a44b0fa5d4c929927c0e5"
+          }
+        },
+        "wide_region_native": {
+          "path": "artifacts/blur-owned-wide_region_native-x86/report.json",
+          "sha256": "b7a953d51c4e81d06943f8e08022f83d14d50e5d37ca684515899641f75ac955",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 1536,
+          "trace_lines": 288022,
+          "trace_sha256": [
+            "895f4796454005d5b06a2d653c04b57819e48c0752f9cfd3517ad6274bdddb71",
+            "895f4796454005d5b06a2d653c04b57819e48c0752f9cfd3517ad6274bdddb71",
+            "895f4796454005d5b06a2d653c04b57819e48c0752f9cfd3517ad6274bdddb71",
+            "895f4796454005d5b06a2d653c04b57819e48c0752f9cfd3517ad6274bdddb71"
+          ],
+          "binary_sha256": {
+            "reference": "94a12f1aeb11ff6d35519a1c019a72916ab105bbf41970315e14584940166a1b",
+            "candidate": "a1612b88a79a8c2bf37b0ceec55453540f0aa59d6cf8f8e31c434ee3a1462525"
+          }
+        },
+        "scan_lines_native": {
+          "path": "artifacts/blur-owned-scan_lines_native-x86/report.json",
+          "sha256": "70050f3d440f4bf2dfb1daa4e5c63ae493e60439cfa2efec92359471a5845de7",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 384,
+          "trace_lines": 70692,
+          "trace_sha256": [
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f"
+          ],
+          "binary_sha256": {
+            "reference": "e4c03a5353f93d7672e14d545dda39f0417950967f6352e329f637cefaa09418",
+            "candidate": "aed78ce2caaadf5ad112321bb664d6d03f5428d4e4c4e64a00bf6be2425b56d7"
+          }
+        },
+        "word_transform_native": {
+          "path": "artifacts/blur-owned-word_transform_native-rerun-x86/report.json",
+          "sha256": "fd820627a6e47334d3a0988c61d7ec9fae23d1d45290ae4c6a1ae984dc1dabb0",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 4560,
+          "trace_lines": 9122,
+          "trace_sha256": [
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd"
+          ],
+          "binary_sha256": {
+            "reference": "a8a090afdd5ac83ac3af267153fe7a555c6199bdc5be4b1f05f2de5279a6288c",
+            "candidate": "d87a20254453cce77f073ab80a7ca8f7e5065f9047ef4250aad4325acf1dd7a9"
+          }
+        },
+        "path_data_native": {
+          "path": "artifacts/blur-owned-path_data_native-x86/report.json",
+          "sha256": "5361397459eda7020bf7eb58e5c3f0c646aa631705c138ae7a4782e7ed86ccee",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 39,
+          "trace_lines": 171,
+          "trace_sha256": [
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2"
+          ],
+          "binary_sha256": {
+            "reference": "4d44a7c19bf3ce02019f31c8b40233b22af80e134a1de0bc471133ebd4e76c1c",
+            "candidate": "8b8c0ba8e3b204d20a6662eab5ae19b2d5b9365a0d18123b31f41de5193e63d1"
+          }
+        },
+        "text_measure_raw": {
+          "path": "artifacts/blur-owned-text_measure_raw-x86/report.json",
+          "sha256": "da09decf35e7d0543d7318a8b8342bac728a603f65c88a2ffc066ae857a7d163",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd",
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd",
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd",
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd"
+          ],
+          "binary_sha256": {
+            "reference": "720fa0215d61c2703d1ccc06ab5f9b490eb6163891241e3d76a2a0de8d7a11ff",
+            "candidate": "29294ef6c1792adda744e23c4b2dfba2f5a26ae1678c3b3424536bbbbc46521c"
+          }
+        },
+        "text_measure_construction": {
+          "path": "artifacts/blur-owned-text_measure_construction-x86/report.json",
+          "sha256": "61737a3156a0ac61069922749c5c6e3e231b503e672666954ef5cb45fa3322ea",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893",
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893",
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893",
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893"
+          ],
+          "binary_sha256": {
+            "reference": "1d052555fedc693ed63f7a208316b8846567aead2c8ac4c17030b64463e991cd",
+            "candidate": "51247861b1d5cd5f8f963cae890f0ea372a26aad855b71a0b8bcbd16679e4fe9"
+          }
+        },
+        "renderer_dc_text_native": {
+          "path": "artifacts/blur-owned-renderer_dc_text_native-x86/report.json",
+          "sha256": "2d1c43c6f1e490c895fb91f8b3c446637c104cb09a7fa07b9fc5918d60cd328d",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 40,
+          "trace_lines": 598,
+          "trace_sha256": [
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330"
+          ],
+          "binary_sha256": {
+            "reference": "d9f325c382b2a46d7ff0256bf331f35e557e128bb22e18b62a783050e42f0c55",
+            "candidate": "715e80d29cf5ba0314141dd7e9375d4eb19c17bcefcae4e2d5ef8c6793f5798c"
+          }
+        },
+        "renderer_dc_native": {
+          "path": "artifacts/blur-owned-renderer_dc_native-x86/report.json",
+          "sha256": "73d93a234bc86615a0a5e67bb3ba536a4cbad96569049b8ef237447c98a213e6",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 6,
+          "trace_lines": 116,
+          "trace_sha256": [
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983"
+          ],
+          "binary_sha256": {
+            "reference": "c260042a3a09222ef18be97580432965afaa6a472948548c0bcca0759173fb74",
+            "candidate": "4099253dfcdadde5656619e5f7866f98cee8fe9a41fcc73ca9d0ecb4139aac43"
+          }
+        },
+        "font_native": {
+          "path": "artifacts/blur-owned-font_native-x86/report.json",
+          "sha256": "80c690e006dfed6d8dc18bbdf9fb7014865e966fa79689bc296fd9664e9dfbe8",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 195,
+          "trace_lines": 392,
+          "trace_sha256": [
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f",
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f",
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f",
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f"
+          ],
+          "binary_sha256": {
+            "reference": "957d8b69e257e0b5dd5c5f61e647b08911cdd5d40148f895085617c5d722c758",
+            "candidate": "fef55b251dd14d289cf597f9b3e65ee8f5704faf6e3102ceea3a2f7d3b2cb2c1"
+          }
+        },
+        "font_gdi_calls": {
+          "path": "artifacts/blur-owned-font_gdi_calls-x86/report.json",
+          "sha256": "a11eee7a7fc7ab3275a6543593b776734af978a6fc9b2f8bcc41f1572424ca2e",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 12,
+          "trace_lines": 126,
+          "trace_sha256": [
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5",
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5",
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5",
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5"
+          ],
+          "binary_sha256": {
+            "reference": "fb964c49e109bb429d2ebe67886dd3fbc04c5af3d71fb6a51cab59c091426499",
+            "candidate": "9bb8986b14de10159f3dcebbfc6a2aeb6f824fc662c6816d84522ce28f993307"
+          }
+        },
+        "blur_dispatch_native": {
+          "path": "artifacts/blur-owned-initial2-x86/report.json",
+          "sha256": "2522fd5a78f92ed853440f764fff0017653fa2e61c1f283a2c1e2a28abab0a2c",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 400,
+          "trace_lines": 402,
+          "trace_sha256": [
+            "b35293037cfd404f170713ad64c96b6187b892a89704835a04f18c4ccea7750f",
+            "b35293037cfd404f170713ad64c96b6187b892a89704835a04f18c4ccea7750f",
+            "b35293037cfd404f170713ad64c96b6187b892a89704835a04f18c4ccea7750f",
+            "b35293037cfd404f170713ad64c96b6187b892a89704835a04f18c4ccea7750f"
+          ],
+          "binary_sha256": {
+            "reference": "7030bd0d10f558ce83b3ff705f1aef4f1ae5cd2ed64fc44002c36e880f31d6a9",
+            "candidate": "8764f6fe63a35d5f74df275536f95fca31ff44986302568f3b574b83a8f8ad62"
+          }
+        }
+      },
+      "rendering": {
+        "path": "artifacts/blur-owned-csri-x86/summary.json",
+        "sha256": "038a7e397d91e5159d9a8bb4068ba91cf2242c6e3974401e5b214f20ed9e9c3c",
+        "original_manifest_sha256": "2949bb98bfbc49bd3496af90ef9a8b3b386395637ff34bc54b0fc4e86fe61363",
+        "partition_exact": true,
+        "cases": 1222,
+        "frames": 13186,
+        "shard_results": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            7,
+            0
+          ]
+        ],
+        "complete": true,
+        "candidate_dll": {
+          "path": "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\bin\\lib_17.0\\Win32\\Release\\VSFilter.dll",
+          "sha256": "8d7897f5f9404db9d5498246233f5370fbc5657d605010f2d671401327f4eec4"
+        },
+        "reference_source": {
+          "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+          "repository": "https://github.com/CoffeeFlux/xy-VSFilter"
+        },
+        "distinct_controls": 192,
+        "stable_equal_cases": 1222,
+        "stable_equal_frames": 13186,
+        "unresolved_cases": [],
+        "shard_reports": [
+          {
+            "path": "artifacts/blur-owned-csri-x86/shard-0/report.json",
+            "sha256": "97ec7137b33b7db0c162e19f7d6a4687e07b1e8b6b4ef25dac2ac993216b7586"
+          },
+          {
+            "path": "artifacts/blur-owned-csri-x86/shard-1/report.json",
+            "sha256": "0d6e5b1834c23cc6c032f81b902ac9a4789db9c5438155ae6b8360c06ec26150"
+          },
+          {
+            "path": "artifacts/blur-owned-csri-x86/shard-2/report.json",
+            "sha256": "4c2c8946f001ee754b2e8c4b982854b847f1ae9fc2e4cf6bebf73fa6f620b380"
+          },
+          {
+            "path": "artifacts/blur-owned-csri-x86/shard-3/report.json",
+            "sha256": "04a735832def6976f0eef3778fbdba815a380260bdbc93fdd9732b5900f07168"
+          },
+          {
+            "path": "artifacts/blur-owned-csri-x86/shard-4/report.json",
+            "sha256": "6b72c9009fbf82ad355ad32cb36e60198662f61f056991777e3658bf4c614591"
+          },
+          {
+            "path": "artifacts/blur-owned-csri-x86/shard-5/report.json",
+            "sha256": "412df180cf516f2d6eb142f6429de9dc641e2d776519989be60372bdad52017d"
+          },
+          {
+            "path": "artifacts/blur-owned-csri-x86/shard-6/report.json",
+            "sha256": "5a1e0fb90a5901a65d6788ee11823f0ae6f879f89812e0511bb0f0303aa3b4f7"
+          },
+          {
+            "path": "artifacts/blur-owned-csri-x86/shard-7/report.json",
+            "sha256": "d151b5ce6ae73eda9ee68220e3eb5a7cbcde7e03b026dfe385f4e0d839e2478e"
+          }
+        ]
+      },
+      "contracts": {
+        "log": {
+          "path": "artifacts/blur-owned-contracts-x86.log",
+          "sha256": "445a1347a43a8f59ccc7dfd18b9c878b4d225eeaaf4cc2cee89c7ff109d43161"
+        },
+        "summary": {
+          "path": "artifacts/blur-owned-contracts-x86/summary.json",
+          "sha256": "6deb4b23cef7dce374bfde358d6b81124423ae0f0920ff2fbd68b1b082a7d9c9"
+        },
+        "com": {
+          "path": "artifacts/blur-owned-contracts-x86/com/report.json",
+          "sha256": "45061c88a1fbc70537a6ede023b1d2b2c78cc630548b7ae5d4e576a2eaa679b2"
+        }
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "path": "bin/lib_17.0/Win32/Release/VSFilter.dll",
+          "sha256": "8d7897f5f9404db9d5498246233f5370fbc5657d605010f2d671401327f4eec4"
+        },
+        "XySubFilter.dll": {
+          "path": "bin/lib_17.0/Win32/Release/XySubFilter.dll",
+          "sha256": "b243cc8a1c3c5281015386b27f489dffbe1ce9693b7eaa2d64fe512c49771ff7"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "path": "bin/lib_17.0/Win32/Release/xy_sub_filter_consumer.dll",
+          "sha256": "9176da84ac621a772828e33ae78d35111590f2a73ba8c9a21e32cd93f982e3cb"
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/blur-owned-build-x86.log",
+          "sha256": "56c08cd1296d6472ee25821b36e6dece4bb8efb31f266da4909138ebfc4bf2e5"
+        },
+        {
+          "path": "artifacts/blur-owned-build-rust-x86.log",
+          "sha256": "e0d6001393dffdb3995b65640768714015df4ed09a66053de8124abb0dbcb02e"
+        }
+      ]
+    },
+    "x64": {
+      "native": {
+        "gaussian_cache_native": {
+          "path": "artifacts/blur-owned-gaussian_cache_native-x64/report.json",
+          "sha256": "012dac28400b489b1c8c1180d67ad088e32f1faa930cd8ab812cbd08796dc5d6",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 404,
+          "trace_lines": 1406,
+          "trace_sha256": [
+            "b30d052182530309c9b8a08d638673164c22abdfdca4a98e64f49df9e6904645",
+            "b30d052182530309c9b8a08d638673164c22abdfdca4a98e64f49df9e6904645",
+            "b30d052182530309c9b8a08d638673164c22abdfdca4a98e64f49df9e6904645",
+            "b30d052182530309c9b8a08d638673164c22abdfdca4a98e64f49df9e6904645"
+          ],
+          "binary_sha256": {
+            "reference": "d19c3b9fef879f33b0b475d423725a6a62c175e603e815d4ff23242b77618885",
+            "candidate": "282bb65f235d7bc1e812d1e36312a8e353d91bdeb2acb74915277a17db2834d7"
+          }
+        },
+        "gaussian_coefficients_native": {
+          "path": "artifacts/blur-owned-gaussian_coefficients_native-x64/report.json",
+          "sha256": "fcd5b0733903c63378b69b840f2917ab4d16e0dd9144744c1edefd9e4c201109",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 212,
+          "trace_lines": 638,
+          "trace_sha256": [
+            "950f235b5c59eaf6365b5f2b0aba2dec3546336eb4d3e5a410be7ccc8d843207",
+            "950f235b5c59eaf6365b5f2b0aba2dec3546336eb4d3e5a410be7ccc8d843207",
+            "950f235b5c59eaf6365b5f2b0aba2dec3546336eb4d3e5a410be7ccc8d843207",
+            "950f235b5c59eaf6365b5f2b0aba2dec3546336eb4d3e5a410be7ccc8d843207"
+          ],
+          "binary_sha256": {
+            "reference": "e2941b9178842963ff7183f8cd0fa32a9b9021b7d7c09fe3569bcbf5a2635171",
+            "candidate": "cfe31c6b4dfe72cbd39cc4deab69f0b2f9202c7d9333d8426e135e02548fcef1"
+          }
+        },
+        "overlay_native": {
+          "path": "artifacts/blur-owned-overlay_native-x64/report.json",
+          "sha256": "51c9191601ef67f5c7142b50d70052d7700b03f11e8b064ebf721c0d7c0cb751",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 17924,
+          "trace_lines": 53774,
+          "trace_sha256": [
+            "2e73a38ee6def813b9561a59aa36272cfe730a0b4d470fc12ebab3f494f02417",
+            "2e73a38ee6def813b9561a59aa36272cfe730a0b4d470fc12ebab3f494f02417",
+            "2e73a38ee6def813b9561a59aa36272cfe730a0b4d470fc12ebab3f494f02417",
+            "2e73a38ee6def813b9561a59aa36272cfe730a0b4d470fc12ebab3f494f02417"
+          ],
+          "binary_sha256": {
+            "reference": "183193107996b177f3b16556a2aacc2f18f11a82fdcff77096fa665ee5e2af4c",
+            "candidate": "796b0cce46c29fd3610bef1fe08b4f67c82aae296fe9028ad2299161992fc032"
+          }
+        },
+        "raster_native": {
+          "path": "artifacts/blur-owned-raster_native-x64/report.json",
+          "sha256": "fa94d7a89f74e7fbf1c4dff526383d82e4daaa9db97ea376223f945693adfb0c",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 512,
+          "trace_lines": 2050,
+          "trace_sha256": [
+            "cb6de9c380203885c4cec5bac67a4771747a68290e6fe0599d191155a71222e3",
+            "cb6de9c380203885c4cec5bac67a4771747a68290e6fe0599d191155a71222e3",
+            "cb6de9c380203885c4cec5bac67a4771747a68290e6fe0599d191155a71222e3",
+            "cb6de9c380203885c4cec5bac67a4771747a68290e6fe0599d191155a71222e3"
+          ],
+          "binary_sha256": {
+            "reference": "8cf5346f2bf464ac1fd0272782a9f449e0913f7c02ce504757084a04007054d5",
+            "candidate": "55857d00bfe16014c2764e712c266870b575d57f204140f571f28aaed516365c"
+          }
+        },
+        "wide_region_native": {
+          "path": "artifacts/blur-owned-wide_region_native-x64/report.json",
+          "sha256": "6bac76f7c3a7beb0dba069597d1f3cf9d7046ecf3c3b9bba1d084d3ab6baa640",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 1536,
+          "trace_lines": 288022,
+          "trace_sha256": [
+            "4fb58dc5e624a826d0a36164656cc725e56f7612b95a03a61824e80741bc7925",
+            "4fb58dc5e624a826d0a36164656cc725e56f7612b95a03a61824e80741bc7925",
+            "4fb58dc5e624a826d0a36164656cc725e56f7612b95a03a61824e80741bc7925",
+            "4fb58dc5e624a826d0a36164656cc725e56f7612b95a03a61824e80741bc7925"
+          ],
+          "binary_sha256": {
+            "reference": "42064ac2f52db1932f1f35c4097f90c7687ca12663157defc1b2e910ea6ef473",
+            "candidate": "06a8c14a80d91cfe74b55163cc9efdadbf1a74cbccb6a16862fb13b6604e43ff"
+          }
+        },
+        "scan_lines_native": {
+          "path": "artifacts/blur-owned-scan_lines_native-x64/report.json",
+          "sha256": "fd7d18bcf05c798532742367e96767db5788122761c050101539bbec613bf2e5",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 384,
+          "trace_lines": 70692,
+          "trace_sha256": [
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2"
+          ],
+          "binary_sha256": {
+            "reference": "1461438e662892c9895a1f832b50a8ea6f8735b7abbc7830253208ef69800d2c",
+            "candidate": "97e6667149fe989b8b66b5e3ed8c61a16c58e52cf9975270c868525a4bd132ac"
+          }
+        },
+        "word_transform_native": {
+          "path": "artifacts/blur-owned-word_transform_native-x64/report.json",
+          "sha256": "d611544d31f93b66187f6cd5326a37da5209bad922863cdf4bf1e1e799629622",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 4560,
+          "trace_lines": 9122,
+          "trace_sha256": [
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b"
+          ],
+          "binary_sha256": {
+            "reference": "ed9644c59a654e46c8fddcb54d5520caabde5f09bbe83a3868daf17df9db1dc7",
+            "candidate": "90d8ef703f920c747db6af2fd9d4c26dc2aae84010a33b56afabc35e8bd0dd37"
+          }
+        },
+        "path_data_native": {
+          "path": "artifacts/blur-owned-path_data_native-x64/report.json",
+          "sha256": "410d33e362fb8e77e798be3febf687be1464d48ec8e65e86437bf45159298c30",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 39,
+          "trace_lines": 171,
+          "trace_sha256": [
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031"
+          ],
+          "binary_sha256": {
+            "reference": "e3f2ab3bf188b6d1a863c4b7d1eb8bb04fa6b0f3a518c863a3471ba8fa51c133",
+            "candidate": "ecce39144893f20ecdd295b473a2b223e45302e0c8e9b20d8d49447e04bc31f0"
+          }
+        },
+        "text_measure_raw": {
+          "path": "artifacts/blur-owned-text_measure_raw-x64/report.json",
+          "sha256": "cd95cc1defbb2100cb20e9b0cf0c33bdce5e4cb27b38aeaaa5a39f1d674f418e",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054",
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054",
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054",
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054"
+          ],
+          "binary_sha256": {
+            "reference": "156057f7a20c7fbcfd4814503990c5688d17b30bad24ce97bb12c9512d1aa94c",
+            "candidate": "01e4951d55cfea6cfeb07465dcbdc7ad415289b834e947b88f4d084c2bd4154a"
+          }
+        },
+        "text_measure_construction": {
+          "path": "artifacts/blur-owned-text_measure_construction-x64/report.json",
+          "sha256": "f48357e5b4d490033c3cfa8d48f073293e6348e730a49e88b837368ea13605ed",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3",
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3",
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3",
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3"
+          ],
+          "binary_sha256": {
+            "reference": "0fcc11143fe6633bf3ed7f3986fb1bb7464ad12d5064b1a94b354adb4011e7a3",
+            "candidate": "66533e1badf7fbcd2e13d5afcbaf62d869eae4172a0d6451bdc386b9a3fda3f7"
+          }
+        },
+        "renderer_dc_text_native": {
+          "path": "artifacts/blur-owned-renderer_dc_text_native-x64/report.json",
+          "sha256": "faef928d2e9f06d8fd304c581d41fa872b02290d01ea59937fa52592269b5367",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 40,
+          "trace_lines": 598,
+          "trace_sha256": [
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac"
+          ],
+          "binary_sha256": {
+            "reference": "ce8f62da9df200541ac63e8a47a754d55d9515e7a44da7ae8dfaa4d02b22c1be",
+            "candidate": "77ede661a09ab2d2921c01d0ec6508bd28e676df6add34656b1cbb3e683c4ee8"
+          }
+        },
+        "renderer_dc_native": {
+          "path": "artifacts/blur-owned-renderer_dc_native-x64/report.json",
+          "sha256": "716fd53df0b3cb858e24a7e32f876df13a44c32de75a7d1853b2012898fc34c5",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 6,
+          "trace_lines": 116,
+          "trace_sha256": [
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd"
+          ],
+          "binary_sha256": {
+            "reference": "7dcd35556dda8329891720e087b85a5cc80b5e4666d40e0832fca0217c8bf801",
+            "candidate": "fc22191fa617afce8b25ec85cdae61ceacd091066d3a8d75dc3d00045f8b1b40"
+          }
+        },
+        "font_native": {
+          "path": "artifacts/blur-owned-font_native-x64/report.json",
+          "sha256": "1bed4e53ebbb9378a39b72fed5812d8ff4598b6db2db490c423bf8dc8e3f5163",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 195,
+          "trace_lines": 392,
+          "trace_sha256": [
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7",
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7",
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7",
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7"
+          ],
+          "binary_sha256": {
+            "reference": "c2d9e9e5abc0ac51f95dfb7c11cea484bf80670d341b2b70ade5ccd5650094eb",
+            "candidate": "9b9e08da1344443ee3fc132432a4f94bffebe84059679d77b3107aa4e5e66fc9"
+          }
+        },
+        "font_gdi_calls": {
+          "path": "artifacts/blur-owned-font_gdi_calls-x64/report.json",
+          "sha256": "84dacaf930590509ee7b155735076239d0b13edae62f235e640f5a8e160d690d",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 12,
+          "trace_lines": 126,
+          "trace_sha256": [
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93",
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93",
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93",
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93"
+          ],
+          "binary_sha256": {
+            "reference": "28b4bba75c0b224a0922ba779d0a9340e4faed95152dc205f91c757fca4cf66d",
+            "candidate": "1bbdab84f1d212c123f4e5e9c18c6b48cf7e569bc6feee5c2fe30ce68c870863"
+          }
+        },
+        "blur_dispatch_native": {
+          "path": "artifacts/blur-owned-initial2-x64/report.json",
+          "sha256": "7b756a118ea648e66d9327d2bc26fe1d6498a589fde4cd5077b30d4e6718851c",
+          "candidate_commit": "87f77e4198f4972e4d7fa38db6d619a41a426e56",
+          "cases": 400,
+          "trace_lines": 402,
+          "trace_sha256": [
+            "9e272fd28944cbf2fa6f0280cc8185193d839fa33b5df5423237f384c2160e72",
+            "9e272fd28944cbf2fa6f0280cc8185193d839fa33b5df5423237f384c2160e72",
+            "9e272fd28944cbf2fa6f0280cc8185193d839fa33b5df5423237f384c2160e72",
+            "9e272fd28944cbf2fa6f0280cc8185193d839fa33b5df5423237f384c2160e72"
+          ],
+          "binary_sha256": {
+            "reference": "ad1760188fe470ab776ce83a1ff7b8219f81340ebcacf25bb5e75aaf13dd88c3",
+            "candidate": "f5661bbe79e50203f51e58f2bded8ae7d6f8843665ee368e598f2410bd5d1591"
+          }
+        }
+      },
+      "rendering": {
+        "path": "artifacts/blur-owned-csri-x64/summary.json",
+        "sha256": "178d13c7394486fb456ef169a07c4aefe16d251f6c72758ce89385c1f6435386",
+        "original_manifest_sha256": "2949bb98bfbc49bd3496af90ef9a8b3b386395637ff34bc54b0fc4e86fe61363",
+        "partition_exact": true,
+        "cases": 1222,
+        "frames": 13186,
+        "shard_results": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            7,
+            0
+          ]
+        ],
+        "complete": true,
+        "candidate_dll": {
+          "path": "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\bin\\lib_17.0\\x64\\Release\\VSFilter.dll",
+          "sha256": "52d2034fd7802d2487e5c43a90a0eda795328a9d650e61fd3b38b19dcc1bd977"
+        },
+        "reference_source": {
+          "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+          "repository": "https://github.com/CoffeeFlux/xy-VSFilter"
+        },
+        "distinct_controls": 192,
+        "stable_equal_cases": 1222,
+        "stable_equal_frames": 13186,
+        "unresolved_cases": [],
+        "shard_reports": [
+          {
+            "path": "artifacts/blur-owned-csri-x64/shard-0/report.json",
+            "sha256": "a1541c9f5b1cdfdc27aeed3404c8b7f30fe24bc26743c202a5de31f59499d52e"
+          },
+          {
+            "path": "artifacts/blur-owned-csri-x64/shard-1/report.json",
+            "sha256": "0e6ae54807c895c0ba29e75bbfc13425898d3968edf96e9eddd6ce4ee2d8c9e3"
+          },
+          {
+            "path": "artifacts/blur-owned-csri-x64/shard-2/report.json",
+            "sha256": "0b6530b8c07dfd4f0cea40677a21a3ef401509d1f18cfdea3478edb8a96cb27a"
+          },
+          {
+            "path": "artifacts/blur-owned-csri-x64/shard-3/report.json",
+            "sha256": "e988a1c268a7e9d4bf6c05aea77a747a24f1b08ab09bebdaa1269231d484a60f"
+          },
+          {
+            "path": "artifacts/blur-owned-csri-x64/shard-4/report.json",
+            "sha256": "5d56fd5ca5557a63ec9bcd821d1359f30e9eaaf28c64c8a4f5c944ea2452045b"
+          },
+          {
+            "path": "artifacts/blur-owned-csri-x64/shard-5/report.json",
+            "sha256": "4ce239ef68b29203748436b3bacafaff390b4f76e4bb208c3856262933c2d6ec"
+          },
+          {
+            "path": "artifacts/blur-owned-csri-x64/shard-6/report.json",
+            "sha256": "a0870a06e122011d43124444c6f8459602807f9899f4a736f8ff24d2b642e8fa"
+          },
+          {
+            "path": "artifacts/blur-owned-csri-x64/shard-7/report.json",
+            "sha256": "921a2f75735f3294f03ce1502b46eec456484b0016974d0182fb460571c2f2b7"
+          }
+        ]
+      },
+      "contracts": {
+        "log": {
+          "path": "artifacts/blur-owned-contracts-x64.log",
+          "sha256": "445a1347a43a8f59ccc7dfd18b9c878b4d225eeaaf4cc2cee89c7ff109d43161"
+        },
+        "summary": {
+          "path": "artifacts/blur-owned-contracts-x64/summary.json",
+          "sha256": "6deb4b23cef7dce374bfde358d6b81124423ae0f0920ff2fbd68b1b082a7d9c9"
+        },
+        "com": {
+          "path": "artifacts/blur-owned-contracts-x64/com/report.json",
+          "sha256": "1b7a101cdd78bac40d9fb7654000c89c4872b4a5e67cbee66a0c7fefccd25355"
+        }
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "path": "bin/lib_17.0/x64/Release/VSFilter.dll",
+          "sha256": "52d2034fd7802d2487e5c43a90a0eda795328a9d650e61fd3b38b19dcc1bd977"
+        },
+        "XySubFilter.dll": {
+          "path": "bin/lib_17.0/x64/Release/XySubFilter.dll",
+          "sha256": "f20c8755728747db7edbd5829e2fef458461eee2a9b5ec4a5fc44173281672ac"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "path": "bin/lib_17.0/x64/Release/xy_sub_filter_consumer.dll",
+          "sha256": "2cf70b78ccd4554b9475aa219d36c7bf3ce1a5dd1333183dd6b007375fb82947"
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/blur-owned-build-x64.log",
+          "sha256": "2344435b610c72b446bb5a597aa6b0421c2d27754275169473567317c41c6e41"
+        },
+        {
+          "path": "artifacts/blur-owned-build-rust-x64.log",
+          "sha256": "66bda6e8aef779514834de6cdeef1df8f748276b3cd08b041a62428af4539e0e"
+        }
+      ]
+    }
+  },
+  "checks": {
+    "rust": {
+      "path": "artifacts/blur-owned-rust-checks.log",
+      "sha256": "70c4ac6a3f8653ccc7641f63851d163976310157a95cf8d9529138ee76029f0f"
+    },
+    "python_log": {
+      "path": "artifacts/blur-owned-python.log",
+      "sha256": "005280bc2dd48a5534b8e5f09c53ab6ef52e662645791881f7bdd1d0a42029c8"
+    },
+    "core_per_architecture": 381,
+    "ffi_per_architecture": 142,
+    "python": 216,
+    "python_skipped": 1,
+    "fmt": true,
+    "clippy_both_architectures_and_native_runtime": true,
+    "attribution": "Rust, Python and inventory were run at e8b07faa. Subsequent 87f77e41 changes only the dispatch observer link manifest; production Rust/native sources are unchanged."
+  },
+  "unsafe_inventory": {
+    "path": "artifacts/blur-owned-unsafe-inventory.json",
+    "sha256": "58021db39b2b89b779e681ef901ec76b530fce12fb3f0e74f0e0d8e1d472737d"
+  },
+  "previous_unresolved_reference": {
+    "evidence": "rust-word-transform-local-evidence.json",
+    "case": "field-unicode-style-space-file",
+    "result": "Earlier x64 cleanup exit access violation remains unresolved; a later passing run does not erase it."
+  },
+  "earlier_ellipse_fp_limit": {
+    "evidence": "ellipse-storage-fp-scope.json",
+    "result": "Earlier optimized native ellipse FP instability retains its original attribution and is not erased by current passing runs."
+  },
+  "limitations": [
+    "Release/default Windows FP controls. Debug, unmasked exceptions, partial allocation failure and arbitrary host concurrency remain unclosed.",
+    "Safe Rust owns Gaussian weak coefficient sharing/lifetimes, sigma orchestration, complete Blur dispatch and intermediate images. Fifteen new fixed-local arithmetic assembly sites preserve Windows comparison/copy/product/growth and argument-conversion behavior; no image or coefficient pointer crosses these numeric boundaries.",
+    "Direct cache comparison measures live initialized coefficient bytes against native xy allocation accounting, excluding detached observer packet copies. It is not a measurement of total Rust heap use.",
+    "The direct dispatch observer covers 400 empty-source/null-output/unchanged nonempty NaN cases. Finite effect sequencing and output pixels are covered by 17,924 actual overlay cases and the full renderer corpus.",
+    "Unknown logical filter input and impossible native geometry remain unresolved. Unknown padding is retained as unknown; no arbitrary uninitialized-byte parity claim.",
+    "Downstream clipping/drawing, caches, host adapters and vendored native code remain in scope. Experimental switches remain opt-in.",
+    "COM checks use fresh disconnected objects and private volatile HKCU keys without DLL registration. Graph playback, media negotiation, UI and all host applications remain unclosed."
+  ],
+  "sources": {
+    "rust/compat/src/gaussian_cache.rs": "3cdc008e95c9ccbbee6e3e17f274c1c31ad31c4308d14c596db8301c8242231d",
+    "rust/compat/src/gaussian_coefficients.rs": "5230315170701d510d4841cce24ee3c29f98b5445f9715f03ce5e38997b4064f",
+    "rust/compat/src/blur.rs": "48c8537a1060d801d296876ad04010fcfc8d6cbdf18aecf47fbe000b35a1a6fe",
+    "rust/compat/src/raster.rs": "02ac928f0f9496071e3fc3089978f0bfff2b0899bc305f097b9f442477033374",
+    "rust/ffi/src/windows_gaussian_cache.rs": "4b76f97aee65d63893c5d96bcde6ba9e9c536c5f8b0355fe21988967e8473a56",
+    "rust/ffi/src/windows_blur.rs": "26087670144e2794a9a0442d9a6a704c17a8227813fc34a1730ed71214aedf39",
+    "rust/ffi/src/path_data.rs": "4e7cff926493e8ffba3d496cac62ef9369cea1ebd80306a19b75ae61304ce213",
+    "include/xy_rust_overlay.h": "947fc9bafc7726f2acc07f66d1389018ef83c0039e3c44724677bfd3b796c11c",
+    "src/subtitles/Rasterizer.cpp": "188ecf9120122b999e5eadf8e42aab88a72844ff6adbfa226430b27dc579a267",
+    "src/subtitles/RustOverlay.inl": "ae212c34657ae89d81563d77858f5b79175d489b32c05bbc45ac21b111724333",
+    "tools/compat/gaussian_cache_native.cpp": "c9e42e4e032fe648e8896608e28e61218e055d00a66c52b92726400999052006",
+    "tools/compat/gaussian_cache_native.py": "6a3b791ac7515555e501b62f26d85817d60980368c311df51febbacfd59999b4",
+    "tools/compat/test_gaussian_cache_native.py": "8bb0e345a59d08df615c6dd5f13b9467e93b309f809a8938eaf72372fe292e85",
+    "tools/compat/blur_dispatch_native.cpp": "f05a9ec1e2bae888de1df8f98fd2d8203fccc97012f8c8c18f42924a691f38e2",
+    "tools/compat/blur_dispatch_native.py": "3b9dc1bbed12a9618efdc8f94bc7253838abd159b869fb23a419f62bbfdbe64d",
+    "tools/compat/test_blur_dispatch_native.py": "cbda44c11c7ec3ce903fa45e1f47750d41106a3a938cb03af1ee3e8f50f74919"
+  },
+  "arithmetic_captures": {
+    "gaussian-cache-numeric": {
+      "x86": {
+        "path": "test/compat/gaussian-cache-numeric/x86/archive.json",
+        "sha256": "950c295a012d4e3a75c9fb0be1cc23755cea3b48d17c6886417d8cba4907ccf1"
+      },
+      "x64": {
+        "path": "test/compat/gaussian-cache-numeric/x64/archive.json",
+        "sha256": "93b867d00b30b6da92e959e72b46e2bf08df2b3d5f08d33a744a9c366671c34e"
+      }
+    },
+    "blur-dispatch-numeric": {
+      "x86": {
+        "path": "test/compat/blur-dispatch-numeric/x86/archive.json",
+        "sha256": "e9154317873f6f5c5a369942494572b8cd009a2bae92e73045da9b27eee54a76"
+      },
+      "x64": {
+        "path": "test/compat/blur-dispatch-numeric/x64/archive.json",
+        "sha256": "c522bc245453d7b87ae81401aaf6a60adffcb76e946697a9ec5a4d46a28f8d2f"
+      }
+    }
+  },
+  "dispatch_constants": {
+    "path": "test/compat/blur-dispatch-numeric/constants.json",
+    "sha256": "9a056ebffc045d2500fb03ac49edc2596d8d2d2dbabbf4fdfdcfc97ae910c3d2"
+  },
+  "initial_observer_diagnostics": [
+    {
+      "path": "artifacts/gaussian-cache-initial-x86/report.json",
+      "sha256": "ea051de55cbc8e7b793b3d89fcce861bb36beaeb2ab89ae7528bd42a468bf62e",
+      "result": "Observer reference compilation failed because <array> was not explicitly included. No native cases ran. f133671e fixed the observer include; the final clean-revision comparisons above passed."
+    },
+    {
+      "path": "artifacts/gaussian-cache-initial-x64/report.json",
+      "sha256": "1de4a1d6515a05a2e02c0425da3668c3763c7d0c94749d6704e762a7660b725e",
+      "result": "Observer reference compilation failed because <array> was not explicitly included. No native cases ran. f133671e fixed the observer include; the final clean-revision comparisons above passed."
+    },
+    {
+      "path": "artifacts/blur-owned-initial-x86/report.json",
+      "sha256": "0af68dbca0f8cdacf4a3ffa76a414685c7aa084dbdbb9fc5c3be61686cbb7b2c",
+      "result": "WinError 740 before reference executable launch; no x86 comparison occurred. An explicit asInvoker manifest in 87f77e41 fixed launch; both final architecture comparisons passed."
+    },
+    {
+      "path": "artifacts/blur-owned-word_transform_native-x86/report.json",
+      "sha256": "64ea7cc631e39d4207c1cf6a9618911034b715b37272e99ba56525a76d577b5e",
+      "result": "Reference link failed C1083/LNK1257 opening generated RTS.asm during overlapping x86 reference links (clipper preparation and focused probe). No cases ran. Preserved initial failure; serialized rerun passed at the unchanged candidate revision."
+    }
+  ],
+  "next_clipper_notes": {
+    "path": "artifacts/blur-owned-next-notes.txt",
+    "sha256": "28f9325ed6f4ed1210107beebab1384c10add232ad791e86f9916da61a3c31e9"
+  },
+  "next_clipper_captures": {
+    "x86": {
+      "path": "artifacts/clipper-next-reference-x86/provenance.json",
+      "sha256": "15523b10b4a6c70087468a5b93ef2ea9fe512c06255ef3103b582bc0a3c51ce6"
+    },
+    "x64": {
+      "path": "artifacts/clipper-next-reference-x64/provenance.json",
+      "sha256": "5219096b79837159efaa3cb6ffb6f899fd85472f6faa7f2dbad82b681a91ffbe"
+    }
+  },
+  "publication_target": {
+    "configured_origin": "git@github.com:CoffeeFlux/xy-VSFilter.git",
+    "branch": "rust/cleanup-ass-parser",
+    "github_repository_id": 1357801903,
+    "resolved_repository": "TypesettingTools/xy-VSFilter",
+    "fork": true,
+    "parent": "pinterf/xy-VSFilter"
+  }
+}

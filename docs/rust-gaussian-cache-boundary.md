@@ -22,7 +22,14 @@ Gaussian scope ends, when both coefficient leases have been released. Whole
 operation comparisons cover final overlay allocation accounting; arbitrary host
 concurrency and partial allocation failure remain unclosed.
 
-The direct cache lifecycle comparison passed 404 cases and 192 retained-value drops on both Windows architectures at `f133671e`. Combined-dispatch validation and full renderer regression are pending for the expanded implementation.
+The complete checkpoint was validated at `87f77e41` on both Windows
+architectures: 404 cache cases plus 192 retained-value drops; 400 actual
+dispatch cases; 17,924 overlay cases; and 1,222 corpus cases / 13,186 frames
+with 192 distinct controls. Scoped host contracts and the focused renderer
+regressions passed. The direct cache first passed at `f133671e`; the later
+checkpoint includes the complete Blur path. See
+[the evidence](rust-blur-owned-local-evidence.json) for source/binary hashes,
+initial observer failures and the unchanged historical unresolved outcomes.
 The complete renderer, host surfaces and vendored native code remain in scope;
 this experimental path is not a production-default switch or migration closure.
 

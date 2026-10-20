@@ -27,7 +27,58 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest port: owned Gaussian filtering (2026-10-19)
+## Latest port: owned Gaussian cache and complete Blur (2026-10-19)
+
+Implementation `e8b07faa`, validated at `87f77e41`, moves the experimental
+Gaussian coefficient cache, sigma products, complete Blur dispatch and
+intermediate image ownership into Rust. The safe cache preserves native key
+hashing, equality order, shared lifetimes, rehash traversal and expired NaN
+entries without retaining dangling coefficient storage. Combined Blur keeps
+Gaussian-before-BeBlur order and unchanged-output early returns. Native weak
+coefficient tables and intermediate overlays are bypassed in this path.
+The current implementation still contains native renderer, host and vendor
+code; the experimental switches remain opt-in.
+
+Fifteen new fixed-local assembly sites preserve Windows scalar products,
+comparisons, copies, table-growth arithmetic and argument conversion. The
+portable core remains `forbid(unsafe_code)`. No image or coefficient pointer
+crosses these numeric boundaries. See [the boundary audit](rust-gaussian-cache-boundary.md)
+and [the checked evidence](rust-blur-owned-local-evidence.json).
+
+Both Windows architectures passed:
+
+* 404 direct cache cases plus 192 retained-value drops, including signed zero,
+  nonfinite/subnormal keys, NaN expiry, sharing and table growth; 400 actual
+  blur-dispatch cases covering empty/null/unchanged outputs and FP status.
+* 17,924 actual overlay cases, plus coefficient, raster, outline, scan-line,
+  path/transform, text measurement, shared DC and font regressions.
+* All 1,222 CSRI corpus cases / 13,186 frames and 192 distinct-frame controls,
+  with stable exact output against the cleanup reference.
+* Release builds, exports and dependencies for all three DLLs; ten scoped COM
+  contract cases and two candidate-only pin-ID controls per architecture.
+
+Rust tests passed 381 core and 142 FFI cases per architecture; formatting and
+Clippy passed, including native-runtime builds. Python passed 216 tests with
+one existing skip. The inventory records 129 portable source files with no
+unsafe constructs and 98 FFI files with 659 unsafe blocks, 433 unsafe functions,
+four unsafe Sync implementations and 76 assembly sites. Counts overlap and are
+not a soundness proof or completion percentage.
+
+Initial observer failures are retained separately: a missing `<array>` include,
+an x86 launch requiring an explicit current-user manifest, and one overlapping
+reference link collision on generated `RTS.asm`. None executed failing native
+cases; corrected or serialized runs passed. Earlier recorded reference crashes
+and ellipse FP instability retain their original unresolved attribution.
+
+Next: own `CClipper` image construction and fade orchestration, then downstream
+mask/compositing storage and caches. Local `clipper-next-reference-{x86,x64}`
+captures preserve the linked cleanup simple/base/scroll/dispatch functions;
+banner is inlined into dispatch. These captures were not executed and are
+preparation, not parity evidence. `artifacts/blur-owned-next-notes.txt` records
+conversion order, zero-fade faults, aliasing and padding constraints. All host
+adapters and vendors remain part of the full Rust migration.
+
+## Previous port: owned Gaussian filtering (2026-10-19)
 
 Implementation `5fd6390f` moves the experimental Gaussian image operation into
 safe Rust: byte conversion, all fourteen fixed filter templates, symmetric
@@ -7418,13 +7469,13 @@ safe Aegisub dependency. Use larger mutation campaigns, coverage-guided fuzzing
 and minimized differential cases to discover the long tail, with a pinned
 reference and isolated workers for every experiment.
 
-## In progress: Gaussian cache and complete blur orchestration
+## Current Windows handoff
 
-The experimental Gaussian operation now calls Rust with raw strength and scales;
-Rust owns sigma products, coefficient table/lifetimes and both image passes.
-The native coefficient table/snapshots are bypassed in that production path.
-The direct cache comparison passes on both architectures at `f133671e`. Combined
-blur now uses a safe Rust intermediate and dispatch, including unchanged-output
-early returns; its validation and full renderer regression are pending. See
-[the boundary](rust-gaussian-cache-boundary.md). Downstream consumers and full
-host/vendor migration remain active.
+Gaussian cache and complete Blur ownership are validated at `87f77e41` against
+the cleanup reference; see the latest-port section and
+[evidence](rust-blur-owned-local-evidence.json). The next native ownership
+boundary is `CClipper`/`GrayImage2`, followed by downstream compositing and
+caches. Preserve the reference capture provenance and historical failures.
+Serialize native links within each architecture: LTCG can write generated
+assembly to shared reference object paths even when observer outputs differ.
+Full host and vendor migration remains active.
