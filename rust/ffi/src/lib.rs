@@ -220,3 +220,5 @@ mod windows_word_transform;
 mod windows_be_blur_numeric;
 #[cfg(windows)]
 mod windows_ellipse_numeric;
+#[cfg(windows)]
+mod windows_gaussian_numeric;

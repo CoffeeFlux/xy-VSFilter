@@ -19,6 +19,7 @@ struct Owners {
     scans: xy_vsfilter_compat::scan_convert::Store,
     regions: xy_vsfilter_compat::wide_region::Store,
     rasters: xy_vsfilter_compat::raster::Store,
+    coefficients: xy_vsfilter_compat::gaussian_coefficients::Store,
     ellipse: xy_vsfilter_compat::ellipse::Cache<crate::windows_ellipse_numeric::Numeric>,
 }
 // SAFETY: all access uses the atomic gate; HRTB closures cannot return borrowed
@@ -43,6 +44,7 @@ impl Boundary {
                 scans: xy_vsfilter_compat::scan_convert::Store::new(),
                 regions: xy_vsfilter_compat::wide_region::Store::new(),
                 rasters: xy_vsfilter_compat::raster::Store::new(),
+                coefficients: xy_vsfilter_compat::gaussian_coefficients::Store::new(),
                 ellipse: xy_vsfilter_compat::ellipse::Cache::new(),
             }),
         }
@@ -65,6 +67,68 @@ impl Boundary {
     }
 }
 static PATHS: Boundary = Boundary::new();
+/// # Safety
+/// output lends sixteen writable bytes for a checked ID and packet length.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_gaussian_coefficients_create_v1(
+    sigma: u64,
+    output: *mut u8,
+) -> u32 {
+    if output.is_null() {
+        return 3;
+    }
+    let (id, len) = match PATHS.with_owners(|o| {
+        let mut numeric = crate::windows_gaussian_numeric::Numeric::new(sigma);
+        let value =
+            xy_vsfilter_compat::gaussian_coefficients::Coefficients::build(sigma, &mut numeric)?;
+        let len = value.bytes().len() as u64;
+        Ok((o.coefficients.insert(value)?, len))
+    }) {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    let mut packet = [0u8; 16];
+    packet[..8].copy_from_slice(&id.to_le_bytes());
+    packet[8..].copy_from_slice(&len.to_le_bytes());
+    // SAFETY: detached initialized scalars and the caller's writable output.
+    unsafe {
+        core::ptr::copy_nonoverlapping(packet.as_ptr(), output, 16);
+    }
+    0
+}
+/// # Safety
+/// output lends capacity writable bytes, disjoint from private owner storage.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_gaussian_coefficients_read_v1(
+    id: u64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    if output.is_null() || capacity > isize::MAX as usize {
+        return 3;
+    }
+    match PATHS.with_owners(|o| {
+        let bytes = o.coefficients.get(id)?.bytes();
+        if bytes.len() > capacity {
+            return Err(4);
+        }
+        // SAFETY: checked capacity, exclusive admission and private source.
+        unsafe {
+            core::ptr::copy_nonoverlapping(bytes.as_ptr(), output, bytes.len());
+        }
+        Ok(())
+    }) {
+        Ok(()) => 0,
+        Err(e) => e,
+    }
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_gaussian_coefficients_destroy_v1(id: u64) -> u32 {
+    match PATHS.with_owners(|o| o.coefficients.remove(id)) {
+        Ok(()) => 0,
+        Err(e) => e,
+    }
+}
 /// # Safety
 /// output lends eight writable bytes for the independent checked overlay ID.
 /// Strength/scale arguments are raw float bits. No image storage is borrowed.
@@ -908,6 +972,52 @@ mod tests {
         // SAFETY: initialized packet inputs and sufficient unaligned writable
         // outputs; handles are created here and every owner is released once.
         unsafe {
+            assert_eq!(
+                xy_vsfilter_gaussian_coefficients_create_v1(0, core::ptr::null_mut()),
+                3
+            );
+            assert_eq!(
+                xy_vsfilter_gaussian_coefficients_create_v1(
+                    1.0f64.to_bits(),
+                    out.as_mut_ptr().add(1)
+                ),
+                0
+            );
+            let coefficient = u64::from_le_bytes(out[1..9].try_into().unwrap());
+            assert_eq!(u64::from_le_bytes(out[9..17].try_into().unwrap()), 40);
+            assert_eq!((out[0], out[17]), (0xa5, 0xa5));
+            let mut coefficient_bytes = [0xa5; 42];
+            assert_eq!(
+                xy_vsfilter_gaussian_coefficients_read_v1(
+                    coefficient,
+                    coefficient_bytes.as_mut_ptr().add(1),
+                    39
+                ),
+                4
+            );
+            assert_eq!(coefficient_bytes, [0xa5; 42]);
+            assert_eq!(
+                xy_vsfilter_gaussian_coefficients_read_v1(
+                    coefficient,
+                    coefficient_bytes.as_mut_ptr().add(1),
+                    40
+                ),
+                0
+            );
+            assert_eq!((coefficient_bytes[0], coefficient_bytes[41]), (0xa5, 0xa5));
+            assert_eq!(xy_vsfilter_gaussian_coefficients_destroy_v1(coefficient), 0);
+            let saved = coefficient_bytes;
+            assert_eq!(
+                xy_vsfilter_gaussian_coefficients_read_v1(
+                    coefficient,
+                    coefficient_bytes.as_mut_ptr(),
+                    42
+                ),
+                1
+            );
+            assert_eq!(coefficient_bytes, saved);
+            assert_eq!(xy_vsfilter_gaussian_coefficients_destroy_v1(coefficient), 1);
+            out.fill(0xa5);
             assert_eq!(xy_vsfilter_path_create_v1(0, out.as_mut_ptr().add(1)), 0);
             let a = u64::from_le_bytes(out[1..9].try_into().unwrap());
             let mut value = Path::allocate(1).unwrap();

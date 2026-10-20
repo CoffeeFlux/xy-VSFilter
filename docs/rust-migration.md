@@ -27,7 +27,16 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest port: owned BeBlur orchestration (2026-10-19)
+## In progress: Gaussian coefficient construction (2026-10-19)
+
+The experimental coefficient constructor now builds an owned Rust packet with
+safe recurrence/indexing and bounded x86/x64 numeric backends. Native weak cache
+sharing and detached filter snapshots remain transitional. Direct linked-cleanup
+coefficient comparisons and actual Windows rendering comparisons are pending.
+See [the boundary audit](rust-gaussian-coefficients-boundary.md). The full-library
+migration remains active; Gaussian filtering and host adapters are still in scope.
+
+## Earlier port: owned BeBlur orchestration (2026-10-19)
 
 Implementation `a4a9a6fc` moves the experimental BeBlur operation onto canonical
 Rust image owners: geometry and copies, complete fixed 3x3 passes, fractional

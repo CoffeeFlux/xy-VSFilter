@@ -35,6 +35,7 @@ pub mod effects;
 pub mod fields;
 pub mod fill;
 pub mod font;
+pub mod gaussian_coefficients;
 pub mod golomb;
 pub mod hdmv;
 pub mod mask;

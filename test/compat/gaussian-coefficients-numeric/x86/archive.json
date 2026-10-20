@@ -1,0 +1,10 @@
+{
+  "scope": "Selected coefficient initialization/sharing excerpts from original unchanged cleanup capture; the provenance file retains the full original capture inventory.",
+  "files": {
+    "gaussian-init.txt": "3f304b2d56fe555a0bf7a43d606268d4495499459bc2bcdf824154ed08e5e496",
+    "gaussian-cache-get.txt": "a2c226252156524c0b6df5df5cf444c7f352631ecfd5ae12c89157ea5780ddbf",
+    "provenance.json": "42c06c22398b3b34169847a29838c7e03b8afdd9316e8190131b41c1f30534de",
+    "reference-observer.cpp": "0812ab05a22beee140028c17c2283e3b9a4ca07cb847b3c6209181a5c06eaa79",
+    "command.json": "8defde457e27939ce50833edadd2da3eea6fdfa81dab3b3e513fe42cd0a2dc67"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "x86-minus-one": {
+    "address": "0x449398",
+    "bytes": "000000000000f0bf",
+    "value": -1.0
+  },
+  "x86-three": {
+    "address": "0x449360",
+    "bytes": "0000000000000840",
+    "value": 3.0
+  },
+  "x64-minus-one": {
+    "address": "0x1400543d0",
+    "bytes": "000000000000f0bf",
+    "value": -1.0
+  },
+  "x64-three": {
+    "address": "0x1400543a0",
+    "bytes": "0000000000000840",
+    "value": 3.0
+  },
+  "x64-one": {
+    "address": "0x140054398",
+    "bytes": "000000000000f03f",
+    "value": 1.0
+  }
+}

@@ -71,6 +71,10 @@ typedef const UINT8 CUINT8, *PCUINT8;
         *(a)=((color)>>24)&0xff;\
     } while(0)
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+#include "RustGaussianCoefficients.h"
+using GaussianCoefficients = XyRust::GaussianCoefficients;
+#else
 class GaussianCoefficients
 {
 #ifdef XY_VSFILTER_RUST_TEXT
@@ -193,6 +197,7 @@ private:
     }
 
 };
+#endif
 
 void xy_gaussian_blur(PUINT8 dst, int dst_stride,
     PCUINT8 src, int width, int height, int stride, 
