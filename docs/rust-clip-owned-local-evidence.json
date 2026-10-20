@@ -1,0 +1,913 @@
+{
+  "schema": 1,
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "candidate_implementation_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+  "observer_metadata_commit": "ec462293baee8f050d55e53462c6256ba29cf8a7",
+  "production_code_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+  "status": "Experimental owned clip-mask construction and fade orchestration checkpoint; full-library Rust migration remains active",
+  "architectures": {
+    "x86": {
+      "native": {
+        "blur_dispatch_native": {
+          "path": "artifacts/clip-owned-blur_dispatch_native-x86/report.json",
+          "sha256": "0b7ca8d04b03dbbff9572116c146c6ad7172eacd2769b6eb07a3b0c9cc65c350",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 400,
+          "trace_lines": 402,
+          "trace_sha256": [
+            "b35293037cfd404f170713ad64c96b6187b892a89704835a04f18c4ccea7750f",
+            "b35293037cfd404f170713ad64c96b6187b892a89704835a04f18c4ccea7750f",
+            "b35293037cfd404f170713ad64c96b6187b892a89704835a04f18c4ccea7750f",
+            "b35293037cfd404f170713ad64c96b6187b892a89704835a04f18c4ccea7750f"
+          ],
+          "binary_sha256": {
+            "reference": "f8cf7f6567bd788d99ba795cdcd38390322109b8f4d0b80632d6af6e8eff789b",
+            "candidate": "5d89c433579a5e506182373b68ad5777b75ec7acc3c5048f85cfeb1abb8921b7"
+          }
+        },
+        "gaussian_cache_native": {
+          "path": "artifacts/clip-owned-gaussian_cache_native-x86/report.json",
+          "sha256": "d6ae5dfa6e8bfd79e6eb3218abc1e85ed4e86f9c585db00dbeefcc4497e439ff",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 404,
+          "trace_lines": 1406,
+          "trace_sha256": [
+            "227caab3d12e61bbe7c7fc91b590214fddcc4a7911987cf120300a61a5534ee4",
+            "227caab3d12e61bbe7c7fc91b590214fddcc4a7911987cf120300a61a5534ee4",
+            "227caab3d12e61bbe7c7fc91b590214fddcc4a7911987cf120300a61a5534ee4",
+            "227caab3d12e61bbe7c7fc91b590214fddcc4a7911987cf120300a61a5534ee4"
+          ],
+          "binary_sha256": {
+            "reference": "c6236bf92cfd775cf22e8055c6e6affbcd38d4d469f0dd3b0ccc76bbe66473e4",
+            "candidate": "f6f917be58af9ea19a0e8cf9eae0276d12a42f313cf2e3a5267fa8cc1018af21"
+          }
+        },
+        "gaussian_coefficients_native": {
+          "path": "artifacts/clip-owned-gaussian_coefficients_native-x86/report.json",
+          "sha256": "3167d0366cc1d507a6ad6a83f4d0fcfa5eaa00ca94d4336e6506434ff0bcd42c",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 212,
+          "trace_lines": 638,
+          "trace_sha256": [
+            "36bb5760e0bb84dad82343aac8a3221ba0ff23f2ea5cc429165e06457077cf47",
+            "36bb5760e0bb84dad82343aac8a3221ba0ff23f2ea5cc429165e06457077cf47",
+            "36bb5760e0bb84dad82343aac8a3221ba0ff23f2ea5cc429165e06457077cf47",
+            "36bb5760e0bb84dad82343aac8a3221ba0ff23f2ea5cc429165e06457077cf47"
+          ],
+          "binary_sha256": {
+            "reference": "62a91764eb07cfb2a332fdf2944d552d72772c2e723dad0074aa5021ac4fee86",
+            "candidate": "43ebe527f467e829d328058209a821838babf42500100424cd49292c540f240b"
+          }
+        },
+        "overlay_native": {
+          "path": "artifacts/clip-owned-overlay_native-x86/report.json",
+          "sha256": "44f83d334aab433ac536c94155a433b053e0f4f504d974808be9e93cbcdd68c5",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 17924,
+          "trace_lines": 53774,
+          "trace_sha256": [
+            "35ea60e7b54d8be5017f986d51e3f52f579bc1f35ab5a805e8e65bee41b5a7f6",
+            "35ea60e7b54d8be5017f986d51e3f52f579bc1f35ab5a805e8e65bee41b5a7f6",
+            "35ea60e7b54d8be5017f986d51e3f52f579bc1f35ab5a805e8e65bee41b5a7f6",
+            "35ea60e7b54d8be5017f986d51e3f52f579bc1f35ab5a805e8e65bee41b5a7f6"
+          ],
+          "binary_sha256": {
+            "reference": "d6896790dd260f491301bce811ff6917d0bf694c36a59c7db8072319d8e25861",
+            "candidate": "4bdda2c2cfc90d4504a60e5aba052f40f8afb97eb37c8ba17bb46793d7f77862"
+          }
+        },
+        "raster_native": {
+          "path": "artifacts/clip-owned-raster_native-x86/report.json",
+          "sha256": "1de95b5ae78a8baefde3bddf9de7af8ec7630a874ce6e89cb6f6dd680285557f",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 512,
+          "trace_lines": 2050,
+          "trace_sha256": [
+            "05a2bd9b09c7b6c1d19519dc8dfc39b6685d652db7bcf780ed47a371d8e63f1f",
+            "05a2bd9b09c7b6c1d19519dc8dfc39b6685d652db7bcf780ed47a371d8e63f1f",
+            "05a2bd9b09c7b6c1d19519dc8dfc39b6685d652db7bcf780ed47a371d8e63f1f",
+            "05a2bd9b09c7b6c1d19519dc8dfc39b6685d652db7bcf780ed47a371d8e63f1f"
+          ],
+          "binary_sha256": {
+            "reference": "cb1b55c470a1ec02468b6f3ccf950aeb912a7fee8f450a581042975cb1982e55",
+            "candidate": "3f628d8736bbc04def226123456939707920aeeb5e2d1ddcec5acf1300a2096a"
+          }
+        },
+        "wide_region_native": {
+          "path": "artifacts/clip-owned-wide_region_native-x86/report.json",
+          "sha256": "b7d0745d283ab983194efc21f6816821bc2871ad01e74dd8a239fb0ababe72ae",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 1536,
+          "trace_lines": 288022,
+          "trace_sha256": [
+            "895f4796454005d5b06a2d653c04b57819e48c0752f9cfd3517ad6274bdddb71",
+            "895f4796454005d5b06a2d653c04b57819e48c0752f9cfd3517ad6274bdddb71",
+            "895f4796454005d5b06a2d653c04b57819e48c0752f9cfd3517ad6274bdddb71",
+            "895f4796454005d5b06a2d653c04b57819e48c0752f9cfd3517ad6274bdddb71"
+          ],
+          "binary_sha256": {
+            "reference": "31d5eb3253765ea81c1215afa556badabc56a892d818ab4cd9d715cd1364fd85",
+            "candidate": "b631d60eac0ecbbcb632a85f7426bb8f1b3398e42d8430ccc7fc72d9c4ababd3"
+          }
+        },
+        "scan_lines_native": {
+          "path": "artifacts/clip-owned-scan_lines_native-x86/report.json",
+          "sha256": "01433aa5b2973b081c3cf928b183f51048ccfcdec4d15db5463e19ed0d389475",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 384,
+          "trace_lines": 70692,
+          "trace_sha256": [
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f"
+          ],
+          "binary_sha256": {
+            "reference": "54952923ad27cfdc12a7609be55b1777353ac6fc837aaab4e956b761265725b2",
+            "candidate": "dbc1383367bd3e5e2f060db645ccab9a55b046652e6e3737e1db30ab0bea4ff3"
+          }
+        },
+        "word_transform_native": {
+          "path": "artifacts/clip-owned-word_transform_native-x86/report.json",
+          "sha256": "c60c38fabe44ef26dfef3ad673de35be473ca44822bf18aa311ed6529b79f26e",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 4560,
+          "trace_lines": 9122,
+          "trace_sha256": [
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd"
+          ],
+          "binary_sha256": {
+            "reference": "28afc4051e433cdd7ba7bdd50af4b3fa02f515696ea0799378ff26fd312cc4b6",
+            "candidate": "3d291c048fb9b1152fbd22b8aa0695b3f6d5af0fa7f0c2457b6ebc499b61834d"
+          }
+        },
+        "path_data_native": {
+          "path": "artifacts/clip-owned-path_data_native-x86/report.json",
+          "sha256": "e33cb024dd863a48b90220f03fc355426d5698a91d6e3a1a955cab6619646562",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 39,
+          "trace_lines": 171,
+          "trace_sha256": [
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2"
+          ],
+          "binary_sha256": {
+            "reference": "0a9675855d96faa71b9aef2e23d7378d67a0dd9a71d9bac42097b3d41db92065",
+            "candidate": "8e02d449ca3a730eb071efb27f92fa0bac3d2207979b848ec3848ec698c7a189"
+          }
+        },
+        "text_measure_raw": {
+          "path": "artifacts/clip-owned-text_measure_raw-x86/report.json",
+          "sha256": "0c27f7a2d2e29e4bf065ed4fd3757a8fda909315b9dda14d651e9ee349272670",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd",
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd",
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd",
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd"
+          ],
+          "binary_sha256": {
+            "reference": "90cf6e385bb787deda46f492e79aa8bb3cf9f61623c1bea4e551baf08c8e75e8",
+            "candidate": "3c2f1197ffbcbe99e0db56b263efdb6ca5639da1f54ec8c49f0c49025654e49f"
+          }
+        },
+        "text_measure_construction": {
+          "path": "artifacts/clip-owned-text_measure_construction-x86/report.json",
+          "sha256": "d7e2f55165ebf17135c2b94e5606338fbf262fd72479e3288b029637610271ee",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893",
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893",
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893",
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893"
+          ],
+          "binary_sha256": {
+            "reference": "3bf36b01fb56b672f288d4a7c80927399bd5aa8400aaca463233c82c2144239d",
+            "candidate": "0d1cb8fd2168f5014c0c757ea12d12d1387c4fcb6f148be78c49ab78dd0ec10b"
+          }
+        },
+        "renderer_dc_text_native": {
+          "path": "artifacts/clip-owned-renderer_dc_text_native-x86/report.json",
+          "sha256": "2f7fb8299af74fdb00e419d60a7decfec62d434fad53818fd623374717b3f4e9",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 40,
+          "trace_lines": 598,
+          "trace_sha256": [
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330"
+          ],
+          "binary_sha256": {
+            "reference": "1709cf08fc9181ba8ac7845393dcbf64da504d451ba428a37b05a4680fe9a5db",
+            "candidate": "d534130eecd9ac4f41c2b6961a045a8d03b2b336885a302ec8dbd650fcba19df"
+          }
+        },
+        "renderer_dc_native": {
+          "path": "artifacts/clip-owned-renderer_dc_native-x86/report.json",
+          "sha256": "1ec0efbc889769b60821962b5bf230edf00d3508afb1ed711bee00f8b4092178",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 6,
+          "trace_lines": 116,
+          "trace_sha256": [
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983"
+          ],
+          "binary_sha256": {
+            "reference": "b56e6d8911b1cbadad8bf06d75f2eadcc0f90cdca7b101ea2fca931022facbbf",
+            "candidate": "09846e5c936728fd5804eaed6795558cf0946387ead4b55e7d1c1d35746b33fe"
+          }
+        },
+        "font_native": {
+          "path": "artifacts/clip-owned-font_native-x86/report.json",
+          "sha256": "d5cd64c7e43fcf07647406337e31bf3ca307394295e3bb43d259fa586dd8a20c",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 195,
+          "trace_lines": 392,
+          "trace_sha256": [
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f",
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f",
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f",
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f"
+          ],
+          "binary_sha256": {
+            "reference": "366b0df0400fb2453484a879010666b3926cb5ecfd51a87555b45d5c0a237a46",
+            "candidate": "6bec0ffafeaf95fa21ff54ee19f3c695d4dcedaf02ea2ff77c23a269fd69bb17"
+          }
+        },
+        "font_gdi_calls": {
+          "path": "artifacts/clip-owned-font_gdi_calls-x86/report.json",
+          "sha256": "6a0204629c0db2e93e622ea230828fcbd37428b1fd12dae26c9d894e7c665d48",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 12,
+          "trace_lines": 126,
+          "trace_sha256": [
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5",
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5",
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5",
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5"
+          ],
+          "binary_sha256": {
+            "reference": "ddd0764c5fc5693e8d6eaf283e3add8d883c5af0a0ad01a5c149047d863dcac7",
+            "candidate": "0a39c9924e03a8cc21f70f4c392ba87701074c4d3d3772409f1781ff88ab4de0"
+          }
+        },
+        "clipper_native": {
+          "path": "artifacts/clip-owned-final-x86/report.json",
+          "sha256": "519b6dacdc8296ed7d878038c0de4374544ed45693b158725b3479dbf4e23293",
+          "candidate_commit": "ec462293baee8f050d55e53462c6256ba29cf8a7",
+          "cases": 5152,
+          "trace_lines": 20610,
+          "trace_sha256": [
+            "d9684e6968893bbfa50739f066ec0bacadbff628c8cd8cfceae8c2719c63b7c6",
+            "d9684e6968893bbfa50739f066ec0bacadbff628c8cd8cfceae8c2719c63b7c6",
+            "d9684e6968893bbfa50739f066ec0bacadbff628c8cd8cfceae8c2719c63b7c6",
+            "d9684e6968893bbfa50739f066ec0bacadbff628c8cd8cfceae8c2719c63b7c6"
+          ],
+          "binary_sha256": {
+            "reference": "8e5a8e7943754d2c49a6df27b059bde84fa9e2664d5c15dea7a0b6fe363b1c33",
+            "candidate": "095111fbfc2450a1e9a2615e2bace759891a3c0360c1d18deedf71cdf02ba335"
+          }
+        }
+      },
+      "rendering": {
+        "path": "artifacts/clip-owned-csri-x86/summary.json",
+        "sha256": "f49f6f48bba0578783d5c844b74f0ea92b0664d853f3c2916fcdb9cbad501e62",
+        "original_manifest_sha256": "2949bb98bfbc49bd3496af90ef9a8b3b386395637ff34bc54b0fc4e86fe61363",
+        "partition_exact": true,
+        "cases": 1222,
+        "frames": 13186,
+        "shard_results": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            7,
+            0
+          ]
+        ],
+        "complete": true,
+        "candidate_dll": {
+          "path": "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\bin\\lib_17.0\\Win32\\Release\\VSFilter.dll",
+          "sha256": "d5055b6d3f75f46c80be34eac8f0efdef4c2b3b4bb6273c90f70101370aade06"
+        },
+        "reference_source": {
+          "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+          "repository": "https://github.com/CoffeeFlux/xy-VSFilter"
+        },
+        "distinct_controls": 192,
+        "stable_equal_cases": 1222,
+        "stable_equal_frames": 13186,
+        "unresolved_cases": [],
+        "shard_reports": [
+          {
+            "path": "artifacts/clip-owned-csri-x86/shard-0/report.json",
+            "sha256": "53e79d1aa1ccd7247826c7562aea640982ab33b64405712db2dde508c1efcc98"
+          },
+          {
+            "path": "artifacts/clip-owned-csri-x86/shard-1/report.json",
+            "sha256": "dff94ae84ce71beb07e2ba4cdf7d7c67fe56e4104ad0b4ad11c543a580000f9e"
+          },
+          {
+            "path": "artifacts/clip-owned-csri-x86/shard-2/report.json",
+            "sha256": "47ca184639f2d582d066a04153dfc2748e84a9fbbb3f8c1254badd2ad47fa6a7"
+          },
+          {
+            "path": "artifacts/clip-owned-csri-x86/shard-3/report.json",
+            "sha256": "a098ab5a9838ec3017da1b2fb32be8dbc89289eee27ff4f8e8c0d5b85f5e8fef"
+          },
+          {
+            "path": "artifacts/clip-owned-csri-x86/shard-4/report.json",
+            "sha256": "2be2956a88ac1e4cba1a0cb15432a2e8f5a3fc46f7a91934bb9c3379b1b9dbf2"
+          },
+          {
+            "path": "artifacts/clip-owned-csri-x86/shard-5/report.json",
+            "sha256": "02400563c76bb8c12063f2f5b510188b144bf0e7a19525609cb78bcad49963ad"
+          },
+          {
+            "path": "artifacts/clip-owned-csri-x86/shard-6/report.json",
+            "sha256": "08dc97d750a7ecdb0e9ae15e1b02ccef45e705d81155f1a420e673b5547ed3fa"
+          },
+          {
+            "path": "artifacts/clip-owned-csri-x86/shard-7/report.json",
+            "sha256": "3f249809d17d76c4da4f238547d67ae87a176f5fe8d1e2749b08848b4261d345"
+          }
+        ]
+      },
+      "contracts": {
+        "log": {
+          "path": "artifacts/clip-owned-contracts-x86.log",
+          "sha256": "445a1347a43a8f59ccc7dfd18b9c878b4d225eeaaf4cc2cee89c7ff109d43161"
+        },
+        "summary": {
+          "path": "artifacts/clip-owned-contracts-x86/summary.json",
+          "sha256": "6deb4b23cef7dce374bfde358d6b81124423ae0f0920ff2fbd68b1b082a7d9c9"
+        },
+        "com": {
+          "path": "artifacts/clip-owned-contracts-x86/com/report.json",
+          "sha256": "180806299faf2515dce925354a9500008da7da7463810d1e5255bf222ec4f014"
+        }
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "path": "bin/lib_17.0/Win32/Release/VSFilter.dll",
+          "sha256": "d5055b6d3f75f46c80be34eac8f0efdef4c2b3b4bb6273c90f70101370aade06"
+        },
+        "XySubFilter.dll": {
+          "path": "bin/lib_17.0/Win32/Release/XySubFilter.dll",
+          "sha256": "3502736d57ffb9812e49c48b6132e4accf932532044616c3a1b5a89efdaef109"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "path": "bin/lib_17.0/Win32/Release/xy_sub_filter_consumer.dll",
+          "sha256": "84811904be43e391e4fefc1008eb033738ba6cb6a1dae6864b189582cc09c67a"
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/clip-owned-build-x86.log",
+          "sha256": "9e0ca9a7c0f1418d8c7685fa79fcbf88418ba355a1dff1389a2a9fd4430b7498"
+        },
+        {
+          "path": "artifacts/clip-owned-build-rust-x86.log",
+          "sha256": "00c90fe6669727b76cabdb275acc4b1be5258c9da1c7f9916d9816c83b37880f"
+        }
+      ]
+    },
+    "x64": {
+      "native": {
+        "blur_dispatch_native": {
+          "path": "artifacts/clip-owned-blur_dispatch_native-x64/report.json",
+          "sha256": "68e64a3daf1e3756a6c59d4b0d2404a85b05ce4156849b215244a2b7fd7e3ad0",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 400,
+          "trace_lines": 402,
+          "trace_sha256": [
+            "9e272fd28944cbf2fa6f0280cc8185193d839fa33b5df5423237f384c2160e72",
+            "9e272fd28944cbf2fa6f0280cc8185193d839fa33b5df5423237f384c2160e72",
+            "9e272fd28944cbf2fa6f0280cc8185193d839fa33b5df5423237f384c2160e72",
+            "9e272fd28944cbf2fa6f0280cc8185193d839fa33b5df5423237f384c2160e72"
+          ],
+          "binary_sha256": {
+            "reference": "f654230ba429f7c8b6f4559df08bafe059f94773f52902556cf6fb3d052e5644",
+            "candidate": "5a07cc2c88c32de7eaf950c369bfd75569698c4d29f829e9cd67b1fd2c3f0294"
+          }
+        },
+        "gaussian_cache_native": {
+          "path": "artifacts/clip-owned-gaussian_cache_native-x64/report.json",
+          "sha256": "3a13b93f74f43349d1545dcd936c47a2e44b7c1355506bd0ec45b02f77f58d31",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 404,
+          "trace_lines": 1406,
+          "trace_sha256": [
+            "b30d052182530309c9b8a08d638673164c22abdfdca4a98e64f49df9e6904645",
+            "b30d052182530309c9b8a08d638673164c22abdfdca4a98e64f49df9e6904645",
+            "b30d052182530309c9b8a08d638673164c22abdfdca4a98e64f49df9e6904645",
+            "b30d052182530309c9b8a08d638673164c22abdfdca4a98e64f49df9e6904645"
+          ],
+          "binary_sha256": {
+            "reference": "52138feb6793aa89e05f6c6268236cbd73c86c0666610142d7725c26ba6f5e43",
+            "candidate": "39eb0d2163d46d085f550e78d86be87835339037cb7187271f28bcdddb954e37"
+          }
+        },
+        "gaussian_coefficients_native": {
+          "path": "artifacts/clip-owned-gaussian_coefficients_native-x64/report.json",
+          "sha256": "f57609d807eb69f7770de81c8b3c64ef0a29640a3ef82711e1d4c9fa107561ba",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 212,
+          "trace_lines": 638,
+          "trace_sha256": [
+            "950f235b5c59eaf6365b5f2b0aba2dec3546336eb4d3e5a410be7ccc8d843207",
+            "950f235b5c59eaf6365b5f2b0aba2dec3546336eb4d3e5a410be7ccc8d843207",
+            "950f235b5c59eaf6365b5f2b0aba2dec3546336eb4d3e5a410be7ccc8d843207",
+            "950f235b5c59eaf6365b5f2b0aba2dec3546336eb4d3e5a410be7ccc8d843207"
+          ],
+          "binary_sha256": {
+            "reference": "6db781af71ca28f1a7f21e38a9fed313a76fe850ea945a17ac607fb18bc279e3",
+            "candidate": "d7e8f86ad0bacc30d07ef39448228c16e09017189f4ebcd4c0908e1d6555e021"
+          }
+        },
+        "overlay_native": {
+          "path": "artifacts/clip-owned-overlay_native-x64/report.json",
+          "sha256": "452135a8f0fd8179c6543b4863bfbd48ece428cf94ce6ed8189de1eccd8f4779",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 17924,
+          "trace_lines": 53774,
+          "trace_sha256": [
+            "2e73a38ee6def813b9561a59aa36272cfe730a0b4d470fc12ebab3f494f02417",
+            "2e73a38ee6def813b9561a59aa36272cfe730a0b4d470fc12ebab3f494f02417",
+            "2e73a38ee6def813b9561a59aa36272cfe730a0b4d470fc12ebab3f494f02417",
+            "2e73a38ee6def813b9561a59aa36272cfe730a0b4d470fc12ebab3f494f02417"
+          ],
+          "binary_sha256": {
+            "reference": "8fca896311d9c64f853fa8fa8acc8cfe9e224be1b974a2e673944eb532e962cc",
+            "candidate": "7f047f2169a60263cec4dc19a0f9639a1851de495f66cbd20971451908c9a880"
+          }
+        },
+        "raster_native": {
+          "path": "artifacts/clip-owned-raster_native-x64/report.json",
+          "sha256": "9e5268c4f7a87259508ff8b34db235af3832dbd91a1467720f3f5808bc565599",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 512,
+          "trace_lines": 2050,
+          "trace_sha256": [
+            "cb6de9c380203885c4cec5bac67a4771747a68290e6fe0599d191155a71222e3",
+            "cb6de9c380203885c4cec5bac67a4771747a68290e6fe0599d191155a71222e3",
+            "cb6de9c380203885c4cec5bac67a4771747a68290e6fe0599d191155a71222e3",
+            "cb6de9c380203885c4cec5bac67a4771747a68290e6fe0599d191155a71222e3"
+          ],
+          "binary_sha256": {
+            "reference": "8cc24a612b30a93aae135ddf772260bdbf5534a4e9d5c4f72ca95f21da36f5ef",
+            "candidate": "36c380f059a1b4895323e56670eb99d5a0fc40c035e12c74efdc21d2118b3d94"
+          }
+        },
+        "wide_region_native": {
+          "path": "artifacts/clip-owned-wide_region_native-x64/report.json",
+          "sha256": "a18865dbc6d2f4f0c6194b50ab4e623869d1ef228c9436f018a72da346be61e1",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 1536,
+          "trace_lines": 288022,
+          "trace_sha256": [
+            "4fb58dc5e624a826d0a36164656cc725e56f7612b95a03a61824e80741bc7925",
+            "4fb58dc5e624a826d0a36164656cc725e56f7612b95a03a61824e80741bc7925",
+            "4fb58dc5e624a826d0a36164656cc725e56f7612b95a03a61824e80741bc7925",
+            "4fb58dc5e624a826d0a36164656cc725e56f7612b95a03a61824e80741bc7925"
+          ],
+          "binary_sha256": {
+            "reference": "aef1e6f64216d9f4fffe35ac51dabacddf7265c83862e59663aaa275e3890c95",
+            "candidate": "a872d73387980a043a7b5b2215820d4c0f9ef032c50f8ffea13c575cee340a26"
+          }
+        },
+        "scan_lines_native": {
+          "path": "artifacts/clip-owned-scan_lines_native-x64/report.json",
+          "sha256": "305b301d04f33353b7c3e28244258b0383c8b2acbb027825913509974f1a160e",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 384,
+          "trace_lines": 70692,
+          "trace_sha256": [
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2"
+          ],
+          "binary_sha256": {
+            "reference": "ccff21e66532f18154dc1fb01fcf94b78f7cd314e79233a03bbdd784510f1452",
+            "candidate": "ff6b0ad750f759ae1c3051686ee1b3b98b1bb0e7bff47d7ef03483c2bd9c0fd6"
+          }
+        },
+        "word_transform_native": {
+          "path": "artifacts/clip-owned-word_transform_native-x64/report.json",
+          "sha256": "2a9ea6db415a6e11c9c7eed7c8e7af24ca8f909742e5126652cfd0ae2d6f2a11",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 4560,
+          "trace_lines": 9122,
+          "trace_sha256": [
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b"
+          ],
+          "binary_sha256": {
+            "reference": "9bf85e3a19a2151410e2916e913b6927bb2d1d5e95e56406cb39ecf766b6d767",
+            "candidate": "2c574b5989bb26bfa8bcdce58cddb86f95502e0c1a4f65fbd6cf85134a184ca1"
+          }
+        },
+        "path_data_native": {
+          "path": "artifacts/clip-owned-path_data_native-x64/report.json",
+          "sha256": "3bd9b021304503351eee5a02a0195113e3bd1d7457496ef87a762291cc83884b",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 39,
+          "trace_lines": 171,
+          "trace_sha256": [
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031"
+          ],
+          "binary_sha256": {
+            "reference": "7e169e306624bbc45fc6e37a24c14f0ec0411b9fc360171827404436e5244965",
+            "candidate": "d5df0630e16e9386e45e7332a1631e86d355735b92441de934eba0293f917227"
+          }
+        },
+        "text_measure_raw": {
+          "path": "artifacts/clip-owned-text_measure_raw-x64/report.json",
+          "sha256": "416e0033a2cdc428f81d3eeca80401e75b479ac42a9de7e99ff9467b11e6eaa0",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054",
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054",
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054",
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054"
+          ],
+          "binary_sha256": {
+            "reference": "6d6fcf533c8addfdf8e0eadf2ab51d4aa9129d750afb905918ddbfdf168e126c",
+            "candidate": "f0511f379f9518b9e8a7dd95f00138c2700317941ef821f837440cb80670919e"
+          }
+        },
+        "text_measure_construction": {
+          "path": "artifacts/clip-owned-text_measure_construction-x64/report.json",
+          "sha256": "4873b485476e514d229606bf6306e6e364c32ca03649da4fb38e06352c674a56",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3",
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3",
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3",
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3"
+          ],
+          "binary_sha256": {
+            "reference": "2ba54a621be901034367dda1d94311323330f67f539aaef707d6c43717ccc0cf",
+            "candidate": "6119242dfd5c4142d5a1b5b091f25cc760540517a0cd0ef8e99de7bdee3592da"
+          }
+        },
+        "renderer_dc_text_native": {
+          "path": "artifacts/clip-owned-renderer_dc_text_native-x64/report.json",
+          "sha256": "a85320067b0a3c56f2ed15d56e81838b161ce7c6d18a87df5f6d96e0dd4a68b5",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 40,
+          "trace_lines": 598,
+          "trace_sha256": [
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac"
+          ],
+          "binary_sha256": {
+            "reference": "ff86acc3754e03f3f535f675c5a44f037133786a9c64928ea6ba690cac2d67a0",
+            "candidate": "b067c76e81508dd080d4d4da26bfb222000bb652d30206beadbe746cb86394cc"
+          }
+        },
+        "renderer_dc_native": {
+          "path": "artifacts/clip-owned-renderer_dc_native-x64/report.json",
+          "sha256": "096da2e25f0ea25a79aa4927f115ed77ca308b7f790a601533e25dd75bec5322",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 6,
+          "trace_lines": 116,
+          "trace_sha256": [
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd"
+          ],
+          "binary_sha256": {
+            "reference": "338512f3f3980425235bba2cf4a191f60b7722a8fac9ea05690a803949ade4ce",
+            "candidate": "0671ca24ba489e9d2dc58c014b666f0c9a71ee34fdf1e29436352c7ea0082a4f"
+          }
+        },
+        "font_native": {
+          "path": "artifacts/clip-owned-font_native-x64/report.json",
+          "sha256": "e1b94a6014ebe431b932e6dd7d622a30bba819054d71c9588035210970a1e5bd",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 195,
+          "trace_lines": 392,
+          "trace_sha256": [
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7",
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7",
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7",
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7"
+          ],
+          "binary_sha256": {
+            "reference": "bffe8d2f8dcf5ce80c2026acc4129a3e074b76c1e62dc0eccae3e816a5d9b7ec",
+            "candidate": "01df28fa0700571ea1a3e49c8c0214b88f48393d5258e9f410cf8aa3879123f0"
+          }
+        },
+        "font_gdi_calls": {
+          "path": "artifacts/clip-owned-font_gdi_calls-x64/report.json",
+          "sha256": "69340fc20896214046b46d6e15fcc577a45a99033d01952a113db2167d44178e",
+          "candidate_commit": "9b0f04e1ddc2573f6aa3b5e3f640bb8eaf519ac3",
+          "cases": 12,
+          "trace_lines": 126,
+          "trace_sha256": [
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93",
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93",
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93",
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93"
+          ],
+          "binary_sha256": {
+            "reference": "b724eeab0323077d0847da190f91db4309dedcd648fb550b3e678857ba4369c0",
+            "candidate": "b28f3c9f261b76d953e24a52de52659035e21404ec360ac6efef78813aa5f8b7"
+          }
+        },
+        "clipper_native": {
+          "path": "artifacts/clip-owned-final-x64/report.json",
+          "sha256": "30c7d658cc9c52914e6e710b2f4514e9a5bf1bf66d134f7ca842ca890b7ceedf",
+          "candidate_commit": "ec462293baee8f050d55e53462c6256ba29cf8a7",
+          "cases": 5152,
+          "trace_lines": 20610,
+          "trace_sha256": [
+            "a9827fdf24f16f37a8427ec4bf8a40019d878eeffc00311fb37642141d1999ea",
+            "a9827fdf24f16f37a8427ec4bf8a40019d878eeffc00311fb37642141d1999ea",
+            "a9827fdf24f16f37a8427ec4bf8a40019d878eeffc00311fb37642141d1999ea",
+            "a9827fdf24f16f37a8427ec4bf8a40019d878eeffc00311fb37642141d1999ea"
+          ],
+          "binary_sha256": {
+            "reference": "44266f555f7049dd339eb791f1268e879aba7d7c793b3bda8d4a9c311d961b14",
+            "candidate": "bb26e0bad46c6d338904decd10f6938e364580f016544c4e54b22d35c9fda3d7"
+          }
+        }
+      },
+      "rendering": {
+        "path": "artifacts/clip-owned-csri-x64/summary.json",
+        "sha256": "c1998b995f92d2526ae12917d8b50611657b478cd4912108e58545133768998b",
+        "original_manifest_sha256": "2949bb98bfbc49bd3496af90ef9a8b3b386395637ff34bc54b0fc4e86fe61363",
+        "partition_exact": true,
+        "cases": 1222,
+        "frames": 13186,
+        "shard_results": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            7,
+            0
+          ]
+        ],
+        "complete": true,
+        "candidate_dll": {
+          "path": "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\bin\\lib_17.0\\x64\\Release\\VSFilter.dll",
+          "sha256": "2ea7c574fb92661007bc242f1b8efe50f38f611c352113f2f4566d06724e539b"
+        },
+        "reference_source": {
+          "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+          "repository": "https://github.com/CoffeeFlux/xy-VSFilter"
+        },
+        "distinct_controls": 192,
+        "stable_equal_cases": 1222,
+        "stable_equal_frames": 13186,
+        "unresolved_cases": [],
+        "shard_reports": [
+          {
+            "path": "artifacts/clip-owned-csri-x64/shard-0/report.json",
+            "sha256": "38a83a0afc5572aa186342db11eede24b52e56ffa1f49d65f84ecdbb20180b40"
+          },
+          {
+            "path": "artifacts/clip-owned-csri-x64/shard-1/report.json",
+            "sha256": "edce43944de6ef6066762dffddf4dadf9cb887d5274adfce7685045a0b088d38"
+          },
+          {
+            "path": "artifacts/clip-owned-csri-x64/shard-2/report.json",
+            "sha256": "fda56ede909570f1c61e5f6930b1e43f84f580a4d7ebc7336cbe0b101dfec749"
+          },
+          {
+            "path": "artifacts/clip-owned-csri-x64/shard-3/report.json",
+            "sha256": "1a1562a2e2f59f614376d0db9774f6d5ad9219b44d692ad5fed17b173b6f728f"
+          },
+          {
+            "path": "artifacts/clip-owned-csri-x64/shard-4/report.json",
+            "sha256": "8f559e89296e529d8227ff4ed8684d2d23f9822062e5cf7552e245deb46125e6"
+          },
+          {
+            "path": "artifacts/clip-owned-csri-x64/shard-5/report.json",
+            "sha256": "0a93767fda7e4589dff01d24e942a1d4aaf65334259c5f50af81cbf7cfa8ba3e"
+          },
+          {
+            "path": "artifacts/clip-owned-csri-x64/shard-6/report.json",
+            "sha256": "003847cd65059e5e8549cf778af3498e20f540793f157069ed386e792534cef7"
+          },
+          {
+            "path": "artifacts/clip-owned-csri-x64/shard-7/report.json",
+            "sha256": "eab603d6ab1333faf1b1cc6bdb18cdfb4c397abe8d365adb7a39ba8623d8cfb9"
+          }
+        ]
+      },
+      "contracts": {
+        "log": {
+          "path": "artifacts/clip-owned-contracts-x64.log",
+          "sha256": "445a1347a43a8f59ccc7dfd18b9c878b4d225eeaaf4cc2cee89c7ff109d43161"
+        },
+        "summary": {
+          "path": "artifacts/clip-owned-contracts-x64/summary.json",
+          "sha256": "6deb4b23cef7dce374bfde358d6b81124423ae0f0920ff2fbd68b1b082a7d9c9"
+        },
+        "com": {
+          "path": "artifacts/clip-owned-contracts-x64/com/report.json",
+          "sha256": "a435f6f207a5e6ec5931b91255d383197c1ff7a4427994bdf0e6e028e0c08702"
+        }
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "path": "bin/lib_17.0/x64/Release/VSFilter.dll",
+          "sha256": "2ea7c574fb92661007bc242f1b8efe50f38f611c352113f2f4566d06724e539b"
+        },
+        "XySubFilter.dll": {
+          "path": "bin/lib_17.0/x64/Release/XySubFilter.dll",
+          "sha256": "259892cdb81678e4ef2f2c8894b05515849c606683bb48e9ba727b38e3a6784c"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "path": "bin/lib_17.0/x64/Release/xy_sub_filter_consumer.dll",
+          "sha256": "9f04ae5ebf5a1fc4d72fdcef2ac289166084cac041c149091de41a77b54374f0"
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/clip-owned-build-x64.log",
+          "sha256": "fb3973229e530f5e89a2c144e153617d6e79e8bd27c566b9e89de5d66fb2c53c"
+        },
+        {
+          "path": "artifacts/clip-owned-build-rust-x64.log",
+          "sha256": "d79030aea3f3edfc69473e735cdb6df133d3156443ceb42f9788123352af42bf"
+        }
+      ]
+    }
+  },
+  "checks": {
+    "rust": {
+      "path": "artifacts/clip-owned-rust-checks.log",
+      "sha256": "95085b264e791392291b9ac6b7ca06bfd17611b249f7980b7fd43975448f24f7"
+    },
+    "python_log": {
+      "path": "artifacts/clip-owned-python-configured.log",
+      "sha256": "b4245c1bfe4a3d371f3cc0eb3b09769e0bbcf70e8d85055d097ab2744b240d04"
+    },
+    "core_per_architecture": 385,
+    "ffi_per_architecture": 142,
+    "python": 218,
+    "python_skipped": 1,
+    "fmt": true,
+    "clippy_both_architectures_and_native_runtime": true,
+    "attribution": "Rust/native checks use the committed clipper source; production code was unchanged during the differential suites."
+  },
+  "unsafe_inventory": {
+    "path": "artifacts/clip-owned-unsafe-inventory.json",
+    "sha256": "9a8634a6098e67c1b4d52d8be9ee4bbdbfc3a2ac36998c47247f495b7c530897"
+  },
+  "previous_unresolved_reference": {
+    "evidence": "rust-word-transform-local-evidence.json",
+    "case": "field-unicode-style-space-file",
+    "result": "Earlier x64 cleanup exit access violation remains unresolved; a later passing run does not erase it."
+  },
+  "earlier_ellipse_fp_limit": {
+    "evidence": "ellipse-storage-fp-scope.json",
+    "result": "Earlier optimized native ellipse FP instability retains its original attribution and is not erased by current passing runs."
+  },
+  "limitations": [
+    "Release/default Windows FP controls. Debug, unmasked exceptions, partial allocation failure and arbitrary host concurrency remain unclosed.",
+    "Safe Rust owns clip geometry, inversion, initialized masks, fades and mask lifetime. Two fixed-local scalar conversion asm sites preserve Windows behavior; no image pointer or traversal enters the numeric backend.",
+    "Simple clip native views retain source-body sharing. Their private Rust canonical snapshots are independent owned values; downstream compositing still uses detached native views.",
+    "Zero fade on nonempty base, unsafe overflow geometry and unknown logical source pixels are unresolved and not admitted as passing comparisons. Raw nonfinite scale cases exercise early-return paths only.",
+    "Direct clipper observations include complete initialized padding, xy allocation deltas, repeated paints and surviving copy lifetimes. This allocation accounting is not total Rust heap measurement.",
+    "Downstream compositing, caches, host adapters and vendored native code remain in scope. Experimental switches remain opt-in.",
+    "COM checks use fresh disconnected objects and private volatile HKCU keys without DLL registration. Graph playback, media negotiation, UI and all host applications remain unclosed."
+  ],
+  "sources": {
+    "rust/compat/src/clipper.rs": "168027aadb8fd20ab8e9778960ee123b2ae1ae46d13991be4f75d21283fd2b85",
+    "rust/compat/src/raster.rs": "efdf85fe8d6f36e73845b7393bd5082afd06367e7dfe8b3dcd9452e2670aa574",
+    "rust/ffi/src/windows_clipper.rs": "4586d275490a5c4fb552d1c9df1f34a07db5af083b1bb1ce1111a3017dda470e",
+    "rust/ffi/src/path_data.rs": "2ac597eeaa7ed02fec8f51d2a788407e97413ac65cb8405b95bf48d35bdb560a",
+    "include/xy_rust_clipper.h": "4277cea5b8b0da8b43409f7d96f8490605c83f7a1fa03326ac24fe40ea310192",
+    "include/xy_rust_overlay.h": "215e9174601fcff17abc24f3a444730f1dda2f316561364d15d3c46ecaa31c5d",
+    "src/subtitles/RTS.cpp": "8c6b90d3dc8c48aea5091093642aa6d4d6f610bd85301fbe60bfb4e9a1167dc8",
+    "src/subtitles/Rasterizer.h": "26b21af1c42462a2de0d85d85c1013969d526588acd7fa5e259af50e3d941d2b",
+    "src/subtitles/RustClipper.inl": "da1ba3536d03d213fbe84a3fa10d2a3f61814ebbb1d943e5c3da194f4b187c58",
+    "tools/compat/clipper_native.cpp": "470b7c402d20829f3cd9bd4f54c9f279449086f56b5ebc0f3ac08b5feb23920e",
+    "tools/compat/clipper_native.py": "4b0142ea6a01563d52a1940dc985e826c908b6b9ef9b1e18a77a4006e643e943",
+    "tools/compat/test_clipper_native.py": "b94f46c719473491368cef5e3cdadaa2b963ab063b79fbd8c99f17354aa37087"
+  },
+  "clipper_input_count": {
+    "inputs": 2576,
+    "sticky_cases": 5152,
+    "metadata_correction": "ec462293 changes only the observer input count from 2520 finite combinations to include 56 raw-scale inputs. The initial 9b0f04e1 runs executed all 5152 cases; direct comparisons were rerun at ec462293. All other production validation remains attributed to 9b0f04e1."
+  },
+  "arithmetic_captures": {
+    "x86": {
+      "path": "test/compat/clipper-numeric/x86/archive.json",
+      "sha256": "444f111e27184683aebc9d9907c9590996a02800c752215feb0dc87d0f52a4a6"
+    },
+    "x64": {
+      "path": "test/compat/clipper-numeric/x64/archive.json",
+      "sha256": "0d49f52eb32174c29f25dbfe9503fddc2039c56f647b1311f55b1474593cbfe1"
+    }
+  },
+  "initial_environment_diagnostics": [
+    {
+      "path": "artifacts/clip-owned-python.log",
+      "sha256": "923cb08a8ae2db27d7b8897190eb8b41068ebd56733be4599c26a65909bfb16d",
+      "result": "Initial Python suite ran outside dev-shell.cmd and failed seven Git ownership-dependent checks (200 tests reached, one skip). It is not a passing suite. The configured-shell rerun above passed all 218 tests with one existing skip. The initial unsafe-audit invocation also failed Git ownership before creating a report; its configured-shell rerun produced the recorded inventory."
+    }
+  ],
+  "next_composite_notes": {
+    "path": "artifacts/clip-owned-next-notes.txt",
+    "sha256": "e278d3f4cda6fa9e646710134736122b908a6f848a45feb60cf23f2e2b31871e"
+  },
+  "next_composite_captures": {
+    "x86": {
+      "path": "artifacts/composite-next-reference-x86/provenance.json",
+      "sha256": "315d23f435c7bd2914d12708e289eaa3b7ef9466a6462a20b74333319daff8c9"
+    },
+    "x64": {
+      "path": "artifacts/composite-next-reference-x64/provenance.json",
+      "sha256": "5cd1f86de8d2a39ea0369013cdb9beb518d826452b9db5a85c57662935493492"
+    }
+  },
+  "publication_target": {
+    "configured_origin": "git@github.com:CoffeeFlux/xy-VSFilter.git",
+    "branch": "rust/cleanup-ass-parser",
+    "github_repository_id": 1357801903,
+    "resolved_repository": "TypesettingTools/xy-VSFilter",
+    "fork": true,
+    "parent": "pinterf/xy-VSFilter"
+  }
+}

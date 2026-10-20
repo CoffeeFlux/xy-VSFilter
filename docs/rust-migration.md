@@ -27,7 +27,58 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest port: owned Gaussian cache and complete Blur (2026-10-19)
+## Latest port: owned clip masks and fades (2026-10-19)
+
+Implementation `9b0f04e1` moves experimental `CClipper::Paint` mask geometry,
+inversion, banner/scroll traversal, initialized-byte tracking and mask lifetime
+into safe Rust. Preparation preserves scale conversion before the native
+polygon-paint boundary; scroll endpoints convert only after successful base
+construction. Two fixed-local numeric sites preserve Windows x87/CRT or SSE2
+conversion and floating-point status. Negative fades remain signed and banner
+overlap still multiplies pixels twice.
+
+Simple masks retain independent canonical Rust snapshots while their detached
+native views share the source body, preserving aliases and allocation counters.
+Base masks own the full target image. `GrayImage2` copies retain Rust owners
+and the existing shared native views. The downstream renderer, host adapters
+and vendors remain in scope; experimental switches remain opt-in. See
+[the boundary](rust-clipper-boundary.md) and
+[validated evidence](rust-clip-owned-local-evidence.json).
+
+Both x86 and x64 passed 5,152 direct clipper cases, each with two paints and
+a surviving copy, twice per role. These cover four shapes, seven target sizes,
+five effect selectors, inverse/simple clips, three finite scale pairs,
+positive/negative/overlapping fades and sticky FP status, plus raw-scale
+early-return cases. Geometry, all initialized bytes/padding, aliases,
+allocation deltas and FP/errno/LastError match the pinned cleanup reference.
+The direct observer was rerun at `ec462293` after correcting its input-count metadata to include
+56 raw-scale combinations (2,576 inputs total); production code was unchanged.
+
+All fifteen focused regressions passed per architecture, including 17,924
+overlay cases. The full CSRI corpus matched 1,222 cases / 13,186 frames and
+192 distinct-frame controls on each architecture. All three DLLs built with
+matching exports/dependencies; ten scoped COM cases and two pin-ID controls
+passed per architecture. Rust passed 385 core and 142 FFI tests per architecture,
+formatting and Clippy, including native-runtime builds. Python passed 218 tests
+with one existing skip in the configured build shell. An initial Python run
+outside that shell failed Git ownership checks and is retained separately.
+
+The current inventory has 130 portable source files with no unsafe constructs
+and 99 FFI source files: 667 unsafe blocks, 438 unsafe functions, four unsafe
+Sync implementations, 78 assembly sites and 548 extern functions. Counts can
+overlap and do not establish whole-library soundness or a completion percentage.
+Zero-fade division on nonempty masks, unsafe overflow geometry, allocation
+failure and arbitrary concurrency remain unclosed. Previously recorded native
+crashes and ellipse FP instability retain their original unresolved attribution.
+
+Next is owned `CompositeAlphaMask` orchestration and its lifetime through
+Draw/AdditionDraw, followed by the remaining compositing/caching/host work.
+Local `composite-next-reference-{x86,x64}` captures contain four x86 and six x64
+linked cleanup functions; they were not executed and are not parity evidence.
+`artifacts/clip-owned-next-notes.txt` records the multi-color mask-pointer quirk,
+unwritten output regions, switch-array bounds and the two production callers.
+
+## Previous port: owned Gaussian cache and complete Blur (2026-10-19)
 
 Implementation `e8b07faa`, validated at `87f77e41`, moves the experimental
 Gaussian coefficient cache, sigma products, complete Blur dispatch and
@@ -7471,20 +7522,16 @@ reference and isolated workers for every experiment.
 
 ## Current Windows handoff
 
-Gaussian cache and complete Blur ownership are validated at `87f77e41` against
+Owned clip-mask construction and fades are validated at `9b0f04e1` against
 the cleanup reference; see the latest-port section and
-[evidence](rust-blur-owned-local-evidence.json). The next native ownership
-boundary is `CClipper`/`GrayImage2`, followed by downstream compositing and
-caches. Preserve the reference capture provenance and historical failures.
+[evidence](rust-clip-owned-local-evidence.json). The next ownership boundary is
+`CompositeAlphaMask` and its intermediate lifetime through drawing, followed
+by downstream compositing and caches. Preserve reference capture provenance
+and historical failures. Full host and vendor migration remains active.
+
 Serialize native links within each architecture: LTCG can write generated
 assembly to shared reference object paths even when observer outputs differ.
-Full host and vendor migration remains active.
-
-## In progress: owned clip masks
-
-The experimental `CClipper::Paint` operation now delegates mask construction,
-inversion, fade traversal and canonical mask ownership to safe Rust, with
-two fixed-local Windows conversion sites. Simple native views retain body
-sharing; downstream compositing still reads detached native views. See
-[the boundary](rust-clipper-boundary.md). Direct clipper comparisons and the
-full Windows renderer/host regressions are pending for this new checkpoint.
+Use `artifacts/dev-shell.cmd` for Python suites and boundary audits as well as
+native builds; it supplies process-local Git safe-directory configuration and
+the toolchain environment. Keep initial environment failures distinct from
+passing configured-shell evidence.

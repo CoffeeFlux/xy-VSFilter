@@ -27,7 +27,12 @@ in the reference and is returned as unresolved error 6 by the checked boundary;
 invalid native addresses, unknown logical input and impossible allocations are
 also unresolved rather than sanitized pixels or matching corruption.
 
-Rust ownership tests and x86/x64 builds are implemented. Direct native clipper,
-full renderer and host regression validation is pending for this checkpoint.
+Validated at `9b0f04e1` on x86 and x64: 5,152 direct clipper cases, fifteen
+focused probes including 17,924 overlay cases, the full 1,222-case / 13,186-frame
+CSRI corpus and 192 distinct controls, all three DLL builds/exports/dependencies,
+and ten scoped COM cases plus two pin-ID controls. Rust tests passed 385 core
+and 142 FFI cases per architecture, formatting and Clippy; Python passed 218
+tests with one existing skip in the configured shell. See
+[the evidence](rust-clip-owned-local-evidence.json) for exact hashes and scope.
 The experimental switches remain opt-in; full renderer/host/vendor migration
 remains active.
