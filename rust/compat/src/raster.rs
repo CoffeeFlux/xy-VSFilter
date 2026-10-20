@@ -109,6 +109,132 @@ impl Image {
     pub fn all_known(&self) -> bool {
         self.known.is_none()
     }
+    pub fn be_blur(&self, numeric: &mut impl crate::be_blur::Numeric) -> Result<Self, u32> {
+        let old = fields(&self.bytes);
+        let [dx, dy] = numeric.geometry().map(|v| v.wrapping_mul(8));
+        let width = old[4].wrapping_add(dx >> 2);
+        let height = old[5].wrapping_add(dy >> 2);
+        let pitch = width.wrapping_add(15) & !15;
+        // Overflowing/negative allocations and addresses are unresolved reference
+        // behavior. In particular, never turn a negative inset into a huge index.
+        if width <= 0
+            || height <= 0
+            || pitch < width
+            || dx < 0
+            || dy < 0
+            || old[4] < 0
+            || old[5] < 0
+            || old[6] < old[4]
+        {
+            return Err(6);
+        }
+        let count = usize::try_from(pitch.checked_mul(height).ok_or(6u32)?).map_err(|_| 6u32)?;
+        let border = old[7] & 1 == 0;
+        let payload = count.checked_mul(if border { 2 } else { 1 }).ok_or(5u32)?;
+        let mut bytes = crate::be_blur::zeroed::<u8>(payload.checked_add(32).ok_or(5u32)?)?;
+        let mut known = crate::be_blur::zeroed::<u8>(payload)?;
+        known.fill(1);
+        for (i, v) in [
+            old[0].wrapping_sub(dx),
+            old[1].wrapping_sub(dy),
+            old[2].wrapping_add(dx.wrapping_mul(2)),
+            old[3].wrapping_add(dy.wrapping_mul(2)),
+            width,
+            height,
+            pitch,
+            if border { 6 } else { 3 },
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            bytes[i * 4..i * 4 + 4].copy_from_slice(&v.to_le_bytes());
+        }
+        let old_count =
+            usize::try_from(old[6].checked_mul(old[5]).ok_or(6u32)?).map_err(|_| 6u32)?;
+        let inset = (dy as usize >> 3)
+            .checked_mul(pitch as usize)
+            .and_then(|n| n.checked_add(dx as usize >> 3))
+            .ok_or(6u32)?;
+        // Copy border before body; absent sources leave the initialized zero plane.
+        for plane in [1usize, 0] {
+            if (plane == 1 && !border) || old[7] & (2 << plane) == 0 {
+                continue;
+            }
+            let source_plane = if plane == 1 && old[7] & 2 == 0 {
+                0
+            } else {
+                plane
+            };
+            let source = self
+                .bytes
+                .get(32 + source_plane * old_count..32 + (source_plane + 1) * old_count)
+                .ok_or(6u32)?;
+            let dest = &mut bytes[32 + plane * count..32 + (plane + 1) * count];
+            for row in 0..old[5] as usize {
+                let n = old[4] as usize;
+                let at = row
+                    .checked_mul(pitch as usize)
+                    .and_then(|n| n.checked_add(inset))
+                    .ok_or(6u32)?;
+                let end = at.checked_add(n).ok_or(6u32)?;
+                let start = row * old[6] as usize;
+                dest.get_mut(at..end)
+                    .ok_or(6u32)?
+                    .copy_from_slice(source.get(start..start + n).ok_or(6u32)?);
+                if let Some(mask) = &self.known {
+                    known[plane * count + at..plane * count + end].copy_from_slice(
+                        &mask[source_plane * old_count + start
+                            ..source_plane * old_count + start + n],
+                    );
+                }
+            }
+        }
+        if let Some(passes) = numeric.passes() {
+            let start = if border { count } else { 0 };
+            let selected_known = &known[start..start + count];
+            let selected = &mut bytes[32 + start..32 + start + count];
+            let check = || {
+                if selected_known
+                    .chunks_exact(pitch as usize)
+                    .any(|r| r[..width as usize].contains(&0))
+                {
+                    Err(6u32)
+                } else {
+                    Ok(())
+                }
+            };
+            if width >= 3 && height >= 3 {
+                for _ in 0..passes {
+                    check()?;
+                    crate::be_blur::plane(
+                        selected,
+                        width as usize,
+                        height as usize,
+                        pitch as usize,
+                    )?;
+                }
+            }
+            if let Some(fraction) = numeric.fraction() {
+                check()?;
+                crate::be_blur::fractional(
+                    selected,
+                    width as usize,
+                    height as usize,
+                    pitch as usize,
+                    fraction,
+                    numeric,
+                )?;
+            }
+        }
+        Ok(Self {
+            bytes,
+            known: if known.contains(&0) {
+                Some(known)
+            } else {
+                None
+            },
+        })
+    }
     pub fn duplicate(&self) -> Result<Self, u32> {
         Self::decode(&self.encode()?)
     }
@@ -340,6 +466,49 @@ impl Store {
 #[cfg(test)]
 mod tests {
     use super::*;
+    struct Blur {
+        adjust: [i32; 2],
+        passes: Option<i32>,
+    }
+    impl crate::be_blur::Numeric for Blur {
+        fn geometry(&mut self) -> [i32; 2] {
+            self.adjust
+        }
+        fn passes(&mut self) -> Option<i32> {
+            self.passes
+        }
+        fn fraction(&mut self) -> Option<u32> {
+            None
+        }
+        fn axis_passes(&mut self, _: u32) -> i32 {
+            unreachable!()
+        }
+        fn axis_filter(&mut self) -> Option<[u32; 2]> {
+            unreachable!()
+        }
+    }
+    #[test]
+    fn blur_copies_only_logical_bytes_and_retains_unknown_logical_values_until_read() {
+        let image = imported();
+        let mut numeric = Blur {
+            adjust: [1, 2],
+            passes: None,
+        };
+        let result = image.be_blur(&mut numeric).unwrap();
+        assert_eq!(fields(result.bytes()), [-8, -16, 24, 40, 4, 6, 16, 3]);
+        assert!(result.all_known());
+        assert_eq!(&result.bytes()[65..67], &[8, 16]);
+        assert_eq!(&result.bytes()[81..83], &[24, 32]);
+        assert!(result.bytes()[32..65].iter().all(|&v| v == 0));
+        let mut wire = image.encode().unwrap();
+        wire[64] = 0;
+        let bad = Image::decode(&wire).unwrap();
+        assert!(!bad.be_blur(&mut numeric).unwrap().all_known());
+        numeric.passes = Some(1);
+        assert!(bad.be_blur(&mut numeric).is_err());
+        numeric.adjust = [-1, 0];
+        assert!(image.be_blur(&mut numeric).is_err());
+    }
     fn imported() -> Image {
         let mut wire = alloc::vec![0;96];
         for (i, v) in [0i32, 0, 8, 8, 2, 2, 16, 3].into_iter().enumerate() {

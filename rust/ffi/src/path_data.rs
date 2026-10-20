@@ -66,6 +66,38 @@ impl Boundary {
 }
 static PATHS: Boundary = Boundary::new();
 /// # Safety
+/// output lends eight writable bytes for the independent checked overlay ID.
+/// Strength/scale arguments are raw float bits. No image storage is borrowed.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_overlay_be_blur_v1(
+    id: u64,
+    be: u32,
+    sx: u32,
+    sy: u32,
+    output: *mut u8,
+) -> u32 {
+    if output.is_null() {
+        return 3;
+    }
+    let id = match PATHS.with_owners(|o| {
+        let mut numeric = crate::windows_be_blur_numeric::Numeric::new(be, sx, sy);
+        let image = if id == 0 {
+            xy_vsfilter_compat::raster::Image::decode(&[0; 32])?.be_blur(&mut numeric)?
+        } else {
+            o.rasters.get(id)?.be_blur(&mut numeric)?
+        };
+        o.rasters.insert(image)
+    }) {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    // SAFETY: detached scalar and caller's writable eight-byte output.
+    unsafe {
+        core::ptr::copy_nonoverlapping(id.to_le_bytes().as_ptr(), output, 8);
+    }
+    0
+}
+/// # Safety
 /// output lends eight writable bytes for an independent checked owner ID.
 #[no_mangle]
 pub unsafe extern "C" fn xy_vsfilter_overlay_clone_v1(id: u64, output: *mut u8) -> u32 {
@@ -1046,6 +1078,24 @@ mod tests {
                 0
             );
             let source = u64::from_le_bytes(raster_info[1..9].try_into().unwrap());
+            let one = 1.0f32.to_bits();
+            assert_eq!(
+                xy_vsfilter_overlay_be_blur_v1(source, one, one, one, core::ptr::null_mut()),
+                3
+            );
+            assert_eq!(
+                xy_vsfilter_overlay_be_blur_v1(
+                    source,
+                    one,
+                    one,
+                    one,
+                    raster_info.as_mut_ptr().add(1)
+                ),
+                0
+            );
+            let blurred = u64::from_le_bytes(raster_info[1..9].try_into().unwrap());
+            assert_ne!(blurred, source);
+            assert_eq!((raster_info[0], raster_info[9]), (0xa5, 0xa5));
             assert_eq!(
                 xy_vsfilter_overlay_clone_v1(source, raster_info.as_mut_ptr().add(1)),
                 0
@@ -1075,6 +1125,30 @@ mod tests {
             let shifted = u64::from_le_bytes(raster_info[1..9].try_into().unwrap());
             assert_ne!(source, shifted);
             assert_eq!(xy_vsfilter_raster_destroy_v1(source), 0);
+            let mut blur_wire = [0xa5; 162];
+            assert_eq!(
+                xy_vsfilter_overlay_read_v1(blurred, blur_wire.as_mut_ptr().add(1), 159),
+                4
+            );
+            assert_eq!(blur_wire, [0xa5; 162]);
+            assert_eq!(
+                xy_vsfilter_overlay_read_v1(blurred, blur_wire.as_mut_ptr().add(1), 160),
+                0
+            );
+            assert_eq!((blur_wire[0], blur_wire[161]), (0xa5, 0xa5));
+            assert_eq!(xy_vsfilter_raster_destroy_v1(blurred), 0);
+            raster_info.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_overlay_be_blur_v1(
+                    blurred,
+                    one,
+                    one,
+                    one,
+                    raster_info.as_mut_ptr().add(1)
+                ),
+                1
+            );
+            assert_eq!(raster_info, [0xa5; 18]);
             let mut wire_out = [0xa5; 98];
             assert_eq!(
                 xy_vsfilter_raster_read_v1(shifted, wire_out.as_mut_ptr(), 98),

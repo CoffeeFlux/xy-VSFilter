@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Included once after Rasterizer.h; private owner IDs and detached wire packets.
 extern "C" {
+uint32_t __cdecl xy_vsfilter_overlay_be_blur_v1(uint64_t,uint32_t,uint32_t,uint32_t,uint8_t*);
 uint32_t __cdecl xy_vsfilter_overlay_import_v1(const uint8_t*,size_t,uint8_t*);
 uint32_t __cdecl xy_vsfilter_overlay_info_v1(uint64_t,uint8_t*);
 uint32_t __cdecl xy_vsfilter_overlay_read_v1(uint64_t,uint8_t*,size_t);
@@ -9,6 +10,9 @@ uint32_t __cdecl xy_vsfilter_overlay_clone_v1(uint64_t,uint8_t*);
 uint32_t __cdecl xy_vsfilter_overlay_offset_v1(uint64_t,int32_t,int32_t,uint8_t*);
 }
 namespace XyRust {
+uint64_t OverlayOwner::BeBlur(float be,float sx,float sy)const{std::array<uint8_t,8> out;
+    uint32_t b,x,y;memcpy(&b,&be,4);memcpy(&x,&sx,4);memcpy(&y,&sy,4);
+    DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_overlay_be_blur_v1(id_,b,x,y,out.data());}));return DocumentDetail::Load(out,0,8);}
 OverlayOwner::OverlayOwner(const OverlayOwner& other){*this=other;}
 OverlayOwner& OverlayOwner::operator=(const OverlayOwner& other){if(this!=&other){std::array<uint8_t,8> out;
     DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_overlay_clone_v1(other.id_,out.data());}));Take(DocumentDetail::Load(out,0,8));}return *this;}

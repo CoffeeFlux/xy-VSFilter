@@ -217,4 +217,6 @@ mod windows_scan_curve;
 mod windows_word_transform;
 
 #[cfg(windows)]
+mod windows_be_blur_numeric;
+#[cfg(windows)]
 mod windows_ellipse_numeric;

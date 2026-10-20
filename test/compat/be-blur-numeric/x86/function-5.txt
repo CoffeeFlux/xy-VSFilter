@@ -1,0 +1,65 @@
+  0040AA40: 51                 push        ecx
+  0040AA41: D9 44 24 08        fld         dword ptr [esp+8]
+  0040AA45: 56                 push        esi
+  0040AA46: D9 C0              fld         st(0)
+  0040AA48: 8B F1              mov         esi,ecx
+  0040AA4A: E8 61 FD 02 00     call        0043A7B0
+  0040AA4F: 89 44 24 04        mov         dword ptr [esp+4],eax
+  0040AA53: 85 C0              test        eax,eax
+  0040AA55: 75 18              jne         0040AA6F
+  0040AA57: DD 05 80 93 44 00  fld         qword ptr ds:[00449380h]
+  0040AA5D: D8 C9              fmul        st,st(1)
+  0040AA5F: D9 C9              fxch        st(1)
+  0040AA61: DC 0D 60 93 44 00  fmul        qword ptr ds:[00449360h]
+  0040AA67: DC 05 58 93 44 00  fadd        qword ptr ds:[00449358h]
+  0040AA6D: EB 52              jmp         0040AAC1
+  0040AA6F: 83 F8 01           cmp         eax,1
+  0040AA72: 75 10              jne         0040AA84
+  0040AA74: DD 05 58 93 44 00  fld         qword ptr ds:[00449358h]
+  0040AA7A: D8 E9              fsubr       st,st(1)
+  0040AA7C: DC 0D 80 93 44 00  fmul        qword ptr ds:[00449380h]
+  0040AA82: EB 39              jmp         0040AABD
+  0040AA84: DB 44 24 04        fild        dword ptr [esp+4]
+  0040AA88: 83 C0 02           add         eax,2
+  0040AA8B: D9 5C 24 04        fstp        dword ptr [esp+4]
+  0040AA8F: D9 44 24 04        fld         dword ptr [esp+4]
+  0040AA93: D9 C1              fld         st(1)
+  0040AA95: 89 44 24 04        mov         dword ptr [esp+4],eax
+  0040AA99: DC 0D 60 93 44 00  fmul        qword ptr ds:[00449360h]
+  0040AA9F: DC 05 58 93 44 00  fadd        qword ptr ds:[00449358h]
+  0040AAA5: D8 E1              fsub        st,st(1)
+  0040AAA7: D9 CA              fxch        st(2)
+  0040AAA9: DE E1              fsubrp      st(1),st
+  0040AAAB: DC 0D 80 93 44 00  fmul        qword ptr ds:[00449380h]
+  0040AAB1: DB 44 24 04        fild        dword ptr [esp+4]
+  0040AAB5: D9 5C 24 04        fstp        dword ptr [esp+4]
+  0040AAB9: D8 4C 24 04        fmul        dword ptr [esp+4]
+  0040AABD: D9 C9              fxch        st(1)
+  0040AABF: DC C0              fadd        st(0),st
+  0040AAC1: DE F9              fdivp       st(1),st
+  0040AAC3: E8 78 FD 02 00     call        0043A840
+  0040AAC8: 89 06              mov         dword ptr [esi],eax
+  0040AACA: B9 80 00 00 00     mov         ecx,80h
+  0040AACF: 2B C8              sub         ecx,eax
+  0040AAD1: 89 46 08           mov         dword ptr [esi+8],eax
+  0040AAD4: 03 C9              add         ecx,ecx
+  0040AAD6: 03 C0              add         eax,eax
+  0040AAD8: 89 4E 04           mov         dword ptr [esi+4],ecx
+  0040AADB: 3B C1              cmp         eax,ecx
+  0040AADD: 76 14              jbe         0040AAF3
+  0040AADF: C7 06 40 00 00 00  mov         dword ptr [esi],40h
+  0040AAE5: C7 46 04 80 00 00  mov         dword ptr [esi+4],80h
+  0040AAEC: C7 46 08 40 00 00  mov         dword ptr [esi+8],40h
+  0040AAF3: 5E                 pop         esi
+  0040AAF4: 59                 pop         ecx
+  0040AAF5: C3                 ret
+  0040AAF6: CC                 int         3
+  0040AAF7: CC                 int         3
+  0040AAF8: CC                 int         3
+  0040AAF9: CC                 int         3
+  0040AAFA: CC                 int         3
+  0040AAFB: CC                 int         3
+  0040AAFC: CC                 int         3
+  0040AAFD: CC                 int         3
+  0040AAFE: CC                 int         3
+  0040AAFF: CC                 int         3

@@ -1,0 +1,17 @@
+  004061A0: 55                 push        ebp
+  004061A1: 8B EC              mov         ebp,esp
+  004061A3: 83 E4 F8           and         esp,0FFFFFFF8h
+  004061A6: 83 EC 08           sub         esp,8
+  004061A9: D9 45 08           fld         dword ptr [ebp+8]
+  004061AC: D9 FA              fsqrt
+  004061AE: D9 5C 24 04        fstp        dword ptr [esp+4]
+  004061B2: D9 44 24 04        fld         dword ptr [esp+4]
+  004061B6: 8B E5              mov         esp,ebp
+  004061B8: 5D                 pop         ebp
+  004061B9: C3                 ret
+  004061BA: CC                 int         3
+  004061BB: CC                 int         3
+  004061BC: CC                 int         3
+  004061BD: CC                 int         3
+  004061BE: CC                 int         3
+  004061BF: CC                 int         3

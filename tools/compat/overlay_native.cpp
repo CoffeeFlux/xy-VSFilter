@@ -29,8 +29,8 @@ int main(){try{
     check(AfxWinInit(GetModuleHandle(NULL),NULL,GetCommandLine(),0)!=FALSE);unsigned index=0;
     printf("overlay-stages pointer_bits=%u\n",unsigned(sizeof(void*)*8));
     const int radii[][2]={{0,0},{1,0},{3,7},{15,19}};
-    const float strengths[]={0.25f,1.0f,2.5f,4.0f};const double gaussian[]={0.1,0.333333,0.75,1.5};
-    const float scales[][2]={{0.5f,1.0f},{1.0f,1.0f},{1.75f,0.5f},{2.0f,1.25f}};
+    const float strengths[]={0.25f,1.0f,2.5f,4.0f,0.99999994f,1.00000012f,2.49999976f,2.50000024f,0.0f,0.000001f};const double gaussian[]={0.1,0.333333,0.75,1.5,0.1,0.333333,0.75,1.5,0.1,0.1};
+    const float scales[][2]={{0.5f,1.0f},{1.0f,1.0f},{1.75f,0.5f},{2.0f,1.25f},{1.0f,1.0f},{1.0f,1.0f},{1.00000012f,0.99999994f},{1.99999988f,0.50000006f},{1.0f,1.0f},{1.0f,1.0f}};
     const unsigned shifts[][2]={{0,0},{1,7},{7,1},{UINT_MAX,0}};
     auto scan=std::make_shared<ScanLineData>();auto raster=std::make_shared<Overlay>();auto output=std::make_shared<Overlay>();
     for(unsigned scenario=0;scenario<8;++scenario){
@@ -38,7 +38,7 @@ int main(){try{
         std::vector<POINT> points={{-13,7},{w,11},{w-17,h},{-3,h-11}};std::vector<BYTE> types={6,2,2,2};
         PathData path;seed_path(path,points,types);CPoint origin;CSize size;path.AlignLeftTop(&origin,&size);check(scan->ScanConvert(path,size));ScanLineData2 wide(origin,scan);
         for(unsigned radius=0;radius<4;++radius){check(wide.CreateWidenedRegion(radii[radius][0],radii[radius][1]));check(Rasterizer::Rasterize(wide,scenario&7,(scenario*3)&7,raster));
-            for(unsigned settings=0;settings<4;++settings){
+            for(unsigned settings=0;settings<10;++settings){
                 for(unsigned stage=0;stage<4;++stage){
                     const float sx=scales[settings][0],sy=scales[settings][1];const size_t before_memory=g_xy_malloc_used_size;reset();if(settings%2)std::feraiseexcept(FE_DIVBYZERO);Status before=status();bool result=true;
                     if(stage==1)result=Rasterizer::BeBlur(*raster,strengths[settings],sx,sy,output);

@@ -27,7 +27,18 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest port: persistent overlay owners and subpixel shifting (2026-10-19)
+## In progress: owned BeBlur orchestration (2026-10-19)
+
+The experimental BeBlur path now consumes canonical overlay IDs. Safe Rust owns
+geometry/copies, complete 3x3 passes, fractional weighted filtering, transposes
+and scratch. A bounded scalar numeric backend preserves the captured x86/x64
+cleanup instructions. The observer now covers 12,804 calls including zero,
+small and rounding-boundary strengths. See [the boundary audit](rust-be-blur-boundary.md).
+Windows comparisons for this implementation are pending; earlier parity evidence
+remains attributed to its own implementation. Gaussian, clip/draw, host adapters
+and vendors remain in scope; no production default has changed.
+
+## Earlier port: persistent overlay owners and subpixel shifting (2026-10-19)
 
 Implementation `0adc9700` retains completed overlays in the checked Rust image
 registry. Raster construction transfers its owner directly; native blur imports

@@ -1,0 +1,131 @@
+{
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "reference_library_sha256": {
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\strmbaseR.lib": "e4a3eed835fc6dcfdd7b81e684678cce0aaf032187e1ff2611b7f4146d6a9067",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\dsutilR.lib": "3dfc9f2eb59caef227f3ab723a1f10b672ab44f3efb61a75030d5b0a8730892b",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\subtitlesR.lib": "d6d48a179e28d70404ff870f6c6b640b9c768940065a95039695f7684689e50d",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\subpicR.lib": "23aed7e98c3c33cf31a956900fc720faf5d603edbb27c1f821964e9ccf87c5de",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\basevideofilterR.lib": "738d7f288e53690373e814f00ab7edcc8419e40de46a96f7a888a549ce8ca39e",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\libssfR.lib": "58a84c5e08a8c4c75e60e0f53b2590e6696e7f5938d52cc46b895ad326b4f1d8",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\unrarR.lib": "3dcfd1c32bc6261c168c841ebeb86c8dd4177f5698730424cbf39628f3e8a56c"
+  },
+  "compiler_environment": {
+    "VCToolsVersion": "14.44.35207",
+    "WindowsSDKVersion": "10.0.26100.0\\",
+    "VSCMD_ARG_TGT_ARCH": "x64"
+  },
+  "binary_sha256": "88d3fa589c5a7a61bb82aead186f84121c226b360680e9099ac054fefa83ade7",
+  "probe_sha256": "0812ab05a22beee140028c17c2283e3b9a4ca07cb847b3c6209181a5c06eaa79",
+  "trace_sha256": "fa5903a19de19a1d38ff9394a6215ec6e5f21f0a19045b116175e2be4eb32991",
+  "functions": [
+    {
+      "name": "?be_blur@@YAXPEAEPEAIHHH@Z",
+      "address": "0x140001660",
+      "end": "0x140001a00",
+      "file": "function-0.txt",
+      "lines": 239
+    },
+    {
+      "name": "?Blur@Rasterizer@@SA_NAEBUOverlay@@MNNNV?$shared_ptr@UOverlay@@@std@@@Z",
+      "address": "0x140001f40",
+      "end": "0x140002240",
+      "file": "function-1.txt",
+      "lines": 208
+    },
+    {
+      "name": "?GaussianBlur@Rasterizer@@SA_NAEBUOverlay@@NNNV?$shared_ptr@UOverlay@@@std@@@Z",
+      "address": "0x140002240",
+      "end": "0x1400026e0",
+      "file": "function-2.txt",
+      "lines": 328
+    },
+    {
+      "name": "?BeBlur@Rasterizer@@SA_NAEBUOverlay@@MMMV?$shared_ptr@UOverlay@@@std@@@Z",
+      "address": "0x140002740",
+      "end": "0x140002be0",
+      "file": "function-3.txt",
+      "lines": 324
+    },
+    {
+      "name": "?xy_be_blur@@YAXPEAEHHHMM@Z",
+      "address": "0x14000b320",
+      "end": "0x14000b680",
+      "file": "function-4.txt",
+      "lines": 218
+    },
+    {
+      "name": "?dtor$0@?0??Blur@Rasterizer@@SA_NAEBUOverlay@@MNNNV?$shared_ptr@UOverlay@@@std@@@Z@4HA",
+      "address": "0x140042380",
+      "end": "0x1400423a0",
+      "file": "function-5.txt",
+      "lines": 22
+    },
+    {
+      "name": "?dtor$2@?0??Blur@Rasterizer@@SA_NAEBUOverlay@@MNNNV?$shared_ptr@UOverlay@@@std@@@Z@4HA",
+      "address": "0x1400423a0",
+      "end": "0x1400423c0",
+      "file": "function-6.txt",
+      "lines": 22
+    },
+    {
+      "name": "?dtor$7@?0??Blur@Rasterizer@@SA_NAEBUOverlay@@MNNNV?$shared_ptr@UOverlay@@@std@@@Z@4HA",
+      "address": "0x1400423c0",
+      "end": "0x1400423e0",
+      "file": "function-7.txt",
+      "lines": 22
+    },
+    {
+      "name": "?dtor$0@?0??GaussianBlur@Rasterizer@@SA_NAEBUOverlay@@NNNV?$shared_ptr@UOverlay@@@std@@@Z@4HA",
+      "address": "0x1400423e0",
+      "end": "0x140042400",
+      "file": "function-8.txt",
+      "lines": 22
+    },
+    {
+      "name": "?dtor$1@?0??GaussianBlur@Rasterizer@@SA_NAEBUOverlay@@NNNV?$shared_ptr@UOverlay@@@std@@@Z@4HA",
+      "address": "0x140042400",
+      "end": "0x140042420",
+      "file": "function-9.txt",
+      "lines": 22
+    },
+    {
+      "name": "?dtor$2@?0??GaussianBlur@Rasterizer@@SA_NAEBUOverlay@@NNNV?$shared_ptr@UOverlay@@@std@@@Z@4HA",
+      "address": "0x140042420",
+      "end": "0x140042440",
+      "file": "function-10.txt",
+      "lines": 22
+    },
+    {
+      "name": "?dtor$0@?0??BeBlur@Rasterizer@@SA_NAEBUOverlay@@MMMV?$shared_ptr@UOverlay@@@std@@@Z@4HA",
+      "address": "0x140042440",
+      "end": "0x140042460",
+      "file": "function-11.txt",
+      "lines": 22
+    },
+    {
+      "name": "?dtor$1@?0??BeBlur@Rasterizer@@SA_NAEBUOverlay@@MMMV?$shared_ptr@UOverlay@@@std@@@Z@4HA",
+      "address": "0x140042460",
+      "end": "0x140042480",
+      "file": "function-12.txt",
+      "lines": 22
+    }
+  ],
+  "capture_observer_commit": "0adc9700e877a5a18e45ad750f343df276312bfd",
+  "capture_observer_file": "reference-observer.cpp",
+  "initialization_and_helpers": [
+    {
+      "name": "?init@GaussianCoefficients@@AEAAHN@Z",
+      "address": "0x140001400",
+      "end": "0x140001660",
+      "file": "gaussian-init.txt",
+      "lines": 179
+    },
+    {
+      "name": "?Get@?$XyInternedByKey@NVGaussianCoefficients@@@@CA?AV?$shared_ptr@$$CBVGaussianCoefficients@@@std@@AEBN@Z",
+      "address": "0x140004dc0",
+      "end": "0x140005020",
+      "file": "gaussian-cache-get.txt",
+      "lines": 172
+    }
+  ]
+}

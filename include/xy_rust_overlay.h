@@ -13,6 +13,7 @@ public:
     void Import(const std::vector<uint8_t>&);
     std::vector<uint8_t> Read()const;
     uint64_t Variance(unsigned,unsigned)const;
+    uint64_t BeBlur(float,float,float)const;
     void Offset(int,int);
 };
 }

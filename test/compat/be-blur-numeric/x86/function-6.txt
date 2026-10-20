@@ -1,0 +1,159 @@
+  0040AB80: 83 EC 1C           sub         esp,1Ch
+  0040AB83: A1 80 24 45 00     mov         eax,dword ptr ds:[00452480h]
+  0040AB88: 33 C4              xor         eax,esp
+  0040AB8A: 89 44 24 18        mov         dword ptr [esp+18h],eax
+  0040AB8E: 53                 push        ebx
+  0040AB8F: 55                 push        ebp
+  0040AB90: 56                 push        esi
+  0040AB91: 8B 74 24 2C        mov         esi,dword ptr [esp+2Ch]
+  0040AB95: 8B DA              mov         ebx,edx
+  0040AB97: 8B EE              mov         ebp,esi
+  0040AB99: 89 4C 24 10        mov         dword ptr [esp+10h],ecx
+  0040AB9D: 0F AF EB           imul        ebp,ebx
+  0040ABA0: 57                 push        edi
+  0040ABA1: 8D 45 17           lea         eax,[ebp+17h]
+  0040ABA4: 50                 push        eax
+  0040ABA5: E8 76 D1 01 00     call        00427D20
+  0040ABAA: 83 C4 04           add         esp,4
+  0040ABAD: 85 C0              test        eax,eax
+  0040ABAF: 75 04              jne         0040ABB5
+  0040ABB1: 33 FF              xor         edi,edi
+  0040ABB3: EB 12              jmp         0040ABC7
+  0040ABB5: 8D 78 17           lea         edi,[eax+17h]
+  0040ABB8: 83 E7 F0           and         edi,0FFFFFFF0h
+  0040ABBB: 01 2D 08 77 45 00  add         dword ptr ds:[00457708h],ebp
+  0040ABC1: 89 47 FC           mov         dword ptr [edi-4],eax
+  0040ABC4: 89 6F F8           mov         dword ptr [edi-8],ebp
+  0040ABC7: D9 44 24 38        fld         dword ptr [esp+38h]
+  0040ABCB: D9 C0              fld         st(0)
+  0040ABCD: 89 7C 24 18        mov         dword ptr [esp+18h],edi
+  0040ABD1: E8 DA FB 02 00     call        0043A7B0
+  0040ABD6: 3E 3E 3E 3E 8B E8  mov         ebp,eax
+  0040ABDC: 89 6C 24 10        mov         dword ptr [esp+10h],ebp
+  0040ABE0: 85 ED              test        ebp,ebp
+  0040ABE2: 7E 29              jle         0040AC0D
+  0040ABE4: 8B 7C 24 14        mov         edi,dword ptr [esp+14h]
+  0040ABE8: DD D8              fstp        st(0)
+  0040ABEA: 8D 9B 00 00 00 00  lea         ebx,[ebx+00000000h]
+  0040ABF0: FF 74 24 34        push        dword ptr [esp+34h]
+  0040ABF4: 56                 push        esi
+  0040ABF5: 53                 push        ebx
+  0040ABF6: 57                 push        edi
+  0040ABF7: E8 44 81 00 00     call        00412D40
+  0040ABFC: 3E 83 C4 10        add         esp,10h
+  0040AC00: 83 ED 01           sub         ebp,1
+  0040AC03: 75 EB              jne         0040ABF0
+  0040AC05: D9 44 24 38        fld         dword ptr [esp+38h]
+  0040AC09: 8B 7C 24 18        mov         edi,dword ptr [esp+18h]
+  0040AC0D: D9 C0              fld         st(0)
+  0040AC0F: DB 44 24 10        fild        dword ptr [esp+10h]
+  0040AC13: D9 5C 24 10        fstp        dword ptr [esp+10h]
+  0040AC17: D8 64 24 10        fsub        dword ptr [esp+10h]
+  0040AC1B: D9 EE              fldz
+  0040AC1D: DE D9              fcompp
+  0040AC1F: DF E0              fnstsw      ax
+  0040AC21: F6 C4 05           test        ah,5
+  0040AC24: 7A 39              jp          0040AC5F
+  0040AC26: 3E 3E 3E 3E 33 C0  xor         eax,eax
+  0040AC2C: 51                 push        ecx
+  0040AC2D: 8D 4C 24 20        lea         ecx,[esp+20h]
+  0040AC31: 89 44 24 20        mov         dword ptr [esp+20h],eax
+  0040AC35: D9 1C 24           fstp        dword ptr [esp]
+  0040AC38: 89 44 24 24        mov         dword ptr [esp+24h],eax
+  0040AC3C: 89 44 24 28        mov         dword ptr [esp+28h],eax
+  0040AC40: E8 FB FD FF FF     call        0040AA40
+  0040AC45: 8B 6C 24 38        mov         ebp,dword ptr [esp+38h]
+  0040AC49: 8D 44 24 20        lea         eax,[esp+20h]
+  0040AC4D: 50                 push        eax
+  0040AC4E: 55                 push        ebp
+  0040AC4F: 56                 push        esi
+  0040AC50: 53                 push        ebx
+  0040AC51: FF 74 24 28        push        dword ptr [esp+28h]
+  0040AC55: E8 26 82 00 00     call        00412E80
+  0040AC5A: 83 C4 18           add         esp,18h
+  0040AC5D: EB 06              jmp         0040AC65
+  0040AC5F: 8B 6C 24 34        mov         ebp,dword ptr [esp+34h]
+  0040AC63: DD D8              fstp        st(0)
+  0040AC65: 55                 push        ebp
+  0040AC66: 56                 push        esi
+  0040AC67: 53                 push        ebx
+  0040AC68: FF 74 24 20        push        dword ptr [esp+20h]
+  0040AC6C: 8B D6              mov         edx,esi
+  0040AC6E: 8B CF              mov         ecx,edi
+  0040AC70: 56                 push        esi
+  0040AC71: E8 8A FE FF FF     call        0040AB00
+  0040AC76: 3E D9 44 24 50     fld         dword ptr ds:[esp+50h]
+  0040AC7B: 83 C4 14           add         esp,14h
+  0040AC7E: D9 C0              fld         st(0)
+  0040AC80: E8 2B FB 02 00     call        0043A7B0
+  0040AC85: 8B E8              mov         ebp,eax
+  0040AC87: 89 6C 24 10        mov         dword ptr [esp+10h],ebp
+  0040AC8B: 85 ED              test        ebp,ebp
+  0040AC8D: 7E 1A              jle         0040ACA9
+  0040AC8F: DD D8              fstp        st(0)
+  0040AC91: 56                 push        esi
+  0040AC92: 53                 push        ebx
+  0040AC93: 56                 push        esi
+  0040AC94: 57                 push        edi
+  0040AC95: E8 A6 80 00 00     call        00412D40
+  0040AC9A: 3E 3E 3E 83 C4 10  add         esp,10h
+  0040ACA0: 83 ED 01           sub         ebp,1
+  0040ACA3: 75 EC              jne         0040AC91
+  0040ACA5: D9 44 24 3C        fld         dword ptr [esp+3Ch]
+  0040ACA9: 3E 3E 3E D9 C0     fld         st(0)
+  0040ACAE: DB 44 24 10        fild        dword ptr [esp+10h]
+  0040ACB2: D9 5C 24 10        fstp        dword ptr [esp+10h]
+  0040ACB6: D8 64 24 10        fsub        dword ptr [esp+10h]
+  0040ACBA: D9 EE              fldz
+  0040ACBC: DE D9              fcompp
+  0040ACBE: DF E0              fnstsw      ax
+  0040ACC0: F6 C4 05           test        ah,5
+  0040ACC3: 7A 33              jp          0040ACF8
+  0040ACC5: 3E 3E 3E 3E 3E 33  xor         eax,eax
+  0040ACCC: 51                 push        ecx
+  0040ACCD: 8D 4C 24 20        lea         ecx,[esp+20h]
+  0040ACD1: 89 44 24 20        mov         dword ptr [esp+20h],eax
+  0040ACD5: D9 1C 24           fstp        dword ptr [esp]
+  0040ACD8: 89 44 24 24        mov         dword ptr [esp+24h],eax
+  0040ACDC: 89 44 24 28        mov         dword ptr [esp+28h],eax
+  0040ACE0: E8 5B FD FF FF     call        0040AA40
+  0040ACE5: 8D 44 24 20        lea         eax,[esp+20h]
+  0040ACE9: 50                 push        eax
+  0040ACEA: 56                 push        esi
+  0040ACEB: 53                 push        ebx
+  0040ACEC: 56                 push        esi
+  0040ACED: 57                 push        edi
+  0040ACEE: E8 8D 81 00 00     call        00412E80
+  0040ACF3: 83 C4 18           add         esp,18h
+  0040ACF6: EB 02              jmp         0040ACFA
+  0040ACF8: DD D8              fstp        st(0)
+  0040ACFA: 8B 4C 24 14        mov         ecx,dword ptr [esp+14h]
+  0040ACFE: 8B D3              mov         edx,ebx
+  0040AD00: 56                 push        esi
+  0040AD01: 53                 push        ebx
+  0040AD02: 56                 push        esi
+  0040AD03: 57                 push        edi
+  0040AD04: FF 74 24 44        push        dword ptr [esp+44h]
+  0040AD08: E8 F3 FD FF FF     call        0040AB00
+  0040AD0D: 83 C4 14           add         esp,14h
+  0040AD10: 85 FF              test        edi,edi
+  0040AD12: 74 14              je          0040AD28
+  0040AD14: 8B 47 F8           mov         eax,dword ptr [edi-8]
+  0040AD17: FF 77 FC           push        dword ptr [edi-4]
+  0040AD1A: 29 05 08 77 45 00  sub         dword ptr ds:[00457708h],eax
+  0040AD20: E8 EB CF 01 00     call        00427D10
+  0040AD25: 83 C4 04           add         esp,4
+  0040AD28: 8B 4C 24 28        mov         ecx,dword ptr [esp+28h]
+  0040AD2C: 5F                 pop         edi
+  0040AD2D: 5E                 pop         esi
+  0040AD2E: 5D                 pop         ebp
+  0040AD2F: 5B                 pop         ebx
+  0040AD30: 33 CC              xor         ecx,esp
+  0040AD32: E8 62 95 01 00     call        00424299
+  0040AD37: 83 C4 1C           add         esp,1Ch
+  0040AD3A: C3                 ret
+  0040AD3B: CC                 int         3
+  0040AD3C: CC                 int         3
+  0040AD3D: CC                 int         3
+  0040AD3E: CC                 int         3
+  0040AD3F: CC                 int         3

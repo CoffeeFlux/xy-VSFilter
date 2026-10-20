@@ -707,6 +707,10 @@ bool Rasterizer::BeBlur( const Overlay& input_overlay, float be_strength,
 {
     ASSERT(output_overlay);
     output_overlay->CleanUp();
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    output_overlay->m_owner.Take(input_overlay.m_owner.BeBlur(be_strength,target_scale_x,target_scale_y));
+    return output_overlay->RestoreRust();
+#else
     output_overlay->mfWideOutlineEmpty = input_overlay.mfWideOutlineEmpty;
 
     ASSERT(be_strength>0 && target_scale_x>0 && target_scale_y>0);
@@ -808,6 +812,7 @@ bool Rasterizer::BeBlur( const Overlay& input_overlay, float be_strength,
     output_overlay->ImportNative();
 #endif
     return true;
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////

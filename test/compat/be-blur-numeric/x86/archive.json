@@ -1,0 +1,14 @@
+{
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "files": {
+    "function-1.txt": "2fae0c0b07d4bd229304fb9409d570fea911d553449f8e012fae042407ea444c",
+    "function-4.txt": "b642fa195d75530675954e704fd7568f69881eb30f2cc169684b47167095ab1f",
+    "function-5.txt": "dd45e35d74eb00ecd00d5198137190e40244abf51ccb4ef9348c848c66688a09",
+    "function-6.txt": "f4ffa4e3724ad9b394dcc9c0bc9e3457afb0a7f5813b22a3445c02fefc99381f",
+    "provenance.json": "42c06c22398b3b34169847a29838c7e03b8afdd9316e8190131b41c1f30534de",
+    "reference-observer.cpp": "0812ab05a22beee140028c17c2283e3b9a4ca07cb847b3c6209181a5c06eaa79",
+    "command.json": "8defde457e27939ce50833edadd2da3eea6fdfa81dab3b3e513fe42cd0a2dc67",
+    "sqrtf.txt": "5c7430380061408a03eeefe18f1e9059fed8cf2bc861ee359b7146ee8f23c9ba"
+  },
+  "scope": "Selected BeBlur arithmetic/traversal excerpts from the earlier full capture. Provenance retains original full-capture file list; unselected Gaussian excerpts remain in artifacts. Arithmetic capture observer is the unchanged prior commit, not the expanded BeBlur parity observer."
+}

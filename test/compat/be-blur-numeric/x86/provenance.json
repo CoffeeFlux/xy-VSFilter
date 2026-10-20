@@ -1,0 +1,166 @@
+{
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "reference_library_sha256": {
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\strmbaseR.lib": "5926e97d337eebffe4ea20b996f2f0e62a33f67d6562e18a829c4f45888a954e",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\dsutilR.lib": "3333bc109c61750684684cafa818c90d68af49906e6c08994013e8e0bb711b0b",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\subtitlesR.lib": "46495e9e54830b1ee76e90021b0cd688be766a46fc9d354b52958651f3888f59",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\subpicR.lib": "2e3315a04138a6822958356c79dafdf47bdd51e6ddd32cf7ce6da8eae54a3e1f",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\basevideofilterR.lib": "3598e7cf095d9fefc68de1393902310c4c621a0b792b16098df40554cd6d2ada",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\libssfR.lib": "3eaa482d6d3b16a0b48816cf21cb96f3bb932963eb7b114c76372c785e4bbc09",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\unrarR.lib": "2a77b674333a0ac1e05fc155374268e7395d3e8163f1dc212788d446f3eb75cf"
+  },
+  "compiler_environment": {
+    "VCToolsVersion": "14.44.35207",
+    "WindowsSDKVersion": "10.0.26100.0\\",
+    "VSCMD_ARG_TGT_ARCH": "x86"
+  },
+  "binary_sha256": "5a9ca5210f4c369d7803a25729790532d4c8cc0b981f1ab649311d27ebcf549f",
+  "probe_sha256": "0812ab05a22beee140028c17c2283e3b9a4ca07cb847b3c6209181a5c06eaa79",
+  "trace_sha256": "22b35cc99bb995f8710d4833520d70542b1fa574f277cdb4ff244543d001415a",
+  "functions": [
+    {
+      "name": "??0GaussianCoefficients@@QAE@N@Z",
+      "address": "0x401340",
+      "end": "0x4013a0",
+      "file": "function-0.txt",
+      "lines": 50
+    },
+    {
+      "name": "?be_blur@@YAXPAEPAIHHH@Z",
+      "address": "0x401540",
+      "end": "0x401880",
+      "file": "function-1.txt",
+      "lines": 253
+    },
+    {
+      "name": "?Blur@Rasterizer@@SA_NABUOverlay@@MNNNV?$shared_ptr@UOverlay@@@std@@@Z",
+      "address": "0x401cc0",
+      "end": "0x401ee0",
+      "file": "function-2.txt",
+      "lines": 190
+    },
+    {
+      "name": "?GaussianBlur@Rasterizer@@SA_NABUOverlay@@NNNV?$shared_ptr@UOverlay@@@std@@@Z",
+      "address": "0x401ee0",
+      "end": "0x402280",
+      "file": "function-3.txt",
+      "lines": 324
+    },
+    {
+      "name": "?BeBlur@Rasterizer@@SA_NABUOverlay@@MMMV?$shared_ptr@UOverlay@@@std@@@Z",
+      "address": "0x4022e0",
+      "end": "0x4026c0",
+      "file": "function-4.txt",
+      "lines": 344
+    },
+    {
+      "name": "?xy_calculate_filter@@YAXMPAI@Z",
+      "address": "0x40aa40",
+      "end": "0x40ab00",
+      "file": "function-5.txt",
+      "lines": 65
+    },
+    {
+      "name": "?xy_be_blur@@YAXPAEHHHMM@Z",
+      "address": "0x40ab80",
+      "end": "0x40ad40",
+      "file": "function-6.txt",
+      "lines": 159
+    },
+    {
+      "name": "__unwindfunclet$?Blur@Rasterizer@@SA_NABUOverlay@@MNNNV?$shared_ptr@UOverlay@@@std@@@Z$0",
+      "address": "0x43b950",
+      "end": "0x43b958",
+      "file": "function-7.txt",
+      "lines": 2
+    },
+    {
+      "name": "__unwindfunclet$?Blur@Rasterizer@@SA_NABUOverlay@@MNNNV?$shared_ptr@UOverlay@@@std@@@Z$2",
+      "address": "0x43b958",
+      "end": "0x43b969",
+      "file": "function-8.txt",
+      "lines": 7
+    },
+    {
+      "name": "__ehhandler$?Blur@Rasterizer@@SA_NABUOverlay@@MNNNV?$shared_ptr@UOverlay@@@std@@@Z",
+      "address": "0x43b969",
+      "end": "0x43b990",
+      "file": "function-9.txt",
+      "lines": 19
+    },
+    {
+      "name": "__unwindfunclet$?GaussianBlur@Rasterizer@@SA_NABUOverlay@@NNNV?$shared_ptr@UOverlay@@@std@@@Z$0",
+      "address": "0x43b990",
+      "end": "0x43b998",
+      "file": "function-10.txt",
+      "lines": 2
+    },
+    {
+      "name": "__unwindfunclet$?GaussianBlur@Rasterizer@@SA_NABUOverlay@@NNNV?$shared_ptr@UOverlay@@@std@@@Z$1",
+      "address": "0x43b998",
+      "end": "0x43b9a0",
+      "file": "function-11.txt",
+      "lines": 2
+    },
+    {
+      "name": "__unwindfunclet$?GaussianBlur@Rasterizer@@SA_NABUOverlay@@NNNV?$shared_ptr@UOverlay@@@std@@@Z$2",
+      "address": "0x43b9a0",
+      "end": "0x43b9ad",
+      "file": "function-12.txt",
+      "lines": 7
+    },
+    {
+      "name": "__ehhandler$?GaussianBlur@Rasterizer@@SA_NABUOverlay@@NNNV?$shared_ptr@UOverlay@@@std@@@Z",
+      "address": "0x43b9ad",
+      "end": "0x43b9d0",
+      "file": "function-13.txt",
+      "lines": 15
+    },
+    {
+      "name": "__unwindfunclet$?BeBlur@Rasterizer@@SA_NABUOverlay@@MMMV?$shared_ptr@UOverlay@@@std@@@Z$0",
+      "address": "0x43b9d0",
+      "end": "0x43b9d8",
+      "file": "function-14.txt",
+      "lines": 2
+    },
+    {
+      "name": "__unwindfunclet$?BeBlur@Rasterizer@@SA_NABUOverlay@@MMMV?$shared_ptr@UOverlay@@@std@@@Z$1",
+      "address": "0x43b9d8",
+      "end": "0x43b9e9",
+      "file": "function-15.txt",
+      "lines": 7
+    },
+    {
+      "name": "__ehhandler$?BeBlur@Rasterizer@@SA_NABUOverlay@@MMMV?$shared_ptr@UOverlay@@@std@@@Z",
+      "address": "0x43b9e9",
+      "end": "0x43ba10",
+      "file": "function-16.txt",
+      "lines": 19
+    }
+  ],
+  "capture_observer_commit": "0adc9700e877a5a18e45ad750f343df276312bfd",
+  "capture_observer_file": "reference-observer.cpp",
+  "initialization_and_helpers": [
+    {
+      "name": "?init@GaussianCoefficients@@AAEHN@Z",
+      "address": "0x4013a0",
+      "end": "0x401540",
+      "file": "gaussian-init.txt",
+      "lines": 170
+    },
+    {
+      "name": "?Get@?$XyInternedByKey@NVGaussianCoefficients@@@@CA?AV?$shared_ptr@$$CBVGaussianCoefficients@@@std@@ABN@Z",
+      "address": "0x4046c0",
+      "end": "0x4048c0",
+      "file": "gaussian-cache-get.txt",
+      "lines": 195
+    },
+    {
+      "name": "_sqrtf",
+      "address": "0x4061a0",
+      "end": "0x4061c0",
+      "file": "sqrtf.txt",
+      "lines": 17
+    }
+  ]
+}
