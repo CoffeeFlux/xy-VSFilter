@@ -1,0 +1,15 @@
+{
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "scope": "Linked cleanup compositor and scalar mask kernels; x86 border paths inline into FillAlphaMash. Original preparation provenance remains verbatim. Runtime comparisons are recorded separately.",
+  "files": {
+    "capture-source.cpp": "e1d5f99723529f2364e6f0a0443096edf697a71795170d788c6af0f87dc96481",
+    "command.json": "8e0f44401f4653a11e83e23110f9cdf2183e3a1d080d3a3a8dfb42b31e1f5ef4",
+    "CompositeAlphaMask.txt": "3823a9a1806fd94abc1a7d2aa29e3723a91f102a5a43104dcd09c541851a4b96",
+    "FillAlphaMash.txt": "699a5e9c1a5e80e53e58d40c410965f35ff54576f3bf884e2fe431c4890254e0",
+    "FillAlphaMashBodyMasked_c.txt": "d4d4956ff3df186d2220a421f382e8c1c293a75f289ecdfcb8349681c480b546",
+    "FillAlphaMashBody_c.txt": "7cf68055944d40e1406d81026825782fc840bc68004f98a5f8fdf76fe9900842",
+    "FillAlphaMashBorderMasked_c.txt": "bef0c4e54d5e5271f29fee78ec8ac9cc1d8e0980c09c2cc2a9d44df72e8820c8",
+    "FillAlphaMashBorder_c.txt": "958349e33367dc6b3394812815b6322fa09c84656336323271777c2e0bc763fa",
+    "provenance.json": "5cd1f86de8d2a39ea0369013cdb9beb518d826452b9db5a85c57662935493492"
+  }
+}

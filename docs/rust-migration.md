@@ -27,7 +27,17 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest port: owned clip masks and fades (2026-10-19)
+## Latest port in progress: owned composite alpha masks (2026-10-19)
+
+The experimental compositor now owns geometry, color segmentation, initialized
+pixels and result lifetime in safe Rust. It preserves mask-pointer restarts
+between color segments and writes before dirty when a switch boundary precedes
+the clipped start. See [the boundary](rust-composite-mask-boundary.md).
+Both Windows DLL builds and Rust checks pass; direct linked comparison and
+whole-renderer regression evidence are pending. This is an implementation
+checkpoint, not completed compatibility validation or a production switch.
+
+## Previous port: owned clip masks and fades (2026-10-19)
 
 Implementation `9b0f04e1` moves experimental `CClipper::Paint` mask geometry,
 inversion, banner/scroll traversal, initialized-byte tracking and mask lifetime
@@ -7524,9 +7534,9 @@ reference and isolated workers for every experiment.
 
 Owned clip-mask construction and fades are validated at `9b0f04e1` against
 the cleanup reference; see the latest-port section and
-[evidence](rust-clip-owned-local-evidence.json). The next ownership boundary is
-`CompositeAlphaMask` and its intermediate lifetime through drawing, followed
-by downstream compositing and caches. Preserve reference capture provenance
+[evidence](rust-clip-owned-local-evidence.json). The owned `CompositeAlphaMask` implementation is ready for direct x86/x64
+comparison and whole-renderer regression validation. Downstream drawing and
+caches follow after this boundary passes. Preserve reference capture provenance
 and historical failures. Full host and vendor migration remains active.
 
 Serialize native links within each architecture: LTCG can write generated

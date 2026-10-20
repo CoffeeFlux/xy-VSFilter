@@ -36,6 +36,7 @@
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 #include "RustPathData.inl"
 #include "RustOverlay.inl"
+#include "RustComposite.inl"
 #endif
 #include <math.h>
 #ifdef XY_VSFILTER_RUST_TEXT
@@ -1504,11 +1505,27 @@ void OverlapRegion(tSpanBuffer& dst, const tSpanBuffer& src, int dx, int dy)
 }
 
 
-SharedPtrByte Rasterizer::CompositeAlphaMask(const SharedPtrOverlay& overlay, const CRect& clipRect, 
+SharedPtrAlphaMask Rasterizer::CompositeAlphaMask(const SharedPtrOverlay& overlay, const CRect& clipRect,
     const GrayImage2* alpha_mask, 
     int xsub, int ysub, const DWORD* switchpts, bool fBody, bool fBorder, 
     CRect *outputDirtyRect)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    using namespace XyRust::DocumentDetail;SharedPtrAlphaMask result;*outputDirtyRect=CRect(0,0,0,0);
+    if(!switchpts||(!fBody&&!fBorder))return result;
+    if(fBorder&&!overlay->mBorder)return result;
+    const int32_t fields[]={clipRect.left,clipRect.top,clipRect.right,clipRect.bottom,xsub,ysub,(fBody?1:0)|(fBorder?2:0)};
+    result.owner=XyRust::CompositeOwner::Build(overlay->m_owner,alpha_mask?&alpha_mask->m_owner:nullptr,fields,reinterpret_cast<const uint32_t*>(switchpts));
+    if(!result.owner)return result;
+    const auto bytes=result.owner->Read();Shape(bytes.size()>=32&&Load(bytes,28,4)==1);
+    outputDirtyRect->SetRect(I32(Load(bytes,0,4)),I32(Load(bytes,4,4)),I32(Load(bytes,8,4)),I32(Load(bytes,12,4)));
+    const int width=I32(Load(bytes,16,4)),height=I32(Load(bytes,20,4)),pitch=I32(Load(bytes,24,4));Shape(width>0&&height>0&&pitch>=width);
+    const size_t count=MulSize(size_t(pitch),size_t(height));Shape(bytes.size()==AddSize(32,MulSize(count,2)));
+    XyRust::PlaneAllocation allocation(count);if(!allocation.Ready())throw std::bad_alloc();
+    for(size_t at=0;at<count;){if(!bytes[32+count+at]){++at;continue;}size_t end=at+1;while(end<count&&bytes[32+count+end])++end;
+        memcpy(allocation.Data()+at,bytes.data()+32+at,end-at);at=end;}
+    allocation.Attach(result.data);return result;
+#else
     //fix me: check and log error
     SharedPtrByte result;
     *outputDirtyRect = CRect(0, 0, 0, 0);
@@ -1585,6 +1602,7 @@ SharedPtrByte Rasterizer::CompositeAlphaMask(const SharedPtrOverlay& overlay, co
 #endif
     result.reset( s_base, xy_free );
     return result;
+#endif
 }
 
 

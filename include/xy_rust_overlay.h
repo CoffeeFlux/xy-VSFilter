@@ -4,6 +4,7 @@
 #include <vector>
 namespace XyRust {
 class OverlayOwner {
+    friend class CompositeOwner;
     uint64_t id_=0;
 public:
     OverlayOwner()=default;~OverlayOwner(){Clear();}

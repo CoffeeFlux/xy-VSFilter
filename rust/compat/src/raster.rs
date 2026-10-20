@@ -109,6 +109,23 @@ impl Image {
     pub(crate) fn field_values(&self) -> [i32; 8] {
         fields(&self.bytes)
     }
+    pub(crate) fn plane_pixel(&self, border: bool, index: usize) -> Result<u8, u32> {
+        let f = fields(&self.bytes);
+        let flag = if border { 4 } else { 2 };
+        if f[7] & flag == 0 {
+            return Err(6);
+        }
+        let count = f[6] as usize * f[5] as usize;
+        if index >= count {
+            return Err(6);
+        }
+        let start = if border && f[7] & 2 != 0 { count } else { 0 };
+        let at = start + index;
+        if self.known.as_ref().is_some_and(|k| k[at] == 0) {
+            return Err(6);
+        }
+        Ok(self.bytes[32 + at])
+    }
     pub(crate) fn body(&self) -> Option<(&[u8], Option<&[u8]>)> {
         let f = fields(&self.bytes);
         if f[7] & 2 == 0 {

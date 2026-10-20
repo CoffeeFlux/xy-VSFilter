@@ -135,6 +135,16 @@ pub struct Mask {
     known: Option<Vec<u8>>,
 }
 impl Mask {
+    pub(crate) fn fields(&self) -> [i32; 6] {
+        self.fields
+    }
+    pub(crate) fn pixel(&self, index: usize) -> Result<u8, u32> {
+        let value = *self.values.get(index).ok_or(6u32)?;
+        if self.known.as_ref().is_some_and(|k| k[index] == 0) {
+            return Err(6);
+        }
+        Ok(value)
+    }
     fn empty(fields: [i32; 6]) -> Self {
         Self {
             fields,

@@ -1,10 +1,19 @@
 import subprocess
 import unittest
 
-from check_decoder import ROOT, extract_fenced_method, extract_method, select_undefined_ifdef
+from check_decoder import ROOT, extract_definition, extract_fenced_method, extract_method, select_undefined_ifdef
 
 
 class SourceExtractionTests(unittest.TestCase):
+    def test_composite_historical_storage_selects_native_branch(self):
+        source=(ROOT/'src/subtitles/Rasterizer.cpp').read_text(encoding='utf-8-sig')
+        body=extract_definition(source,'SharedPtrAlphaMask Rasterizer::CompositeAlphaMask(')
+        native=select_undefined_ifdef(body,'XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL')
+        self.assertNotIn('CompositeOwner',native)
+        self.assertNotIn('result.owner',native)
+        self.assertIn('overlay->FillAlphaMash',native)
+        self.assertIn('XyRust::PlaneAllocation',native)
+
     def test_preserves_alternative_opening_branches(self):
         body = "void A() {\n#if OPTION\nif (one) {\n#else\nif (two) {\n#endif\nwork();\n}\n}"
         self.assertEqual(extract_fenced_method(body + "\n\nvoid B() {}", "void A()", "void B()"), body)

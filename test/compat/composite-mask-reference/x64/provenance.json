@@ -1,0 +1,72 @@
+{
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "source_sha256": "e1d5f99723529f2364e6f0a0443096edf697a71795170d788c6af0f87dc96481",
+  "library_sha256": {
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\strmbaseR.lib": "e4a3eed835fc6dcfdd7b81e684678cce0aaf032187e1ff2611b7f4146d6a9067",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\dsutilR.lib": "3dfc9f2eb59caef227f3ab723a1f10b672ab44f3efb61a75030d5b0a8730892b",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\subtitlesR.lib": "d6d48a179e28d70404ff870f6c6b640b9c768940065a95039695f7684689e50d",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\subpicR.lib": "23aed7e98c3c33cf31a956900fc720faf5d603edbb27c1f821964e9ccf87c5de",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\basevideofilterR.lib": "738d7f288e53690373e814f00ab7edcc8419e40de46a96f7a888a549ce8ca39e",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\libssfR.lib": "58a84c5e08a8c4c75e60e0f53b2590e6696e7f5938d52cc46b895ad326b4f1d8",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\unrarR.lib": "3dcfd1c32bc6261c168c841ebeb86c8dd4177f5698730424cbf39628f3e8a56c"
+  },
+  "functions": [
+    {
+      "name": "?CompositeAlphaMask@Rasterizer@@SA?AV?$shared_ptr@E@std@@AEBV?$shared_ptr@UOverlay@@@3@AEBVCRect@@PEBUGrayImage2@@HHPEBK_N4PEAV5@@Z",
+      "address": "0x140001400",
+      "end": "0x1400017c0",
+      "file": "CompositeAlphaMask.txt",
+      "lines": 254
+    },
+    {
+      "name": "?FillAlphaMashBody_c@@YAXPEAEPEBEHHHH@Z",
+      "address": "0x1400017c0",
+      "end": "0x140001980",
+      "file": "FillAlphaMashBody_c.txt",
+      "lines": 120
+    },
+    {
+      "name": "?FillAlphaMashBorder_c@@YAXPEAEPEBE1HHHH@Z",
+      "address": "0x140001980",
+      "end": "0x140001b80",
+      "file": "FillAlphaMashBorder_c.txt",
+      "lines": 143
+    },
+    {
+      "name": "?FillAlphaMashBodyMasked_c@@YAXPEAEPEBEHHHH1H@Z",
+      "address": "0x140001b80",
+      "end": "0x140001de0",
+      "file": "FillAlphaMashBodyMasked_c.txt",
+      "lines": 158
+    },
+    {
+      "name": "?FillAlphaMashBorderMasked_c@@YAXPEAEPEBE1HHHH1H@Z",
+      "address": "0x140001de0",
+      "end": "0x140002040",
+      "file": "FillAlphaMashBorderMasked_c.txt",
+      "lines": 162
+    },
+    {
+      "name": "?FillAlphaMash@Overlay@@QEAAXPEAE_N1HHHHPEBEHK@Z",
+      "address": "0x140002040",
+      "end": "0x140002250",
+      "file": "FillAlphaMash.txt",
+      "lines": 124
+    }
+  ],
+  "files": {
+    "build.log": "aa27712e78deac2eabc8fcc956dae76aaa346c61e79bc6574c62dbf6a362125c",
+    "command.json": "8e0f44401f4653a11e83e23110f9cdf2183e3a1d080d3a3a8dfb42b31e1f5ef4",
+    "CompositeAlphaMask.txt": "3823a9a1806fd94abc1a7d2aa29e3723a91f102a5a43104dcd09c541851a4b96",
+    "disassembly.txt": "b714353ca457cb88a48eb4c69364686a312c656bdfc571287526103ea43e2002",
+    "FillAlphaMash.txt": "699a5e9c1a5e80e53e58d40c410965f35ff54576f3bf884e2fe431c4890254e0",
+    "FillAlphaMashBodyMasked_c.txt": "d4d4956ff3df186d2220a421f382e8c1c293a75f289ecdfcb8349681c480b546",
+    "FillAlphaMashBody_c.txt": "7cf68055944d40e1406d81026825782fc840bc68004f98a5f8fdf76fe9900842",
+    "FillAlphaMashBorderMasked_c.txt": "bef0c4e54d5e5271f29fee78ec8ac9cc1d8e0980c09c2cc2a9d44df72e8820c8",
+    "FillAlphaMashBorder_c.txt": "958349e33367dc6b3394812815b6322fa09c84656336323271777c2e0bc763fa",
+    "probe.exe": "e84c56c6a570c926e619c1b4f158db5ba51e5b2e4a490599987b9e50bbcb6157",
+    "probe.map": "1ac95995d9fff6070a5cb4b74a85c2108d393b3c4655da05f9e39f4c779819ec",
+    "probe.obj": "881b543ce1f7f6c68927102e31ec8a3da5a5abfeb5cf4c4b66bb60d9e51e5f83"
+  },
+  "scope": "Unchanged pinned composite-mask functions linked for numeric and control-flow inspection. Executable not run; no behavior or parity claim."
+}

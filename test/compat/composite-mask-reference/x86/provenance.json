@@ -1,0 +1,56 @@
+{
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "source_sha256": "e1d5f99723529f2364e6f0a0443096edf697a71795170d788c6af0f87dc96481",
+  "library_sha256": {
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\strmbaseR.lib": "5926e97d337eebffe4ea20b996f2f0e62a33f67d6562e18a829c4f45888a954e",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\dsutilR.lib": "3333bc109c61750684684cafa818c90d68af49906e6c08994013e8e0bb711b0b",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\subtitlesR.lib": "46495e9e54830b1ee76e90021b0cd688be766a46fc9d354b52958651f3888f59",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\subpicR.lib": "2e3315a04138a6822958356c79dafdf47bdd51e6ddd32cf7ce6da8eae54a3e1f",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\basevideofilterR.lib": "3598e7cf095d9fefc68de1393902310c4c621a0b792b16098df40554cd6d2ada",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\libssfR.lib": "3eaa482d6d3b16a0b48816cf21cb96f3bb932963eb7b114c76372c785e4bbc09",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\unrarR.lib": "2a77b674333a0ac1e05fc155374268e7395d3e8163f1dc212788d446f3eb75cf"
+  },
+  "functions": [
+    {
+      "name": "?CompositeAlphaMask@Rasterizer@@SA?AV?$shared_ptr@E@std@@ABV?$shared_ptr@UOverlay@@@3@ABVCRect@@PBUGrayImage2@@HHPBK_N4PAV5@@Z",
+      "address": "0x401340",
+      "end": "0x401640",
+      "file": "CompositeAlphaMask.txt",
+      "lines": 266
+    },
+    {
+      "name": "?FillAlphaMashBody_c@@YAXPAEPBEHHHH@Z",
+      "address": "0x401640",
+      "end": "0x4016a0",
+      "file": "FillAlphaMashBody_c.txt",
+      "lines": 50
+    },
+    {
+      "name": "?FillAlphaMashBodyMasked_c@@YAXPAEPBEHHHH1H@Z",
+      "address": "0x4016a0",
+      "end": "0x401740",
+      "file": "FillAlphaMashBodyMasked_c.txt",
+      "lines": 66
+    },
+    {
+      "name": "?FillAlphaMash@Overlay@@QAEXPAE_N1HHHHPBEHK@Z",
+      "address": "0x401740",
+      "end": "0x401940",
+      "file": "FillAlphaMash.txt",
+      "lines": 176
+    }
+  ],
+  "files": {
+    "build.log": "dc72edfd3ff2956f859e53374ffd81de608b2feaff7c403f56d889d01fb6c0c3",
+    "command.json": "5be647100427f2a074c0b41fd044afcff71134862e5197830909c9fc1792389b",
+    "CompositeAlphaMask.txt": "18f89b2d731706a03ffdabe8c6f4b03d5b5c4e7a3c2edc38ef4cbc88350a36f2",
+    "disassembly.txt": "32e4c564c72b9e91e41a0933e27ed48c90b36f494c07b6ed72e477f8f5b913fe",
+    "FillAlphaMash.txt": "4dc9f7c555e65366fc6b0e5a201aee669ed5ca3775d68d8d1581832a2d238d5c",
+    "FillAlphaMashBodyMasked_c.txt": "c8f2fe032c8c8f73cf784d151c1cb87f5c8965361833ebba8440e4868f556b94",
+    "FillAlphaMashBody_c.txt": "e0d1fdc38060138177286c474e6992a4a43cbaf11f74d73772cc5fd5b308fe8f",
+    "probe.exe": "d285cd3faac1ff7ba0af2438f523b7d1ce57b899bf8da5b389c7e4b9bcfa0052",
+    "probe.map": "535095ba494ed255936bd9bfd9465a0d2ac2f6a072b70e17926ed3c0113dabcf",
+    "probe.obj": "d380612a377691191c6ad73d2e9f1ea3d3fd9321be40e9fa25c940c38f57c5f7"
+  },
+  "scope": "Unchanged pinned composite-mask functions linked for numeric and control-flow inspection. Executable not run; no behavior or parity claim."
+}

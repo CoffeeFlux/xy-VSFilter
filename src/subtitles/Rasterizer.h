@@ -48,6 +48,7 @@ typedef struct {
 #include "xy_rust_scan_data.h"
 #include "xy_rust_overlay.h"
 #include "xy_rust_clipper.h"
+#include "xy_rust_composite.h"
 #endif
 struct PathData
 {
@@ -262,6 +263,18 @@ public:
 
 typedef std::shared_ptr<GrayImage2> SharedPtrGrayImage2;
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+struct AlphaMask {
+    std::shared_ptr<XyRust::CompositeOwner> owner;
+    SharedPtrByte data;
+    BYTE* get()const{return data.get();}
+    explicit operator bool()const{return bool(data);}
+};
+typedef AlphaMask SharedPtrAlphaMask;
+#else
+typedef SharedPtrByte SharedPtrAlphaMask;
+#endif
+
 class XyBitmap;
 class Rasterizer
 {
@@ -297,7 +310,7 @@ public:
         double target_scale_x, double target_scale_y, 
         SharedPtrOverlay output_overlay );
 
-    static SharedPtrByte CompositeAlphaMask(const SharedPtrOverlay& overlay, const CRect& clipRect, 
+    static SharedPtrAlphaMask CompositeAlphaMask(const SharedPtrOverlay& overlay, const CRect& clipRect,
         const GrayImage2* alpha_mask, 
         int xsub, int ysub, const DWORD* switchpts, bool fBody, bool fBorder, 
         CRect *outputDirtyRect);

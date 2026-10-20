@@ -23,6 +23,8 @@ struct Owners {
     gaussian: xy_vsfilter_compat::gaussian_cache::Cache,
     clip_requests: xy_vsfilter_compat::clipper::Store<xy_vsfilter_compat::clipper::Request>,
     clip_masks: xy_vsfilter_compat::clipper::Store<xy_vsfilter_compat::clipper::Mask>,
+    composite_masks:
+        xy_vsfilter_compat::clipper::Store<xy_vsfilter_compat::composite_mask::Composite>,
     ellipse: xy_vsfilter_compat::ellipse::Cache<crate::windows_ellipse_numeric::Numeric>,
 }
 // SAFETY: all access uses the atomic gate; HRTB closures cannot return borrowed
@@ -51,6 +53,7 @@ impl Boundary {
                 gaussian: xy_vsfilter_compat::gaussian_cache::Cache::new(),
                 clip_requests: xy_vsfilter_compat::clipper::Store::new(),
                 clip_masks: xy_vsfilter_compat::clipper::Store::new(),
+                composite_masks: xy_vsfilter_compat::clipper::Store::new(),
                 ellipse: xy_vsfilter_compat::ellipse::Cache::new(),
             }),
         }
@@ -73,6 +76,144 @@ impl Boundary {
     }
 }
 static PATHS: Boundary = Boundary::new();
+/// # Safety
+/// parameters lends 28 initialized bytes (clip, subpixel origin, body/border
+/// flags). For nonempty geometry, nonnull switches lends two initialized DWORDs for single color or
+/// six for multiple colors, matching both production DrawItem callers.
+/// Switches are read only after nonempty geometry is established. output lends
+/// eight writable bytes. None of these pointers aliases private owner storage.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_composite_mask_create_v1(
+    overlay: u64,
+    mask: u64,
+    parameters: *const u8,
+    switches: *const u8,
+    output: *mut u8,
+) -> u32 {
+    if parameters.is_null() || output.is_null() {
+        return 3;
+    }
+    let mut bytes = [0u8; 28];
+    // SAFETY: caller's fixed scalar packet, detached before any output write.
+    unsafe {
+        core::ptr::copy_nonoverlapping(parameters, bytes.as_mut_ptr(), 28);
+    }
+    let int = |at| i32::from_le_bytes(bytes[at..at + 4].try_into().unwrap());
+    let flags = int(24);
+    if flags & !3 != 0 {
+        return 6;
+    }
+    let p = xy_vsfilter_compat::composite_mask::Parameters {
+        clip: [int(0), int(4), int(8), int(12)],
+        sub: [int(16), int(20)],
+        body: flags & 1 != 0,
+        border: flags & 2 != 0,
+    };
+    let result = PATHS.with_owners(|o| {
+        if switches.is_null() || flags == 0 {
+            return Ok(0u64);
+        }
+        let image = if overlay == 0 {
+            None
+        } else {
+            Some(o.rasters.get(overlay)?)
+        };
+        // A missing requested border short-circuits before the clip mask.
+        if p.border
+            && image
+                .is_none_or(|v| i32::from_le_bytes(v.bytes()[28..32].try_into().unwrap()) & 4 == 0)
+        {
+            return Ok(0);
+        }
+        let clip = if mask == 0 {
+            None
+        } else {
+            Some(o.clip_masks.get(mask)?)
+        };
+        let Some(geometry) = xy_vsfilter_compat::composite_mask::prepare(image, clip, p, true)?
+        else {
+            return Ok(0);
+        };
+        let mut raw = [0u8; 24];
+        // SAFETY: the active caller supplies at least the first two DWORDs.
+        unsafe {
+            core::ptr::copy_nonoverlapping(switches, raw.as_mut_ptr(), 8);
+        }
+        let single = raw[4..8] == [255; 4];
+        if !single {
+            // SAFETY: the production multi-color switch packet is six DWORDs.
+            unsafe {
+                core::ptr::copy_nonoverlapping(switches.add(8), raw.as_mut_ptr().add(8), 16);
+            }
+        }
+        let words: [u32; 6] =
+            core::array::from_fn(|i| u32::from_le_bytes(raw[i * 4..i * 4 + 4].try_into().unwrap()));
+        let composite = geometry.finish(image.ok_or(6u32)?, clip, &words)?;
+        o.composite_masks.insert(composite)
+    });
+    match result {
+        Ok(id) => {
+            // SAFETY: detached scalar and caller's writable output.
+            unsafe {
+                core::ptr::copy_nonoverlapping(id.to_le_bytes().as_ptr(), output, 8);
+            }
+            0
+        }
+        Err(e) => e,
+    }
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_composite_mask_destroy_v1(id: u64) -> u32 {
+    PATHS
+        .with_owners(|o| o.composite_masks.remove(id))
+        .err()
+        .unwrap_or(0)
+}
+/// # Safety
+/// output lends eight writable bytes for the detached snapshot length.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_composite_mask_info_v1(id: u64, output: *mut u8) -> u32 {
+    if output.is_null() {
+        return 3;
+    }
+    match PATHS.with_owners(|o| o.composite_masks.get(id)?.wire_len()) {
+        Ok(size) => {
+            // SAFETY: detached scalar and caller's writable output.
+            unsafe {
+                core::ptr::copy_nonoverlapping((size as u64).to_le_bytes().as_ptr(), output, 8);
+            }
+            0
+        }
+        Err(e) => e,
+    }
+}
+/// # Safety
+/// output lends capacity writable bytes, disjoint from private owner storage.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_composite_mask_read_v1(
+    id: u64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    if output.is_null() || capacity > isize::MAX as usize {
+        return 3;
+    }
+    PATHS
+        .with_owners(|o| {
+            let value = o.composite_masks.get(id)?;
+            if value.wire_len()? > capacity {
+                return Err(4);
+            }
+            let bytes = value.encode()?;
+            // SAFETY: checked destination capacity and detached initialized packet.
+            unsafe {
+                core::ptr::copy_nonoverlapping(bytes.as_ptr(), output, bytes.len());
+            }
+            Ok(())
+        })
+        .err()
+        .unwrap_or(0)
+}
 /// # Safety
 /// input lends 48 initialized bytes of scalar configuration; output lends eight
 /// writable bytes. Neither points into private owner storage.
@@ -1968,6 +2109,97 @@ mod tests {
                 1
             );
             assert_eq!(output, [0xa5; 34]);
+        }
+        unsafe {
+            let mut source_wire = [0u8; 40];
+            for (i, v) in [0i32, 0, 16, 16, 2, 2, 2, 3].into_iter().enumerate() {
+                source_wire[i * 4..i * 4 + 4].copy_from_slice(&v.to_le_bytes());
+            }
+            source_wire[32..36].copy_from_slice(&[0, 64, 65, 255]);
+            source_wire[36..].fill(1);
+            let mut id = [0xa5; 10];
+            assert_eq!(
+                xy_vsfilter_overlay_import_v1(source_wire.as_ptr(), 40, id.as_mut_ptr().add(1)),
+                0
+            );
+            let source = u64::from_le_bytes(id[1..9].try_into().unwrap());
+            let mut parameters = [0u8; 29];
+            for (i, v) in [0i32, 0, 2, 2, 0, 0, 1].into_iter().enumerate() {
+                parameters[1 + i * 4..5 + i * 4].copy_from_slice(&v.to_le_bytes());
+            }
+            let switches = [0u8, 0, 0, 255, 255, 255, 255, 255];
+            assert_eq!(
+                xy_vsfilter_composite_mask_create_v1(
+                    source,
+                    0,
+                    core::ptr::null(),
+                    switches.as_ptr(),
+                    id.as_mut_ptr()
+                ),
+                3
+            );
+            assert_eq!(
+                xy_vsfilter_composite_mask_create_v1(
+                    source,
+                    0,
+                    parameters.as_ptr().add(1),
+                    core::ptr::null(),
+                    id.as_mut_ptr().add(1)
+                ),
+                0
+            );
+            assert_eq!(u64::from_le_bytes(id[1..9].try_into().unwrap()), 0);
+            assert_eq!(
+                xy_vsfilter_composite_mask_create_v1(
+                    source,
+                    0,
+                    parameters.as_ptr().add(1),
+                    switches.as_ptr(),
+                    id.as_mut_ptr().add(1)
+                ),
+                0
+            );
+            assert_eq!((id[0], id[9]), (0xa5, 0xa5));
+            let composite = u64::from_le_bytes(id[1..9].try_into().unwrap());
+            assert_ne!(composite, 0);
+            parameters[1..5].copy_from_slice(&9i32.to_le_bytes());
+            assert_eq!(
+                xy_vsfilter_composite_mask_create_v1(
+                    source,
+                    0,
+                    parameters.as_ptr().add(1),
+                    core::ptr::NonNull::<u8>::dangling().as_ptr(),
+                    id.as_mut_ptr().add(1)
+                ),
+                0
+            );
+            assert_eq!(u64::from_le_bytes(id[1..9].try_into().unwrap()), 0);
+            assert_eq!(xy_vsfilter_raster_destroy_v1(source), 0);
+            assert_eq!(
+                xy_vsfilter_composite_mask_info_v1(composite, id.as_mut_ptr().add(1)),
+                0
+            );
+            assert_eq!(u64::from_le_bytes(id[1..9].try_into().unwrap()), 40);
+            let mut output = [0xa5; 42];
+            assert_eq!(
+                xy_vsfilter_composite_mask_read_v1(composite, output.as_mut_ptr().add(1), 39),
+                4
+            );
+            assert_eq!(output, [0xa5; 42]);
+            assert_eq!(
+                xy_vsfilter_composite_mask_read_v1(composite, output.as_mut_ptr().add(1), 40),
+                0
+            );
+            assert_eq!((output[0], output[41]), (0xa5, 0xa5));
+            assert_eq!(output[33..41], [0, 255, 3, 248, 1, 1, 1, 1]);
+            assert_eq!(xy_vsfilter_composite_mask_destroy_v1(composite), 0);
+            assert_eq!(xy_vsfilter_composite_mask_destroy_v1(composite), 1);
+            output.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_composite_mask_read_v1(composite, output.as_mut_ptr(), 42),
+                1
+            );
+            assert_eq!(output, [0xa5; 42]);
         }
         assert_eq!(boundary.with(|_| boundary.with(|_| Ok(()))), Err(2));
         assert_eq!(boundary.with(|s| s.create(Path::default())), Ok(1));

@@ -1,0 +1,66 @@
+  004016A0: 83 EC 08           sub         esp,8
+  004016A3: 8B 44 24 14        mov         eax,dword ptr [esp+14h]
+  004016A7: 89 14 24           mov         dword ptr [esp],edx
+  004016AA: 89 4C 24 04        mov         dword ptr [esp+4],ecx
+  004016AE: 85 C0              test        eax,eax
+  004016B0: 74 7B              je          0040172D
+  004016B2: 53                 push        ebx
+  004016B3: 55                 push        ebp
+  004016B4: 8B 6C 24 24        mov         ebp,dword ptr [esp+24h]
+  004016B8: 56                 push        esi
+  004016B9: 8B 74 24 24        mov         esi,dword ptr [esp+24h]
+  004016BD: 57                 push        edi
+  004016BE: 8B FF              mov         edi,edi
+  004016C0: 48                 dec         eax
+  004016C1: 83 7C 24 20 00     cmp         dword ptr [esp+20h],0
+  004016C6: 89 44 24 24        mov         dword ptr [esp+24h],eax
+  004016CA: 7E 49              jle         00401715
+  004016CC: 8B 74 24 20        mov         esi,dword ptr [esp+20h]
+  004016D0: 8B FA              mov         edi,edx
+  004016D2: 8B D9              mov         ebx,ecx
+  004016D4: 2B FD              sub         edi,ebp
+  004016D6: 8B C5              mov         eax,ebp
+  004016D8: 2B DD              sub         ebx,ebp
+  004016DA: 8D 9B 00 00 00 00  lea         ebx,[ebx+00000000h]
+  004016E0: 0F B6 14 38        movzx       edx,byte ptr [eax+edi]
+  004016E4: 8D 40 01           lea         eax,[eax+1]
+  004016E7: 0F B6 48 FF        movzx       ecx,byte ptr [eax-1]
+  004016EB: 0F AF D1           imul        edx,ecx
+  004016EE: 0F AF 54 24 1C     imul        edx,dword ptr [esp+1Ch]
+  004016F3: 81 C2 00 08 00 00  add         edx,800h
+  004016F9: C1 FA 0C           sar         edx,0Ch
+  004016FC: 88 54 03 FF        mov         byte ptr [ebx+eax-1],dl
+  00401700: 83 EE 01           sub         esi,1
+  00401703: 75 DB              jne         004016E0
+  00401705: 8B 44 24 24        mov         eax,dword ptr [esp+24h]
+  00401709: 8B 54 24 10        mov         edx,dword ptr [esp+10h]
+  0040170D: 8B 4C 24 14        mov         ecx,dword ptr [esp+14h]
+  00401711: 8B 74 24 28        mov         esi,dword ptr [esp+28h]
+  00401715: 03 6C 24 30        add         ebp,dword ptr [esp+30h]
+  00401719: 03 D6              add         edx,esi
+  0040171B: 03 CE              add         ecx,esi
+  0040171D: 89 54 24 10        mov         dword ptr [esp+10h],edx
+  00401721: 89 4C 24 14        mov         dword ptr [esp+14h],ecx
+  00401725: 85 C0              test        eax,eax
+  00401727: 75 97              jne         004016C0
+  00401729: 5F                 pop         edi
+  0040172A: 5E                 pop         esi
+  0040172B: 5D                 pop         ebp
+  0040172C: 5B                 pop         ebx
+  0040172D: 83 C4 08           add         esp,8
+  00401730: C3                 ret
+  00401731: CC                 int         3
+  00401732: CC                 int         3
+  00401733: CC                 int         3
+  00401734: CC                 int         3
+  00401735: CC                 int         3
+  00401736: CC                 int         3
+  00401737: CC                 int         3
+  00401738: CC                 int         3
+  00401739: CC                 int         3
+  0040173A: CC                 int         3
+  0040173B: CC                 int         3
+  0040173C: CC                 int         3
+  0040173D: CC                 int         3
+  0040173E: CC                 int         3
+  0040173F: CC                 int         3

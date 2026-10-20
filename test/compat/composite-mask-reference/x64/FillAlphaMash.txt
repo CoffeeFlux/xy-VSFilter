@@ -1,0 +1,124 @@
+  0000000140002040: 48 89 5C 24 08     mov         qword ptr [rsp+8],rbx
+  0000000140002045: 48 89 74 24 10     mov         qword ptr [rsp+10h],rsi
+  000000014000204A: 57                 push        rdi
+  000000014000204B: 48 83 EC 50        sub         rsp,50h
+  000000014000204F: 4C 8B 11           mov         r10,qword ptr [rcx]
+  0000000140002052: 48 8B F2           mov         rsi,rdx
+  0000000140002055: 48 8B 51 10        mov         rdx,qword ptr [rcx+10h]
+  0000000140002059: 41 0F B6 F8        movzx       edi,r8b
+  000000014000205D: 44 8B 59 38        mov         r11d,dword ptr [rcx+38h]
+  0000000140002061: 41 8B CB           mov         ecx,r11d
+  0000000140002064: 0F AF 8C 24 88 00  imul        ecx,dword ptr [rsp+0000000000000088h]
+  000000014000206C: 48 63 9C 24 80 00  movsxd      rbx,dword ptr [rsp+0000000000000080h]
+  0000000140002074: 4D 85 D2           test        r10,r10
+  0000000140002077: 74 09              je          0000000140002082
+  0000000140002079: 48 63 C1           movsxd      rax,ecx
+  000000014000207C: 48 03 C3           add         rax,rbx
+  000000014000207F: 4C 03 D0           add         r10,rax
+  0000000140002082: 4C 63 C1           movsxd      r8,ecx
+  0000000140002085: 48 85 D2           test        rdx,rdx
+  0000000140002088: 74 07              je          0000000140002091
+  000000014000208A: 49 8D 04 18        lea         rax,[r8+rbx]
+  000000014000208E: 48 03 D0           add         rdx,rax
+  0000000140002091: 3E 3E 3E 3E 3E 3E  lea         rcx,ds:[rbx+r8]
+  000000014000209D: 48 03 CE           add         rcx,rsi
+  00000001400020A0: 45 84 C9           test        r9b,r9b
+  00000001400020A3: 0F 85 8C 00 00 00  jne         0000000140002135
+  00000001400020A9: 40 84 FF           test        dil,dil
+  00000001400020AC: 0F 84 83 01 00 00  je          0000000140002235
+  00000001400020B2: 48 8B 94 24 A0 00  mov         rdx,qword ptr [rsp+00000000000000A0h]
+  00000001400020BA: 44 8B 8C 24 90 00  mov         r9d,dword ptr [rsp+0000000000000090h]
+  00000001400020C2: 44 8B 84 24 B0 00  mov         r8d,dword ptr [rsp+00000000000000B0h]
+  00000001400020CA: 48 85 D2           test        rdx,rdx
+  00000001400020CD: 75 2D              jne         00000001400020FC
+  00000001400020CF: 8B 84 24 98 00 00  mov         eax,dword ptr [rsp+0000000000000098h]
+  00000001400020D6: 49 8B D2           mov         rdx,r10
+  00000001400020D9: 44 89 9C 24 88 00  mov         dword ptr [rsp+0000000000000088h],r11d
+  00000001400020E1: 89 84 24 80 00 00  mov         dword ptr [rsp+0000000000000080h],eax
+  00000001400020E8: 48 8B 5C 24 60     mov         rbx,qword ptr [rsp+60h]
+  00000001400020ED: 48 8B 74 24 68     mov         rsi,qword ptr [rsp+68h]
+  00000001400020F2: 48 83 C4 50        add         rsp,50h
+  00000001400020F6: 5F                 pop         rdi
+  00000001400020F7: E9 C4 F6 FF FF     jmp         00000001400017C0
+  00000001400020FC: 3E 8B 84 24 A8 00  mov         eax,dword ptr ds:[rsp+00000000000000A8h]
+  0000000140002104: 89 44 24 38        mov         dword ptr [rsp+38h],eax
+  0000000140002108: 8B 84 24 98 00 00  mov         eax,dword ptr [rsp+0000000000000098h]
+  000000014000210F: 48 89 54 24 30     mov         qword ptr [rsp+30h],rdx
+  0000000140002114: 49 8B D2           mov         rdx,r10
+  0000000140002117: 44 89 5C 24 28     mov         dword ptr [rsp+28h],r11d
+  000000014000211C: 89 44 24 20        mov         dword ptr [rsp+20h],eax
+  0000000140002120: E8 5B FA FF FF     call        0000000140001B80
+  0000000140002125: 48 8B 5C 24 60     mov         rbx,qword ptr [rsp+60h]
+  000000014000212A: 48 8B 74 24 68     mov         rsi,qword ptr [rsp+68h]
+  000000014000212F: 48 83 C4 50        add         rsp,50h
+  0000000140002133: 5F                 pop         rdi
+  0000000140002134: C3                 ret
+  0000000140002135: 3E 3E 3E 4C 8B 84  mov         r8,qword ptr ds:[rsp+00000000000000A0h]
+  0000000140002140: 40 84 FF           test        dil,dil
+  0000000140002143: 74 7D              je          00000001400021C2
+  0000000140002145: 44 8B 8C 24 90 00  mov         r9d,dword ptr [rsp+0000000000000090h]
+  000000014000214D: 4D 85 C0           test        r8,r8
+  0000000140002150: 75 33              jne         0000000140002185
+  0000000140002152: 3E 8B 84 24 98 00  mov         eax,dword ptr ds:[rsp+0000000000000098h]
+  000000014000215A: 44 8B 84 24 B0 00  mov         r8d,dword ptr [rsp+00000000000000B0h]
+  0000000140002162: 44 89 9C 24 88 00  mov         dword ptr [rsp+0000000000000088h],r11d
+  000000014000216A: 89 84 24 80 00 00  mov         dword ptr [rsp+0000000000000080h],eax
+  0000000140002171: 48 8B 5C 24 60     mov         rbx,qword ptr [rsp+60h]
+  0000000140002176: 48 8B 74 24 68     mov         rsi,qword ptr [rsp+68h]
+  000000014000217B: 48 83 C4 50        add         rsp,50h
+  000000014000217F: 5F                 pop         rdi
+  0000000140002180: E9 3B F6 FF FF     jmp         00000001400017C0
+  0000000140002185: 8B 84 24 A8 00 00  mov         eax,dword ptr [rsp+00000000000000A8h]
+  000000014000218C: 89 44 24 38        mov         dword ptr [rsp+38h],eax
+  0000000140002190: 8B 84 24 98 00 00  mov         eax,dword ptr [rsp+0000000000000098h]
+  0000000140002197: 4C 89 44 24 30     mov         qword ptr [rsp+30h],r8
+  000000014000219C: 44 8B 84 24 B0 00  mov         r8d,dword ptr [rsp+00000000000000B0h]
+  00000001400021A4: 44 89 5C 24 28     mov         dword ptr [rsp+28h],r11d
+  00000001400021A9: 89 44 24 20        mov         dword ptr [rsp+20h],eax
+  00000001400021AD: E8 CE F9 FF FF     call        0000000140001B80
+  00000001400021B2: 48 8B 5C 24 60     mov         rbx,qword ptr [rsp+60h]
+  00000001400021B7: 48 8B 74 24 68     mov         rsi,qword ptr [rsp+68h]
+  00000001400021BC: 48 83 C4 50        add         rsp,50h
+  00000001400021C0: 5F                 pop         rdi
+  00000001400021C1: C3                 ret
+  00000001400021C2: 44 8B 8C 24 B0 00  mov         r9d,dword ptr [rsp+00000000000000B0h]
+  00000001400021CA: 4D 85 C0           test        r8,r8
+  00000001400021CD: 75 33              jne         0000000140002202
+  00000001400021CF: 8B 84 24 98 00 00  mov         eax,dword ptr [rsp+0000000000000098h]
+  00000001400021D6: 4D 8B C2           mov         r8,r10
+  00000001400021D9: 44 89 5C 24 30     mov         dword ptr [rsp+30h],r11d
+  00000001400021DE: 89 44 24 28        mov         dword ptr [rsp+28h],eax
+  00000001400021E2: 8B 84 24 90 00 00  mov         eax,dword ptr [rsp+0000000000000090h]
+  00000001400021E9: 89 44 24 20        mov         dword ptr [rsp+20h],eax
+  00000001400021ED: E8 8E F7 FF FF     call        0000000140001980
+  00000001400021F2: 48 8B 5C 24 60     mov         rbx,qword ptr [rsp+60h]
+  00000001400021F7: 48 8B 74 24 68     mov         rsi,qword ptr [rsp+68h]
+  00000001400021FC: 48 83 C4 50        add         rsp,50h
+  0000000140002200: 5F                 pop         rdi
+  0000000140002201: C3                 ret
+  0000000140002202: 8B 84 24 A8 00 00  mov         eax,dword ptr [rsp+00000000000000A8h]
+  0000000140002209: 89 44 24 40        mov         dword ptr [rsp+40h],eax
+  000000014000220D: 8B 84 24 98 00 00  mov         eax,dword ptr [rsp+0000000000000098h]
+  0000000140002214: 4C 89 44 24 38     mov         qword ptr [rsp+38h],r8
+  0000000140002219: 4D 8B C2           mov         r8,r10
+  000000014000221C: 44 89 5C 24 30     mov         dword ptr [rsp+30h],r11d
+  0000000140002221: 89 44 24 28        mov         dword ptr [rsp+28h],eax
+  0000000140002225: 8B 84 24 90 00 00  mov         eax,dword ptr [rsp+0000000000000090h]
+  000000014000222C: 89 44 24 20        mov         dword ptr [rsp+20h],eax
+  0000000140002230: E8 AB FB FF FF     call        0000000140001DE0
+  0000000140002235: 48 8B 5C 24 60     mov         rbx,qword ptr [rsp+60h]
+  000000014000223A: 48 8B 74 24 68     mov         rsi,qword ptr [rsp+68h]
+  000000014000223F: 48 83 C4 50        add         rsp,50h
+  0000000140002243: 5F                 pop         rdi
+  0000000140002244: C3                 ret
+  0000000140002245: CC                 int         3
+  0000000140002246: CC                 int         3
+  0000000140002247: CC                 int         3
+  0000000140002248: CC                 int         3
+  0000000140002249: CC                 int         3
+  000000014000224A: CC                 int         3
+  000000014000224B: CC                 int         3
+  000000014000224C: CC                 int         3
+  000000014000224D: CC                 int         3
+  000000014000224E: CC                 int         3
+  000000014000224F: CC                 int         3

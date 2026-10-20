@@ -12,6 +12,7 @@ public:
     uint64_t Id()const{return id_;}
 };
 class ClipMaskOwner {
+    friend class CompositeOwner;
     uint64_t id_=0;
 public:
     ClipMaskOwner()=default;~ClipMaskOwner();

@@ -1,0 +1,50 @@
+  00401640: 53                 push        ebx
+  00401641: 55                 push        ebp
+  00401642: 57                 push        edi
+  00401643: 8B 7C 24 18        mov         edi,dword ptr [esp+18h]
+  00401647: 8B EA              mov         ebp,edx
+  00401649: 8B D9              mov         ebx,ecx
+  0040164B: 85 FF              test        edi,edi
+  0040164D: 74 3F              je          0040168E
+  0040164F: 8B 4C 24 1C        mov         ecx,dword ptr [esp+1Ch]
+  00401653: 8B 54 24 14        mov         edx,dword ptr [esp+14h]
+  00401657: 56                 push        esi
+  00401658: 4F                 dec         edi
+  00401659: 85 D2              test        edx,edx
+  0040165B: 7E 28              jle         00401685
+  0040165D: 8B F5              mov         esi,ebp
+  0040165F: 8B C3              mov         eax,ebx
+  00401661: 2B F3              sub         esi,ebx
+  00401663: 0F B6 0C 06        movzx       ecx,byte ptr [esi+eax]
+  00401667: 8D 40 01           lea         eax,[eax+1]
+  0040166A: 0F AF 4C 24 14     imul        ecx,dword ptr [esp+14h]
+  0040166F: 83 C1 20           add         ecx,20h
+  00401672: C1 F9 06           sar         ecx,6
+  00401675: 88 48 FF           mov         byte ptr [eax-1],cl
+  00401678: 83 EA 01           sub         edx,1
+  0040167B: 75 E6              jne         00401663
+  0040167D: 8B 4C 24 20        mov         ecx,dword ptr [esp+20h]
+  00401681: 8B 54 24 18        mov         edx,dword ptr [esp+18h]
+  00401685: 03 E9              add         ebp,ecx
+  00401687: 03 D9              add         ebx,ecx
+  00401689: 85 FF              test        edi,edi
+  0040168B: 75 CB              jne         00401658
+  0040168D: 5E                 pop         esi
+  0040168E: 5F                 pop         edi
+  0040168F: 5D                 pop         ebp
+  00401690: 5B                 pop         ebx
+  00401691: C3                 ret
+  00401692: CC                 int         3
+  00401693: CC                 int         3
+  00401694: CC                 int         3
+  00401695: CC                 int         3
+  00401696: CC                 int         3
+  00401697: CC                 int         3
+  00401698: CC                 int         3
+  00401699: CC                 int         3
+  0040169A: CC                 int         3
+  0040169B: CC                 int         3
+  0040169C: CC                 int         3
+  0040169D: CC                 int         3
+  0040169E: CC                 int         3
+  0040169F: CC                 int         3

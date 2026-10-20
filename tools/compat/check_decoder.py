@@ -1537,7 +1537,12 @@ void xy_byte_2_byte_transpose_c(UINT8* dst,int dw,int ds,PCUINT8 src,int w,int h
         if name == "CandidateComposite":
             composite_code += "#define XY_VSFILTER_RUST_TEXT\n"
         composite_code += extract_definition(composite_text, "void Overlay::FillAlphaMash(").replace("Overlay::FillAlphaMash(", "Overlay::FillAlphaMashImpl(") + "\n"
-        composite_code += extract_definition(composite_text, "SharedPtrByte Rasterizer::CompositeAlphaMask(").replace("XyRust::PlaneAllocation", "XyRust::ObservedCompositeAllocation") + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
+        # This historical storage oracle selects the retained native/leaf path.
+        # The owned experimental operation has a separate actual-linked observer.
+        composite_signature = ("SharedPtrAlphaMask" if "SharedPtrAlphaMask Rasterizer::CompositeAlphaMask(" in composite_text else "SharedPtrByte") + " Rasterizer::CompositeAlphaMask("
+        composite_body = select_undefined_ifdef(extract_definition(composite_text, composite_signature), "XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL")
+        composite_body = composite_body.replace("SharedPtrAlphaMask Rasterizer::CompositeAlphaMask(", "SharedPtrByte Rasterizer::CompositeAlphaMask(", 1)
+        composite_code += composite_body.replace("XyRust::PlaneAllocation", "XyRust::ObservedCompositeAllocation") + "\n}\n#undef XY_VSFILTER_RUST_TEXT\n"
     (destination / "original_composite_storage.h").write_text(composite_code, encoding="utf-8")
     dvb = '#include "original_hdmv.h"\n#include "dvb_shell.h"\n'
     dvb += '#define UnionRect ObservedUnionRect\n'
