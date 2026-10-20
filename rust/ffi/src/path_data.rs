@@ -18,10 +18,11 @@ struct Owners {
     paths: Store,
     scans: xy_vsfilter_compat::scan_convert::Store,
     regions: xy_vsfilter_compat::wide_region::Store,
+    rasters: xy_vsfilter_compat::raster::Store,
     ellipse: xy_vsfilter_compat::ellipse::Cache<crate::windows_ellipse_numeric::Numeric>,
 }
 // SAFETY: all access uses the atomic gate; HRTB closures cannot return borrowed
-// references, and all three registries own only Send data. No native pointer is
+// references, and all four registries own only Send data. No native pointer is
 // stored. Path->scan conversion uses disjoint fields under this single gate,
 // so it never nests admissions or releases a path loan across a callback.
 // The ellipse cache owns only scalar numeric state, an arc and a table. Region
@@ -41,6 +42,7 @@ impl Boundary {
                 paths: Store::new(),
                 scans: xy_vsfilter_compat::scan_convert::Store::new(),
                 regions: xy_vsfilter_compat::wide_region::Store::new(),
+                rasters: xy_vsfilter_compat::raster::Store::new(),
                 ellipse: xy_vsfilter_compat::ellipse::Cache::new(),
             }),
         }
@@ -63,6 +65,79 @@ impl Boundary {
     }
 }
 static PATHS: Boundary = Boundary::new();
+/// # Safety
+/// output spans sixteen writable bytes for a checked raster ID and byte length.
+/// Both sources and the new owned result remain admitted together. No pointer
+/// into any owner, span or pixel allocation crosses this operation.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_raster_create_v1(
+    scan: u64,
+    region: u64,
+    offset_x: i32,
+    offset_y: i32,
+    sub_x: i32,
+    sub_y: i32,
+    output: *mut u8,
+) -> u32 {
+    if output.is_null() {
+        return 3;
+    }
+    let (id, length) = match PATHS.with_owners(|o| {
+        let image = xy_vsfilter_compat::raster::Image::render(
+            o.scans.get(scan)?,
+            o.regions.get(region)?,
+            [offset_x, offset_y],
+            [sub_x, sub_y],
+        )?;
+        let length = image.bytes().len() as u64;
+        Ok((o.rasters.insert(image)?, length))
+    }) {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    // SAFETY: caller's writable output, detached scalars after admission ends.
+    unsafe {
+        core::ptr::copy_nonoverlapping(id.to_le_bytes().as_ptr(), output, 8);
+        core::ptr::copy_nonoverlapping(length.to_le_bytes().as_ptr(), output.add(8), 8);
+    }
+    0
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_raster_destroy_v1(id: u64) -> u32 {
+    match PATHS.with_owners(|o| o.rasters.remove(id)) {
+        Ok(()) => 0,
+        Err(e) => e,
+    }
+}
+/// # Safety
+/// output spans capacity writable bytes and cannot alias a private owner. The
+/// checked copy holds admission through its entire write; no owner loan escapes.
+/// Invalid IDs or short buffers leave output unchanged.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_raster_read_v1(
+    id: u64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    if output.is_null() || capacity > isize::MAX as usize {
+        return 3;
+    }
+    match PATHS.with_owners(|o| {
+        let bytes = o.rasters.get(id)?.bytes();
+        if bytes.len() > capacity {
+            return Err(4);
+        }
+        // SAFETY: caller's disjoint writable buffer, checked size and unique
+        // admission. The source cannot be mutated/released during the copy.
+        unsafe {
+            core::ptr::copy_nonoverlapping(bytes.as_ptr(), output, bytes.len());
+        }
+        Ok(())
+    }) {
+        Ok(()) => 0,
+        Err(e) => e,
+    }
+}
 /// # Safety
 /// output spans eight writable bytes. No owner address is exported.
 #[no_mangle]
@@ -715,6 +790,67 @@ mod tests {
             assert_eq!(&snapshot[1..13], &[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
             assert_eq!(xy_vsfilter_region_info_v1(region, scan_id.as_mut_ptr()), 0);
             assert_eq!(u64::from_le_bytes(scan_id), 12);
+            let mut raster_info = [0xa5u8; 18];
+            assert_eq!(
+                xy_vsfilter_raster_create_v1(
+                    u64::MAX,
+                    region,
+                    0,
+                    0,
+                    0,
+                    0,
+                    raster_info.as_mut_ptr().add(1)
+                ),
+                1
+            );
+            assert_eq!(raster_info, [0xa5; 18]);
+            assert_eq!(
+                xy_vsfilter_raster_create_v1(scan, region, 0, 0, 0, 0, core::ptr::null_mut()),
+                3
+            );
+            assert_eq!(
+                xy_vsfilter_raster_create_v1(
+                    scan,
+                    region,
+                    0,
+                    0,
+                    -1,
+                    -9,
+                    raster_info.as_mut_ptr().add(1)
+                ),
+                0
+            );
+            let raster = u64::from_le_bytes(raster_info[1..9].try_into().unwrap());
+            assert_eq!(
+                u64::from_le_bytes(raster_info[9..17].try_into().unwrap()),
+                80
+            );
+            assert_eq!((raster_info[0], raster_info[17]), (0xa5, 0xa5));
+            let mut raster_bytes = [0xa5; 82];
+            assert_eq!(
+                xy_vsfilter_raster_read_v1(raster, raster_bytes.as_mut_ptr().add(1), 79),
+                4
+            );
+            assert_eq!(raster_bytes, [0xa5; 82]);
+            assert_eq!(
+                xy_vsfilter_raster_read_v1(raster, raster_bytes.as_mut_ptr().add(1), 80),
+                0
+            );
+            let fields: alloc::vec::Vec<_> = raster_bytes[1..33]
+                .chunks_exact(4)
+                .map(|b| i32::from_le_bytes(b.try_into().unwrap()))
+                .collect();
+            assert_eq!(fields, [-7, -7, 39, 15, 6, 3, 16, 3]);
+            assert_eq!(&raster_bytes[33..81], &[0; 48]);
+            assert_eq!((raster_bytes[0], raster_bytes[81]), (0xa5, 0xa5));
+            assert_eq!(xy_vsfilter_raster_destroy_v1(raster), 0);
+            raster_bytes.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_raster_read_v1(raster, raster_bytes.as_mut_ptr(), 82),
+                1
+            );
+            assert_eq!(raster_bytes, [0xa5; 82]);
+            assert_eq!(xy_vsfilter_raster_destroy_v1(raster), 1);
             assert_eq!(xy_vsfilter_region_destroy_v1(region), 0);
             assert_eq!(xy_vsfilter_region_info_v1(region, scan_id.as_mut_ptr()), 1);
             assert_eq!(xy_vsfilter_scan_destroy_v1(scan), 0);

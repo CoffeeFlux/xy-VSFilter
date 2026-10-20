@@ -132,6 +132,7 @@ pub mod path_buffer;
 
 pub mod edge_storage;
 pub mod plane;
+pub mod raster;
 pub mod scan_row;
 pub mod span_coverage;
 

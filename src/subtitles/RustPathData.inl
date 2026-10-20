@@ -2,6 +2,9 @@
 // Included once by Rasterizer.cpp. All Rust data crosses as detached bytes.
 #include "RustDocumentOwner.h"
 extern "C" {
+uint32_t __cdecl xy_vsfilter_raster_create_v1(uint64_t,uint64_t,int32_t,int32_t,int32_t,int32_t,uint8_t*);
+uint32_t __cdecl xy_vsfilter_raster_read_v1(uint64_t,uint8_t*,size_t);
+uint32_t __cdecl xy_vsfilter_raster_destroy_v1(uint64_t);
 uint32_t __cdecl xy_vsfilter_region_create_v1(uint8_t*);
 uint32_t __cdecl xy_vsfilter_region_destroy_v1(uint64_t);
 uint32_t __cdecl xy_vsfilter_region_convert_v1(uint64_t,uint64_t,int32_t,int32_t,uint8_t*);
@@ -33,6 +36,13 @@ std::array<uint8_t,12> PathInfo(uint64_t id){std::array<uint8_t,12> out;
 }
 RegionOwner::RegionOwner(){std::array<uint8_t,8> out;DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_region_create_v1(out.data());}));id_=DocumentDetail::Load(out,0,8);}
 RegionOwner::~RegionOwner(){DocumentDetail::Release(DocumentDetail::Invoke([&](){return xy_vsfilter_region_destroy_v1(id_);}));}
+std::vector<uint8_t> RegionOwner::Raster(const ScanOwner& scan,int x,int y,int xsub,int ysub)const{
+    DocumentDetail::Loan gate;std::array<uint8_t,16> info;
+    DocumentDetail::Check(xy_vsfilter_raster_create_v1(scan.id_,id_,x,y,xsub,ysub,info.data()));
+    struct ReleaseRaster { uint64_t id;~ReleaseRaster(){DocumentDetail::Release(xy_vsfilter_raster_destroy_v1(id));} } release{DocumentDetail::Load(info,0,8)};
+    const size_t length=DocumentDetail::Size(DocumentDetail::Load(info,8,8));DocumentDetail::Shape(length>=32);
+    DocumentDetail::Bytes bytes(length);DocumentDetail::Check(xy_vsfilter_raster_read_v1(release.id,bytes.data(),bytes.size()));return bytes;
+}
 bool RegionOwner::Convert(const ScanOwner& scan,int rx,int ry){std::array<uint8_t,4> out;
     DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_region_convert_v1(id_,scan.id_,rx,ry,out.data());}));return DocumentDetail::Load(out,0,4)!=0;}
 RegionSnapshot RegionOwner::Read()const{

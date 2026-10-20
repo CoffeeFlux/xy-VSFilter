@@ -433,10 +433,27 @@ bool Rasterizer::Rasterize(const ScanLineData2& scan_line_data2, int xsub, int y
     }
     overlay->CleanUp();
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    const auto scan_line_data=scan_line_data2.m_scan_line_data->Snapshot();
+    // Rust owns construction and coverage. These are detached snapshots for
+    // transitional blur/clip/draw consumers, never a loan from the raster owner.
+    const auto bytes=scan_line_data2.m_region.Raster(scan_line_data2.m_scan_line_data->m_scan,
+        scan_line_data2.mPathOffsetX,scan_line_data2.mPathOffsetY,xsub,ysub);
+    using namespace XyRust::DocumentDetail;
+    overlay->mOffsetX=I32(Load(bytes,0,4));overlay->mOffsetY=I32(Load(bytes,4,4));
+    overlay->mWidth=I32(Load(bytes,8,4));overlay->mHeight=I32(Load(bytes,12,4));
+    overlay->mOverlayWidth=I32(Load(bytes,16,4));overlay->mOverlayHeight=I32(Load(bytes,20,4));
+    overlay->mOverlayPitch=I32(Load(bytes,24,4));const unsigned flags=static_cast<unsigned>(Load(bytes,28,4));
+    overlay->mfWideOutlineEmpty=(flags&1)!=0;
+    if(flags==0){Shape(bytes.size()==32);return true;}
+    Shape(flags==3||flags==6);Shape(overlay->mOverlayPitch>0&&overlay->mOverlayHeight>0);
+    const size_t count=MulSize(static_cast<size_t>(overlay->mOverlayPitch),static_cast<size_t>(overlay->mOverlayHeight));
+    Shape(bytes.size()==AddSize(32,MulSize(count,flags==6?2:1)));
+    XyRust::PlaneAllocation body(count);if(!body.Ready())return false;
+    memcpy(body.Data(),bytes.data()+32,count);body.Attach(overlay->mBody);
+    if(flags==6){XyRust::PlaneAllocation border(count);if(!border.Ready())return false;
+        memcpy(border.Data(),bytes.data()+32+count,count);border.Attach(overlay->mBorder);}
+    return true;
 #else
     const ScanLineData& scan_line_data = *scan_line_data2.m_scan_line_data;
-#endif
     if(!scan_line_data.mWidth || !scan_line_data.mHeight)
     {
         return true;
@@ -446,11 +463,7 @@ bool Rasterizer::Rasterize(const ScanLineData2& scan_line_data2, int xsub, int y
     //xsub = ysub = 0;
     int width = scan_line_data.mWidth + xsub;
     int height = scan_line_data.mHeight + ysub;
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    const auto region=scan_line_data2.Snapshot();
-#else
     const auto& region=scan_line_data2;
-#endif
     overlay->mfWideOutlineEmpty = region.mWideOutline.empty();
     if(!overlay->mfWideOutlineEmpty)
     {
@@ -547,6 +560,7 @@ bool Rasterizer::Rasterize(const ScanLineData2& scan_line_data2, int xsub, int y
     }
 
     return true;
+#endif
 }
 
 const float Rasterizer::GAUSSIAN_BLUR_THREHOLD = 0.333333f;

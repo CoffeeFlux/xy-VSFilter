@@ -22,6 +22,9 @@ pub struct Scan {
     spans: Vec<[u64; 2]>,
 }
 impl Scan {
+    pub fn size(&self) -> [i32; 2] {
+        self.size
+    }
     pub fn spans(&self) -> &[[u64; 2]] {
         &self.spans
     }

@@ -27,5 +27,6 @@ public:
     RegionOwner();~RegionOwner();
     bool Convert(const ScanOwner&,int,int);
     RegionSnapshot Read()const;
+    std::vector<uint8_t> Raster(const ScanOwner&,int,int,int,int)const;
 };
 }

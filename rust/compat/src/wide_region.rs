@@ -39,6 +39,12 @@ pub struct Region {
     spans: Vec<Span>,
 }
 impl Region {
+    pub fn border(&self) -> i32 {
+        self.border
+    }
+    pub fn spans(&self) -> &[[u64; 2]] {
+        &self.spans
+    }
     pub fn convert<E: Ellipse>(
         &mut self,
         src: &[Span],
