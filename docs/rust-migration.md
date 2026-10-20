@@ -27,16 +27,58 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## In progress: owned BeBlur orchestration (2026-10-19)
+## Latest port: owned BeBlur orchestration (2026-10-19)
 
-The experimental BeBlur path now consumes canonical overlay IDs. Safe Rust owns
-geometry/copies, complete 3x3 passes, fractional weighted filtering, transposes
-and scratch. A bounded scalar numeric backend preserves the captured x86/x64
-cleanup instructions. The observer now covers 12,804 calls including zero,
-small and rounding-boundary strengths. See [the boundary audit](rust-be-blur-boundary.md).
-Windows comparisons for this implementation are pending; earlier parity evidence
-remains attributed to its own implementation. Gaussian, clip/draw, host adapters
-and vendors remain in scope; no production default has changed.
+Implementation `a4a9a6fc` moves the experimental BeBlur operation onto canonical
+Rust image owners: geometry and copies, complete fixed 3x3 passes, fractional
+weighted filters, transposes and scratch. Unknown padding is never read; unknown
+logical bytes remain tracked and filtering them reports unresolved. The source
+owner remains independent of the result. Native consumers receive detached
+snapshots with the existing alias and cache-allocation accounting.
+
+A bounded scalar backend preserves the linked cleanup's x86 x87/CRT and x64 SSE
+calculation order. Its ten assembly sites address only fixed initialized local
+slots. No image pointer, pixel index or allocation enters that backend. The
+portable core remains unsafe-free. Selected instructions, constants and original
+capture provenance are archived in `test/compat/be-blur-numeric`. See
+[the boundary audit](rust-be-blur-boundary.md).
+
+The corrected observer `d3b88d46` matches 12,804 calls / 38,414 trace lines twice
+per role on Windows x86/x64. Coverage includes rounding boundaries, direct
+zero-strength BeBlur, very small strengths, Gaussian/combined stages, cache-copy
+offsets and chained subpixel shifts. Known bytes, metadata, FP/error status and
+allocation deltas match. All eleven preceding focused probes pass. Each complete
+rendering run matches 1,222 cases / 13,186 frames and passes 192 distinct-frame
+controls against cleanup `67da07cd`. All three DLLs build and preserve exports/
+dependencies; ten COM cases plus two controls pass per architecture.
+
+Rust passes 375 core and 141 FFI tests per architecture, formatting and Clippy;
+Python passes 208 tests with one skip. Tests cover spatial kernel results, edges,
+padding, transposes, unknown logical reads, stale IDs, unaligned outputs and
+result survival after source release. The boundary inventory records 617 unsafe
+blocks, 425 unsafe functions, four unsafe Sync implementations and 44 assembly
+sites; these are not completion percentages or a soundness proof. Detailed
+provenance is in [the local evidence](rust-be-blur-local-evidence.json).
+
+The initial expanded observer incorrectly demanded successful combined Blur when
+both effects were below activation threshold; its check exited 2. The corrected
+combined case uses an active effect while direct BeBlur retains zero. No candidate
+implementation changed. Initial diagnostics remain recorded. Earlier cleanup
+crashes and ellipse FP instability retain their original attribution.
+
+Gaussian orchestration/coefficient sharing, Blur dispatch, clip/draw/GrayImage,
+native object graphs, host adapters and vendors remain in scope. Allocation
+failure (including the omitted unused native temporary allocation), partial
+failure state, invalid geometry, Debug, other FP controls and arbitrary host
+concurrency remain unclosed. The experimental switch remains opt-in; the full
+migration is active.
+
+Next Gaussian arithmetic/traversal excerpts are in
+`artifacts/gaussian-next-reference-x86` and `artifacts/gaussian-next-reference-x64`,
+with notes in `artifacts/gaussian-next-notes.txt`. They come from the unchanged
+prior cleanup capture, not a new parity claim. Gaussian uses the floating SSE
+filter dispatch and its weak coefficient sharing; the existing integer Gaussian
+module is not its replacement.
 
 ## Earlier port: persistent overlay owners and subpixel shifting (2026-10-19)
 
