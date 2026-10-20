@@ -1,0 +1,584 @@
+{
+  "schema": 1,
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "candidate_implementation_commit": "d9899cfccce1b1f58f065e895c6b23441dfed1d6",
+  "status": "Experimental owned ellipse cache and target arithmetic checkpoint; full-library migration remains active",
+  "architectures": {
+    "x86": {
+      "native": {
+        "wide_region_native": {
+          "path": "artifacts/ellipse-owned-wide_region_native-x86/report.json",
+          "sha256": "b798e2fa4c1d35ec1235aa26ed4578a13c3c9f7b60ac66adae348ece645118f3",
+          "candidate_commit": "d9899cfccce1b1f58f065e895c6b23441dfed1d6",
+          "cases": 1536,
+          "trace_lines": 288022,
+          "trace_sha256": [
+            "895f4796454005d5b06a2d653c04b57819e48c0752f9cfd3517ad6274bdddb71",
+            "895f4796454005d5b06a2d653c04b57819e48c0752f9cfd3517ad6274bdddb71",
+            "895f4796454005d5b06a2d653c04b57819e48c0752f9cfd3517ad6274bdddb71",
+            "895f4796454005d5b06a2d653c04b57819e48c0752f9cfd3517ad6274bdddb71"
+          ],
+          "binary_sha256": {
+            "reference": "2d3f0cd3fdfd6ac4d27b5b15eb6b8ffdf8f40e3d8b780c9d830310cbe52a0429",
+            "candidate": "d8f0e2f27f96cb9fa9fcdd605f8c0ac2b3394dd2e073823d851579cb638a5f88"
+          }
+        },
+        "scan_lines_native": {
+          "path": "artifacts/ellipse-owned-scan_lines_native-x86/report.json",
+          "sha256": "3e56f50decf55dafa3b50ce4e8872625993906859f5a1a9808ee27ece611ff98",
+          "candidate_commit": "d9899cfccce1b1f58f065e895c6b23441dfed1d6",
+          "cases": 384,
+          "trace_lines": 70692,
+          "trace_sha256": [
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f"
+          ],
+          "binary_sha256": {
+            "reference": "92348438bb943a2484de5efef85613edf9766c3b944d11083510753f91c823ad",
+            "candidate": "e0f30c8292a12de33d31bd333b0e6929f3f10fbbaba2054ea736fc417e7df3b3"
+          }
+        },
+        "word_transform_native": {
+          "path": "artifacts/ellipse-owned-word_transform_native-x86/report.json",
+          "sha256": "409ef969e56115f83c74dcd0d3afaa8c78c542c010d99ac40a4725ffddcbb80f",
+          "candidate_commit": "d9899cfccce1b1f58f065e895c6b23441dfed1d6",
+          "cases": 4560,
+          "trace_lines": 9122,
+          "trace_sha256": [
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd"
+          ],
+          "binary_sha256": {
+            "reference": "029709c3ac9713075d706d70ea59bdabca11c25ffc17fb012814b0cf793ff1c4",
+            "candidate": "28215c3c73c1d8ea3b35a043aef66261c7bb2262bf837e330085da63f1415735"
+          }
+        },
+        "path_data_native": {
+          "path": "artifacts/ellipse-owned-path_data_native-x86/report.json",
+          "sha256": "a627e428bd776d089d5f3feb1f3d30c45237fc4b20c34cff5a7d41a3f2e69ea1",
+          "candidate_commit": "d9899cfccce1b1f58f065e895c6b23441dfed1d6",
+          "cases": 39,
+          "trace_lines": 171,
+          "trace_sha256": [
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2"
+          ],
+          "binary_sha256": {
+            "reference": "94b780ed33e7153bd7bdfc2cf3fbee4723bb35e27defaab2071abce1fbd548df",
+            "candidate": "f0a1b0c3925c30d98137b452177af5ea1ac1f94e6945e63efa83368e7daae0c4"
+          }
+        },
+        "text_measure_raw": {
+          "path": "artifacts/ellipse-owned-text_measure_raw-x86/report.json",
+          "sha256": "6fc43d05c61b667b3e08d4ca53d8620fb01edad2c5caa853d00c8db1a7ec7338",
+          "candidate_commit": "d9899cfccce1b1f58f065e895c6b23441dfed1d6",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd",
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd",
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd",
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd"
+          ],
+          "binary_sha256": {
+            "reference": "366c63d6bedbbfddfdf89babcdfd3dda0cd73779acd1ab3209fa44aebe8610a4",
+            "candidate": "c51c367d4236f14c3572ca941dc11b94b18d83afb434ca45eb4b628008d87d49"
+          }
+        },
+        "text_measure_construction": {
+          "path": "artifacts/ellipse-owned-text_measure_construction-x86/report.json",
+          "sha256": "e38d4c4f3c9fe444e8e6e146ce4a717a797e6c99d480d4145088d393abf56a3e",
+          "candidate_commit": "d9899cfccce1b1f58f065e895c6b23441dfed1d6",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893",
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893",
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893",
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893"
+          ],
+          "binary_sha256": {
+            "reference": "bfef3d1320487b7e78803b5093a2dff8cc4b2bf5049c2c096f8af1d6287d7f44",
+            "candidate": "96d378b6ec7de0d8b32c51714a790df819bdaf32d99156b950acf481b76ff18f"
+          }
+        },
+        "renderer_dc_text_native": {
+          "path": "artifacts/ellipse-owned-renderer_dc_text_native-x86/report.json",
+          "sha256": "2551adba62f68314508be2700b1a0876c5103d9ce4a7593b8295e2f51c6c83d6",
+          "candidate_commit": "d9899cfccce1b1f58f065e895c6b23441dfed1d6",
+          "cases": 40,
+          "trace_lines": 598,
+          "trace_sha256": [
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330"
+          ],
+          "binary_sha256": {
+            "reference": "d737f87ae347399c690e7bed65410574f6175f94cc5603409a8b06161080db0a",
+            "candidate": "fb97160fd7fd990e03290fd50f2b76ddd22a6b71f9e9e16900d8dba26ee4fe1d"
+          }
+        },
+        "renderer_dc_native": {
+          "path": "artifacts/ellipse-owned-renderer_dc_native-x86/report.json",
+          "sha256": "31947ae789b7097fcd4962381e740fb30e6149f62c2d06ca8de43ad5506dd3ae",
+          "candidate_commit": "d9899cfccce1b1f58f065e895c6b23441dfed1d6",
+          "cases": 6,
+          "trace_lines": 116,
+          "trace_sha256": [
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983"
+          ],
+          "binary_sha256": {
+            "reference": "36a210ef09b0b6e6b705ab6827d97613ee7e0d38a2ff5ea37db2aa4e73831817",
+            "candidate": "df14c9a5470ec7e317e2221d16bee76cf886c94ca8222863ec7723c0e95ec063"
+          }
+        },
+        "font_native": {
+          "path": "artifacts/ellipse-owned-font_native-x86/report.json",
+          "sha256": "e53f90e788fd904898c31bc1ae0032f3010c66a41431a9392941e8adaa9d23c6",
+          "candidate_commit": "d9899cfccce1b1f58f065e895c6b23441dfed1d6",
+          "cases": 195,
+          "trace_lines": 392,
+          "trace_sha256": [
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f",
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f",
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f",
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f"
+          ],
+          "binary_sha256": {
+            "reference": "a77a49d5b315efa653a49cd1f1a42e5f805dbb658719606331a6a148e379608e",
+            "candidate": "5aa606dd795ec4022559ff8cb4db668c63de0fae36c1619d6ddf66fd650324f8"
+          }
+        },
+        "font_gdi_calls": {
+          "path": "artifacts/ellipse-owned-font_gdi_calls-x86/report.json",
+          "sha256": "fd48aa2e44b83a0acd809bc50f69ba13cad4c5cc2cfa07a2cfd6d37d3420b8d2",
+          "candidate_commit": "d9899cfccce1b1f58f065e895c6b23441dfed1d6",
+          "cases": 12,
+          "trace_lines": 126,
+          "trace_sha256": [
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5",
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5",
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5",
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5"
+          ],
+          "binary_sha256": {
+            "reference": "13be4d5ae23e8d71dfa88f2848e06928378670c4f86f257b8a7b4357222a3b29",
+            "candidate": "9b8c02987288f06ef24f3f520997087b328400ec2b55bb85ebe5799201fe9cbb"
+          }
+        }
+      },
+      "rendering": {
+        "path": "artifacts/ellipse-owned-csri-x86/summary.json",
+        "sha256": "9dd88d9ab4d9e78cd51986ad82e9543d1812b41998b6cbad00982337d3097143",
+        "original_manifest_sha256": "2949bb98bfbc49bd3496af90ef9a8b3b386395637ff34bc54b0fc4e86fe61363",
+        "partition_exact": true,
+        "cases": 1222,
+        "frames": 13186,
+        "shard_results": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            7,
+            0
+          ]
+        ],
+        "complete": true,
+        "candidate_dll": {
+          "path": "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\bin\\lib_17.0\\Win32\\Release\\VSFilter.dll",
+          "sha256": "df7b92d6fd38591a4873d5731e87b1192317066fc17425d8b2dafa60d2f4a9ac"
+        },
+        "reference_source": {
+          "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+          "repository": "https://github.com/CoffeeFlux/xy-VSFilter"
+        },
+        "distinct_controls": 192,
+        "stable_equal_cases": 1222,
+        "stable_equal_frames": 13186,
+        "unresolved_cases": []
+      },
+      "contracts": {
+        "path": "artifacts/ellipse-owned-contracts-x86.log",
+        "sha256": "445a1347a43a8f59ccc7dfd18b9c878b4d225eeaaf4cc2cee89c7ff109d43161"
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "path": "bin/lib_17.0/Win32/Release/VSFilter.dll",
+          "sha256": "df7b92d6fd38591a4873d5731e87b1192317066fc17425d8b2dafa60d2f4a9ac"
+        },
+        "XySubFilter.dll": {
+          "path": "bin/lib_17.0/Win32/Release/XySubFilter.dll",
+          "sha256": "6eae8b83535e71ddb0fd21fbb06dbbb3ae61f27fd3849765cc1ca8ca1650b953"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "path": "bin/lib_17.0/Win32/Release/xy_sub_filter_consumer.dll",
+          "sha256": "255abc530f279e577844968547ea6fba76a57691d05887b45cd185f37c1a34f5"
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/ellipse-owned-build-x86.log",
+          "sha256": "93f3ba2777bff695565b6be63417561eff77f1f87a853928258cfd7d4978c0ec"
+        },
+        {
+          "path": "artifacts/ellipse-owned-build-rust-x86.log",
+          "sha256": "a26443d086f7d554f2847e552f282c572fd3f7a3cbfdb41915cd960c61f6c4e6"
+        }
+      ]
+    },
+    "x64": {
+      "native": {
+        "wide_region_native": {
+          "path": "artifacts/ellipse-owned-wide_region_native-x64/report.json",
+          "sha256": "fbb97c168c981322f429ab7e405f1e93a925c96d188059f4d97c85ee45aa5e2d",
+          "candidate_commit": "d9899cfccce1b1f58f065e895c6b23441dfed1d6",
+          "cases": 1536,
+          "trace_lines": 288022,
+          "trace_sha256": [
+            "4fb58dc5e624a826d0a36164656cc725e56f7612b95a03a61824e80741bc7925",
+            "4fb58dc5e624a826d0a36164656cc725e56f7612b95a03a61824e80741bc7925",
+            "4fb58dc5e624a826d0a36164656cc725e56f7612b95a03a61824e80741bc7925",
+            "4fb58dc5e624a826d0a36164656cc725e56f7612b95a03a61824e80741bc7925"
+          ],
+          "binary_sha256": {
+            "reference": "e6001f5d0d303f0741886647783dff679851c2ef6ba7909585448a51d5efe9bd",
+            "candidate": "622a83f94752406786030f7cfb0bc655901b005dea39a7324cf70afa8cc74efb"
+          }
+        },
+        "scan_lines_native": {
+          "path": "artifacts/ellipse-owned-scan_lines_native-x64/report.json",
+          "sha256": "e8f877c61fda713eeffdd18b3a1c438f5dc534bcdb3b8b91d7068c25ca3b74c8",
+          "candidate_commit": "d9899cfccce1b1f58f065e895c6b23441dfed1d6",
+          "cases": 384,
+          "trace_lines": 70692,
+          "trace_sha256": [
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2"
+          ],
+          "binary_sha256": {
+            "reference": "ef50c5fdbffcd8a3aee82a3b7b9d28492d0852f11bf60cf0b3f3df8689be42b9",
+            "candidate": "cca061817410aad8e8bdf72e78a580cfd4946a6cffcd91e04662ede55bc91837"
+          }
+        },
+        "word_transform_native": {
+          "path": "artifacts/ellipse-owned-word_transform_native-x64/report.json",
+          "sha256": "917d0cbbd2f49400dc1dc6a24657b0fcbcd6467ba23931662a5d804d345f03dd",
+          "candidate_commit": "d9899cfccce1b1f58f065e895c6b23441dfed1d6",
+          "cases": 4560,
+          "trace_lines": 9122,
+          "trace_sha256": [
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b"
+          ],
+          "binary_sha256": {
+            "reference": "3f8c459df4c3c6e930f1332367a236a8abbe4442a524402139db1856229ab110",
+            "candidate": "bfdd6db1f22f859b418329f5bad1220f6607403a420fa14fe8881a860aaa510b"
+          }
+        },
+        "path_data_native": {
+          "path": "artifacts/ellipse-owned-path_data_native-x64/report.json",
+          "sha256": "0e7ef41bf4c19f5ccea95b8224a46f528167636124546678e220f279be2ad41f",
+          "candidate_commit": "d9899cfccce1b1f58f065e895c6b23441dfed1d6",
+          "cases": 39,
+          "trace_lines": 171,
+          "trace_sha256": [
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031"
+          ],
+          "binary_sha256": {
+            "reference": "8674ff5af01a5164f9cae7a8933000157b803fe134afe8735bf51ae02a1bb826",
+            "candidate": "ce75c06b698521c15b1fa9fe7fbc3b774afec8eb7a0522e774e5b4274e2dc67b"
+          }
+        },
+        "text_measure_raw": {
+          "path": "artifacts/ellipse-owned-text_measure_raw-x64/report.json",
+          "sha256": "54b0a566f656e66b0c5023f837fd33f43668ddf0d2128a99593c87858a239676",
+          "candidate_commit": "d9899cfccce1b1f58f065e895c6b23441dfed1d6",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054",
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054",
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054",
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054"
+          ],
+          "binary_sha256": {
+            "reference": "4b0bf207e9fc152d8d26e04fc3389dc000758fd170ff0564149009dee88b988b",
+            "candidate": "d479fbf5cc3dd08ab16d2d184da7bbdc1aaf69ac627fe3556baae0d54451ac45"
+          }
+        },
+        "text_measure_construction": {
+          "path": "artifacts/ellipse-owned-text_measure_construction-x64/report.json",
+          "sha256": "6305c12dbe544f93944642f5f7db9b09619bd4eabcdd3ccd9bece07cb66e128f",
+          "candidate_commit": "d9899cfccce1b1f58f065e895c6b23441dfed1d6",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3",
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3",
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3",
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3"
+          ],
+          "binary_sha256": {
+            "reference": "f7daa0264337ac75510cf68a115f10a7ae6f3d3c92f2a22ebfe149bdf38e6500",
+            "candidate": "2ef244f6c176fa9469b03c0af20d6b0a67b4e7c0d3605db49070f8a0cba74e19"
+          }
+        },
+        "renderer_dc_text_native": {
+          "path": "artifacts/ellipse-owned-renderer_dc_text_native-x64/report.json",
+          "sha256": "bd456066fbd46a8ed26ea693830aca5984d1e8b2e644593fd36b62515755f92f",
+          "candidate_commit": "d9899cfccce1b1f58f065e895c6b23441dfed1d6",
+          "cases": 40,
+          "trace_lines": 598,
+          "trace_sha256": [
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac"
+          ],
+          "binary_sha256": {
+            "reference": "30e1a4913ea469477bb8c0c9184eb377fde21f2dd5b0961a414d457393b9f7d1",
+            "candidate": "d9f48c48b74aeec67fe548a4817d80f96c2638e87a8e312e54b4d1eed905ea5b"
+          }
+        },
+        "renderer_dc_native": {
+          "path": "artifacts/ellipse-owned-renderer_dc_native-x64/report.json",
+          "sha256": "bc59c495c8303363e82c0d3c81f099c3eed80e10aa2f7f7098bc93d34d095e38",
+          "candidate_commit": "d9899cfccce1b1f58f065e895c6b23441dfed1d6",
+          "cases": 6,
+          "trace_lines": 116,
+          "trace_sha256": [
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd"
+          ],
+          "binary_sha256": {
+            "reference": "2182c4acf32164857afb79149415696b710059c4a10f099900f2dd035c07f4f4",
+            "candidate": "282277868e1b1058eb2590275a27776b34b9d8836ce1b631e8edde3001d8d8e8"
+          }
+        },
+        "font_native": {
+          "path": "artifacts/ellipse-owned-font_native-x64/report.json",
+          "sha256": "131006eeb701a79d9a85c49d92868a456eed5cdc3f17ee5a59ec6257b0ab66e7",
+          "candidate_commit": "d9899cfccce1b1f58f065e895c6b23441dfed1d6",
+          "cases": 195,
+          "trace_lines": 392,
+          "trace_sha256": [
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7",
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7",
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7",
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7"
+          ],
+          "binary_sha256": {
+            "reference": "90bef7e849cd1bfc53dad067dbd395ffabfe8d093b93b39ce78f8dceffa16301",
+            "candidate": "807c0f185f08e276d9d3cdc966c91c34f6d692b4ae78f4cd83e3e92852212661"
+          }
+        },
+        "font_gdi_calls": {
+          "path": "artifacts/ellipse-owned-font_gdi_calls-x64/report.json",
+          "sha256": "19cb8dfccfcd2d4bf26e01412fd57b2aa5a36c0a4ef06fc0de024ad50a5164f9",
+          "candidate_commit": "d9899cfccce1b1f58f065e895c6b23441dfed1d6",
+          "cases": 12,
+          "trace_lines": 126,
+          "trace_sha256": [
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93",
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93",
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93",
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93"
+          ],
+          "binary_sha256": {
+            "reference": "d4fb27402a353444d37bbe95a6a60748072ea6de2ed279747e87fd9e5442b278",
+            "candidate": "0b354210864d3a647fe3aeb725488932c180818870b800da4467a96044c44365"
+          }
+        }
+      },
+      "rendering": {
+        "path": "artifacts/ellipse-owned-csri-x64/summary.json",
+        "sha256": "fb34d718033b94910a4d6673e7393908b65643bf47448f63ce1e8e3730e7678d",
+        "original_manifest_sha256": "2949bb98bfbc49bd3496af90ef9a8b3b386395637ff34bc54b0fc4e86fe61363",
+        "partition_exact": true,
+        "cases": 1222,
+        "frames": 13186,
+        "shard_results": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            7,
+            0
+          ]
+        ],
+        "complete": true,
+        "candidate_dll": {
+          "path": "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\bin\\lib_17.0\\x64\\Release\\VSFilter.dll",
+          "sha256": "71fecd4bea47db199daad9f6cc1c3d13d80a9e2a1a8a9d4a0f9dc0fb2559bb43"
+        },
+        "reference_source": {
+          "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+          "repository": "https://github.com/CoffeeFlux/xy-VSFilter"
+        },
+        "distinct_controls": 192,
+        "stable_equal_cases": 1222,
+        "stable_equal_frames": 13186,
+        "unresolved_cases": []
+      },
+      "contracts": {
+        "path": "artifacts/ellipse-owned-contracts-x64.log",
+        "sha256": "445a1347a43a8f59ccc7dfd18b9c878b4d225eeaaf4cc2cee89c7ff109d43161"
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "path": "bin/lib_17.0/x64/Release/VSFilter.dll",
+          "sha256": "71fecd4bea47db199daad9f6cc1c3d13d80a9e2a1a8a9d4a0f9dc0fb2559bb43"
+        },
+        "XySubFilter.dll": {
+          "path": "bin/lib_17.0/x64/Release/XySubFilter.dll",
+          "sha256": "a5237465d8bdd3f8258a81a6ebd68417fe1dca4724d3ffddccd9a9ab7c1d59a6"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "path": "bin/lib_17.0/x64/Release/xy_sub_filter_consumer.dll",
+          "sha256": "64f640f79273cc2d633464b31cc86af92acc427dcd00d4741085f7ff71125bc6"
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/ellipse-owned-build-x64.log",
+          "sha256": "060f1a2b683f9c3b10173d2c42afb96e775c4c9700bab708b2e5731028b5e55f"
+        },
+        {
+          "path": "artifacts/ellipse-owned-build-rust-x64.log",
+          "sha256": "a26443d086f7d554f2847e552f282c572fd3f7a3cbfdb41915cd960c61f6c4e6"
+        }
+      ]
+    }
+  },
+  "checks": {
+    "path": "artifacts/ellipse-owned-checks.log",
+    "sha256": "4f4d737a7deea092719d7c15c1a9d85628ad67e2772f656881dff16482f8e70c",
+    "core_per_architecture": 365,
+    "ffi_per_architecture": 141,
+    "python": 204,
+    "python_skipped": 1,
+    "fmt": true,
+    "clippy_both_architectures_and_native_runtime": true
+  },
+  "new_observer_controls": {
+    "path": "artifacts/ellipse-owned-probe-controls.log",
+    "sha256": "2cca4f3364681cd8bd82e44335671d31f5d3b788fa532b9ed88ca1e4f73f7827",
+    "tests": 2,
+    "scope": "Expanded widening observer completeness, changes and unstable reference repeat rejection, rerun after the 32-radius expansion; not additional unique tests beyond the 204-test suite."
+  },
+  "unsafe_inventory": {
+    "path": "artifacts/ellipse-owned-unsafe-inventory.json",
+    "sha256": "117928feb966a867f0eb485134e41bfc1393e10b3c74be98725b93bdd452e744"
+  },
+  "previous_unresolved_reference": {
+    "evidence": "rust-word-transform-local-evidence.json",
+    "case": "field-unicode-style-space-file",
+    "result": "Earlier x64 cleanup exit access violation remains unresolved; a later passing run does not erase it."
+  },
+  "limitations": [
+    "Finite Release/default Windows floating-control observations; Debug, unmasked exceptions, allocator failure and arbitrary host concurrency remain unclosed.",
+    "Invalid span/list/table shapes, arithmetic ranges and the native leftover-A horizontal merge hang remain unresolved outcomes. No unsafe clipping or native pointer fallback is used by the new sweep.",
+    "Fresh parameterized native widened-border state was uninitialized; Rust initializes safely without claiming parity before CreateWidenedRegion. Failed conversion may retain partial internal state.",
+    "The ellipse callback is removed. Fixed local arithmetic buffers contain no table/arc/path/native-object pointer; x86 ceil and ftol2 remain scalar Windows CRT calls.",
+    "Raster output ownership, object graphs, host adapters and vendors remain in scope. Legacy native ellipse code/opaque handles remain in the fallback, not the experimental path. No production default switched."
+  ],
+  "earlier_ellipse_fp_limit": {
+    "evidence": "ellipse-storage-fp-scope.json",
+    "result": "Earlier optimized native ellipse FP instability retains its original attribution and is not erased by current passing runs."
+  },
+  "sources": {
+    "rust/compat/src/ellipse.rs": "a1226b66b46e1af792e463e3069dee46db561eb1560458305ceaac6aa37f5510",
+    "rust/ffi/src/windows_ellipse_numeric.rs": "9538376c78a8ae7744d66e1d855558f8743b313114f62a482a6e335ec47050f2",
+    "docs/rust-ellipse-owner-boundary.md": "d7193df97fa3359f171854bfd20901bb46d760e45674b5a107d4e0604f36e630",
+    "test/compat/ellipse-numeric/provenance.json": "9554155ca6b6ebe010cc69c7561d481bd0f740ec582fd86479d1100c9ead19e3",
+    "test/compat/ellipse-numeric/constants.json": "737b2d3907354aa611787f9514d41638b89cecaa732aa25edd26f24243175d25",
+    "rust/compat/src/wide_region.rs": "86d9c2e8a3c8adeb5e84f4b08df135c5d74fcf9f0ba7dd48b452189f248666b8",
+    "src/subtitles/xy_widen_region.cpp": "32c3661f2ef39fa9e7654bc07f63cb32e75d6a92d8bc39374f59f45b2c79b20b",
+    "tools/compat/wide_region_native.cpp": "fb1f38fd1c95ac3d9fecc57f55041f15cae83b862de6b86b9844af535863fd41",
+    "tools/compat/wide_region_native.py": "d2fe750efe5df5d83bcd4170a6e15e29824228b64e5e473c80aca7a1a2d839cd",
+    "tools/compat/test_wide_region_native.py": "93cdb9d3eff29e18d7159d33feecb161650cdd7eddca8dc887383b8086b47f17",
+    "docs/rust-wide-owner-boundary.md": "6efee01fb59b3d63768a0db983ba1255e21830e3dc0a3d52ee2edb318b6c3772",
+    "rust/compat/src/scan_convert.rs": "8edb5920872590c3859dcc86cfd18ddafde1f0e3bc782f5c56d1ddffe7a9742e",
+    "rust/compat/src/path_data.rs": "77f53b08eaa23a8f2c6831ef02ab1e00829dd949cd725a9f27095535820a33f2",
+    "rust/compat/src/scan_row.rs": "a70d8ec32701e2b5ce4feb8abda5db7de6df3f77edda1e8ecadf5f1aa33a6fe7",
+    "rust/ffi/src/path_data.rs": "3eccdcc4fe96275cc52cd6e9df683470bbd6913163901e4dcf9ab1f47f3735f7",
+    "rust/ffi/src/windows_scan_curve.rs": "ac4d910ae8b39493c66ed5bbae106cd8e55d99e26a6b5769ab7ee828ccd95498",
+    "include/xy_rust_path_data.h": "ec59f26eb01044364f8b941cd57d10965f53885b3e98d11a8e542f7db220259c",
+    "include/xy_rust_scan_data.h": "f229f80cf679dc2359cace98401dda394f1749a120b62ab6db7705ca20d9c421",
+    "src/subtitles/Rasterizer.cpp": "a369a61fa6da0528ce0d65c395e39825cb8849811fb68e1ca4bb5f2b6aee1426",
+    "src/subtitles/Rasterizer.h": "622082f35b72d4d4994356a3e34d93caf3df5dba67e70236e89061343e81cc4e",
+    "src/subtitles/RustPathData.inl": "3db33b7a1ebc8f707b28bd4f5123bcd7eb80a79c81d06185535fc43d46223f0c",
+    "tools/compat/scan_lines_native.cpp": "57bebc901918b7597e2a4f6031a7d3fd4377f4452de6ff96e03e192d485e1eb4",
+    "docs/rust-scan-owner-boundary.md": "3c2b49b097a82ded48e875ab7fade5a04feb476194b8a643085fe861783becee",
+    "test/compat/scan-curve/provenance.json": "622916658cb0a2dd7887220ae1e641e0ca26c39b6528164aa82b1c63aba79358"
+  }
+}

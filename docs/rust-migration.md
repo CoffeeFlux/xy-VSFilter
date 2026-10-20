@@ -27,7 +27,54 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest port: owned widened outlines and linked-arc sweep (2026-10-19)
+## Latest port: owned ellipse cache and exact target arithmetic (2026-10-19)
+
+Implementation `d9899cfc` removes the experimental widening path's C++ ellipse
+callback and native cache. The admitted Rust owner state now includes the cached
+radius pair, integer arc, optional intersection table and scalar numeric state.
+Safe Rust owns cache replacement/reuse, table-size selection, scratch zeroing
+and row retention, sample/clamp/write order, boundary-cell overwrite, intersection
+clipping and translated arc lookup. Absent cells remain absent; no table, arc,
+path or native-object pointer enters arithmetic or crosses the new operation.
+
+Eight fixed-buffer arithmetic blocks preserve the actual cleanup compiler's
+x86/x64 instructions. x86 retains extended divisions, f32/f64 spills, square-root
+rounding, ceil and integer-conversion order. x64 retains DIVSS-to-double radius
+inverses, MAXSS/SQRTSS, operand order and the inline ceiling sequence. Each block
+addresses only fixed slots in an initialized aligned 512-byte local buffer.
+The only x86 calls are scalar Windows CRT ceil and ftol conversion; there is no
+native callback or retained native ellipse object. Reference disassembly,
+constants, exact observer source and binary/library provenance are archived in
+[the numeric reference](../test/compat/ellipse-numeric/provenance.json). See the
+[boundary audit](rust-ellipse-owner-boundary.md).
+
+The expanded actual-method observer compares 1,536 reused-object calls / 288,022
+trace lines on both Windows architectures, twice per role. Its 32 radius pairs
+cover additional thin/zero-width ellipses and lookup-threshold neighbors across
+24 straight/curved paths. Every packed span, border/result and floating/error
+status matches. The other nine focused probes pass. All three DLLs build and
+preserve exports/dependencies; ten COM cases plus two controls pass on x86/x64.
+Each full rendering run matches 1,222 cases / 13,186 frames and passes 192
+distinct-frame controls against the cleanup reference.
+
+Rust passes 365 core and 141 FFI tests per architecture, formatting and Clippy;
+Python passes 204 tests with one skip. Expanded observer controls also pass after
+the radius expansion. Core tests cover cache hits, table sample order, absent
+rows, analytic selection and checked wrapping arc queries without claiming that
+controlled arithmetic is native numeric parity. The core remains unsafe-free;
+the FFI inventory records 597 production unsafe blocks, 416 unsafe functions,
+four unsafe Sync implementations and 34 assembly sites. Detailed provenance is
+in [the local evidence](rust-ellipse-owner-local-evidence.json).
+
+Invalid/unwritten cells, impossible logical tables, allocator failure, Debug,
+other FP controls and arbitrary host concurrency remain unclosed. Earlier native
+ellipse FP instability and cleanup exit-crash evidence retain their original
+scope. The legacy native ellipse code and opaque-handle APIs remain only in the
+fallback/historical paths. Raster output ownership, object graphs, host adapters
+and vendors remain in scope. The next boundary is raster output and overlay
+ownership; the experimental flag stays opt-in and the full migration stays active.
+
+## Earlier port: owned widened outlines and linked-arc sweep (2026-10-19)
 
 Implementation `f72fa4ba` moves the experimental widened-outline operation and
 persistent output into safe Rust. ScanLineData2 now holds a checked region ID;
