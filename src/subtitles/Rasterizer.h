@@ -46,6 +46,7 @@ typedef struct {
 #ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 #include "xy_rust_path_data.h"
 #include "xy_rust_scan_data.h"
+#include "xy_rust_overlay.h"
 #endif
 struct PathData
 {
@@ -203,6 +204,9 @@ public:
 
     void CleanUp()
     {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        m_owner.Clear();
+#endif
         mBody.reset((BYTE*)NULL);
         mBorder.reset((BYTE*)NULL);
         mOffsetX=mOffsetY=mWidth=mHeight=0;
@@ -215,6 +219,19 @@ public:
         const byte* pAlphaMask, int pitch, DWORD color_alpha);
 
     Overlay* GetSubpixelVariance(unsigned int xshift, unsigned int yshift);
+    void SetOffsets(int x,int y){
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+        m_owner.Offset(x,y);
+#endif
+        mOffsetX=x;mOffsetY=y;
+    }
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+private:
+    XyRust::OverlayOwner m_owner;
+    void ImportNative(bool gaussian=false,int padding_rows=0);
+    bool RestoreRust();
+    friend class Rasterizer;
+#endif
 public:
     SharedPtrByte mBody;
     SharedPtrByte mBorder;

@@ -1,5 +1,10 @@
 # Rust raster construction boundary
 
+This describes implementation `b2379898`. The subsequent
+[persistent overlay boundary](rust-overlay-owner-boundary.md) retains its result
+owner and adds initializedness-aware copying and subpixel shifting. The original
+raster construction evidence remains attributed to its original implementation.
+
 The experimental `Rasterizer::Rasterize` path consumes checked Rust scan and
 widened-region IDs directly. `rust/compat/src/raster.rs` owns dimension and offset
 calculation, border rounding, fully initialized body/border storage and ordered

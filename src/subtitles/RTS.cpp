@@ -313,8 +313,8 @@ bool CWord::PaintFromPathData(const CPointCoor2& psub, const CPointCoor2& trans_
     {
         SharedPtrOverlay raterize_result( DEBUG_NEW Overlay() );
         *raterize_result = *overlay_cache->GetAt(pos);
-        raterize_result->mOffsetX = left_top.x - psub.x - ((wide_border+7)&~7);
-        raterize_result->mOffsetY = left_top.y - psub.y - ((wide_border+7)&~7);
+        raterize_result->SetOffsets(left_top.x - psub.x - ((wide_border+7)&~7),
+            left_top.y - psub.y - ((wide_border+7)&~7));
         PaintFromNoneBluredOverlay(raterize_result, key, overlay);
         result = true;
         overlay_cache->UpdateCache(key, raterize_result);

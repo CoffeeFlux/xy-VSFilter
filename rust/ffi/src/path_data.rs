@@ -66,6 +66,61 @@ impl Boundary {
 }
 static PATHS: Boundary = Boundary::new();
 /// # Safety
+/// output lends eight writable bytes for an independent checked owner ID.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_overlay_clone_v1(id: u64, output: *mut u8) -> u32 {
+    if output.is_null() {
+        return 3;
+    }
+    let id = match PATHS.with_owners(|o| {
+        if id == 0 {
+            return Ok(0);
+        }
+        let image = o.rasters.get(id)?.duplicate()?;
+        o.rasters.insert(image)
+    }) {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    // SAFETY: detached scalar and caller's writable eight-byte output.
+    unsafe {
+        core::ptr::copy_nonoverlapping(id.to_le_bytes().as_ptr(), output, 8);
+    }
+    0
+}
+/// # Safety
+/// output lends eight writable bytes for the retained or newly created owner ID.
+/// No native field or pixel storage is borrowed while the offset is updated.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_overlay_offset_v1(
+    id: u64,
+    x: i32,
+    y: i32,
+    output: *mut u8,
+) -> u32 {
+    if output.is_null() {
+        return 3;
+    }
+    let id = match PATHS.with_owners(|o| {
+        if id == 0 {
+            let mut image = xy_vsfilter_compat::raster::Image::decode(&[0; 32])?;
+            image.offset(x, y);
+            o.rasters.insert(image)
+        } else {
+            o.rasters.get_mut(id)?.offset(x, y);
+            Ok(id)
+        }
+    }) {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    // SAFETY: detached scalar and caller's writable eight-byte output.
+    unsafe {
+        core::ptr::copy_nonoverlapping(id.to_le_bytes().as_ptr(), output, 8);
+    }
+    0
+}
+/// # Safety
 /// output spans sixteen writable bytes for a checked raster ID and byte length.
 /// Both sources and the new owned result remain admitted together. No pointer
 /// into any owner, span or pixel allocation crosses this operation.
@@ -124,6 +179,9 @@ pub unsafe extern "C" fn xy_vsfilter_raster_read_v1(
     }
     match PATHS.with_owners(|o| {
         let bytes = o.rasters.get(id)?.bytes();
+        if !o.rasters.get(id)?.all_known() {
+            return Err(6);
+        }
         if bytes.len() > capacity {
             return Err(4);
         }
@@ -137,6 +195,114 @@ pub unsafe extern "C" fn xy_vsfilter_raster_read_v1(
         Ok(()) => 0,
         Err(e) => e,
     }
+}
+/// # Safety
+/// input is an initialized, immutable wire packet for this call; output lends
+/// eight writable bytes. The packet contains values and validity bits, never
+/// native uninitialized bytes. Output may overlap input after decode completes.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_overlay_import_v1(
+    input: *const u8,
+    length: usize,
+    output: *mut u8,
+) -> u32 {
+    if input.is_null() || output.is_null() || length < 32 || length > isize::MAX as usize {
+        return 3;
+    }
+    // SAFETY: bounded initialized packet, borrowed only during owned decoding.
+    let image = match xy_vsfilter_compat::raster::Image::decode(unsafe {
+        core::slice::from_raw_parts(input, length)
+    }) {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    let id = match PATHS.with_owners(|o| o.rasters.insert(image)) {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    // SAFETY: detached scalar; no input borrow remains.
+    unsafe {
+        core::ptr::copy_nonoverlapping(id.to_le_bytes().as_ptr(), output, 8);
+    }
+    0
+}
+/// # Safety
+/// output lends eight writable bytes for the detached encoded length.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_overlay_info_v1(id: u64, output: *mut u8) -> u32 {
+    if output.is_null() {
+        return 3;
+    }
+    let length = match PATHS.with_owners(|o| o.rasters.get(id)?.wire_len().ok_or(5u32)) {
+        Ok(v) => v as u64,
+        Err(e) => return e,
+    };
+    // SAFETY: detached scalar into caller's writable buffer.
+    unsafe {
+        core::ptr::copy_nonoverlapping(length.to_le_bytes().as_ptr(), output, 8);
+    }
+    0
+}
+/// # Safety
+/// output lends capacity writable bytes. No canonical storage address escapes;
+/// unknown bytes are represented by validity zero and an opaque placeholder.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_overlay_read_v1(
+    id: u64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    if output.is_null() || capacity > isize::MAX as usize {
+        return 3;
+    }
+    let bytes = match PATHS.with_owners(|o| {
+        let image = o.rasters.get(id)?;
+        if image.wire_len().ok_or(5u32)? > capacity {
+            return Err(4);
+        }
+        image.encode()
+    }) {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    // SAFETY: detached initialized packet and checked caller capacity.
+    unsafe {
+        core::ptr::copy_nonoverlapping(bytes.as_ptr(), output, bytes.len());
+    }
+    0
+}
+/// # Safety
+/// output lends eight writable bytes for the new checked ID, or zero for the
+/// reference's null-result branch. Source ownership remains admitted throughout.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_overlay_variance_v1(
+    id: u64,
+    x: u32,
+    y: u32,
+    output: *mut u8,
+) -> u32 {
+    if output.is_null() {
+        return 3;
+    }
+    let id = match PATHS.with_owners(|o| {
+        let image = if id == 0 {
+            xy_vsfilter_compat::raster::Image::decode(&[0; 32])?.variance(x, y)?
+        } else {
+            o.rasters.get(id)?.variance(x, y)?
+        };
+        match image {
+            Some(v) => o.rasters.insert(v),
+            None => Ok(0),
+        }
+    }) {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    // SAFETY: detached scalar after source borrow ends.
+    unsafe {
+        core::ptr::copy_nonoverlapping(id.to_le_bytes().as_ptr(), output, 8);
+    }
+    0
 }
 /// # Safety
 /// output spans eight writable bytes. No owner address is exported.
@@ -851,6 +1017,95 @@ mod tests {
             );
             assert_eq!(raster_bytes, [0xa5; 82]);
             assert_eq!(xy_vsfilter_raster_destroy_v1(raster), 1);
+            let mut overlay_wire = [0u8; 96];
+            for (i, v) in [0i32, 0, 8, 8, 2, 2, 16, 3].into_iter().enumerate() {
+                overlay_wire[i * 4..i * 4 + 4].copy_from_slice(&v.to_le_bytes());
+            }
+            for (at, v) in [(0, 8), (1, 16), (16, 24), (17, 32)] {
+                overlay_wire[32 + at] = v;
+                overlay_wire[64 + at] = 1;
+            }
+            raster_info.fill(0xa5);
+            overlay_wire[64] = 2;
+            assert_eq!(
+                xy_vsfilter_overlay_import_v1(
+                    overlay_wire.as_ptr(),
+                    96,
+                    raster_info.as_mut_ptr().add(1)
+                ),
+                3
+            );
+            assert_eq!(raster_info, [0xa5; 18]);
+            overlay_wire[64] = 1;
+            assert_eq!(
+                xy_vsfilter_overlay_import_v1(
+                    overlay_wire.as_ptr(),
+                    96,
+                    raster_info.as_mut_ptr().add(1)
+                ),
+                0
+            );
+            let source = u64::from_le_bytes(raster_info[1..9].try_into().unwrap());
+            assert_eq!(
+                xy_vsfilter_overlay_clone_v1(source, raster_info.as_mut_ptr().add(1)),
+                0
+            );
+            let copied = u64::from_le_bytes(raster_info[1..9].try_into().unwrap());
+            assert_ne!(copied, source);
+            assert_eq!(
+                xy_vsfilter_overlay_offset_v1(copied, 19, -23, raster_info.as_mut_ptr().add(1)),
+                0
+            );
+            assert_eq!(
+                u64::from_le_bytes(raster_info[1..9].try_into().unwrap()),
+                copied
+            );
+            let mut copy_wire = [0; 96];
+            assert_eq!(
+                xy_vsfilter_overlay_read_v1(copied, copy_wire.as_mut_ptr(), 96),
+                0
+            );
+            assert_eq!(&copy_wire[8..], &overlay_wire[8..]);
+            assert_eq!(&copy_wire[..4], &19i32.to_le_bytes());
+            assert_eq!(xy_vsfilter_raster_destroy_v1(copied), 0);
+            assert_eq!(
+                xy_vsfilter_overlay_variance_v1(source, 0, 0, raster_info.as_mut_ptr().add(1)),
+                0
+            );
+            let shifted = u64::from_le_bytes(raster_info[1..9].try_into().unwrap());
+            assert_ne!(source, shifted);
+            assert_eq!(xy_vsfilter_raster_destroy_v1(source), 0);
+            let mut wire_out = [0xa5; 98];
+            assert_eq!(
+                xy_vsfilter_raster_read_v1(shifted, wire_out.as_mut_ptr(), 98),
+                6
+            );
+            assert_eq!(
+                xy_vsfilter_overlay_read_v1(shifted, wire_out.as_mut_ptr().add(1), 95),
+                4
+            );
+            assert_eq!(wire_out, [0xa5; 98]);
+            assert_eq!(
+                xy_vsfilter_overlay_read_v1(shifted, wire_out.as_mut_ptr().add(1), 96),
+                0
+            );
+            assert_eq!(&wire_out[1..97], &overlay_wire);
+            assert_eq!((wire_out[0], wire_out[97]), (0xa5, 0xa5));
+            assert_eq!(
+                xy_vsfilter_overlay_info_v1(shifted, raster_info.as_mut_ptr().add(1)),
+                0
+            );
+            assert_eq!(
+                u64::from_le_bytes(raster_info[1..9].try_into().unwrap()),
+                96
+            );
+            assert_eq!(xy_vsfilter_raster_destroy_v1(shifted), 0);
+            raster_info.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_overlay_variance_v1(shifted, 0, 0, raster_info.as_mut_ptr().add(1)),
+                1
+            );
+            assert_eq!(raster_info, [0xa5; 18]);
             assert_eq!(xy_vsfilter_region_destroy_v1(region), 0);
             assert_eq!(xy_vsfilter_region_info_v1(region, scan_id.as_mut_ptr()), 1);
             assert_eq!(xy_vsfilter_scan_destroy_v1(scan), 0);
