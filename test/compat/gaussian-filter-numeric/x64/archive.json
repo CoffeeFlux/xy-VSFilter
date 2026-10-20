@@ -1,0 +1,26 @@
+{
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "files": {
+    "function-0.txt": "be30867e5dbfafa8cbf72fa8d1e1fe5e299f107847633fe62cdd292855f53e8b",
+    "function-1.txt": "870d817e8918b6aaa60da78f9da286d92ed6b454a87e967fa3255029ba4fceac",
+    "function-10.txt": "085d26d7e804917c61558dfbc19ada8c8947df0c930e871c191e7e90e1f5244f",
+    "function-11.txt": "88b38bcab90956a3c89c69143342c9242d71ae336ff13afdf32e78cef7fae327",
+    "function-12.txt": "6b928db9c3b93ffcd0f62f9de17596e75a15a9654f9cfe8beaaaf200e97f9523",
+    "function-13.txt": "a716fa42316402e8caaec154c467de66c13543596c65bc78fd3007a1e85ef22a",
+    "function-14.txt": "321b96496f6ca43c09ba6087080186df86792d915fdbc2998087b8d05fc78195",
+    "function-15.txt": "2cb9a24a1e5e74377f7d358ae3e01d5679eebc59ee551ad997c51e92e39194f0",
+    "function-16.txt": "b231851c0d081a357f1982125d2f927f35134fd8c852b7c2ff1a27551f365feb",
+    "function-17.txt": "0544d4b205fc619cb7e14407a528bda42a762262cf44f29af7fd18df28f1fca9",
+    "function-18.txt": "93b19f81ffac7bae610b7d31a7ae33485b207f5e310751870b795cb811c6de28",
+    "function-2.txt": "c81b0a78f485ab4efc642f3eae0f35134adb287adba68fa834958d2daf6d35ef",
+    "function-3.txt": "c5b5d3c1a2d94eb0ee353242421ac468fff88c18b9739cac8d5781cd31679f63",
+    "function-4.txt": "5b1031526b20c1b78a4149c5053c320ec3101966a9a125f1fd29d6fc568a036e",
+    "function-5.txt": "0d4483ad5ca5603f0de6a36f6584fd86960f79b53116b4240fa86bc695b39644",
+    "function-6.txt": "7f27a596151996f551ecfb8b24ff8110b4699aa64c5952e1bc284d4138a59688",
+    "function-7.txt": "d6ede3e30b8d507ba3861b9c0979bf90f3b6ea57afb2a5a11b7ccb0b0ee0054b",
+    "function-8.txt": "e93525d9b350fa1759cdbc88c833bd9ee13395be5609aa77f2ea8dfbc761a637",
+    "function-9.txt": "e5a44396e7090dc15237440ef032c512ce7993f00e42922933bbc976c2a21ac4",
+    "provenance.json": "279f6cc782c47dc3c404dc4a1a18f5e810473968de8d3586a11ea91c49666aea"
+  },
+  "scope": "Linked Gaussian filter/conversion/transpose excerpts from the unchanged original reference binary. Original preparation provenance remains verbatim; current Rust comparison evidence is recorded separately."
+}

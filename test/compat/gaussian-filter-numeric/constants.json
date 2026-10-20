@@ -1,0 +1,14 @@
+{
+  "x86": {
+    "address": "0x449350",
+    "bytes": "000000000000e03f",
+    "binary_sha256": "5a9ca5210f4c369d7803a25729790532d4c8cc0b981f1ab649311d27ebcf549f",
+    "original_provenance_sha256": "42c06c22398b3b34169847a29838c7e03b8afdd9316e8190131b41c1f30534de"
+  },
+  "x64": {
+    "address": "0x140054390",
+    "bytes": "000000000000e03f",
+    "binary_sha256": "88d3fa589c5a7a61bb82aead186f84121c226b360680e9099ac054fefa83ade7",
+    "original_provenance_sha256": "3508defbf588c6337ab7e3ac99991c9233cda499ab026768b27eb11b7dc26e1d"
+  }
+}

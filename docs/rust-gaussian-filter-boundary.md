@@ -32,5 +32,5 @@ and image arrays, nondefault FP controls and unmasked exceptions remain unclosed
 The actual overlay observer additionally covers Gaussian strengths through 32,
 anisotropic scaling, copies and chained subpixel shifts.
 
-Windows comparison results are pending for this implementation checkpoint.
+Windows x86/x64 comparison evidence is recorded in [the local evidence](rust-gaussian-filter-local-evidence.json): 3,840 direct filter cases, 17,924 actual overlay calls, all preceding focused probes, and the full 1,222-case / 13,186-frame rendering corpus match per architecture. Rust passes 379 core and 142 FFI tests per architecture; Python passes 212 tests with one skip. See the migration handoff for remaining scope and the isolated COM environment failure/retry.
 The experimental production switch remains opt-in; this is not whole-library closure.

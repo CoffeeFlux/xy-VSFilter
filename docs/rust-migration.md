@@ -27,7 +27,65 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest port: Gaussian coefficient construction (2026-10-19)
+## Latest port: owned Gaussian filtering (2026-10-19)
+
+Implementation `5fd6390f` moves the experimental Gaussian image operation into
+safe Rust: byte conversion, all fourteen fixed filter templates, symmetric
+three-tap and v6 traversal, both transposes, scratch buffers, output geometry,
+pixels and initialized-byte masks. The core preserves accumulation order
+0,2,1,3 and the two distinct final byte conversion rules. SIMD blocks use MXCSR
+rounding and saturation; scalar tails add binary64 0.5, truncate and retain the
+low byte. Eight fixed-local assembly sites preserve Windows arithmetic and
+status; no image pointer, index, allocation or traversal enters that backend.
+See [the boundary audit](rust-gaussian-filter-boundary.md).
+
+The checked operation consumes a canonical Rust overlay and detached initialized
+coefficient values, then returns an independent overlay ID. It replaces native
+Gaussian image/scratch construction and the subsequent native-image import.
+The native weak coefficient cache and sigma products remain transitional;
+coefficient construction itself was already ported. Detached native output
+snapshots still serve the remaining downstream consumers. Unknown Gaussian
+padding is retained as unknown, including the distinction between whole initialized
+body margin rows and only initialized logical pixels in middle rows.
+
+Windows x86 and x64 each match 3,840 direct floating-filter calls / 7,682 trace
+lines, repeated twice per role. Coverage includes finite normal, negative,
+signed-zero and subnormal values and coefficients, every dispatch path, kernels
+wider than the source, untouched padding, FP status, errno and LastError.
+The expanded actual overlay observer matches 17,924 calls / 53,774 lines,
+including Gaussian strengths through 32, anisotropic scaling, copies and chained
+subpixel shifts. All twelve other focused probes pass on both architectures.
+
+Each architecture's full rendering corpus matches 1,222 cases / 13,186 frames
+and passes 192 distinct-frame controls against cleanup `67da07cd`. All three
+DLLs build and preserve exports/dependencies; ten scoped COM cases and two
+candidate-only controls pass per architecture. The COM checks use disconnected
+objects and private volatile HKCU settings, with no DLL registration. The first
+sandboxed x64 COM attempt exited before DLL loading because creation of that
+private key was denied; its diagnostics remain recorded separately from the
+successful authorized run.
+
+Rust passes 379 core and 142 FFI tests per architecture, formatting and Clippy
+including native-runtime. Python passes 212 tests with one skip. The portable
+core remains unsafe-free. The inventory records 641 FFI unsafe blocks, 429 unsafe
+functions, four unsafe Sync implementations and 61 assembly sites; these counts
+are not a completion percentage or a soundness proof. The arithmetic captures,
+constants, source and binary hashes are linked from
+[the local evidence](rust-gaussian-filter-local-evidence.json).
+
+Native weak coefficient sharing, sigma products and combined Blur dispatch are
+next. Preparation captures are in `artifacts/gaussian-cache-next-reference-x86`
+and `artifacts/gaussian-cache-next-reference-x64`, with notes in
+`artifacts/gaussian-owned-next-notes.txt`. Preserve cache lookup order, NaN-key
+persistence, separate key-copy quieting and allocation/error/status effects.
+Downstream clipping/drawing, GrayImage, renderer/control object graphs, every
+host adapter and vendored native code remain in scope. Allocation/partial failure,
+invalid native geometry, Debug, nondefault FP controls, arbitrary NaN filter
+payloads and host concurrency remain unclosed. Earlier reference crashes and
+ellipse instability keep their original attribution. The experimental switch
+remains opt-in and the whole-library migration remains active.
+
+## Earlier port: Gaussian coefficient construction (2026-10-19)
 
 Implementation `02696f40`, refined in `216bc4ee`, moves Gaussian coefficient
 construction into safe Rust: owned allocation, symmetric recurrence indexing,
@@ -7354,11 +7412,3 @@ memory-safety inventory; converting first-party code alone does not establish a
 safe Aegisub dependency. Use larger mutation campaigns, coverage-guided fuzzing
 and minimized differential cases to discover the long tail, with a pinned
 reference and isolated workers for every experiment.
-
-## In progress: owned Gaussian filtering
-
-The experimental Gaussian operation now uses safe Rust image/scratch ownership
-and filter traversal; Windows comparison evidence is pending for this checkpoint.
-See [the boundary](rust-gaussian-filter-boundary.md). The native weak coefficient
-cache, sigma products, combined dispatch and remaining renderer/host/vendor code
-still require migration. The complete drop-in replacement remains the goal.
