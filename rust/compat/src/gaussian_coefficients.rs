@@ -61,6 +61,19 @@ impl Coefficients {
     pub fn bytes(&self) -> &[u8] {
         &self.bytes
     }
+    pub fn kernel(&self) -> Result<crate::gaussian_filter::Kernel, u32> {
+        let radius = i32::from_le_bytes(self.bytes[..4].try_into().unwrap());
+        let mut words = Vec::new();
+        words
+            .try_reserve_exact((self.bytes.len() - 24) / 4)
+            .map_err(|_| 5u32)?;
+        words.extend(
+            self.bytes[24..]
+                .chunks_exact(4)
+                .map(|v| u32::from_le_bytes(v.try_into().unwrap())),
+        );
+        crate::gaussian_filter::Kernel::new(radius, words)
+    }
 }
 pub struct Store {
     next: u64,

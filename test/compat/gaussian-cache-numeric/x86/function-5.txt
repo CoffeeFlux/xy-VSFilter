@@ -1,0 +1,17 @@
+  00404610: 57                 push        edi
+  00404611: 8B F9              mov         edi,ecx
+  00404613: 85 FF              test        edi,edi
+  00404615: 74 15              je          0040462C
+  00404617: 8B 07              mov         eax,dword ptr [edi]
+  00404619: 56                 push        esi
+  0040461A: 6A 01              push        1
+  0040461C: 8B 70 08           mov         esi,dword ptr [eax+8]
+  0040461F: 8B CE              mov         ecx,esi
+  00404621: FF 15 C8 D3 43 00  call        dword ptr ds:[0043D3C8h]
+  00404627: 8B CF              mov         ecx,edi
+  00404629: FF D6              call        esi
+  0040462B: 5E                 pop         esi
+  0040462C: 5F                 pop         edi
+  0040462D: C3                 ret
+  0040462E: CC                 int         3
+  0040462F: CC                 int         3

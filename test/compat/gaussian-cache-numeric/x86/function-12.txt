@@ -1,0 +1,82 @@
+  004053C0: 55                 push        ebp
+  004053C1: 8B EC              mov         ebp,esp
+  004053C3: 6A FF              push        0FFFFFFFFh
+  004053C5: 68 D7 BB 43 00     push        43BBD7h
+  004053CA: 64 A1 00 00 00 00  mov         eax,dword ptr fs:[00000000h]
+  004053D0: 50                 push        eax
+  004053D1: 51                 push        ecx
+  004053D2: 56                 push        esi
+  004053D3: A1 80 24 45 00     mov         eax,dword ptr ds:[00452480h]
+  004053D8: 33 C5              xor         eax,ebp
+  004053DA: 50                 push        eax
+  004053DB: 8D 45 F4           lea         eax,[ebp-0Ch]
+  004053DE: 64 A3 00 00 00 00  mov         dword ptr fs:[00000000h],eax
+  004053E4: 64 A1 2C 00 00 00  mov         eax,dword ptr fs:[0000002Ch]
+  004053EA: 8B 08              mov         ecx,dword ptr [eax]
+  004053EC: A1 4C 79 45 00     mov         eax,dword ptr ds:[0045794Ch]
+  004053F1: 3B 81 04 00 00 00  cmp         eax,dword ptr [ecx+00000004h]
+  004053F7: 7F 15              jg          0040540E
+  004053F9: A1 50 79 45 00     mov         eax,dword ptr ds:[00457950h]
+  004053FE: 8B 4D F4           mov         ecx,dword ptr [ebp-0Ch]
+  00405401: 64 89 0D 00 00 00  mov         dword ptr fs:[00000000h],ecx
+            00
+  00405408: 59                 pop         ecx
+  00405409: 5E                 pop         esi
+  0040540A: 8B E5              mov         esp,ebp
+  0040540C: 5D                 pop         ebp
+  0040540D: C3                 ret
+  0040540E: 68 4C 79 45 00     push        45794Ch
+  00405413: E8 1A EE 01 00     call        00424232
+  00405418: 83 C4 04           add         esp,4
+  0040541B: 83 3D 4C 79 45 00  cmp         dword ptr ds:[0045794Ch],0FFFFFFFFh
+            FF
+  00405422: 75 D5              jne         004053F9
+  00405424: 6A 20              push        20h
+  00405426: C7 45 FC 00 00 00  mov         dword ptr [ebp-4],0
+            00
+  0040542D: E8 CE 23 01 00     call        00417800
+  00405432: 3E 3E 8B F0        mov         esi,eax
+  00405436: 83 C4 04           add         esp,4
+  00405439: 89 75 F0           mov         dword ptr [ebp-10h],esi
+  0040543C: C6 45 FC 01        mov         byte ptr [ebp-4],1
+  00405440: 85 F6              test        esi,esi
+  00405442: 74 5E              je          004054A2
+  00405444: D9 EE              fldz
+  00405446: D9 1E              fstp        dword ptr [esi]
+  00405448: 6A 20              push        20h
+  0040544A: C7 46 04 00 00 00  mov         dword ptr [esi+4],0
+            00
+  00405451: C7 46 08 00 00 00  mov         dword ptr [esi+8],0
+            00
+  00405458: E8 A3 23 01 00     call        00417800
+  0040545D: 83 C4 04           add         esp,4
+  00405460: 89 00              mov         dword ptr [eax],eax
+  00405462: 89 40 04           mov         dword ptr [eax+4],eax
+  00405465: 89 46 04           mov         dword ptr [esi+4],eax
+  00405468: 8D 4E 0C           lea         ecx,[esi+0Ch]
+  0040546B: C7 01 00 00 00 00  mov         dword ptr [ecx],0
+  00405471: C7 41 04 00 00 00  mov         dword ptr [ecx+4],0
+            00
+  00405478: C7 41 08 00 00 00  mov         dword ptr [ecx+8],0
+            00
+  0040547F: C6 45 FC 03        mov         byte ptr [ebp-4],3
+  00405483: FF 76 04           push        dword ptr [esi+4]
+  00405486: D9 E8              fld1
+  00405488: 6A 10              push        10h
+  0040548A: D9 1E              fstp        dword ptr [esi]
+  0040548C: C7 46 18 07 00 00  mov         dword ptr [esi+18h],7
+            00
+  00405493: C7 46 1C 08 00 00  mov         dword ptr [esi+1Ch],8
+            00
+  0040549A: E8 C1 07 00 00     call        00405C60
+  0040549F: 90                 nop
+  004054A0: EB 04              jmp         004054A6
+  004054A2: 33 F6              xor         esi,esi
+  004054A4: EB 00              jmp         004054A6
+  004054A6: 68 4C 79 45 00     push        45794Ch
+  004054AB: 89 35 50 79 45 00  mov         dword ptr ds:[00457950h],esi
+  004054B1: E8 2B ED 01 00     call        004241E1
+  004054B6: 83 C4 04           add         esp,4
+  004054B9: E9 3B FF FF FF     jmp         004053F9
+  004054BE: CC                 int         3
+  004054BF: CC                 int         3

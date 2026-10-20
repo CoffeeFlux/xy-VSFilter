@@ -1,0 +1,49 @@
+  00405D40: 55                 push        ebp
+  00405D41: 8B EC              mov         ebp,esp
+  00405D43: 83 E4 F8           and         esp,0FFFFFFF8h
+  00405D46: 51                 push        ecx
+  00405D47: 56                 push        esi
+  00405D48: 3B CA              cmp         ecx,edx
+  00405D4A: 74 0F              je          00405D5B
+  00405D4C: 8B 75 08           mov         esi,dword ptr [ebp+8]
+  00405D4F: 90                 nop
+  00405D50: 8B 06              mov         eax,dword ptr [esi]
+  00405D52: 89 01              mov         dword ptr [ecx],eax
+  00405D54: 83 C1 04           add         ecx,4
+  00405D57: 3B CA              cmp         ecx,edx
+  00405D59: 75 F5              jne         00405D50
+  00405D5B: 3E 5E              pop         esi
+  00405D5D: 8B E5              mov         esp,ebp
+  00405D5F: 5D                 pop         ebp
+  00405D60: C3                 ret
+  00405D61: CC                 int         3
+  00405D62: CC                 int         3
+  00405D63: CC                 int         3
+  00405D64: CC                 int         3
+  00405D65: CC                 int         3
+  00405D66: CC                 int         3
+  00405D67: CC                 int         3
+  00405D68: CC                 int         3
+  00405D69: CC                 int         3
+  00405D6A: CC                 int         3
+  00405D6B: CC                 int         3
+  00405D6C: CC                 int         3
+  00405D6D: CC                 int         3
+  00405D6E: CC                 int         3
+  00405D6F: CC                 int         3
+  00405D70: CC                 int         3
+  00405D71: CC                 int         3
+  00405D72: CC                 int         3
+  00405D73: CC                 int         3
+  00405D74: CC                 int         3
+  00405D75: CC                 int         3
+  00405D76: CC                 int         3
+  00405D77: CC                 int         3
+  00405D78: CC                 int         3
+  00405D79: CC                 int         3
+  00405D7A: CC                 int         3
+  00405D7B: CC                 int         3
+  00405D7C: CC                 int         3
+  00405D7D: CC                 int         3
+  00405D7E: CC                 int         3
+  00405D7F: CC                 int         3

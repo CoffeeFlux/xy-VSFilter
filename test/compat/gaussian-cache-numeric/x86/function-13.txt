@@ -1,0 +1,60 @@
+  004055A0: 8B 41 18           mov         eax,dword ptr [ecx+18h]
+  004055A3: 23 44 24 0C        and         eax,dword ptr [esp+0Ch]
+  004055A7: 56                 push        esi
+  004055A8: 8B 71 0C           mov         esi,dword ptr [ecx+0Ch]
+  004055AB: 8B 49 04           mov         ecx,dword ptr [ecx+4]
+  004055AE: 8B 54 C6 04        mov         edx,dword ptr [esi+eax*8+4]
+  004055B2: 3B D1              cmp         edx,ecx
+  004055B4: 75 11              jne         004055C7
+  004055B6: 8B 44 24 08        mov         eax,dword ptr [esp+8]
+  004055BA: 5E                 pop         esi
+  004055BB: C7 40 04 00 00 00  mov         dword ptr [eax+4],0
+            00
+  004055C2: 89 08              mov         dword ptr [eax],ecx
+  004055C4: C2 0C 00           ret         0Ch
+  004055C7: 8B 0C C6           mov         ecx,dword ptr [esi+eax*8]
+  004055CA: 8B 44 24 0C        mov         eax,dword ptr [esp+0Ch]
+  004055CE: DD 00              fld         qword ptr [eax]
+  004055D0: DD 42 08           fld         qword ptr [edx+8]
+  004055D3: DD E9              fucomp      st(1)
+  004055D5: DF E0              fnstsw      ax
+  004055D7: F6 C4 44           test        ah,44h
+  004055DA: 7B 20              jnp         004055FC
+  004055DC: 8D 64 24 00        lea         esp,[esp]
+  004055E0: 3B D1              cmp         edx,ecx
+  004055E2: 74 05              je          004055E9
+  004055E4: 8B 52 04           mov         edx,dword ptr [edx+4]
+  004055E7: EB E7              jmp         004055D0
+  004055E9: 8B 44 24 08        mov         eax,dword ptr [esp+8]
+  004055ED: DD D8              fstp        st(0)
+  004055EF: 5E                 pop         esi
+  004055F0: 89 10              mov         dword ptr [eax],edx
+  004055F2: C7 40 04 00 00 00  mov         dword ptr [eax+4],0
+            00
+  004055F9: C2 0C 00           ret         0Ch
+  004055FC: 8B 44 24 08        mov         eax,dword ptr [esp+8]
+  00405600: DD D8              fstp        st(0)
+  00405602: 8B 0A              mov         ecx,dword ptr [edx]
+  00405604: 5E                 pop         esi
+  00405605: 89 50 04           mov         dword ptr [eax+4],edx
+  00405608: 89 08              mov         dword ptr [eax],ecx
+  0040560A: C2 0C 00           ret         0Ch
+  0040560D: CC                 int         3
+  0040560E: CC                 int         3
+  0040560F: CC                 int         3
+  00405610: CC                 int         3
+  00405611: CC                 int         3
+  00405612: CC                 int         3
+  00405613: CC                 int         3
+  00405614: CC                 int         3
+  00405615: CC                 int         3
+  00405616: CC                 int         3
+  00405617: CC                 int         3
+  00405618: CC                 int         3
+  00405619: CC                 int         3
+  0040561A: CC                 int         3
+  0040561B: CC                 int         3
+  0040561C: CC                 int         3
+  0040561D: CC                 int         3
+  0040561E: CC                 int         3
+  0040561F: CC                 int         3

@@ -1,0 +1,76 @@
+  00405100: 3E 3E 3E 3E 55     push        ebp
+  00405105: 8B EC              mov         ebp,esp
+  00405107: 6A FF              push        0FFFFFFFFh
+  00405109: 68 3D BB 43 00     push        43BB3Dh
+  0040510E: 64 A1 00 00 00 00  mov         eax,dword ptr fs:[00000000h]
+  00405114: 50                 push        eax
+  00405115: 83 EC 18           sub         esp,18h
+  00405118: 53                 push        ebx
+  00405119: 56                 push        esi
+  0040511A: 57                 push        edi
+  0040511B: A1 80 24 45 00     mov         eax,dword ptr ds:[00452480h]
+  00405120: 33 C5              xor         eax,ebp
+  00405122: 50                 push        eax
+  00405123: 8D 45 F4           lea         eax,[ebp-0Ch]
+  00405126: 64 A3 00 00 00 00  mov         dword ptr fs:[00000000h],eax
+  0040512C: 8B F1              mov         esi,ecx
+  0040512E: 8B 45 0C           mov         eax,dword ptr [ebp+0Ch]
+  00405131: 8B 55 10           mov         edx,dword ptr [ebp+10h]
+  00405134: 8B 7D 08           mov         edi,dword ptr [ebp+8]
+  00405137: 89 45 E8           mov         dword ptr [ebp-18h],eax
+  0040513A: 8D 45 E8           lea         eax,[ebp-18h]
+  0040513D: C7 06 00 00 00 00  mov         dword ptr [esi],0
+  00405143: C7 46 04 00 00 00  mov         dword ptr [esi+4],0
+            00
+  0040514A: 89 55 EC           mov         dword ptr [ebp-14h],edx
+  0040514D: 89 7D DC           mov         dword ptr [ebp-24h],edi
+  00405150: 89 45 E0           mov         dword ptr [ebp-20h],eax
+  00405153: C6 45 E4 01        mov         byte ptr [ebp-1Ch],1
+  00405157: 6A 20              push        20h
+  00405159: C7 45 FC 00 00 00  mov         dword ptr [ebp-4],0
+            00
+  00405160: E8 9B 26 01 00     call        00417800
+  00405165: 83 C4 04           add         esp,4
+  00405168: 89 45 F0           mov         dword ptr [ebp-10h],eax
+  0040516B: 85 C0              test        eax,eax
+  0040516D: 74 25              je          00405194
+  0040516F: 8B 4D E8           mov         ecx,dword ptr [ebp-18h]
+  00405172: 8B 55 EC           mov         edx,dword ptr [ebp-14h]
+  00405175: C7 40 04 01 00 00  mov         dword ptr [eax+4],1
+            00
+  0040517C: C7 40 08 01 00 00  mov         dword ptr [eax+8],1
+            00
+  00405183: C7 00 14 81 44 00  mov         dword ptr [eax],448114h
+  00405189: 89 48 10           mov         dword ptr [eax+10h],ecx
+  0040518C: 89 50 14           mov         dword ptr [eax+14h],edx
+  0040518F: 89 78 18           mov         dword ptr [eax+18h],edi
+  00405192: EB 02              jmp         00405196
+  00405194: 33 C0              xor         eax,eax
+  00405196: 89 3E              mov         dword ptr [esi],edi
+  00405198: 89 46 04           mov         dword ptr [esi+4],eax
+  0040519B: 8B C6              mov         eax,esi
+  0040519D: 8B 4D F4           mov         ecx,dword ptr [ebp-0Ch]
+  004051A0: 64 89 0D 00 00 00  mov         dword ptr fs:[00000000h],ecx
+            00
+  004051A7: 59                 pop         ecx
+  004051A8: 5F                 pop         edi
+  004051A9: 5E                 pop         esi
+  004051AA: 5B                 pop         ebx
+  004051AB: 8B E5              mov         esp,ebp
+  004051AD: 5D                 pop         ebp
+  004051AE: C2 0C 00           ret         0Ch
+  004051B1: CC                 int         3
+  004051B2: CC                 int         3
+  004051B3: CC                 int         3
+  004051B4: CC                 int         3
+  004051B5: CC                 int         3
+  004051B6: CC                 int         3
+  004051B7: CC                 int         3
+  004051B8: CC                 int         3
+  004051B9: CC                 int         3
+  004051BA: CC                 int         3
+  004051BB: CC                 int         3
+  004051BC: CC                 int         3
+  004051BD: CC                 int         3
+  004051BE: CC                 int         3
+  004051BF: CC                 int         3

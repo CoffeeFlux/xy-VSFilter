@@ -1,0 +1,61 @@
+  0000000140006120: 36 36 48 89 5C 24  mov         qword ptr ss:[rsp+10h],rbx
+                    10
+  0000000140006127: 56                 push        rsi
+  0000000140006128: 48 83 EC 20        sub         rsp,20h
+  000000014000612C: 48 8B 11           mov         rdx,qword ptr [rcx]
+  000000014000612F: 48 8B F1           mov         rsi,rcx
+  0000000140006132: 48 8B 42 08        mov         rax,qword ptr [rdx+8]
+  0000000140006136: 48 C7 00 00 00 00  mov         qword ptr [rax],0
+                    00
+  000000014000613D: 48 8B 1A           mov         rbx,qword ptr [rdx]
+  0000000140006140: 48 85 DB           test        rbx,rbx
+  0000000140006143: 74 4D              je          0000000140006192
+  0000000140006145: 48 89 7C 24 30     mov         qword ptr [rsp+30h],rdi
+  000000014000614A: 66 0F 1F 44 00 00  nop         word ptr [rax+rax]
+  0000000140006150: 48 8B 4B 20        mov         rcx,qword ptr [rbx+20h]
+  0000000140006154: 48 8B 3B           mov         rdi,qword ptr [rbx]
+  0000000140006157: 48 85 C9           test        rcx,rcx
+  000000014000615A: 74 1C              je          0000000140006178
+  000000014000615C: B8 FF FF FF FF     mov         eax,0FFFFFFFFh
+  0000000140006161: F0 0F C1 41 0C     lock xadd   dword ptr [rcx+0Ch],eax
+  0000000140006166: 83 F8 01           cmp         eax,1
+  0000000140006169: 75 0D              jne         0000000140006178
+  000000014000616B: 48 8B 01           mov         rax,qword ptr [rcx]
+  000000014000616E: 48 8B 40 08        mov         rax,qword ptr [rax+8]
+  0000000140006172: FF 15 70 E6 03 00  call        qword ptr [00000001400447E8h]
+  0000000140006178: BA 30 00 00 00     mov         edx,30h
+  000000014000617D: 48 8B CB           mov         rcx,rbx
+  0000000140006180: E8 2B 3E 00 00     call        0000000140009FB0
+  0000000140006185: 48 8B DF           mov         rbx,rdi
+  0000000140006188: 48 85 FF           test        rdi,rdi
+  000000014000618B: 75 C3              jne         0000000140006150
+  000000014000618D: 48 8B 7C 24 30     mov         rdi,qword ptr [rsp+30h]
+  0000000140006192: 48 8B 0E           mov         rcx,qword ptr [rsi]
+  0000000140006195: BA 30 00 00 00     mov         edx,30h
+  000000014000619A: 48 8B 5C 24 38     mov         rbx,qword ptr [rsp+38h]
+  000000014000619F: 48 83 C4 20        add         rsp,20h
+  00000001400061A3: 5E                 pop         rsi
+  00000001400061A4: E9 07 3E 00 00     jmp         0000000140009FB0
+  00000001400061A9: CC                 int         3
+  00000001400061AA: CC                 int         3
+  00000001400061AB: CC                 int         3
+  00000001400061AC: CC                 int         3
+  00000001400061AD: CC                 int         3
+  00000001400061AE: CC                 int         3
+  00000001400061AF: CC                 int         3
+  00000001400061B0: CC                 int         3
+  00000001400061B1: CC                 int         3
+  00000001400061B2: CC                 int         3
+  00000001400061B3: CC                 int         3
+  00000001400061B4: CC                 int         3
+  00000001400061B5: CC                 int         3
+  00000001400061B6: CC                 int         3
+  00000001400061B7: CC                 int         3
+  00000001400061B8: CC                 int         3
+  00000001400061B9: CC                 int         3
+  00000001400061BA: CC                 int         3
+  00000001400061BB: CC                 int         3
+  00000001400061BC: CC                 int         3
+  00000001400061BD: CC                 int         3
+  00000001400061BE: CC                 int         3
+  00000001400061BF: CC                 int         3

@@ -1,0 +1,206 @@
+{
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "original_provenance": "artifacts/blur-numeric-reference-x86/provenance.json",
+  "original_provenance_sha256": "42c06c22398b3b34169847a29838c7e03b8afdd9316e8190131b41c1f30534de",
+  "binary_sha256": "5a9ca5210f4c369d7803a25729790532d4c8cc0b981f1ab649311d27ebcf549f",
+  "map_sha256": "4c9076131622b65b184dd6c163eedd8b29c19fb2ca6e223a0510e0939bdd25f7",
+  "functions": [
+    {
+      "name": "??0GaussianCoefficients@@QAE@N@Z",
+      "address": "0x401340",
+      "end": "0x4013a0",
+      "file": "function-0.txt",
+      "sha256": "15e562bf18d48be0ae7b1c016f064feccd0faad1b70798b9b993571f2f346296"
+    },
+    {
+      "name": "?init@GaussianCoefficients@@AAEHN@Z",
+      "address": "0x4013a0",
+      "end": "0x401540",
+      "file": "function-1.txt",
+      "sha256": "295d361f9ed4a21864f17cd4acb3cae29e2a2add5b3151ec532f9f0b6846b626"
+    },
+    {
+      "name": "?Blur@Rasterizer@@SA_NABUOverlay@@MNNNV?$shared_ptr@UOverlay@@@std@@@Z",
+      "address": "0x401cc0",
+      "end": "0x401ee0",
+      "file": "function-2.txt",
+      "sha256": "1df3fb759d4ab187f5ad7015e2559b032d33bca6635342ab997f1a3c86d63eff"
+    },
+    {
+      "name": "??1?$XyInternedByKey@NVGaussianCoefficients@@@@QAE@XZ",
+      "address": "0x402280",
+      "end": "0x4022e0",
+      "file": "function-3.txt",
+      "sha256": "15fec0906469309e496dc3b717fa3a3f47936ce1b236b8cdf7071dfad54c0265"
+    },
+    {
+      "name": "??1?$shared_ptr@$$CBVGaussianCoefficients@@@std@@QAE@XZ",
+      "address": "0x402280",
+      "end": "0x4022e0",
+      "file": "function-4.txt",
+      "sha256": "15fec0906469309e496dc3b717fa3a3f47936ce1b236b8cdf7071dfad54c0265"
+    },
+    {
+      "name": "?_Delete_this@?$_Ref_count_resource@PAVGaussianCoefficients@@V<lambda_475735c4dd3cc445b3c19a1103b91493>@@@std@@EAEXXZ",
+      "address": "0x404610",
+      "end": "0x404630",
+      "file": "function-5.txt",
+      "sha256": "1e7e8a5ac5527f625a5a03c3d85addd8a7f5b50deb38cbef9b3aeec1aaf02b77"
+    },
+    {
+      "name": "?Get@?$XyInternedByKey@NVGaussianCoefficients@@@@CA?AV?$shared_ptr@$$CBVGaussianCoefficients@@@std@@ABN@Z",
+      "address": "0x4046c0",
+      "end": "0x4048c0",
+      "file": "function-6.txt",
+      "sha256": "792d62ac45c199d761449fa1f57a19a35346b393a47057f9a5f94acf032cee4d"
+    },
+    {
+      "name": "??R<lambda_475735c4dd3cc445b3c19a1103b91493>@@QBE@PBVGaussianCoefficients@@@Z",
+      "address": "0x4048c0",
+      "end": "0x404960",
+      "file": "function-7.txt",
+      "sha256": "e271100614e788808a108f406a6acc55d4e6883e48e453d31080084a8a55e0cf"
+    },
+    {
+      "name": "??1Entry@?$XyInternedByKey@NVGaussianCoefficients@@@@QAE@XZ",
+      "address": "0x404ac0",
+      "end": "0x404b00",
+      "file": "function-8.txt",
+      "sha256": "4901d7b7d6ca795a2b03101a834145d613f4776dffa7afca3495df6e9543b7d7"
+    },
+    {
+      "name": "??$erase@V?$_List_iterator@V?$_List_val@U?$_List_simple_types@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@@std@@@std@@@std@@$0A@@?$_Hash@V?$_Umap_traits@NUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@V?$_Uhash_compare@NUXyHashValue@@U?$equal_to@N@std@@@std@@V?$allocator@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@@4@$0A@@std@@@std@@QAE?AV?$_List_iterator@V?$_List_val@U?$_List_simple_types@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@@std@@@std@@@1@V21@@Z",
+      "address": "0x405040",
+      "end": "0x405100",
+      "file": "function-9.txt",
+      "sha256": "dc52489e56aa03ab862aeb809ed556f8c142c6dae8373d8987c649eee956ac95"
+    },
+    {
+      "name": "??$?0VGaussianCoefficients@@V<lambda_475735c4dd3cc445b3c19a1103b91493>@@$0A@@?$shared_ptr@$$CBVGaussianCoefficients@@@std@@QAE@PAVGaussianCoefficients@@V<lambda_475735c4dd3cc445b3c19a1103b91493>@@@Z",
+      "address": "0x405100",
+      "end": "0x4051c0",
+      "file": "function-10.txt",
+      "sha256": "e707fb8fc35cbecf5d03b13cc1aa727d1f8c2e5fcdd3c3eafd5c63a64dfe04bb"
+    },
+    {
+      "name": "??$emplace@ABNAAUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@?$_Hash@V?$_Umap_traits@NUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@V?$_Uhash_compare@NUXyHashValue@@U?$equal_to@N@std@@@std@@V?$allocator@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@@4@$0A@@std@@@std@@QAE?AU?$pair@V?$_List_iterator@V?$_List_val@U?$_List_simple_types@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@@std@@@std@@@std@@_N@1@ABNAAUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@Z",
+      "address": "0x4051c0",
+      "end": "0x4053c0",
+      "file": "function-11.txt",
+      "sha256": "7647ca73022f9e78307241e441888c2f48696ad28046d1e2313d70157f6a91cb"
+    },
+    {
+      "name": "?GetTable@?$XyInternedByKey@NVGaussianCoefficients@@@@CAAAV?$unordered_map@NUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@UXyHashValue@@U?$equal_to@N@std@@V?$allocator@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@@5@@std@@XZ",
+      "address": "0x4053c0",
+      "end": "0x4054c0",
+      "file": "function-12.txt",
+      "sha256": "236e3eb8382b1413522efc30b44131168bad92f9224ab5a74c296408e4c5f110"
+    },
+    {
+      "name": "??$_Find_last@N@?$_Hash@V?$_Umap_traits@NUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@V?$_Uhash_compare@NUXyHashValue@@U?$equal_to@N@std@@@std@@V?$allocator@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@@4@$0A@@std@@@std@@IBE?AU?$_Hash_find_last_result@PAU?$_List_node@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@PAX@std@@@1@ABNI@Z",
+      "address": "0x4055a0",
+      "end": "0x405620",
+      "file": "function-13.txt",
+      "sha256": "58ef4bee795124aa31042799e071b26b46d1144a3cc850dd637c4ce4c1741e1f"
+    },
+    {
+      "name": "??1?$_List_node_emplace_op2@V?$allocator@U?$_List_node@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@PAX@std@@@std@@@std@@QAE@XZ",
+      "address": "0x405620",
+      "end": "0x405680",
+      "file": "function-14.txt",
+      "sha256": "7aacf10f1c37114557e2628214a81c2867156e4cbafb566d2a742e61b9044498"
+    },
+    {
+      "name": "?_Destroy@?$_Ref_count_resource@PAVGaussianCoefficients@@V<lambda_475735c4dd3cc445b3c19a1103b91493>@@@std@@EAEXXZ",
+      "address": "0x405960",
+      "end": "0x4059b0",
+      "file": "function-15.txt",
+      "sha256": "9809313babe114d00af22ef888351477c7bb14e15c55d50e34f1847f26e4d274"
+    },
+    {
+      "name": "?_Get_deleter@?$_Ref_count_resource@PAVGaussianCoefficients@@V<lambda_475735c4dd3cc445b3c19a1103b91493>@@@std@@UBEPAXABVtype_info@@@Z",
+      "address": "0x4059b0",
+      "end": "0x4059e0",
+      "file": "function-16.txt",
+      "sha256": "a9596ee04998a8f9185aa64e92bc48076de69e60b78a9b5970d621c065785110"
+    },
+    {
+      "name": "??1?$_Temporary_owner_del@PAVGaussianCoefficients@@V<lambda_475735c4dd3cc445b3c19a1103b91493>@@@std@@QAE@XZ",
+      "address": "0x4059e0",
+      "end": "0x405a30",
+      "file": "function-17.txt",
+      "sha256": "81db0cd5fec4f04479d901bfdf6980b8a14386c4ab53d71c1e0cf76e6a6dc98a"
+    },
+    {
+      "name": "??1?$_Alloc_construct_ptr@V?$allocator@U?$_List_node@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@PAX@std@@@std@@@std@@QAE@XZ",
+      "address": "0x405a30",
+      "end": "0x405a60",
+      "file": "function-18.txt",
+      "sha256": "0ef4b9ec69a455b850d975bf9b0d40ec8bba1d8a6c1807811481db447a870a53"
+    },
+    {
+      "name": "??1?$_Hash_vec@V?$allocator@V?$_List_unchecked_iterator@V?$_List_val@U?$_List_simple_types@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@@std@@@std@@@std@@@std@@@std@@QAE@XZ",
+      "address": "0x405a60",
+      "end": "0x405ac0",
+      "file": "function-19.txt",
+      "sha256": "29f4c85162714b416a06bdccba3097da623bd6f56b11010120758145aac9ba35"
+    },
+    {
+      "name": "??1?$list@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@V?$allocator@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@@2@@std@@QAE@XZ",
+      "address": "0x405ac0",
+      "end": "0x405ae0",
+      "file": "function-20.txt",
+      "sha256": "f416c95915549cfcc20d1a2ade720a0926e56de709e5fe4aa6c1adc07d3fcbeb"
+    },
+    {
+      "name": "?_Forced_rehash@?$_Hash@V?$_Umap_traits@NUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@V?$_Uhash_compare@NUXyHashValue@@U?$equal_to@N@std@@@std@@V?$allocator@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@@4@$0A@@std@@@std@@IAEXI@Z",
+      "address": "0x405ae0",
+      "end": "0x405c40",
+      "file": "function-21.txt",
+      "sha256": "4ba86079864c50905018c3774bc7d880e6f57ad7d88e892bba6b190a5a6a06ae"
+    },
+    {
+      "name": "??_E?$_Ref_count_resource@PAVGaussianCoefficients@@V<lambda_475735c4dd3cc445b3c19a1103b91493>@@@std@@UAEPAXI@Z",
+      "address": "0x405c40",
+      "end": "0x405c60",
+      "file": "function-22.txt",
+      "sha256": "f1ad8b7d8b3b702e263f4e5ded148d5c4297b3ba56b160c136a71e3cbd96ebfd"
+    },
+    {
+      "name": "??_G?$_Ref_count_resource@PAVGaussianCoefficients@@V<lambda_475735c4dd3cc445b3c19a1103b91493>@@@std@@UAEPAXI@Z",
+      "address": "0x405c40",
+      "end": "0x405c60",
+      "file": "function-23.txt",
+      "sha256": "f1ad8b7d8b3b702e263f4e5ded148d5c4297b3ba56b160c136a71e3cbd96ebfd"
+    },
+    {
+      "name": "?_Assign_grow@?$_Hash_vec@V?$allocator@V?$_List_unchecked_iterator@V?$_List_val@U?$_List_simple_types@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@@std@@@std@@@std@@@std@@@std@@QAEXIV?$_List_unchecked_iterator@V?$_List_val@U?$_List_simple_types@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@@std@@@std@@@2@@Z",
+      "address": "0x405c60",
+      "end": "0x405d40",
+      "file": "function-24.txt",
+      "sha256": "828925b7b157ff4bf3fe5f9c8c29a0a690bc09913cb06a56b9533d299aa80374"
+    },
+    {
+      "name": "??$uninitialized_fill@PAV?$_List_unchecked_iterator@V?$_List_val@U?$_List_simple_types@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@@std@@@std@@@std@@V12@@std@@YAXQAV?$_List_unchecked_iterator@V?$_List_val@U?$_List_simple_types@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@@std@@@std@@@0@0ABV10@@Z",
+      "address": "0x405d40",
+      "end": "0x405d80",
+      "file": "function-25.txt",
+      "sha256": "1bb8fad00b1683db1d37b22fcc1a96e6fd3899b6db8bc0d1daa8bc6eada3e9af"
+    },
+    {
+      "name": "??$_Free_non_head@V?$allocator@U?$_List_node@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@PAX@std@@@std@@@?$_List_node@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@PAX@std@@SAXAAV?$allocator@U?$_List_node@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@PAX@std@@@1@PAU01@@Z",
+      "address": "0x405d80",
+      "end": "0x405de0",
+      "file": "function-26.txt",
+      "sha256": "b6439890037b1ee5e7af89a1809e72836d0296fec186041a78788494762b6cf9"
+    },
+    {
+      "name": "?deallocate@?$allocator@V?$_List_unchecked_iterator@V?$_List_val@U?$_List_simple_types@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@@std@@@std@@@std@@@std@@QAEXQAV?$_List_unchecked_iterator@V?$_List_val@U?$_List_simple_types@U?$pair@$$CBNUEntry@?$XyInternedByKey@NVGaussianCoefficients@@@@@std@@@std@@@std@@@2@I@Z",
+      "address": "0x405de0",
+      "end": "0x405e30",
+      "file": "function-27.txt",
+      "sha256": "072b533e01fe72fc960b4af5dfb4e74b8cf158e52724a556d75ed980289dd4f7"
+    }
+  ],
+  "scope": "Read-only preparation for remaining cache and Blur dispatch; original observer and linked binary unchanged. No new cache parity claim."
+}

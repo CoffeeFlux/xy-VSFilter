@@ -7417,3 +7417,11 @@ memory-safety inventory; converting first-party code alone does not establish a
 safe Aegisub dependency. Use larger mutation campaigns, coverage-guided fuzzing
 and minimized differential cases to discover the long tail, with a pinned
 reference and isolated workers for every experiment.
+
+## In progress: Gaussian cache and sigma ownership
+
+The experimental Gaussian operation now calls Rust with raw strength and scales;
+Rust owns sigma products, coefficient table/lifetimes and both image passes.
+The native coefficient table/snapshots are bypassed in that production path.
+Windows differential evidence is pending. See [the boundary](rust-gaussian-cache-boundary.md).
+Combined dispatch, downstream consumers and full host/vendor migration remain active.

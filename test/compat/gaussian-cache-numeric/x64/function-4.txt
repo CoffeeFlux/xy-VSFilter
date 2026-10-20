@@ -1,0 +1,31 @@
+  0000000140004CD0: 48 85 C9           test        rcx,rcx
+  0000000140004CD3: 74 13              je          0000000140004CE8
+  0000000140004CD5: 48 8B 01           mov         rax,qword ptr [rcx]
+  0000000140004CD8: BA 01 00 00 00     mov         edx,1
+  0000000140004CDD: 48 8B 40 10        mov         rax,qword ptr [rax+10h]
+  0000000140004CE1: 48 FF 25 00 FB 03  jmp         qword ptr [00000001400447E8h]
+                    00
+  0000000140004CE8: C3                 ret
+  0000000140004CE9: CC                 int         3
+  0000000140004CEA: CC                 int         3
+  0000000140004CEB: CC                 int         3
+  0000000140004CEC: CC                 int         3
+  0000000140004CED: CC                 int         3
+  0000000140004CEE: CC                 int         3
+  0000000140004CEF: CC                 int         3
+  0000000140004CF0: CC                 int         3
+  0000000140004CF1: CC                 int         3
+  0000000140004CF2: CC                 int         3
+  0000000140004CF3: CC                 int         3
+  0000000140004CF4: CC                 int         3
+  0000000140004CF5: CC                 int         3
+  0000000140004CF6: CC                 int         3
+  0000000140004CF7: CC                 int         3
+  0000000140004CF8: CC                 int         3
+  0000000140004CF9: CC                 int         3
+  0000000140004CFA: CC                 int         3
+  0000000140004CFB: CC                 int         3
+  0000000140004CFC: CC                 int         3
+  0000000140004CFD: CC                 int         3
+  0000000140004CFE: CC                 int         3
+  0000000140004CFF: CC                 int         3

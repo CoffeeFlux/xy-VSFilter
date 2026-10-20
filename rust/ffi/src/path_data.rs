@@ -20,6 +20,7 @@ struct Owners {
     regions: xy_vsfilter_compat::wide_region::Store,
     rasters: xy_vsfilter_compat::raster::Store,
     coefficients: xy_vsfilter_compat::gaussian_coefficients::Store,
+    gaussian: xy_vsfilter_compat::gaussian_cache::Cache,
     ellipse: xy_vsfilter_compat::ellipse::Cache<crate::windows_ellipse_numeric::Numeric>,
 }
 // SAFETY: all access uses the atomic gate; HRTB closures cannot return borrowed
@@ -45,6 +46,7 @@ impl Boundary {
                 regions: xy_vsfilter_compat::wide_region::Store::new(),
                 rasters: xy_vsfilter_compat::raster::Store::new(),
                 coefficients: xy_vsfilter_compat::gaussian_coefficients::Store::new(),
+                gaussian: xy_vsfilter_compat::gaussian_cache::Cache::new(),
                 ellipse: xy_vsfilter_compat::ellipse::Cache::new(),
             }),
         }
@@ -67,6 +69,93 @@ impl Boundary {
     }
 }
 static PATHS: Boundary = Boundary::new();
+/// # Safety
+/// output lends 24 writable bytes: checked lease ID, shared identity and length.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_gaussian_cache_acquire_v1(key: u64, output: *mut u8) -> u32 {
+    if output.is_null() {
+        return 3;
+    }
+    let info = match PATHS.with_owners(|o| {
+        let id = o
+            .gaussian
+            .acquire(key, &mut crate::windows_gaussian_cache::Numeric::new())?;
+        Ok([
+            id,
+            o.gaussian.identity(id)?,
+            o.gaussian.get(id)?.bytes().len() as u64,
+        ])
+    }) {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    let mut bytes = [0; 24];
+    for (i, v) in info.into_iter().enumerate() {
+        bytes[i * 8..i * 8 + 8].copy_from_slice(&v.to_le_bytes());
+    }
+    // SAFETY: detached initialized packet and caller's writable output.
+    unsafe {
+        core::ptr::copy_nonoverlapping(bytes.as_ptr(), output, 24);
+    }
+    0
+}
+/// # Safety
+/// output lends capacity writable bytes, disjoint from private cache storage.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_gaussian_cache_read_v1(
+    id: u64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    if output.is_null() || capacity > isize::MAX as usize {
+        return 3;
+    }
+    match PATHS.with_owners(|o| {
+        let bytes = o.gaussian.get(id)?.bytes();
+        if bytes.len() > capacity {
+            return Err(4);
+        }
+        // SAFETY: checked capacity and source held under exclusive admission.
+        unsafe {
+            core::ptr::copy_nonoverlapping(bytes.as_ptr(), output, bytes.len());
+        }
+        Ok(())
+    }) {
+        Ok(()) => 0,
+        Err(e) => e,
+    }
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_gaussian_cache_release_v1(id: u64) -> u32 {
+    match PATHS.with_owners(|o| {
+        o.gaussian
+            .release(id, &mut crate::windows_gaussian_cache::Numeric::new())
+    }) {
+        Ok(()) => 0,
+        Err(e) => e,
+    }
+}
+/// # Safety
+/// output lends sixteen writable bytes: weak entry count and live coefficient bytes.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_gaussian_cache_stats_v1(output: *mut u8) -> u32 {
+    if output.is_null() {
+        return 3;
+    }
+    let info = match PATHS.with_owners(|o| Ok(o.gaussian.stats())) {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    let mut bytes = [0; 16];
+    for (i, v) in info.into_iter().enumerate() {
+        bytes[i * 8..i * 8 + 8].copy_from_slice(&v.to_le_bytes());
+    }
+    // SAFETY: detached initialized scalars and caller's writable output.
+    unsafe {
+        core::ptr::copy_nonoverlapping(bytes.as_ptr(), output, 16);
+    }
+    0
+}
 /// # Safety
 /// output lends sixteen writable bytes for a checked ID and packet length.
 #[no_mangle]
@@ -184,28 +273,26 @@ pub unsafe extern "C" fn xy_vsfilter_overlay_clone_v1(id: u64, output: *mut u8) 
     0
 }
 /// # Safety
-/// input lends `length` initialized coefficient packet bytes; output lends eight
-/// writable bytes. Input may overlap output after decoding. No pixel loan crosses.
+/// output lends eight writable bytes for an independent image ID. Strength and
+/// scales are raw binary64 words; no coefficient or image buffer is borrowed.
 #[no_mangle]
-pub unsafe extern "C" fn xy_vsfilter_overlay_gaussian_v1(
+pub unsafe extern "C" fn xy_vsfilter_overlay_gaussian_v2(
     id: u64,
-    input: *const u8,
-    length: usize,
+    sigma: u64,
+    sx: u64,
+    sy: u64,
     output: *mut u8,
 ) -> u32 {
-    if input.is_null() || output.is_null() || length < 16 || length > isize::MAX as usize {
+    if output.is_null() {
         return 3;
     }
-    // SAFETY: caller's bounded initialized packet, decoded to owned coefficients.
-    let kernels = match xy_vsfilter_compat::gaussian_filter::kernels(unsafe {
-        core::slice::from_raw_parts(input, length)
-    }) {
-        Ok(v) => v,
-        Err(e) => return e,
-    };
     let id = match PATHS.with_owners(|o| {
-        let image = o.rasters.get(id)?.gaussian(
-            &kernels,
+        let mut numeric = crate::windows_gaussian_cache::Numeric::new();
+        let products = numeric.products(sigma, sx, sy);
+        let image = o.gaussian.gaussian(
+            o.rasters.get(id)?,
+            products,
+            &mut numeric,
             &mut crate::windows_gaussian_filter::Numeric::new(),
         )?;
         o.rasters.insert(image)
@@ -213,7 +300,7 @@ pub unsafe extern "C" fn xy_vsfilter_overlay_gaussian_v1(
         Ok(v) => v,
         Err(e) => return e,
     };
-    // SAFETY: detached scalar write after all input borrowing has ended.
+    // SAFETY: detached scalar and caller's writable eight-byte output.
     unsafe {
         core::ptr::copy_nonoverlapping(id.to_le_bytes().as_ptr(), output, 8);
     }
@@ -1223,39 +1310,99 @@ mod tests {
                 0
             );
             let source = u64::from_le_bytes(raster_info[1..9].try_into().unwrap());
-            let mut kernel_packet = [0u8; 49];
-            for (i, v) in [0u32, 0, 4, 4, 0x3f800000, 0, 0, 0, 0x3f800000, 0, 0, 0]
-                .into_iter()
-                .enumerate()
-            {
-                kernel_packet[1 + 4 * i..5 + 4 * i].copy_from_slice(&v.to_le_bytes());
-            }
-            let kernel_bytes = &kernel_packet[1..];
+            let mut cache_info = [0xa5; 26];
             assert_eq!(
-                xy_vsfilter_overlay_gaussian_v1(
-                    source,
-                    kernel_bytes.as_ptr(),
-                    48,
-                    core::ptr::null_mut()
+                xy_vsfilter_gaussian_cache_acquire_v1(1f64.to_bits(), core::ptr::null_mut()),
+                3
+            );
+            assert_eq!(
+                xy_vsfilter_gaussian_cache_acquire_v1(
+                    1f64.to_bits(),
+                    cache_info.as_mut_ptr().add(1)
                 ),
+                0
+            );
+            let first = u64::from_le_bytes(cache_info[1..9].try_into().unwrap());
+            let identity = u64::from_le_bytes(cache_info[9..17].try_into().unwrap());
+            assert_eq!((cache_info[0], cache_info[25]), (0xa5, 0xa5));
+            assert_eq!(
+                u64::from_le_bytes(cache_info[17..25].try_into().unwrap()),
+                40
+            );
+            assert_eq!(
+                xy_vsfilter_gaussian_cache_acquire_v1(
+                    1f64.to_bits(),
+                    cache_info.as_mut_ptr().add(1)
+                ),
+                0
+            );
+            let second = u64::from_le_bytes(cache_info[1..9].try_into().unwrap());
+            assert_ne!(first, second);
+            assert_eq!(
+                u64::from_le_bytes(cache_info[9..17].try_into().unwrap()),
+                identity
+            );
+            let mut coefficient_packet = [0xa5; 42];
+            assert_eq!(
+                xy_vsfilter_gaussian_cache_read_v1(
+                    first,
+                    coefficient_packet.as_mut_ptr().add(1),
+                    39
+                ),
+                4
+            );
+            assert_eq!(coefficient_packet, [0xa5; 42]);
+            assert_eq!(
+                xy_vsfilter_gaussian_cache_read_v1(
+                    first,
+                    coefficient_packet.as_mut_ptr().add(1),
+                    40
+                ),
+                0
+            );
+            assert_eq!(
+                (coefficient_packet[0], coefficient_packet[41]),
+                (0xa5, 0xa5)
+            );
+            assert_eq!(xy_vsfilter_gaussian_cache_release_v1(first), 0);
+            assert_eq!(xy_vsfilter_gaussian_cache_release_v1(first), 1);
+            assert_eq!(
+                xy_vsfilter_gaussian_cache_read_v1(
+                    first,
+                    coefficient_packet.as_mut_ptr().add(1),
+                    40
+                ),
+                1
+            );
+            assert_eq!(
+                xy_vsfilter_gaussian_cache_read_v1(
+                    second,
+                    coefficient_packet.as_mut_ptr().add(1),
+                    40
+                ),
+                0
+            );
+            assert_eq!(xy_vsfilter_gaussian_cache_release_v1(second), 0);
+            let mut cache_stats = [0xa5; 18];
+            assert_eq!(
+                xy_vsfilter_gaussian_cache_stats_v1(cache_stats.as_mut_ptr().add(1)),
+                0
+            );
+            assert_eq!(&cache_stats[1..17], &[0; 16]);
+            assert_eq!((cache_stats[0], cache_stats[17]), (0xa5, 0xa5));
+            let small = 0.1f64.to_bits();
+            let scale = 1f64.to_bits();
+            assert_eq!(
+                xy_vsfilter_overlay_gaussian_v2(source, small, scale, scale, core::ptr::null_mut()),
                 3
             );
             raster_info.fill(0xa5);
             assert_eq!(
-                xy_vsfilter_overlay_gaussian_v1(
+                xy_vsfilter_overlay_gaussian_v2(
                     source,
-                    kernel_bytes.as_ptr(),
-                    47,
-                    raster_info.as_mut_ptr().add(1)
-                ),
-                6
-            );
-            assert_eq!(raster_info, [0xa5; 18]);
-            assert_eq!(
-                xy_vsfilter_overlay_gaussian_v1(
-                    source,
-                    kernel_bytes.as_ptr(),
-                    48,
+                    small,
+                    scale,
+                    scale,
                     raster_info.as_mut_ptr().add(1)
                 ),
                 0
@@ -1277,10 +1424,11 @@ mod tests {
             assert_eq!((gaussian_wire[0], gaussian_wire[97]), (0xa5, 0xa5));
             assert_eq!(xy_vsfilter_raster_destroy_v1(gaussian), 0);
             assert_eq!(
-                xy_vsfilter_overlay_gaussian_v1(
+                xy_vsfilter_overlay_gaussian_v2(
                     gaussian,
-                    kernel_bytes.as_ptr(),
-                    48,
+                    small,
+                    scale,
+                    scale,
                     raster_info.as_mut_ptr().add(1)
                 ),
                 1

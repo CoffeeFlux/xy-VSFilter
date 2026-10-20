@@ -1,0 +1,87 @@
+  00405040: 8B 44 24 08        mov         eax,dword ptr [esp+8]
+  00405044: 53                 push        ebx
+  00405045: 56                 push        esi
+  00405046: 57                 push        edi
+  00405047: 8B 50 08           mov         edx,dword ptr [eax+8]
+  0040504A: 8B F9              mov         edi,ecx
+  0040504C: 81 C2 63 42 00 00  add         edx,4263h
+  00405052: 8B F2              mov         esi,edx
+  00405054: C1 E6 05           shl         esi,5
+  00405057: 8B 4F 0C           mov         ecx,dword ptr [edi+0Ch]
+  0040505A: 03 F2              add         esi,edx
+  0040505C: 03 70 0C           add         esi,dword ptr [eax+0Ch]
+  0040505F: 23 77 18           and         esi,dword ptr [edi+18h]
+  00405062: 8B 14 F1           mov         edx,dword ptr [ecx+esi*8]
+  00405065: 39 44 F1 04        cmp         dword ptr [ecx+esi*8+4],eax
+  00405069: 75 19              jne         00405084
+  0040506B: 3B D0              cmp         edx,eax
+  0040506D: 75 0C              jne         0040507B
+  0040506F: 8B 47 04           mov         eax,dword ptr [edi+4]
+  00405072: 89 04 F1           mov         dword ptr [ecx+esi*8],eax
+  00405075: 89 44 F1 04        mov         dword ptr [ecx+esi*8+4],eax
+  00405079: EB 12              jmp         0040508D
+  0040507B: 8B 40 04           mov         eax,dword ptr [eax+4]
+  0040507E: 89 44 F1 04        mov         dword ptr [ecx+esi*8+4],eax
+  00405082: EB 09              jmp         0040508D
+  00405084: 3B D0              cmp         edx,eax
+  00405086: 75 09              jne         00405091
+  00405088: 8B 00              mov         eax,dword ptr [eax]
+  0040508A: 89 04 F1           mov         dword ptr [ecx+esi*8],eax
+  0040508D: 8B 44 24 14        mov         eax,dword ptr [esp+14h]
+  00405091: 8B 18              mov         ebx,dword ptr [eax]
+  00405093: FF 4F 08           dec         dword ptr [edi+8]
+  00405096: 8B 40 04           mov         eax,dword ptr [eax+4]
+  00405099: 89 18              mov         dword ptr [eax],ebx
+  0040509B: 8B 44 24 14        mov         eax,dword ptr [esp+14h]
+  0040509F: 8B 40 04           mov         eax,dword ptr [eax+4]
+  004050A2: 89 43 04           mov         dword ptr [ebx+4],eax
+  004050A5: 8B 44 24 14        mov         eax,dword ptr [esp+14h]
+  004050A9: 8B 78 14           mov         edi,dword ptr [eax+14h]
+  004050AC: 85 FF              test        edi,edi
+  004050AE: 74 1B              je          004050CB
+  004050B0: 83 C8 FF           or          eax,0FFFFFFFFh
+  004050B3: F0 0F C1 47 08     lock xadd   dword ptr [edi+8],eax
+  004050B8: 75 11              jne         004050CB
+  004050BA: 8B 07              mov         eax,dword ptr [edi]
+  004050BC: 8B 70 04           mov         esi,dword ptr [eax+4]
+  004050BF: 8B CE              mov         ecx,esi
+  004050C1: FF 15 C8 D3 43 00  call        dword ptr ds:[0043D3C8h]
+  004050C7: 8B CF              mov         ecx,edi
+  004050C9: FF D6              call        esi
+  004050CB: 6A 20              push        20h
+  004050CD: FF 74 24 18        push        dword ptr [esp+18h]
+  004050D1: E8 7C EE 01 00     call        00423F52
+  004050D6: 8B 44 24 18        mov         eax,dword ptr [esp+18h]
+  004050DA: 83 C4 08           add         esp,8
+  004050DD: 5F                 pop         edi
+  004050DE: 5E                 pop         esi
+  004050DF: 89 18              mov         dword ptr [eax],ebx
+  004050E1: 5B                 pop         ebx
+  004050E2: C2 08 00           ret         8
+  004050E5: CC                 int         3
+  004050E6: CC                 int         3
+  004050E7: CC                 int         3
+  004050E8: CC                 int         3
+  004050E9: CC                 int         3
+  004050EA: CC                 int         3
+  004050EB: CC                 int         3
+  004050EC: CC                 int         3
+  004050ED: CC                 int         3
+  004050EE: CC                 int         3
+  004050EF: CC                 int         3
+  004050F0: CC                 int         3
+  004050F1: CC                 int         3
+  004050F2: CC                 int         3
+  004050F3: CC                 int         3
+  004050F4: CC                 int         3
+  004050F5: CC                 int         3
+  004050F6: CC                 int         3
+  004050F7: CC                 int         3
+  004050F8: CC                 int         3
+  004050F9: CC                 int         3
+  004050FA: CC                 int         3
+  004050FB: CC                 int         3
+  004050FC: CC                 int         3
+  004050FD: CC                 int         3
+  004050FE: CC                 int         3
+  004050FF: CC                 int         3

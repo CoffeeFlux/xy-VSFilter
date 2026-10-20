@@ -1,0 +1,40 @@
+  00405A60: 56                 push        esi
+  00405A61: 8B F1              mov         esi,ecx
+  00405A63: 8B 06              mov         eax,dword ptr [esi]
+  00405A65: 85 C0              test        eax,eax
+  00405A67: 74 40              je          00405AA9
+  00405A69: 8B 56 08           mov         edx,dword ptr [esi+8]
+  00405A6C: 2B D0              sub         edx,eax
+  00405A6E: 83 E2 FC           and         edx,0FFFFFFFCh
+  00405A71: 81 FA 00 10 00 00  cmp         edx,1000h
+  00405A77: 72 12              jb          00405A8B
+  00405A79: 8B 48 FC           mov         ecx,dword ptr [eax-4]
+  00405A7C: 83 C2 23           add         edx,23h
+  00405A7F: 2B C1              sub         eax,ecx
+  00405A81: 83 C0 FC           add         eax,0FFFFFFFCh
+  00405A84: 83 F8 1F           cmp         eax,1Fh
+  00405A87: 77 22              ja          00405AAB
+  00405A89: 8B C1              mov         eax,ecx
+  00405A8B: 52                 push        edx
+  00405A8C: 50                 push        eax
+  00405A8D: E8 C0 E4 01 00     call        00423F52
+  00405A92: 83 C4 08           add         esp,8
+  00405A95: C7 06 00 00 00 00  mov         dword ptr [esi],0
+  00405A9B: C7 46 04 00 00 00  mov         dword ptr [esi+4],0
+            00
+  00405AA2: C7 46 08 00 00 00  mov         dword ptr [esi+8],0
+            00
+  00405AA9: 5E                 pop         esi
+  00405AAA: C3                 ret
+  00405AAB: 6A 00              push        0
+  00405AAD: 6A 00              push        0
+  00405AAF: 6A 00              push        0
+  00405AB1: 6A 00              push        0
+  00405AB3: 6A 00              push        0
+  00405AB5: E8 85 1F 02 00     call        00427A3F
+  00405ABA: CC                 int         3
+  00405ABB: CC                 int         3
+  00405ABC: CC                 int         3
+  00405ABD: CC                 int         3
+  00405ABE: CC                 int         3
+  00405ABF: CC                 int         3

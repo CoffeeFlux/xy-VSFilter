@@ -1,0 +1,33 @@
+  00000001400026E0: 40 53              push        rbx
+  00000001400026E2: 48 83 EC 20        sub         rsp,20h
+  00000001400026E6: 48 8B 59 08        mov         rbx,qword ptr [rcx+8]
+  00000001400026EA: 48 85 DB           test        rbx,rbx
+  00000001400026ED: 74 44              je          0000000140002733
+  00000001400026EF: 48 89 7C 24 30     mov         qword ptr [rsp+30h],rdi
+  00000001400026F4: BF FF FF FF FF     mov         edi,0FFFFFFFFh
+  00000001400026F9: 8B C7              mov         eax,edi
+  00000001400026FB: F0 0F C1 43 08     lock xadd   dword ptr [rbx+8],eax
+  0000000140002700: 83 F8 01           cmp         eax,1
+  0000000140002703: 75 29              jne         000000014000272E
+  0000000140002705: 48 8B 03           mov         rax,qword ptr [rbx]
+  0000000140002708: 48 8B CB           mov         rcx,rbx
+  000000014000270B: 48 8B 00           mov         rax,qword ptr [rax]
+  000000014000270E: FF 15 D4 20 04 00  call        qword ptr [00000001400447E8h]
+  0000000140002714: F0 0F C1 7B 0C     lock xadd   dword ptr [rbx+0Ch],edi
+  0000000140002719: 83 FF 01           cmp         edi,1
+  000000014000271C: 75 10              jne         000000014000272E
+  000000014000271E: 48 8B 03           mov         rax,qword ptr [rbx]
+  0000000140002721: 48 8B CB           mov         rcx,rbx
+  0000000140002724: 48 8B 40 08        mov         rax,qword ptr [rax+8]
+  0000000140002728: FF 15 BA 20 04 00  call        qword ptr [00000001400447E8h]
+  000000014000272E: 48 8B 7C 24 30     mov         rdi,qword ptr [rsp+30h]
+  0000000140002733: 48 83 C4 20        add         rsp,20h
+  0000000140002737: 5B                 pop         rbx
+  0000000140002738: C3                 ret
+  0000000140002739: CC                 int         3
+  000000014000273A: CC                 int         3
+  000000014000273B: CC                 int         3
+  000000014000273C: CC                 int         3
+  000000014000273D: CC                 int         3
+  000000014000273E: CC                 int         3
+  000000014000273F: CC                 int         3

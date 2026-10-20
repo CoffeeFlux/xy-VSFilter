@@ -182,6 +182,7 @@ pub mod string_flyweight;
 pub mod style_intern;
 pub mod text_path;
 
+pub mod gaussian_cache;
 pub mod gaussian_filter;
 pub mod scan_convert;
 pub mod scan_line;

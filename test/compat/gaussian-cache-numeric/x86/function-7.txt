@@ -1,0 +1,70 @@
+  004048C0: 83 EC 0C           sub         esp,0Ch
+  004048C3: 53                 push        ebx
+  004048C4: 56                 push        esi
+  004048C5: 57                 push        edi
+  004048C6: 8B F9              mov         edi,ecx
+  004048C8: E8 F3 0A 00 00     call        004053C0
+  004048CD: 8B 37              mov         esi,dword ptr [edi]
+  004048CF: 8B D8              mov         ebx,eax
+  004048D1: 81 C6 63 42 00 00  add         esi,4263h
+  004048D7: 8D 44 24 10        lea         eax,[esp+10h]
+  004048DB: 8B D6              mov         edx,esi
+  004048DD: 8B CB              mov         ecx,ebx
+  004048DF: C1 E2 05           shl         edx,5
+  004048E2: 03 D6              add         edx,esi
+  004048E4: 03 57 04           add         edx,dword ptr [edi+4]
+  004048E7: 52                 push        edx
+  004048E8: 57                 push        edi
+  004048E9: 50                 push        eax
+  004048EA: E8 B1 0C 00 00     call        004055A0
+  004048EF: 8B 74 24 1C        mov         esi,dword ptr [esp+1Ch]
+  004048F3: 8B 40 04           mov         eax,dword ptr [eax+4]
+  004048F6: 85 C0              test        eax,eax
+  004048F8: 74 18              je          00404912
+  004048FA: 3B 43 04           cmp         eax,dword ptr [ebx+4]
+  004048FD: 74 13              je          00404912
+  004048FF: 90                 nop
+  00404900: 39 70 18           cmp         dword ptr [eax+18h],esi
+  00404903: 75 0D              jne         00404912
+  00404905: 50                 push        eax
+  00404906: 8D 44 24 14        lea         eax,[esp+14h]
+  0040490A: 8B CB              mov         ecx,ebx
+  0040490C: 50                 push        eax
+  0040490D: E8 2E 07 00 00     call        00405040
+  00404912: 85 F6              test        esi,esi
+  00404914: 74 32              je          00404948
+  00404916: 8B 4E 0C           mov         ecx,dword ptr [esi+0Ch]
+  00404919: 85 C9              test        ecx,ecx
+  0040491B: 74 14              je          00404931
+  0040491D: 8B 41 F8           mov         eax,dword ptr [ecx-8]
+  00404920: 29 05 08 77 45 00  sub         dword ptr ds:[00457708h],eax
+  00404926: FF 71 FC           push        dword ptr [ecx-4]
+  00404929: E8 E2 33 02 00     call        00427D10
+  0040492E: 83 C4 04           add         esp,4
+  00404931: 3E 3E 3E 3E 3E 6A  push        18h
+            18
+  00404938: 56                 push        esi
+  00404939: C7 46 0C 00 00 00  mov         dword ptr [esi+0Ch],0
+            00
+  00404940: E8 0D F6 01 00     call        00423F52
+  00404945: 83 C4 08           add         esp,8
+  00404948: 5F                 pop         edi
+  00404949: 5E                 pop         esi
+  0040494A: 5B                 pop         ebx
+  0040494B: 83 C4 0C           add         esp,0Ch
+  0040494E: C2 04 00           ret         4
+  00404951: CC                 int         3
+  00404952: CC                 int         3
+  00404953: CC                 int         3
+  00404954: CC                 int         3
+  00404955: CC                 int         3
+  00404956: CC                 int         3
+  00404957: CC                 int         3
+  00404958: CC                 int         3
+  00404959: CC                 int         3
+  0040495A: CC                 int         3
+  0040495B: CC                 int         3
+  0040495C: CC                 int         3
+  0040495D: CC                 int         3
+  0040495E: CC                 int         3
+  0040495F: CC                 int         3

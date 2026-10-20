@@ -1,0 +1,18 @@
+  00405AC0: 56                 push        esi
+  00405AC1: 8B F1              mov         esi,ecx
+  00405AC3: 8B 16              mov         edx,dword ptr [esi]
+  00405AC5: E8 B6 02 00 00     call        00405D80
+  00405ACA: 6A 20              push        20h
+  00405ACC: FF 36              push        dword ptr [esi]
+  00405ACE: E8 7F E4 01 00     call        00423F52
+  00405AD3: 83 C4 08           add         esp,8
+  00405AD6: 5E                 pop         esi
+  00405AD7: C3                 ret
+  00405AD8: CC                 int         3
+  00405AD9: CC                 int         3
+  00405ADA: CC                 int         3
+  00405ADB: CC                 int         3
+  00405ADC: CC                 int         3
+  00405ADD: CC                 int         3
+  00405ADE: CC                 int         3
+  00405ADF: CC                 int         3

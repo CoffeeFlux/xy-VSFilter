@@ -1,0 +1,38 @@
+  004059E0: 55                 push        ebp
+  004059E1: 8B EC              mov         ebp,esp
+  004059E3: 6A FF              push        0FFFFFFFFh
+  004059E5: 68 40 BC 43 00     push        43BC40h
+  004059EA: 64 A1 00 00 00 00  mov         eax,dword ptr fs:[00000000h]
+  004059F0: 50                 push        eax
+  004059F1: A1 80 24 45 00     mov         eax,dword ptr ds:[00452480h]
+  004059F6: 33 C5              xor         eax,ebp
+  004059F8: 50                 push        eax
+  004059F9: 8D 45 F4           lea         eax,[ebp-0Ch]
+  004059FC: 64 A3 00 00 00 00  mov         dword ptr fs:[00000000h],eax
+  00405A02: 80 79 08 00        cmp         byte ptr [ecx+8],0
+  00405A06: 74 0A              je          00405A12
+  00405A08: FF 31              push        dword ptr [ecx]
+  00405A0A: 8B 49 04           mov         ecx,dword ptr [ecx+4]
+  00405A0D: E8 AE EE FF FF     call        004048C0
+  00405A12: 8B 4D F4           mov         ecx,dword ptr [ebp-0Ch]
+  00405A15: 64 89 0D 00 00 00  mov         dword ptr fs:[00000000h],ecx
+            00
+  00405A1C: 59                 pop         ecx
+  00405A1D: 8B E5              mov         esp,ebp
+  00405A1F: 5D                 pop         ebp
+  00405A20: C3                 ret
+  00405A21: CC                 int         3
+  00405A22: CC                 int         3
+  00405A23: CC                 int         3
+  00405A24: CC                 int         3
+  00405A25: CC                 int         3
+  00405A26: CC                 int         3
+  00405A27: CC                 int         3
+  00405A28: CC                 int         3
+  00405A29: CC                 int         3
+  00405A2A: CC                 int         3
+  00405A2B: CC                 int         3
+  00405A2C: CC                 int         3
+  00405A2D: CC                 int         3
+  00405A2E: CC                 int         3
+  00405A2F: CC                 int         3

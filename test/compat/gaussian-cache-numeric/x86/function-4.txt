@@ -1,0 +1,54 @@
+  00402280: 57                 push        edi
+  00402281: 8B 79 04           mov         edi,dword ptr [ecx+4]
+  00402284: 85 FF              test        edi,edi
+  00402286: 74 3D              je          004022C5
+  00402288: 53                 push        ebx
+  00402289: 83 CB FF           or          ebx,0FFFFFFFFh
+  0040228C: 8B C3              mov         eax,ebx
+  0040228E: F0 0F C1 47 04     lock xadd   dword ptr [edi+4],eax
+  00402293: 75 2F              jne         004022C4
+  00402295: 3E 3E 3E 3E 8B 07  mov         eax,dword ptr ds:[edi]
+  0040229B: 56                 push        esi
+  0040229C: 8B 30              mov         esi,dword ptr [eax]
+  0040229E: 8B CE              mov         ecx,esi
+  004022A0: FF 15 C8 D3 43 00  call        dword ptr ds:[0043D3C8h]
+  004022A6: 8B CF              mov         ecx,edi
+  004022A8: FF D6              call        esi
+  004022AA: F0 0F C1 5F 08     lock xadd   dword ptr [edi+8],ebx
+  004022AF: 4B                 dec         ebx
+  004022B0: 75 11              jne         004022C3
+  004022B2: 8B 07              mov         eax,dword ptr [edi]
+  004022B4: 8B 70 04           mov         esi,dword ptr [eax+4]
+  004022B7: 8B CE              mov         ecx,esi
+  004022B9: FF 15 C8 D3 43 00  call        dword ptr ds:[0043D3C8h]
+  004022BF: 8B CF              mov         ecx,edi
+  004022C1: FF D6              call        esi
+  004022C3: 5E                 pop         esi
+  004022C4: 5B                 pop         ebx
+  004022C5: 5F                 pop         edi
+  004022C6: C3                 ret
+  004022C7: CC                 int         3
+  004022C8: CC                 int         3
+  004022C9: CC                 int         3
+  004022CA: CC                 int         3
+  004022CB: CC                 int         3
+  004022CC: CC                 int         3
+  004022CD: CC                 int         3
+  004022CE: CC                 int         3
+  004022CF: CC                 int         3
+  004022D0: CC                 int         3
+  004022D1: CC                 int         3
+  004022D2: CC                 int         3
+  004022D3: CC                 int         3
+  004022D4: CC                 int         3
+  004022D5: CC                 int         3
+  004022D6: CC                 int         3
+  004022D7: CC                 int         3
+  004022D8: CC                 int         3
+  004022D9: CC                 int         3
+  004022DA: CC                 int         3
+  004022DB: CC                 int         3
+  004022DC: CC                 int         3
+  004022DD: CC                 int         3
+  004022DE: CC                 int         3
+  004022DF: CC                 int         3

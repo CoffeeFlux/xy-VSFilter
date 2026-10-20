@@ -71,10 +71,7 @@ typedef const UINT8 CUINT8, *PCUINT8;
         *(a)=((color)>>24)&0xff;\
     } while(0)
 
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-#include "RustGaussianCoefficients.h"
-using GaussianCoefficients = XyRust::GaussianCoefficients;
-#else
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 class GaussianCoefficients
 {
 #ifdef XY_VSFILTER_RUST_TEXT
@@ -611,6 +608,10 @@ bool Rasterizer::GaussianBlur( const Overlay& input_overlay, double gaussian_blu
 {
     ASSERT(output_overlay);
     output_overlay->CleanUp();
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    output_overlay->m_owner.Take(input_overlay.m_owner.Gaussian(gaussian_blur_strength,target_scale_x,target_scale_y));
+    return output_overlay->RestoreRust();
+#else
     output_overlay->mfWideOutlineEmpty = input_overlay.mfWideOutlineEmpty;
 
     ASSERT(gaussian_blur_strength > 0);
@@ -631,10 +632,6 @@ bool Rasterizer::GaussianBlur( const Overlay& input_overlay, double gaussian_blu
     const GaussianCoefficients& filter_x = fw_filter_x.get();
     const GaussianCoefficients& filter_y = fw_filter_y.get();
 
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    output_overlay->m_owner.Take(input_overlay.m_owner.Gaussian(filter_x.g_r,filter_y.g_r,filter_x.g_f,filter_x.g_w_ex,filter_y.g_f,filter_y.g_w_ex));
-    return output_overlay->RestoreRust();
-#else
     int bluradjust_x = filter_x.g_r * 8;
     int bluradjust_y = filter_y.g_r * 8;
     output_overlay->mOffsetX       = input_overlay.mOffsetX - bluradjust_x;

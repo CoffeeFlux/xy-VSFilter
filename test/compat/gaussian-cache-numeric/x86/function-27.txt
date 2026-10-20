@@ -1,0 +1,35 @@
+  00405DE0: 8B 44 24 08        mov         eax,dword ptr [esp+8]
+  00405DE4: 8D 0C 85 00 00 00  lea         ecx,[eax*4+00000000h]
+            00
+  00405DEB: 8B 44 24 04        mov         eax,dword ptr [esp+4]
+  00405DEF: 81 F9 00 10 00 00  cmp         ecx,1000h
+  00405DF5: 72 12              jb          00405E09
+  00405DF7: 8B 50 FC           mov         edx,dword ptr [eax-4]
+  00405DFA: 83 C1 23           add         ecx,23h
+  00405DFD: 2B C2              sub         eax,edx
+  00405DFF: 83 C0 FC           add         eax,0FFFFFFFCh
+  00405E02: 83 F8 1F           cmp         eax,1Fh
+  00405E05: 77 0F              ja          00405E16
+  00405E07: 8B C2              mov         eax,edx
+  00405E09: 51                 push        ecx
+  00405E0A: 50                 push        eax
+  00405E0B: E8 42 E1 01 00     call        00423F52
+  00405E10: 83 C4 08           add         esp,8
+  00405E13: C2 08 00           ret         8
+  00405E16: 6A 00              push        0
+  00405E18: 6A 00              push        0
+  00405E1A: 6A 00              push        0
+  00405E1C: 6A 00              push        0
+  00405E1E: 6A 00              push        0
+  00405E20: E8 1A 1C 02 00     call        00427A3F
+  00405E25: CC                 int         3
+  00405E26: CC                 int         3
+  00405E27: CC                 int         3
+  00405E28: CC                 int         3
+  00405E29: CC                 int         3
+  00405E2A: CC                 int         3
+  00405E2B: CC                 int         3
+  00405E2C: CC                 int         3
+  00405E2D: CC                 int         3
+  00405E2E: CC                 int         3
+  00405E2F: CC                 int         3

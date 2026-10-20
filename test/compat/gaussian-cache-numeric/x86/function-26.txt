@@ -1,0 +1,53 @@
+  00405D80: 8B 42 04           mov         eax,dword ptr [edx+4]
+  00405D83: 56                 push        esi
+  00405D84: C7 00 00 00 00 00  mov         dword ptr [eax],0
+  00405D8A: 8B 32              mov         esi,dword ptr [edx]
+  00405D8C: 85 F6              test        esi,esi
+  00405D8E: 74 3B              je          00405DCB
+  00405D90: 53                 push        ebx
+  00405D91: 55                 push        ebp
+  00405D92: 57                 push        edi
+  00405D93: 8B 5E 14           mov         ebx,dword ptr [esi+14h]
+  00405D96: 8B 2E              mov         ebp,dword ptr [esi]
+  00405D98: 85 DB              test        ebx,ebx
+  00405D9A: 74 1B              je          00405DB7
+  00405D9C: 83 C8 FF           or          eax,0FFFFFFFFh
+  00405D9F: F0 0F C1 43 08     lock xadd   dword ptr [ebx+8],eax
+  00405DA4: 75 11              jne         00405DB7
+  00405DA6: 8B 03              mov         eax,dword ptr [ebx]
+  00405DA8: 8B 78 04           mov         edi,dword ptr [eax+4]
+  00405DAB: 8B CF              mov         ecx,edi
+  00405DAD: FF 15 C8 D3 43 00  call        dword ptr ds:[0043D3C8h]
+  00405DB3: 8B CB              mov         ecx,ebx
+  00405DB5: FF D7              call        edi
+  00405DB7: 6A 20              push        20h
+  00405DB9: 56                 push        esi
+  00405DBA: E8 93 E1 01 00     call        00423F52
+  00405DBF: 83 C4 08           add         esp,8
+  00405DC2: 8B F5              mov         esi,ebp
+  00405DC4: 85 ED              test        ebp,ebp
+  00405DC6: 75 CB              jne         00405D93
+  00405DC8: 5F                 pop         edi
+  00405DC9: 5D                 pop         ebp
+  00405DCA: 5B                 pop         ebx
+  00405DCB: 5E                 pop         esi
+  00405DCC: C3                 ret
+  00405DCD: CC                 int         3
+  00405DCE: CC                 int         3
+  00405DCF: CC                 int         3
+  00405DD0: CC                 int         3
+  00405DD1: CC                 int         3
+  00405DD2: CC                 int         3
+  00405DD3: CC                 int         3
+  00405DD4: CC                 int         3
+  00405DD5: CC                 int         3
+  00405DD6: CC                 int         3
+  00405DD7: CC                 int         3
+  00405DD8: CC                 int         3
+  00405DD9: CC                 int         3
+  00405DDA: CC                 int         3
+  00405DDB: CC                 int         3
+  00405DDC: CC                 int         3
+  00405DDD: CC                 int         3
+  00405DDE: CC                 int         3
+  00405DDF: CC                 int         3

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Included once after Rasterizer.h; private owner IDs and detached wire packets.
 extern "C" {
-uint32_t __cdecl xy_vsfilter_overlay_gaussian_v1(uint64_t,const uint8_t*,size_t,uint8_t*);
+uint32_t __cdecl xy_vsfilter_overlay_gaussian_v2(uint64_t,uint64_t,uint64_t,uint64_t,uint8_t*);
 uint32_t __cdecl xy_vsfilter_overlay_be_blur_v1(uint64_t,uint32_t,uint32_t,uint32_t,uint8_t*);
 uint32_t __cdecl xy_vsfilter_overlay_import_v1(const uint8_t*,size_t,uint8_t*);
 uint32_t __cdecl xy_vsfilter_overlay_info_v1(uint64_t,uint8_t*);
@@ -14,12 +14,9 @@ namespace XyRust {
 uint64_t OverlayOwner::BeBlur(float be,float sx,float sy)const{std::array<uint8_t,8> out;
     uint32_t b,x,y;memcpy(&b,&be,4);memcpy(&x,&sx,4);memcpy(&y,&sy,4);
     DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_overlay_be_blur_v1(id_,b,x,y,out.data());}));return DocumentDetail::Load(out,0,8);}
-uint64_t OverlayOwner::Gaussian(int rx,int ry,const float* x,int nx,const float* y,int ny)const{
-    using namespace DocumentDetail;Shape(nx>0&&ny>0&&x&&y);
-    const size_t bx=MulSize(size_t(nx),4),by=MulSize(size_t(ny),4);Bytes packet(AddSize(16,AddSize(bx,by)));
-    Put(packet,0,uint32_t(rx),4);Put(packet,4,uint32_t(ry),4);Put(packet,8,uint32_t(nx),4);Put(packet,12,uint32_t(ny),4);
-    memcpy(packet.data()+16,x,bx);memcpy(packet.data()+16+bx,y,by);std::array<uint8_t,8> out;
-    Check(Invoke([&](){return xy_vsfilter_overlay_gaussian_v1(id_,packet.data(),packet.size(),out.data());}));return Load(out,0,8);
+uint64_t OverlayOwner::Gaussian(double sigma,double sx,double sy)const{
+    using namespace DocumentDetail;uint64_t g,x,y;memcpy(&g,&sigma,8);memcpy(&x,&sx,8);memcpy(&y,&sy,8);std::array<uint8_t,8> out;
+    Check(Invoke([&](){return xy_vsfilter_overlay_gaussian_v2(id_,g,x,y,out.data());}));return Load(out,0,8);
 }
 OverlayOwner::OverlayOwner(const OverlayOwner& other){*this=other;}
 OverlayOwner& OverlayOwner::operator=(const OverlayOwner& other){if(this!=&other){std::array<uint8_t,8> out;

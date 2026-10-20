@@ -1,0 +1,37 @@
+  00404AC0: 57                 push        edi
+  00404AC1: 8B 79 04           mov         edi,dword ptr [ecx+4]
+  00404AC4: 85 FF              test        edi,edi
+  00404AC6: 74 23              je          00404AEB
+  00404AC8: 83 C8 FF           or          eax,0FFFFFFFFh
+  00404ACB: F0 0F C1 47 08     lock xadd   dword ptr [edi+8],eax
+  00404AD0: 75 19              jne         00404AEB
+  00404AD2: 3E 3E 3E 3E 3E 3E  mov         eax,dword ptr ds:[edi]
+            8B 07
+  00404ADA: 56                 push        esi
+  00404ADB: 8B 70 04           mov         esi,dword ptr [eax+4]
+  00404ADE: 8B CE              mov         ecx,esi
+  00404AE0: FF 15 C8 D3 43 00  call        dword ptr ds:[0043D3C8h]
+  00404AE6: 8B CF              mov         ecx,edi
+  00404AE8: FF D6              call        esi
+  00404AEA: 5E                 pop         esi
+  00404AEB: 5F                 pop         edi
+  00404AEC: C3                 ret
+  00404AED: CC                 int         3
+  00404AEE: CC                 int         3
+  00404AEF: CC                 int         3
+  00404AF0: CC                 int         3
+  00404AF1: CC                 int         3
+  00404AF2: CC                 int         3
+  00404AF3: CC                 int         3
+  00404AF4: CC                 int         3
+  00404AF5: CC                 int         3
+  00404AF6: CC                 int         3
+  00404AF7: CC                 int         3
+  00404AF8: CC                 int         3
+  00404AF9: CC                 int         3
+  00404AFA: CC                 int         3
+  00404AFB: CC                 int         3
+  00404AFC: CC                 int         3
+  00404AFD: CC                 int         3
+  00404AFE: CC                 int         3
+  00404AFF: CC                 int         3

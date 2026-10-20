@@ -1,0 +1,41 @@
+  00405960: 55                 push        ebp
+  00405961: 8B EC              mov         ebp,esp
+  00405963: 6A FF              push        0FFFFFFFFh
+  00405965: 68 20 BC 43 00     push        43BC20h
+  0040596A: 64 A1 00 00 00 00  mov         eax,dword ptr fs:[00000000h]
+  00405970: 50                 push        eax
+  00405971: A1 80 24 45 00     mov         eax,dword ptr ds:[00452480h]
+  00405976: 33 C5              xor         eax,ebp
+  00405978: 50                 push        eax
+  00405979: 8D 45 F4           lea         eax,[ebp-0Ch]
+  0040597C: 64 A3 00 00 00 00  mov         dword ptr fs:[00000000h],eax
+  00405982: FF 71 18           push        dword ptr [ecx+18h]
+  00405985: 83 C1 10           add         ecx,10h
+  00405988: E8 33 EF FF FF     call        004048C0
+  0040598D: 8B 4D F4           mov         ecx,dword ptr [ebp-0Ch]
+  00405990: 64 89 0D 00 00 00  mov         dword ptr fs:[00000000h],ecx
+            00
+  00405997: 59                 pop         ecx
+  00405998: 8B E5              mov         esp,ebp
+  0040599A: 5D                 pop         ebp
+  0040599B: C3                 ret
+  0040599C: CC                 int         3
+  0040599D: CC                 int         3
+  0040599E: CC                 int         3
+  0040599F: CC                 int         3
+  004059A0: CC                 int         3
+  004059A1: CC                 int         3
+  004059A2: CC                 int         3
+  004059A3: CC                 int         3
+  004059A4: CC                 int         3
+  004059A5: CC                 int         3
+  004059A6: CC                 int         3
+  004059A7: CC                 int         3
+  004059A8: CC                 int         3
+  004059A9: CC                 int         3
+  004059AA: CC                 int         3
+  004059AB: CC                 int         3
+  004059AC: CC                 int         3
+  004059AD: CC                 int         3
+  004059AE: CC                 int         3
+  004059AF: CC                 int         3

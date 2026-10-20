@@ -1,0 +1,53 @@
+  00401340: 55                 push        ebp
+  00401341: 8B EC              mov         ebp,esp
+  00401343: 83 E4 C0           and         esp,0FFFFFFC0h
+  00401346: D9 EE              fldz
+  00401348: 83 EC 3C           sub         esp,3Ch
+  0040134B: 56                 push        esi
+  0040134C: 8B F1              mov         esi,ecx
+  0040134E: 83 EC 08           sub         esp,8
+  00401351: DD 5E 10           fstp        qword ptr [esi+10h]
+  00401354: DD 45 08           fld         qword ptr [ebp+8]
+  00401357: DD 1C 24           fstp        qword ptr [esp]
+  0040135A: C7 06 00 00 00 00  mov         dword ptr [esi],0
+  00401360: C7 46 04 00 00 00  mov         dword ptr [esi+4],0
+            00
+  00401367: C7 46 08 00 00 00  mov         dword ptr [esi+8],0
+            00
+  0040136E: C7 46 0C 00 00 00  mov         dword ptr [esi+0Ch],0
+            00
+  00401375: E8 26 00 00 00     call        004013A0
+  0040137A: 8B C6              mov         eax,esi
+  0040137C: 5E                 pop         esi
+  0040137D: 8B E5              mov         esp,ebp
+  0040137F: 5D                 pop         ebp
+  00401380: C2 08 00           ret         8
+  00401383: CC                 int         3
+  00401384: CC                 int         3
+  00401385: CC                 int         3
+  00401386: CC                 int         3
+  00401387: CC                 int         3
+  00401388: CC                 int         3
+  00401389: CC                 int         3
+  0040138A: CC                 int         3
+  0040138B: CC                 int         3
+  0040138C: CC                 int         3
+  0040138D: CC                 int         3
+  0040138E: CC                 int         3
+  0040138F: CC                 int         3
+  00401390: CC                 int         3
+  00401391: CC                 int         3
+  00401392: CC                 int         3
+  00401393: CC                 int         3
+  00401394: CC                 int         3
+  00401395: CC                 int         3
+  00401396: CC                 int         3
+  00401397: CC                 int         3
+  00401398: CC                 int         3
+  00401399: CC                 int         3
+  0040139A: CC                 int         3
+  0040139B: CC                 int         3
+  0040139C: CC                 int         3
+  0040139D: CC                 int         3
+  0040139E: CC                 int         3
+  0040139F: CC                 int         3

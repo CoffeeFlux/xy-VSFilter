@@ -1,0 +1,33 @@
+  0000000140005D80: 40 53              push        rbx
+  0000000140005D82: 48 83 EC 20        sub         rsp,20h
+  0000000140005D86: 48 8B D9           mov         rbx,rcx
+  0000000140005D89: 48 8B 49 08        mov         rcx,qword ptr [rcx+8]
+  0000000140005D8D: 48 85 C9           test        rcx,rcx
+  0000000140005D90: 74 25              je          0000000140005DB7
+  0000000140005D92: 48 8B 49 20        mov         rcx,qword ptr [rcx+20h]
+  0000000140005D96: 48 85 C9           test        rcx,rcx
+  0000000140005D99: 74 1C              je          0000000140005DB7
+  0000000140005D9B: B8 FF FF FF FF     mov         eax,0FFFFFFFFh
+  0000000140005DA0: F0 0F C1 41 0C     lock xadd   dword ptr [rcx+0Ch],eax
+  0000000140005DA5: 83 F8 01           cmp         eax,1
+  0000000140005DA8: 75 0D              jne         0000000140005DB7
+  0000000140005DAA: 48 8B 01           mov         rax,qword ptr [rcx]
+  0000000140005DAD: 48 8B 40 08        mov         rax,qword ptr [rax+8]
+  0000000140005DB1: FF 15 31 EA 03 00  call        qword ptr [00000001400447E8h]
+  0000000140005DB7: 3E 3E 3E 3E 3E 48  mov         rcx,qword ptr ds:[rbx+8]
+                    8B 4B 08
+  0000000140005DC0: 48 85 C9           test        rcx,rcx
+  0000000140005DC3: 74 0F              je          0000000140005DD4
+  0000000140005DC5: BA 30 00 00 00     mov         edx,30h
+  0000000140005DCA: 48 83 C4 20        add         rsp,20h
+  0000000140005DCE: 5B                 pop         rbx
+  0000000140005DCF: E9 DC 41 00 00     jmp         0000000140009FB0
+  0000000140005DD4: 48 83 C4 20        add         rsp,20h
+  0000000140005DD8: 5B                 pop         rbx
+  0000000140005DD9: C3                 ret
+  0000000140005DDA: CC                 int         3
+  0000000140005DDB: CC                 int         3
+  0000000140005DDC: CC                 int         3
+  0000000140005DDD: CC                 int         3
+  0000000140005DDE: CC                 int         3
+  0000000140005DDF: CC                 int         3
