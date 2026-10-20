@@ -69,6 +69,58 @@ impl Boundary {
     }
 }
 static PATHS: Boundary = Boundary::new();
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_blur_active_v1(be: u32, gaussian: u64) -> u32 {
+    u32::from(crate::windows_blur::Numeric::new(be, gaussian, 0, 0).active())
+}
+/// # Safety
+/// output lends sixteen writable bytes: optional new image ID, return bool and
+/// replace bool. Raw scalar bits are copied; no native image storage is lent.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_overlay_blur_v1(
+    id: u64,
+    be: u32,
+    gaussian: u64,
+    sx: u64,
+    sy: u64,
+    output: *mut u8,
+) -> u32 {
+    if output.is_null() {
+        return 3;
+    }
+    let result = match PATHS.with_owners(|o| {
+        let image = if id == 0 {
+            None
+        } else {
+            Some(o.rasters.get(id)?)
+        };
+        let outcome = xy_vsfilter_compat::blur::run(
+            image,
+            &mut o.gaussian,
+            &mut crate::windows_blur::Numeric::new(be, gaussian, sx, sy),
+            &mut crate::windows_gaussian_cache::Numeric::new(),
+            &mut crate::windows_gaussian_filter::Numeric::new(),
+        )?;
+        use xy_vsfilter_compat::blur::Outcome;
+        Ok(match outcome {
+            Outcome::Inactive => (0u64, false, false),
+            Outcome::Unchanged => (0, true, false),
+            Outcome::Replace(image) => (o.rasters.insert(image)?, true, true),
+        })
+    }) {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    let mut bytes = [0; 16];
+    bytes[..8].copy_from_slice(&result.0.to_le_bytes());
+    bytes[8..12].copy_from_slice(&u32::from(result.1).to_le_bytes());
+    bytes[12..].copy_from_slice(&u32::from(result.2).to_le_bytes());
+    // SAFETY: detached initialized scalar packet and caller's writable output.
+    unsafe {
+        core::ptr::copy_nonoverlapping(bytes.as_ptr(), output, 16);
+    }
+    0
+}
 /// # Safety
 /// output lends 24 writable bytes: checked lease ID, shared identity and length.
 #[no_mangle]
@@ -1390,6 +1442,111 @@ mod tests {
             );
             assert_eq!(&cache_stats[1..17], &[0; 16]);
             assert_eq!((cache_stats[0], cache_stats[17]), (0xa5, 0xa5));
+            assert_eq!(xy_vsfilter_blur_active_v1(0, 0), 0);
+            assert_eq!(xy_vsfilter_blur_active_v1(1f32.to_bits(), 0), 1);
+            let mut dispatch_info = [0xa5; 18];
+            let scale64 = 1f64.to_bits();
+            assert_eq!(
+                xy_vsfilter_overlay_blur_v1(source, 0, 0, scale64, scale64, core::ptr::null_mut()),
+                3
+            );
+            assert_eq!(
+                xy_vsfilter_overlay_blur_v1(
+                    source,
+                    0,
+                    0,
+                    scale64,
+                    scale64,
+                    dispatch_info.as_mut_ptr().add(1)
+                ),
+                0
+            );
+            assert_eq!(&dispatch_info[1..17], &[0; 16]);
+            assert_eq!((dispatch_info[0], dispatch_info[17]), (0xa5, 0xa5));
+            assert_eq!(
+                xy_vsfilter_overlay_blur_v1(
+                    0,
+                    1f32.to_bits(),
+                    0,
+                    scale64,
+                    scale64,
+                    dispatch_info.as_mut_ptr().add(1)
+                ),
+                0
+            );
+            assert_eq!(&dispatch_info[1..9], &[0; 8]);
+            assert_eq!(&dispatch_info[9..13], &1u32.to_le_bytes());
+            assert_eq!(&dispatch_info[13..17], &[0; 4]);
+            let quarter = 0.25f32.to_bits();
+            let half = 0.5f64.to_bits();
+            let scale32 = 1f32.to_bits();
+            assert_eq!(
+                xy_vsfilter_overlay_gaussian_v2(
+                    source,
+                    half,
+                    scale64,
+                    scale64,
+                    dispatch_info.as_mut_ptr().add(1)
+                ),
+                0
+            );
+            let first_pass = u64::from_le_bytes(dispatch_info[1..9].try_into().unwrap());
+            assert_eq!(
+                xy_vsfilter_overlay_be_blur_v1(
+                    first_pass,
+                    quarter,
+                    scale32,
+                    scale32,
+                    dispatch_info.as_mut_ptr().add(1)
+                ),
+                0
+            );
+            let separate = u64::from_le_bytes(dispatch_info[1..9].try_into().unwrap());
+            assert_eq!(
+                xy_vsfilter_overlay_blur_v1(
+                    source,
+                    quarter,
+                    half,
+                    scale64,
+                    scale64,
+                    dispatch_info.as_mut_ptr().add(1)
+                ),
+                0
+            );
+            let combined = u64::from_le_bytes(dispatch_info[1..9].try_into().unwrap());
+            assert_ne!(combined, separate);
+            assert_eq!(&dispatch_info[9..13], &1u32.to_le_bytes());
+            assert_eq!(&dispatch_info[13..17], &1u32.to_le_bytes());
+            let mut sizes = [0; 8];
+            assert_eq!(xy_vsfilter_overlay_info_v1(combined, sizes.as_mut_ptr()), 0);
+            let len = u64::from_le_bytes(sizes) as usize;
+            let mut expected = alloc::vec![0;len];
+            let mut actual = alloc::vec![0;len];
+            assert_eq!(
+                xy_vsfilter_overlay_read_v1(separate, expected.as_mut_ptr(), len),
+                0
+            );
+            assert_eq!(
+                xy_vsfilter_overlay_read_v1(combined, actual.as_mut_ptr(), len),
+                0
+            );
+            assert_eq!(actual, expected);
+            for id in [first_pass, separate, combined] {
+                assert_eq!(xy_vsfilter_raster_destroy_v1(id), 0);
+            }
+            dispatch_info.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_overlay_blur_v1(
+                    combined,
+                    quarter,
+                    half,
+                    scale64,
+                    scale64,
+                    dispatch_info.as_mut_ptr().add(1)
+                ),
+                1
+            );
+            assert_eq!(dispatch_info, [0xa5; 18]);
             let small = 0.1f64.to_bits();
             let scale = 1f64.to_bits();
             assert_eq!(

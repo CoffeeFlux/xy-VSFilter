@@ -554,11 +554,15 @@ const float Rasterizer::GAUSSIAN_BLUR_THREHOLD = 0.333333f;
 
 bool Rasterizer::IsItReallyBlur( float be_strength, double gaussian_blur_strength )
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    uint32_t b;uint64_t g;memcpy(&b,&be_strength,4);memcpy(&g,&gaussian_blur_strength,8);return xy_vsfilter_blur_active_v1(b,g)!=0;
+#else
     if (be_strength<=0 && gaussian_blur_strength<=GAUSSIAN_BLUR_THREHOLD)
     {
         return false;
     }
     return true;
+#endif
 }
 
 // @return: true if actually a blur operation has done, or else false and output is leave unset.
@@ -567,6 +571,12 @@ bool Rasterizer::Blur(const Overlay& input_overlay, float be_strength,
     double target_scale_x, double target_scale_y, 
     SharedPtrOverlay output_overlay)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    if(!output_overlay)return false;
+    bool result;const uint64_t id=input_overlay.m_owner.Blur(be_strength,gaussian_blur_strength,target_scale_x,target_scale_y,result);
+    if(id){output_overlay->CleanUp();output_overlay->m_owner.Take(id);output_overlay->RestoreRust();}
+    return result;
+#else
     ASSERT(IsItReallyBlur(be_strength, gaussian_blur_strength));
     if(!output_overlay || !IsItReallyBlur(be_strength, gaussian_blur_strength))
     {
@@ -600,6 +610,7 @@ bool Rasterizer::Blur(const Overlay& input_overlay, float be_strength,
         ASSERT(rv);
     }
     return true;
+#endif
 }
 
 bool Rasterizer::GaussianBlur( const Overlay& input_overlay, double gaussian_blur_strength, 

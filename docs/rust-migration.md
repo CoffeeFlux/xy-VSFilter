@@ -7418,10 +7418,13 @@ safe Aegisub dependency. Use larger mutation campaigns, coverage-guided fuzzing
 and minimized differential cases to discover the long tail, with a pinned
 reference and isolated workers for every experiment.
 
-## In progress: Gaussian cache and sigma ownership
+## In progress: Gaussian cache and complete blur orchestration
 
 The experimental Gaussian operation now calls Rust with raw strength and scales;
 Rust owns sigma products, coefficient table/lifetimes and both image passes.
 The native coefficient table/snapshots are bypassed in that production path.
-Windows differential evidence is pending. See [the boundary](rust-gaussian-cache-boundary.md).
-Combined dispatch, downstream consumers and full host/vendor migration remain active.
+The direct cache comparison passes on both architectures at `f133671e`. Combined
+blur now uses a safe Rust intermediate and dispatch, including unchanged-output
+early returns; its validation and full renderer regression are pending. See
+[the boundary](rust-gaussian-cache-boundary.md). Downstream consumers and full
+host/vendor migration remain active.

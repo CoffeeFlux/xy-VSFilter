@@ -32,6 +32,9 @@ impl Numeric {
     }
 }
 impl Backend for Numeric {
+    fn products(&mut self, sigma: u64, sx: u64, sy: u64) -> [u64; 2] {
+        self.products(sigma, sx, sy)
+    }
     fn copy(&mut self, key: u64) -> u64 {
         self.data[0] = key;
         #[cfg(target_arch = "x86")]

@@ -1,0 +1,12 @@
+{
+  "x86": {
+    "address": "0x434fb0",
+    "bytes": "000000e05355d53f",
+    "binary_sha256": "75f1b80220ed1fe6f388953105a166be68b8f0906f7facc6207a0b50e5bc213c"
+  },
+  "x64": {
+    "address": "0x14003ee78",
+    "bytes": "000000e05355d53f",
+    "binary_sha256": "20d3d110512c395a1f67e3ff79c61c8ce8859e26dc03196c73bd422ebbbbf603"
+  }
+}

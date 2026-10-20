@@ -221,6 +221,8 @@ mod gaussian_filter;
 #[cfg(windows)]
 mod windows_be_blur_numeric;
 #[cfg(windows)]
+mod windows_blur;
+#[cfg(windows)]
 mod windows_ellipse_numeric;
 #[cfg(windows)]
 mod windows_gaussian_cache;

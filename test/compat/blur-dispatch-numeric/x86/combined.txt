@@ -1,0 +1,193 @@
+  00401CC0: 55                 push        ebp
+  00401CC1: 8B EC              mov         ebp,esp
+  00401CC3: 6A FF              push        0FFFFFFFFh
+  00401CC5: 68 69 B9 43 00     push        43B969h
+  00401CCA: 64 A1 00 00 00 00  mov         eax,dword ptr fs:[00000000h]
+  00401CD0: 50                 push        eax
+  00401CD1: 83 EC 14           sub         esp,14h
+  00401CD4: 53                 push        ebx
+  00401CD5: 56                 push        esi
+  00401CD6: 57                 push        edi
+  00401CD7: A1 80 24 45 00     mov         eax,dword ptr ds:[00452480h]
+  00401CDC: 33 C5              xor         eax,ebp
+  00401CDE: 50                 push        eax
+  00401CDF: 8D 45 F4           lea         eax,[ebp-0Ch]
+  00401CE2: 64 A3 00 00 00 00  mov         dword ptr fs:[00000000h],eax
+  00401CE8: C7 45 FC 00 00 00  mov         dword ptr [ebp-4],0
+            00
+  00401CEF: 83 7D 28 00        cmp         dword ptr [ebp+28h],0
+  00401CF3: 0F 84 86 01 00 00  je          00401E7F
+  00401CF9: D9 EE              fldz
+  00401CFB: D9 45 0C           fld         dword ptr [ebp+0Ch]
+  00401CFE: D8 D1              fcom        st(1)
+  00401D00: DF E0              fnstsw      ax
+  00401D02: DD 45 10           fld         qword ptr [ebp+10h]
+  00401D05: F6 C4 41           test        ah,41h
+  00401D08: 7A 13              jp          00401D1D
+  00401D0A: DD 05 48 93 44 00  fld         qword ptr ds:[00449348h]
+  00401D10: D8 D9              fcomp       st(1)
+  00401D12: DF E0              fnstsw      ax
+  00401D14: F6 C4 01           test        ah,1
+  00401D17: 0F 84 5C 01 00 00  je          00401E79
+  00401D1D: 8B 75 08           mov         esi,dword ptr [ebp+8]
+  00401D20: 83 7E 20 00        cmp         dword ptr [esi+20h],0
+  00401D24: 0F 8E 45 01 00 00  jle         00401E6F
+  00401D2A: 83 7E 24 00        cmp         dword ptr [esi+24h],0
+  00401D2E: 0F 8E 3B 01 00 00  jle         00401E6F
+  00401D34: D9 EE              fldz
+  00401D36: DE D9              fcompp
+  00401D38: DF E0              fnstsw      ax
+  00401D3A: DA E9              fucompp
+  00401D3C: F6 C4 05           test        ah,5
+  00401D3F: DF E0              fnstsw      ax
+  00401D41: 0F 8A E5 00 00 00  jp          00401E2C
+  00401D47: F6 C4 44           test        ah,44h
+  00401D4A: 0F 8B A7 00 00 00  jnp         00401DF7
+  00401D50: 6A 30              push        30h
+  00401D52: E8 A9 5A 01 00     call        00417800
+  00401D57: 3E 3E 3E 83 C4 04  add         esp,4
+  00401D5D: 89 45 EC           mov         dword ptr [ebp-14h],eax
+  00401D60: 85 C0              test        eax,eax
+  00401D62: 74 09              je          00401D6D
+  00401D64: 8B C8              mov         ecx,eax
+  00401D66: E8 55 44 00 00     call        004061C0
+  00401D6B: EB 02              jmp         00401D6F
+  00401D6D: 33 C0              xor         eax,eax
+  00401D6F: 50                 push        eax
+  00401D70: 8D 4D E4           lea         ecx,[ebp-1Ch]
+  00401D73: E8 E8 25 00 00     call        00404360
+  00401D78: 83 EC 08           sub         esp,8
+  00401D7B: C6 45 FC 01        mov         byte ptr [ebp-4],1
+  00401D7F: 8D 45 E4           lea         eax,[ebp-1Ch]
+  00401D82: 8B CC              mov         ecx,esp
+  00401D84: 50                 push        eax
+  00401D85: E8 86 26 00 00     call        00404410
+  00401D8A: DD 45 20           fld         qword ptr [ebp+20h]
+  00401D8D: 83 EC 18           sub         esp,18h
+  00401D90: DD 5C 24 10        fstp        qword ptr [esp+10h]
+  00401D94: DD 45 18           fld         qword ptr [ebp+18h]
+  00401D97: DD 5C 24 08        fstp        qword ptr [esp+8]
+  00401D9B: DD 45 10           fld         qword ptr [ebp+10h]
+  00401D9E: DD 1C 24           fstp        qword ptr [esp]
+  00401DA1: 56                 push        esi
+  00401DA2: E8 39 01 00 00     call        00401EE0
+  00401DA7: 83 C4 1C           add         esp,1Ch
+  00401DAA: 8D 45 28           lea         eax,[ebp+28h]
+  00401DAD: 8B CC              mov         ecx,esp
+  00401DAF: 50                 push        eax
+  00401DB0: E8 5B 26 00 00     call        00404410
+  00401DB5: 3E 3E 3E 3E 3E DD  fld         qword ptr ds:[ebp+20h]
+            45 20
+  00401DBD: 83 EC 0C           sub         esp,0Ch
+  00401DC0: D9 5D F0           fstp        dword ptr [ebp-10h]
+  00401DC3: DD 45 18           fld         qword ptr [ebp+18h]
+  00401DC6: D9 5D EC           fstp        dword ptr [ebp-14h]
+  00401DC9: D9 45 F0           fld         dword ptr [ebp-10h]
+  00401DCC: D9 5C 24 08        fstp        dword ptr [esp+8]
+  00401DD0: D9 45 EC           fld         dword ptr [ebp-14h]
+  00401DD3: D9 5C 24 04        fstp        dword ptr [esp+4]
+  00401DD7: D9 45 0C           fld         dword ptr [ebp+0Ch]
+  00401DDA: D9 1C 24           fstp        dword ptr [esp]
+  00401DDD: FF 75 E4           push        dword ptr [ebp-1Ch]
+  00401DE0: E8 FB 04 00 00     call        004022E0
+  00401DE5: 83 C4 18           add         esp,18h
+  00401DE8: 8D 4D E4           lea         ecx,[ebp-1Ch]
+  00401DEB: E8 90 04 00 00     call        00402280
+  00401DF0: B3 01              mov         bl,1
+  00401DF2: E9 8A 00 00 00     jmp         00401E81
+  00401DF7: 83 EC 08           sub         esp,8
+  00401DFA: 8D 45 28           lea         eax,[ebp+28h]
+  00401DFD: 8B CC              mov         ecx,esp
+  00401DFF: 50                 push        eax
+  00401E00: E8 0B 26 00 00     call        00404410
+  00401E05: 3E 3E 3E DD 45 20  fld         qword ptr ds:[ebp+20h]
+  00401E0B: 83 EC 18           sub         esp,18h
+  00401E0E: DD 5C 24 10        fstp        qword ptr [esp+10h]
+  00401E12: DD 45 18           fld         qword ptr [ebp+18h]
+  00401E15: DD 5C 24 08        fstp        qword ptr [esp+8]
+  00401E19: DD 45 10           fld         qword ptr [ebp+10h]
+  00401E1C: DD 1C 24           fstp        qword ptr [esp]
+  00401E1F: 56                 push        esi
+  00401E20: E8 BB 00 00 00     call        00401EE0
+  00401E25: 83 C4 24           add         esp,24h
+  00401E28: B3 01              mov         bl,1
+  00401E2A: EB 55              jmp         00401E81
+  00401E2C: F6 C4 44           test        ah,44h
+  00401E2F: 7B 3A              jnp         00401E6B
+  00401E31: 83 EC 08           sub         esp,8
+  00401E34: 8D 45 28           lea         eax,[ebp+28h]
+  00401E37: 8B CC              mov         ecx,esp
+  00401E39: 50                 push        eax
+  00401E3A: E8 D1 25 00 00     call        00404410
+  00401E3F: DD 45 20           fld         qword ptr [ebp+20h]
+  00401E42: 83 EC 0C           sub         esp,0Ch
+  00401E45: D9 5D EC           fstp        dword ptr [ebp-14h]
+  00401E48: DD 45 18           fld         qword ptr [ebp+18h]
+  00401E4B: D9 5D F0           fstp        dword ptr [ebp-10h]
+  00401E4E: D9 45 EC           fld         dword ptr [ebp-14h]
+  00401E51: D9 5C 24 08        fstp        dword ptr [esp+8]
+  00401E55: D9 45 F0           fld         dword ptr [ebp-10h]
+  00401E58: D9 5C 24 04        fstp        dword ptr [esp+4]
+  00401E5C: D9 45 0C           fld         dword ptr [ebp+0Ch]
+  00401E5F: D9 1C 24           fstp        dword ptr [esp]
+  00401E62: 56                 push        esi
+  00401E63: E8 78 04 00 00     call        004022E0
+  00401E68: 83 C4 18           add         esp,18h
+  00401E6B: B3 01              mov         bl,1
+  00401E6D: EB 12              jmp         00401E81
+  00401E6F: DD D9              fstp        st(1)
+  00401E71: B3 01              mov         bl,1
+  00401E73: DD D9              fstp        st(1)
+  00401E75: DD D8              fstp        st(0)
+  00401E77: EB 08              jmp         00401E81
+  00401E79: DD D9              fstp        st(1)
+  00401E7B: DD D9              fstp        st(1)
+  00401E7D: DD D8              fstp        st(0)
+  00401E7F: 32 DB              xor         bl,bl
+  00401E81: 8B 7D 2C           mov         edi,dword ptr [ebp+2Ch]
+  00401E84: 85 FF              test        edi,edi
+  00401E86: 74 35              je          00401EBD
+  00401E88: 83 C8 FF           or          eax,0FFFFFFFFh
+  00401E8B: F0 0F C1 47 04     lock xadd   dword ptr [edi+4],eax
+  00401E90: 75 2B              jne         00401EBD
+  00401E92: 8B 07              mov         eax,dword ptr [edi]
+  00401E94: 8B 30              mov         esi,dword ptr [eax]
+  00401E96: 8B CE              mov         ecx,esi
+  00401E98: FF 15 C8 D3 43 00  call        dword ptr ds:[0043D3C8h]
+  00401E9E: 8B CF              mov         ecx,edi
+  00401EA0: FF D6              call        esi
+  00401EA2: 83 C8 FF           or          eax,0FFFFFFFFh
+  00401EA5: F0 0F C1 47 08     lock xadd   dword ptr [edi+8],eax
+  00401EAA: 75 11              jne         00401EBD
+  00401EAC: 8B 17              mov         edx,dword ptr [edi]
+  00401EAE: 8B 72 04           mov         esi,dword ptr [edx+4]
+  00401EB1: 8B CE              mov         ecx,esi
+  00401EB3: FF 15 C8 D3 43 00  call        dword ptr ds:[0043D3C8h]
+  00401EB9: 8B CF              mov         ecx,edi
+  00401EBB: FF D6              call        esi
+  00401EBD: 8A C3              mov         al,bl
+  00401EBF: 8B 4D F4           mov         ecx,dword ptr [ebp-0Ch]
+  00401EC2: 64 89 0D 00 00 00  mov         dword ptr fs:[00000000h],ecx
+            00
+  00401EC9: 59                 pop         ecx
+  00401ECA: 5F                 pop         edi
+  00401ECB: 5E                 pop         esi
+  00401ECC: 5B                 pop         ebx
+  00401ECD: 8B E5              mov         esp,ebp
+  00401ECF: 5D                 pop         ebp
+  00401ED0: C3                 ret
+  00401ED1: CC                 int         3
+  00401ED2: CC                 int         3
+  00401ED3: CC                 int         3
+  00401ED4: CC                 int         3
+  00401ED5: CC                 int         3
+  00401ED6: CC                 int         3
+  00401ED7: CC                 int         3
+  00401ED8: CC                 int         3
+  00401ED9: CC                 int         3
+  00401EDA: CC                 int         3
+  00401EDB: CC                 int         3
+  00401EDC: CC                 int         3
+  00401EDD: CC                 int         3
+  00401EDE: CC                 int         3
+  00401EDF: CC                 int         3

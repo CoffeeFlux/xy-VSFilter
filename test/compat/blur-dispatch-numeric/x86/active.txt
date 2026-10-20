@@ -1,0 +1,26 @@
+  00401340: D9 EE              fldz
+  00401342: D8 5C 24 04        fcomp       dword ptr [esp+4]
+  00401346: DF E0              fnstsw      ax
+  00401348: F6 C4 01           test        ah,1
+  0040134B: 75 14              jne         00401361
+  0040134D: DD 05 B0 4F 43 00  fld         qword ptr ds:[00434FB0h]
+  00401353: DC 5C 24 08        fcomp       qword ptr [esp+8]
+  00401357: DF E0              fnstsw      ax
+  00401359: F6 C4 01           test        ah,1
+  0040135C: 75 03              jne         00401361
+  0040135E: 32 C0              xor         al,al
+  00401360: C3                 ret
+  00401361: B0 01              mov         al,1
+  00401363: C3                 ret
+  00401364: CC                 int         3
+  00401365: CC                 int         3
+  00401366: CC                 int         3
+  00401367: CC                 int         3
+  00401368: CC                 int         3
+  00401369: CC                 int         3
+  0040136A: CC                 int         3
+  0040136B: CC                 int         3
+  0040136C: CC                 int         3
+  0040136D: CC                 int         3
+  0040136E: CC                 int         3
+  0040136F: CC                 int         3

@@ -5,6 +5,7 @@ use crate::gaussian_coefficients::Coefficients;
 use alloc::{collections::BTreeMap, vec::Vec};
 
 pub trait Numeric {
+    fn products(&mut self, sigma: u64, sx: u64, sy: u64) -> [u64; 2];
     fn copy(&mut self, key: u64) -> u64;
     fn equal(&mut self, lookup: u64, stored: u64) -> bool;
     fn build(&mut self, key: u64) -> Result<Coefficients, u32>;
@@ -248,6 +249,9 @@ mod tests {
     }
     struct N;
     impl Numeric for N {
+        fn products(&mut self, _: u64, _: u64, _: u64) -> [u64; 2] {
+            unreachable!()
+        }
         fn copy(&mut self, k: u64) -> u64 {
             k
         }

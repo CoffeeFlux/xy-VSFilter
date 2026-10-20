@@ -1,0 +1,26 @@
+{
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "name": "?IsItReallyBlur@Rasterizer@@SA_NMN@Z",
+  "address": "0x401340",
+  "end": "0x401370",
+  "files": {
+    "active.txt": "df1d6fc3a0342eb71a9ab150388de85c79700f8a4faed5f065d1a0e2ccfc0bc4",
+    "build.log": "a0f92ca3843da55ffdc7188c7d24de6462458c25675559a91982edc3868b9466",
+    "command.json": "00e1fc2d426a36248c1d7a132303c5a6b09b2d7c8537bae6ca3ec7bb7a6efd8a",
+    "disassembly.txt": "7edf582cfedafd7890c7f4c8dafa22bed50347b8d23a4937f436a2bbfe0079e7",
+    "probe.exe": "75f1b80220ed1fe6f388953105a166be68b8f0906f7facc6207a0b50e5bc213c",
+    "probe.map": "5d70b0409ab48627356e61d32d09877db1afa094bc95c0ccaf415891c404206b",
+    "probe.obj": "2a25d5fb4d840a7f24c80f336f5ac31ad0c85f716748ab3fef6d0a856d5d2549"
+  },
+  "source_sha256": "f3146d3a8c6e2418703eb52d96858ebd4e6ef720c9a9cc08cda807009892e39e",
+  "scope": "Linked original IsItReallyBlur predicate. Compiler command records original pinned reference libraries; numeric input only, not renderer parity evidence.",
+  "reference_library_sha256": {
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\strmbaseR.lib": "5926e97d337eebffe4ea20b996f2f0e62a33f67d6562e18a829c4f45888a954e",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\dsutilR.lib": "3333bc109c61750684684cafa818c90d68af49906e6c08994013e8e0bb711b0b",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\subtitlesR.lib": "46495e9e54830b1ee76e90021b0cd688be766a46fc9d354b52958651f3888f59",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\subpicR.lib": "2e3315a04138a6822958356c79dafdf47bdd51e6ddd32cf7ce6da8eae54a3e1f",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\basevideofilterR.lib": "3598e7cf095d9fefc68de1393902310c4c621a0b792b16098df40554cd6d2ada",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\libssfR.lib": "3eaa482d6d3b16a0b48816cf21cb96f3bb932963eb7b114c76372c785e4bbc09",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\Win32\\unrarR.lib": "2a77b674333a0ac1e05fc155374268e7395d3e8163f1dc212788d446f3eb75cf"
+  }
+}

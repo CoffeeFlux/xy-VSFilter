@@ -15,6 +15,7 @@ public:
     uint64_t Variance(unsigned,unsigned)const;
     uint64_t BeBlur(float,float,float)const;
     uint64_t Gaussian(double,double,double)const;
+    uint64_t Blur(float,double,double,double,bool&)const;
     void Offset(int,int);
 };
 }

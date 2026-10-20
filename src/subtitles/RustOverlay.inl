@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Included once after Rasterizer.h; private owner IDs and detached wire packets.
 extern "C" {
+uint32_t __cdecl xy_vsfilter_blur_active_v1(uint32_t,uint64_t);
+uint32_t __cdecl xy_vsfilter_overlay_blur_v1(uint64_t,uint32_t,uint64_t,uint64_t,uint64_t,uint8_t*);
 uint32_t __cdecl xy_vsfilter_overlay_gaussian_v2(uint64_t,uint64_t,uint64_t,uint64_t,uint8_t*);
 uint32_t __cdecl xy_vsfilter_overlay_be_blur_v1(uint64_t,uint32_t,uint32_t,uint32_t,uint8_t*);
 uint32_t __cdecl xy_vsfilter_overlay_import_v1(const uint8_t*,size_t,uint8_t*);
@@ -14,6 +16,10 @@ namespace XyRust {
 uint64_t OverlayOwner::BeBlur(float be,float sx,float sy)const{std::array<uint8_t,8> out;
     uint32_t b,x,y;memcpy(&b,&be,4);memcpy(&x,&sx,4);memcpy(&y,&sy,4);
     DocumentDetail::Check(DocumentDetail::Invoke([&](){return xy_vsfilter_overlay_be_blur_v1(id_,b,x,y,out.data());}));return DocumentDetail::Load(out,0,8);}
+uint64_t OverlayOwner::Blur(float be,double gaussian,double sx,double sy,bool& result)const{
+    using namespace DocumentDetail;uint32_t b;uint64_t g,x,y;memcpy(&b,&be,4);memcpy(&g,&gaussian,8);memcpy(&x,&sx,8);memcpy(&y,&sy,8);std::array<uint8_t,16> out;
+    Check(Invoke([&](){return xy_vsfilter_overlay_blur_v1(id_,b,g,x,y,out.data());}));result=Load(out,8,4)!=0;const uint64_t id=Load(out,0,8);Shape(bool(id)==bool(Load(out,12,4)));return id;
+}
 uint64_t OverlayOwner::Gaussian(double sigma,double sx,double sy)const{
     using namespace DocumentDetail;uint64_t g,x,y;memcpy(&g,&sigma,8);memcpy(&x,&sx,8);memcpy(&y,&sy,8);std::array<uint8_t,8> out;
     Check(Invoke([&](){return xy_vsfilter_overlay_gaussian_v2(id_,g,x,y,out.data());}));return Load(out,0,8);

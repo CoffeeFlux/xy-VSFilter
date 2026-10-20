@@ -1,0 +1,12 @@
+{
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "files": {
+    "active.txt": "88ff30132265a9c39e826e1456edec738e7c508f31033d8339a562a588d2d96e",
+    "combined-provenance.json": "1c199cd56cbb36473d4c25d26db2838137b8be9dc34d563294cd2062385afa59",
+    "combined.txt": "70477172116921f592b00d01bf3b3d41629d341e75b6eff85e35fb684c47918a",
+    "command.json": "e76da0b712f6c1ff09bfa9719cebf09d676e24ddf574cb56c20e47437c666cd3",
+    "provenance.json": "d4c0a5e517e9c97a7589555dfd36ce266331acd93b1d7965b0281f59cdbffe97",
+    "reference-source.cpp": "f3146d3a8c6e2418703eb52d96858ebd4e6ef720c9a9cc08cda807009892e39e"
+  },
+  "scope": "Linked standalone predicate plus previously captured combined Blur. Original binary provenance remains explicit for each capture."
+}

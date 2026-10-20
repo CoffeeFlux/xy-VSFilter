@@ -109,6 +109,10 @@ impl Image {
     pub fn all_known(&self) -> bool {
         self.known.is_none()
     }
+    pub fn positive_size(&self) -> bool {
+        let f = fields(&self.bytes);
+        f[4] > 0 && f[5] > 0
+    }
     pub fn be_blur(&self, numeric: &mut impl crate::be_blur::Numeric) -> Result<Self, u32> {
         let old = fields(&self.bytes);
         let [dx, dy] = numeric.geometry().map(|v| v.wrapping_mul(8));
