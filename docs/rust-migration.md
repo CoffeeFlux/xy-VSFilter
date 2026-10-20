@@ -27,7 +27,59 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest port: owned ellipse cache and exact target arithmetic (2026-10-19)
+## Latest port: owned raster construction (2026-10-19)
+
+Implementation `b2379898` moves the experimental `Rasterizer::Rasterize` operation
+into safe Rust. It consumes the checked scan and widened-outline owners directly,
+without rebuilding native span vectors. Rust computes offsets, dimensions and
+rounded border padding, allocates initialized body/border storage and accumulates
+border spans before body spans with the cleanup byte wrapping and linear-address
+behavior. Either zero scan dimension returns the original cleaned empty state.
+The result stays in a checked Rust registry until its detached snapshot is read;
+no canonical owner pointer or pixel loan crosses this new boundary.
+
+The transitional native overlay receives detached copies for blur, subpixel
+variance, clipping and drawing. Body/border shared aliases and allocation-count
+changes are preserved: `g_xy_malloc_used_size` affects cache eviction. This is
+the raster construction port, not completion of overlay ownership. Gaussian
+blur's unwritten padding requires a separate initialized-byte contract. See
+[the boundary audit](rust-raster-boundary.md).
+
+The maintained actual-method observer matches 512 reused-overlay calls / 2,050
+trace lines on Windows x86 and x64, twice per role. It compares metadata, every
+initialized body/border byte including padding, retained old body images, cache
+allocation deltas and FP/errno/LastError state across 16 paths, eight radii and
+four signed/extreme offsets. All ten preceding focused probes also pass. Each
+full rendering run matches 1,222 cases / 13,186 frames and passes 192 distinct-frame
+controls against cleanup commit `67da07cd`. All three DLLs build and retain their
+exports/dependencies; ten COM cases plus two controls pass on both architectures.
+
+Rust passes 368 core and 141 FFI tests per architecture, formatting and Clippy.
+The existing Python suite passes 204 tests with one skip; two new raster-observer
+control tests pass separately (206 unique tests total). The portable core remains
+unsafe-free. The FFI inventory records 599 production unsafe blocks, 418 unsafe
+functions, four unsafe Sync implementations and 34 assembly sites; these counts
+are neither a soundness proof nor a completion percentage. Detailed provenance is
+in [the local evidence](rust-raster-local-evidence.json).
+
+Invalid addresses, unsupported signed shifts, allocation failure and overflow,
+Debug builds, other FP controls and arbitrary host concurrency remain unclosed.
+Earlier cleanup exit-crash and ellipse FP-instability evidence retain their
+original attribution. Full overlay/GrayImage ownership, blur, native object
+graphs, all host adapters and vendors remain in scope. The experimental flag stays
+opt-in and the full migration stays active.
+
+Next-boundary preparation is saved under `artifacts/overlay-stages-baseline-*`:
+2,560 actual raster/BeBlur/Gaussian/combined-blur/variance operations match twice
+per role on both architectures. Only initialized bytes are compared. A separate
+reference-only allocator-fill experiment (`artifacts/overlay-padding-probe-*`)
+changes 634 of 700 padding observations while all known bytes and status match
+the unmodified reference. This is finite initialization evidence, not parity for
+uninitialized padding or a full-overlay completion claim. Promote the staged
+observer into the maintained provenance/control workflow before switching the
+next implementation boundary.
+
+## Earlier port: owned ellipse cache and exact target arithmetic (2026-10-19)
 
 Implementation `d9899cfc` removes the experimental widening path's C++ ellipse
 callback and native cache. The admitted Rust owner state now includes the cached

@@ -1,0 +1,784 @@
+{
+  "schema": 1,
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "candidate_implementation_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+  "status": "Experimental owned raster construction checkpoint; full overlay and full-library migration remain active",
+  "architectures": {
+    "x86": {
+      "native": {
+        "raster_native": {
+          "path": "artifacts/raster-owned-raster_native-x86/report.json",
+          "sha256": "b34293c47a4567286db0e6517539a767fa494160f8ecbeb291273d390d8e8ee4",
+          "candidate_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+          "cases": 512,
+          "trace_lines": 2050,
+          "trace_sha256": [
+            "05a2bd9b09c7b6c1d19519dc8dfc39b6685d652db7bcf780ed47a371d8e63f1f",
+            "05a2bd9b09c7b6c1d19519dc8dfc39b6685d652db7bcf780ed47a371d8e63f1f",
+            "05a2bd9b09c7b6c1d19519dc8dfc39b6685d652db7bcf780ed47a371d8e63f1f",
+            "05a2bd9b09c7b6c1d19519dc8dfc39b6685d652db7bcf780ed47a371d8e63f1f"
+          ],
+          "binary_sha256": {
+            "reference": "2f2174f00122ca232911cba91690e3cb0575fee469458c12e2e6c179f0cfa4b8",
+            "candidate": "54ab58327a0d79aff2b24f4982d37b8bca557e2ce188380d2e6c384d681e304b"
+          }
+        },
+        "wide_region_native": {
+          "path": "artifacts/raster-owned-wide_region_native-x86/report.json",
+          "sha256": "362e7b37308f7aeea391bc1953708f3ac8039cbcc3fb070ed9befb0346e1a7de",
+          "candidate_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+          "cases": 1536,
+          "trace_lines": 288022,
+          "trace_sha256": [
+            "895f4796454005d5b06a2d653c04b57819e48c0752f9cfd3517ad6274bdddb71",
+            "895f4796454005d5b06a2d653c04b57819e48c0752f9cfd3517ad6274bdddb71",
+            "895f4796454005d5b06a2d653c04b57819e48c0752f9cfd3517ad6274bdddb71",
+            "895f4796454005d5b06a2d653c04b57819e48c0752f9cfd3517ad6274bdddb71"
+          ],
+          "binary_sha256": {
+            "reference": "679648feba4ce1d32dacd58f6782d7688ce01d42be2d380d5647a6140f4f9f99",
+            "candidate": "6323e75a2b92f345dc32e584325c81063377ff4a8693e58187da8f0d63188c4f"
+          }
+        },
+        "scan_lines_native": {
+          "path": "artifacts/raster-owned-scan_lines_native-x86/report.json",
+          "sha256": "cb62831a0ed94a9bcf1289aa6a94a0c5d08c29563e76c39a0a6e65d93ac26ead",
+          "candidate_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+          "cases": 384,
+          "trace_lines": 70692,
+          "trace_sha256": [
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f"
+          ],
+          "binary_sha256": {
+            "reference": "b847fb61ac279c7a4885086542d9c7caccc61343c677a057c1ffdeee2ab96810",
+            "candidate": "fa4fd112c36978770cb4d1c80e9820cce43b343b8b3424f2ec552d0de4b3ed7b"
+          }
+        },
+        "word_transform_native": {
+          "path": "artifacts/raster-owned-word_transform_native-x86/report.json",
+          "sha256": "6ce8fb71d8a481340e83b7856fdffa49f6bd14309fd9cb437069223145963026",
+          "candidate_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+          "cases": 4560,
+          "trace_lines": 9122,
+          "trace_sha256": [
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd"
+          ],
+          "binary_sha256": {
+            "reference": "e6fe368aa5b6c6e736c5663c2ec972e35eaba945e07af3eb7289cc2a4dd22611",
+            "candidate": "34499a1e7c616e864ad9820f5aa8b228e6a6825558eed1de5e23bc75543ffd2d"
+          }
+        },
+        "path_data_native": {
+          "path": "artifacts/raster-owned-path_data_native-x86/report.json",
+          "sha256": "7878ffcb06ca12d2468a3b93049752b436139ecefadf8e3836407691367e16af",
+          "candidate_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+          "cases": 39,
+          "trace_lines": 171,
+          "trace_sha256": [
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2"
+          ],
+          "binary_sha256": {
+            "reference": "f3699656d9c6fb657bd2d365698f4af4a9e6be8fa5d9164f124e0b37373dc464",
+            "candidate": "337275081d2d2fe975b690fd94fe3118613f4425d4734ff44bf9b60417593ef5"
+          }
+        },
+        "text_measure_raw": {
+          "path": "artifacts/raster-owned-text_measure_raw-x86/report.json",
+          "sha256": "4e125c004b323571178cf35ceb83d7c3e75f7970aed9fdad0f305f1cce0dd54e",
+          "candidate_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd",
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd",
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd",
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd"
+          ],
+          "binary_sha256": {
+            "reference": "e071348d6fd0781c8bdd3312786584bf96859005dbbb7b288083b3bab8440166",
+            "candidate": "bd334d037c4c9615859ede1252b0efa708c901ec7accc9228383b6a257a59d22"
+          }
+        },
+        "text_measure_construction": {
+          "path": "artifacts/raster-owned-text_measure_construction-x86/report.json",
+          "sha256": "fac858ee8674132b5f207ae6cce8e608757b79b2dd557afbe5e3cc09e95bf096",
+          "candidate_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893",
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893",
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893",
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893"
+          ],
+          "binary_sha256": {
+            "reference": "3c6974eb8de378d2a1e1e6a42f4969f453c547a175ac72e96b3aa82d17a3e8e6",
+            "candidate": "313e29878a0fd3726142a4a78b87f5507f48b9ff85030e94a8aa6536efde4ce0"
+          }
+        },
+        "renderer_dc_text_native": {
+          "path": "artifacts/raster-owned-renderer_dc_text_native-x86/report.json",
+          "sha256": "9e589b6ca1113d6628a63b22dc5e85e33f733f931372b5a953394027a9e3ec0c",
+          "candidate_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+          "cases": 40,
+          "trace_lines": 598,
+          "trace_sha256": [
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330"
+          ],
+          "binary_sha256": {
+            "reference": "0d23c4dd2ec341147366899a12c268a9f6df590e0504639fafdba9309f91e494",
+            "candidate": "8e03e5f777e35d8746c7ee1282f08368185682a202f57831bf91b554f6f60e5f"
+          }
+        },
+        "renderer_dc_native": {
+          "path": "artifacts/raster-owned-renderer_dc_native-x86/report.json",
+          "sha256": "d628e4c16f7af1c9660219965bbef87018880661f82c25c5080afc55c8e6ff3a",
+          "candidate_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+          "cases": 6,
+          "trace_lines": 116,
+          "trace_sha256": [
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983"
+          ],
+          "binary_sha256": {
+            "reference": "f040c027a7f9dc59581efa367218fdd75aae13c503c9467e3f4f5c2c59c49e25",
+            "candidate": "dd501823e72abf63fbfece6d9f5d6da13cf000b84387f46fb5be67bdd0926b87"
+          }
+        },
+        "font_native": {
+          "path": "artifacts/raster-owned-font_native-x86/report.json",
+          "sha256": "cfda0ef2982ebb0064d051c00acb2678cc35963f73143906cb13c33a265ce70a",
+          "candidate_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+          "cases": 195,
+          "trace_lines": 392,
+          "trace_sha256": [
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f",
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f",
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f",
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f"
+          ],
+          "binary_sha256": {
+            "reference": "92d7aac507ad1ffb198b59e8a88071fb28f6519ea36764fe9623b6f9ece098e4",
+            "candidate": "2b12987aeed51091c44d9e14c07ada6367fb76a085067e2b2820ba5bcfe68cd0"
+          }
+        },
+        "font_gdi_calls": {
+          "path": "artifacts/raster-owned-font_gdi_calls-x86/report.json",
+          "sha256": "4beb7ef2f557366566d815acac83da4c2e78fe5d5f425bfdb47fc01b1e60003f",
+          "candidate_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+          "cases": 12,
+          "trace_lines": 126,
+          "trace_sha256": [
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5",
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5",
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5",
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5"
+          ],
+          "binary_sha256": {
+            "reference": "14cc152e4fad898d450c91055ded98bb960d06d24459097cd129bb769f41ca59",
+            "candidate": "196f6d3177fe36e51124691cf8e6102a6f81ae78124ee0749facc6facde936b3"
+          }
+        }
+      },
+      "rendering": {
+        "path": "artifacts/raster-owned-csri-x86/summary.json",
+        "sha256": "6b6fbb8f8b5ecf19a376befc02a18ff824497fde298a36bd6511bf16c510fcc7",
+        "original_manifest_sha256": "2949bb98bfbc49bd3496af90ef9a8b3b386395637ff34bc54b0fc4e86fe61363",
+        "partition_exact": true,
+        "cases": 1222,
+        "frames": 13186,
+        "shard_results": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            7,
+            0
+          ]
+        ],
+        "complete": true,
+        "candidate_dll": {
+          "path": "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\bin\\lib_17.0\\Win32\\Release\\VSFilter.dll",
+          "sha256": "80fab855f3a57b8aef16c1306029f76e6c138966b4d2313db54dad5e030d72ce"
+        },
+        "reference_source": {
+          "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+          "repository": "https://github.com/CoffeeFlux/xy-VSFilter"
+        },
+        "distinct_controls": 192,
+        "stable_equal_cases": 1222,
+        "stable_equal_frames": 13186,
+        "unresolved_cases": []
+      },
+      "contracts": {
+        "path": "artifacts/raster-owned-contracts-x86.log",
+        "sha256": "445a1347a43a8f59ccc7dfd18b9c878b4d225eeaaf4cc2cee89c7ff109d43161"
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "path": "bin/lib_17.0/Win32/Release/VSFilter.dll",
+          "sha256": "80fab855f3a57b8aef16c1306029f76e6c138966b4d2313db54dad5e030d72ce"
+        },
+        "XySubFilter.dll": {
+          "path": "bin/lib_17.0/Win32/Release/XySubFilter.dll",
+          "sha256": "3b3b5307fd7826a1aadfb39eef1647b2da430ebc6a1196dd5008279b031c2c53"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "path": "bin/lib_17.0/Win32/Release/xy_sub_filter_consumer.dll",
+          "sha256": "144b64414fb967ac8527526b14695936b4a734f903faee05ce2fe93476889dba"
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/raster-owned-build-x86.log",
+          "sha256": "f19c2f75e9fcf14da97d6fcb17c8e34b2b66b1caae11efe0b899c59f95c511b9"
+        },
+        {
+          "path": "artifacts/raster-owned-build-rust-x86.log",
+          "sha256": "beb045aa82bf59647c52e874894b0000c3fede2c9448a75976adba217b864a4c"
+        }
+      ]
+    },
+    "x64": {
+      "native": {
+        "raster_native": {
+          "path": "artifacts/raster-owned-raster_native-x64/report.json",
+          "sha256": "6fe0ac7961b6775dc198e4d6067e0e904b76b34dc3217062d4ea2e761a5b6b43",
+          "candidate_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+          "cases": 512,
+          "trace_lines": 2050,
+          "trace_sha256": [
+            "cb6de9c380203885c4cec5bac67a4771747a68290e6fe0599d191155a71222e3",
+            "cb6de9c380203885c4cec5bac67a4771747a68290e6fe0599d191155a71222e3",
+            "cb6de9c380203885c4cec5bac67a4771747a68290e6fe0599d191155a71222e3",
+            "cb6de9c380203885c4cec5bac67a4771747a68290e6fe0599d191155a71222e3"
+          ],
+          "binary_sha256": {
+            "reference": "8ee4292e805af9ba0dfec6f59a3156b95c2245dda13f6d3f01c0cea0e10f73a0",
+            "candidate": "49362e68739b66435ac9e79d6d3d3f4b189bdb01d8077919658639809d1d4e7b"
+          }
+        },
+        "wide_region_native": {
+          "path": "artifacts/raster-owned-wide_region_native-x64/report.json",
+          "sha256": "e811855c077f3d3479d1275b1aee7a55f5ab41914ab727eb222214c4a4d283b8",
+          "candidate_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+          "cases": 1536,
+          "trace_lines": 288022,
+          "trace_sha256": [
+            "4fb58dc5e624a826d0a36164656cc725e56f7612b95a03a61824e80741bc7925",
+            "4fb58dc5e624a826d0a36164656cc725e56f7612b95a03a61824e80741bc7925",
+            "4fb58dc5e624a826d0a36164656cc725e56f7612b95a03a61824e80741bc7925",
+            "4fb58dc5e624a826d0a36164656cc725e56f7612b95a03a61824e80741bc7925"
+          ],
+          "binary_sha256": {
+            "reference": "180505c32f1346569b4b4ffa755ca75fa2774bb556a7f6c5d34f852b8abd131e",
+            "candidate": "a4cfeec6b3a4c931bb2e56b920f5f91e80cb7bf5b7a65812345ea615bcd38a72"
+          }
+        },
+        "scan_lines_native": {
+          "path": "artifacts/raster-owned-scan_lines_native-x64/report.json",
+          "sha256": "b03d210b030c33a251d0504b58186953239febff3cb13628b34bd57b6d4f1e0d",
+          "candidate_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+          "cases": 384,
+          "trace_lines": 70692,
+          "trace_sha256": [
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2"
+          ],
+          "binary_sha256": {
+            "reference": "8f69a08040ff72c3f6cce1e90eaefd9cdd6dd50199fc1797501143088ae2c92b",
+            "candidate": "2bb5ca80baa99f3be61f8af770568628d6ca66c9cfc9711efbcbb0a8c8361dd1"
+          }
+        },
+        "word_transform_native": {
+          "path": "artifacts/raster-owned-word_transform_native-x64/report.json",
+          "sha256": "b31baafd48c89112a90cece262b700c70b7510aff9c3ffd0296d6b21b7249631",
+          "candidate_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+          "cases": 4560,
+          "trace_lines": 9122,
+          "trace_sha256": [
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b"
+          ],
+          "binary_sha256": {
+            "reference": "4faaac86a217154db91f51cc76e6610a52f4da7920d32d37091a750b69b78b15",
+            "candidate": "11c7a4fb45b3c750c48f1fac8945ea7794d0e6ea1e3dc9e2bdb906b9f5fb08c1"
+          }
+        },
+        "path_data_native": {
+          "path": "artifacts/raster-owned-path_data_native-x64/report.json",
+          "sha256": "bb2a10c0ddb277e547094396de573ce71a5db2c47b0c85ee75da5bfdd6ea84eb",
+          "candidate_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+          "cases": 39,
+          "trace_lines": 171,
+          "trace_sha256": [
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031"
+          ],
+          "binary_sha256": {
+            "reference": "f2910d390cc1d762ea3a4f13522657a1bb3c9de5c6c28f13621eba763b2b3378",
+            "candidate": "1abf5808c176bae57b6cb48e209d7b299fa4c356b883a09754412991219a9596"
+          }
+        },
+        "text_measure_raw": {
+          "path": "artifacts/raster-owned-text_measure_raw-x64/report.json",
+          "sha256": "5aad215ca30f3e6ffaf6cd9a4e9ee5db8b90f3e65c966c2c1d90b249e766bc58",
+          "candidate_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054",
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054",
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054",
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054"
+          ],
+          "binary_sha256": {
+            "reference": "794188b70c556a85cabf63218bcc0b3331c1cb42e67747acbab6a3b2fbd0123a",
+            "candidate": "edf1730b4b02d453beb05eff7083868d9463fcbef8f44e3efc0864aebc022d5d"
+          }
+        },
+        "text_measure_construction": {
+          "path": "artifacts/raster-owned-text_measure_construction-x64/report.json",
+          "sha256": "883e2a3196bca9784cd5e9909c551a8de4aeb607eb2c382ec14bb9a9e256c1ff",
+          "candidate_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3",
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3",
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3",
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3"
+          ],
+          "binary_sha256": {
+            "reference": "ca67024145afb336c7e20f5305ae79af7e8b34e292032e4bbac95bfa119f8a09",
+            "candidate": "9a62425d8f79b626e4d971889a0dd42408a1461e06912668dbdbbe46a4517e99"
+          }
+        },
+        "renderer_dc_text_native": {
+          "path": "artifacts/raster-owned-renderer_dc_text_native-x64/report.json",
+          "sha256": "9f301c59a6ddac850774ab14901b0bc67e22bd431e89c2167b0a34485ed5be4e",
+          "candidate_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+          "cases": 40,
+          "trace_lines": 598,
+          "trace_sha256": [
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac"
+          ],
+          "binary_sha256": {
+            "reference": "0395547bdf9e78d6e9f466c114c5151391194cd401c68036e03b52d6a82c1e0c",
+            "candidate": "e4665f9ed411740680f4dab1bc166f0a1dcebf170b6097ecba00ff074c07e735"
+          }
+        },
+        "renderer_dc_native": {
+          "path": "artifacts/raster-owned-renderer_dc_native-x64/report.json",
+          "sha256": "feceacf5e969974e494d3edd2f57f1fe60491084b07328d2e28dc1957ce375bc",
+          "candidate_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+          "cases": 6,
+          "trace_lines": 116,
+          "trace_sha256": [
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd"
+          ],
+          "binary_sha256": {
+            "reference": "e996bbf8ce7d97ed123ea4d6bafea8edf6b8c2a3236e04805f092cf33750e12c",
+            "candidate": "73d1d6db07f8ba79462b3bd69c36ad2a523246f2a3f4d97f1f934c943bbd0b99"
+          }
+        },
+        "font_native": {
+          "path": "artifacts/raster-owned-font_native-x64/report.json",
+          "sha256": "47d0e89a81fa9de1e8fe313286eb4d593095f503cf8f0f460f44ea8bbc11f44e",
+          "candidate_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+          "cases": 195,
+          "trace_lines": 392,
+          "trace_sha256": [
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7",
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7",
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7",
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7"
+          ],
+          "binary_sha256": {
+            "reference": "dfef8097fb4fd9b2f15ed2ca1a20b5b5976db27b03237135661e6e2a31836ba4",
+            "candidate": "d0075b209bdd4acf6d2c9409ed07b9e5b5e85c3161897c1ce30af834c458bce0"
+          }
+        },
+        "font_gdi_calls": {
+          "path": "artifacts/raster-owned-font_gdi_calls-x64/report.json",
+          "sha256": "552a2dfd173581090a94ed166ee6a2b45b3d0dcc9e23190e36e2e6377f7b78fa",
+          "candidate_commit": "b23798989bb493c3b41c525d1843d383ee774a69",
+          "cases": 12,
+          "trace_lines": 126,
+          "trace_sha256": [
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93",
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93",
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93",
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93"
+          ],
+          "binary_sha256": {
+            "reference": "a768994745dddb969d10a26e5c1cf1cd96f2914c54e2496a38383cdcec9367cd",
+            "candidate": "99d6db1d25c6f7078e749f6db8bb5a499ecac91c6d9d966ac041dcaffc0fadd7"
+          }
+        }
+      },
+      "rendering": {
+        "path": "artifacts/raster-owned-csri-x64/summary.json",
+        "sha256": "e13522a618e364930af80e6265b32616665a4c4fa35a3a8bb7ba3cc4f767d1d2",
+        "original_manifest_sha256": "2949bb98bfbc49bd3496af90ef9a8b3b386395637ff34bc54b0fc4e86fe61363",
+        "partition_exact": true,
+        "cases": 1222,
+        "frames": 13186,
+        "shard_results": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            7,
+            0
+          ]
+        ],
+        "complete": true,
+        "candidate_dll": {
+          "path": "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\bin\\lib_17.0\\x64\\Release\\VSFilter.dll",
+          "sha256": "7a7b84e13a526afb08e773cb16577be4b98a638f801ec11a975ab8f604402f52"
+        },
+        "reference_source": {
+          "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+          "repository": "https://github.com/CoffeeFlux/xy-VSFilter"
+        },
+        "distinct_controls": 192,
+        "stable_equal_cases": 1222,
+        "stable_equal_frames": 13186,
+        "unresolved_cases": []
+      },
+      "contracts": {
+        "path": "artifacts/raster-owned-contracts-x64.log",
+        "sha256": "445a1347a43a8f59ccc7dfd18b9c878b4d225eeaaf4cc2cee89c7ff109d43161"
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "path": "bin/lib_17.0/x64/Release/VSFilter.dll",
+          "sha256": "7a7b84e13a526afb08e773cb16577be4b98a638f801ec11a975ab8f604402f52"
+        },
+        "XySubFilter.dll": {
+          "path": "bin/lib_17.0/x64/Release/XySubFilter.dll",
+          "sha256": "c70089ccbc332eb482b878cbc2e01c72e3e28b8cfc2c73df4985e13bcc8c8703"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "path": "bin/lib_17.0/x64/Release/xy_sub_filter_consumer.dll",
+          "sha256": "bbab21fbce049d3bfadddeb950592239d51864eb3c20589ff11aa3a5c3004c2d"
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/raster-owned-build-x64.log",
+          "sha256": "00b7af8867ae25a67e90bfce84b04b1f1f057143215598224cd1b67221371cd5"
+        },
+        {
+          "path": "artifacts/raster-owned-build-rust-x64.log",
+          "sha256": "e9ee1acb2c9b7fe9a86618d3a928444fc94be4f322d7e4e8c2163c2cd2f9f7b9"
+        }
+      ]
+    }
+  },
+  "checks": {
+    "path": "artifacts/raster-owned-checks.log",
+    "sha256": "f3a7160fc07f162e46540f7963872393ea48c2df197b78593076229518a76a7c",
+    "core_per_architecture": 368,
+    "ffi_per_architecture": 141,
+    "python": 204,
+    "python_skipped": 1,
+    "fmt": true,
+    "clippy_both_architectures_and_native_runtime": true
+  },
+  "new_observer_controls": {
+    "path": "artifacts/raster-owned-probe-controls.log",
+    "sha256": "ff1831f109f4a78c839cc36ff0f641096ac3927c6c4e8162a2aa94cbd9a157c3",
+    "tests": 2,
+    "scope": "New raster observer completeness, plane changes, alias/accounting and unstable reference repeat rejection. These two new tests ran separately after the existing 204-test suite discovered its files, for 206 unique Python tests with one skip."
+  },
+  "unsafe_inventory": {
+    "path": "artifacts/raster-owned-unsafe-inventory.json",
+    "sha256": "da6b0d642bdde3f28ceceeb0d3bc64878d9a82e90fdb0e8a3d4e191c79f4b6d6"
+  },
+  "previous_unresolved_reference": {
+    "evidence": "rust-word-transform-local-evidence.json",
+    "case": "field-unicode-style-space-file",
+    "result": "Earlier x64 cleanup exit access violation remains unresolved; a later passing run does not erase it."
+  },
+  "limitations": [
+    "Finite Release/default Windows FP-control observations; Debug, unmasked exceptions, allocator failure and arbitrary host concurrency remain unclosed.",
+    "Invalid raster geometry, allocation/address overflow and unsupported signed-shift domains report unresolved; no clipping or native unsafe fallback.",
+    "Safe Rust owns raster construction and its temporary checked result. Transitional native Overlay/GrayImage blur, variance, clipping and draw consumers still receive detached planes and retain existing shared aliases and cache accounting.",
+    "Gaussian blur padding is not covered by the fully initialized raster contract. Native object graphs, host adapters and vendors remain in scope; no production default switched."
+  ],
+  "earlier_ellipse_fp_limit": {
+    "evidence": "ellipse-storage-fp-scope.json",
+    "result": "Earlier optimized native ellipse FP instability retains its original attribution and is not erased by current passing runs."
+  },
+  "sources": {
+    "rust/compat/src/raster.rs": "eb10b821ab588c3c4f15330b1c4de2d87b8483757021ed891fd35798cd71aa4f",
+    "rust/compat/src/span_coverage.rs": "e077da746e289118fed1f918b740876e1c3e3fbc1374f43aa32de2f768617865",
+    "rust/compat/src/scan_convert.rs": "65bbbb17924bb5ac627e93aac7bff3a4724731e7ed0c68ae82b58f254c0826c2",
+    "rust/compat/src/wide_region.rs": "d0f7970a134af94ab594b5a19effd2cecc42ab37e7972aea66498fea1b5f05e2",
+    "rust/ffi/src/path_data.rs": "c16ec19ebf4c9a9f0a257ffb5c5d662c71761e30083ce1b8f522e573b190aeb7",
+    "src/subtitles/Rasterizer.cpp": "7c90e9e105ffccb2db8583b4ec6a7c01a4a948929e2f34f7361b69601d7d522c",
+    "src/subtitles/Rasterizer.h": "622082f35b72d4d4994356a3e34d93caf3df5dba67e70236e89061343e81cc4e",
+    "src/subtitles/RustPathData.inl": "6dc8c145cd74a933461aef37c2d0f9b727eb6d4e6b7159b013257fa129b64960",
+    "include/xy_rust_scan_data.h": "078842b286d6dd391cefbaf3c0b6f52d4eb7c5bbd31a7aa6dfffd5f242484b00",
+    "include/xy_rust_plane.h": "ac797b792a9b84dc2e5c168bead81d971b0058fed07d3ec7fa41f929de82da2a",
+    "docs/rust-raster-boundary.md": "6f11607cb5a572b2eced9c035bf137e2b30321d22f00b967a6b90b9c5e4b4d8d",
+    "tools/compat/raster_native.cpp": "59d3f308bc403d100012ad095f11f5abd596189edd8a76933e255033a7915787",
+    "tools/compat/raster_native.py": "5e7131b427d5863d0086f59fd4edeb0e84b6f00861dc2125cc4ddea316c2fa0d",
+    "tools/compat/test_raster_native.py": "cd7b9208c66a3bc54a99f56c4d71cb0064f35b0fc1697cb473e328c8feab3a3a"
+  },
+  "next_boundary_exploration": {
+    "scope": "Preparation only, not maintained probe coverage or whole-overlay parity. Actual staged blur/variance traces compare known bytes; separately instrumented reference allocation fills identify unwritten padding.",
+    "reports": {
+      "overlay-stages-baseline-x86": {
+        "path": "artifacts/overlay-stages-baseline-x86/report.json",
+        "sha256": "f47fe0a1e9449ad177c2821954126542824cc532bfa66a8eb09b79d23a66788a",
+        "exploratory": true,
+        "runs": [
+          {
+            "role": "reference",
+            "repeat": 0,
+            "exit": 0,
+            "bytes": 1861322,
+            "sha256": "f5985db6f57ecb4ee59ef2fbcfb9e57ecfe3dda1dff3cea5f9b724de290647cf",
+            "complete": true
+          },
+          {
+            "role": "reference",
+            "repeat": 1,
+            "exit": 0,
+            "bytes": 1861322,
+            "sha256": "f5985db6f57ecb4ee59ef2fbcfb9e57ecfe3dda1dff3cea5f9b724de290647cf",
+            "complete": true
+          },
+          {
+            "role": "candidate",
+            "repeat": 0,
+            "exit": 0,
+            "bytes": 1861322,
+            "sha256": "f5985db6f57ecb4ee59ef2fbcfb9e57ecfe3dda1dff3cea5f9b724de290647cf",
+            "complete": true
+          },
+          {
+            "role": "candidate",
+            "repeat": 1,
+            "exit": 0,
+            "bytes": 1861322,
+            "sha256": "f5985db6f57ecb4ee59ef2fbcfb9e57ecfe3dda1dff3cea5f9b724de290647cf",
+            "complete": true
+          }
+        ],
+        "equal": true,
+        "source_sha256": "6405970ae2d545d98990d21a3ec974ed46ea92d8d02bdd44fa0f65977115794b"
+      },
+      "overlay-padding-probe-x86": {
+        "path": "artifacts/overlay-padding-probe-x86/report.json",
+        "sha256": "7473aae1a0c2cce155e0fffac537c8863ab4bd72cfbcdcb018945ee0bdf59f49",
+        "instrumented_reference_only": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "source_sha256": "682e046d6cbacf842b24f87fe85fe42a8b33826724f39ef71c19ad436982d157",
+        "runs": [
+          {
+            "fill": 165,
+            "repeat": 0,
+            "exit": 0,
+            "sha256": "689bfe7f5490f0af5aaf24440ebbd53426dbc0fc13c6b1a6f8948b3640d8d7e0",
+            "complete": true
+          },
+          {
+            "fill": 165,
+            "repeat": 1,
+            "exit": 0,
+            "sha256": "689bfe7f5490f0af5aaf24440ebbd53426dbc0fc13c6b1a6f8948b3640d8d7e0",
+            "complete": true
+          },
+          {
+            "fill": 90,
+            "repeat": 0,
+            "exit": 0,
+            "sha256": "44bce01e4775e9f307ea0e77e48ca48acc72a46e3de2b43fb9793289ee4c09d6",
+            "complete": true
+          },
+          {
+            "fill": 90,
+            "repeat": 1,
+            "exit": 0,
+            "sha256": "44bce01e4775e9f307ea0e77e48ca48acc72a46e3de2b43fb9793289ee4c09d6",
+            "complete": true
+          }
+        ],
+        "known_bytes_and_status_match_unmodified": true,
+        "padding_lines": 700,
+        "padding_repeat_stable": true,
+        "padding_lines_changed_by_fill": 634,
+        "limits": "Initialization instrumentation changes reference allocation contents. This detects influence in a finite staged corpus, not parity for previously uninitialized bytes or proof for arbitrary inputs."
+      },
+      "overlay-stages-baseline-x64": {
+        "path": "artifacts/overlay-stages-baseline-x64/report.json",
+        "sha256": "7d9d49bb07ce44b73c542f328f9611650fb336599e82554508acd91db6feb4ce",
+        "exploratory": true,
+        "runs": [
+          {
+            "role": "reference",
+            "repeat": 0,
+            "exit": 0,
+            "bytes": 1861322,
+            "sha256": "a2167121e721405759aea2b099c49202cff9061be406551051b17f879cadd906",
+            "complete": true
+          },
+          {
+            "role": "reference",
+            "repeat": 1,
+            "exit": 0,
+            "bytes": 1861322,
+            "sha256": "a2167121e721405759aea2b099c49202cff9061be406551051b17f879cadd906",
+            "complete": true
+          },
+          {
+            "role": "candidate",
+            "repeat": 0,
+            "exit": 0,
+            "bytes": 1861322,
+            "sha256": "a2167121e721405759aea2b099c49202cff9061be406551051b17f879cadd906",
+            "complete": true
+          },
+          {
+            "role": "candidate",
+            "repeat": 1,
+            "exit": 0,
+            "bytes": 1861322,
+            "sha256": "a2167121e721405759aea2b099c49202cff9061be406551051b17f879cadd906",
+            "complete": true
+          }
+        ],
+        "equal": true,
+        "source_sha256": "6405970ae2d545d98990d21a3ec974ed46ea92d8d02bdd44fa0f65977115794b"
+      },
+      "overlay-padding-probe-x64": {
+        "path": "artifacts/overlay-padding-probe-x64/report.json",
+        "sha256": "3fd2bc26770b5464e52e1b4caa61be9a17e72aaa231c5abb8a0cdfdbbd3ddaa1",
+        "instrumented_reference_only": true,
+        "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+        "source_sha256": "682e046d6cbacf842b24f87fe85fe42a8b33826724f39ef71c19ad436982d157",
+        "runs": [
+          {
+            "fill": 165,
+            "repeat": 0,
+            "exit": 0,
+            "sha256": "dd1916b0f2d01487151fa7ac7daebabcc83d2a8267408b64825a29b005b0e60f",
+            "complete": true
+          },
+          {
+            "fill": 165,
+            "repeat": 1,
+            "exit": 0,
+            "sha256": "dd1916b0f2d01487151fa7ac7daebabcc83d2a8267408b64825a29b005b0e60f",
+            "complete": true
+          },
+          {
+            "fill": 90,
+            "repeat": 0,
+            "exit": 0,
+            "sha256": "d040817247c2101a71bc0cb2a0f2bf6f1951188c29f463b0cb7e1383a09202e7",
+            "complete": true
+          },
+          {
+            "fill": 90,
+            "repeat": 1,
+            "exit": 0,
+            "sha256": "d040817247c2101a71bc0cb2a0f2bf6f1951188c29f463b0cb7e1383a09202e7",
+            "complete": true
+          }
+        ],
+        "known_bytes_and_status_match_unmodified": true,
+        "padding_lines": 700,
+        "padding_repeat_stable": true,
+        "padding_lines_changed_by_fill": 634,
+        "limits": "Initialization instrumentation changes reference allocation contents. This detects influence in a finite staged corpus, not parity for previously uninitialized bytes or proof for arbitrary inputs."
+      }
+    },
+    "sources": {
+      "artifacts/overlay-stages-baseline.cpp": "6405970ae2d545d98990d21a3ec974ed46ea92d8d02bdd44fa0f65977115794b",
+      "artifacts/run-overlay-stages-baseline.py": "d08808c094184a58b6e2a0f906123ef3dd6e778ce8b9c5237f23c8fe311be2f2",
+      "artifacts/overlay-padding-probe.cpp": "682e046d6cbacf842b24f87fe85fe42a8b33826724f39ef71c19ad436982d157",
+      "artifacts/run-overlay-padding-probe.py": "c16eaea0a1c993bf0ed63abe2bd43167cbb57f6292b87abdc71abb30f525b250"
+    }
+  }
+}
