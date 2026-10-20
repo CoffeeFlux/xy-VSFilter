@@ -209,6 +209,12 @@ pub struct Composite {
     known: Vec<u8>,
 }
 impl Composite {
+    pub(crate) fn pixel(&self, at: usize) -> Result<u8, u32> {
+        if *self.known.get(at).ok_or(6u32)? == 0 {
+            return Err(6);
+        }
+        self.values.get(at).copied().ok_or(6)
+    }
     pub fn wire_len(&self) -> Result<usize, u32> {
         self.values
             .len()

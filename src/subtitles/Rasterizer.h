@@ -271,8 +271,12 @@ struct AlphaMask {
     explicit operator bool()const{return bool(data);}
 };
 typedef AlphaMask SharedPtrAlphaMask;
+typedef const SharedPtrAlphaMask& DrawAlphaMask;
+inline DrawAlphaMask AlphaMaskForDraw(const SharedPtrAlphaMask& alpha){return alpha;}
 #else
 typedef SharedPtrByte SharedPtrAlphaMask;
+typedef BYTE* DrawAlphaMask;
+inline DrawAlphaMask AlphaMaskForDraw(const SharedPtrAlphaMask& alpha){return alpha.get();}
 #endif
 
 class XyBitmap;
@@ -318,7 +322,7 @@ public:
     static void Draw(XyBitmap* bitmap, 
         SharedPtrOverlay overlay, 
         const CRect& clipRect, 
-        byte* s_base, 
+        DrawAlphaMask s_base,
         int xsub, int ysub, 
         const DWORD* switchpts, bool fBody, bool fBorder);
 
@@ -327,7 +331,7 @@ public:
     static void AdditionDraw(XyBitmap         *bitmap   , 
                              SharedPtrOverlay  overlay  , 
                              const CRect      &clipRect , 
-                             byte             *s_base   , 
+                             DrawAlphaMask     s_base   ,
                              int               xsub     ,
                              int               ysub     ,
                              const DWORD      *switchpts, 

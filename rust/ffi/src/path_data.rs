@@ -14,7 +14,10 @@ struct Boundary {
     busy: AtomicBool,
     state: UnsafeCell<Owners>,
 }
+#[path = "bitmap.rs"]
+mod bitmap;
 struct Owners {
+    bitmaps: xy_vsfilter_compat::clipper::Store<xy_vsfilter_compat::bitmap::Bitmap>,
     paths: Store,
     scans: xy_vsfilter_compat::scan_convert::Store,
     regions: xy_vsfilter_compat::wide_region::Store,
@@ -45,6 +48,7 @@ impl Boundary {
         Self {
             busy: AtomicBool::new(false),
             state: UnsafeCell::new(Owners {
+                bitmaps: xy_vsfilter_compat::clipper::Store::new(),
                 paths: Store::new(),
                 scans: xy_vsfilter_compat::scan_convert::Store::new(),
                 regions: xy_vsfilter_compat::wide_region::Store::new(),
@@ -2162,6 +2166,7 @@ mod tests {
             assert_eq!((id[0], id[9]), (0xa5, 0xa5));
             let composite = u64::from_le_bytes(id[1..9].try_into().unwrap());
             assert_ne!(composite, 0);
+            let bitmap = bitmap::check_create_draw(source, composite);
             parameters[1..5].copy_from_slice(&9i32.to_le_bytes());
             assert_eq!(
                 xy_vsfilter_composite_mask_create_v1(
@@ -2194,6 +2199,7 @@ mod tests {
             assert_eq!(output[33..41], [0, 255, 3, 248, 1, 1, 1, 1]);
             assert_eq!(xy_vsfilter_composite_mask_destroy_v1(composite), 0);
             assert_eq!(xy_vsfilter_composite_mask_destroy_v1(composite), 1);
+            bitmap::check_survival_release(bitmap);
             output.fill(0xa5);
             assert_eq!(
                 xy_vsfilter_composite_mask_read_v1(composite, output.as_mut_ptr(), 42),

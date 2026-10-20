@@ -72,7 +72,7 @@ CRectCoor2 DrawItem::AlphaBltDraw( XyBitmap* bitmap, DrawItem& draw_item, const 
         draw_item.xsub, draw_item.ysub, draw_item.switchpts, draw_item.fBody, draw_item.fBorder,
         &result);
 
-    Rasterizer::Draw(bitmap, overlay, result, alpha.get(),
+    Rasterizer::Draw(bitmap, overlay, result, AlphaMaskForDraw(alpha),
         draw_item.xsub, draw_item.ysub, draw_item.switchpts, draw_item.fBody, draw_item.fBorder);
     return result;
 }
@@ -92,7 +92,7 @@ CRectCoor2 DrawItem::AdditionDraw( XyBitmap *bitmap, DrawItem& draw_item, const 
         draw_item.xsub, draw_item.ysub, draw_item.switchpts, draw_item.fBody, draw_item.fBorder,
         &result);
 
-    Rasterizer::AdditionDraw(bitmap, overlay, result, alpha.get(),
+    Rasterizer::AdditionDraw(bitmap, overlay, result, AlphaMaskForDraw(alpha),
         draw_item.xsub, draw_item.ysub, draw_item.switchpts, draw_item.fBody, draw_item.fBorder);
     return result;
 }
@@ -545,7 +545,11 @@ void GroupedDrawItems::Draw( SharedPtrXyBitmap *bitmap, int *bitmap_identity_num
         HRESULT hr = XySubRenderFrameCreater::GetDefaultCreater()->GetColorSpace(&color_space);
         ASSERT(SUCCEEDED(hr));
         if (color_space==XY_CS_ARGB_F)
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+            tmp->FlipAlphaOwned();
+#else
             XyBitmap::FlipAlphaValue(tmp->bits, tmp->w, tmp->h, tmp->pitch);
+#endif
 #ifdef XY_DBG_SHOW_BITMAP_BOX_IN_COLOR
         if (color_space==XY_CS_ARGB_F||color_space==XY_CS_ARGB)//not support plannar format yet
         {
@@ -553,6 +557,9 @@ void GroupedDrawItems::Draw( SharedPtrXyBitmap *bitmap, int *bitmap_identity_num
             {
                 DWORD color = color_space==XY_CS_ARGB_F ? (0xff000000 | XY_DBG_SHOW_BITMAP_BOX_IN_COLOR)
                     : (0x00ffffff & XY_DBG_SHOW_BITMAP_BOX_IN_COLOR);
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+                tmp->DebugBoxOwned(color);
+#else
                 BYTE *pixel = (BYTE *)tmp->bits;
                 memsetd(pixel, color, tmp->w*4);
                 int i=1;
@@ -567,6 +574,7 @@ void GroupedDrawItems::Draw( SharedPtrXyBitmap *bitmap, int *bitmap_identity_num
                     pixel += tmp->pitch;
                     memsetd(pixel, color, tmp->w*4);
                 }
+#endif
             }
 
         }

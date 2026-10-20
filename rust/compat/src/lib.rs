@@ -20,6 +20,7 @@ pub mod ass_tree;
 pub mod be_blur;
 pub mod be_filter;
 pub mod bilinear;
+pub mod bitmap;
 pub mod document;
 pub mod document_style;
 pub mod document_style_add;

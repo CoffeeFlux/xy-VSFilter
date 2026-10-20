@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "xy_bitmap.h"
 #include "xy_malloc.h"
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+#include "RustDocumentOwner.h"
+#include "RustBitmap.inl"
+#endif
 #include "../SubPic/ISubPic.h"
 #include "../subpic/color_conv_table.h"
 
@@ -38,6 +42,11 @@ XyBitmap::~XyBitmap()
 
 XyBitmap * XyBitmap::CreateBitmap( const CRect& target_rect, MemLayout layout )
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    std::unique_ptr<XyBitmap> result(DEBUG_NEW XyBitmap());
+    const int32_t fields[]={target_rect.left,target_rect.top,target_rect.right,target_rect.bottom,static_cast<int32_t>(layout)};
+    result->m_owner.Create(fields);result->RestoreRust();return result.release();
+#else
     XyBitmap *result = DEBUG_NEW XyBitmap();
     if (result==NULL)
     {
@@ -83,6 +92,7 @@ XyBitmap * XyBitmap::CreateBitmap( const CRect& target_rect, MemLayout layout )
     }
     ClearBitmap(result);
     return result;
+#endif
 }
 
 void XyBitmap::ClearBitmap( XyBitmap *bitmap )

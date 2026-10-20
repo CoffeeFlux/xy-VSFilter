@@ -27,7 +27,16 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest port: owned composite alpha masks (2026-10-19)
+## Latest port in progress: owned bitmaps and drawing (2026-10-19)
+
+The experimental path now owns bitmap initialization, Draw/AdditionDraw color
+traversal, pixels, final alpha adjustment and bitmap lifetime in safe Rust.
+Both native builds and Rust checks pass. Direct linked drawing and complete
+renderer comparisons are pending; see [the boundary](rust-bitmap-draw-boundary.md).
+This implementation checkpoint does not establish completed compatibility or
+change experimental opt-in switches. Full library/host/vendor migration remains active.
+
+## Previous port: owned composite alpha masks (2026-10-19)
 
 Implementation `69d9a694` moves experimental `CompositeAlphaMask` clipping,
 color segmentation, initialized pixels and result lifetime into safe Rust.

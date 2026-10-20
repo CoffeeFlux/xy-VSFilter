@@ -1,0 +1,88 @@
+{
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "source_sha256": "8f90aa62f3a2b2a001f64c312061c55015d73e9f88254c1f828f1bab06ed3471",
+  "library_sha256": {
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\strmbaseR.lib": "e4a3eed835fc6dcfdd7b81e684678cce0aaf032187e1ff2611b7f4146d6a9067",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\dsutilR.lib": "3dfc9f2eb59caef227f3ab723a1f10b672ab44f3efb61a75030d5b0a8730892b",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\subtitlesR.lib": "d6d48a179e28d70404ff870f6c6b640b9c768940065a95039695f7684689e50d",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\subpicR.lib": "23aed7e98c3c33cf31a956900fc720faf5d603edbb27c1f821964e9ccf87c5de",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\basevideofilterR.lib": "738d7f288e53690373e814f00ab7edcc8419e40de46a96f7a888a549ce8ca39e",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\libssfR.lib": "58a84c5e08a8c4c75e60e0f53b2590e6696e7f5938d52cc46b895ad326b4f1d8",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\unrarR.lib": "3dcfd1c32bc6261c168c841ebeb86c8dd4177f5698730424cbf39628f3e8a56c"
+  },
+  "functions": [
+    {
+      "name": "?AlphaBlt8bppC@@YAXPEAEPEBEEHHHH@Z",
+      "address": "0x140001400",
+      "end": "0x140001640",
+      "file": "AlphaBlt8bppC.txt",
+      "lines": 141
+    },
+    {
+      "name": "?AlphaBlt8bppSse2@@YAXPEAEPEBEEHHHH@Z",
+      "address": "0x140001640",
+      "end": "0x140001b40",
+      "file": "AlphaBlt8bppSse2.txt",
+      "lines": 289
+    },
+    {
+      "name": "?DrawSingleColorPackPix@@YAXPEAKPEBEKHHHH@Z",
+      "address": "0x140001b40",
+      "end": "0x140001fa0",
+      "file": "DrawSingleColorPackPix.txt",
+      "lines": 245
+    },
+    {
+      "name": "?Draw@Rasterizer@@SAXPEAVXyBitmap@@V?$shared_ptr@UOverlay@@@std@@AEBVCRect@@PEAEHHPEBK_N5@Z",
+      "address": "0x140001fa0",
+      "end": "0x140002520",
+      "file": "Draw.txt",
+      "lines": 370
+    },
+    {
+      "name": "?DoAdditionDraw@@YAXPEAEPEBEKHHHH@Z",
+      "address": "0x140002520",
+      "end": "0x1400029e0",
+      "file": "DoAdditionDraw.txt",
+      "lines": 274
+    },
+    {
+      "name": "?DoAdditionDrawMultiColor@@YAXPEAEPEBEPEBKHHHH@Z",
+      "address": "0x1400029e0",
+      "end": "0x140002f80",
+      "file": "DoAdditionDrawMultiColor.txt",
+      "lines": 319
+    },
+    {
+      "name": "?AdditionDraw@Rasterizer@@SAXPEAVXyBitmap@@V?$shared_ptr@UOverlay@@@std@@AEBVCRect@@PEAEHHPEBK_N5@Z",
+      "address": "0x140002f80",
+      "end": "0x140003210",
+      "file": "AdditionDraw.txt",
+      "lines": 185
+    },
+    {
+      "name": "?CreateBitmap@XyBitmap@@SAPEAV1@AEBVCRect@@W4MemLayout@1@@Z",
+      "address": "0x140006900",
+      "end": "0x140006b50",
+      "file": "CreateBitmap.txt",
+      "lines": 176
+    }
+  ],
+  "files": {
+    "AdditionDraw.txt": "b409361485266deafd06824162b1c2b850cc87f162d66cb0d4dd40d519e70d79",
+    "AlphaBlt8bppC.txt": "5ffa3078872c6ee4b6c160933a3e6dab186a32134ff55261e28203a2e147346e",
+    "AlphaBlt8bppSse2.txt": "6e9673cd1381905f8d7ed4e71e94a7dedd66d808533ab0c7f1faa1736aa485f4",
+    "build.log": "da9364df3e6b27fad2340e5ef988b4d87673ad788e104e65f7a47eaed1c811b0",
+    "command.json": "9047b4bcd65799d2ca3d24d014e3331b338067019d41c7bf010c4d735a8462f6",
+    "CreateBitmap.txt": "faec8306cbb56f4b1db79458c16c04fbdc65d4683a26625dbe29689bd3cdfe0e",
+    "disassembly.txt": "6b74442d23dd643204fa501bd15b1daa6626c9e113c9a5f114425f3d29efd144",
+    "DoAdditionDraw.txt": "46b5a6562e17cb67a2f2414731f2345567ed7f6bb6ec46f5b640f90e8485b77d",
+    "DoAdditionDrawMultiColor.txt": "1c4d7a0b298a410de1d72cd5b8c346111f9c8c1f9abb83eb5c8483548cff435a",
+    "Draw.txt": "bb76d5a18919c60ac39f0ef48106ef54d5615eff2d066750f23ddd6d772b78f5",
+    "DrawSingleColorPackPix.txt": "1c223cc2b195d9d2ad8180631cdacddcd060fb058051c11eac55fb43758358ea",
+    "probe.exe": "4eba410aad68362e55ad7bd1c6e2f6851249cfdc6bbed6cd127caa4415af6c00",
+    "probe.map": "15c76a9ddbf2cbe2f329adf2d4dfe0b55221fcf9b00733920d794278c562d977",
+    "probe.obj": "7ed4d32b277092d8c117031cfbbd62306c7bcc790e2ece02b7005d2e41636c9e"
+  },
+  "scope": "Unchanged pinned drawing and bitmap functions linked for numeric and control-flow inspection. Executable not run; no behavior or parity claim."
+}

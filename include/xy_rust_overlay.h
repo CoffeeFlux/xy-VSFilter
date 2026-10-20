@@ -5,6 +5,7 @@
 namespace XyRust {
 class OverlayOwner {
     friend class CompositeOwner;
+    friend class BitmapOwner;
     uint64_t id_=0;
 public:
     OverlayOwner()=default;~OverlayOwner(){Clear();}

@@ -8,6 +8,10 @@
 #include "xy_rust_shifted_plane.h"
 #endif
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+#include "xy_rust_bitmap.h"
+#endif
+
 class XyBitmap
 {
 public:
@@ -32,6 +36,10 @@ public:
 
     static XyBitmap *CreateBitmap(const CRect& target_rect, MemLayout layout);
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    void DrawRust(const XyRust::OverlayOwner&,const XyRust::CompositeOwner*,const CRect&,int,int,const DWORD*,bool,bool,bool);
+    void FlipAlphaOwned();void DebugBoxOwned(DWORD);
+#endif
     static void FlipAlphaValue( LPVOID pixels, int w, int h, int pitch );
     static void AlphaBltPack(SubPicDesc& spd, POINT pos, SIZE size, LPCVOID pixels, int pitch);
     static void AlphaBltPlannar(SubPicDesc& spd, POINT pos, SIZE size, const XyPlannerFormatExtra& pixels, int pitch);
@@ -39,6 +47,10 @@ public:
     static void BltPack( SubPicDesc& spd, POINT pos, SIZE size, LPCVOID pixels, int pitch );
 private:
     static void ClearBitmap(XyBitmap *bitmap);
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    XyRust::BitmapOwner m_owner;
+    void RestoreRust();
+#endif
 #ifdef XY_VSFILTER_RUST_TEXT
     XyRust::ShiftedPlaneStorage m_storage;
 #endif

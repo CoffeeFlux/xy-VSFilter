@@ -1653,9 +1653,14 @@ void DrawMultiColorPackPix(     DWORD *dst,
 // 
 // draw overlay[clipRect] to bitmap[0,0,w,h]
 // 
-void Rasterizer::Draw(XyBitmap* bitmap, SharedPtrOverlay overlay, const CRect& clipRect, byte* s_base, 
+void Rasterizer::Draw(XyBitmap* bitmap, SharedPtrOverlay overlay, const CRect& clipRect, DrawAlphaMask s_base,
     int xsub, int ysub, const DWORD* switchpts, bool fBody, bool fBorder)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    if(!switchpts||(!fBody&&!fBorder)||!bitmap)return;
+    bitmap->DrawRust(overlay->m_owner,s_base.owner.get(),clipRect,xsub,ysub,switchpts,fBody,fBorder,false);
+#else
+
     if (!switchpts || !fBody && !fBorder) return;
     if (bitmap==NULL)
     {
@@ -1761,6 +1766,7 @@ void Rasterizer::Draw(XyBitmap* bitmap, SharedPtrOverlay overlay, const CRect& c
     break;
     }
     return;
+#endif
 }
 
 void Rasterizer::FillSolidRect(SubPicDesc& spd, int x, int y, int nWidth, int nHeight, DWORD argb)
@@ -1858,13 +1864,18 @@ void DoAdditionDrawMultiColor(      BYTE  *dst,
 void Rasterizer::AdditionDraw(XyBitmap         *bitmap   , 
                               SharedPtrOverlay  overlay  , 
                               const CRect      &clipRect , 
-                              byte             *s_base   , 
+                              DrawAlphaMask     s_base   ,
                               int               xsub     ,
                               int               ysub     ,
                               const DWORD      *switchpts, 
                               bool              fBody    , 
                               bool              fBorder)
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    if(!switchpts||(!fBody&&!fBorder)||!bitmap)return;
+    bitmap->DrawRust(overlay->m_owner,s_base.owner.get(),clipRect,xsub,ysub,switchpts,fBody,fBorder,true);
+#else
+
     if (!switchpts || !fBody && !fBorder) return;
     if (bitmap==NULL)
     {
@@ -1945,6 +1956,7 @@ void Rasterizer::AdditionDraw(XyBitmap         *bitmap   ,
         DoAdditionDrawMultiColor(dst, s, new_switchpts, w, h, overlayPitch, bitmap->pitch);
     }
     return;
+#endif
 }
 
 ///////////////////////////////////////////////////////////////

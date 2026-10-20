@@ -273,6 +273,9 @@ impl<T> Store<T> {
     pub fn get(&self, id: u64) -> Result<&T, u32> {
         self.values.get(&id).ok_or(1)
     }
+    pub fn get_mut(&mut self, id: u64) -> Result<&mut T, u32> {
+        self.values.get_mut(&id).ok_or(1)
+    }
     pub fn remove(&mut self, id: u64) -> Result<(), u32> {
         self.values.remove(&id).map(|_| ()).ok_or(1)
     }

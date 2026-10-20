@@ -6,6 +6,7 @@
 namespace XyRust {
 class OverlayOwner;class ClipMaskOwner;
 class CompositeOwner {
+    friend class BitmapOwner;
     uint64_t id_=0;
 public:
     CompositeOwner()=default;~CompositeOwner();

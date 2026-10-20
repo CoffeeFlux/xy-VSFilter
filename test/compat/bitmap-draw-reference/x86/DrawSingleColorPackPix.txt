@@ -1,0 +1,263 @@
+  004015A0: 55                 push        ebp
+  004015A1: 8B EC              mov         ebp,esp
+  004015A3: 83 E4 F0           and         esp,0FFFFFFF0h
+  004015A6: 83 EC 78           sub         esp,78h
+  004015A9: 56                 push        esi
+  004015AA: 57                 push        edi
+  004015AB: 8B 7D 10           mov         edi,dword ptr [ebp+10h]
+  004015AE: 89 54 24 0C        mov         dword ptr [esp+0Ch],edx
+  004015B2: 89 4C 24 10        mov         dword ptr [esp+10h],ecx
+  004015B6: 85 FF              test        edi,edi
+  004015B8: 0F 84 AB 03 00 00  je          00401969
+  004015BE: 8B 45 08           mov         eax,dword ptr [ebp+8]
+  004015C1: 0F 57 F6           xorps       xmm6,xmm6
+  004015C4: 8B 75 0C           mov         esi,dword ptr [ebp+0Ch]
+  004015C7: 25 00 00 FF 00     and         eax,0FF0000h
+  004015CC: 0F 28 54 24 70     movaps      xmm2,xmmword ptr [esp+70h]
+  004015D1: 83 E6 F0           and         esi,0FFFFFFF0h
+  004015D4: 0F 29 54 24 20     movaps      xmmword ptr [esp+20h],xmm2
+  004015D9: 66 0F 6E C0        movd        xmm0,eax
+  004015DD: 8B 45 08           mov         eax,dword ptr [ebp+8]
+  004015E0: 25 00 FF 00 00     and         eax,0FF00h
+  004015E5: 66 0F 70 C0 00     pshufd      xmm0,xmm0,0
+  004015EA: C1 E0 08           shl         eax,8
+  004015ED: 0F 29 44 24 40     movaps      xmmword ptr [esp+40h],xmm0
+  004015F2: 66 0F 6E C0        movd        xmm0,eax
+  004015F6: 8B 45 08           mov         eax,dword ptr [ebp+8]
+  004015F9: 0F B6 C0           movzx       eax,al
+  004015FC: C1 E0 10           shl         eax,10h
+  004015FF: 03 F2              add         esi,edx
+  00401601: 66 0F 70 C0 00     pshufd      xmm0,xmm0,0
+  00401606: 0F 29 44 24 50     movaps      xmmword ptr [esp+50h],xmm0
+  0040160B: 89 74 24 18        mov         dword ptr [esp+18h],esi
+  0040160F: 66 0F 6E C0        movd        xmm0,eax
+  00401613: 66 0F 70 C0 00     pshufd      xmm0,xmm0,0
+  00401618: 0F 29 44 24 30     movaps      xmmword ptr [esp+30h],xmm0
+  0040161D: 8D 49 00           lea         ecx,[ecx]
+  00401620: 4F                 dec         edi
+  00401621: 8B C2              mov         eax,edx
+  00401623: 89 7D 10           mov         dword ptr [ebp+10h],edi
+  00401626: 8B F9              mov         edi,ecx
+  00401628: 8B 4D 0C           mov         ecx,dword ptr [ebp+0Ch]
+  0040162B: 03 CA              add         ecx,edx
+  0040162D: 89 4C 24 14        mov         dword ptr [esp+14h],ecx
+  00401631: 3B D6              cmp         edx,esi
+  00401633: 0F 83 98 02 00 00  jae         004018D1
+  00401639: 8B 54 24 10        mov         edx,dword ptr [esp+10h]
+  0040163D: 83 C2 20           add         edx,20h
+  00401640: 89 54 24 1C        mov         dword ptr [esp+1Ch],edx
+  00401644: 8B 54 24 0C        mov         edx,dword ptr [esp+0Ch]
+  00401648: 8B 4C 24 1C        mov         ecx,dword ptr [esp+1Ch]
+  0040164C: 8D 64 24 00        lea         esp,[esp]
+  00401650: 0F 10 00           movups      xmm0,xmmword ptr [eax]
+  00401653: 0F 10 49 10        movups      xmm1,xmmword ptr [ecx+10h]
+  00401657: 0F 10 1F           movups      xmm3,xmmword ptr [edi]
+  0040165A: 0F 29 4C 24 60     movaps      xmmword ptr [esp+60h],xmm1
+  0040165F: 66 0F 76 D2        pcmpeqd     xmm2,xmm2
+  00401663: 0F 57 D0           xorps       xmm2,xmm0
+  00401666: 0F 57 C9           xorps       xmm1,xmm1
+  00401669: 0F 29 54 24 20     movaps      xmmword ptr [esp+20h],xmm2
+  0040166E: 66 0F 60 D0        punpcklbw   xmm2,xmm0
+  00401672: 0F 28 E2           movaps      xmm4,xmm2
+  00401675: 66 0F 60 D6        punpcklbw   xmm2,xmm6
+  00401679: 66 0F FD 15 F0 6F  paddw       xmm2,xmmword ptr ds:[00436FF0h]
+  00401681: 66 0F 68 E6        punpckhbw   xmm4,xmm6
+  00401685: 0F 28 74 24 20     movaps      xmm6,xmmword ptr [esp+20h]
+  0040168A: 66 0F 68 F0        punpckhbw   xmm6,xmm0
+  0040168E: 0F 28 C6           movaps      xmm0,xmm6
+  00401691: 66 0F FD 25 F0 6F  paddw       xmm4,xmmword ptr ds:[00436FF0h]
+  00401699: 66 0F 68 C1        punpckhbw   xmm0,xmm1
+  0040169D: 66 0F FD 05 F0 6F  paddw       xmm0,xmmword ptr ds:[00436FF0h]
+  004016A5: 0F 29 44 24 70     movaps      xmmword ptr [esp+70h],xmm0
+  004016AA: 0F 28 C3           movaps      xmm0,xmm3
+  004016AD: 66 0F 60 F1        punpcklbw   xmm6,xmm1
+  004016B1: 0F 28 CB           movaps      xmm1,xmm3
+  004016B4: 66 0F 72 F0 18     pslld       xmm0,18h
+  004016B9: 66 0F 72 F1 10     pslld       xmm1,10h
+  004016BE: 66 0F 72 D0 18     psrld       xmm0,18h
+  004016C3: 66 0F 72 D1 18     psrld       xmm1,18h
+  004016C8: 0F 56 44 24 30     orps        xmm0,xmmword ptr [esp+30h]
+  004016CD: 0F 56 4C 24 50     orps        xmm1,xmmword ptr [esp+50h]
+  004016D2: 66 0F F5 C2        pmaddwd     xmm0,xmm2
+  004016D6: 66 0F F5 CA        pmaddwd     xmm1,xmm2
+  004016DA: 0F 10 69 F0        movups      xmm5,xmmword ptr [ecx-10h]
+  004016DE: 0F 10 39           movups      xmm7,xmmword ptr [ecx]
+  004016E1: 66 0F 72 D0 08     psrld       xmm0,8
+  004016E6: 66 0F 72 D1 08     psrld       xmm1,8
+  004016EB: 66 0F FD 35 F0 6F  paddw       xmm6,xmmword ptr ds:[00436FF0h]
+  004016F3: 66 0F 72 F1 08     pslld       xmm1,8
+  004016F8: 0F 56 C8           orps        xmm1,xmm0
+  004016FB: 0F 28 C3           movaps      xmm0,xmm3
+  004016FE: 66 0F 72 F0 08     pslld       xmm0,8
+  00401703: 66 0F 72 D3 18     psrld       xmm3,18h
+  00401708: 66 0F 72 D0 18     psrld       xmm0,18h
+  0040170D: 66 0F D5 DA        pmullw      xmm3,xmm2
+  00401711: 0F 56 44 24 40     orps        xmm0,xmmword ptr [esp+40h]
+  00401716: 66 0F F5 C2        pmaddwd     xmm0,xmm2
+  0040171A: 0F 28 54 24 50     movaps      xmm2,xmmword ptr [esp+50h]
+  0040171F: 66 0F 72 D3 08     psrld       xmm3,8
+  00401724: 66 0F 72 D0 08     psrld       xmm0,8
+  00401729: 66 0F 72 F3 18     pslld       xmm3,18h
+  0040172E: 66 0F 72 F0 10     pslld       xmm0,10h
+  00401733: 0F 56 C8           orps        xmm1,xmm0
+  00401736: 0F 28 C5           movaps      xmm0,xmm5
+  00401739: 0F 56 CB           orps        xmm1,xmm3
+  0040173C: 66 0F 72 F0 18     pslld       xmm0,18h
+  00401741: 0F 11 0F           movups      xmmword ptr [edi],xmm1
+  00401744: 0F 28 CD           movaps      xmm1,xmm5
+  00401747: 66 0F 72 D0 18     psrld       xmm0,18h
+  0040174C: 66 0F 72 F1 10     pslld       xmm1,10h
+  00401751: 0F 56 44 24 30     orps        xmm0,xmmword ptr [esp+30h]
+  00401756: 66 0F 72 D1 18     psrld       xmm1,18h
+  0040175B: 66 0F F5 C4        pmaddwd     xmm0,xmm4
+  0040175F: 0F 56 CA           orps        xmm1,xmm2
+  00401762: 66 0F F5 CC        pmaddwd     xmm1,xmm4
+  00401766: 66 0F 72 D0 08     psrld       xmm0,8
+  0040176B: 66 0F 72 D1 08     psrld       xmm1,8
+  00401770: 66 0F 72 F1 08     pslld       xmm1,8
+  00401775: 0F 56 C8           orps        xmm1,xmm0
+  00401778: 0F 28 C5           movaps      xmm0,xmm5
+  0040177B: 66 0F 72 F0 08     pslld       xmm0,8
+  00401780: 66 0F 72 D5 18     psrld       xmm5,18h
+  00401785: 66 0F 72 D0 18     psrld       xmm0,18h
+  0040178A: 66 0F D5 EC        pmullw      xmm5,xmm4
+  0040178E: 0F 56 44 24 40     orps        xmm0,xmmword ptr [esp+40h]
+  00401793: 66 0F F5 C4        pmaddwd     xmm0,xmm4
+  00401797: 66 0F 72 D5 08     psrld       xmm5,8
+  0040179C: 66 0F 72 D0 08     psrld       xmm0,8
+  004017A1: 66 0F 72 F5 18     pslld       xmm5,18h
+  004017A6: 66 0F 72 F0 10     pslld       xmm0,10h
+  004017AB: 0F 56 C8           orps        xmm1,xmm0
+  004017AE: 0F 56 CD           orps        xmm1,xmm5
+  004017B1: 0F 11 49 F0        movups      xmmword ptr [ecx-10h],xmm1
+  004017B5: 0F 28 CF           movaps      xmm1,xmm7
+  004017B8: 0F 28 5C 24 60     movaps      xmm3,xmmword ptr [esp+60h]
+  004017BD: 66 0F 72 F1 10     pslld       xmm1,10h
+  004017C2: 8D 49 40           lea         ecx,[ecx+40h]
+  004017C5: 0F 28 C7           movaps      xmm0,xmm7
+  004017C8: 83 C0 10           add         eax,10h
+  004017CB: 66 0F 72 F0 18     pslld       xmm0,18h
+  004017D0: 83 C7 40           add         edi,40h
+  004017D3: 66 0F 72 D1 18     psrld       xmm1,18h
+  004017D8: 66 0F 72 D0 18     psrld       xmm0,18h
+  004017DD: 0F 56 CA           orps        xmm1,xmm2
+  004017E0: 0F 56 44 24 30     orps        xmm0,xmmword ptr [esp+30h]
+  004017E5: 66 0F F5 C6        pmaddwd     xmm0,xmm6
+  004017E9: 66 0F F5 CE        pmaddwd     xmm1,xmm6
+  004017ED: 66 0F 72 D0 08     psrld       xmm0,8
+  004017F2: 66 0F 72 D1 08     psrld       xmm1,8
+  004017F7: 66 0F 72 F1 08     pslld       xmm1,8
+  004017FC: 0F 56 C8           orps        xmm1,xmm0
+  004017FF: 0F 28 C7           movaps      xmm0,xmm7
+  00401802: 66 0F 72 F0 08     pslld       xmm0,8
+  00401807: 66 0F 72 D7 18     psrld       xmm7,18h
+  0040180C: 66 0F 72 D0 18     psrld       xmm0,18h
+  00401811: 66 0F D5 FE        pmullw      xmm7,xmm6
+  00401815: 0F 56 44 24 40     orps        xmm0,xmmword ptr [esp+40h]
+  0040181A: 66 0F F5 C6        pmaddwd     xmm0,xmm6
+  0040181E: 0F 57 F6           xorps       xmm6,xmm6
+  00401821: 66 0F 72 D7 08     psrld       xmm7,8
+  00401826: 66 0F 72 D0 08     psrld       xmm0,8
+  0040182B: 66 0F 72 F7 18     pslld       xmm7,18h
+  00401830: 66 0F 72 F0 10     pslld       xmm0,10h
+  00401835: 0F 56 C8           orps        xmm1,xmm0
+  00401838: 0F 28 C3           movaps      xmm0,xmm3
+  0040183B: 66 0F 72 F0 18     pslld       xmm0,18h
+  00401840: 0F 56 CF           orps        xmm1,xmm7
+  00401843: 0F 11 49 C0        movups      xmmword ptr [ecx-40h],xmm1
+  00401847: 66 0F 72 D0 18     psrld       xmm0,18h
+  0040184C: 0F 28 CB           movaps      xmm1,xmm3
+  0040184F: 66 0F 72 F1 10     pslld       xmm1,10h
+  00401854: 0F 56 44 24 30     orps        xmm0,xmmword ptr [esp+30h]
+  00401859: 66 0F 72 D1 18     psrld       xmm1,18h
+  0040185E: 0F 56 CA           orps        xmm1,xmm2
+  00401861: 0F 28 54 24 70     movaps      xmm2,xmmword ptr [esp+70h]
+  00401866: 66 0F F5 CA        pmaddwd     xmm1,xmm2
+  0040186A: 66 0F F5 C2        pmaddwd     xmm0,xmm2
+  0040186E: 66 0F 72 D1 08     psrld       xmm1,8
+  00401873: 66 0F 72 D0 08     psrld       xmm0,8
+  00401878: 66 0F 72 F1 08     pslld       xmm1,8
+  0040187D: 0F 56 C8           orps        xmm1,xmm0
+  00401880: 0F 28 C3           movaps      xmm0,xmm3
+  00401883: 66 0F 72 F0 08     pslld       xmm0,8
+  00401888: 66 0F 72 D3 18     psrld       xmm3,18h
+  0040188D: 66 0F 72 D0 18     psrld       xmm0,18h
+  00401892: 66 0F D5 DA        pmullw      xmm3,xmm2
+  00401896: 0F 56 44 24 40     orps        xmm0,xmmword ptr [esp+40h]
+  0040189B: 66 0F F5 C2        pmaddwd     xmm0,xmm2
+  0040189F: 0F 28 54 24 20     movaps      xmm2,xmmword ptr [esp+20h]
+  004018A4: 66 0F 72 D3 08     psrld       xmm3,8
+  004018A9: 66 0F 72 D0 08     psrld       xmm0,8
+  004018AE: 66 0F 72 F3 18     pslld       xmm3,18h
+  004018B3: 66 0F 72 F0 10     pslld       xmm0,10h
+  004018B8: 0F 56 C8           orps        xmm1,xmm0
+  004018BB: 0F 56 CB           orps        xmm1,xmm3
+  004018BE: 0F 11 49 D0        movups      xmmword ptr [ecx-30h],xmm1
+  004018C2: 3B C6              cmp         eax,esi
+  004018C4: 0F 82 86 FD FF FF  jb          00401650
+  004018CA: 8B 4C 24 14        mov         ecx,dword ptr [esp+14h]
+  004018CE: 0F 57 F6           xorps       xmm6,xmm6
+  004018D1: 3B C1              cmp         eax,ecx
+  004018D3: 73 6B              jae         00401940
+  004018D5: 8B 4D 08           mov         ecx,dword ptr [ebp+8]
+  004018D8: 81 E1 FF FF FF 00  and         ecx,0FFFFFFh
+  004018DE: 66 0F 6E D1        movd        xmm2,ecx
+  004018E2: 66 0F 60 D6        punpcklbw   xmm2,xmm6
+  004018E6: EB 08              jmp         004018F0
+  004018E8: 8D A4 24 00 00 00  lea         esp,[esp+00000000h]
+  004018EF: 90                 nop
+  004018F0: 0F B6 30           movzx       esi,byte ptr [eax]
+  004018F3: 8D 7F 04           lea         edi,[edi+4]
+  004018F6: 66 0F 6E 4F FC     movd        xmm1,dword ptr [edi-4]
+  004018FB: B9 00 01 00 00     mov         ecx,100h
+  00401900: 2B CE              sub         ecx,esi
+  00401902: 66 0F 60 CE        punpcklbw   xmm1,xmm6
+  00401906: 66 0F 61 CA        punpcklwd   xmm1,xmm2
+  0040190A: 40                 inc         eax
+  0040190B: 8D 56 01           lea         edx,[esi+1]
+  0040190E: C1 E2 10           shl         edx,10h
+  00401911: 0B D1              or          edx,ecx
+  00401913: 66 0F 6E C2        movd        xmm0,edx
+  00401917: 66 0F 70 C0 00     pshufd      xmm0,xmm0,0
+  0040191C: 66 0F F5 C8        pmaddwd     xmm1,xmm0
+  00401920: 66 0F 72 D1 08     psrld       xmm1,8
+  00401925: 66 0F 6B C9        packssdw    xmm1,xmm1
+  00401929: 66 0F 67 C9        packuswb    xmm1,xmm1
+  0040192D: 66 0F 7E 4F FC     movd        dword ptr [edi-4],xmm1
+  00401932: 3B 44 24 14        cmp         eax,dword ptr [esp+14h]
+  00401936: 72 B8              jb          004018F0
+  00401938: 8B 54 24 0C        mov         edx,dword ptr [esp+0Ch]
+  0040193C: 8B 74 24 18        mov         esi,dword ptr [esp+18h]
+  00401940: 8B 4C 24 10        mov         ecx,dword ptr [esp+10h]
+  00401944: 03 55 14           add         edx,dword ptr [ebp+14h]
+  00401947: 03 75 14           add         esi,dword ptr [ebp+14h]
+  0040194A: 03 4D 18           add         ecx,dword ptr [ebp+18h]
+  0040194D: 8B 7D 10           mov         edi,dword ptr [ebp+10h]
+  00401950: 0F 28 54 24 20     movaps      xmm2,xmmword ptr [esp+20h]
+  00401955: 89 54 24 0C        mov         dword ptr [esp+0Ch],edx
+  00401959: 89 74 24 18        mov         dword ptr [esp+18h],esi
+  0040195D: 89 4C 24 10        mov         dword ptr [esp+10h],ecx
+  00401961: 85 FF              test        edi,edi
+  00401963: 0F 85 B7 FC FF FF  jne         00401620
+  00401969: 5F                 pop         edi
+  0040196A: 5E                 pop         esi
+  0040196B: 8B E5              mov         esp,ebp
+  0040196D: 5D                 pop         ebp
+  0040196E: C3                 ret
+  0040196F: CC                 int         3
+  00401970: CC                 int         3
+  00401971: CC                 int         3
+  00401972: CC                 int         3
+  00401973: CC                 int         3
+  00401974: CC                 int         3
+  00401975: CC                 int         3
+  00401976: CC                 int         3
+  00401977: CC                 int         3
+  00401978: CC                 int         3
+  00401979: CC                 int         3
+  0040197A: CC                 int         3
+  0040197B: CC                 int         3
+  0040197C: CC                 int         3
+  0040197D: CC                 int         3
+  0040197E: CC                 int         3
+  0040197F: CC                 int         3

@@ -1,0 +1,17 @@
+{
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "scope": "Linked cleanup drawing and bitmap initialization functions, inspection only. Inlined helpers are represented in their callers. Original preparation provenance remains verbatim; runtime comparisons are separate.",
+  "files": {
+    "AdditionDraw.txt": "b409361485266deafd06824162b1c2b850cc87f162d66cb0d4dd40d519e70d79",
+    "AlphaBlt8bppC.txt": "5ffa3078872c6ee4b6c160933a3e6dab186a32134ff55261e28203a2e147346e",
+    "AlphaBlt8bppSse2.txt": "6e9673cd1381905f8d7ed4e71e94a7dedd66d808533ab0c7f1faa1736aa485f4",
+    "capture-source.cpp": "8f90aa62f3a2b2a001f64c312061c55015d73e9f88254c1f828f1bab06ed3471",
+    "command.json": "9047b4bcd65799d2ca3d24d014e3331b338067019d41c7bf010c4d735a8462f6",
+    "CreateBitmap.txt": "faec8306cbb56f4b1db79458c16c04fbdc65d4683a26625dbe29689bd3cdfe0e",
+    "DoAdditionDraw.txt": "46b5a6562e17cb67a2f2414731f2345567ed7f6bb6ec46f5b640f90e8485b77d",
+    "DoAdditionDrawMultiColor.txt": "1c4d7a0b298a410de1d72cd5b8c346111f9c8c1f9abb83eb5c8483548cff435a",
+    "Draw.txt": "bb76d5a18919c60ac39f0ef48106ef54d5615eff2d066750f23ddd6d772b78f5",
+    "DrawSingleColorPackPix.txt": "1c223cc2b195d9d2ad8180631cdacddcd060fb058051c11eac55fb43758358ea",
+    "provenance.json": "65561d18ee90cb516dab6f5e4f05427214e049fb0d3bc8087f590cc6c030695f"
+  }
+}
