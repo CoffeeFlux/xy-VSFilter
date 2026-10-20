@@ -1,0 +1,64 @@
+  0040AD40: 55                 push        ebp
+  0040AD41: 8B EC              mov         ebp,esp
+  0040AD43: 83 E4 F8           and         esp,0FFFFFFF8h
+  0040AD46: 8B 45 18           mov         eax,dword ptr [ebp+18h]
+  0040AD49: 8B 55 08           mov         edx,dword ptr [ebp+8]
+  0040AD4C: 8B 4D 0C           mov         ecx,dword ptr [ebp+0Ch]
+  0040AD4F: 56                 push        esi
+  0040AD50: 8B 75 14           mov         esi,dword ptr [ebp+14h]
+  0040AD53: F3 0F 10 10        movss       xmm2,dword ptr [eax]
+  0040AD57: 57                 push        edi
+  0040AD58: 8B 7D 10           mov         edi,dword ptr [ebp+10h]
+  0040AD5B: 0F AF FE           imul        edi,esi
+  0040AD5E: 0F C6 D2 00        shufps      xmm2,xmm2,0
+  0040AD62: 03 FA              add         edi,edx
+  0040AD64: 3B D7              cmp         edx,edi
+  0040AD66: 73 3F              jae         0040ADA7
+  0040AD68: 83 C1 FC           add         ecx,0FFFFFFFCh
+  0040AD6B: 0F 57 C9           xorps       xmm1,xmm1
+  0040AD6E: 8D 0C 8A           lea         ecx,[edx+ecx*4]
+  0040AD71: 0F 11 4A F0        movups      xmmword ptr [edx-10h],xmm1
+  0040AD75: 8B C2              mov         eax,edx
+  0040AD77: 3B D1              cmp         edx,ecx
+  0040AD79: 73 18              jae         0040AD93
+  0040AD7B: EB 03              jmp         0040AD80
+  0040AD7D: 8D 49 00           lea         ecx,[ecx]
+  0040AD80: 0F 10 00           movups      xmm0,xmmword ptr [eax]
+  0040AD83: 0F 59 C2           mulps       xmm0,xmm2
+  0040AD86: 0F 58 C1           addps       xmm0,xmm1
+  0040AD89: 0F 11 00           movups      xmmword ptr [eax],xmm0
+  0040AD8C: 83 C0 10           add         eax,10h
+  0040AD8F: 3B C1              cmp         eax,ecx
+  0040AD91: 72 ED              jb          0040AD80
+  0040AD93: 0F 10 00           movups      xmm0,xmmword ptr [eax]
+  0040AD96: 03 D6              add         edx,esi
+  0040AD98: 0F 59 C2           mulps       xmm0,xmm2
+  0040AD9B: 03 CE              add         ecx,esi
+  0040AD9D: 0F 58 C1           addps       xmm0,xmm1
+  0040ADA0: 0F 11 00           movups      xmmword ptr [eax],xmm0
+  0040ADA3: 3B D7              cmp         edx,edi
+  0040ADA5: 72 CA              jb          0040AD71
+  0040ADA7: 5F                 pop         edi
+  0040ADA8: 5E                 pop         esi
+  0040ADA9: 8B E5              mov         esp,ebp
+  0040ADAB: 5D                 pop         ebp
+  0040ADAC: C3                 ret
+  0040ADAD: CC                 int         3
+  0040ADAE: CC                 int         3
+  0040ADAF: CC                 int         3
+  0040ADB0: CC                 int         3
+  0040ADB1: CC                 int         3
+  0040ADB2: CC                 int         3
+  0040ADB3: CC                 int         3
+  0040ADB4: CC                 int         3
+  0040ADB5: CC                 int         3
+  0040ADB6: CC                 int         3
+  0040ADB7: CC                 int         3
+  0040ADB8: CC                 int         3
+  0040ADB9: CC                 int         3
+  0040ADBA: CC                 int         3
+  0040ADBB: CC                 int         3
+  0040ADBC: CC                 int         3
+  0040ADBD: CC                 int         3
+  0040ADBE: CC                 int         3
+  0040ADBF: CC                 int         3

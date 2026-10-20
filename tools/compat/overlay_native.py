@@ -10,7 +10,7 @@ import subprocess
 from document_native_lifecycle import ROOT, PIN, LIBRARIES, SYSTEM_LIBRARIES, find_library, git, sha
 
 SOURCE = ROOT / "tools/compat/overlay_native.cpp"
-CASES = 12804
+CASES = 17924
 INPUTS = 8
 
 def validate(data,bits):
@@ -19,11 +19,11 @@ def validate(data,bits):
     status=rb'[0-9a-f]+,[0-9a-f]+,-?[0-9]+,[0-9]+'
     parents={}
     for index in range(CASES):
-        if index<12800:
+        if index<17920:
             stage=(index//10)%4;step=index%10
             name=['raster','be','gaussian','combined'][stage]
             shift=4 if step==0 else 9 if step==1 else (step-2)//2+(5 if step%2 else 0)
-        else:name='empty';shift=index-12800;step=2;stage=0
+        else:name='empty';shift=index-17920;step=2;stage=0
         prefix=f'stage index={index} name={name} shift={shift} '.encode()
         if at>=len(rows) or not rows[at].startswith(prefix):raise ValueError('missing/reordered overlay case')
         m=re.fullmatch(rb'offset=-?[0-9]+,-?[0-9]+ size=(-?[0-9]+),(-?[0-9]+) overlay=([0-9]+),([0-9]+),([0-9]+) empty=([01]) full=([01]) memory_delta=(-?[0-9]+) before='+status+rb' after='+status,rows[at][len(prefix):])
@@ -48,7 +48,7 @@ def validate(data,bits):
             p=re.fullmatch(f'stage-plane index={plane} present='.encode()+rb'([01]) ([0-9a-f]*)',rows[at]);at+=1
             count=(pitch if full else width)*height if present else 0
             if not p or int(p[1])!=present or len(p[2])!=count*2:raise ValueError('incomplete overlay bytes')
-    if rows[at:]!=[b'overlay-stages-complete cases=12804']:raise ValueError('missing overlay completion')
+    if rows[at:]!=[b'overlay-stages-complete cases=17924']:raise ValueError('missing overlay completion')
 
 def compare(traces,bits):
     if len(traces)!=4:raise ValueError('two runs per role required')
@@ -76,7 +76,7 @@ def main():
                   probe_sha256=sha(SOURCE.read_bytes()), 
                   runner_sha256=sha(Path(__file__).read_bytes()),
                   environment={key:os.environ.get(key) for key in ("VCToolsVersion","WindowsSDKVersion","VSCMD_ARG_TGT_ARCH")},
-                  limits=["12804 actual raster/BeBlur/Gaussian/combined/copy/variance calls: eight paths, four radii and ten settings, four shifts, chained shifts and empty source",
+                  limits=["17924 actual raster/BeBlur/Gaussian/combined/copy/variance calls: eight paths, four radii and fourteen settings, four shifts, chained shifts and empty source",
                           "Every known plane byte and metadata/status/allocation delta; Gaussian padding is omitted when uninitialized and stays outside parity claims",
                           "Default FP controls plus sticky division-by-zero, Release build; allocator failures, invalid geometry and full host closure remain unclosed"])
     def save():

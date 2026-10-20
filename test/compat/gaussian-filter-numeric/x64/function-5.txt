@@ -1,0 +1,43 @@
+  000000014000B680: 48 8B 44 24 28     mov         rax,qword ptr [rsp+28h]
+  000000014000B685: 4C 8B D1           mov         r10,rcx
+  000000014000B688: 45 0F AF C1        imul        r8d,r9d
+  000000014000B68C: F3 0F 10 10        movss       xmm2,dword ptr [rax]
+  000000014000B690: 0F C6 D2 00        shufps      xmm2,xmm2,0
+  000000014000B694: 4D 63 D8           movsxd      r11,r8d
+  000000014000B697: 4C 03 D9           add         r11,rcx
+  000000014000B69A: 49 3B CB           cmp         rcx,r11
+  000000014000B69D: 73 5A              jae         000000014000B6F9
+  000000014000B69F: 4C 63 C2           movsxd      r8,edx
+  000000014000B6A2: 0F 57 C9           xorps       xmm1,xmm1
+  000000014000B6A5: 49 8B D0           mov         rdx,r8
+  000000014000B6A8: 4D 63 C9           movsxd      r9,r9d
+  000000014000B6AB: 48 F7 DA           neg         rdx
+  000000014000B6AE: 66 90              nop
+  000000014000B6B0: 3E 49 8D 48 FC     lea         rcx,ds:[r8-4]
+  000000014000B6B5: 49 8B C2           mov         rax,r10
+  000000014000B6B8: 49 8D 0C 8A        lea         rcx,[r10+rcx*4]
+  000000014000B6BC: 0F 11 0C 91        movups      xmmword ptr [rcx+rdx*4],xmm1
+  000000014000B6C0: 4C 3B D1           cmp         r10,rcx
+  000000014000B6C3: 73 20              jae         000000014000B6E5
+  000000014000B6C5: 66 66 66 0F 1F 84  nop         word ptr [rax+rax+0000000000000000h]
+  000000014000B6D0: 0F 28 C2           movaps      xmm0,xmm2
+  000000014000B6D3: 0F 59 00           mulps       xmm0,xmmword ptr [rax]
+  000000014000B6D6: 0F 58 C1           addps       xmm0,xmm1
+  000000014000B6D9: 0F 11 00           movups      xmmword ptr [rax],xmm0
+  000000014000B6DC: 48 83 C0 10        add         rax,10h
+  000000014000B6E0: 48 3B C1           cmp         rax,rcx
+  000000014000B6E3: 72 EB              jb          000000014000B6D0
+  000000014000B6E5: 0F 28 C2           movaps      xmm0,xmm2
+  000000014000B6E8: 4D 03 D1           add         r10,r9
+  000000014000B6EB: 0F 59 00           mulps       xmm0,xmmword ptr [rax]
+  000000014000B6EE: 0F 58 C1           addps       xmm0,xmm1
+  000000014000B6F1: 0F 11 00           movups      xmmword ptr [rax],xmm0
+  000000014000B6F4: 4D 3B D3           cmp         r10,r11
+  000000014000B6F7: 72 B7              jb          000000014000B6B0
+  000000014000B6F9: C3                 ret
+  000000014000B6FA: CC                 int         3
+  000000014000B6FB: CC                 int         3
+  000000014000B6FC: CC                 int         3
+  000000014000B6FD: CC                 int         3
+  000000014000B6FE: CC                 int         3
+  000000014000B6FF: CC                 int         3

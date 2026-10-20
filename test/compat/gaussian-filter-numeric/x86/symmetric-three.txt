@@ -1,0 +1,86 @@
+  0040A140: 55                 push        ebp
+  0040A141: 8B EC              mov         ebp,esp
+  0040A143: 83 E4 F8           and         esp,0FFFFFFF8h
+  0040A146: 8B 45 10           mov         eax,dword ptr [ebp+10h]
+  0040A149: 56                 push        esi
+  0040A14A: 57                 push        edi
+  0040A14B: 8B 7D 08           mov         edi,dword ptr [ebp+8]
+  0040A14E: 8B F1              mov         esi,ecx
+  0040A150: 8B 4D 0C           mov         ecx,dword ptr [ebp+0Ch]
+  0040A153: F3 0F 10 20        movss       xmm4,dword ptr [eax]
+  0040A157: F3 0F 10 68 04     movss       xmm5,dword ptr [eax+4]
+  0040A15C: 0F AF F9           imul        edi,ecx
+  0040A15F: 0F C6 E4 00        shufps      xmm4,xmm4,0
+  0040A163: 0F C6 ED 00        shufps      xmm5,xmm5,0
+  0040A167: 03 FE              add         edi,esi
+  0040A169: 3B F7              cmp         esi,edi
+  0040A16B: 0F 83 9A 00 00 00  jae         0040A20B
+  0040A171: 83 C2 FC           add         edx,0FFFFFFFCh
+  0040A174: 0F 57 F6           xorps       xmm6,xmm6
+  0040A177: 0F 28 FE           movaps      xmm7,xmm6
+  0040A17A: 0F 59 FC           mulps       xmm7,xmm4
+  0040A17D: 8D 14 96           lea         edx,[esi+edx*4]
+  0040A180: 0F 10 1E           movups      xmm3,xmmword ptr [esi]
+  0040A183: 0F 28 CE           movaps      xmm1,xmm6
+  0040A186: 0F C6 CB 4E        shufps      xmm1,xmm3,4Eh
+  0040A18A: 0F 28 C6           movaps      xmm0,xmm6
+  0040A18D: 0F C6 C1 99        shufps      xmm0,xmm1,99h
+  0040A191: 8B C6              mov         eax,esi
+  0040A193: 0F 59 C5           mulps       xmm0,xmm5
+  0040A196: 0F 59 CC           mulps       xmm1,xmm4
+  0040A199: 0F 58 C7           addps       xmm0,xmm7
+  0040A19C: 0F 58 C1           addps       xmm0,xmm1
+  0040A19F: 0F 11 46 F0        movups      xmmword ptr [esi-10h],xmm0
+  0040A1A3: 3B F2              cmp         esi,edx
+  0040A1A5: 73 38              jae         0040A1DF
+  0040A1A7: EB 07              jmp         0040A1B0
+  0040A1A9: 8D A4 24 00 00 00  lea         esp,[esp+00000000h]
+  0040A1B0: 0F 28 C3           movaps      xmm0,xmm3
+  0040A1B3: 0F 28 CB           movaps      xmm1,xmm3
+  0040A1B6: 0F C6 40 10 4E     shufps      xmm0,xmmword ptr [eax+10h],4Eh
+  0040A1BB: 0F C6 C8 99        shufps      xmm1,xmm0,99h
+  0040A1BF: 0F 59 CD           mulps       xmm1,xmm5
+  0040A1C2: 0F 59 DC           mulps       xmm3,xmm4
+  0040A1C5: 0F 59 C4           mulps       xmm0,xmm4
+  0040A1C8: 0F 58 CB           addps       xmm1,xmm3
+  0040A1CB: 0F 10 58 10        movups      xmm3,xmmword ptr [eax+10h]
+  0040A1CF: 0F 58 C8           addps       xmm1,xmm0
+  0040A1D2: 0F 11 08           movups      xmmword ptr [eax],xmm1
+  0040A1D5: 83 C0 10           add         eax,10h
+  0040A1D8: 3B C2              cmp         eax,edx
+  0040A1DA: 72 D4              jb          0040A1B0
+  0040A1DC: 8B 4D 0C           mov         ecx,dword ptr [ebp+0Ch]
+  0040A1DF: 0F 28 CB           movaps      xmm1,xmm3
+  0040A1E2: 0F 28 C3           movaps      xmm0,xmm3
+  0040A1E5: 0F C6 CE 4E        shufps      xmm1,xmm6,4Eh
+  0040A1E9: 03 F1              add         esi,ecx
+  0040A1EB: 0F C6 C1 99        shufps      xmm0,xmm1,99h
+  0040A1EF: 03 D1              add         edx,ecx
+  0040A1F1: 0F 59 C5           mulps       xmm0,xmm5
+  0040A1F4: 0F 59 DC           mulps       xmm3,xmm4
+  0040A1F7: 0F 59 CC           mulps       xmm1,xmm4
+  0040A1FA: 0F 58 C3           addps       xmm0,xmm3
+  0040A1FD: 0F 58 C1           addps       xmm0,xmm1
+  0040A200: 0F 11 00           movups      xmmword ptr [eax],xmm0
+  0040A203: 3B F7              cmp         esi,edi
+  0040A205: 0F 82 75 FF FF FF  jb          0040A180
+  0040A20B: 5F                 pop         edi
+  0040A20C: 5E                 pop         esi
+  0040A20D: 8B E5              mov         esp,ebp
+  0040A20F: 5D                 pop         ebp
+  0040A210: C3                 ret
+  0040A211: CC                 int         3
+  0040A212: CC                 int         3
+  0040A213: CC                 int         3
+  0040A214: CC                 int         3
+  0040A215: CC                 int         3
+  0040A216: CC                 int         3
+  0040A217: CC                 int         3
+  0040A218: CC                 int         3
+  0040A219: CC                 int         3
+  0040A21A: CC                 int         3
+  0040A21B: CC                 int         3
+  0040A21C: CC                 int         3
+  0040A21D: CC                 int         3
+  0040A21E: CC                 int         3
+  0040A21F: CC                 int         3

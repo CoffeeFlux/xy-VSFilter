@@ -1,0 +1,168 @@
+{
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "source_capture_provenance": "artifacts\\blur-numeric-reference-x86\\provenance.json",
+  "source_capture_provenance_sha256": "42c06c22398b3b34169847a29838c7e03b8afdd9316e8190131b41c1f30534de",
+  "functions": [
+    {
+      "name": "?xy_filter_sse_v6@@YAXPAMHHHPBMH@Z",
+      "address": "0x409c00",
+      "end": "0x40a140",
+      "file": "function-0.txt",
+      "lines": 421,
+      "sha256": "6100a020137c30d5167810561d7fc2f261befbfe30dec1920ec2926ebc0b8f2d"
+    },
+    {
+      "name": "?xy_filter_sse@@YAXPAMHHHPBMH@Z",
+      "address": "0x40a220",
+      "end": "0x40a420",
+      "file": "function-1.txt",
+      "lines": 129,
+      "sha256": "63387f7400bb3d4eb7f80d232bdaff3c1d6a5d218c4bc7f5f0bbc44d4a116477"
+    },
+    {
+      "name": "?xy_byte_2_float_sse@@YAXPAMHHPBEHHH@Z",
+      "address": "0x40a420",
+      "end": "0x40a5a0",
+      "file": "function-2.txt",
+      "lines": 138,
+      "sha256": "777e2d12f834900ae385fc57ebc4bb8c470164d2222d73e3178f81a948164d62"
+    },
+    {
+      "name": "?xy_float_2_byte_transpose_sse@@YAXPAEHHPBMHHH@Z",
+      "address": "0x40a5a0",
+      "end": "0x40a7c0",
+      "file": "function-3.txt",
+      "lines": 182,
+      "sha256": "f64a31080f16d1aa97d954657c590716984b0028ce84822b782a08433dc1e174"
+    },
+    {
+      "name": "?xy_gaussian_blur@@YAXPAEHPBEHHHPBMHH2HH@Z",
+      "address": "0x40a7c0",
+      "end": "0x40aa40",
+      "file": "function-4.txt",
+      "lines": 216,
+      "sha256": "63a631b38ac93d1b7bb6ee4eb9e59b2ee65bcced4dee542eb50ccc22b061bdb2"
+    },
+    {
+      "name": "??$xy_filter_sse_template@$00@@YAXPAMHHHPBM@Z",
+      "address": "0x40ad40",
+      "end": "0x40adc0",
+      "file": "function-5.txt",
+      "lines": 64,
+      "sha256": "d9fea45289d6ebc1144607833b99f1389a1a8528e3e3b4f53e4e3146798a1381"
+    },
+    {
+      "name": "??$xy_filter_sse_template@$03@@YAXPAMHHHPBM@Z",
+      "address": "0x40adc0",
+      "end": "0x40af00",
+      "file": "function-6.txt",
+      "lines": 113,
+      "sha256": "ff1e0d23c898833ec20b505a958dcff0295314fef0067c961268fb2e780e9ebc"
+    },
+    {
+      "name": "??$xy_filter_sse_template@$04@@YAXPAMHHHPBM@Z",
+      "address": "0x40af00",
+      "end": "0x40b0a0",
+      "file": "function-7.txt",
+      "lines": 132,
+      "sha256": "46385fca7b69691aaf9074102b56a0e5df8b961c10d8baae056ba589d94a7463"
+    },
+    {
+      "name": "??$xy_filter_sse_template@$07@@YAXPAMHHHPBM@Z",
+      "address": "0x40b0a0",
+      "end": "0x40b380",
+      "file": "function-8.txt",
+      "lines": 212,
+      "sha256": "9a6e66939c66b6fb96a6f48dfbba61dde66ee7b6f4e6868b3c3ef49b5f2b7052"
+    },
+    {
+      "name": "??$xy_filter_sse_template@$08@@YAXPAMHHHPBM@Z",
+      "address": "0x40b380",
+      "end": "0x40b740",
+      "file": "function-9.txt",
+      "lines": 260,
+      "sha256": "a06aee979dd88f2b3885dbdbe22aa4afbcbeb849dbdd394359ec43856407ca9d"
+    },
+    {
+      "name": "??$xy_filter_sse_template@$0M@@@YAXPAMHHHPBM@Z",
+      "address": "0x40b740",
+      "end": "0x40bc60",
+      "file": "function-10.txt",
+      "lines": 346,
+      "sha256": "869c8c4c7daf37565b148e8f918d3611d0278c777eb233409a94336348259525"
+    },
+    {
+      "name": "??$xy_filter_sse_template@$0N@@@YAXPAMHHHPBM@Z",
+      "address": "0x40bc60",
+      "end": "0x40c2a0",
+      "file": "function-11.txt",
+      "lines": 398,
+      "sha256": "ae30fb0b2d97ce42a23ac1836b6f2bbc144bf766f459d1480219197a45187e43"
+    },
+    {
+      "name": "??$xy_filter_sse_template@$0BA@@@YAXPAMHHHPBM@Z",
+      "address": "0x40c2a0",
+      "end": "0x40cae0",
+      "file": "function-12.txt",
+      "lines": 492,
+      "sha256": "54ad71b04c18df89003a625fc43941229a67ccdba2393d66d165886f55b12e5c"
+    },
+    {
+      "name": "??$xy_filter_sse_template@$0BB@@@YAXPAMHHHPBM@Z",
+      "address": "0x40cae0",
+      "end": "0x40d540",
+      "file": "function-13.txt",
+      "lines": 625,
+      "sha256": "1210d33ea8666bad95ae556f2cfa940ced383928fcc7a43cacd573de047963de"
+    },
+    {
+      "name": "??$xy_filter_sse_template@$0BE@@@YAXPAMHHHPBM@Z",
+      "address": "0x40d540",
+      "end": "0x40e1c0",
+      "file": "function-14.txt",
+      "lines": 715,
+      "sha256": "7d3e4bd5d207d326ec787b90464a6fa115b5b3a7ab9a4fc0757fe5c8c631b2dd"
+    },
+    {
+      "name": "??$xy_filter_sse_template@$0BF@@@YAXPAMHHHPBM@Z",
+      "address": "0x40e1c0",
+      "end": "0x40f080",
+      "file": "function-15.txt",
+      "lines": 841,
+      "sha256": "5d315d0490d7ae7dd89d6761f3fb9de4db08d10bb40b132c5689a2ee82434bb2"
+    },
+    {
+      "name": "??$xy_filter_sse_template@$0BI@@@YAXPAMHHHPBM@Z",
+      "address": "0x40f080",
+      "end": "0x4101e0",
+      "file": "function-16.txt",
+      "lines": 968,
+      "sha256": "847394a91fbd78428409d3368164e53bef6aec9c5956aa4e65ceb559edd6c1c9"
+    },
+    {
+      "name": "??$xy_filter_sse_template@$0BJ@@@YAXPAMHHHPBM@Z",
+      "address": "0x4101e0",
+      "end": "0x411620",
+      "file": "function-17.txt",
+      "lines": 1140,
+      "sha256": "c90d6eefac2a4afea4f185361b087c237539cfb89223f83b9fdc92c4ecf82df6"
+    },
+    {
+      "name": "??$xy_filter_sse_template@$0BM@@@YAXPAMHHHPBM@Z",
+      "address": "0x411620",
+      "end": "0x412d40",
+      "file": "function-18.txt",
+      "lines": 1261,
+      "sha256": "d9bcd36867c5a7a4659d8c107b8f7af5af9a7bd32e3411dbaf1cb0ca083dbd84"
+    },
+    {
+      "name": "?xy_3_tag_symmetric_filter_sse@@YAXPAMHHHPBM@Z",
+      "address": "0x40a140",
+      "end": "0x40a220",
+      "file": "symmetric-three.txt",
+      "lines": 86,
+      "sha256": "9f970ebe536d67a6e0ba2e3a56a84348a2090d1e69530c20855712a5bb9e8f9c"
+    }
+  ],
+  "scope": "Preparation only: additional linked Gaussian conversion/filter/transpose excerpts from the unchanged earlier binary. No Gaussian Rust parity claimed."
+}

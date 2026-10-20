@@ -1,0 +1,841 @@
+  0040E1C0: 55                 push        ebp
+  0040E1C1: 8B EC              mov         ebp,esp
+  0040E1C3: 83 E4 F0           and         esp,0FFFFFFF0h
+  0040E1C6: 81 EC 28 02 00 00  sub         esp,228h
+  0040E1CC: 8B 45 18           mov         eax,dword ptr [ebp+18h]
+  0040E1CF: 8B 55 14           mov         edx,dword ptr [ebp+14h]
+  0040E1D2: 8B 4D 0C           mov         ecx,dword ptr [ebp+0Ch]
+  0040E1D5: 56                 push        esi
+  0040E1D6: F3 0F 10 60 50     movss       xmm4,dword ptr [eax+50h]
+  0040E1DB: 0F 10 18           movups      xmm3,xmmword ptr [eax]
+  0040E1DE: 0F 10 50 10        movups      xmm2,xmmword ptr [eax+10h]
+  0040E1E2: 0F 10 48 20        movups      xmm1,xmmword ptr [eax+20h]
+  0040E1E6: 0F 10 40 30        movups      xmm0,xmmword ptr [eax+30h]
+  0040E1EA: 0F 10 70 40        movups      xmm6,xmmword ptr [eax+40h]
+  0040E1EE: 8B C2              mov         eax,edx
+  0040E1F0: 0F AF 45 10        imul        eax,dword ptr [ebp+10h]
+  0040E1F4: 57                 push        edi
+  0040E1F5: 8B 7D 08           mov         edi,dword ptr [ebp+8]
+  0040E1F8: 0F C6 E4 00        shufps      xmm4,xmm4,0
+  0040E1FC: 89 94 24 38 01 00  mov         dword ptr [esp+00000138h],edx
+  0040E203: 03 C7              add         eax,edi
+  0040E205: 0F 29 A4 24 20 01  movaps      xmmword ptr [esp+00000120h],xmm4
+  0040E20D: 89 84 24 3C 01 00  mov         dword ptr [esp+0000013Ch],eax
+  0040E214: 3B F8              cmp         edi,eax
+  0040E216: 0F 83 4A 0E 00 00  jae         0040F066
+  0040E21C: 0F 28 FE           movaps      xmm7,xmm6
+  0040E21F: 8D 57 20           lea         edx,[edi+20h]
+  0040E222: 0F C6 FE 55        shufps      xmm7,xmm6,55h
+  0040E226: 8D 42 F0           lea         eax,[edx-10h]
+  0040E229: 0F 11 7C 24 50     movups      xmmword ptr [esp+50h],xmm7
+  0040E22E: 83 C1 E8           add         ecx,0FFFFFFE8h
+  0040E231: 0F 57 FF           xorps       xmm7,xmm7
+  0040E234: 0F 28 EE           movaps      xmm5,xmm6
+  0040E237: 0F 28 E7           movaps      xmm4,xmm7
+  0040E23A: 0F C6 EE 00        shufps      xmm5,xmm6,0
+  0040E23E: 0F 29 6C 24 40     movaps      xmmword ptr [esp+40h],xmm5
+  0040E243: 0F 28 EE           movaps      xmm5,xmm6
+  0040E246: 0F 59 64 24 40     mulps       xmm4,xmmword ptr [esp+40h]
+  0040E24B: 8D 34 8F           lea         esi,[edi+ecx*4]
+  0040E24E: 0F C6 EE AA        shufps      xmm5,xmm6,0AAh
+  0040E252: 0F C6 F6 FF        shufps      xmm6,xmm6,0FFh
+  0040E256: 0F 11 6C 24 30     movups      xmmword ptr [esp+30h],xmm5
+  0040E25B: 0F 58 E7           addps       xmm4,xmm7
+  0040E25E: 0F 29 B4 24 80 01  movaps      xmmword ptr [esp+00000180h],xmm6
+  0040E266: 0F 28 F8           movaps      xmm7,xmm0
+  0040E269: 0F C6 F8 00        shufps      xmm7,xmm0,0
+  0040E26D: 0F 11 7C 24 60     movups      xmmword ptr [esp+60h],xmm7
+  0040E272: 0F 28 F8           movaps      xmm7,xmm0
+  0040E275: 0F C6 F8 AA        shufps      xmm7,xmm0,0AAh
+  0040E279: 0F 11 7C 24 70     movups      xmmword ptr [esp+70h],xmm7
+  0040E27E: 0F 28 F8           movaps      xmm7,xmm0
+  0040E281: 0F C6 F8 55        shufps      xmm7,xmm0,55h
+  0040E285: 0F C6 C0 FF        shufps      xmm0,xmm0,0FFh
+  0040E289: 0F 29 84 24 90 00  movaps      xmmword ptr [esp+00000090h],xmm0
+  0040E291: 0F 11 BC 24 80 00  movups      xmmword ptr [esp+00000080h],xmm7
+  0040E299: 0F 57 FF           xorps       xmm7,xmm7
+  0040E29C: 0F 28 C7           movaps      xmm0,xmm7
+  0040E29F: 0F 59 44 24 60     mulps       xmm0,xmmword ptr [esp+60h]
+  0040E2A4: 0F 11 A4 24 E0 01  movups      xmmword ptr [esp+000001E0h],xmm4
+  0040E2AC: 0F 58 C7           addps       xmm0,xmm7
+  0040E2AF: 0F 11 84 24 F0 01  movups      xmmword ptr [esp+000001F0h],xmm0
+  0040E2B7: 0F 28 C1           movaps      xmm0,xmm1
+  0040E2BA: 0F C6 C1 00        shufps      xmm0,xmm1,0
+  0040E2BE: 0F 11 84 24 A0 00  movups      xmmword ptr [esp+000000A0h],xmm0
+  0040E2C6: 0F 28 C1           movaps      xmm0,xmm1
+  0040E2C9: 0F C6 C1 AA        shufps      xmm0,xmm1,0AAh
+  0040E2CD: 0F 11 84 24 B0 00  movups      xmmword ptr [esp+000000B0h],xmm0
+  0040E2D5: 0F 28 C1           movaps      xmm0,xmm1
+  0040E2D8: 0F C6 C1 55        shufps      xmm0,xmm1,55h
+  0040E2DC: 0F 11 84 24 C0 00  movups      xmmword ptr [esp+000000C0h],xmm0
+  0040E2E4: 0F 28 C7           movaps      xmm0,xmm7
+  0040E2E7: 0F C6 C9 FF        shufps      xmm1,xmm1,0FFh
+  0040E2EB: 0F 59 84 24 A0 00  mulps       xmm0,xmmword ptr [esp+000000A0h]
+  0040E2F3: 0F 29 8C 24 D0 00  movaps      xmmword ptr [esp+000000D0h],xmm1
+  0040E2FB: 0F 28 CA           movaps      xmm1,xmm2
+  0040E2FE: 0F C6 CA 00        shufps      xmm1,xmm2,0
+  0040E302: 0F 11 8C 24 60 01  movups      xmmword ptr [esp+00000160h],xmm1
+  0040E30A: 0F 58 C7           addps       xmm0,xmm7
+  0040E30D: 0F 11 84 24 00 02  movups      xmmword ptr [esp+00000200h],xmm0
+  0040E315: 0F 28 C2           movaps      xmm0,xmm2
+  0040E318: 0F C6 C2 AA        shufps      xmm0,xmm2,0AAh
+  0040E31C: 0F 11 84 24 E0 00  movups      xmmword ptr [esp+000000E0h],xmm0
+  0040E324: 0F 28 C2           movaps      xmm0,xmm2
+  0040E327: 0F C6 C2 55        shufps      xmm0,xmm2,55h
+  0040E32B: 0F 11 84 24 F0 00  movups      xmmword ptr [esp+000000F0h],xmm0
+  0040E333: 0F 28 C7           movaps      xmm0,xmm7
+  0040E336: 0F C6 D2 FF        shufps      xmm2,xmm2,0FFh
+  0040E33A: 0F 59 C1           mulps       xmm0,xmm1
+  0040E33D: 0F 28 CB           movaps      xmm1,xmm3
+  0040E340: 0F C6 CB 00        shufps      xmm1,xmm3,0
+  0040E344: 0F 11 94 24 00 01  movups      xmmword ptr [esp+00000100h],xmm2
+  0040E34C: 0F 58 C7           addps       xmm0,xmm7
+  0040E34F: 0F 11 8C 24 70 01  movups      xmmword ptr [esp+00000170h],xmm1
+  0040E357: 0F 11 84 24 10 02  movups      xmmword ptr [esp+00000210h],xmm0
+  0040E35F: 0F 28 C3           movaps      xmm0,xmm3
+  0040E362: 0F C6 C3 AA        shufps      xmm0,xmm3,0AAh
+  0040E366: 0F 11 84 24 40 01  movups      xmmword ptr [esp+00000140h],xmm0
+  0040E36E: 0F 28 C3           movaps      xmm0,xmm3
+  0040E371: 0F C6 C3 55        shufps      xmm0,xmm3,55h
+  0040E375: 0F 11 84 24 10 01  movups      xmmword ptr [esp+00000110h],xmm0
+  0040E37D: 0F 28 C7           movaps      xmm0,xmm7
+  0040E380: 0F C6 DB FF        shufps      xmm3,xmm3,0FFh
+  0040E384: 0F 59 C1           mulps       xmm0,xmm1
+  0040E387: 0F 11 9C 24 50 01  movups      xmmword ptr [esp+00000150h],xmm3
+  0040E38F: 0F 58 C7           addps       xmm0,xmm7
+  0040E392: 0F 11 84 24 20 02  movups      xmmword ptr [esp+00000220h],xmm0
+  0040E39A: 0F 28 A4 24 20 01  movaps      xmm4,xmmword ptr [esp+00000120h]
+  0040E3A2: 8D 4A 10           lea         ecx,[edx+10h]
+  0040E3A5: 89 44 24 2C        mov         dword ptr [esp+2Ch],eax
+  0040E3A9: 89 4C 24 28        mov         dword ptr [esp+28h],ecx
+  0040E3AD: 8D 49 00           lea         ecx,[ecx]
+  0040E3B0: 0F 11 7A 80        movups      xmmword ptr [edx-80h],xmm7
+  0040E3B4: 0F 28 CF           movaps      xmm1,xmm7
+  0040E3B7: 0F 10 5A E0        movups      xmm3,xmmword ptr [edx-20h]
+  0040E3BB: 0F 28 D7           movaps      xmm2,xmm7
+  0040E3BE: 0F C6 CB 4E        shufps      xmm1,xmm3,4Eh
+  0040E3C2: 8B CF              mov         ecx,edi
+  0040E3C4: 0F C6 D1 99        shufps      xmm2,xmm1,99h
+  0040E3C8: 0F 28 C1           movaps      xmm0,xmm1
+  0040E3CB: 0F 59 54 24 50     mulps       xmm2,xmmword ptr [esp+50h]
+  0040E3D0: 0F 59 C5           mulps       xmm0,xmm5
+  0040E3D3: 0F C6 CB 99        shufps      xmm1,xmm3,99h
+  0040E3D7: 0F 59 E3           mulps       xmm4,xmm3
+  0040E3DA: 0F 28 DF           movaps      xmm3,xmm7
+  0040E3DD: 0F 58 84 24 E0 01  addps       xmm0,xmmword ptr [esp+000001E0h]
+  0040E3E5: 0F 59 CE           mulps       xmm1,xmm6
+  0040E3E8: 0F 58 D0           addps       xmm2,xmm0
+  0040E3EB: 0F 58 D1           addps       xmm2,xmm1
+  0040E3EE: 0F 28 CF           movaps      xmm1,xmm7
+  0040E3F1: 0F 58 D4           addps       xmm2,xmm4
+  0040E3F4: 0F 11 52 90        movups      xmmword ptr [edx-70h],xmm2
+  0040E3F8: 0F 10 62 E0        movups      xmm4,xmmword ptr [edx-20h]
+  0040E3FC: 0F C6 CC 4E        shufps      xmm1,xmm4,4Eh
+  0040E400: 0F 28 D4           movaps      xmm2,xmm4
+  0040E403: 0F 10 28           movups      xmm5,xmmword ptr [eax]
+  0040E406: 0F 28 C1           movaps      xmm0,xmm1
+  0040E409: 0F 59 44 24 70     mulps       xmm0,xmmword ptr [esp+70h]
+  0040E40E: 0F C6 D9 99        shufps      xmm3,xmm1,99h
+  0040E412: 0F 59 9C 24 80 00  mulps       xmm3,xmmword ptr [esp+00000080h]
+  0040E41A: 0F 58 84 24 F0 01  addps       xmm0,xmmword ptr [esp+000001F0h]
+  0040E422: 0F C6 CC 99        shufps      xmm1,xmm4,99h
+  0040E426: 0F 59 8C 24 90 00  mulps       xmm1,xmmword ptr [esp+00000090h]
+  0040E42E: 0F C6 D5 4E        shufps      xmm2,xmm5,4Eh
+  0040E432: 0F 58 D8           addps       xmm3,xmm0
+  0040E435: 0F 28 C4           movaps      xmm0,xmm4
+  0040E438: 0F 59 44 24 40     mulps       xmm0,xmmword ptr [esp+40h]
+  0040E43D: 0F C6 E2 99        shufps      xmm4,xmm2,99h
+  0040E441: 0F 59 64 24 50     mulps       xmm4,xmmword ptr [esp+50h]
+  0040E446: 0F 58 D9           addps       xmm3,xmm1
+  0040E449: 0F 28 CF           movaps      xmm1,xmm7
+  0040E44C: 0F 58 D8           addps       xmm3,xmm0
+  0040E44F: 0F 28 C2           movaps      xmm0,xmm2
+  0040E452: 0F 59 44 24 30     mulps       xmm0,xmmword ptr [esp+30h]
+  0040E457: 0F C6 D5 99        shufps      xmm2,xmm5,99h
+  0040E45B: 0F 59 D6           mulps       xmm2,xmm6
+  0040E45E: 0F 58 D8           addps       xmm3,xmm0
+  0040E461: 0F 28 84 24 20 01  movaps      xmm0,xmmword ptr [esp+00000120h]
+  0040E469: 0F 59 C5           mulps       xmm0,xmm5
+  0040E46C: 0F 58 DC           addps       xmm3,xmm4
+  0040E46F: 0F 58 DA           addps       xmm3,xmm2
+  0040E472: 0F 58 D8           addps       xmm3,xmm0
+  0040E475: 0F 57 C0           xorps       xmm0,xmm0
+  0040E478: 0F 28 E8           movaps      xmm5,xmm0
+  0040E47B: 0F 11 5A A0        movups      xmmword ptr [edx-60h],xmm3
+  0040E47F: 0F 10 5A E0        movups      xmm3,xmmword ptr [edx-20h]
+  0040E483: 0F 10 72 F0        movups      xmm6,xmmword ptr [edx-10h]
+  0040E487: 0F 28 D3           movaps      xmm2,xmm3
+  0040E48A: 0F C6 CB 4E        shufps      xmm1,xmm3,4Eh
+  0040E48E: 0F 28 E6           movaps      xmm4,xmm6
+  0040E491: 0F 28 C1           movaps      xmm0,xmm1
+  0040E494: 0F C6 E9 99        shufps      xmm5,xmm1,99h
+  0040E498: 0F 59 84 24 B0 00  mulps       xmm0,xmmword ptr [esp+000000B0h]
+  0040E4A0: 0F 59 AC 24 C0 00  mulps       xmm5,xmmword ptr [esp+000000C0h]
+  0040E4A8: 0F 10 3A           movups      xmm7,xmmword ptr [edx]
+  0040E4AB: 0F 58 84 24 00 02  addps       xmm0,xmmword ptr [esp+00000200h]
+  0040E4B3: 0F C6 CB 99        shufps      xmm1,xmm3,99h
+  0040E4B7: 0F 59 8C 24 D0 00  mulps       xmm1,xmmword ptr [esp+000000D0h]
+  0040E4BF: 0F C6 D6 4E        shufps      xmm2,xmm6,4Eh
+  0040E4C3: 0F 58 E8           addps       xmm5,xmm0
+  0040E4C6: 0F C6 E7 4E        shufps      xmm4,xmm7,4Eh
+  0040E4CA: 0F 28 C3           movaps      xmm0,xmm3
+  0040E4CD: 0F C6 DA 99        shufps      xmm3,xmm2,99h
+  0040E4D1: 0F 59 44 24 60     mulps       xmm0,xmmword ptr [esp+60h]
+  0040E4D6: 0F 59 9C 24 80 00  mulps       xmm3,xmmword ptr [esp+00000080h]
+  0040E4DE: 0F 58 E9           addps       xmm5,xmm1
+  0040E4E1: 0F 58 E8           addps       xmm5,xmm0
+  0040E4E4: 0F 28 C2           movaps      xmm0,xmm2
+  0040E4E7: 0F 59 44 24 70     mulps       xmm0,xmmword ptr [esp+70h]
+  0040E4EC: 0F C6 D6 99        shufps      xmm2,xmm6,99h
+  0040E4F0: 0F 59 94 24 90 00  mulps       xmm2,xmmword ptr [esp+00000090h]
+  0040E4F8: 0F 58 E8           addps       xmm5,xmm0
+  0040E4FB: 0F 58 EB           addps       xmm5,xmm3
+  0040E4FE: 0F 58 EA           addps       xmm5,xmm2
+  0040E501: 8B 44 24 28        mov         eax,dword ptr [esp+28h]
+  0040E505: 0F 28 C6           movaps      xmm0,xmm6
+  0040E508: 0F C6 F4 99        shufps      xmm6,xmm4,99h
+  0040E50C: 0F 59 44 24 40     mulps       xmm0,xmmword ptr [esp+40h]
+  0040E511: 0F 59 74 24 50     mulps       xmm6,xmmword ptr [esp+50h]
+  0040E516: 0F 58 E8           addps       xmm5,xmm0
+  0040E519: 0F 28 C4           movaps      xmm0,xmm4
+  0040E51C: 0F 59 44 24 30     mulps       xmm0,xmmword ptr [esp+30h]
+  0040E521: 0F C6 E7 99        shufps      xmm4,xmm7,99h
+  0040E525: 0F 59 BC 24 20 01  mulps       xmm7,xmmword ptr [esp+00000120h]
+  0040E52D: 0F 59 A4 24 80 01  mulps       xmm4,xmmword ptr [esp+00000180h]
+  0040E535: 0F 58 E8           addps       xmm5,xmm0
+  0040E538: 0F 58 EE           addps       xmm5,xmm6
+  0040E53B: 0F 58 EC           addps       xmm5,xmm4
+  0040E53E: 0F 58 EF           addps       xmm5,xmm7
+  0040E541: 0F 57 FF           xorps       xmm7,xmm7
+  0040E544: 0F 28 CF           movaps      xmm1,xmm7
+  0040E547: 0F 11 6A B0        movups      xmmword ptr [edx-50h],xmm5
+  0040E54B: 0F 10 6A F0        movups      xmm5,xmmword ptr [edx-10h]
+  0040E54F: 0F 10 5A E0        movups      xmm3,xmmword ptr [edx-20h]
+  0040E553: 0F 28 E5           movaps      xmm4,xmm5
+  0040E556: 0F 10 32           movups      xmm6,xmmword ptr [edx]
+  0040E559: 0F 28 D3           movaps      xmm2,xmm3
+  0040E55C: 0F 10 00           movups      xmm0,xmmword ptr [eax]
+  0040E55F: 0F 29 84 24 90 01  movaps      xmmword ptr [esp+00000190h],xmm0
+  0040E567: 0F C6 CB 4E        shufps      xmm1,xmm3,4Eh
+  0040E56B: 0F C6 F9 99        shufps      xmm7,xmm1,99h
+  0040E56F: 0F 59 BC 24 F0 00  mulps       xmm7,xmmword ptr [esp+000000F0h]
+  0040E577: 0F C6 E6 4E        shufps      xmm4,xmm6,4Eh
+  0040E57B: 0F 29 74 24 10     movaps      xmmword ptr [esp+10h],xmm6
+  0040E580: 0F C6 F0 4E        shufps      xmm6,xmm0,4Eh
+  0040E584: 0F 28 C1           movaps      xmm0,xmm1
+  0040E587: 0F 59 84 24 E0 00  mulps       xmm0,xmmword ptr [esp+000000E0h]
+  0040E58F: 0F C6 CB 99        shufps      xmm1,xmm3,99h
+  0040E593: 0F 59 8C 24 00 01  mulps       xmm1,xmmword ptr [esp+00000100h]
+  0040E59B: 0F 58 84 24 10 02  addps       xmm0,xmmword ptr [esp+00000210h]
+  0040E5A3: 0F C6 D5 4E        shufps      xmm2,xmm5,4Eh
+  0040E5A7: 0F 58 F8           addps       xmm7,xmm0
+  0040E5AA: 0F 28 C3           movaps      xmm0,xmm3
+  0040E5AD: 0F 59 84 24 A0 00  mulps       xmm0,xmmword ptr [esp+000000A0h]
+  0040E5B5: 0F C6 DA 99        shufps      xmm3,xmm2,99h
+  0040E5B9: 0F 59 9C 24 C0 00  mulps       xmm3,xmmword ptr [esp+000000C0h]
+  0040E5C1: 0F 58 F9           addps       xmm7,xmm1
+  0040E5C4: 0F 28 4C 24 10     movaps      xmm1,xmmword ptr [esp+10h]
+  0040E5C9: 0F 58 F8           addps       xmm7,xmm0
+  0040E5CC: 0F 28 C2           movaps      xmm0,xmm2
+  0040E5CF: 0F 59 84 24 B0 00  mulps       xmm0,xmmword ptr [esp+000000B0h]
+  0040E5D7: 0F C6 D5 99        shufps      xmm2,xmm5,99h
+  0040E5DB: 0F 59 94 24 D0 00  mulps       xmm2,xmmword ptr [esp+000000D0h]
+  0040E5E3: 0F 58 F8           addps       xmm7,xmm0
+  0040E5E6: 0F 28 C5           movaps      xmm0,xmm5
+  0040E5E9: 0F 59 44 24 60     mulps       xmm0,xmmword ptr [esp+60h]
+  0040E5EE: 0F C6 EC 99        shufps      xmm5,xmm4,99h
+  0040E5F2: 0F 59 AC 24 80 00  mulps       xmm5,xmmword ptr [esp+00000080h]
+  0040E5FA: 0F 58 FB           addps       xmm7,xmm3
+  0040E5FD: 0F 58 FA           addps       xmm7,xmm2
+  0040E600: 0F 58 F8           addps       xmm7,xmm0
+  0040E603: 0F 28 C4           movaps      xmm0,xmm4
+  0040E606: 0F 59 44 24 70     mulps       xmm0,xmmword ptr [esp+70h]
+  0040E60B: 0F C6 E1 99        shufps      xmm4,xmm1,99h
+  0040E60F: 0F 59 A4 24 90 00  mulps       xmm4,xmmword ptr [esp+00000090h]
+  0040E617: 0F 58 F8           addps       xmm7,xmm0
+  0040E61A: 0F 28 C1           movaps      xmm0,xmm1
+  0040E61D: 0F 59 44 24 40     mulps       xmm0,xmmword ptr [esp+40h]
+  0040E622: 0F C6 CE 99        shufps      xmm1,xmm6,99h
+  0040E626: 0F 59 4C 24 50     mulps       xmm1,xmmword ptr [esp+50h]
+  0040E62B: 0F 58 FD           addps       xmm7,xmm5
+  0040E62E: 0F 58 FC           addps       xmm7,xmm4
+  0040E631: 0F 58 F8           addps       xmm7,xmm0
+  0040E634: 0F 28 C6           movaps      xmm0,xmm6
+  0040E637: 0F 59 44 24 30     mulps       xmm0,xmmword ptr [esp+30h]
+  0040E63C: 0F 58 F8           addps       xmm7,xmm0
+  0040E63F: 0F 28 84 24 90 01  movaps      xmm0,xmmword ptr [esp+00000190h]
+  0040E647: 0F C6 F0 99        shufps      xmm6,xmm0,99h
+  0040E64B: 0F 59 B4 24 80 01  mulps       xmm6,xmmword ptr [esp+00000180h]
+  0040E653: 0F 59 84 24 20 01  mulps       xmm0,xmmword ptr [esp+00000120h]
+  0040E65B: 0F 58 F9           addps       xmm7,xmm1
+  0040E65E: 0F 58 FE           addps       xmm7,xmm6
+  0040E661: 0F 58 F8           addps       xmm7,xmm0
+  0040E664: 0F 11 7A C0        movups      xmmword ptr [edx-40h],xmm7
+  0040E668: 0F 10 3A           movups      xmm7,xmmword ptr [edx]
+  0040E66B: 0F 57 C0           xorps       xmm0,xmm0
+  0040E66E: 0F 10 5A E0        movups      xmm3,xmmword ptr [edx-20h]
+  0040E672: 0F 28 C8           movaps      xmm1,xmm0
+  0040E675: 0F 10 42 10        movups      xmm0,xmmword ptr [edx+10h]
+  0040E679: 0F 28 F7           movaps      xmm6,xmm7
+  0040E67C: 0F C6 F0 4E        shufps      xmm6,xmm0,4Eh
+  0040E680: 0F 28 D3           movaps      xmm2,xmm3
+  0040E683: 0F 29 84 24 D0 01  movaps      xmmword ptr [esp+000001D0h],xmm0
+  0040E68B: 0F C6 CB 4E        shufps      xmm1,xmm3,4Eh
+  0040E68F: 0F 29 B4 24 90 01  movaps      xmmword ptr [esp+00000190h],xmm6
+  0040E697: 0F 10 72 20        movups      xmm6,xmmword ptr [edx+20h]
+  0040E69B: 0F C6 C6 4E        shufps      xmm0,xmm6,4Eh
+  0040E69F: 0F 29 84 24 A0 01  movaps      xmmword ptr [esp+000001A0h],xmm0
+  0040E6A7: 0F 57 C0           xorps       xmm0,xmm0
+  0040E6AA: 0F C6 C1 99        shufps      xmm0,xmm1,99h
+  0040E6AE: 0F 59 84 24 10 01  mulps       xmm0,xmmword ptr [esp+00000110h]
+  0040E6B6: 0F 10 6A F0        movups      xmm5,xmmword ptr [edx-10h]
+  0040E6BA: 0F 29 B4 24 B0 01  movaps      xmmword ptr [esp+000001B0h],xmm6
+  0040E6C2: 0F 28 E5           movaps      xmm4,xmm5
+  0040E6C5: 0F C6 D5 4E        shufps      xmm2,xmm5,4Eh
+  0040E6C9: 0F 11 44 24 10     movups      xmmword ptr [esp+10h],xmm0
+  0040E6CE: 0F 28 84 24 40 01  movaps      xmm0,xmmword ptr [esp+00000140h]
+  0040E6D6: 0F 10 74 24 10     movups      xmm6,xmmword ptr [esp+10h]
+  0040E6DB: 0F 59 C1           mulps       xmm0,xmm1
+  0040E6DE: 0F C6 CB 99        shufps      xmm1,xmm3,99h
+  0040E6E2: 0F 59 8C 24 50 01  mulps       xmm1,xmmword ptr [esp+00000150h]
+  0040E6EA: 0F 58 84 24 20 02  addps       xmm0,xmmword ptr [esp+00000220h]
+  0040E6F2: 0F C6 E7 4E        shufps      xmm4,xmm7,4Eh
+  0040E6F6: 0F 58 F0           addps       xmm6,xmm0
+  0040E6F9: 0F 11 74 24 10     movups      xmmword ptr [esp+10h],xmm6
+  0040E6FE: 0F 10 44 24 10     movups      xmm0,xmmword ptr [esp+10h]
+  0040E703: 0F 28 B4 24 90 01  movaps      xmm6,xmmword ptr [esp+00000190h]
+  0040E70B: 0F 58 C1           addps       xmm0,xmm1
+  0040E70E: 0F 11 44 24 10     movups      xmmword ptr [esp+10h],xmm0
+  0040E713: 0F 10 4C 24 10     movups      xmm1,xmmword ptr [esp+10h]
+  0040E718: 0F 28 C3           movaps      xmm0,xmm3
+  0040E71B: 0F C6 DA 99        shufps      xmm3,xmm2,99h
+  0040E71F: 0F 59 84 24 60 01  mulps       xmm0,xmmword ptr [esp+00000160h]
+  0040E727: 0F 59 9C 24 F0 00  mulps       xmm3,xmmword ptr [esp+000000F0h]
+  0040E72F: 0F 58 C8           addps       xmm1,xmm0
+  0040E732: 0F 28 84 24 E0 00  movaps      xmm0,xmmword ptr [esp+000000E0h]
+  0040E73A: 0F 59 C2           mulps       xmm0,xmm2
+  0040E73D: 0F C6 D5 99        shufps      xmm2,xmm5,99h
+  0040E741: 0F 59 94 24 00 01  mulps       xmm2,xmmword ptr [esp+00000100h]
+  0040E749: 0F 58 C8           addps       xmm1,xmm0
+  0040E74C: 0F 28 C5           movaps      xmm0,xmm5
+  0040E74F: 0F 59 84 24 A0 00  mulps       xmm0,xmmword ptr [esp+000000A0h]
+  0040E757: 0F C6 EC 99        shufps      xmm5,xmm4,99h
+  0040E75B: 0F 59 AC 24 C0 00  mulps       xmm5,xmmword ptr [esp+000000C0h]
+  0040E763: 0F 58 CB           addps       xmm1,xmm3
+  0040E766: 0F 11 4C 24 10     movups      xmmword ptr [esp+10h],xmm1
+  0040E76B: 0F 10 5C 24 10     movups      xmm3,xmmword ptr [esp+10h]
+  0040E770: 0F 28 8C 24 A0 01  movaps      xmm1,xmmword ptr [esp+000001A0h]
+  0040E778: 0F 58 DA           addps       xmm3,xmm2
+  0040E77B: 0F 28 94 24 D0 01  movaps      xmm2,xmmword ptr [esp+000001D0h]
+  0040E783: 0F 58 D8           addps       xmm3,xmm0
+  0040E786: 0F 28 C4           movaps      xmm0,xmm4
+  0040E789: 0F 59 84 24 B0 00  mulps       xmm0,xmmword ptr [esp+000000B0h]
+  0040E791: 0F C6 E7 99        shufps      xmm4,xmm7,99h
+  0040E795: 0F 59 A4 24 D0 00  mulps       xmm4,xmmword ptr [esp+000000D0h]
+  0040E79D: 0F 58 D8           addps       xmm3,xmm0
+  0040E7A0: 0F 28 C7           movaps      xmm0,xmm7
+  0040E7A3: 0F 59 44 24 60     mulps       xmm0,xmmword ptr [esp+60h]
+  0040E7A8: 0F C6 FE 99        shufps      xmm7,xmm6,99h
+  0040E7AC: 0F 59 BC 24 80 00  mulps       xmm7,xmmword ptr [esp+00000080h]
+  0040E7B4: 0F 58 DD           addps       xmm3,xmm5
+  0040E7B7: 0F 58 DC           addps       xmm3,xmm4
+  0040E7BA: 0F 58 D8           addps       xmm3,xmm0
+  0040E7BD: 0F 28 C6           movaps      xmm0,xmm6
+  0040E7C0: 0F 59 44 24 70     mulps       xmm0,xmmword ptr [esp+70h]
+  0040E7C5: 0F C6 F2 99        shufps      xmm6,xmm2,99h
+  0040E7C9: 0F 59 B4 24 90 00  mulps       xmm6,xmmword ptr [esp+00000090h]
+  0040E7D1: 0F 58 D8           addps       xmm3,xmm0
+  0040E7D4: 0F 28 C2           movaps      xmm0,xmm2
+  0040E7D7: 0F 59 44 24 40     mulps       xmm0,xmmword ptr [esp+40h]
+  0040E7DC: 0F 58 DF           addps       xmm3,xmm7
+  0040E7DF: 0F 58 DE           addps       xmm3,xmm6
+  0040E7E2: 0F 58 D8           addps       xmm3,xmm0
+  0040E7E5: 0F 28 C1           movaps      xmm0,xmm1
+  0040E7E8: 0F 59 44 24 30     mulps       xmm0,xmmword ptr [esp+30h]
+  0040E7ED: 0F 58 D8           addps       xmm3,xmm0
+  0040E7F0: 0F C6 D1 99        shufps      xmm2,xmm1,99h
+  0040E7F4: 0F 59 54 24 50     mulps       xmm2,xmmword ptr [esp+50h]
+  0040E7F9: 8D 42 E0           lea         eax,[edx-20h]
+  0040E7FC: 0F 28 84 24 B0 01  movaps      xmm0,xmmword ptr [esp+000001B0h]
+  0040E804: 0F C6 C8 99        shufps      xmm1,xmm0,99h
+  0040E808: 0F 59 8C 24 80 01  mulps       xmm1,xmmword ptr [esp+00000180h]
+  0040E810: 0F 59 84 24 20 01  mulps       xmm0,xmmword ptr [esp+00000120h]
+  0040E818: 0F 58 DA           addps       xmm3,xmm2
+  0040E81B: 0F 58 D9           addps       xmm3,xmm1
+  0040E81E: 0F 58 D8           addps       xmm3,xmm0
+  0040E821: 0F 11 5A D0        movups      xmmword ptr [edx-30h],xmm3
+  0040E825: 3B C6              cmp         eax,esi
+  0040E827: 0F 83 DB 01 00 00  jae         0040EA08
+  0040E82D: 8D 42 20           lea         eax,[edx+20h]
+  0040E830: 3E 0F 10 70 E0     movups      xmm6,xmmword ptr ds:[eax-20h]
+  0040E835: 0F 10 60 D0        movups      xmm4,xmmword ptr [eax-30h]
+  0040E839: 0F 28 EE           movaps      xmm5,xmm6
+  0040E83C: 0F 10 78 F0        movups      xmm7,xmmword ptr [eax-10h]
+  0040E840: 0F 28 DC           movaps      xmm3,xmm4
+  0040E843: 0F 10 00           movups      xmm0,xmmword ptr [eax]
+  0040E846: 83 C0 10           add         eax,10h
+  0040E849: 0F 10 09           movups      xmm1,xmmword ptr [ecx]
+  0040E84C: 0F 29 84 24 D0 01  movaps      xmmword ptr [esp+000001D0h],xmm0
+  0040E854: 0F 28 D1           movaps      xmm2,xmm1
+  0040E857: 0F C6 EF 4E        shufps      xmm5,xmm7,4Eh
+  0040E85B: 0F 29 BC 24 B0 01  movaps      xmmword ptr [esp+000001B0h],xmm7
+  0040E863: 0F C6 F8 4E        shufps      xmm7,xmm0,4Eh
+  0040E867: 0F 29 BC 24 A0 01  movaps      xmmword ptr [esp+000001A0h],xmm7
+  0040E86F: 0F 10 38           movups      xmm7,xmmword ptr [eax]
+  0040E872: 0F C6 C7 4E        shufps      xmm0,xmm7,4Eh
+  0040E876: 0F 29 84 24 90 01  movaps      xmmword ptr [esp+00000190h],xmm0
+  0040E87E: 0F 28 84 24 70 01  movaps      xmm0,xmmword ptr [esp+00000170h]
+  0040E886: 0F 59 C1           mulps       xmm0,xmm1
+  0040E889: 0F C6 D4 4E        shufps      xmm2,xmm4,4Eh
+  0040E88D: 0F 29 BC 24 C0 01  movaps      xmmword ptr [esp+000001C0h],xmm7
+  0040E895: 0F 57 FF           xorps       xmm7,xmm7
+  0040E898: 0F C6 CA 99        shufps      xmm1,xmm2,99h
+  0040E89C: 0F 58 C7           addps       xmm0,xmm7
+  0040E89F: 0F 59 8C 24 10 01  mulps       xmm1,xmmword ptr [esp+00000110h]
+  0040E8A7: 0F C6 DE 4E        shufps      xmm3,xmm6,4Eh
+  0040E8AB: 0F 11 44 24 10     movups      xmmword ptr [esp+10h],xmm0
+  0040E8B0: 0F 10 7C 24 10     movups      xmm7,xmmword ptr [esp+10h]
+  0040E8B5: 0F 28 C2           movaps      xmm0,xmm2
+  0040E8B8: 0F C6 D4 99        shufps      xmm2,xmm4,99h
+  0040E8BC: 0F 59 84 24 40 01  mulps       xmm0,xmmword ptr [esp+00000140h]
+  0040E8C4: 0F 59 94 24 50 01  mulps       xmm2,xmmword ptr [esp+00000150h]
+  0040E8CC: 0F 58 F8           addps       xmm7,xmm0
+  0040E8CF: 0F 11 7C 24 10     movups      xmmword ptr [esp+10h],xmm7
+  0040E8D4: 0F 10 44 24 10     movups      xmm0,xmmword ptr [esp+10h]
+  0040E8D9: 0F 28 BC 24 A0 01  movaps      xmm7,xmmword ptr [esp+000001A0h]
+  0040E8E1: 0F 58 C1           addps       xmm0,xmm1
+  0040E8E4: 0F 28 8C 24 B0 01  movaps      xmm1,xmmword ptr [esp+000001B0h]
+  0040E8EC: 0F 58 C2           addps       xmm0,xmm2
+  0040E8EF: 0F 11 44 24 10     movups      xmmword ptr [esp+10h],xmm0
+  0040E8F4: 0F 28 84 24 60 01  movaps      xmm0,xmmword ptr [esp+00000160h]
+  0040E8FC: 0F 10 54 24 10     movups      xmm2,xmmword ptr [esp+10h]
+  0040E901: 0F 59 C4           mulps       xmm0,xmm4
+  0040E904: 0F C6 E3 99        shufps      xmm4,xmm3,99h
+  0040E908: 0F 59 A4 24 F0 00  mulps       xmm4,xmmword ptr [esp+000000F0h]
+  0040E910: 0F 58 D0           addps       xmm2,xmm0
+  0040E913: 0F 28 C3           movaps      xmm0,xmm3
+  0040E916: 0F 59 84 24 E0 00  mulps       xmm0,xmmword ptr [esp+000000E0h]
+  0040E91E: 0F C6 DE 99        shufps      xmm3,xmm6,99h
+  0040E922: 0F 59 9C 24 00 01  mulps       xmm3,xmmword ptr [esp+00000100h]
+  0040E92A: 0F 58 D0           addps       xmm2,xmm0
+  0040E92D: 0F 28 C6           movaps      xmm0,xmm6
+  0040E930: 0F 59 84 24 A0 00  mulps       xmm0,xmmword ptr [esp+000000A0h]
+  0040E938: 0F C6 F5 99        shufps      xmm6,xmm5,99h
+  0040E93C: 0F 59 B4 24 C0 00  mulps       xmm6,xmmword ptr [esp+000000C0h]
+  0040E944: 0F 58 D4           addps       xmm2,xmm4
+  0040E947: 0F 58 D3           addps       xmm2,xmm3
+  0040E94A: 0F 28 9C 24 D0 01  movaps      xmm3,xmmword ptr [esp+000001D0h]
+  0040E952: 0F 58 D0           addps       xmm2,xmm0
+  0040E955: 0F 28 C5           movaps      xmm0,xmm5
+  0040E958: 0F 59 84 24 B0 00  mulps       xmm0,xmmword ptr [esp+000000B0h]
+  0040E960: 0F C6 E9 99        shufps      xmm5,xmm1,99h
+  0040E964: 0F 59 AC 24 D0 00  mulps       xmm5,xmmword ptr [esp+000000D0h]
+  0040E96C: 0F 58 D0           addps       xmm2,xmm0
+  0040E96F: 0F 28 C1           movaps      xmm0,xmm1
+  0040E972: 0F 59 44 24 60     mulps       xmm0,xmmword ptr [esp+60h]
+  0040E977: 0F C6 CF 99        shufps      xmm1,xmm7,99h
+  0040E97B: 0F 59 8C 24 80 00  mulps       xmm1,xmmword ptr [esp+00000080h]
+  0040E983: 0F 58 D6           addps       xmm2,xmm6
+  0040E986: 0F 58 D5           addps       xmm2,xmm5
+  0040E989: 0F 58 D0           addps       xmm2,xmm0
+  0040E98C: 0F 28 C7           movaps      xmm0,xmm7
+  0040E98F: 0F 59 44 24 70     mulps       xmm0,xmmword ptr [esp+70h]
+  0040E994: 0F C6 FB 99        shufps      xmm7,xmm3,99h
+  0040E998: 0F 59 BC 24 90 00  mulps       xmm7,xmmword ptr [esp+00000090h]
+  0040E9A0: 0F 58 D0           addps       xmm2,xmm0
+  0040E9A3: 0F 28 C3           movaps      xmm0,xmm3
+  0040E9A6: 0F 59 44 24 40     mulps       xmm0,xmmword ptr [esp+40h]
+  0040E9AB: 0F 58 D1           addps       xmm2,xmm1
+  0040E9AE: 0F 58 D7           addps       xmm2,xmm7
+  0040E9B1: 0F 58 D0           addps       xmm2,xmm0
+  0040E9B4: 0F 28 8C 24 90 01  movaps      xmm1,xmmword ptr [esp+00000190h]
+  0040E9BC: 0F 28 C1           movaps      xmm0,xmm1
+  0040E9BF: 0F C6 D9 99        shufps      xmm3,xmm1,99h
+  0040E9C3: 0F 59 44 24 30     mulps       xmm0,xmmword ptr [esp+30h]
+  0040E9C8: 0F 59 5C 24 50     mulps       xmm3,xmmword ptr [esp+50h]
+  0040E9CD: 0F C6 8C 24 C0 01  shufps      xmm1,xmmword ptr [esp+000001C0h],99h
+  0040E9D6: 0F 59 8C 24 80 01  mulps       xmm1,xmmword ptr [esp+00000180h]
+  0040E9DE: 0F 58 D0           addps       xmm2,xmm0
+  0040E9E1: 0F 28 84 24 20 01  movaps      xmm0,xmmword ptr [esp+00000120h]
+  0040E9E9: 0F 59 84 24 C0 01  mulps       xmm0,xmmword ptr [esp+000001C0h]
+  0040E9F1: 0F 58 D3           addps       xmm2,xmm3
+  0040E9F4: 0F 58 D1           addps       xmm2,xmm1
+  0040E9F7: 0F 58 D0           addps       xmm2,xmm0
+  0040E9FA: 0F 11 11           movups      xmmword ptr [ecx],xmm2
+  0040E9FD: 83 C1 10           add         ecx,10h
+  0040EA00: 3B CE              cmp         ecx,esi
+  0040EA02: 0F 82 28 FE FF FF  jb          0040E830
+  0040EA08: 3E 3E 3E 3E 0F 10  movups      xmm6,xmmword ptr ds:[ecx+20h]
+  0040EA10: 0F 10 79 30        movups      xmm7,xmmword ptr [ecx+30h]
+  0040EA14: 0F 28 EE           movaps      xmm5,xmm6
+  0040EA17: 0F 10 41 40        movups      xmm0,xmmword ptr [ecx+40h]
+  0040EA1B: 0F 10 11           movups      xmm2,xmmword ptr [ecx]
+  0040EA1E: 0F 29 84 24 A0 01  movaps      xmmword ptr [esp+000001A0h],xmm0
+  0040EA26: 0F 28 CA           movaps      xmm1,xmm2
+  0040EA29: 0F 10 61 10        movups      xmm4,xmmword ptr [ecx+10h]
+  0040EA2D: 0F C6 EF 4E        shufps      xmm5,xmm7,4Eh
+  0040EA31: 0F 28 DC           movaps      xmm3,xmm4
+  0040EA34: 0F 29 BC 24 C0 01  movaps      xmmword ptr [esp+000001C0h],xmm7
+  0040EA3C: 0F C6 F8 4E        shufps      xmm7,xmm0,4Eh
+  0040EA40: 0F 29 BC 24 B0 01  movaps      xmmword ptr [esp+000001B0h],xmm7
+  0040EA48: 0F 10 79 50        movups      xmm7,xmmword ptr [ecx+50h]
+  0040EA4C: 0F C6 C7 4E        shufps      xmm0,xmm7,4Eh
+  0040EA50: 0F 29 84 24 D0 01  movaps      xmmword ptr [esp+000001D0h],xmm0
+  0040EA58: 0F 28 84 24 70 01  movaps      xmm0,xmmword ptr [esp+00000170h]
+  0040EA60: 0F 59 C2           mulps       xmm0,xmm2
+  0040EA63: 0F 29 BC 24 90 01  movaps      xmmword ptr [esp+00000190h],xmm7
+  0040EA6B: 0F 57 FF           xorps       xmm7,xmm7
+  0040EA6E: 0F C6 CC 4E        shufps      xmm1,xmm4,4Eh
+  0040EA72: 0F C6 D1 99        shufps      xmm2,xmm1,99h
+  0040EA76: 0F 59 94 24 10 01  mulps       xmm2,xmmword ptr [esp+00000110h]
+  0040EA7E: 0F 58 C7           addps       xmm0,xmm7
+  0040EA81: 0F C6 DE 4E        shufps      xmm3,xmm6,4Eh
+  0040EA85: 0F 11 44 24 10     movups      xmmword ptr [esp+10h],xmm0
+  0040EA8A: 0F 10 7C 24 10     movups      xmm7,xmmword ptr [esp+10h]
+  0040EA8F: 0F 28 C1           movaps      xmm0,xmm1
+  0040EA92: 0F C6 CC 99        shufps      xmm1,xmm4,99h
+  0040EA96: 0F 59 84 24 40 01  mulps       xmm0,xmmword ptr [esp+00000140h]
+  0040EA9E: 0F 59 8C 24 50 01  mulps       xmm1,xmmword ptr [esp+00000150h]
+  0040EAA6: 0F 58 F8           addps       xmm7,xmm0
+  0040EAA9: 0F 11 7C 24 10     movups      xmmword ptr [esp+10h],xmm7
+  0040EAAE: 0F 10 44 24 10     movups      xmm0,xmmword ptr [esp+10h]
+  0040EAB3: 0F 28 BC 24 B0 01  movaps      xmm7,xmmword ptr [esp+000001B0h]
+  0040EABB: 0F 58 C2           addps       xmm0,xmm2
+  0040EABE: 0F 11 44 24 10     movups      xmmword ptr [esp+10h],xmm0
+  0040EAC3: 0F 10 54 24 10     movups      xmm2,xmmword ptr [esp+10h]
+  0040EAC8: 0F 28 C4           movaps      xmm0,xmm4
+  0040EACB: 0F C6 E3 99        shufps      xmm4,xmm3,99h
+  0040EACF: 0F 59 84 24 60 01  mulps       xmm0,xmmword ptr [esp+00000160h]
+  0040EAD7: 0F 58 D1           addps       xmm2,xmm1
+  0040EADA: 0F 59 A4 24 F0 00  mulps       xmm4,xmmword ptr [esp+000000F0h]
+  0040EAE2: 0F 28 8C 24 C0 01  movaps      xmm1,xmmword ptr [esp+000001C0h]
+  0040EAEA: 0F 58 D0           addps       xmm2,xmm0
+  0040EAED: 0F 28 C3           movaps      xmm0,xmm3
+  0040EAF0: 0F 59 84 24 E0 00  mulps       xmm0,xmmword ptr [esp+000000E0h]
+  0040EAF8: 0F C6 DE 99        shufps      xmm3,xmm6,99h
+  0040EAFC: 0F 59 9C 24 00 01  mulps       xmm3,xmmword ptr [esp+00000100h]
+  0040EB04: 0F 58 D0           addps       xmm2,xmm0
+  0040EB07: 0F 28 C6           movaps      xmm0,xmm6
+  0040EB0A: 0F 59 84 24 A0 00  mulps       xmm0,xmmword ptr [esp+000000A0h]
+  0040EB12: 0F C6 F5 99        shufps      xmm6,xmm5,99h
+  0040EB16: 0F 59 B4 24 C0 00  mulps       xmm6,xmmword ptr [esp+000000C0h]
+  0040EB1E: 0F 58 D4           addps       xmm2,xmm4
+  0040EB21: 0F 58 D3           addps       xmm2,xmm3
+  0040EB24: 0F 28 9C 24 A0 01  movaps      xmm3,xmmword ptr [esp+000001A0h]
+  0040EB2C: 0F 58 D0           addps       xmm2,xmm0
+  0040EB2F: 0F 28 C5           movaps      xmm0,xmm5
+  0040EB32: 0F 59 84 24 B0 00  mulps       xmm0,xmmword ptr [esp+000000B0h]
+  0040EB3A: 0F C6 E9 99        shufps      xmm5,xmm1,99h
+  0040EB3E: 0F 59 AC 24 D0 00  mulps       xmm5,xmmword ptr [esp+000000D0h]
+  0040EB46: 0F 58 D0           addps       xmm2,xmm0
+  0040EB49: 0F 28 C1           movaps      xmm0,xmm1
+  0040EB4C: 0F 59 44 24 60     mulps       xmm0,xmmword ptr [esp+60h]
+  0040EB51: 0F C6 CF 99        shufps      xmm1,xmm7,99h
+  0040EB55: 0F 59 8C 24 80 00  mulps       xmm1,xmmword ptr [esp+00000080h]
+  0040EB5D: 0F 58 D6           addps       xmm2,xmm6
+  0040EB60: 0F 58 D5           addps       xmm2,xmm5
+  0040EB63: 0F 58 D0           addps       xmm2,xmm0
+  0040EB66: 0F 28 C7           movaps      xmm0,xmm7
+  0040EB69: 0F 59 44 24 70     mulps       xmm0,xmmword ptr [esp+70h]
+  0040EB6E: 0F C6 FB 99        shufps      xmm7,xmm3,99h
+  0040EB72: 0F 59 BC 24 90 00  mulps       xmm7,xmmword ptr [esp+00000090h]
+  0040EB7A: 0F 58 D0           addps       xmm2,xmm0
+  0040EB7D: 0F 28 C3           movaps      xmm0,xmm3
+  0040EB80: 0F 59 44 24 40     mulps       xmm0,xmmword ptr [esp+40h]
+  0040EB85: 0F 58 D1           addps       xmm2,xmm1
+  0040EB88: 0F 28 8C 24 D0 01  movaps      xmm1,xmmword ptr [esp+000001D0h]
+  0040EB90: 0F 58 D7           addps       xmm2,xmm7
+  0040EB93: 0F 58 D0           addps       xmm2,xmm0
+  0040EB96: 0F 28 C1           movaps      xmm0,xmm1
+  0040EB99: 0F C6 D9 99        shufps      xmm3,xmm1,99h
+  0040EB9D: 0F 59 44 24 30     mulps       xmm0,xmmword ptr [esp+30h]
+  0040EBA2: 0F 59 5C 24 50     mulps       xmm3,xmmword ptr [esp+50h]
+  0040EBA7: 0F 58 D0           addps       xmm2,xmm0
+  0040EBAA: 0F 28 84 24 90 01  movaps      xmm0,xmmword ptr [esp+00000190h]
+  0040EBB2: 0F C6 C8 99        shufps      xmm1,xmm0,99h
+  0040EBB6: 0F 59 84 24 20 01  mulps       xmm0,xmmword ptr [esp+00000120h]
+  0040EBBE: 0F 59 8C 24 80 01  mulps       xmm1,xmmword ptr [esp+00000180h]
+  0040EBC6: 0F 58 D3           addps       xmm2,xmm3
+  0040EBC9: 0F 58 D1           addps       xmm2,xmm1
+  0040EBCC: 0F 58 D0           addps       xmm2,xmm0
+  0040EBCF: 0F 11 11           movups      xmmword ptr [ecx],xmm2
+  0040EBD2: 0F 10 71 30        movups      xmm6,xmmword ptr [ecx+30h]
+  0040EBD6: 0F 10 41 40        movups      xmm0,xmmword ptr [ecx+40h]
+  0040EBDA: 0F 28 EE           movaps      xmm5,xmm6
+  0040EBDD: 0F 10 79 50        movups      xmm7,xmmword ptr [ecx+50h]
+  0040EBE1: 0F 10 51 10        movups      xmm2,xmmword ptr [ecx+10h]
+  0040EBE5: 0F 10 61 20        movups      xmm4,xmmword ptr [ecx+20h]
+  0040EBE9: 0F 28 CA           movaps      xmm1,xmm2
+  0040EBEC: 0F C6 E8 4E        shufps      xmm5,xmm0,4Eh
+  0040EBF0: 0F 28 DC           movaps      xmm3,xmm4
+  0040EBF3: 0F 29 84 24 C0 01  movaps      xmmword ptr [esp+000001C0h],xmm0
+  0040EBFB: 0F C6 C7 4E        shufps      xmm0,xmm7,4Eh
+  0040EBFF: 0F 29 BC 24 A0 01  movaps      xmmword ptr [esp+000001A0h],xmm7
+  0040EC07: 0F 28 FA           movaps      xmm7,xmm2
+  0040EC0A: 0F 59 BC 24 70 01  mulps       xmm7,xmmword ptr [esp+00000170h]
+  0040EC12: 0F 29 84 24 B0 01  movaps      xmmword ptr [esp+000001B0h],xmm0
+  0040EC1A: 0F 57 C0           xorps       xmm0,xmm0
+  0040EC1D: 0F C6 CC 4E        shufps      xmm1,xmm4,4Eh
+  0040EC21: 0F C6 D1 99        shufps      xmm2,xmm1,99h
+  0040EC25: 0F 58 F8           addps       xmm7,xmm0
+  0040EC28: 0F 59 94 24 10 01  mulps       xmm2,xmmword ptr [esp+00000110h]
+  0040EC30: 0F 28 C1           movaps      xmm0,xmm1
+  0040EC33: 0F C6 DE 4E        shufps      xmm3,xmm6,4Eh
+  0040EC37: 0F 59 84 24 40 01  mulps       xmm0,xmmword ptr [esp+00000140h]
+  0040EC3F: 0F C6 CC 99        shufps      xmm1,xmm4,99h
+  0040EC43: 0F 59 8C 24 50 01  mulps       xmm1,xmmword ptr [esp+00000150h]
+  0040EC4B: 0F 58 F8           addps       xmm7,xmm0
+  0040EC4E: 0F 28 C4           movaps      xmm0,xmm4
+  0040EC51: 0F 59 84 24 60 01  mulps       xmm0,xmmword ptr [esp+00000160h]
+  0040EC59: 0F C6 E3 99        shufps      xmm4,xmm3,99h
+  0040EC5D: 0F 59 A4 24 F0 00  mulps       xmm4,xmmword ptr [esp+000000F0h]
+  0040EC65: 0F 58 FA           addps       xmm7,xmm2
+  0040EC68: 0F 28 94 24 A0 01  movaps      xmm2,xmmword ptr [esp+000001A0h]
+  0040EC70: 0F 58 F9           addps       xmm7,xmm1
+  0040EC73: 0F 28 8C 24 C0 01  movaps      xmm1,xmmword ptr [esp+000001C0h]
+  0040EC7B: 0F 58 F8           addps       xmm7,xmm0
+  0040EC7E: 0F 28 C3           movaps      xmm0,xmm3
+  0040EC81: 0F 59 84 24 E0 00  mulps       xmm0,xmmword ptr [esp+000000E0h]
+  0040EC89: 0F C6 DE 99        shufps      xmm3,xmm6,99h
+  0040EC8D: 0F 59 9C 24 00 01  mulps       xmm3,xmmword ptr [esp+00000100h]
+  0040EC95: 0F 58 F8           addps       xmm7,xmm0
+  0040EC98: 0F 28 C6           movaps      xmm0,xmm6
+  0040EC9B: 0F 59 84 24 A0 00  mulps       xmm0,xmmword ptr [esp+000000A0h]
+  0040ECA3: 0F C6 F5 99        shufps      xmm6,xmm5,99h
+  0040ECA7: 0F 59 B4 24 C0 00  mulps       xmm6,xmmword ptr [esp+000000C0h]
+  0040ECAF: 0F 58 FC           addps       xmm7,xmm4
+  0040ECB2: 0F 57 E4           xorps       xmm4,xmm4
+  0040ECB5: 0F 58 FB           addps       xmm7,xmm3
+  0040ECB8: 0F 28 9C 24 B0 01  movaps      xmm3,xmmword ptr [esp+000001B0h]
+  0040ECC0: 0F 58 F8           addps       xmm7,xmm0
+  0040ECC3: 0F 28 C5           movaps      xmm0,xmm5
+  0040ECC6: 0F 59 84 24 B0 00  mulps       xmm0,xmmword ptr [esp+000000B0h]
+  0040ECCE: 0F C6 E9 99        shufps      xmm5,xmm1,99h
+  0040ECD2: 0F 59 AC 24 D0 00  mulps       xmm5,xmmword ptr [esp+000000D0h]
+  0040ECDA: 0F 58 F8           addps       xmm7,xmm0
+  0040ECDD: 0F 28 C1           movaps      xmm0,xmm1
+  0040ECE0: 0F 59 44 24 60     mulps       xmm0,xmmword ptr [esp+60h]
+  0040ECE5: 0F C6 CB 99        shufps      xmm1,xmm3,99h
+  0040ECE9: 0F 59 8C 24 80 00  mulps       xmm1,xmmword ptr [esp+00000080h]
+  0040ECF1: 0F 58 FE           addps       xmm7,xmm6
+  0040ECF4: 0F 58 FD           addps       xmm7,xmm5
+  0040ECF7: 0F 58 F8           addps       xmm7,xmm0
+  0040ECFA: 0F 28 C3           movaps      xmm0,xmm3
+  0040ECFD: 0F 59 44 24 70     mulps       xmm0,xmmword ptr [esp+70h]
+  0040ED02: 0F C6 DA 99        shufps      xmm3,xmm2,99h
+  0040ED06: 0F 58 F8           addps       xmm7,xmm0
+  0040ED09: 0F 58 F9           addps       xmm7,xmm1
+  0040ED0C: 0F 28 CA           movaps      xmm1,xmm2
+  0040ED0F: 0F C6 CC 4E        shufps      xmm1,xmm4,4Eh
+  0040ED13: 0F 59 9C 24 90 00  mulps       xmm3,xmmword ptr [esp+00000090h]
+  0040ED1B: 0F 28 C2           movaps      xmm0,xmm2
+  0040ED1E: 0F 59 44 24 40     mulps       xmm0,xmmword ptr [esp+40h]
+  0040ED23: 0F C6 D1 99        shufps      xmm2,xmm1,99h
+  0040ED27: 0F 59 54 24 50     mulps       xmm2,xmmword ptr [esp+50h]
+  0040ED2C: 0F 58 DF           addps       xmm3,xmm7
+  0040ED2F: 0F 58 D8           addps       xmm3,xmm0
+  0040ED32: 0F 28 C1           movaps      xmm0,xmm1
+  0040ED35: 0F 59 44 24 30     mulps       xmm0,xmmword ptr [esp+30h]
+  0040ED3A: 0F C6 CC 99        shufps      xmm1,xmm4,99h
+  0040ED3E: 0F 59 8C 24 80 01  mulps       xmm1,xmmword ptr [esp+00000180h]
+  0040ED46: 0F 58 D8           addps       xmm3,xmm0
+  0040ED49: 0F 58 DA           addps       xmm3,xmm2
+  0040ED4C: 0F 58 D9           addps       xmm3,xmm1
+  0040ED4F: 0F 11 59 10        movups      xmmword ptr [ecx+10h],xmm3
+  0040ED53: 0F 10 71 40        movups      xmm6,xmmword ptr [ecx+40h]
+  0040ED57: 0F 10 51 20        movups      xmm2,xmmword ptr [ecx+20h]
+  0040ED5B: 0F 28 C6           movaps      xmm0,xmm6
+  0040ED5E: 0F 10 79 50        movups      xmm7,xmmword ptr [ecx+50h]
+  0040ED62: 0F 28 EA           movaps      xmm5,xmm2
+  0040ED65: 0F 59 AC 24 70 01  mulps       xmm5,xmmword ptr [esp+00000170h]
+  0040ED6D: 0F 28 CA           movaps      xmm1,xmm2
+  0040ED70: 0F 10 61 30        movups      xmm4,xmmword ptr [ecx+30h]
+  0040ED74: 0F C6 C7 4E        shufps      xmm0,xmm7,4Eh
+  0040ED78: 0F 28 DC           movaps      xmm3,xmm4
+  0040ED7B: 0F 29 84 24 C0 01  movaps      xmmword ptr [esp+000001C0h],xmm0
+  0040ED83: 0F 57 C0           xorps       xmm0,xmm0
+  0040ED86: 0F 58 E8           addps       xmm5,xmm0
+  0040ED89: 0F C6 CC 4E        shufps      xmm1,xmm4,4Eh
+  0040ED8D: 0F C6 D1 99        shufps      xmm2,xmm1,99h
+  0040ED91: 0F 28 C1           movaps      xmm0,xmm1
+  0040ED94: 0F 59 84 24 40 01  mulps       xmm0,xmmword ptr [esp+00000140h]
+  0040ED9C: 0F 59 94 24 10 01  mulps       xmm2,xmmword ptr [esp+00000110h]
+  0040EDA4: 0F C6 CC 99        shufps      xmm1,xmm4,99h
+  0040EDA8: 0F 59 8C 24 50 01  mulps       xmm1,xmmword ptr [esp+00000150h]
+  0040EDB0: 0F 58 E8           addps       xmm5,xmm0
+  0040EDB3: 0F 28 C4           movaps      xmm0,xmm4
+  0040EDB6: 0F C6 DE 4E        shufps      xmm3,xmm6,4Eh
+  0040EDBA: 0F 59 84 24 60 01  mulps       xmm0,xmmword ptr [esp+00000160h]
+  0040EDC2: 0F 58 EA           addps       xmm5,xmm2
+  0040EDC5: 0F C6 E3 99        shufps      xmm4,xmm3,99h
+  0040EDC9: 0F 59 A4 24 F0 00  mulps       xmm4,xmmword ptr [esp+000000F0h]
+  0040EDD1: 0F 28 94 24 C0 01  movaps      xmm2,xmmword ptr [esp+000001C0h]
+  0040EDD9: 0F 58 E9           addps       xmm5,xmm1
+  0040EDDC: 0F 28 CF           movaps      xmm1,xmm7
+  0040EDDF: 0F 58 E8           addps       xmm5,xmm0
+  0040EDE2: 0F 28 84 24 E0 00  movaps      xmm0,xmmword ptr [esp+000000E0h]
+  0040EDEA: 0F 59 C3           mulps       xmm0,xmm3
+  0040EDED: 0F C6 DE 99        shufps      xmm3,xmm6,99h
+  0040EDF1: 0F 59 9C 24 00 01  mulps       xmm3,xmmword ptr [esp+00000100h]
+  0040EDF9: 0F 58 E8           addps       xmm5,xmm0
+  0040EDFC: 0F 28 C6           movaps      xmm0,xmm6
+  0040EDFF: 0F 59 84 24 A0 00  mulps       xmm0,xmmword ptr [esp+000000A0h]
+  0040EE07: 0F C6 F2 99        shufps      xmm6,xmm2,99h
+  0040EE0B: 0F 59 B4 24 C0 00  mulps       xmm6,xmmword ptr [esp+000000C0h]
+  0040EE13: 0F 58 EC           addps       xmm5,xmm4
+  0040EE16: 0F 58 EB           addps       xmm5,xmm3
+  0040EE19: 0F 58 E8           addps       xmm5,xmm0
+  0040EE1C: 0F 28 C2           movaps      xmm0,xmm2
+  0040EE1F: 0F 59 84 24 B0 00  mulps       xmm0,xmmword ptr [esp+000000B0h]
+  0040EE27: 0F C6 D7 99        shufps      xmm2,xmm7,99h
+  0040EE2B: 0F 59 94 24 D0 00  mulps       xmm2,xmmword ptr [esp+000000D0h]
+  0040EE33: 0F 58 E8           addps       xmm5,xmm0
+  0040EE36: 0F 57 C0           xorps       xmm0,xmm0
+  0040EE39: 0F C6 C8 4E        shufps      xmm1,xmm0,4Eh
+  0040EE3D: 0F 28 C7           movaps      xmm0,xmm7
+  0040EE40: 0F 59 44 24 60     mulps       xmm0,xmmword ptr [esp+60h]
+  0040EE45: 0F C6 F9 99        shufps      xmm7,xmm1,99h
+  0040EE49: 0F 59 BC 24 80 00  mulps       xmm7,xmmword ptr [esp+00000080h]
+  0040EE51: 0F 58 EE           addps       xmm5,xmm6
+  0040EE54: 0F 58 D5           addps       xmm2,xmm5
+  0040EE57: 0F 58 D0           addps       xmm2,xmm0
+  0040EE5A: 0F 28 C1           movaps      xmm0,xmm1
+  0040EE5D: 0F 59 44 24 70     mulps       xmm0,xmmword ptr [esp+70h]
+  0040EE62: 0F 58 D0           addps       xmm2,xmm0
+  0040EE65: 0F 58 D7           addps       xmm2,xmm7
+  0040EE68: 0F 57 FF           xorps       xmm7,xmm7
+  0040EE6B: 0F C6 CF 99        shufps      xmm1,xmm7,99h
+  0040EE6F: 0F 59 8C 24 90 00  mulps       xmm1,xmmword ptr [esp+00000090h]
+  0040EE77: 0F 58 D1           addps       xmm2,xmm1
+  0040EE7A: 0F 11 51 20        movups      xmmword ptr [ecx+20h],xmm2
+  0040EE7E: 0F 10 51 30        movups      xmm2,xmmword ptr [ecx+30h]
+  0040EE82: 0F 10 61 40        movups      xmm4,xmmword ptr [ecx+40h]
+  0040EE86: 0F 28 DA           movaps      xmm3,xmm2
+  0040EE89: 0F 59 9C 24 70 01  mulps       xmm3,xmmword ptr [esp+00000170h]
+  0040EE91: 0F 28 CA           movaps      xmm1,xmm2
+  0040EE94: 0F C6 CC 4E        shufps      xmm1,xmm4,4Eh
+  0040EE98: 0F 28 F4           movaps      xmm6,xmm4
+  0040EE9B: 0F 10 69 50        movups      xmm5,xmmword ptr [ecx+50h]
+  0040EE9F: 0F 28 C1           movaps      xmm0,xmm1
+  0040EEA2: 0F 59 84 24 40 01  mulps       xmm0,xmmword ptr [esp+00000140h]
+  0040EEAA: 0F C6 D1 99        shufps      xmm2,xmm1,99h
+  0040EEAE: 0F 58 DF           addps       xmm3,xmm7
+  0040EEB1: 0F 59 94 24 10 01  mulps       xmm2,xmmword ptr [esp+00000110h]
+  0040EEB9: 0F C6 CC 99        shufps      xmm1,xmm4,99h
+  0040EEBD: 0F 59 8C 24 50 01  mulps       xmm1,xmmword ptr [esp+00000150h]
+  0040EEC5: 0F 58 D8           addps       xmm3,xmm0
+  0040EEC8: 0F C6 F5 4E        shufps      xmm6,xmm5,4Eh
+  0040EECC: 0F 28 C4           movaps      xmm0,xmm4
+  0040EECF: 0F C6 E6 99        shufps      xmm4,xmm6,99h
+  0040EED3: 0F 59 84 24 60 01  mulps       xmm0,xmmword ptr [esp+00000160h]
+  0040EEDB: 0F 59 A4 24 F0 00  mulps       xmm4,xmmword ptr [esp+000000F0h]
+  0040EEE3: 0F 58 DA           addps       xmm3,xmm2
+  0040EEE6: 0F 58 D9           addps       xmm3,xmm1
+  0040EEE9: 0F 28 CD           movaps      xmm1,xmm5
+  0040EEEC: 0F C6 CF 4E        shufps      xmm1,xmm7,4Eh
+  0040EEF0: 0F 58 D8           addps       xmm3,xmm0
+  0040EEF3: 0F 28 C6           movaps      xmm0,xmm6
+  0040EEF6: 0F 59 84 24 E0 00  mulps       xmm0,xmmword ptr [esp+000000E0h]
+  0040EEFE: 0F C6 F5 99        shufps      xmm6,xmm5,99h
+  0040EF02: 0F 59 B4 24 00 01  mulps       xmm6,xmmword ptr [esp+00000100h]
+  0040EF0A: 0F 58 D8           addps       xmm3,xmm0
+  0040EF0D: 0F 28 C5           movaps      xmm0,xmm5
+  0040EF10: 0F 59 84 24 A0 00  mulps       xmm0,xmmword ptr [esp+000000A0h]
+  0040EF18: 0F C6 E9 99        shufps      xmm5,xmm1,99h
+  0040EF1C: 0F 59 AC 24 C0 00  mulps       xmm5,xmmword ptr [esp+000000C0h]
+  0040EF24: 0F 58 DC           addps       xmm3,xmm4
+  0040EF27: 0F 58 F3           addps       xmm6,xmm3
+  0040EF2A: 0F 58 F0           addps       xmm6,xmm0
+  0040EF2D: 0F 28 C1           movaps      xmm0,xmm1
+  0040EF30: 0F 59 84 24 B0 00  mulps       xmm0,xmmword ptr [esp+000000B0h]
+  0040EF38: 0F C6 CF 99        shufps      xmm1,xmm7,99h
+  0040EF3C: 0F 59 8C 24 D0 00  mulps       xmm1,xmmword ptr [esp+000000D0h]
+  0040EF44: 0F 58 F0           addps       xmm6,xmm0
+  0040EF47: 0F 58 F5           addps       xmm6,xmm5
+  0040EF4A: 0F 58 F1           addps       xmm6,xmm1
+  0040EF4D: 0F 11 71 30        movups      xmmword ptr [ecx+30h],xmm6
+  0040EF51: 0F 10 49 40        movups      xmm1,xmmword ptr [ecx+40h]
+  0040EF55: 0F 10 59 50        movups      xmm3,xmmword ptr [ecx+50h]
+  0040EF59: 0F 28 D1           movaps      xmm2,xmm1
+  0040EF5C: 0F 59 94 24 70 01  mulps       xmm2,xmmword ptr [esp+00000170h]
+  0040EF64: 0F 28 E1           movaps      xmm4,xmm1
+  0040EF67: 0F C6 E3 4E        shufps      xmm4,xmm3,4Eh
+  0040EF6B: 0F 28 C4           movaps      xmm0,xmm4
+  0040EF6E: 0F C6 CC 99        shufps      xmm1,xmm4,99h
+  0040EF72: 0F 59 84 24 40 01  mulps       xmm0,xmmword ptr [esp+00000140h]
+  0040EF7A: 0F 59 8C 24 10 01  mulps       xmm1,xmmword ptr [esp+00000110h]
+  0040EF82: 0F 58 D7           addps       xmm2,xmm7
+  0040EF85: 0F C6 E3 99        shufps      xmm4,xmm3,99h
+  0040EF89: 0F 59 A4 24 50 01  mulps       xmm4,xmmword ptr [esp+00000150h]
+  0040EF91: 0F 58 D0           addps       xmm2,xmm0
+  0040EF94: 0F 28 C3           movaps      xmm0,xmm3
+  0040EF97: 0F 59 84 24 60 01  mulps       xmm0,xmmword ptr [esp+00000160h]
+  0040EF9F: 0F 58 D1           addps       xmm2,xmm1
+  0040EFA2: 0F 28 CB           movaps      xmm1,xmm3
+  0040EFA5: 0F C6 CF 4E        shufps      xmm1,xmm7,4Eh
+  0040EFA9: 0F C6 D9 99        shufps      xmm3,xmm1,99h
+  0040EFAD: 0F 59 9C 24 F0 00  mulps       xmm3,xmmword ptr [esp+000000F0h]
+  0040EFB5: 0F 58 E2           addps       xmm4,xmm2
+  0040EFB8: 0F 58 E0           addps       xmm4,xmm0
+  0040EFBB: 0F 28 C1           movaps      xmm0,xmm1
+  0040EFBE: 0F 59 84 24 E0 00  mulps       xmm0,xmmword ptr [esp+000000E0h]
+  0040EFC6: 0F C6 CF 99        shufps      xmm1,xmm7,99h
+  0040EFCA: 0F 59 8C 24 00 01  mulps       xmm1,xmmword ptr [esp+00000100h]
+  0040EFD2: 0F 58 E0           addps       xmm4,xmm0
+  0040EFD5: 0F 58 E3           addps       xmm4,xmm3
+  0040EFD8: 0F 58 E1           addps       xmm4,xmm1
+  0040EFDB: 0F 11 61 40        movups      xmmword ptr [ecx+40h],xmm4
+  0040EFDF: 0F 10 51 50        movups      xmm2,xmmword ptr [ecx+50h]
+  0040EFE3: 0F 28 DA           movaps      xmm3,xmm2
+  0040EFE6: 0F 28 CA           movaps      xmm1,xmm2
+  0040EFE9: 0F C6 DF 4E        shufps      xmm3,xmm7,4Eh
+  0040EFED: 0F 59 8C 24 70 01  mulps       xmm1,xmmword ptr [esp+00000170h]
+  0040EFF5: 0F 28 C3           movaps      xmm0,xmm3
+  0040EFF8: 0F 59 84 24 40 01  mulps       xmm0,xmmword ptr [esp+00000140h]
+  0040F000: 0F C6 D3 99        shufps      xmm2,xmm3,99h
+  0040F004: 0F 59 94 24 10 01  mulps       xmm2,xmmword ptr [esp+00000110h]
+  0040F00C: 0F 58 CF           addps       xmm1,xmm7
+  0040F00F: 0F 28 B4 24 80 01  movaps      xmm6,xmmword ptr [esp+00000180h]
+  0040F017: 0F 28 A4 24 20 01  movaps      xmm4,xmmword ptr [esp+00000120h]
+  0040F01F: 0F 10 6C 24 30     movups      xmm5,xmmword ptr [esp+30h]
+  0040F024: 0F 58 C8           addps       xmm1,xmm0
+  0040F027: 0F C6 DF 99        shufps      xmm3,xmm7,99h
+  0040F02B: 0F 59 9C 24 50 01  mulps       xmm3,xmmword ptr [esp+00000150h]
+  0040F033: 0F 58 CA           addps       xmm1,xmm2
+  0040F036: 0F 58 CB           addps       xmm1,xmm3
+  0040F039: 0F 11 49 50        movups      xmmword ptr [ecx+50h],xmm1
+  0040F03D: 8B 8C 24 38 01 00  mov         ecx,dword ptr [esp+00000138h]
+  0040F044: 03 D1              add         edx,ecx
+  0040F046: 01 4C 24 2C        add         dword ptr [esp+2Ch],ecx
+  0040F04A: 03 F1              add         esi,ecx
+  0040F04C: 01 4C 24 28        add         dword ptr [esp+28h],ecx
+  0040F050: 03 F9              add         edi,ecx
+  0040F052: 8D 42 E0           lea         eax,[edx-20h]
+  0040F055: 3B 84 24 3C 01 00  cmp         eax,dword ptr [esp+0000013Ch]
+  0040F05C: 8B 44 24 2C        mov         eax,dword ptr [esp+2Ch]
+  0040F060: 0F 82 4A F3 FF FF  jb          0040E3B0
+  0040F066: 5F                 pop         edi
+  0040F067: 5E                 pop         esi
+  0040F068: 8B E5              mov         esp,ebp
+  0040F06A: 5D                 pop         ebp
+  0040F06B: C3                 ret
+  0040F06C: CC                 int         3
+  0040F06D: CC                 int         3
+  0040F06E: CC                 int         3
+  0040F06F: CC                 int         3
+  0040F070: CC                 int         3
+  0040F071: CC                 int         3
+  0040F072: CC                 int         3
+  0040F073: CC                 int         3
+  0040F074: CC                 int         3
+  0040F075: CC                 int         3
+  0040F076: CC                 int         3
+  0040F077: CC                 int         3
+  0040F078: CC                 int         3
+  0040F079: CC                 int         3
+  0040F07A: CC                 int         3
+  0040F07B: CC                 int         3
+  0040F07C: CC                 int         3
+  0040F07D: CC                 int         3
+  0040F07E: CC                 int         3
+  0040F07F: CC                 int         3

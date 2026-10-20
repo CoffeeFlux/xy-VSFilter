@@ -14,6 +14,7 @@ public:
     std::vector<uint8_t> Read()const;
     uint64_t Variance(unsigned,unsigned)const;
     uint64_t BeBlur(float,float,float)const;
+    uint64_t Gaussian(int,int,const float*,int,const float*,int)const;
     void Offset(int,int);
 };
 }

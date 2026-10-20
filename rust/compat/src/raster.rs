@@ -235,6 +235,106 @@ impl Image {
             },
         })
     }
+    pub fn gaussian(
+        &self,
+        kernels: &[crate::gaussian_filter::Kernel; 2],
+        numeric: &mut impl crate::gaussian_filter::Numeric,
+    ) -> Result<Self, u32> {
+        let old = fields(&self.bytes);
+        let [rx, ry] = kernels.each_ref().map(|k| k.radius());
+        let [dx, dy] = [rx, ry].map(|r| (r as i32).wrapping_mul(8));
+        let width = old[4].wrapping_add(dx >> 2);
+        let height = old[5].wrapping_add(dy >> 2);
+        let pitch = width.wrapping_add(15) & !15;
+        if old[4] <= 0
+            || old[5] <= 0
+            || old[6] < old[4]
+            || width <= 0
+            || height <= 0
+            || pitch < width
+            || dx < 0
+            || dy < 0
+            || (old[4] as usize).checked_add(2 * rx) != Some(width as usize)
+            || (old[5] as usize).checked_add(2 * ry) != Some(height as usize)
+        {
+            return Err(6);
+        }
+        let count = usize::try_from(pitch.checked_mul(height).ok_or(6u32)?).map_err(|_| 6u32)?;
+        let old_count =
+            usize::try_from(old[6].checked_mul(old[5]).ok_or(6u32)?).map_err(|_| 6u32)?;
+        let border = old[7] & 1 == 0;
+        let selected = if border { 1usize } else { 0 };
+        if old[7] & (2 << selected) == 0 || (border && old[7] & 2 == 0) {
+            return Err(6);
+        }
+        let source_at = selected * old_count;
+        if let Some(known) = &self.known {
+            if known[source_at..source_at + old_count]
+                .chunks_exact(old[6] as usize)
+                .any(|r| r[..old[4] as usize].contains(&0))
+            {
+                return Err(6);
+            }
+        }
+        let payload = count.checked_mul(if border { 2 } else { 1 }).ok_or(5u32)?;
+        let mut bytes = crate::be_blur::zeroed::<u8>(payload.checked_add(32).ok_or(5u32)?)?;
+        let mut known = crate::be_blur::zeroed::<u8>(payload)?;
+        for (i, v) in [
+            old[0].wrapping_sub(dx),
+            old[1].wrapping_sub(dy),
+            old[2].wrapping_add(dx.wrapping_mul(2)),
+            old[3].wrapping_add(dy.wrapping_mul(2)),
+            width,
+            height,
+            pitch,
+            if border { 6 } else { 3 },
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            bytes[i * 4..i * 4 + 4].copy_from_slice(&v.to_le_bytes());
+        }
+        crate::gaussian_filter::plane(
+            &self.bytes[32 + source_at..32 + source_at + old_count],
+            old[4] as usize,
+            old[5] as usize,
+            old[6] as usize,
+            &mut bytes[32 + selected * count..32 + (selected + 1) * count],
+            pitch as usize,
+            &kernels[0],
+            &kernels[1],
+            numeric,
+        )?;
+        for row in known[selected * count..(selected + 1) * count].chunks_exact_mut(pitch as usize)
+        {
+            row[..width as usize].fill(1);
+        }
+        if border {
+            // Native Gaussian initializes whole top/bottom body rows, but only
+            // the logical width of its middle rows. Preserve unknown padding.
+            known[..ry * pitch as usize].fill(1);
+            known[(height as usize - ry) * pitch as usize..count].fill(1);
+            for row in 0..old[5] as usize {
+                let dest = (row + ry) * pitch as usize;
+                known[dest..dest + width as usize].fill(1);
+                let source = row * old[6] as usize;
+                bytes[32 + dest + rx..32 + dest + rx + old[4] as usize]
+                    .copy_from_slice(&self.bytes[32 + source..32 + source + old[4] as usize]);
+                if let Some(mask) = &self.known {
+                    known[dest + rx..dest + rx + old[4] as usize]
+                        .copy_from_slice(&mask[source..source + old[4] as usize]);
+                }
+            }
+        }
+        Ok(Self {
+            bytes,
+            known: if known.contains(&0) {
+                Some(known)
+            } else {
+                None
+            },
+        })
+    }
     pub fn duplicate(&self) -> Result<Self, u32> {
         Self::decode(&self.encode()?)
     }

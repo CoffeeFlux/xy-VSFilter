@@ -7354,3 +7354,11 @@ memory-safety inventory; converting first-party code alone does not establish a
 safe Aegisub dependency. Use larger mutation campaigns, coverage-guided fuzzing
 and minimized differential cases to discover the long tail, with a pinned
 reference and isolated workers for every experiment.
+
+## In progress: owned Gaussian filtering
+
+The experimental Gaussian operation now uses safe Rust image/scratch ownership
+and filter traversal; Windows comparison evidence is pending for this checkpoint.
+See [the boundary](rust-gaussian-filter-boundary.md). The native weak coefficient
+cache, sigma products, combined dispatch and remaining renderer/host/vendor code
+still require migration. The complete drop-in replacement remains the goal.

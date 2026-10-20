@@ -1,0 +1,113 @@
+  0040ADC0: 55                 push        ebp
+  0040ADC1: 8B EC              mov         ebp,esp
+  0040ADC3: 83 E4 F0           and         esp,0FFFFFFF0h
+  0040ADC6: 8B 4D 14           mov         ecx,dword ptr [ebp+14h]
+  0040ADC9: 83 EC 38           sub         esp,38h
+  0040ADCC: 8B 55 08           mov         edx,dword ptr [ebp+8]
+  0040ADCF: 8B 45 18           mov         eax,dword ptr [ebp+18h]
+  0040ADD2: 56                 push        esi
+  0040ADD3: 8B 75 0C           mov         esi,dword ptr [ebp+0Ch]
+  0040ADD6: 0F 10 30           movups      xmm6,xmmword ptr [eax]
+  0040ADD9: 57                 push        edi
+  0040ADDA: 8B 7D 10           mov         edi,dword ptr [ebp+10h]
+  0040ADDD: 0F AF F9           imul        edi,ecx
+  0040ADE0: 03 FA              add         edi,edx
+  0040ADE2: 3B D7              cmp         edx,edi
+  0040ADE4: 0F 83 FE 00 00 00  jae         0040AEE8
+  0040ADEA: 0F 28 CE           movaps      xmm1,xmm6
+  0040ADED: 0F 57 ED           xorps       xmm5,xmm5
+  0040ADF0: 0F C6 CE 00        shufps      xmm1,xmm6,0
+  0040ADF4: 0F 28 C6           movaps      xmm0,xmm6
+  0040ADF7: 0F 28 E1           movaps      xmm4,xmm1
+  0040ADFA: 0F C6 C6 55        shufps      xmm0,xmm6,55h
+  0040ADFE: 0F 59 E5           mulps       xmm4,xmm5
+  0040AE01: 83 C6 FC           add         esi,0FFFFFFFCh
+  0040AE04: 0F 28 FE           movaps      xmm7,xmm6
+  0040AE07: 0F 29 4C 24 10     movaps      xmmword ptr [esp+10h],xmm1
+  0040AE0C: 0F C6 FE AA        shufps      xmm7,xmm6,0AAh
+  0040AE10: 0F 11 44 24 20     movups      xmmword ptr [esp+20h],xmm0
+  0040AE15: 8D 34 B2           lea         esi,[edx+esi*4]
+  0040AE18: 0F 58 E5           addps       xmm4,xmm5
+  0040AE1B: 0F C6 F6 FF        shufps      xmm6,xmm6,0FFh
+  0040AE1F: 0F 11 64 24 30     movups      xmmword ptr [esp+30h],xmm4
+  0040AE24: 0F 28 DD           movaps      xmm3,xmm5
+  0040AE27: 0F 28 CD           movaps      xmm1,xmm5
+  0040AE2A: 0F C6 1A 4E        shufps      xmm3,xmmword ptr [edx],4Eh
+  0040AE2E: 8B C2              mov         eax,edx
+  0040AE30: 0F C6 CB 99        shufps      xmm1,xmm3,99h
+  0040AE34: 0F 59 C8           mulps       xmm1,xmm0
+  0040AE37: 0F 28 C7           movaps      xmm0,xmm7
+  0040AE3A: 0F 59 C3           mulps       xmm0,xmm3
+  0040AE3D: 0F C6 1A 99        shufps      xmm3,xmmword ptr [edx],99h
+  0040AE41: 0F 59 DE           mulps       xmm3,xmm6
+  0040AE44: 0F 58 C4           addps       xmm0,xmm4
+  0040AE47: 0F 58 C8           addps       xmm1,xmm0
+  0040AE4A: 0F 58 CB           addps       xmm1,xmm3
+  0040AE4D: 0F 11 4A F0        movups      xmmword ptr [edx-10h],xmm1
+  0040AE51: 3B D6              cmp         edx,esi
+  0040AE53: 73 48              jae         0040AE9D
+  0040AE55: 0F 10 20           movups      xmm4,xmmword ptr [eax]
+  0040AE58: 0F 28 C7           movaps      xmm0,xmm7
+  0040AE5B: 0F 28 4C 24 10     movaps      xmm1,xmmword ptr [esp+10h]
+  0040AE60: 0F 28 DC           movaps      xmm3,xmm4
+  0040AE63: 0F C6 58 10 4E     shufps      xmm3,xmmword ptr [eax+10h],4Eh
+  0040AE68: 0F 59 CC           mulps       xmm1,xmm4
+  0040AE6B: 0F 59 C3           mulps       xmm0,xmm3
+  0040AE6E: 0F C6 E3 99        shufps      xmm4,xmm3,99h
+  0040AE72: 0F 59 64 24 20     mulps       xmm4,xmmword ptr [esp+20h]
+  0040AE77: 0F 58 CD           addps       xmm1,xmm5
+  0040AE7A: 0F C6 58 10 99     shufps      xmm3,xmmword ptr [eax+10h],99h
+  0040AE7F: 0F 59 DE           mulps       xmm3,xmm6
+  0040AE82: 0F 58 C8           addps       xmm1,xmm0
+  0040AE85: 0F 58 CC           addps       xmm1,xmm4
+  0040AE88: 0F 58 CB           addps       xmm1,xmm3
+  0040AE8B: 0F 11 08           movups      xmmword ptr [eax],xmm1
+  0040AE8E: 83 C0 10           add         eax,10h
+  0040AE91: 3B C6              cmp         eax,esi
+  0040AE93: 72 C0              jb          0040AE55
+  0040AE95: 0F 10 64 24 30     movups      xmm4,xmmword ptr [esp+30h]
+  0040AE9A: 8B 4D 14           mov         ecx,dword ptr [ebp+14h]
+  0040AE9D: 3E 3E 3E 3E 3E 0F  movups      xmm2,xmmword ptr ds:[eax]
+  0040AEA5: 0F 28 C7           movaps      xmm0,xmm7
+  0040AEA8: 0F 28 4C 24 10     movaps      xmm1,xmmword ptr [esp+10h]
+  0040AEAD: 0F 28 DA           movaps      xmm3,xmm2
+  0040AEB0: 0F 59 CA           mulps       xmm1,xmm2
+  0040AEB3: 03 D1              add         edx,ecx
+  0040AEB5: 03 F1              add         esi,ecx
+  0040AEB7: 0F C6 DD 4E        shufps      xmm3,xmm5,4Eh
+  0040AEBB: 0F 59 C3           mulps       xmm0,xmm3
+  0040AEBE: 0F C6 D3 99        shufps      xmm2,xmm3,99h
+  0040AEC2: 0F 58 CD           addps       xmm1,xmm5
+  0040AEC5: 0F C6 DD 99        shufps      xmm3,xmm5,99h
+  0040AEC9: 0F 59 DE           mulps       xmm3,xmm6
+  0040AECC: 0F 58 C8           addps       xmm1,xmm0
+  0040AECF: 0F 10 44 24 20     movups      xmm0,xmmword ptr [esp+20h]
+  0040AED4: 0F 59 D0           mulps       xmm2,xmm0
+  0040AED7: 0F 58 CA           addps       xmm1,xmm2
+  0040AEDA: 0F 58 CB           addps       xmm1,xmm3
+  0040AEDD: 0F 11 08           movups      xmmword ptr [eax],xmm1
+  0040AEE0: 3B D7              cmp         edx,edi
+  0040AEE2: 0F 82 3C FF FF FF  jb          0040AE24
+  0040AEE8: 5F                 pop         edi
+  0040AEE9: 5E                 pop         esi
+  0040AEEA: 8B E5              mov         esp,ebp
+  0040AEEC: 5D                 pop         ebp
+  0040AEED: C3                 ret
+  0040AEEE: CC                 int         3
+  0040AEEF: CC                 int         3
+  0040AEF0: CC                 int         3
+  0040AEF1: CC                 int         3
+  0040AEF2: CC                 int         3
+  0040AEF3: CC                 int         3
+  0040AEF4: CC                 int         3
+  0040AEF5: CC                 int         3
+  0040AEF6: CC                 int         3
+  0040AEF7: CC                 int         3
+  0040AEF8: CC                 int         3
+  0040AEF9: CC                 int         3
+  0040AEFA: CC                 int         3
+  0040AEFB: CC                 int         3
+  0040AEFC: CC                 int         3
+  0040AEFD: CC                 int         3
+  0040AEFE: CC                 int         3
+  0040AEFF: CC                 int         3

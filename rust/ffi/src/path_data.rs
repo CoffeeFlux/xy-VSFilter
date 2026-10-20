@@ -184,6 +184,42 @@ pub unsafe extern "C" fn xy_vsfilter_overlay_clone_v1(id: u64, output: *mut u8) 
     0
 }
 /// # Safety
+/// input lends `length` initialized coefficient packet bytes; output lends eight
+/// writable bytes. Input may overlap output after decoding. No pixel loan crosses.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_overlay_gaussian_v1(
+    id: u64,
+    input: *const u8,
+    length: usize,
+    output: *mut u8,
+) -> u32 {
+    if input.is_null() || output.is_null() || length < 16 || length > isize::MAX as usize {
+        return 3;
+    }
+    // SAFETY: caller's bounded initialized packet, decoded to owned coefficients.
+    let kernels = match xy_vsfilter_compat::gaussian_filter::kernels(unsafe {
+        core::slice::from_raw_parts(input, length)
+    }) {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    let id = match PATHS.with_owners(|o| {
+        let image = o.rasters.get(id)?.gaussian(
+            &kernels,
+            &mut crate::windows_gaussian_filter::Numeric::new(),
+        )?;
+        o.rasters.insert(image)
+    }) {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    // SAFETY: detached scalar write after all input borrowing has ended.
+    unsafe {
+        core::ptr::copy_nonoverlapping(id.to_le_bytes().as_ptr(), output, 8);
+    }
+    0
+}
+/// # Safety
 /// output lends eight writable bytes for the retained or newly created owner ID.
 /// No native field or pixel storage is borrowed while the offset is updated.
 #[no_mangle]
@@ -1187,6 +1223,68 @@ mod tests {
                 0
             );
             let source = u64::from_le_bytes(raster_info[1..9].try_into().unwrap());
+            let mut kernel_packet = [0u8; 49];
+            for (i, v) in [0u32, 0, 4, 4, 0x3f800000, 0, 0, 0, 0x3f800000, 0, 0, 0]
+                .into_iter()
+                .enumerate()
+            {
+                kernel_packet[1 + 4 * i..5 + 4 * i].copy_from_slice(&v.to_le_bytes());
+            }
+            let kernel_bytes = &kernel_packet[1..];
+            assert_eq!(
+                xy_vsfilter_overlay_gaussian_v1(
+                    source,
+                    kernel_bytes.as_ptr(),
+                    48,
+                    core::ptr::null_mut()
+                ),
+                3
+            );
+            raster_info.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_overlay_gaussian_v1(
+                    source,
+                    kernel_bytes.as_ptr(),
+                    47,
+                    raster_info.as_mut_ptr().add(1)
+                ),
+                6
+            );
+            assert_eq!(raster_info, [0xa5; 18]);
+            assert_eq!(
+                xy_vsfilter_overlay_gaussian_v1(
+                    source,
+                    kernel_bytes.as_ptr(),
+                    48,
+                    raster_info.as_mut_ptr().add(1)
+                ),
+                0
+            );
+            let gaussian = u64::from_le_bytes(raster_info[1..9].try_into().unwrap());
+            assert_ne!(gaussian, source);
+            assert_eq!((raster_info[0], raster_info[9]), (0xa5, 0xa5));
+            let mut gaussian_wire = [0xa5; 98];
+            assert_eq!(
+                xy_vsfilter_overlay_read_v1(gaussian, gaussian_wire.as_mut_ptr().add(1), 95),
+                4
+            );
+            assert_eq!(gaussian_wire, [0xa5; 98]);
+            assert_eq!(
+                xy_vsfilter_overlay_read_v1(gaussian, gaussian_wire.as_mut_ptr().add(1), 96),
+                0
+            );
+            assert_eq!(&gaussian_wire[1..97], &overlay_wire);
+            assert_eq!((gaussian_wire[0], gaussian_wire[97]), (0xa5, 0xa5));
+            assert_eq!(xy_vsfilter_raster_destroy_v1(gaussian), 0);
+            assert_eq!(
+                xy_vsfilter_overlay_gaussian_v1(
+                    gaussian,
+                    kernel_bytes.as_ptr(),
+                    48,
+                    raster_info.as_mut_ptr().add(1)
+                ),
+                1
+            );
             let one = 1.0f32.to_bits();
             assert_eq!(
                 xy_vsfilter_overlay_be_blur_v1(source, one, one, one, core::ptr::null_mut()),

@@ -631,6 +631,10 @@ bool Rasterizer::GaussianBlur( const Overlay& input_overlay, double gaussian_blu
     const GaussianCoefficients& filter_x = fw_filter_x.get();
     const GaussianCoefficients& filter_y = fw_filter_y.get();
 
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    output_overlay->m_owner.Take(input_overlay.m_owner.Gaussian(filter_x.g_r,filter_y.g_r,filter_x.g_f,filter_x.g_w_ex,filter_y.g_f,filter_y.g_w_ex));
+    return output_overlay->RestoreRust();
+#else
     int bluradjust_x = filter_x.g_r * 8;
     int bluradjust_y = filter_y.g_r * 8;
     output_overlay->mOffsetX       = input_overlay.mOffsetX - bluradjust_x;
@@ -701,10 +705,8 @@ bool Rasterizer::GaussianBlur( const Overlay& input_overlay, double gaussian_blu
         }
         memset(body, 0, output_overlay->mOverlayPitch * (bluradjust_y>>3));
     }
-#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
-    output_overlay->ImportNative(true,filter_y.g_r);
-#endif
     return true;
+#endif
 }
 
 bool Rasterizer::BeBlur( const Overlay& input_overlay, float be_strength, 
