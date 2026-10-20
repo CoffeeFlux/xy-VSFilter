@@ -33,7 +33,13 @@ Linked cleanup functions are archived under `test/compat/composite-mask-referenc
 These captures establish provenance, not execution parity. A new actual-linked
 observer covers 13,824 cases per architecture, repeated twice per role, with
 initialized footprint bytes, geometry, floating-point/errno/LastError state,
-native allocation deltas, copied-result survival and final release. Direct and
-whole-renderer comparison results are pending at this implementation checkpoint.
+native allocation deltas, copied-result survival and final release.
+
+Validated at `69d9a694`: all 13,824 direct cases passed on x86 and x64, as did
+sixteen focused probes, the full 1,222-case / 13,186-frame CSRI corpus with 192
+distinct controls per architecture, all three DLL contracts and scoped COM
+checks. Rust passed 389 core and 142 FFI tests per architecture plus formatting
+and Clippy; Python passed 221 tests with one existing skip. See
+[the evidence](rust-composite-owned-local-evidence.json) for exact hashes and scope.
 The older extracted storage harness explicitly selects its original native
 branch; its narrower historical evidence is not relabeled as owned-path parity.

@@ -27,15 +27,49 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest port in progress: owned composite alpha masks (2026-10-19)
+## Latest port: owned composite alpha masks (2026-10-19)
 
-The experimental compositor now owns geometry, color segmentation, initialized
-pixels and result lifetime in safe Rust. It preserves mask-pointer restarts
-between color segments and writes before dirty when a switch boundary precedes
-the clipped start. See [the boundary](rust-composite-mask-boundary.md).
-Both Windows DLL builds and Rust checks pass; direct linked comparison and
-whole-renderer regression evidence are pending. This is an implementation
-checkpoint, not completed compatibility validation or a production switch.
+Implementation `69d9a694` moves experimental `CompositeAlphaMask` clipping,
+color segmentation, initialized pixels and result lifetime into safe Rust.
+Canonical owners survive native view copies and Draw/AdditionDraw calls.
+The port preserves two quirks: every color segment restarts at the original
+clip-mask position, and a boundary before the clipped start can cause writes
+before the dirty rectangle. Equal-alpha coalescing remains unchanged.
+Only known pixels are copied into aligned native views, preserving unwritten
+padding and native allocation accounting. See [the boundary](rust-composite-mask-boundary.md)
+and [validated evidence](rust-composite-owned-local-evidence.json).
+
+Both x86 and x64 passed 13,824 direct cases (6,912 inputs with two sticky-state
+variants), twice per role. These compare initialized footprints including
+prefixes before dirty, geometry, native allocation deltas, copied-result
+survival, final release and FP/errno/LastError state. Sixteen focused regression
+probes passed per architecture, including 5,152 clipper and 17,924 overlay cases.
+The full CSRI corpus matched 1,222 cases / 13,186 frames and 192 distinct-frame
+controls per architecture. All three DLLs built with matching exports and
+dependencies; ten scoped COM cases and two pin-ID controls passed per architecture.
+
+Rust passed 389 core and 142 FFI tests on each architecture, formatting and
+Clippy including native-runtime builds. Python passed 221 tests with one
+existing skip. The current inventory has 131 portable source files with no
+unsafe constructs and 99 FFI source files: 673 unsafe blocks, 441 unsafe
+functions, four unsafe Sync implementations, 78 assembly sites and 552 extern
+functions. Counts overlap and do not establish whole-library soundness or a
+completion percentage. This port adds no numeric assembly.
+
+Production switch arrays are bounded six-DWORD initialized records; the bridge
+reads only two words for single color and reads switches only after nonempty
+geometry. Unknown source bytes actually consumed, exhausted switch histories,
+invalid addresses and allocation failures remain unclosed. Previously recorded
+native crashes and ellipse FP instability retain their original attribution.
+The older extracted storage harness explicitly selects its historical native
+branch; that evidence is not relabeled as owned-path parity.
+
+Next is owned Draw/AdditionDraw orchestration and XyBitmap state, followed by
+remaining caches, host adapters and vendored code. Experimental switches stay
+opt-in. `artifacts/composite-owned-next-notes.txt` records the distinct packed,
+planar and addition switch traversal and bitmap initialization. New
+`draw-next-reference-{x86,x64}` linked captures are inspection-only; their
+executables were not run and are not parity evidence.
 
 ## Previous port: owned clip masks and fades (2026-10-19)
 
@@ -7532,12 +7566,14 @@ reference and isolated workers for every experiment.
 
 ## Current Windows handoff
 
-Owned clip-mask construction and fades are validated at `9b0f04e1` against
-the cleanup reference; see the latest-port section and
-[evidence](rust-clip-owned-local-evidence.json). The owned `CompositeAlphaMask` implementation is ready for direct x86/x64
-comparison and whole-renderer regression validation. Downstream drawing and
-caches follow after this boundary passes. Preserve reference capture provenance
-and historical failures. Full host and vendor migration remains active.
+Owned composite alpha masks are validated at `69d9a694` against the cleanup
+reference; see the latest-port section and
+[evidence](rust-composite-owned-local-evidence.json). Continue with owned
+Draw/AdditionDraw and bitmap initialization/lifetime. Packed, planar and addition
+color traversal differ; preserve those differences and unknown padding.
+Reference drawing captures and next-boundary notes are recorded in the evidence.
+Full host and vendor migration remains active. Preserve historical unresolved
+reference outcomes and experimental opt-in switches.
 
 Serialize native links within each architecture: LTCG can write generated
 assembly to shared reference object paths even when observer outputs differ.
