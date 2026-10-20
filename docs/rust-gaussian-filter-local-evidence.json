@@ -740,5 +740,16 @@
     "path": "artifacts/gaussian-owned-contracts-x64/com/report.json",
     "sha256": "8d78a01e9be8738d7ea489fa90b36e56d6ccc592f5396f321f8972d4e0b80dc3",
     "result": "Every worker exited 5 before DLL loading because sandbox RegCreateKeyExW for private volatile settings was denied. Preserved as an environment failure, never counted as parity. Authorized isolated rerun passed all ten cases and two controls."
+  },
+  "publication": {
+    "configured_origin": "git@github.com:CoffeeFlux/xy-VSFilter.git",
+    "branch": "rust/cleanup-ass-parser",
+    "implementation_commit": "5fd6390f170160a224b4014c5e72bca213aae006",
+    "evidence_commit": "4831e66ef6d4f03f7bf11f77bc77b48bcb8c6ff2",
+    "github_repository_id": 1357801903,
+    "resolved_repository": "TypesettingTools/xy-VSFilter",
+    "fork": true,
+    "parent": "pinterf/xy-VSFilter",
+    "verification": "The configured CoffeeFlux push succeeded with a repository-moved notice. Read-only GET https://api.github.com/repos/CoffeeFlux/xy-VSFilter resolved to https://api.github.com/repositories/1357801903 and returned this fork metadata. The configured origin was retained."
   }
 }

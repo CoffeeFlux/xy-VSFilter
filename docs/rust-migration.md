@@ -85,6 +85,11 @@ payloads and host concurrency remain unclosed. Earlier reference crashes and
 ellipse instability keep their original attribution. The experimental switch
 remains opt-in and the whole-library migration remains active.
 
+Publication uses the configured `CoffeeFlux/xy-VSFilter` origin. GitHub now
+redirects that repository to `TypesettingTools/xy-VSFilter`; its public API
+identifies repository `1357801903` as a fork of `pinterf/xy-VSFilter`.
+The configured origin remains unchanged. See the evidence publication record.
+
 ## Earlier port: Gaussian coefficient construction (2026-10-19)
 
 Implementation `02696f40`, refined in `216bc4ee`, moves Gaussian coefficient
