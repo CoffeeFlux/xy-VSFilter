@@ -27,14 +27,58 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## In progress: Gaussian coefficient construction (2026-10-19)
+## Latest port: Gaussian coefficient construction (2026-10-19)
 
-The experimental coefficient constructor now builds an owned Rust packet with
-safe recurrence/indexing and bounded x86/x64 numeric backends. Native weak cache
-sharing and detached filter snapshots remain transitional. Direct linked-cleanup
-coefficient comparisons and actual Windows rendering comparisons are pending.
-See [the boundary audit](rust-gaussian-coefficients-boundary.md). The full-library
-migration remains active; Gaussian filtering and host adapters are still in scope.
+Implementation `02696f40`, refined in `216bc4ee`, moves Gaussian coefficient
+construction into safe Rust: owned allocation, symmetric recurrence indexing,
+normalization traversal, zero tail and detached packets. A checked temporary
+owner is read into the aligned native filter snapshot and released with RAII.
+Native weak sharing and the Gaussian image/filter orchestration remain
+transitional. See [the boundary audit](rust-gaussian-coefficients-boundary.md).
+
+The numeric backend reproduces linked cleanup instructions using only fixed
+initialized scalar slots. x86 retains 80-bit recurrence/volume intermediates,
+uses the inline x87 exponential and original CRT ceil/conversion; x64 retains
+SSE ordering and the same CRT exp routine. Both evaluate the exponential before
+the zero-sigma early return. Stored sigma bits come from the backend, preserving
+x86 signaling-NaN quieting. Captures/constants are archived in
+`test/compat/gaussian-coefficients-numeric` with their original provenance.
+
+The dedicated observer matches 212 lifecycle cases / 638 trace lines twice per
+role on Windows x86/x64. It calls the cleanup's linked private initializer and
+covers 53 raw sigma inputs, repeated construction/sharing/copy/release, sticky
+FP status, signed zero, negative/subnormal/nonfinite inputs and rounding
+boundaries. Coefficient/sigma bits, metadata, sharing, counts, allocation deltas
+and FP/error status match. The sequence retains 32 NaN-key weak cache entries
+in both roles; later cache comparisons can affect FP status. This is an existing
+native cache quirk to preserve during the remaining cache port.
+
+The actual overlay observer also matches 12,804 calls / 38,414 trace lines, and
+all eleven preceding focused probes pass. Each architecture's full rendering
+run matches 1,222 cases / 13,186 frames and passes 192 distinct-frame controls
+against cleanup `67da07cd`. All three DLLs build and preserve exports/dependencies;
+ten COM cases and two controls pass per architecture. These COM checks use fresh
+disconnected filters and private volatile HKCU settings keys; they do not close
+media negotiation, graph playback, UI or all host interfaces.
+
+Rust passes 377 core and 141 FFI tests per architecture, formatting and Clippy;
+Python passes 210 tests with one skip. The portable core remains unsafe-free.
+The FFI inventory records 629 unsafe blocks, 427 unsafe functions, four unsafe
+Sync implementations and 53 assembly sites; these counts are not a completion
+percentage or a soundness proof. See [the local evidence](rust-gaussian-coefficients-local-evidence.json).
+
+Gaussian filtering/dispatch, image construction, native weak sharing, clip/draw,
+GrayImage, broader native object graphs, host adapters and vendors remain in
+scope. Allocation/partial failure, invalid native image geometry, Debug,
+nondefault FP controls and arbitrary host concurrency remain unclosed. Prior
+cleanup crashes and ellipse instability retain their original attribution.
+The experimental switch remains opt-in and the full migration is active.
+
+Next-step captures remain in `artifacts/gaussian-next-reference-x86` and
+`artifacts/gaussian-next-reference-x64`. Updated notes are in
+`artifacts/gaussian-coeff-next-notes.txt`; the earlier notes and evidence hashes
+are preserved. The next operation is the floating SSE Gaussian filtering and
+its owned scratch/image orchestration, not the separate integer Gaussian module.
 
 ## Earlier port: owned BeBlur orchestration (2026-10-19)
 

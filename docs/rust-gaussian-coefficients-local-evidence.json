@@ -1,0 +1,685 @@
+{
+  "schema": 1,
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "candidate_implementation_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+  "status": "Experimental safe Gaussian coefficient construction checkpoint; native Gaussian filtering/cache and full-library migration remain active",
+  "architectures": {
+    "x86": {
+      "native": {
+        "overlay_native": {
+          "path": "artifacts/gaussian-coeff-overlay_native-x86/report.json",
+          "sha256": "c37956217fd7c0fafb852ea6fc80b7e26841c6f6bb153fbab39c52a407f5df94",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 12804,
+          "trace_lines": 38414,
+          "trace_sha256": [
+            "853e40ba497743678e3488abf3de157a0ba2769723765d8cb9f8cb673dc6ef06",
+            "853e40ba497743678e3488abf3de157a0ba2769723765d8cb9f8cb673dc6ef06",
+            "853e40ba497743678e3488abf3de157a0ba2769723765d8cb9f8cb673dc6ef06",
+            "853e40ba497743678e3488abf3de157a0ba2769723765d8cb9f8cb673dc6ef06"
+          ],
+          "binary_sha256": {
+            "reference": "2d7918093789f7b935fc8e452f397b748c903f37fdfb99015fc6a7753f0bdd06",
+            "candidate": "ea8d8631c6f0c0f8e872ca8bbd872ca2321bb55056a87f0fafe2eed7833a3dab"
+          }
+        },
+        "raster_native": {
+          "path": "artifacts/gaussian-coeff-raster_native-x86/report.json",
+          "sha256": "8c4c5333ab1451ed43f42bf944692c33dc0ee9422565614564b417c6c30499a8",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 512,
+          "trace_lines": 2050,
+          "trace_sha256": [
+            "05a2bd9b09c7b6c1d19519dc8dfc39b6685d652db7bcf780ed47a371d8e63f1f",
+            "05a2bd9b09c7b6c1d19519dc8dfc39b6685d652db7bcf780ed47a371d8e63f1f",
+            "05a2bd9b09c7b6c1d19519dc8dfc39b6685d652db7bcf780ed47a371d8e63f1f",
+            "05a2bd9b09c7b6c1d19519dc8dfc39b6685d652db7bcf780ed47a371d8e63f1f"
+          ],
+          "binary_sha256": {
+            "reference": "b8166972d3303e9cb0ae328f6ae1fa7b93161f9da4d9525386149cb73e9daf98",
+            "candidate": "f432dbfa8854a853519f7706bd5c723cd5ce55a1013b788e6b4e05934e1de156"
+          }
+        },
+        "wide_region_native": {
+          "path": "artifacts/gaussian-coeff-wide_region_native-x86/report.json",
+          "sha256": "c9b6184368f6fa8dfc6a07d4ab36fb4741294699768220e780c61290ce0f2d57",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 1536,
+          "trace_lines": 288022,
+          "trace_sha256": [
+            "895f4796454005d5b06a2d653c04b57819e48c0752f9cfd3517ad6274bdddb71",
+            "895f4796454005d5b06a2d653c04b57819e48c0752f9cfd3517ad6274bdddb71",
+            "895f4796454005d5b06a2d653c04b57819e48c0752f9cfd3517ad6274bdddb71",
+            "895f4796454005d5b06a2d653c04b57819e48c0752f9cfd3517ad6274bdddb71"
+          ],
+          "binary_sha256": {
+            "reference": "4e6e8ce0d41ddbe684f33f07f570e6a66fe2e57efe7481fdb00304b0a475cdf6",
+            "candidate": "23c6723d371e197556dbd5bc7c56d8e80a6e538a210a7b36a1fd8502629cdf81"
+          }
+        },
+        "scan_lines_native": {
+          "path": "artifacts/gaussian-coeff-scan_lines_native-x86/report.json",
+          "sha256": "74183a91994585420907f1ea9d45d10268726ad7043d8d4b43976f2ba1787012",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 384,
+          "trace_lines": 70692,
+          "trace_sha256": [
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f",
+            "f1dfe1acbf2041dc5d7f1820b64e058b09e4d5a2f3999106a9aaae8d91fd595f"
+          ],
+          "binary_sha256": {
+            "reference": "3198602183c9d397f4018a57343fbf831041ebb45912e9a74cb4ebd5de530370",
+            "candidate": "dae4fb9967c71bfdf0f0176fd551f45ee7752fa549d2038ddf15bd4b34e72244"
+          }
+        },
+        "word_transform_native": {
+          "path": "artifacts/gaussian-coeff-word_transform_native-x86/report.json",
+          "sha256": "2aaece9e15c44da1debcd506488f9fca5583e2d688ceb841984f699cab0516ef",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 4560,
+          "trace_lines": 9122,
+          "trace_sha256": [
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd",
+            "a85de56a3c575f0393a20e184187a26409a71477793529717e227454c77f22dd"
+          ],
+          "binary_sha256": {
+            "reference": "a0911802f412e8a55487065947a9be6fe310cfc0742ec48fbf1d5ab9a14083f2",
+            "candidate": "102bc99d704702fddf3d2ab799a2615e392a683f099824578eda8eb1299242cf"
+          }
+        },
+        "path_data_native": {
+          "path": "artifacts/gaussian-coeff-path_data_native-x86/report.json",
+          "sha256": "37db5f451548184158aed1942623c5fae4dac30b713519e0efdc358df11cc6f0",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 39,
+          "trace_lines": 171,
+          "trace_sha256": [
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2",
+            "20f34b3b493eba6b8587582c4bc1cafb59828bb2ad3158b21bde666fdffd33c2"
+          ],
+          "binary_sha256": {
+            "reference": "e799ee81fe68654992a1d4c14376da148e0f67f8e43dbc3534e5bd5b396994c0",
+            "candidate": "8e2471861f40b8e6dee9e81bc24d9d8a3fe80fe6b1d0a97a5b0dbc624fdb6f21"
+          }
+        },
+        "text_measure_raw": {
+          "path": "artifacts/gaussian-coeff-text_measure_raw-x86/report.json",
+          "sha256": "f295d270a64bd635579be6c32693dfd2137a21377335ce55bd2c7363c40dd462",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd",
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd",
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd",
+            "2add52f4292d896571ce0b798c146d2990c93702f668e9158f5665e788bf39bd"
+          ],
+          "binary_sha256": {
+            "reference": "5b63df0c1c77db1eb03686ef789b6e2a4c2fb6426d28a88bd35b43148440c5cf",
+            "candidate": "15a26f0200f81b680d5892441c109c1dbf5cbd1cd2e482593b29fbba199ff4d0"
+          }
+        },
+        "text_measure_construction": {
+          "path": "artifacts/gaussian-coeff-text_measure_construction-x86/report.json",
+          "sha256": "85391e8e1a2a929e2186e3a5a7105398b3a7fcc0f9713cd5ccee0229d124ac82",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893",
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893",
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893",
+            "3ff68c7e0503cd9e31b766fc4394b64f760f7a926fb0077d4ab490a775c00893"
+          ],
+          "binary_sha256": {
+            "reference": "2503e2855585f3bcae719bb9a0fcab5947e8e6100952336ff1eca8d9b15947c1",
+            "candidate": "c921715b4b38c32b105412687b6513a82acb31b478b4d469e05c208f7d4ad729"
+          }
+        },
+        "renderer_dc_text_native": {
+          "path": "artifacts/gaussian-coeff-renderer_dc_text_native-x86/report.json",
+          "sha256": "5d59ef18694f28d014f413b0c7795c565ee24f51ad9fa5416e59633eaf90f3b8",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 40,
+          "trace_lines": 598,
+          "trace_sha256": [
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330",
+            "a89d82a74965cb711309b1dfc42e708331839db3aab3bbd29e759f6e1ed1e330"
+          ],
+          "binary_sha256": {
+            "reference": "285993fbaf435cfd36e9f17480389f02048d8d8b694645c30a753709f7d87113",
+            "candidate": "6ab82ead4997960c9bfc02438bddd0b11bb271dd5e82f7c83c36befce6bad628"
+          }
+        },
+        "renderer_dc_native": {
+          "path": "artifacts/gaussian-coeff-renderer_dc_native-x86/report.json",
+          "sha256": "70631de06d0aafb9294f127efb013bf5c7c2d1dd8c5f95dab8c4e6302a66227b",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 6,
+          "trace_lines": 116,
+          "trace_sha256": [
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983",
+            "ac4347ced055e448984741bcfa500ee5074003005f0198de3102c6ef585c4983"
+          ],
+          "binary_sha256": {
+            "reference": "2cc4bdf0ad140f17137067e0391ebc72f86b26d896daaadf6645f444070a818f",
+            "candidate": "28805f3120829e0b1c58663c46ec7dae62efdd32f85f7433688e97250de60f5d"
+          }
+        },
+        "font_native": {
+          "path": "artifacts/gaussian-coeff-font_native-x86/report.json",
+          "sha256": "e0ca4652da4de70b96dc55f22aa0da95138681b4d307b9df84316634f4c0c883",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 195,
+          "trace_lines": 392,
+          "trace_sha256": [
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f",
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f",
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f",
+            "9cd25789565cb2a988f5e96bb52e95bcf57907f47e7f7583783e208a38c20b6f"
+          ],
+          "binary_sha256": {
+            "reference": "f79bf40b2a38274f57695269991d17be2201f26dcb9568a671f89b0d6b83f98e",
+            "candidate": "67dda51b64d74510521fdd59ac3773c11ca494905523553ce2506edc82f8fd86"
+          }
+        },
+        "font_gdi_calls": {
+          "path": "artifacts/gaussian-coeff-font_gdi_calls-x86/report.json",
+          "sha256": "e27966caafcbc89dfeefca12f3c712d18c6bfd8ed65fe18ebe8a58b88d2c6ddc",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 12,
+          "trace_lines": 126,
+          "trace_sha256": [
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5",
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5",
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5",
+            "1dadd5355b6960ac686bf20a55dcb756f580833cbc1bd9505e2271d9c74acab5"
+          ],
+          "binary_sha256": {
+            "reference": "5b07b8ff1cd38643a7fb5eddc279b814c7ea0939f873e37add1cd2c1d170f962",
+            "candidate": "589f7a40900983670a756bad544ccdd617e9150528a1d6f77514333556054705"
+          }
+        },
+        "gaussian_coefficients_native": {
+          "path": "artifacts/gaussian-coeff-initial-x86/report.json",
+          "sha256": "c3ba7121467ec4c497903238ffa74e20808a681196890072d18551fa3ec12e81",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 212,
+          "trace_lines": 638,
+          "trace_sha256": [
+            "36bb5760e0bb84dad82343aac8a3221ba0ff23f2ea5cc429165e06457077cf47",
+            "36bb5760e0bb84dad82343aac8a3221ba0ff23f2ea5cc429165e06457077cf47",
+            "36bb5760e0bb84dad82343aac8a3221ba0ff23f2ea5cc429165e06457077cf47",
+            "36bb5760e0bb84dad82343aac8a3221ba0ff23f2ea5cc429165e06457077cf47"
+          ],
+          "binary_sha256": {
+            "reference": "e1ead38a459a8fdad66a7e944e4e3babb1f7a98a1c21b643c11be8ccc7739f57",
+            "candidate": "d3a8b0f4afe7bdcfb7769434d9707312afb40b40657e975e07b358b0ca2b2f9f"
+          }
+        }
+      },
+      "rendering": {
+        "path": "artifacts/gaussian-coeff-csri-x86/summary.json",
+        "sha256": "dbf55606d8ca5bbe1a573ac33a69e5aa52bcc555c6c62fe7c0d4b8f26d84d064",
+        "original_manifest_sha256": "2949bb98bfbc49bd3496af90ef9a8b3b386395637ff34bc54b0fc4e86fe61363",
+        "partition_exact": true,
+        "cases": 1222,
+        "frames": 13186,
+        "shard_results": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            7,
+            0
+          ]
+        ],
+        "complete": true,
+        "candidate_dll": {
+          "path": "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\bin\\lib_17.0\\Win32\\Release\\VSFilter.dll",
+          "sha256": "50da97f4e77cedd736d829e3e881929ee4749dd89f19c7e6c6023540fb55efa7"
+        },
+        "reference_source": {
+          "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+          "repository": "https://github.com/CoffeeFlux/xy-VSFilter"
+        },
+        "distinct_controls": 192,
+        "stable_equal_cases": 1222,
+        "stable_equal_frames": 13186,
+        "unresolved_cases": []
+      },
+      "contracts": {
+        "path": "artifacts/gaussian-coeff-contracts-x86.log",
+        "sha256": "445a1347a43a8f59ccc7dfd18b9c878b4d225eeaaf4cc2cee89c7ff109d43161"
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "path": "bin/lib_17.0/Win32/Release/VSFilter.dll",
+          "sha256": "50da97f4e77cedd736d829e3e881929ee4749dd89f19c7e6c6023540fb55efa7"
+        },
+        "XySubFilter.dll": {
+          "path": "bin/lib_17.0/Win32/Release/XySubFilter.dll",
+          "sha256": "4f36574a1b029dddca23b8d671857ec32d8b663477d185e15b4c714832635646"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "path": "bin/lib_17.0/Win32/Release/xy_sub_filter_consumer.dll",
+          "sha256": "3609abafe741e50fdf9137bf62739c5a231730f3acdd653851786795b0173ae1"
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/gaussian-coeff-build-x86.log",
+          "sha256": "179f0dcc6f3ba0fed826072c45267da07e51e97c19f152f12e66662f50f052fa"
+        },
+        {
+          "path": "artifacts/gaussian-coeff-build-rust-x86.log",
+          "sha256": "d28749fcc060a16ff7bfb89b1b561c39eee407e47c0b0e82669beccded9c76e9"
+        }
+      ]
+    },
+    "x64": {
+      "native": {
+        "overlay_native": {
+          "path": "artifacts/gaussian-coeff-overlay_native-x64/report.json",
+          "sha256": "cec758480713a2bc835199022ce2c76d5d30647c13fc429e8dbbd12ca4a5c866",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 12804,
+          "trace_lines": 38414,
+          "trace_sha256": [
+            "0e404b3af644f5d9be4ee3b49bcd51abb53f44f3c356348b3c312dee98ac8c2b",
+            "0e404b3af644f5d9be4ee3b49bcd51abb53f44f3c356348b3c312dee98ac8c2b",
+            "0e404b3af644f5d9be4ee3b49bcd51abb53f44f3c356348b3c312dee98ac8c2b",
+            "0e404b3af644f5d9be4ee3b49bcd51abb53f44f3c356348b3c312dee98ac8c2b"
+          ],
+          "binary_sha256": {
+            "reference": "53bb3845c4a93ffc7f01b3062d4f21af955bf581b928b96eab1d3e2a247e579c",
+            "candidate": "66660cdebbe48f4ee05518e563c25d28b80754b2f7dedd7286214ce54607b343"
+          }
+        },
+        "raster_native": {
+          "path": "artifacts/gaussian-coeff-raster_native-x64/report.json",
+          "sha256": "d93f9592b9ee0bd554616b93d6f19a48aa44369ad44def0a2f31cb9874477d9f",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 512,
+          "trace_lines": 2050,
+          "trace_sha256": [
+            "cb6de9c380203885c4cec5bac67a4771747a68290e6fe0599d191155a71222e3",
+            "cb6de9c380203885c4cec5bac67a4771747a68290e6fe0599d191155a71222e3",
+            "cb6de9c380203885c4cec5bac67a4771747a68290e6fe0599d191155a71222e3",
+            "cb6de9c380203885c4cec5bac67a4771747a68290e6fe0599d191155a71222e3"
+          ],
+          "binary_sha256": {
+            "reference": "46b375a94cc3bbc3dc445aad94a27db9d71ddf03522157a304450b3d5cdcf2e0",
+            "candidate": "1f4acb62cd7ea2ba885f93d9f2d7078592de36de4333b61fb0332ab64d9bd0d5"
+          }
+        },
+        "wide_region_native": {
+          "path": "artifacts/gaussian-coeff-wide_region_native-x64/report.json",
+          "sha256": "c3e77b205c1dc3d078e3c1b94fc39b8618ba283538c274e766ee0dd81c6a4f5c",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 1536,
+          "trace_lines": 288022,
+          "trace_sha256": [
+            "4fb58dc5e624a826d0a36164656cc725e56f7612b95a03a61824e80741bc7925",
+            "4fb58dc5e624a826d0a36164656cc725e56f7612b95a03a61824e80741bc7925",
+            "4fb58dc5e624a826d0a36164656cc725e56f7612b95a03a61824e80741bc7925",
+            "4fb58dc5e624a826d0a36164656cc725e56f7612b95a03a61824e80741bc7925"
+          ],
+          "binary_sha256": {
+            "reference": "3e4d192c08aed89d965c7a65cecd57284e1920854a07d4701701b56ed3577032",
+            "candidate": "333c9724c4f834c86ce74585aef18862de12de04bf8c1977cfe7fb08453257de"
+          }
+        },
+        "scan_lines_native": {
+          "path": "artifacts/gaussian-coeff-scan_lines_native-x64/report.json",
+          "sha256": "0a50d19125f7d9348f5283c0be6f78fcce5759b6151f2f9be14f4ab58f8aae20",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 384,
+          "trace_lines": 70692,
+          "trace_sha256": [
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2",
+            "cd603fc5f0b3c209c61686cf12cec577803c69f473b5f1627bb334a405f364a2"
+          ],
+          "binary_sha256": {
+            "reference": "4833ac0963ccbd6b3e74610b42d39fa06ee5077ded5d23baa4bd113f5f007e2d",
+            "candidate": "b779b5745cbaeffbab247ddb1f43446b6193ee11dd9a84a0b0234317b5680b51"
+          }
+        },
+        "word_transform_native": {
+          "path": "artifacts/gaussian-coeff-word_transform_native-x64/report.json",
+          "sha256": "2b2d6cce5b787364bda70c56e15926dbf654ee1829f5fe9e8397a58d72ed2bf4",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 4560,
+          "trace_lines": 9122,
+          "trace_sha256": [
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b",
+            "07fd143f1776bd57a08e04cf3fec34d849801f10faab1aaf31398602435d307b"
+          ],
+          "binary_sha256": {
+            "reference": "bf0e643967d4349a3f35db2399aa4e4488c401fab33c389f3f5e889358a23829",
+            "candidate": "82f17516749d07e67c33414dfed3fdee27e35c9e3f924bf421aab3d4e6006cea"
+          }
+        },
+        "path_data_native": {
+          "path": "artifacts/gaussian-coeff-path_data_native-x64/report.json",
+          "sha256": "4268fc04a477f2950e7f982ed2a5af6d59d57ae186d46a296bde1879aa860cc5",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 39,
+          "trace_lines": 171,
+          "trace_sha256": [
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031",
+            "ecab0b2c9015b7744b49778991e7c172b086479ab23a50ee8e2c597404214031"
+          ],
+          "binary_sha256": {
+            "reference": "a4db805b7832338b4bf1de749456fd3522c67884c0b1c4addcbf210ff09c7d43",
+            "candidate": "85a070fff4868bb510657752f9ac4fea077beb6e0ad0e10689694f1987d166cf"
+          }
+        },
+        "text_measure_raw": {
+          "path": "artifacts/gaussian-coeff-text_measure_raw-x64/report.json",
+          "sha256": "14164977dbda30e47d89a4596d44923f5c5caa50cfc057385a1dc1224a54e02b",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054",
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054",
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054",
+            "f512069af6dba306fbf5447930431ca6a7a05ed077601bc4dd7a3daf4c44a054"
+          ],
+          "binary_sha256": {
+            "reference": "ff1b90c520d2eeddfaafd371d3619e3694dabab0e34d9532d3d03886bc5014d4",
+            "candidate": "2497746a3b67eb473b064fbfe2621c4b128000c38c666fbeda1ab24270771c1e"
+          }
+        },
+        "text_measure_construction": {
+          "path": "artifacts/gaussian-coeff-text_measure_construction-x64/report.json",
+          "sha256": "ad400eb20dcb8af803c38c096073a504cff8f493a7fce2565f3ebd12e2dac435",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 432,
+          "trace_lines": 2454,
+          "trace_sha256": [
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3",
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3",
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3",
+            "54fb5fdbd00f10b57faefd4047cdb0e256cf67d34b33c669a673643a12d2c3c3"
+          ],
+          "binary_sha256": {
+            "reference": "d2ba1f2f802d2b00323b3a85d8f7d520462c79293f51c977dbf6c4d8d84d0c7e",
+            "candidate": "d4969a1828d242e3127735407d54f51bdd40cf3bf28c0a539766bd57b9868507"
+          }
+        },
+        "renderer_dc_text_native": {
+          "path": "artifacts/gaussian-coeff-renderer_dc_text_native-x64/report.json",
+          "sha256": "822165d69a98e883e339c3e168c676178b12c309de59aeb84c483df7798dd7f7",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 40,
+          "trace_lines": 598,
+          "trace_sha256": [
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac",
+            "ed7160f114269ad624818d2133e0a69ab2130ac68150eee78cc4fda067c94aac"
+          ],
+          "binary_sha256": {
+            "reference": "5635c9e3f74785fcb63eaf1eae441a37e4e8582b741ab6b2a214ae8375f9c253",
+            "candidate": "f2fdb7285da93b5c4a2018dbc9e75dd1e6c3d3bc56d401868383380e30a8bb57"
+          }
+        },
+        "renderer_dc_native": {
+          "path": "artifacts/gaussian-coeff-renderer_dc_native-x64/report.json",
+          "sha256": "58621c85ab79660bc0397049c342def7be2a3ff886d4b096b3add72c96aacaa7",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 6,
+          "trace_lines": 116,
+          "trace_sha256": [
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd",
+            "3416ba3684de501020f15af53114d2c6d3c01ad0a240be4ef84659acbdbe59fd"
+          ],
+          "binary_sha256": {
+            "reference": "16f6209cf25c5e0d2e51224e5b2187be3a33e4870b54d24178f38dbd3e8501a5",
+            "candidate": "01598686f2d665841286b5812e4ab68652308b335b659eee154dc241203b9128"
+          }
+        },
+        "font_native": {
+          "path": "artifacts/gaussian-coeff-font_native-x64/report.json",
+          "sha256": "5a4a30742b6f9ce77eefb63afb6015edbfa2547206c040392e70abf486473220",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 195,
+          "trace_lines": 392,
+          "trace_sha256": [
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7",
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7",
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7",
+            "71d7dc16ff46697801449ca5d1cf08da97fe6adeb5a3f83bda59f1fbe1116ff7"
+          ],
+          "binary_sha256": {
+            "reference": "fbfb06e600427bf94ed8c13823c74504120df769006eb71b91a3661e1ce01292",
+            "candidate": "66b8f4b111c1c57fa503aa3b7a7cb1aeb829c02aa779be5cc16b09df3485ce8e"
+          }
+        },
+        "font_gdi_calls": {
+          "path": "artifacts/gaussian-coeff-font_gdi_calls-x64/report.json",
+          "sha256": "ae84c0a6b5628e17315801e0eb8cb15375506e8e9eb2a01b1ccf854016a292aa",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 12,
+          "trace_lines": 126,
+          "trace_sha256": [
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93",
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93",
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93",
+            "665953fa34c5df68f30ffb45fe16244e18ce23b2960e2808fbfce45ee45e5b93"
+          ],
+          "binary_sha256": {
+            "reference": "cbb68ba3a1467551cedc400e25fbdcd8ee62adc440f5106a24d56db777ec8668",
+            "candidate": "a1cf9f7784543710c60d35603d5a9a666e3e2543c0704afee0bdd948eb545006"
+          }
+        },
+        "gaussian_coefficients_native": {
+          "path": "artifacts/gaussian-coeff-initial-x64/report.json",
+          "sha256": "5e943076baff5b9cb764d1bcf837e9b6c26f534266d659389b80c73fecd38c4e",
+          "candidate_commit": "216bc4eefc781cbaeec2e8192b4ffc335571aa27",
+          "cases": 212,
+          "trace_lines": 638,
+          "trace_sha256": [
+            "950f235b5c59eaf6365b5f2b0aba2dec3546336eb4d3e5a410be7ccc8d843207",
+            "950f235b5c59eaf6365b5f2b0aba2dec3546336eb4d3e5a410be7ccc8d843207",
+            "950f235b5c59eaf6365b5f2b0aba2dec3546336eb4d3e5a410be7ccc8d843207",
+            "950f235b5c59eaf6365b5f2b0aba2dec3546336eb4d3e5a410be7ccc8d843207"
+          ],
+          "binary_sha256": {
+            "reference": "750c629fba0b2f5dccb8df9efa3c2f0f6bd753105ac4c4130a9f8d84f31df61a",
+            "candidate": "4520887f1b74f6291ca6acff435a96936b383624bcf369d0ff85a5a3f734416e"
+          }
+        }
+      },
+      "rendering": {
+        "path": "artifacts/gaussian-coeff-csri-x64/summary.json",
+        "sha256": "64b892d54405afe98d0100f856bf2672f3a72eccabe0df5de05acde594945a85",
+        "original_manifest_sha256": "2949bb98bfbc49bd3496af90ef9a8b3b386395637ff34bc54b0fc4e86fe61363",
+        "partition_exact": true,
+        "cases": 1222,
+        "frames": 13186,
+        "shard_results": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            7,
+            0
+          ]
+        ],
+        "complete": true,
+        "candidate_dll": {
+          "path": "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\bin\\lib_17.0\\x64\\Release\\VSFilter.dll",
+          "sha256": "c12055fe381f4845bd7affd3e122a0f93f385295139a88c8c572a183d6f25d0c"
+        },
+        "reference_source": {
+          "commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+          "repository": "https://github.com/CoffeeFlux/xy-VSFilter"
+        },
+        "distinct_controls": 192,
+        "stable_equal_cases": 1222,
+        "stable_equal_frames": 13186,
+        "unresolved_cases": []
+      },
+      "contracts": {
+        "path": "artifacts/gaussian-coeff-contracts-x64.log",
+        "sha256": "445a1347a43a8f59ccc7dfd18b9c878b4d225eeaaf4cc2cee89c7ff109d43161"
+      },
+      "dlls": {
+        "VSFilter.dll": {
+          "path": "bin/lib_17.0/x64/Release/VSFilter.dll",
+          "sha256": "c12055fe381f4845bd7affd3e122a0f93f385295139a88c8c572a183d6f25d0c"
+        },
+        "XySubFilter.dll": {
+          "path": "bin/lib_17.0/x64/Release/XySubFilter.dll",
+          "sha256": "d0401f6b8851cb7afc629b3d9347abc343e3b14a7ff0fbb1d16ef6fe95c9ed01"
+        },
+        "xy_sub_filter_consumer.dll": {
+          "path": "bin/lib_17.0/x64/Release/xy_sub_filter_consumer.dll",
+          "sha256": "9ca7be2d6d73b758f8c611bb01943e42fbbdaa3b6c04963b446c0229129495de"
+        }
+      },
+      "build_logs": [
+        {
+          "path": "artifacts/gaussian-coeff-build-x64.log",
+          "sha256": "936e74ba875a8a2aeb68690ea4c6285ec1d452ea5714cab266e1dc175a37341b"
+        },
+        {
+          "path": "artifacts/gaussian-coeff-build-rust-x64.log",
+          "sha256": "53e3f3b2c220caded05ba8aef26b3bd47c5280cc1f3e5e818c0f585fad9c4efc"
+        }
+      ]
+    }
+  },
+  "checks": {
+    "path": "artifacts/gaussian-coeff-checks.log",
+    "sha256": "db8c9941d4f89aa4ac4cfa6bef3b01662e415b893ee5ecbac088bc372a771b9a",
+    "core_per_architecture": 377,
+    "ffi_per_architecture": 141,
+    "python": 210,
+    "python_skipped": 1,
+    "fmt": true,
+    "clippy_both_architectures_and_native_runtime": true
+  },
+  "unsafe_inventory": {
+    "path": "artifacts/gaussian-coeff-unsafe-inventory.json",
+    "sha256": "d2148cbc0afbbe97d590d8d5cd3462f4a83124a4d2da56b175708fa77a1cd18c"
+  },
+  "previous_unresolved_reference": {
+    "evidence": "rust-word-transform-local-evidence.json",
+    "case": "field-unicode-style-space-file",
+    "result": "Earlier x64 cleanup exit access violation remains unresolved; a later passing run does not erase it."
+  },
+  "limitations": [
+    "Finite Release/default Windows FP-control observations; Debug, unmasked exceptions, allocator failure and arbitrary host concurrency remain unclosed.",
+    "Safe Rust owns coefficient generation, indexing, normalization and zero tail. Bounded scalar backend preserves x86 extended intermediates and x64 SSE/CRT arithmetic, including stored sigma bits. No coefficient pointer crosses this ABI.",
+    "The aligned native snapshot and weak coefficient sharing remain transitional. Gaussian filtering/dispatch, image construction, clip/draw, host adapters and vendors remain in scope.",
+    "Dedicated observer uses the linked cleanup private init method with a declared native layout, field initialization, ordinary byte copy and destructor. Full renderer comparisons independently exercise actual Gaussian/combined methods."
+  ],
+  "earlier_ellipse_fp_limit": {
+    "evidence": "ellipse-storage-fp-scope.json",
+    "result": "Earlier optimized native ellipse FP instability retains its original attribution and is not erased by current passing runs."
+  },
+  "sources": {
+    "rust/compat/src/gaussian_coefficients.rs": "d493647b9e45aae59a8a1fd07e7660e88a98401361d788a66d1cbdea8970037f",
+    "rust/ffi/src/windows_gaussian_numeric.rs": "e164a930fae107f9a3c45a38b923a9a7b4ab2ebbf2518d4019389cfc3b7ec8d9",
+    "rust/ffi/src/path_data.rs": "a1ab4a7e6b99238bb6893d4874365df1402c66909c18e50bedd2a2b6f70d5269",
+    "src/subtitles/Rasterizer.cpp": "b9fa51a5fc4a401c85d882b17d21fbf00217ef685b93f9a53b4ba80431c45154",
+    "src/subtitles/RustGaussianCoefficients.h": "535b124f914e3853b28caa2d5f6636587cd0757318e073dfa290e6aa4ee89950",
+    "docs/rust-gaussian-coefficients-boundary.md": "7d0e2f03f9a421f94de0a66248fa872b47a071eb94aa50262b91879813433af1",
+    "tools/compat/gaussian_coefficients_native.cpp": "22e574a973d2e8dfd3679f8977df26aec3748fe1e1817b357e9f028de61a0b95",
+    "tools/compat/gaussian_coefficients_native.py": "6322d861d6443993456612f0e3f77c9a7ea85787a528c4bea95de083b9f8cd4e",
+    "tools/compat/test_gaussian_coefficients_native.py": "3f8871f6031dca3a6bbf879bbae16fff80a06cd0c4cd1a88d25eda10d4eb05a1",
+    "tools/compat/overlay_native.cpp": "43baab10ecfa64923607464ed9bc334199561eee11f8b5be38e81a3010742b1f",
+    "tools/compat/overlay_native.py": "9644a662a51be1796e203eddbfb8b9606ef8ade0598322609ff37f0f2dd6fe6c"
+  },
+  "arithmetic_capture": {
+    "x86": {
+      "path": "test/compat/gaussian-coefficients-numeric/x86/archive.json",
+      "sha256": "98273889cf3bfa51be0d6be2d08b0e9ea990629eae9cb3dded1efb6cf2e2b8ff"
+    },
+    "x64": {
+      "path": "test/compat/gaussian-coefficients-numeric/x64/archive.json",
+      "sha256": "86379f10638d4378a499d2b4a49002d65d89974826737b7ed47d423669977d57"
+    }
+  },
+  "arithmetic_constants": {
+    "path": "test/compat/gaussian-coefficients-numeric/constants.json",
+    "sha256": "b8c69c328cac044f751748f02060a2188e24e952dccbac362ada5f0c7f014bf0"
+  },
+  "next_gaussian_notes": {
+    "path": "artifacts/gaussian-coeff-next-notes.txt",
+    "sha256": "2df6ebfcd26a82c8c49de6c421b9810a88876bfb0aa905a0f010c057d2601ace"
+  },
+  "native_cache_observation": "The dedicated sequence ends with 32 retained NaN-key weak entries, matching both roles. These are existing native cache semantics, not a new Rust cache implementation. Future cache migration must preserve comparison/FP effects."
+}
