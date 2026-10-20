@@ -27,7 +27,58 @@ Stable behavior implemented with unsafe C++ may need safe emulation in Rust.
 Do not reproduce memory corruption. Crashes, hangs and unstable output are
 unresolved reference outcomes requiring investigation, never matching results.
 
-## Latest port: owned raster construction (2026-10-19)
+## Latest port: persistent overlay owners and subpixel shifting (2026-10-19)
+
+Implementation `0adc9700` retains completed overlays in the checked Rust image
+registry. Raster construction transfers its owner directly; native blur imports
+only its initialized output ranges. Rust owns metadata, pixel values and their
+initializedness. Cleanup releases the owner, assignment makes an independent
+owner, and cache-copy offset changes update only the copy. Transitional native
+snapshots preserve their shared aliases and cache allocation accounting.
+
+`Overlay::GetSubpixelVariance` now runs on these owners in safe Rust: shift masking,
+wrapping geometry, full-pitch versus row-width copying, initialized zero padding
+where appropriate, and bilinear history/rounding. Unknown Gaussian padding stays
+unknown through full-pitch copies and is never materialized from a placeholder.
+An attempt to use an unknown logical pixel reports unresolved. Empty overlays
+retain the cleanup's admitted zero-plane results. The facade materializes only
+known byte runs for existing native consumers. See [the boundary audit](rust-overlay-owner-boundary.md).
+
+The maintained actual-method observer matches 5,124 calls / 15,374 trace lines,
+twice per role on Windows x86/x64. It covers raster, BeBlur, Gaussian and combined
+blur, shared native aliases, independent cache-copy offsets, four subpixel shifts,
+chained shifts and empty sources. Metadata, every initialized byte, FP/error
+status and allocation deltas match. Unknown padding is explicitly outside byte
+parity. All eleven preceding focused probes pass. Each full rendering run matches
+1,222 cases / 13,186 frames and passes 192 distinct-frame controls against cleanup
+`67da07cd`. All three DLLs build and preserve exports/dependencies; ten COM cases
+plus two controls pass on each architecture.
+
+Rust passes 371 core and 141 FFI tests per architecture, formatting and Clippy;
+Python passes 208 tests with one skip. Tests include unknown-byte propagation,
+refusal to filter unknown pixels, copy independence, stale IDs and unaligned/
+short packet outputs. Core remains unsafe-free. The FFI inventory records 606
+production unsafe blocks, 424 unsafe functions, four unsafe Sync implementations
+and 34 assembly sites; these are not a completion percentage or soundness proof.
+Detailed provenance is in [the local evidence](rust-overlay-owner-local-evidence.json).
+
+Native blur orchestration and its floating-point control, clip/draw/GrayImage
+consumers, broader native object graphs, host adapters and vendors remain in scope.
+Additional canonical Rust storage increases memory use but does not alter the
+legacy cached-snapshot counter. Allocation failure, partial native failure state,
+invalid geometry, Debug, other FP controls and arbitrary host concurrency remain
+unclosed. Earlier cleanup crashes and ellipse FP instability retain their original
+attribution. The next boundary is native blur orchestration; the experimental flag
+remains opt-in and the full migration stays active.
+
+Cleanup arithmetic captures for the next blur port are saved in
+`artifacts/blur-numeric-reference-x86` and `artifacts/blur-numeric-reference-x64`.
+They include actual linked method disassembly, Gaussian initialization/cache
+helpers, exact observer source, compiler/library/binary provenance and two traces
+matching the maintained reference. They are preparation evidence, not a completed
+Rust blur port; archive the relevant instructions with that implementation.
+
+## Earlier port: owned raster construction (2026-10-19)
 
 Implementation `b2379898` moves the experimental `Rasterizer::Rasterize` operation
 into safe Rust. It consumes the checked scan and widened-outline owners directly,
