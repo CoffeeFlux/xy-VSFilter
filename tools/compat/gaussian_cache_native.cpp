@@ -5,6 +5,7 @@
 #undef main
 #include <process.h>
 #include <cfenv>
+#include <array>
 #include "xy_bitmap.h"
 #ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 class GaussianCoefficients {
