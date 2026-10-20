@@ -46,6 +46,9 @@
 #include "xy_overlay_paint_machine.h"
 #include "xy_clipper_paint_machine.h"
 #include "..\dsutil\DSUtil.h"
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+#include "RustClipper.inl"
+#endif
 
 #if ENABLE_XY_LOG_TEXT_PARSER
 #  define TRACE_PARSER(msg) XY_LOG_TRACE(msg)
@@ -1081,6 +1084,7 @@ CClipper::~CClipper()
 {
 }
 
+#ifndef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
 GrayImage2* CClipper::PaintSimpleClipper()
 {
     GrayImage2* result = NULL;
@@ -1277,8 +1281,18 @@ GrayImage2* CClipper::PaintScrollClipper()
     return result;
 }
 
+#endif
+
 GrayImage2* CClipper::Paint()
 {
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    XyRust::ClipRequest request(m_size.cx,m_size.cy,m_inverse,m_effectType,m_effect.param,m_polygon->m_target_scale_x,m_polygon->m_target_scale_y);
+    if(!request.Id())return NULL;
+    SharedPtrOverlay overlay;CWordPaintMachine::PaintBody(m_polygon,CPoint(0,0),CPoint(0,0),&overlay);
+    XyRust::ClipMaskOwner guard;const uint64_t id=overlay->m_owner.Clip(request.Id());if(!id)return NULL;guard.Take(id);
+    std::unique_ptr<GrayImage2> result(DEBUG_NEW GrayImage2());result->m_owner.Swap(guard);
+    if(!result->RestoreRust(*overlay))return NULL;return result.release();
+#else
     GrayImage2* result = NULL;
     switch(m_effectType)
     {
@@ -1300,6 +1314,7 @@ GrayImage2* CClipper::Paint()
         break;
     }
     return result;
+#endif
 }
 
 void CClipper::SetEffect( const Effect& effect, int effectType )

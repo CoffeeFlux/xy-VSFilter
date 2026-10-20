@@ -1,0 +1,29 @@
+{
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "scope": "Linked original clipper operations and scalar conversion; original preparation provenance remains verbatim. Runtime parity recorded separately.",
+  "helpers": [
+    {
+      "name": "__ftol2_sse",
+      "address": "0x446ae0",
+      "end": "0x446af0",
+      "file": "ftol2_sse.txt"
+    },
+    {
+      "name": "__ftol2",
+      "address": "0x446b70",
+      "end": "0x446b8e",
+      "file": "ftol2.txt"
+    }
+  ],
+  "files": {
+    "capture-source.cpp": "8f4d1201b1c8bf7d0afd380ea9766554f125787e86a38188d8691a94e3b9abbd",
+    "command.json": "f35c7ff94627e190cc3ca6a475e91277d9ddb9428993e477d84e85337585cb25",
+    "ftol2.txt": "7b8d7dde7f00e308e66a49fb686c5b4b911d9ff8a09e223eb008f197cbae797d",
+    "ftol2_sse.txt": "823349fec67a8c4b4ddaf4b992931fa9f34fca95447e9009a62a0023b540b000",
+    "Paint.txt": "43ec32b19103228324f624ca048073ff4da1b3ad5ac101b2621d1b10506fd0ff",
+    "PaintBaseClipper.txt": "c015192545642fe4a8b3f47437d7005eaa3b9484ea45118dbc1b725b72c37acc",
+    "PaintScrollClipper.txt": "585d6df6ffef409a63d5419d44f35b726a2bac3393d48e0748bcbd4becae612c",
+    "PaintSimpleClipper.txt": "4221fe3367338135bb87fbc4636b3c2602e8502d6ccc8358a0d25c4d337fceec",
+    "provenance.json": "15523b10b4a6c70087468a5b93ef2ea9fe512c06255ef3103b582bc0a3c51ce6"
+  }
+}

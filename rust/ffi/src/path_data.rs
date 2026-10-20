@@ -21,6 +21,8 @@ struct Owners {
     rasters: xy_vsfilter_compat::raster::Store,
     coefficients: xy_vsfilter_compat::gaussian_coefficients::Store,
     gaussian: xy_vsfilter_compat::gaussian_cache::Cache,
+    clip_requests: xy_vsfilter_compat::clipper::Store<xy_vsfilter_compat::clipper::Request>,
+    clip_masks: xy_vsfilter_compat::clipper::Store<xy_vsfilter_compat::clipper::Mask>,
     ellipse: xy_vsfilter_compat::ellipse::Cache<crate::windows_ellipse_numeric::Numeric>,
 }
 // SAFETY: all access uses the atomic gate; HRTB closures cannot return borrowed
@@ -47,6 +49,8 @@ impl Boundary {
                 rasters: xy_vsfilter_compat::raster::Store::new(),
                 coefficients: xy_vsfilter_compat::gaussian_coefficients::Store::new(),
                 gaussian: xy_vsfilter_compat::gaussian_cache::Cache::new(),
+                clip_requests: xy_vsfilter_compat::clipper::Store::new(),
+                clip_masks: xy_vsfilter_compat::clipper::Store::new(),
                 ellipse: xy_vsfilter_compat::ellipse::Cache::new(),
             }),
         }
@@ -69,6 +73,168 @@ impl Boundary {
     }
 }
 static PATHS: Boundary = Boundary::new();
+/// # Safety
+/// input lends 48 initialized bytes of scalar configuration; output lends eight
+/// writable bytes. Neither points into private owner storage.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_clip_begin_v1(input: *const u8, output: *mut u8) -> u32 {
+    if input.is_null() || output.is_null() {
+        return 3;
+    }
+    let mut bytes = [0u8; 48];
+    // SAFETY: caller lends the input; its detached copy ends the borrow.
+    unsafe {
+        core::ptr::copy_nonoverlapping(input, bytes.as_mut_ptr(), 48);
+    }
+    let int = |at| i32::from_le_bytes(bytes[at..at + 4].try_into().unwrap());
+    let word = |at| u64::from_le_bytes(bytes[at..at + 8].try_into().unwrap());
+    if !matches!(int(8), 0 | 1) {
+        return 6;
+    }
+    let p = xy_vsfilter_compat::clipper::Parameters {
+        size: [int(0), int(4)],
+        inverse: int(8) != 0,
+        effect: int(12),
+        values: [int(16), int(20), int(24), int(28)],
+        scales: [word(32), word(40)],
+    };
+    let result = PATHS.with_owners(|o| {
+        match xy_vsfilter_compat::clipper::Request::begin(p, &mut crate::windows_clipper::Numeric) {
+            Some(request) => o.clip_requests.insert(request),
+            None => Ok(0),
+        }
+    });
+    match result {
+        Ok(id) => {
+            // SAFETY: detached scalar and caller's writable output.
+            unsafe {
+                core::ptr::copy_nonoverlapping(id.to_le_bytes().as_ptr(), output, 8);
+            }
+            0
+        }
+        Err(e) => e,
+    }
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_clip_request_destroy_v1(id: u64) -> u32 {
+    PATHS
+        .with_owners(|o| o.clip_requests.remove(id))
+        .err()
+        .unwrap_or(0)
+}
+/// # Safety
+/// output lends eight writable bytes. Input IDs refer only to private storage;
+/// zero overlay denotes the native empty overlay. The request remains owned.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_clip_finish_v1(
+    request: u64,
+    overlay: u64,
+    output: *mut u8,
+) -> u32 {
+    if output.is_null() {
+        return 3;
+    }
+    let result = PATHS.with_owners(|o| {
+        let request = *o.clip_requests.get(request)?;
+        let image = if overlay == 0 {
+            None
+        } else {
+            Some(o.rasters.get(overlay)?)
+        };
+        match request.finish(image, &mut crate::windows_clipper::Numeric)? {
+            Some(mask) => o.clip_masks.insert(mask),
+            None => Ok(0),
+        }
+    });
+    match result {
+        Ok(id) => {
+            // SAFETY: detached scalar and caller's writable output.
+            unsafe {
+                core::ptr::copy_nonoverlapping(id.to_le_bytes().as_ptr(), output, 8);
+            }
+            0
+        }
+        Err(e) => e,
+    }
+}
+#[no_mangle]
+pub extern "C" fn xy_vsfilter_clip_mask_destroy_v1(id: u64) -> u32 {
+    PATHS
+        .with_owners(|o| o.clip_masks.remove(id))
+        .err()
+        .unwrap_or(0)
+}
+/// # Safety
+/// output lends eight writable bytes for a new independent mask ID.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_clip_mask_clone_v1(id: u64, output: *mut u8) -> u32 {
+    if output.is_null() {
+        return 3;
+    }
+    let result = PATHS.with_owners(|o| {
+        if id == 0 {
+            return Ok(0);
+        }
+        let mask = o.clip_masks.get(id)?.duplicate()?;
+        o.clip_masks.insert(mask)
+    });
+    match result {
+        Ok(id) => {
+            // SAFETY: detached scalar and caller's writable output.
+            unsafe {
+                core::ptr::copy_nonoverlapping(id.to_le_bytes().as_ptr(), output, 8);
+            }
+            0
+        }
+        Err(e) => e,
+    }
+}
+/// # Safety
+/// output lends eight writable bytes for the complete detached wire length.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_clip_mask_info_v1(id: u64, output: *mut u8) -> u32 {
+    if output.is_null() {
+        return 3;
+    }
+    let result = PATHS.with_owners(|o| o.clip_masks.get(id)?.wire_len());
+    match result {
+        Ok(size) => {
+            // SAFETY: detached scalar and caller's writable output.
+            unsafe {
+                core::ptr::copy_nonoverlapping((size as u64).to_le_bytes().as_ptr(), output, 8);
+            }
+            0
+        }
+        Err(e) => e,
+    }
+}
+/// # Safety
+/// output lends capacity writable bytes, disjoint from private owner storage.
+#[no_mangle]
+pub unsafe extern "C" fn xy_vsfilter_clip_mask_read_v1(
+    id: u64,
+    output: *mut u8,
+    capacity: usize,
+) -> u32 {
+    if output.is_null() || capacity > isize::MAX as usize {
+        return 3;
+    }
+    PATHS
+        .with_owners(|o| {
+            let mask = o.clip_masks.get(id)?;
+            if mask.wire_len()? > capacity {
+                return Err(4);
+            }
+            let bytes = mask.encode()?;
+            // SAFETY: caller's checked capacity and independent initialized packet.
+            unsafe {
+                core::ptr::copy_nonoverlapping(bytes.as_ptr(), output, bytes.len());
+            }
+            Ok(())
+        })
+        .err()
+        .unwrap_or(0)
+}
 #[no_mangle]
 pub extern "C" fn xy_vsfilter_blur_active_v1(be: u32, gaussian: u64) -> u32 {
     u32::from(crate::windows_blur::Numeric::new(be, gaussian, 0, 0).active())
@@ -1726,6 +1892,83 @@ mod tests {
             assert!(out.iter().all(|v| *v == 0xa5));
         }
         let boundary = Boundary::new();
+        // Canonical clip masks outlive their source/request; detached, unaligned
+        // output packets retain guards and failed reads leave outputs untouched.
+        unsafe {
+            let mut input = [0u8; 49];
+            input[13..17].copy_from_slice(&(-1i32).to_le_bytes());
+            let mut id = [0xa5; 10];
+            assert_eq!(
+                xy_vsfilter_clip_begin_v1(core::ptr::null(), id.as_mut_ptr()),
+                3
+            );
+            assert_eq!(id, [0xa5; 10]);
+            assert_eq!(
+                xy_vsfilter_clip_begin_v1(input.as_ptr().add(1), id.as_mut_ptr().add(1)),
+                0
+            );
+            assert_eq!((id[0], id[9]), (0xa5, 0xa5));
+            let request = u64::from_le_bytes(id[1..9].try_into().unwrap());
+            assert_ne!(request, 0);
+            let mut wire = [0u8; 40];
+            for (i, v) in [0i32, 0, 16, 16, 2, 2, 2, 3].into_iter().enumerate() {
+                wire[i * 4..i * 4 + 4].copy_from_slice(&v.to_le_bytes());
+            }
+            wire[32..36].copy_from_slice(&[0, 64, 65, 255]);
+            wire[36..].fill(1);
+            assert_eq!(
+                xy_vsfilter_overlay_import_v1(wire.as_ptr(), 40, id.as_mut_ptr().add(1)),
+                0
+            );
+            let source = u64::from_le_bytes(id[1..9].try_into().unwrap());
+            assert_eq!(
+                xy_vsfilter_clip_finish_v1(request, source, core::ptr::null_mut()),
+                3
+            );
+            assert_eq!(
+                xy_vsfilter_clip_finish_v1(request, source, id.as_mut_ptr().add(1)),
+                0
+            );
+            let mask = u64::from_le_bytes(id[1..9].try_into().unwrap());
+            assert_eq!(
+                xy_vsfilter_clip_mask_clone_v1(mask, id.as_mut_ptr().add(1)),
+                0
+            );
+            let copied = u64::from_le_bytes(id[1..9].try_into().unwrap());
+            assert_ne!(mask, copied);
+            assert_eq!(xy_vsfilter_clip_request_destroy_v1(request), 0);
+            assert_eq!(xy_vsfilter_clip_request_destroy_v1(request), 1);
+            assert_eq!(xy_vsfilter_clip_mask_destroy_v1(mask), 0);
+            assert_eq!(xy_vsfilter_raster_destroy_v1(source), 0);
+            assert_eq!(
+                xy_vsfilter_clip_mask_info_v1(copied, id.as_mut_ptr().add(1)),
+                0
+            );
+            assert_eq!(u64::from_le_bytes(id[1..9].try_into().unwrap()), 32);
+            let mut output = [0xa5; 34];
+            assert_eq!(
+                xy_vsfilter_clip_mask_read_v1(copied, output.as_mut_ptr().add(1), 31),
+                4
+            );
+            assert_eq!(output, [0xa5; 34]);
+            assert_eq!(
+                xy_vsfilter_clip_mask_read_v1(copied, output.as_mut_ptr().add(1), 32),
+                0
+            );
+            assert_eq!((output[0], output[33]), (0xa5, 0xa5));
+            assert_eq!(output[25..33], [0, 64, 65, 255, 1, 1, 1, 1]);
+            assert_eq!(xy_vsfilter_clip_mask_destroy_v1(copied), 0);
+            output.fill(0xa5);
+            assert_eq!(
+                xy_vsfilter_clip_mask_read_v1(copied, output.as_mut_ptr(), 34),
+                1
+            );
+            assert_eq!(
+                xy_vsfilter_clip_finish_v1(request, 0, output.as_mut_ptr()),
+                1
+            );
+            assert_eq!(output, [0xa5; 34]);
+        }
         assert_eq!(boundary.with(|_| boundary.with(|_| Ok(()))), Err(2));
         assert_eq!(boundary.with(|s| s.create(Path::default())), Ok(1));
     }

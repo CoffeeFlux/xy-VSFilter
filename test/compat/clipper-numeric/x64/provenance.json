@@ -1,0 +1,57 @@
+{
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "source_sha256": "8f4d1201b1c8bf7d0afd380ea9766554f125787e86a38188d8691a94e3b9abbd",
+  "library_sha256": {
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\strmbaseR.lib": "e4a3eed835fc6dcfdd7b81e684678cce0aaf032187e1ff2611b7f4146d6a9067",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\dsutilR.lib": "3dfc9f2eb59caef227f3ab723a1f10b672ab44f3efb61a75030d5b0a8730892b",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\subtitlesR.lib": "d6d48a179e28d70404ff870f6c6b640b9c768940065a95039695f7684689e50d",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\subpicR.lib": "23aed7e98c3c33cf31a956900fc720faf5d603edbb27c1f821964e9ccf87c5de",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\basevideofilterR.lib": "738d7f288e53690373e814f00ab7edcc8419e40de46a96f7a888a549ce8ca39e",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\libssfR.lib": "58a84c5e08a8c4c75e60e0f53b2590e6696e7f5938d52cc46b895ad326b4f1d8",
+    "C:\\Users\\Ryan\\Documents\\git\\xy-VSFilter-2\\artifacts\\cleanup-reference\\bin\\lib_17.0\\x64\\unrarR.lib": "3dcfd1c32bc6261c168c841ebeb86c8dd4177f5698730424cbf39628f3e8a56c"
+  },
+  "functions": [
+    {
+      "name": "?PaintSimpleClipper@CClipper@@AEAAPEAUGrayImage2@@XZ",
+      "address": "0x140005840",
+      "end": "0x140005a60",
+      "file": "PaintSimpleClipper.txt",
+      "lines": 164
+    },
+    {
+      "name": "?PaintBaseClipper@CClipper@@AEAAPEAUGrayImage2@@XZ",
+      "address": "0x140005a60",
+      "end": "0x140005e80",
+      "file": "PaintBaseClipper.txt",
+      "lines": 292
+    },
+    {
+      "name": "?PaintScrollClipper@CClipper@@AEAAPEAUGrayImage2@@XZ",
+      "address": "0x140005f00",
+      "end": "0x140006300",
+      "file": "PaintScrollClipper.txt",
+      "lines": 260
+    },
+    {
+      "name": "?Paint@CClipper@@AEAAPEAUGrayImage2@@XZ",
+      "address": "0x140006300",
+      "end": "0x140006470",
+      "file": "Paint.txt",
+      "lines": 118
+    }
+  ],
+  "files": {
+    "build.log": "6526e78a879e0da6dcd5eefd97dc475c685e6c896de9735010fc7a3373654822",
+    "command.json": "7278b9cbf351301dfbd8e0f2f52999a003eb954a708c29b6fdbbf78461f79ebf",
+    "disassembly.txt": "75be6c9227567046807b121227d4f848a617a53af2e42d1bf0f0c270104b6cc9",
+    "Paint.txt": "71efdeab14db17190a1c66c0abed4382d1cc11999121d10ede683443fcc29810",
+    "PaintBaseClipper.txt": "0e74e3dff3eedfa59823d7c5a325a334230dd9f031f0c765e7a8b2c53d0a2b66",
+    "PaintScrollClipper.txt": "064e04766b52b2f9e005e2d31e2221f321aaa81512361eaff17de648b82e10ea",
+    "PaintSimpleClipper.txt": "4ae8668e98fb677801bab7522a3770b6aaf4e75844774534e8c6e2df48237441",
+    "probe.exe": "fa58a20c949dbdfb4cdf53352c8fd48e90585786556e8fa036b10af2976af915",
+    "probe.map": "b4a426309e8df01d15a8890b1a4159634e6ed450bc4cff190d809fb0b06a384a",
+    "probe.obj": "e261ff2ec3281fcb6f74f192d3cb27c4a6c47d2da6b879e93136521a689225db"
+  },
+  "inlining": "PaintBannerClipper is inlined into Paint on both architectures; initial metadata-only assertion expected five functions and failed. No executable was run.",
+  "scope": "Unchanged pinned clipper functions linked for numeric and control-flow inspection. Executable not run; no behavior or parity claim."
+}

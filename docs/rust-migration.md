@@ -7479,3 +7479,12 @@ caches. Preserve the reference capture provenance and historical failures.
 Serialize native links within each architecture: LTCG can write generated
 assembly to shared reference object paths even when observer outputs differ.
 Full host and vendor migration remains active.
+
+## In progress: owned clip masks
+
+The experimental `CClipper::Paint` operation now delegates mask construction,
+inversion, fade traversal and canonical mask ownership to safe Rust, with
+two fixed-local Windows conversion sites. Simple native views retain body
+sharing; downstream compositing still reads detached native views. See
+[the boundary](rust-clipper-boundary.md). Direct clipper comparisons and the
+full Windows renderer/host regressions are pending for this new checkpoint.

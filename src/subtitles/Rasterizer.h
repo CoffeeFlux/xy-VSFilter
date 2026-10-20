@@ -47,6 +47,7 @@ typedef struct {
 #include "xy_rust_path_data.h"
 #include "xy_rust_scan_data.h"
 #include "xy_rust_overlay.h"
+#include "xy_rust_clipper.h"
 #endif
 struct PathData
 {
@@ -231,6 +232,7 @@ private:
     void ImportNative(bool gaussian=false,int padding_rows=0);
     bool RestoreRust();
     friend class Rasterizer;
+    friend class CClipper;
 #endif
 public:
     SharedPtrByte mBody;
@@ -248,6 +250,10 @@ typedef std::shared_ptr<Overlay> SharedPtrOverlay;
 struct GrayImage2
 {
 public:
+#ifdef XY_VSFILTER_RUST_DOCUMENT_EXPERIMENTAL
+    XyRust::ClipMaskOwner m_owner;
+    bool RestoreRust(const Overlay&);
+#endif
     CPoint left_top;
     CSize size;
     int pitch;

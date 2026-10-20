@@ -106,6 +106,20 @@ impl Image {
     pub fn bytes(&self) -> &[u8] {
         &self.bytes
     }
+    pub(crate) fn field_values(&self) -> [i32; 8] {
+        fields(&self.bytes)
+    }
+    pub(crate) fn body(&self) -> Option<(&[u8], Option<&[u8]>)> {
+        let f = fields(&self.bytes);
+        if f[7] & 2 == 0 {
+            return None;
+        }
+        let count = f[6] as usize * f[5] as usize;
+        Some((
+            &self.bytes[32..32 + count],
+            self.known.as_ref().map(|v| &v[..count]),
+        ))
+    }
     pub fn all_known(&self) -> bool {
         self.known.is_none()
     }

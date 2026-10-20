@@ -1,0 +1,10 @@
+  00446B70: 83 3D 78 50 46 00  cmp         dword ptr ds:[00465078h],2
+  00446B77: 7C 15              jl          00446B8E
+  00446B79: 8B CC              mov         ecx,esp
+  00446B7B: 83 C4 F8           add         esp,0FFFFFFF8h
+  00446B7E: 83 E4 F8           and         esp,0FFFFFFF8h
+  00446B81: DD 0C 24           fisttp      qword ptr [esp]
+  00446B84: 8B 04 24           mov         eax,dword ptr [esp]
+  00446B87: 8B 54 24 04        mov         edx,dword ptr [esp+4]
+  00446B8B: 8B E1              mov         esp,ecx
+  00446B8D: C3                 ret

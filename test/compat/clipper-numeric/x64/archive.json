@@ -1,0 +1,14 @@
+{
+  "reference_commit": "67da07cda068088b93e6de300f56cbad15ab6c5d",
+  "scope": "Linked original clipper operations and scalar conversion; original preparation provenance remains verbatim. Runtime parity recorded separately.",
+  "helpers": [],
+  "files": {
+    "capture-source.cpp": "8f4d1201b1c8bf7d0afd380ea9766554f125787e86a38188d8691a94e3b9abbd",
+    "command.json": "7278b9cbf351301dfbd8e0f2f52999a003eb954a708c29b6fdbbf78461f79ebf",
+    "Paint.txt": "71efdeab14db17190a1c66c0abed4382d1cc11999121d10ede683443fcc29810",
+    "PaintBaseClipper.txt": "0e74e3dff3eedfa59823d7c5a325a334230dd9f031f0c765e7a8b2c53d0a2b66",
+    "PaintScrollClipper.txt": "064e04766b52b2f9e005e2d31e2221f321aaa81512361eaff17de648b82e10ea",
+    "PaintSimpleClipper.txt": "4ae8668e98fb677801bab7522a3770b6aaf4e75844774534e8c6e2df48237441",
+    "provenance.json": "5219096b79837159efaa3cb6ffb6f899fd85472f6faa7f2dbad82b681a91ffbe"
+  }
+}

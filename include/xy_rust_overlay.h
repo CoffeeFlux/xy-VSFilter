@@ -16,6 +16,7 @@ public:
     uint64_t BeBlur(float,float,float)const;
     uint64_t Gaussian(double,double,double)const;
     uint64_t Blur(float,double,double,double,bool&)const;
+    uint64_t Clip(uint64_t)const;
     void Offset(int,int);
 };
 }

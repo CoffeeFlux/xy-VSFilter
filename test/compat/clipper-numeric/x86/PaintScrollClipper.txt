@@ -1,0 +1,170 @@
+  00405C40: 3E 3E 83 EC 34     sub         esp,34h
+  00405C45: 53                 push        ebx
+  00405C46: 55                 push        ebp
+  00405C47: 8B E9              mov         ebp,ecx
+  00405C49: 56                 push        esi
+  00405C4A: 57                 push        edi
+  00405C4B: 89 6C 24 28        mov         dword ptr [esp+28h],ebp
+  00405C4F: DB 45 2C           fild        dword ptr [ebp+2Ch]
+  00405C52: DD 5C 24 38        fstp        qword ptr [esp+38h]
+  00405C56: DD 44 24 38        fld         qword ptr [esp+38h]
+  00405C5A: 8B 45 04           mov         eax,dword ptr [ebp+4]
+  00405C5D: DC 48 48           fmul        qword ptr [eax+48h]
+  00405C60: E8 7B 0E 04 00     call        00446AE0
+  00405C65: 8B 75 10           mov         esi,dword ptr [ebp+10h]
+  00405C68: 8B F8              mov         edi,eax
+  00405C6A: 8B 5D 0C           mov         ebx,dword ptr [ebp+0Ch]
+  00405C6D: 8B CD              mov         ecx,ebp
+  00405C6F: 89 7C 24 18        mov         dword ptr [esp+18h],edi
+  00405C73: 89 74 24 34        mov         dword ptr [esp+34h],esi
+  00405C77: E8 44 FC FF FF     call        004058C0
+  00405C7C: 89 44 24 38        mov         dword ptr [esp+38h],eax
+  00405C80: 85 C0              test        eax,eax
+  00405C82: 75 08              jne         00405C8C
+  00405C84: 5F                 pop         edi
+  00405C85: 5E                 pop         esi
+  00405C86: 5D                 pop         ebp
+  00405C87: 5B                 pop         ebx
+  00405C88: 83 C4 34           add         esp,34h
+  00405C8B: C3                 ret
+  00405C8C: 8B 40 14           mov         eax,dword ptr [eax+14h]
+  00405C8F: 89 44 24 1C        mov         dword ptr [esp+1Ch],eax
+  00405C93: B8 00 40 00 00     mov         eax,4000h
+  00405C98: 99                 cdq
+  00405C99: F7 FF              idiv        eax,edi
+  00405C9B: DB 45 1C           fild        dword ptr [ebp+1Ch]
+  00405C9E: 89 44 24 14        mov         dword ptr [esp+14h],eax
+  00405CA2: 33 FF              xor         edi,edi
+  00405CA4: DD 5C 24 20        fstp        qword ptr [esp+20h]
+  00405CA8: DD 44 24 20        fld         qword ptr [esp+20h]
+  00405CAC: 8B 4D 04           mov         ecx,dword ptr [ebp+4]
+  00405CAF: DC 49 48           fmul        qword ptr [ecx+48h]
+  00405CB2: E8 29 0E 04 00     call        00446AE0
+  00405CB7: 8B 6C 24 18        mov         ebp,dword ptr [esp+18h]
+  00405CBB: 8B C8              mov         ecx,eax
+  00405CBD: C1 F9 03           sar         ecx,3
+  00405CC0: 03 E9              add         ebp,ecx
+  00405CC2: 85 C9              test        ecx,ecx
+  00405CC4: 79 09              jns         00405CCF
+  00405CC6: 8B F9              mov         edi,ecx
+  00405CC8: 0F AF 7C 24 14     imul        edi,dword ptr [esp+14h]
+  00405CCD: F7 DF              neg         edi
+  00405CCF: 3E 3E 3E 33 C0     xor         eax,eax
+  00405CD4: 85 C9              test        ecx,ecx
+  00405CD6: 0F 98 C0           sets        al
+  00405CD9: 48                 dec         eax
+  00405CDA: 23 C1              and         eax,ecx
+  00405CDC: 89 44 24 20        mov         dword ptr [esp+20h],eax
+  00405CE0: 3B EE              cmp         ebp,esi
+  00405CE2: 7E 02              jle         00405CE6
+  00405CE4: 8B EE              mov         ebp,esi
+  00405CE6: 3B C6              cmp         eax,esi
+  00405CE8: 7D 48              jge         00405D32
+  00405CEA: 8B 4C 24 1C        mov         ecx,dword ptr [esp+1Ch]
+  00405CEE: 0F AF C3           imul        eax,ebx
+  00405CF1: 50                 push        eax
+  00405CF2: 6A 00              push        0
+  00405CF4: 51                 push        ecx
+  00405CF5: 8D 34 08           lea         esi,[eax+ecx]
+  00405CF8: E8 A3 B1 02 00     call        00430EA0
+  00405CFD: 8B 44 24 2C        mov         eax,dword ptr [esp+2Ch]
+  00405D01: 83 C4 0C           add         esp,0Ch
+  00405D04: 3B C5              cmp         eax,ebp
+  00405D06: 7D 2A              jge         00405D32
+  00405D08: 2B E8              sub         ebp,eax
+  00405D0A: 8B 44 24 14        mov         eax,dword ptr [esp+14h]
+  00405D0E: 8B FF              mov         edi,edi
+  00405D10: 85 DB              test        ebx,ebx
+  00405D12: 7E 17              jle         00405D2B
+  00405D14: 8B CB              mov         ecx,ebx
+  00405D16: 0F B6 06           movzx       eax,byte ptr [esi]
+  00405D19: 0F AF C7           imul        eax,edi
+  00405D1C: C1 F8 0E           sar         eax,0Eh
+  00405D1F: 88 06              mov         byte ptr [esi],al
+  00405D21: 46                 inc         esi
+  00405D22: 83 E9 01           sub         ecx,1
+  00405D25: 75 EF              jne         00405D16
+  00405D27: 8B 44 24 14        mov         eax,dword ptr [esp+14h]
+  00405D2B: 03 F8              add         edi,eax
+  00405D2D: 83 ED 01           sub         ebp,1
+  00405D30: 75 DE              jne         00405D10
+  00405D32: 3E 3E 8B 7C 24 18  mov         edi,dword ptr ds:[esp+18h]
+  00405D38: B8 00 C0 FF FF     mov         eax,0FFFFC000h
+  00405D3D: 99                 cdq
+  00405D3E: BE 00 40 00 00     mov         esi,4000h
+  00405D43: F7 FF              idiv        eax,edi
+  00405D45: 8B 4C 24 28        mov         ecx,dword ptr [esp+28h]
+  00405D49: 8B E8              mov         ebp,eax
+  00405D4B: 89 6C 24 18        mov         dword ptr [esp+18h],ebp
+  00405D4F: DB 41 20           fild        dword ptr [ecx+20h]
+  00405D52: DD 5C 24 28        fstp        qword ptr [esp+28h]
+  00405D56: DD 44 24 28        fld         qword ptr [esp+28h]
+  00405D5A: 8B 49 04           mov         ecx,dword ptr [ecx+4]
+  00405D5D: DC 49 48           fmul        qword ptr [ecx+48h]
+  00405D60: E8 7B 0D 04 00     call        00446AE0
+  00405D65: C1 F8 03           sar         eax,3
+  00405D68: 8B D0              mov         edx,eax
+  00405D6A: 2B D7              sub         edx,edi
+  00405D6C: 79 0F              jns         00405D7D
+  00405D6E: 8B F7              mov         esi,edi
+  00405D70: 2B F0              sub         esi,eax
+  00405D72: 0F AF F5           imul        esi,ebp
+  00405D75: 81 C6 00 40 00 00  add         esi,4000h
+  00405D7B: 33 D2              xor         edx,edx
+  00405D7D: 8B 6C 24 34        mov         ebp,dword ptr [esp+34h]
+  00405D81: 3B C5              cmp         eax,ebp
+  00405D83: 7E 02              jle         00405D87
+  00405D85: 8B C5              mov         eax,ebp
+  00405D87: 3B D5              cmp         edx,ebp
+  00405D89: 7D 5D              jge         00405DE8
+  00405D8B: 8B CA              mov         ecx,edx
+  00405D8D: 0F AF CB           imul        ecx,ebx
+  00405D90: 03 4C 24 1C        add         ecx,dword ptr [esp+1Ch]
+  00405D94: 3B D0              cmp         edx,eax
+  00405D96: 7D 3C              jge         00405DD4
+  00405D98: 8B F8              mov         edi,eax
+  00405D9A: 89 44 24 34        mov         dword ptr [esp+34h],eax
+  00405D9E: 8B 44 24 18        mov         eax,dword ptr [esp+18h]
+  00405DA2: 2B FA              sub         edi,edx
+  00405DA4: 85 DB              test        ebx,ebx
+  00405DA6: 7E 21              jle         00405DC9
+  00405DA8: 8B D3              mov         edx,ebx
+  00405DAA: 8D 9B 00 00 00 00  lea         ebx,[ebx+00000000h]
+  00405DB0: 3E 3E 3E 3E 0F B6  movzx       eax,byte ptr ds:[ecx]
+  00405DB7: 0F AF C6           imul        eax,esi
+  00405DBA: C1 F8 0E           sar         eax,0Eh
+  00405DBD: 88 01              mov         byte ptr [ecx],al
+  00405DBF: 41                 inc         ecx
+  00405DC0: 83 EA 01           sub         edx,1
+  00405DC3: 75 EB              jne         00405DB0
+  00405DC5: 8B 44 24 18        mov         eax,dword ptr [esp+18h]
+  00405DC9: 03 F0              add         esi,eax
+  00405DCB: 83 EF 01           sub         edi,1
+  00405DCE: 75 D4              jne         00405DA4
+  00405DD0: 8B 54 24 34        mov         edx,dword ptr [esp+34h]
+  00405DD4: 3E 3E 3E 2B EA     sub         ebp,edx
+  00405DD9: 0F AF EB           imul        ebp,ebx
+  00405DDC: 55                 push        ebp
+  00405DDD: 6A 00              push        0
+  00405DDF: 51                 push        ecx
+  00405DE0: E8 BB B0 02 00     call        00430EA0
+  00405DE5: 83 C4 0C           add         esp,0Ch
+  00405DE8: 8B 44 24 38        mov         eax,dword ptr [esp+38h]
+  00405DEC: 5F                 pop         edi
+  00405DED: 5E                 pop         esi
+  00405DEE: 5D                 pop         ebp
+  00405DEF: 5B                 pop         ebx
+  00405DF0: 83 C4 34           add         esp,34h
+  00405DF3: C3                 ret
+  00405DF4: CC                 int         3
+  00405DF5: CC                 int         3
+  00405DF6: CC                 int         3
+  00405DF7: CC                 int         3
+  00405DF8: CC                 int         3
+  00405DF9: CC                 int         3
+  00405DFA: CC                 int         3
+  00405DFB: CC                 int         3
+  00405DFC: CC                 int         3
+  00405DFD: CC                 int         3
+  00405DFE: CC                 int         3
+  00405DFF: CC                 int         3
