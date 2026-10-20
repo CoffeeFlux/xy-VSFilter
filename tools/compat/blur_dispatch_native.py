@@ -94,7 +94,7 @@ def main():
             command=["cl","/nologo","/Bv","/O2","/Oi","/Ob2","/fp:precise","/EHsc","/std:c++14","/MT","/Gy","/showIncludes"]
             if bits==32:command.append("/arch:IA32")
             command += ["/D"+define for define in defines]+["/I"+str(path) for path in includes]
-            command += [str(SOURCE),"/Fo:"+str(work/"probe.obj"),"/Fe:"+str(exe),"/link","/SUBSYSTEM:CONSOLE","/OPT:REF","/OPT:ICF","/VERBOSE:LIB","/LIBPATH:"+str(root/"lib")]
+            command += [str(SOURCE),"/Fo:"+str(work/"probe.obj"),"/Fe:"+str(exe),"/link","/SUBSYSTEM:CONSOLE","/MANIFEST:EMBED","/MANIFESTUAC:level='asInvoker' uiAccess='false'","/OPT:REF","/OPT:ICF","/VERBOSE:LIB","/LIBPATH:"+str(root/"lib")]
             command += list(map(str,libraries))+list(SYSTEM_LIBRARIES)
             build={"library_sha256":{str(path):sha(path.read_bytes()) for path in libraries}}
             report["builds"][label]=build;save()
