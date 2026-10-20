@@ -11,7 +11,7 @@ from document_native_lifecycle import ROOT, PIN, LIBRARIES, SYSTEM_LIBRARIES, fi
 
 SOURCE = ROOT / "tools/compat/clipper_native.cpp"
 CASES = 5152
-INPUTS = 2520
+INPUTS = 2520 + 56  # finite combinations plus raw-scale early-return inputs
 
 def validate(data,bits):
     rows=data.splitlines()
