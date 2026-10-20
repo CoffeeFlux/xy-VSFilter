@@ -1,0 +1,57 @@
+{
+  "x86-quarter": {
+    "address": "0x449340",
+    "bytes": "000000000000d03f",
+    "value": 0.25
+  },
+  "x86-half": {
+    "address": "0x449350",
+    "bytes": "000000000000e03f",
+    "value": 0.5
+  },
+  "x86-one": {
+    "address": "0x449358",
+    "bytes": "000000000000f03f",
+    "value": 1.0
+  },
+  "x86-three": {
+    "address": "0x449360",
+    "bytes": "0000000000000840",
+    "value": 3.0
+  },
+  "x86-volume": {
+    "address": "0x449380",
+    "bytes": "0000000000007040",
+    "value": 256.0
+  },
+  "x64-quarter": {
+    "address": "0x140054370",
+    "bytes": "0000803e",
+    "value": 0.25
+  },
+  "x64-half": {
+    "address": "0x140054374",
+    "bytes": "0000003f",
+    "value": 0.5
+  },
+  "x64-one": {
+    "address": "0x140054378",
+    "bytes": "0000803f",
+    "value": 1.0
+  },
+  "x64-double-half": {
+    "address": "0x140054390",
+    "bytes": "000000000000e03f",
+    "value": 0.5
+  },
+  "x64-three": {
+    "address": "0x1400543c0",
+    "bytes": "00004040",
+    "value": 3.0
+  },
+  "x64-volume": {
+    "address": "0x1400543c4",
+    "bytes": "00008043",
+    "value": 256.0
+  }
+}

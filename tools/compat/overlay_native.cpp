@@ -43,7 +43,8 @@ int main(){try{
                     const float sx=scales[settings][0],sy=scales[settings][1];const size_t before_memory=g_xy_malloc_used_size;reset();if(settings%2)std::feraiseexcept(FE_DIVBYZERO);Status before=status();bool result=true;
                     if(stage==1)result=Rasterizer::BeBlur(*raster,strengths[settings],sx,sy,output);
                     if(stage==2)result=Rasterizer::GaussianBlur(*raster,gaussian[settings],sx,sy,output);
-                    if(stage==3)result=Rasterizer::Blur(*raster,strengths[settings],gaussian[settings],sx,sy,output);
+                    // Zero is tested directly in BeBlur; combined Blur requires an active effect.
+                    if(stage==3)result=Rasterizer::Blur(*raster,settings==8?0.25f:strengths[settings],gaussian[settings],sx,sy,output);
                     Status after=status();check(result);auto current=stage?output:raster;const char* name=stage==0?"raster":stage==1?"be":stage==2?"gaussian":"combined";
                     show(*current,index++,name,4,stage!=2,before,after,static_cast<long long>(g_xy_malloc_used_size)-before_memory);
                     const int old_x=current->mOffsetX,old_y=current->mOffsetY;
