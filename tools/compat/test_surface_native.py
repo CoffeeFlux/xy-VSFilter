@@ -19,7 +19,7 @@ class SurfaceObserverTests(unittest.TestCase):
 
     def test_noncanonical_delta_bounds_missing_rows_and_difference_are_rejected(self):
         data=trace()
-        for corrupt in [data.replace(b'delta=0:01',b'delta=0:00',1),data.replace(b'delta=0:01',b'delta=3072:01',1),data.replace(b'delta=0:01',b'delta=0:01,0:02',1),data.replace(b'stage=1',b'stage=0',1)]:
+        for corrupt in [data.replace(b'delta=0:01',b'delta=0:00',1),data.replace(b'delta=0:01',b'delta=4096:01',1),data.replace(b'delta=0:01',b'delta=0:01,0:02',1),data.replace(b'stage=1',b'stage=0',1)]:
             with self.assertRaises(ValueError):observer.validate(corrupt,64)
         with self.assertRaises(ValueError):observer.compare([data,data,data,data.replace(b'delta=0:01',b'delta=0:02',1)],64)
 

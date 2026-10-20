@@ -37,7 +37,7 @@ becomes readable only after a prior row writes it.
 
 Direct Windows comparisons are pending at this implementation checkpoint. The
 observer covers 11,916 cases per architecture, twice per role, with two operations
-per case. Lossless deltas compare every byte in initialized 3,072-byte backing
+per case. Lossless deltas compare every byte in initialized 4,096-byte backing
 allocations, including guard regions, plus native allocation and FP/error state.
 Reference disassembly and provenance are archived under
 `test/compat/surface-reference`; inspection captures alone establish no parity.
@@ -48,3 +48,11 @@ The initial observer at `29c9e736` failed compilation on both architectures
 because its std::array header was missing. No probe executable ran. The header
 correction changes only the observer; production code is unchanged. Failed
 reports remain under `artifacts/surface-owned-initial-{x86,x64}`.
+
+The first executable observer at `474275d6` crashed in the reference on both
+architectures. Its 3,072-byte fixture was too small for unclipped solid fills
+at right/bottom positions combined with a cross-row alias (up to byte 3,212).
+These are rejected comparisons, preserved under `surface-owned-final-*`.
+The corrected observer uses 4,096 bytes and checks conservative source/output
+footprints before invoking native code. This fixes the harness, not production;
+no memory-corruption outcome is accepted as compatible.

@@ -8,7 +8,7 @@
 #include <cfenv>
 #include <process.h>
 static void exercise(unsigned index,unsigned kind,int w,int h,unsigned direction,unsigned position,unsigned alias,unsigned sticky){
-    alignas(16) std::array<BYTE,3072> data;for(size_t i=0;i<data.size();++i)data[i]=BYTE(i*37+index*13+(i>>3));const auto initial=data;
+    alignas(16) std::array<BYTE,4096> data;for(size_t i=0;i<data.size();++i)data[i]=BYTE(i*37+index*13+(i>>3));const auto initial=data;
     const bool planar=kind==1||kind==5;const int dw=w+2,dh=4;
     const int stride=((dw+15)&~15)*(planar?1:4),pitch=direction==0?stride:direction==1?-stride:0;
     const int bump=pitch<0?((planar?4:1)*dh-1)*stride:0;
@@ -18,6 +18,16 @@ static void exercise(unsigned index,unsigned kind,int w,int h,unsigned direction
     if(alias==3)destination=source-(planar?1:4);
     if(alias==4)destination=source+stride;
     POINT pos={0,0};if(position==1){pos.x=-1;pos.y=-1;}if(position==2){pos.x=dw-1;pos.y=dh-1;}
+    // Check a conservative footprint before forming pointers or calling native code.
+    // Solid fills are deliberately unclipped; right/bottom positions can extend
+    // beyond spd dimensions while still remaining within this backing allocation.
+    const auto bounds=[&](long long at,long long bytes){check(at>=0&&bytes>=0&&at+bytes<=static_cast<long long>(data.size()));};
+    const int pixel=planar?1:4;
+    for(int plane=0;plane<(planar?4:1);++plane)for(int row=0;row<h;++row){
+        bounds(static_cast<long long>(source)+plane*pitch*dh+row*pitch,w*pixel);
+        bounds(static_cast<long long>(destination)+plane*pitch*dh+row*pitch,w*pixel);
+        bounds(static_cast<long long>(destination)+plane*pitch*dh+(row+pos.y)*pitch+pos.x*pixel,w*pixel);
+    }
     SIZE size={w,h};SubPicDesc spd;spd.type=planar?MSP_AYUV_PLANAR:MSP_RGB32;spd.w=dw;spd.h=dh;spd.bpp=planar?8:(index%3==0?24:32);spd.pitch=pitch;spd.bits=data.data()+destination;
     XyPlannerFormatExtra planes;for(int i=0;i<4;++i)planes.plans[i]=planar?data.data()+source+i*pitch*dh:nullptr;
     const unsigned alphas[]={0,1,127,128,255};const DWORD color=(alphas[index%5]<<24)|((index*0x91e10da5U)&0xffffff);

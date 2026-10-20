@@ -14,7 +14,7 @@ DRAW_INPUTS = 6 * 11 * 2 * 3 * 3 * 5
 EMPTY_INPUTS = 6 * 3
 CASES = (DRAW_INPUTS + EMPTY_INPUTS) * 2
 INPUTS = DRAW_INPUTS + EMPTY_INPUTS
-BUFFER = 3072
+BUFFER = 4096
 
 
 def validate(data,bits):
@@ -71,7 +71,7 @@ def main():
                   environment={key:os.environ.get(key) for key in ("VCToolsVersion","WindowsSDKVersion","VSCMD_ARG_TGT_ARCH")},
                   limits=["11916 cases (5940 nonempty matrix inputs plus 18 empty inputs, each with two sticky states), two operations per case, twice per role",
                           "Packed/planar alpha blits, packed copies, external alpha flips and packed/planar solid fills. Eleven widths around vector thresholds, positive/negative/zero pitches, clipping, noncanonical packed bpp offsets, exact/forward/backward/cross-row aliases",
-                          "Lossless canonical deltas cover every byte of fully initialized 3072-byte backing allocations, including all guard regions. FP/errno/LastError and native allocation deltas compare exactly",
+                          "Lossless canonical deltas cover every byte of fully initialized 4096-byte backing allocations, including all guard regions. FP/errno/LastError and native allocation deltas compare exactly",
                           "Negative memcpy counts, overflowing geometry, metadata aliases, invalid pointers, uninitialized initial-read bytes, allocation failure and arbitrary concurrency remain unresolved. Uninitialized write-then-read destinations have a separate FFI ownership test"])
 
 
