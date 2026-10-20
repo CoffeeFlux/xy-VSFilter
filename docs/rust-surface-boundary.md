@@ -43,3 +43,8 @@ Reference disassembly and provenance are archived under
 `test/compat/surface-reference`; inspection captures alone establish no parity.
 Experimental switches remain opt-in. Frame/creator state, color conversion,
 caches, full hosts and vendors remain part of the whole-library migration.
+
+The initial observer at `29c9e736` failed compilation on both architectures
+because its std::array header was missing. No probe executable ran. The header
+correction changes only the observer; production code is unchanged. Failed
+reports remain under `artifacts/surface-owned-initial-{x86,x64}`.

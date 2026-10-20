@@ -4,6 +4,7 @@
 #include "renderer_dc_native.cpp"
 #undef main
 #include "xy_bitmap.h"
+#include <array>
 #include <cfenv>
 #include <process.h>
 static void exercise(unsigned index,unsigned kind,int w,int h,unsigned direction,unsigned position,unsigned alias,unsigned sticky){
